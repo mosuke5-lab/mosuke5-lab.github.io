@@ -8,7 +8,7 @@
     <meta name="description" content="mosuke5&#39;s blog">
     <link rel="canonical" href="https://blog.mosuke.tech/categories/xinetd/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Xinetd &middot; Goldstine研究所">
@@ -74,7 +74,16 @@
                     </header>
 
                     <div class="post-description">
-                        使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。 そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させ�...
+                        使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。
+そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させることが可能らしい。
+ということで、そのスーパーサーバとやらを実際に触ってみた。
+スーパーサーバというとinetdとxinetdがあるらしいが、
+xinetdはinetdの拡張版で、アクセス制御などの機能を搭載しているとのこと。
+今回はxinetdを設定してみる。
+1. 事前準備 【環境】
+Vagrantで構築したCentOS 6.5
+(仮想環境のIPアドレスは192.168.33.10)
+まずは...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/01/02/013658/">全文を読む</a>

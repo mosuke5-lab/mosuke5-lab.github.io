@@ -6,9 +6,9 @@
     <title>データベース &middot; Goldstine研究所</title>
 
     <meta name="description" content="mosuke5&#39;s blog">
-    <link rel="canonical" href="https://blog.mosuke.tech/categories/e38387e383bce382bfe38399e383bce382b9/">
+    <link rel="canonical" href="https://blog.mosuke.tech/categories/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="データベース &middot; Goldstine研究所">
@@ -74,7 +74,11 @@
                     </header>
 
                     <div class="post-description">
-                        ある実装についてどのように実装するか悩んだ。 その悩んだ過程や実装案をメモする。似たようなケースの実装案として参考になればと思う。 状況 ある申請に対して、検査Aと検査Bを行い、その検査状態・検査日時を管理�...
+                        ある実装についてどのように実装するか悩んだ。
+その悩んだ過程や実装案をメモする。似たようなケースの実装案として参考になればと思う。
+状況 ある申請に対して、検査Aと検査Bを行い、その検査状態・検査日時を管理・閲覧するシステムがあるとする。 申請のテーブルは下記とする。
+ id: int name: varchar(20) # どうでもいいので無視していい check_a: datetime # 検査すると実施した日時がはいる check_b: datetime # 検査すると実施した日時がはいる  UIとして下記のように表示したいと考えている。
+   番号 状態 名前 検査A 検査B     ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2016/03/16/175431/">全文を読む</a>
@@ -100,7 +104,11 @@
                     </header>
 
                     <div class="post-description">
-                        前回の「【SQLテーブル結合】INNER JOIN とWHERE結合の違いについて」の続き。 やはりFROM句の後にテーブルを複数書いてWHEREで結合させるのはナンセンスだと思う。 例えば、内部結合に加え、外部結合もある場合を考える。 WHERE...
+                        前回の「【SQLテーブル結合】INNER JOIN とWHERE結合の違いについて」の続き。
+やはりFROM句の後にテーブルを複数書いてWHEREで結合させるのはナンセンスだと思う。
+例えば、内部結合に加え、外部結合もある場合を考える。
+WHERE型
+SELECT * FROM table1, table2 #←結合させたいもの LEFT OUTER JOIN ( ・ ・ &amp;lt;副問い合わせとか長いSQLが入ると想定&amp;gt; ・ ・ ) AS sub ON table1.id=sub.id AND table2.id=sub.id WHERE table1.id=table2.id #←結合...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/02/28/233025/">全文を読む</a>

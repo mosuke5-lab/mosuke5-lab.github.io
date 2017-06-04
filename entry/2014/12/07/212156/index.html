@@ -8,7 +8,7 @@
     <meta name="description" content=" VPS1台でインフラ勉強シリーズでVPN構築を行ったのでそのメモ。       1. 実施したこと      VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2014/12/07/212156/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="【VPS1台でインフラ勉強】SoftEtherを使ってVPN構築 &middot; Goldstine研究所">
@@ -190,7 +190,6 @@ vpnserver       0:off   1:off   2:on    3:on    4:on    5:on    6:off
 
 ##起動
 $ sudo /etc/init.d/vpnserver start  
-
 </code></pre>
 
 <p></div>
@@ -201,7 +200,7 @@ $ sudo /etc/init.d/vpnserver start
     <h4>(1)管理者パスワードの設定</h4>
 &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</p>
 
-<h1 id="pre-class-code-data-lang-data-unlink-vpnserverへ接続:c1b6613662ee4f2f8321c8715a84defe"><pre class="code" data-lang="" data-unlink> ## vpnserverへ接続</h1>
+<h1 id="pre-class-code-data-lang-data-unlink-vpnserverへ接続"><pre class="code" data-lang="" data-unlink> ## vpnserverへ接続</h1>
 
 <pre><code>## vpnserverへ接続
 &gt;&gt;&gt;&gt;&gt;&gt;&gt; 4f3b2c72e32161441359f6d2116c410a27a8faaf
@@ -215,87 +214,87 @@ VPN Server&gt; ServerPasswordSet
 <div class="section">
     <h4>(2)仮想HUBの作成</h4>
     <p>デフォルトで「default」という仮想がHUBがあるのでそれで構築。<br>
-自分の仮想HUBを作りたければHubCreateでつくれる。</p>
-```
-VPN Server&gt; HubCreate</p>
+自分の仮想HUBを作りたければHubCreateでつくれる。</p></p>
 
-<pre><code>&lt;p&gt;※HELPコマンドがだいぶ使えるので使おう。日本語で書かれているのでわかりやすいです。&lt;/p&gt;
-
+<pre><code>VPN Server&gt; HubCreate 
 </code></pre>
 
-<p>VPN Server&gt;HELP
+<p>※HELPコマンドがだいぶ使えるので使おう。日本語で書かれているのでわかりやすいです。</p>
+
+<pre><code>VPN Server&gt;HELP
 下記の 205 個のコマンドが使用できます:
  About                      - バージョン情報の表示
  AcAdd                      - 接続元 IP 制限リストにルールを追加 (IPv4)
  AcAdd6                     - 接続元 IP 制限リストにルールを追加 (IPv6)
  AcDel                      - 接続元 IP 制限リスト内のルールの削除
  AcList                     - 接続元 IP 制限リストのルール一覧の取得
-(&hellip;以下略)
-<code>
-&lt;/div&gt;
-&lt;div class=&quot;section&quot;&gt;
-    &lt;h4&gt;(3) &lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/IPsec&quot;&gt;IPsec&lt;/a&gt; &lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/VPN&quot;&gt;VPN&lt;/a&gt; サーバー機能の有効化&lt;/h4&gt;
-    &lt;p&gt;&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/VPN&quot;&gt;VPN&lt;/a&gt;のトンネリングをするにあたって事前共有鍵が必要なので作成する必要がある。&lt;/p&gt;
-</code>
-VPN Server&gt;IPsecEnable
+(...以下略) 
+</code></pre>
+
+<p></div>
+<div class="section">
+    <h4>(3) <a class="keyword" href="http://d.hatena.ne.jp/keyword/IPsec">IPsec</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a> サーバー機能の有効化</h4>
+    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>のトンネリングをするにあたって事前共有鍵が必要なので作成する必要がある。</p></p>
+
+<pre><code>VPN Server&gt;IPsecEnable
     IPsecEnable コマンド - IPsec VPN サーバー機能の有効化 / 無効化
     L2TP over IPsec サーバー機能を有効 (yes / no): yes
     Raw L2TP サーバー機能を有効 (yes / no): yes
     EtherIP / L2TPv3 over IPsec サーバー機能を有効 (yes / no): yes
     IPsec 事前共有鍵の文字列 (9 文字以下を推奨): *******
-    VPN 接続時に仮想 HUB 名が省略された場合のデフォルト仮想 HUB 名: Default</p>
-
-<pre><code>&lt;/div&gt;
-&lt;div class=&quot;section&quot;&gt;
-    &lt;h4&gt;(4) グループとユーザの作成&lt;/h4&gt;
-    &lt;p&gt;ユーザを作成するにはグループの作成が必要なので先にグループを作る。&lt;br&gt;
-また、ユーザを作ったでではパスワードが設定されないので忘れずにパスワード設定。&lt;/p&gt;
+    VPN 接続時に仮想 HUB 名が省略された場合のデフォルト仮想 HUB 名: Default 
 </code></pre>
 
-<p>VPN Server&gt;Hub Default
+<p></div>
+<div class="section">
+    <h4>(4) グループとユーザの作成</h4>
+    <p>ユーザを作成するにはグループの作成が必要なので先にグループを作る。<br>
+また、ユーザを作ったでではパスワードが設定されないので忘れずにパスワード設定。</p></p>
+
+<pre><code>VPN Server&gt;Hub Default
 VPN Server/DEFAULT&gt;GroupCreate
     GroupCreate コマンド - グループの作成
     グループ名: mygroup
     グループの本名: mygroup
-    グループの説明: mygroup</p>
+    グループの説明: mygroup
 
-<p>VPN Server/DEFAULT&gt;UserCreate
+VPN Server/DEFAULT&gt;UserCreate
     UserCreate コマンド - ユーザーの作成
     ユーザー名: myuser
     参加するグループ名: mygroup
     ユーザーの本名: myuser
     ユーザーの説明: myuser
-    コマンドは正常に終了しました。</p>
+    コマンドは正常に終了しました。
 
-<h2 id="ユーザを作っただけではパスワードが設定されないので:c1b6613662ee4f2f8321c8715a84defe">ユーザを作っただけではパスワードが設定されないので</h2>
-
-<p>VPN Server/DEFAULT&gt; UserPasswordSet
-<code>
-&lt;/div&gt;
-&lt;div class=&quot;section&quot;&gt;
-    &lt;h4&gt;(5) ローカルブリッジの設定&lt;/h4&gt;
-    &lt;p&gt;次にローカルブリッジの設定をする。&lt;br&gt;
-ローカルブリッジは&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/VPN&quot;&gt;VPN&lt;/a&gt;の仮想ネットワークと、LAN の実ネットワーク（ここでは&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/VPS&quot;&gt;VPS&lt;/a&gt;ホストサーバと仮想Webサーバ間のローカルネットワーク）をつなげる設定です。&lt;br&gt;
-ローカルブリッジを行うLANカードを指定する必要があるが、ここでは仮想の「vboxnet0」を使用します。&lt;/p&gt;
-</code>
-VPN Server/DEFAULT&gt;BridgeCreate
-    BridgeCreate コマンド - ローカルブリッジ接続の作成
-    ブリッジする仮想 HUB 名: Default
-    ブリッジ先のデバイス名: vboxnet0</p>
-
-<pre><code>&lt;/div&gt;
-&lt;div class=&quot;section&quot;&gt;
-    &lt;h4&gt;(6) &lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/DHCP&quot;&gt;DHCP&lt;/a&gt;の設定&lt;/h4&gt;
-    &lt;p&gt;&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/VPN&quot;&gt;VPN&lt;/a&gt;クライアント側に割り当てる&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&quot;&gt;IPアドレス&lt;/a&gt;のレンジを決めてあげます。&lt;br&gt;
-今回は最小限構成で実現するため、ローカルの&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&quot;&gt;IPアドレス&lt;/a&gt;は同一セグメントとしました。&lt;br&gt;
-192.168.33.0/24を利用セグメントとした。&lt;br&gt;
-また、サーバ側に割り当てているIPとバッティングしないように192.168.33.20以降を&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/DHCP&quot;&gt;DHCP&lt;/a&gt;のIPレンジとした。&lt;/p&gt;
+## ユーザを作っただけではパスワードが設定されないので
+VPN Server/DEFAULT&gt; UserPasswordSet 
 </code></pre>
 
-<p>##まずは有効化。これをやらないと「PPPサーバーとの接続が確立ができません」ってなってハマります。
-VPN Server/example&gt; SecureNatEnable</p>
+<p></div>
+<div class="section">
+    <h4>(5) ローカルブリッジの設定</h4>
+    <p>次にローカルブリッジの設定をする。<br>
+ローカルブリッジは<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>の仮想ネットワークと、LAN の実ネットワーク（ここでは<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>ホストサーバと仮想Webサーバ間のローカルネットワーク）をつなげる設定です。<br>
+ローカルブリッジを行うLANカードを指定する必要があるが、ここでは仮想の「vboxnet0」を使用します。</p></p>
 
-<p>VPN Server/DEFAULT&gt;DhcpSet
+<pre><code>VPN Server/DEFAULT&gt;BridgeCreate
+    BridgeCreate コマンド - ローカルブリッジ接続の作成
+    ブリッジする仮想 HUB 名: Default
+    ブリッジ先のデバイス名: vboxnet0 
+</code></pre>
+
+<p></div>
+<div class="section">
+    <h4>(6) <a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>の設定</h4>
+    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>クライアント側に割り当てる<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>のレンジを決めてあげます。<br>
+今回は最小限構成で実現するため、ローカルの<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>は同一セグメントとしました。<br>
+192.168.33.0/24を利用セグメントとした。<br>
+また、サーバ側に割り当てているIPとバッティングしないように192.168.33.20以降を<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>のIPレンジとした。</p></p>
+
+<pre><code>##まずは有効化。これをやらないと「PPPサーバーとの接続が確立ができません」ってなってハマります。
+VPN Server/example&gt; SecureNatEnable
+
+VPN Server/DEFAULT&gt;DhcpSet
     DhcpSet コマンド - SecureNAT 機能の仮想 DHCP サーバー機能の設定の変更
     配布するアドレス帯の開始点: 192.168.33.20
     配布するアドレス帯の終了点: 192.168.33.50
@@ -305,9 +304,10 @@ VPN Server/example&gt; SecureNatEnable</p>
     DNS サーバー 1 (未設定可):
     DNS サーバー 2 (未設定可):
     ドメイン名:
-    ログの保存 (yes / no): yes
-```
-</div>
+    ログの保存 (yes / no): yes 
+</code></pre>
+
+<p></div>
 </div>
 <div class="section">
     <h2>5. <a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>接続試験</h2>

@@ -6,8 +6,9 @@
     <title>D3.Js &middot; Goldstine研究所</title>
 
     <meta name="description" content="mosuke5&#39;s blog">
+    <link rel="canonical" href="https://blog.mosuke.tech/categories/d3/index.js/">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="D3.Js &middot; Goldstine研究所">
@@ -84,14 +85,10 @@ value : int
 ※また、下記ではSinatra上で行っているが、他の言語でも同様のことがいえる。
 (1) 簡単なAPIのようなものを利用する 先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、
 これが一番複雑にならずに良いと思ったということ。
-Sinatra側で/csvにアクセスするとcsvファイルをダウンロードできるようにする。
-#Sinatra側 get '/csv' do content_type 'application/csv' attachment 'download.csv' #DBからデータ取得(Activerecord利用) @data = Model.all() #出力するCSVデータの変数。csvヘッダーを先につけている。 @csv = &quot;date,value\n&quot; #DBのデータをCSVの形にして格納 @data.each do |d| @csv += d.date.to_s + &quot;,&quot; + d.value.to_s + &quot;\n&quot; end #csvtest.erbというビューに出力 erb :csvtest, :layout =&gt; false end  csvtest.erb
-```ruby ``` こうすることで"http://*****/csv"にアクセスするとcsvファイルとしてダウンロードできる状態になる。
-条件指定をしてデータをダウンロードできるようにしたい場合はGETでパラメータ指定できるようにすれば良いと思う。
-（SinatraでCSVファイルを生成するところのコードがナンセンスだと思っているので、もっといい方法があるはず…）
-また、今回はcsvにしているがjsonなどの他の形式でも同様のことがいえる。
-これをD3.js側で以下のように読み込ませる。
-d3.csv(&quot;/csv&quot;, function(error, data) { (中略) }  d3.
+Sinatra側で/csvにアクセスするとcs...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/09/15/135611/">全文を読む</a>
                     </div>
                 </section>
                 

@@ -8,7 +8,7 @@
     <meta name="description" content="mosuke5&#39;s blog">
     <link rel="canonical" href="https://blog.mosuke.tech/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Goldstine研究所 &middot; Goldstine研究所">
@@ -661,7 +661,6 @@ if文を１行追加するだけだろ…って思うようなものでも数百
  X-Forwarded-Forというヘッダー名にNginxでもっている変数$proxy_add_x_forwarded_forをつっこむ。</p>
 
 <pre><code>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
-
 </code></pre>
 
 <p>設定は簡単なんだけど、そもそもX-Forwarded-Forなんていうヘッダーあったっけ。。。？<br>
@@ -713,7 +712,6 @@ $ tcpdump dst port 80 -X
      0x0000:  4500 0355 c705 0000 3706 24ca adc2 265f  1.0..X-Forwarded
      0x0010:  c0a8 000a 0050 d57f 51ad 1e62 e596 78a4  -For:.192.168.33
      0x0020:  8018 0137 8dbe 0000 0101 080a d1dc c19e  .1..Host:.xxxxxx 
-
 </code></pre>
 
 <p>いたいた。<br>
@@ -1054,7 +1052,6 @@ SoftwareDesignの2015年7月号を見ながら、何度目かの入門をした�
 <pre><code>$ brew install tmux
 $ tmux -V
 tmux 2.1 
-
 </code></pre>
 
 <h1>起動</h1>
@@ -1108,7 +1105,6 @@ tmuxを起動した状態で<code>Ctrl-b</code>+<code>d</code>を押してみよ
 
 <pre><code>$ tmux ls
 0: 1 windows (created Thu Apr 14 21:26:19 2016) [129x32] 
-
 </code></pre>
 
 <p>ではアタッチしてみよう。下記で元のtmuxに戻ってくるはずです。</p>
@@ -1127,7 +1123,6 @@ tmuxを使わずにpstreeコマンドを打つと、<a class="keyword" href="htt
 <pre><code>$ pstree -p
 systemd(1)
     ├─sshd(13589)─┬─sshd(15066)───sshd(15068)───bash(15069)───pstree(15115) 
-
 </code></pre>
 
 <p>一方、tmuxを起動し、tmux上でpstreeを実行すると、<a class="keyword" href="http://d.hatena.ne.jp/keyword/sshd">sshd</a>のプロセスの下にはtmuxが動いており、<br>
@@ -1237,7 +1232,6 @@ RAILS_ENV:                production
 $ heroku config:set RAILS_ENV=staging --app app-name
 $ heroku config --app app-name
 RAILS_ENV:                staging 
-
 </code></pre>
 
 <h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/Basic%C7%A7%BE%DA">Basic認証</a></h1>
@@ -1362,7 +1356,6 @@ $ dig pages.github.com
 ;; ANSWER SECTION:
 pages.github.com.   900 IN  CNAME   github.map.fastly.net.
 github.map.fastly.net.  23  IN  A   103.245.222.133[f:id:mosuke5:20160319233634j:plain] 
-
 </code></pre>
 
 <p>後者のほうでは、fastly（CDN）の結果が返ってくる。<br>

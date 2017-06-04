@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Sinatra on Goldstine研究所</title>
-    <link>https://blog.mosuke.tech/categories/sinatra/</link>
-    <description>Recent content in Sinatra on Goldstine研究所</description>
+    <title>Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/sinatra/index.xml</link>
+    <description>Recent content on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Fri, 08 May 2015 17:47:00 +0900</lastBuildDate>
     <atom:link href="https://blog.mosuke.tech/categories/sinatra/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
@@ -50,7 +49,6 @@ prorudction環境で動作させようとしたら、jsのエラーが出るよ�
 
   js_compression :jsmin
 end
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;layout.erbにはもちろん、libs.jsが先に来るように記述している。&lt;/p&gt;
@@ -146,35 +144,33 @@ end
     &lt;h3&gt;(1) 簡単な&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/API&#34;&gt;API&lt;/a&gt;のようなものを利用する&lt;/h3&gt;
     &lt;p&gt;先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、&lt;br&gt;
 これが一番複雑にならずに良いと思ったということ。&lt;/p&gt;
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Sinatra&#34;&gt;Sinatra&lt;/a&gt;側で/&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/csv&#34;&gt;csv&lt;/a&gt;にアクセスすると&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/csv&#34;&gt;csv&lt;/a&gt;ファイルをダウンロードできるようにする。&lt;/p&gt;
-```ruby
-#Sinatra側
-get &amp;lsquo;/csv&amp;rsquo; do
-    content_type &amp;lsquo;application/csv&amp;rsquo;
-    attachment &amp;lsquo;download.csv&amp;rsquo;&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Sinatra&#34;&gt;Sinatra&lt;/a&gt;側で/&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/csv&#34;&gt;csv&lt;/a&gt;にアクセスすると&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/csv&#34;&gt;csv&lt;/a&gt;ファイルをダウンロードできるようにする。&lt;/p&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;#DBからデータ取得(Activerecord利用)
-@data   = Model.all()
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;#Sinatra側
+get &#39;/csv&#39; do
+    content_type &#39;application/csv&#39;
+    attachment &#39;download.csv&#39;
 
-#出力するCSVデータの変数。csvヘッダーを先につけている。
-@csv = &amp;quot;date,value\n&amp;quot;
+    #DBからデータ取得(Activerecord利用)
+    @data   = Model.all()
 
-#DBのデータをCSVの形にして格納
-@data.each do |d|
-    @csv += d.date.to_s + &amp;quot;,&amp;quot; + d.value.to_s + &amp;quot;\n&amp;quot;
+    #出力するCSVデータの変数。csvヘッダーを先につけている。
+    @csv = &amp;quot;date,value\n&amp;quot;
+
+    #DBのデータをCSVの形にして格納
+    @data.each do |d|
+        @csv += d.date.to_s + &amp;quot;,&amp;quot; + d.value.to_s + &amp;quot;\n&amp;quot;
+    end
+    
+    #csvtest.erbというビューに出力
+    erb :csvtest, :layout =&amp;gt; false
 end
-
-#csvtest.erbというビューに出力
-erb :csvtest, :layout =&amp;gt; false
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;end&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;p&amp;gt;csvtest.erb&amp;lt;/p&amp;gt;
+&lt;p&gt;csvtest.erb&lt;/p&gt;
 ```ruby
-&amp;lt;%= @csv %&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;%= @csv %&gt;
+```
 &lt;p&gt;こうすることで&#34;&lt;a href=&#34;http://*****/csv&#34;&gt;http://*****/csv&lt;/a&gt;&#34;にアクセスすると&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/csv&#34;&gt;csv&lt;/a&gt;ファイルとしてダウンロードできる状態になる。&lt;br&gt;
 条件指定をしてデータをダウンロードできるようにしたい場合はGETでパラメータ指定できるようにすれば良いと思う。&lt;br&gt;
 （&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Sinatra&#34;&gt;Sinatra&lt;/a&gt;で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/CSV&#34;&gt;CSV&lt;/a&gt;ファイルを生成するところのコードがナンセンスだと思っているので、もっといい方法があるはず…）&lt;/p&gt;
@@ -192,22 +188,22 @@ erb :csvtest, :layout =&amp;gt; false
 &lt;div class=&#34;section&#34;&gt;
     &lt;h3&gt;(2) &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/javascript&#34;&gt;javascript&lt;/a&gt;コードの中で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Ruby&#34;&gt;Ruby&lt;/a&gt;変数を展開させる&lt;/h3&gt;
     &lt;p&gt;d3.jsのdatasetの中で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Ruby&#34;&gt;Ruby&lt;/a&gt;の変数を展開させる。ビューに&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Javascript&#34;&gt;Javascript&lt;/a&gt;を書いているので、ビューの中で変数展開するのと同じ要領。&lt;br&gt;
-しかし、jsコードに&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Ruby&#34;&gt;Ruby&lt;/a&gt;コードも交じるので複雑になりがち。&lt;/p&gt;
-```javascript
-var dataset = [
+しかし、jsコードに&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Ruby&#34;&gt;Ruby&lt;/a&gt;コードも交じるので複雑になりがち。&lt;/p&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var dataset = [
 &amp;lt;% @data.each do |d| %&amp;gt;
     {date:&amp;lt;%= d.date%&amp;gt;, value:&amp;lt;%= d.value %&amp;gt;},
 &amp;lt;% end %&amp;gt;
-];&lt;/p&gt;
+];
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;lt;/div&amp;gt;
-&amp;lt;div class=&amp;quot;section&amp;quot;&amp;gt;
-    &amp;lt;h3&amp;gt;(3) &amp;lt;a class=&amp;quot;keyword&amp;quot; href=&amp;quot;http://d.hatena.ne.jp/keyword/CSV&amp;quot;&amp;gt;CSV&amp;lt;/a&amp;gt;ファイルをおいておく&amp;lt;/h3&amp;gt;
-    &amp;lt;p&amp;gt;こちらはリアルタイムな更新でなれけばこれはこれでありだと思う。&amp;lt;br&amp;gt;
-publicのフォルダに予め&amp;lt;a class=&amp;quot;keyword&amp;quot; href=&amp;quot;http://d.hatena.ne.jp/keyword/csv&amp;quot;&amp;gt;csv&amp;lt;/a&amp;gt;ファイルを設置しておき、以下のようにd3.jsで読み込ませる。&amp;lt;/p&amp;gt;
+&lt;p&gt;&lt;/div&gt;
+&lt;div class=&#34;section&#34;&gt;
+    &lt;h3&gt;(3) &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/CSV&#34;&gt;CSV&lt;/a&gt;ファイルをおいておく&lt;/h3&gt;
+    &lt;p&gt;こちらはリアルタイムな更新でなれけばこれはこれでありだと思う。&lt;br&gt;
+publicのフォルダに予め&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/csv&#34;&gt;csv&lt;/a&gt;ファイルを設置しておき、以下のようにd3.jsで読み込ませる。&lt;/p&gt;&lt;/p&gt;
 
-```javascript
-d3.csv(&amp;quot;test.csv&amp;quot;, function(error, data) {
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;d3.csv(&amp;quot;test.csv&amp;quot;, function(error, data) {
     (中略)
 }
 &lt;/code&gt;&lt;/pre&gt;

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Arduino on Goldstine研究所</title>
-    <link>https://blog.mosuke.tech/categories/arduino/</link>
-    <description>Recent content in Arduino on Goldstine研究所</description>
+    <title>Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/arduino/index.xml</link>
+    <description>Recent content on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sat, 13 Sep 2014 11:15:00 +0900</lastBuildDate>
     <atom:link href="https://blog.mosuke.tech/categories/arduino/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
@@ -77,16 +76,16 @@ Request timeout for icmp_seq 0
 &lt;p&gt;構成図&lt;br&gt;
 &lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140913/20140913110038.png&#34; alt=&#34;f:id:mosuke5:20140913110038p:plain&#34; title=&#34;f:id:mosuke5:20140913110038p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN&#34;&gt;無線LAN&lt;/a&gt;ルータから有線LANケーブルを伸ばし&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Arduino&#34;&gt;Arduino&lt;/a&gt;に結線。&lt;br&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/DHCP&#34;&gt;DHCP&lt;/a&gt;による&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&#34;&gt;IPアドレス&lt;/a&gt;の取得はとても容易で以下のようにマックアドレスを指定するのみ。&lt;/p&gt;
-```
-Ethernet.begin(mac)&lt;/p&gt;
+&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/DHCP&#34;&gt;DHCP&lt;/a&gt;による&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&#34;&gt;IPアドレス&lt;/a&gt;の取得はとても容易で以下のようにマックアドレスを指定するのみ。&lt;/p&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;lt;p&amp;gt;以下は&amp;lt;a class=&amp;quot;keyword&amp;quot; href=&amp;quot;http://d.hatena.ne.jp/keyword/Arduino&amp;quot;&amp;gt;Arduino&amp;lt;/a&amp;gt;公式サイトに則って実施したもの。&amp;lt;br&amp;gt;
-&amp;lt;a href=&amp;quot;http://arduino.cc/en/Tutorial/DhcpAddressPrinter&amp;quot;&amp;gt;Arduino - DhcpAddressPrinter&amp;lt;/a&amp;gt;&amp;lt;br&amp;gt;
-&amp;lt;/p&amp;gt;
+&lt;pre&gt;&lt;code&gt;Ethernet.begin(mac) 
+&lt;/code&gt;&lt;/pre&gt;
 
-```c
-#include &amp;lt;SPI.h&amp;gt;
+&lt;p&gt;以下は&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Arduino&#34;&gt;Arduino&lt;/a&gt;公式サイトに則って実施したもの。&lt;br&gt;
+&lt;a href=&#34;http://arduino.cc/en/Tutorial/DhcpAddressPrinter&#34;&gt;Arduino - DhcpAddressPrinter&lt;/a&gt;&lt;br&gt;
+&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#include &amp;lt;SPI.h&amp;gt;
 #include &amp;lt;Ethernet.h&amp;gt;
 
 //Mac Address Static
@@ -250,13 +249,12 @@ void loop(){
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;出力結果&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;hoge1
+```
+hoge1
 hoge2
 hoge3
  .... 
-&lt;/code&gt;&lt;/pre&gt;
-
+```
 &lt;p&gt;&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140721/20140721103544.png&#34; alt=&#34;f:id:mosuke5:20140721103544p:plain&#34; title=&#34;f:id:mosuke5:20140721103544p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;&lt;/p&gt;
 &lt;h2&gt;3. 超音波距離センサの利用&lt;/h2&gt;次のステップとしてセンサーの利用を行った。&lt;br&gt;
@@ -264,8 +262,8 @@ hoge3
 ここでは超音波距離センサを利用するが、大事なことはセンサーの種類ではなく、センサーを利用した入力である。&lt;p&gt;【作ったもの】&lt;br&gt;
 超音波距離センサにて測定した物体との距離をシリアルモニターで表示するもの。&lt;/p&gt;
 &lt;p&gt;【&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9&#34;&gt;ソースコード&lt;/a&gt;】&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;// 送信側のピン番号
+```c
+// 送信側のピン番号
 const int TRIGPIN = 8; 
 
 // 受信側のピン番号
@@ -304,12 +302,12 @@ void loop() {
   
   //シリアルモニタへ出力
   Serial.print(dis);
-  Serial.println(&amp;quot; cm&amp;quot;);
+  Serial.println(&#34; cm&#34;);
   
   delay(500);
   
 }
-&lt;/code&gt;&lt;/pre&gt;
+```
 
 &lt;p&gt;【回路】&lt;br&gt;
 &lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140721/20140721220559.png&#34; alt=&#34;f:id:mosuke5:20140721220559p:plain&#34; title=&#34;f:id:mosuke5:20140721220559p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
@@ -440,7 +438,7 @@ void loop() {
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;【Processing側】&lt;/p&gt;
+&lt;p&gt;&lt;p&gt;【Processing側】&lt;/p&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;import processing.serial.*;
 

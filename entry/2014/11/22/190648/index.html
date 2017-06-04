@@ -8,7 +8,7 @@
     <meta name="description" content=" もろもろな理由のためにGithubが利用できないことも多くあると思う。 というわけでGithubクローンのGitlabを試しに立ててみたが、簡単すぎでした…  GitLab | Open source software to collab">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2014/11/22/190648/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="GithubクローンのGitlabの導入とその際のちょっとした注意点 &middot; Goldstine研究所">
@@ -80,37 +80,37 @@
 さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a> 1Gプラン<br>
 OS：CentOS7</p>
 <p>インストール<br>
-基本的にはドキュメントに書いてある以下のとおりで終わり。</p>
-```
-$ curl -O <a href="https://downloads-packages.s3.amazonaws.com/centos-7.0.1406/gitlab-7.5.1_omnibus.5.2.0.ci-1.el7.x86_64.rpm">https://downloads-packages.s3.amazonaws.com/centos-7.0.1406/gitlab-7.5.1_omnibus.5.2.0.ci-1.el7.x86_64.rpm</a>
+基本的にはドキュメントに書いてある以下のとおりで終わり。</p></p>
+
+<pre><code>$ curl -O https://downloads-packages.s3.amazonaws.com/centos-7.0.1406/gitlab-7.5.1_omnibus.5.2.0.ci-1.el7.x86_64.rpm
 $ sudo yum install openssh-server
 $ sudo systemctl enable sshd
 $ sudo systemctl start sshd
 $ sudo yum install postfix
 $ sudo systemctl enable postfix
 $ sudo systemctl start postfix
-$ sudo rpm -i gitlab-7.5.1_omnibus.5.2.0.ci-1.el7.x86_64.rpm</p>
+$ sudo rpm -i gitlab-7.5.1_omnibus.5.2.0.ci-1.el7.x86_64.rpm
 
-<p>$ sudo gitlab-ctl reconfigure
-$ sudo firewall-cmd &ndash;permanent &ndash;add-service=http # open up the firewall for HTTP and SSH requests
-$ sudo systemctl reload firewalld</p>
-
-<pre><code>&lt;p&gt;しかし１つ気をつけないといけないことがある。&lt;br&gt;
-gitlabでは裏でNginxが起動しhttpのレスポンスに応答する。&lt;br&gt;
-すでに&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/Apache&quot;&gt;Apache&lt;/a&gt;等が動いている場合には停止、あるいはポート番号の変更などの工夫が必要。&lt;/p&gt;
-&lt;p&gt;ちなみに&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/Apache&quot;&gt;Apache&lt;/a&gt;を停止し、Gitlabを起動した状態で80番ポートのプロセスをみると。&lt;br&gt;
-nginxが動いていることがわかります。&lt;/p&gt;
+$ sudo gitlab-ctl reconfigure
+$ sudo firewall-cmd --permanent --add-service=http # open up the firewall for HTTP and SSH requests
+$ sudo systemctl reload firewalld 
 </code></pre>
 
-<p>$ sudo lsof -i:80
+<p>しかし１つ気をつけないといけないことがある。<br>
+gitlabでは裏でNginxが起動しhttpのレスポンスに応答する。<br>
+すでに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>等が動いている場合には停止、あるいはポート番号の変更などの工夫が必要。</p>
+<p>ちなみに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>を停止し、Gitlabを起動した状態で80番ポートのプロセスをみると。<br>
+nginxが動いていることがわかります。</p>
+```
+$ sudo lsof -i:80
 COMMAND   PID       USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
 nginx   25937       root    6u  IPv4  84715      0t0  TCP *:http (LISTEN)
 nginx   25942 gitlab-www    6u  IPv4  84715      0t0  TCP *:http (LISTEN)
-nginx   25943 gitlab-www    6u  IPv4  84715      0t0  TCP *:http (LISTEN)
+nginx   25943 gitlab-www    6u  IPv4  84715      0t0  TCP *:http (LISTEN) 
 ```
 <p>特定のポートで何が起動しているかみるのに<b>lsof</b>コマンドはとても便利。</p>
 <p>あともう一つとまどったのが、GItlabを起動させたものの、はじめログイン方法がわからなかった。<br>
-が、よーくページのしたの方よくみると書いてありました。（単なる見落とし）</p></p>
+が、よーくページのしたの方よくみると書いてありました。（単なる見落とし）</p>
 
 <pre><code>&lt;blockquote&gt;
     &lt;p&gt;Browse to the hostname and login &lt;br&gt;

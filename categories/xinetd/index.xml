@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Xinetd on Goldstine研究所</title>
-    <link>https://blog.mosuke.tech/categories/xinetd/</link>
-    <description>Recent content in Xinetd on Goldstine研究所</description>
+    <title>Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/xinetd/index.xml</link>
+    <description>Recent content on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Fri, 02 Jan 2015 01:36:00 +0900</lastBuildDate>
     <atom:link href="https://blog.mosuke.tech/categories/xinetd/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
@@ -42,7 +41,6 @@ xinetdはinetdの拡張版で、アクセス制御などの機能を搭載して
 &lt;p&gt;まずはxinetdとvsftpをインストール&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ sudo yum install xinetd vsftpd 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;br&gt;
@@ -58,7 +56,6 @@ xinetdどうこうの前に、&lt;a class=&#34;keyword&#34; href=&#34;http://d.h
 Connected to 192.168.33.10.
 220 (vsFTPd 2.2.2)
 Name (192.168.33.10:username): 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h1&gt;2. xinetdの設定&lt;/h1&gt;
@@ -81,7 +78,6 @@ service ftp
         log_on_failure  += USERID
 }
  
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;設定項目については以下参照。&lt;br&gt;
@@ -109,7 +105,6 @@ xinetd (pid  3521) is running...
 
 $ sudo service vsftpd status
 vsftpd is stopped 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;br&gt;
@@ -127,7 +122,6 @@ Connected to 192.168.33.10.
 &lt;pre&gt;&lt;code&gt;$ sudo tail /var/log/message
 Jan  1 15:07:25 server xinetd[3335]: START: ftp pid=3337 from=::ffff:192.168.33.1
 Jan  1 15:07:28 server xinetd[3335]: EXIT: ftp status=1 pid=3337 duration=3(sec) 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;接続できているようだがその後すぐに切断されているようにみえる。
@@ -140,7 +134,6 @@ vsftpd側の設定を疑ってみた。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;$ sudo vim /etc/vsftpd/vsftpd.conf
 listen=NO
  
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;vsftpdのlistenの設定は以下のとおり。&lt;/p&gt;
@@ -179,7 +172,6 @@ vagrant   3559  2742  0 16:18 pts/0    00:00:00 grep ftp
 &amp;gt; 接続終了後
 $ ps -ef | grep ftp
 vagrant   3552  2742  0 16:17 pts/0    00:00:00 grep ftp 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;br&gt;

@@ -8,7 +8,7 @@
     <meta name="description" content="mosuke5&#39;s blog">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Entries &middot; Goldstine研究所">
@@ -74,7 +74,13 @@
                     </header>
 
                     <div class="post-description">
-                        AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&amp;hellip; と思ったところである初歩的な罠にハマった。 本番環境へPalybook実行！！ ``` $ ansible-playbook playbook.yml -i hosts &amp;lt;p&amp;gt;あれ、GATHERING FACTSで10分以上も待�...
+                        AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&amp;hellip;
+と思ったところである初歩的な罠にハマった。
+本番環境へPalybook実行！！
+$ ansible-playbook playbook.yml -i hosts  あれ、GATHERING FACTSで10分以上も待たされた&amp;hellip;
+しかも、エラー出た&amp;hellip;
+GATHERING FACTS failed to parse [ sudo via ansible, key= ..... ]  sudoできていない&amp;hellip;？
+playbook内のsudo: yesを外...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/28/001748/">全文を読む</a>
@@ -100,7 +106,15 @@
                     </header>
 
                     <div class="post-description">
-                        もろもろな理由のためにGithubが利用できないことも多くあると思う。 というわけでGithubクローンのGitlabを試しに立ててみたが、簡単すぎでした… GitLab | Open source software to collaborate on code 環境 さくらVPS 1Gプラン OS：CentOS7 イ�...
+                        もろもろな理由のためにGithubが利用できないことも多くあると思う。
+というわけでGithubクローンのGitlabを試しに立ててみたが、簡単すぎでした…
+GitLab | Open source software to collaborate on code
+環境
+さくらVPS 1Gプラン
+OS：CentOS7
+インストール
+基本的にはドキュメントに書いてある以下のとおりで終わり。
+$ curl -O https://downloads-packages.s3.amazonaws.com/centos-7.0.1406/gitlab-7.5.1_omnibus.5.2.0.ci-1.el7...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/22/190648/">全文を読む</a>
@@ -126,7 +140,14 @@
                     </header>
 
                     <div class="post-description">
-                        Gitレポジトリを作って、複数人で開発をしていた。 しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、 Push, PullするときにPermission errorで怒られまくる。 ユーザには共通のグル�...
+                        Gitレポジトリを作って、複数人で開発をしていた。
+しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、
+Push, PullするときにPermission errorで怒られまくる。
+ユーザには共通のグループを作っていたのに…なんでだっけ…
+気づけばレポジトリを作るとき以下のようにしていた。
+$ git init --bare  複数人で共有するときには以下のようにするべきであった。
+$ git init --bare --shared  では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。
+調べると「setgid」というキーワ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/20/230334/">全文を読む</a>
@@ -152,7 +173,12 @@
                     </header>
 
                     <div class="post-description">
-                        AnsibleのPlaybookを書いていると、ワイルドカードを含んだコマンドを実行したい時がある。 そんなときあるところでハマった。 Apacheをソースインストールして、パスを/usr/sbinにリンクを貼ろうとして以下を実行した。 - command...
+                        AnsibleのPlaybookを書いていると、ワイルドカードを含んだコマンドを実行したい時がある。
+そんなときあるところでハマった。
+Apacheをソースインストールして、パスを/usr/sbinにリンクを貼ろうとして以下を実行した。
+- command: ln -s /usr/local/httpd/bin/* /usr/sbin  /usr/sbin内に「*」というリンクが貼られてしまった。
+* -&amp;gt; /usr/local/httpd/bin  どうやらcommandモジュールはワイルドカードに対応していないよう。
+ワイルドカードを使いたいときはshellモジュールを利用すると良い...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/18/225542/">全文を読む</a>
@@ -178,7 +204,18 @@
                     </header>
 
                     <div class="post-description">
-                        最近、Ansibleを使い始めたのだが、yumやapt-getでインストールできるものはいいけど、 どうしてもソースインストールが必要な場合がある。 ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。 まず、あたり�...
+                        最近、Ansibleを使い始めたのだが、yumやapt-getでインストールできるものはいいけど、
+どうしてもソースインストールが必要な場合がある。
+ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。
+まず、あたりまえだが、ソースインストールを行うには以下のフローを踏まなければいけな。
+1. ソースファイルの取得(tarで固められていると仮定)
+2. tarファイルの解凍
+3. 解答してできたディレクトリへ移動
+4. configure
+5. make
+6. make install
+また、Ansibleでは何回もPlaybookを実行していくため、
+すでにインストールさ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/16/153223/">全文を読む</a>
@@ -204,7 +241,13 @@
                     </header>
 
                     <div class="post-description">
-                        VPS1台でインフラ勉強の会で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てたが、 仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければならない。 これが面倒だったので多...
+                        VPS1台でインフラ勉強の会で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てたが、
+仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければならない。
+これが面倒だったので多段SSHの設定をして、一発でSSH接続できるようにした。
+以下の図で言うと、web10, web11(192.168.33.10&amp;frasl;11)に一発でSSHできるようにする。
+
+クライアントPC側に以下の設定をした。
+$ vim ~/.ssh/config host gateway HostName xxxxx.xxx User username Host web10 Hos...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/09/172745/">全文を読む</a>
@@ -230,7 +273,17 @@
                     </header>
 
                     <div class="post-description">
-                        前回の【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築に続き、同様の環境を用いて、ロードバランサ構築を行った。 ロードバランサの構築にはHAProxyを利用した。 1. 環境 前回同様で、さくらVPSの1G...
+                        前回の【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築に続き、同様の環境を用いて、ロードバランサ構築を行った。
+ロードバランサの構築にはHAProxyを利用した。
+1. 環境 前回同様で、さくらVPSの1GBのプラン1台のみ。
+・メモリ：１GB
+・CPU：仮想２コア
+・HDD：100GB
+・OS：CentOS7
+・サーバ仮想化：Vagrant(Utuntu13)
+・ロードバランサ：HAProxy - The Reliable, High Performance TCP/HTTP Load Balancer
+ 2. 構成図 
+ 3. ロードバランサの構築 ■ホストサ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/09/171436/">全文を読む</a>
@@ -256,7 +309,8 @@
                     </header>
 
                     <div class="post-description">
-                        自宅サーバを公開するときに使うDDNSや固定IP。 それが必要な理由について図解的にまとめ。それだけ。...
+                        自宅サーバを公開するときに使うDDNSや固定IP。
+それが必要な理由について図解的にまとめ。それだけ。...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/10/19/170854/">全文を読む</a>
@@ -282,7 +336,17 @@
                     </header>
 
                     <div class="post-description">
-                        ロードバランシングとかクラスタリングとかリバースプロキシとか、 業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりない。 自分で構築してみたいなーと思いつつもあたりまえだけど、�...
+                        ロードバランシングとかクラスタリングとかリバースプロキシとか、
+業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりない。
+自分で構築してみたいなーと思いつつもあたりまえだけど、サーバやネットワーク機器をそう簡単に調達もできない。
+お金も当然ない。
+というわけで、さくらVPSで仮想化つかってロードバランシングとかクラスタリングとかリバースプロキシとか勉強しましょうという「サーバインフラ会」を友人と始めた。
+その第１回目のメモ。
+第1回 サーバ複数台構成、Nginxでリバースプロキシ構築
+第2回 HAProxyでロードバランサ構築
+
+
+1. 使用した環境 まず今回利用した...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/10/09/230555/">全文を読む</a>
@@ -308,7 +372,12 @@
                     </header>
 
                     <div class="post-description">
-                        最近VPSのOSをcentos7にしたのだが、なかなか手付かずでiptablesの設定も放置していた… （sshの最低限の設定はしていたが、ほんとうに良くない…） 久しぶりに手が空いたので設定するかーと思いきや まず/etc/sysconfig/iptablesが�...
+                        最近VPSのOSをcentos7にしたのだが、なかなか手付かずでiptablesの設定も放置していた…
+（sshの最低限の設定はしていたが、ほんとうに良くない…）
+久しぶりに手が空いたので設定するかーと思いきや
+まず/etc/sysconfig/iptablesがないし&amp;hellip;
+Cent7からのsystemctlでiptablesのサービスを確認してもでてこないし…
+# systemctl status iptables iptables.service Loaded: not-found (Reason: No such file or directory) Active: inac...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/09/20/180326/">全文を読む</a>

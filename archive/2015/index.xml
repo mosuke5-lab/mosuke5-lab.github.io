@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>2015 on Goldstine研究所</title>
-    <link>https://blog.mosuke.tech/archive/2015/</link>
-    <description>Recent content in 2015 on Goldstine研究所</description>
+    <title>Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/archive/2015/index.xml</link>
+    <description>Recent content on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Mon, 28 Dec 2015 15:00:00 +0900</lastBuildDate>
     <atom:link href="https://blog.mosuke.tech/archive/2015/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
@@ -145,7 +144,6 @@ Ansibleを使ってアプリケーションのデプロイまですべて行う�
 
 &lt;pre&gt;&lt;code&gt;$ ansible-playbook site.yml -i 
 $ bundle exec rake serverspec 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;2つ実行することが面倒であり、面倒であるがゆえにserverspecの実行を怠ったりしていました。&lt;br&gt;
@@ -170,7 +168,6 @@ serverspecでも&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/ke
 
 &lt;pre&gt;&lt;code&gt;ansible -playbook site.yml -i --extra-args=&#39;ansible_sudo_pass=xxxxxxxx&#39;
 bundle exec rake serverspec SUDO_PASSWORD=xxxxxxxx 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;ですが、おわかりの通り、&lt;b&gt;コマンドの履歴にもパスワードが残ります&lt;/b&gt;。&lt;br&gt;
@@ -295,7 +292,6 @@ Pipelining機能をなしの状態だと、このファイル転送とファイ�
 &amp;lt;192.168.33.100&amp;gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&amp;quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&amp;quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c &#39;mkdir -p $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321 &amp;amp;&amp;amp; chmod a+rx $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321 &amp;amp;&amp;amp; echo $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321&#39;
 &amp;lt;192.168.33.100&amp;gt; PUT /var/folders/7_/d_dwdlcx1m95mn_846x30xb40000gn/T/tmpc8amAw TO /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/command
 &amp;lt;192.168.33.100&amp;gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&amp;quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&amp;quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c &#39;sudo -k &amp;amp;&amp;amp; sudo -E -S -p &amp;quot;[sudo via ansible, key=koibtlgpbiprbaihcqxiqgcnnreofxuo] password: &amp;quot; -u root /bin/sh -c &#39;&amp;quot;&#39;&amp;quot;&#39;echo BECOME-SUCCESS-koibtlgpbiprbaihcqxiqgcnnreofxuo; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/command; rm -rf /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/ &amp;gt;/dev/null 2&amp;gt;&amp;amp;1&#39;&amp;quot;&#39;&amp;quot;&#39;&#39; 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Pipiliningの機能を有効にすると、タスク実行ごとのモジュールファイルの転送と削除をしなくなる。&lt;br&gt;
@@ -364,7 +360,6 @@ transport = ssh
 [ssh_connection]
 pipeline = false
 ssh_args = -o ControlMaster=no 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;② ControlMaster: &lt;b&gt;&lt;span style=&#34;color: #ff0000&#34;&gt;有効&lt;/span&gt;&lt;/b&gt; ＆ pipeline: &lt;b&gt;無効&lt;/b&gt;&lt;/p&gt;
@@ -385,7 +380,6 @@ transport = ssh
 [ssh_connection]
 pipeline = true
 ssh_args = -o ControlMaster=auto -o ControlPersist=300s 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2&gt;実行コマンド&lt;/h2&gt;
@@ -480,7 +474,6 @@ describe port(80) do
   it { should be_listening }
 end
  
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h1&gt;各種テストの立ち位置&lt;/h1&gt;
@@ -593,7 +586,6 @@ end
   }
 ]
  
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;このようにすることで、役割の違うサーバでも共有するテスト項目はコードの重複なくテストできます。&lt;br&gt;
@@ -710,7 +702,6 @@ Host ansible-target
     HostName 192.168.33.10
     User xxxxx
     ProxyCommand ssh -W %h:%p yyyyy@hostserver 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;上記のファイルを使って多段&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;できることを確認します。&lt;/p&gt;
@@ -903,7 +894,6 @@ CONBU自体はソフトウェアデザインで特集されているのを見て
 下記を実行しないと&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Mac&#34;&gt;Mac&lt;/a&gt;で接続すると「互換性のないバージョンです」的なこといわれました…すいません。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ gsettings set org.gnome.Vino require-encryption false 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;設定ができたら、きちんとサーバとして&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VNC&#34;&gt;VNC&lt;/a&gt;接続を待ち受けているか確認します。&lt;/p&gt;
@@ -1329,7 +1319,6 @@ LINE 5: )DEFAULT CHARACTER SET utf8;
 &amp;quot;name&amp;quot; varchar(50) NOT NULL,
 &amp;quot;migration&amp;quot; varchar(100) DEFAULT &#39;&#39; NOT NULL
 )DEFAULT CHARACTER SET utf8;&amp;quot; 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h1&gt;理由&lt;/h1&gt;
@@ -1362,7 +1351,6 @@ LINE 5: )DEFAULT CHARACTER SET utf8;
 &lt;p&gt;簡単に言うとdbのコンフィグで、charsetをnullにすると&lt;code&gt;DEFAULT CHARACTER SET xxx&lt;/code&gt;部分が発行されない。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;&#39;charset&#39; =&amp;gt; NULL, 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h1&gt;2. PRIMARY KEYの問題&lt;/h1&gt;
@@ -1455,7 +1443,6 @@ $.ajax({
     $(&amp;quot;#result&amp;quot;).append(html);
   },
 })
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;jsの変数の中にhtmlが含まれる。&lt;br&gt;
@@ -1611,7 +1598,6 @@ prorudction環境で動作させようとしたら、jsのエラーが出るよ�
 
   js_compression :jsmin
 end
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;layout.erbにはもちろん、libs.jsが先に来るように記述している。&lt;/p&gt;
@@ -1810,7 +1796,6 @@ Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
 [vagrant@testsv ~]$
 [vagrant@testsv ~]$ ls -l /tmp | grep ssh
 drwx------. 2 vagrant    vagrant    23  4月  4 11:35 ssh-skQVHsUCHU 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;br&gt;
@@ -1840,7 +1825,6 @@ Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
 USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
 vagrant  pts/0    192.168.33.1     11:35    1.00s  0.04s  0.01s ssh -A vagrant@192.168.33.100
 vagrant  pts/1    192.168.33.100   11:50    1.00s  0.01s  0.00s w 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;wコマンドの結果の3行目のFROMをみるとわかるが、接続元が変わるわけではない。&lt;/p&gt;
@@ -1866,7 +1850,6 @@ sudo後に&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/
 
 &lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ sudo env | grep -i ssh
 　(なにも表示されない) 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;br&gt;
@@ -1892,7 +1875,6 @@ remote: Total 27 (delta 13), reused 0 (delta 0)
 Receiving objects: 100% (27/27), done.
 Resolving deltas: 100% (13/13), done.
 Checking connectivity... done. 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;予想通り成功しました！&lt;/p&gt;
@@ -1927,7 +1909,6 @@ fatal: Could not read from remote repository.
 
 Please make sure you have the correct access rights
 and the repository exists. 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;br&gt;

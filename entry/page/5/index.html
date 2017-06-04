@@ -8,7 +8,7 @@
     <meta name="description" content="mosuke5&#39;s blog">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Entries &middot; Goldstine研究所">
@@ -74,7 +74,14 @@
                     </header>
 
                     <div class="post-description">
-                        FTPやSFTPでの転送モードの話。 ついこの前、WinSCPを利用している人が転送モードを選んでいて、 「SFTPには転送モードはないと思っていたのに、転送モードを選んでいる！？」 と疑問に思ったのでその辺りまとめた。 FTPのバ...
+                        FTPやSFTPでの転送モードの話。
+ついこの前、WinSCPを利用している人が転送モードを選んでいて、
+「SFTPには転送モードはないと思っていたのに、転送モードを選んでいる！？」
+と疑問に思ったのでその辺りまとめた。
+ FTPのバイナリーモードとアスキーモード 入社しはじめの頃、それまでSFTPしかほとんど使ったことなかったので、
+先輩に「FTPではバイナリーモードを使って…」と言われて、意味が理解できなかったときがあったのを思い出す。
+FTPにはファイル転送モードが２つあって、ちゃんと理解していないと思わぬところで痛い目にあう。
+ バイナリーモード：ファイルの改行コードを変換せず転送する...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/02/17/220526/">全文を読む</a>
@@ -100,7 +107,14 @@
                     </header>
 
                     <div class="post-description">
-                        SSHローカルフォワードの話。 前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。 SSHでローカルポートフォワードを実際に試す - Goldstine研究所 1. やりたいこと https...
+                        SSHローカルフォワードの話。
+前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。
+SSHでローカルポートフォワードを実際に試す - Goldstine研究所
+1. やりたいこと httpsでしか接続を許可していないサーバへ、SSHローカルフォワーディングを使って接続しようした。
+（直接疎通性がないためにポートフォワーディングする必要があった。）
+2. 行ったこと httpsでしか接続ができないので、ローカル端末のポート5000を接続したいサーバのポート443に飛ばせばおっけーと思って、
+下記のようにssh接続とブラウザから接続を行った。
+ss...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/02/11/172123/">全文を読む</a>
@@ -126,7 +140,13 @@
                     </header>
 
                     <div class="post-description">
-                        自分がハマったのでメモ。 リモートのサーバでdocker runを実行し(/bin/bash)、ローカル側でシェルを操作したかった。 sshでリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。 ssh user@host &#39;docker run -t -i ...
+                        自分がハマったのでメモ。
+リモートのサーバでdocker runを実行し(/bin/bash)、ローカル側でシェルを操作したかった。
+sshでリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。
+ssh user@host &#39;docker run -t -i image_name /bin/bash&#39;  そうすると
+[root@0c6742f02bd9 ~]# [root@0c6742f02bd9 ~]# ^[[A^[[A^[[C  エンターを押すと2行されるし、矢印キーはキーコードがでてしまう。
+これを解消するのには以下のようにすればいい。
+ssh -t us...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/02/07/144208/">全文を読む</a>
@@ -152,7 +172,15 @@
                     </header>
 
                     <div class="post-description">
-                        Ansibleでソースコードインストールする際とか すでにインストールされているかのチェックなどで、 シェルコマンドを実行してその結果で判断したい時がある。 ぼくがよくやる例では以下とか。 - name: check httpd installed command...
+                        Ansibleでソースコードインストールする際とか
+すでにインストールされているかのチェックなどで、
+シェルコマンドを実行してその結果で判断したい時がある。
+ぼくがよくやる例では以下とか。
+- name: check httpd installed command: which httpd ignore_errors: true  なんですが...
+こうやってしまうと、仮に既にインストールされていて、正常なときでも&#34;changed&#34;と表示されてしまう。
+これでは、本当にchangedなものなのか、わからなくなってくる。
+これを解決するのにchaged_whenを使うといい。
+- name: c...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/02/02/201008/">全文を読む</a>
@@ -178,7 +206,10 @@
                     </header>
 
                     <div class="post-description">
-                        dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、 特定のユーザでログインした状態のコンテナを作りたいという場面に遭遇した。 &amp;lt;やりたいこと&amp;gt; 特定のユーザでログインした状態のシェルを�...
+                        dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、
+特定のユーザでログインした状態のコンテナを作りたいという場面に遭遇した。
+&amp;lt;やりたいこと&amp;gt;  特定のユーザでログインした状態のシェルを提供すること その際、ユーザの.bash_profile（あるいあは.bashrc）を読み込んだ状態であること  .bash_profileに記載したPATHやaliasを使いたい ユーザのログインシェルを利用したい（カスタマイズされたシェルとか）    docker runに-uオプションがあるし、これで余裕！と思った。
+[host] $ sudo docker run ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/01/24/213255/">全文を読む</a>
@@ -204,7 +235,16 @@
                     </header>
 
                     <div class="post-description">
-                        使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。 そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させ�...
+                        使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。
+そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させることが可能らしい。
+ということで、そのスーパーサーバとやらを実際に触ってみた。
+スーパーサーバというとinetdとxinetdがあるらしいが、
+xinetdはinetdの拡張版で、アクセス制御などの機能を搭載しているとのこと。
+今回はxinetdを設定してみる。
+1. 事前準備 【環境】
+Vagrantで構築したCentOS 6.5
+(仮想環境のIPアドレスは192.168.33.10)
+まずは...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/01/02/013658/">全文を読む</a>
@@ -230,7 +270,13 @@
                     </header>
 
                     <div class="post-description">
-                        2015年になってしまいました。 2014年に技術分野で印象に残ってること３つを思い返してみる。 1. インフラ会 @mogulla3と軽いノリで始めたインフラ会。 普段触らない、あるいは触ったとしてもすでに構築された環境で触ること...
+                        2015年になってしまいました。
+2014年に技術分野で印象に残ってること３つを思い返してみる。
+1. インフラ会 @mogulla3と軽いノリで始めたインフラ会。
+普段触らない、あるいは触ったとしてもすでに構築された環境で触ることの多いインフラ技術について
+土日を使って自らの手で構築してみるといった会。
+10月くらいから初めて以下を実際にやってみた。
+ 仮想化　：Docker, Vagrant  リバースプロキシ　：Nginx  ロードバランサー　：HAProxy  クラスタリング　：Pacemaker&#43;corosync(heartbeat)  VPN　：SoftEther  構成管理ツール...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/01/01/161826/">全文を読む</a>
@@ -256,7 +302,17 @@
                     </header>
 
                     <div class="post-description">
-                        SSH・・・ いろんなことができる&amp;rdquo;らしい&amp;rdquo;ということは知っていたし、 例えばポートフォワーディングなんていうこともできるのも知っている。 でもそれがどんなものなのか自分の手で試したことはないし、 なんと...
+                        SSH・・・
+いろんなことができる&amp;rdquo;らしい&amp;rdquo;ということは知っていたし、
+例えばポートフォワーディングなんていうこともできるのも知っている。
+でもそれがどんなものなのか自分の手で試したことはないし、
+なんとなくただのサーバログインツールとして利用していた。
+サーバインフラ技術に興味を持つようになっていろんなことを勉強していると、
+ポートフォワーディングは必須な技術であることも感じ、
+年末の持て余す時間を使ってSSHのローカルポートフォワードを試してみたのでメモする。
+環境とやりたいこと 
+ローカルPCからexample.jpは以下で接続できる状態。
+[local pc] ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/12/31/170545/">全文を読む</a>
@@ -282,7 +338,14 @@
                     </header>
 
                     <div class="post-description">
-                        自作PCを作ったのでその材料と参考資料などを簡単にまとめる。 すべての部品は秋葉原のツクモで揃えた。 パソコン・ゲームPC・自作パソコンなら【TSUKUMO】 わけがあって荷物はすべて手で運んだのだが、かなり重くなるの�...
+                        自作PCを作ったのでその材料と参考資料などを簡単にまとめる。
+すべての部品は秋葉原のツクモで揃えた。
+パソコン・ゲームPC・自作パソコンなら【TSUKUMO】 わけがあって荷物はすべて手で運んだのだが、かなり重くなるので郵送をおすすめする。
+以下買ったパーツ一式や用意した道具。
+ちなみに全部で54000円程度でした。（お店で買うとセット割などがあったため）
+材料・パーツ一式 マザーボード 
+ASUSTeK Intel H97チップセット搭載マザーボード H97-PRO 【ATX】
+  出版社/メーカー: Asustek   発売日: 2014/05/17  メディア: Personal Com...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/12/29/154251/">全文を読む</a>
@@ -308,7 +371,16 @@
                     </header>
 
                     <div class="post-description">
-                        VPS1台でインフラ勉強シリーズでVPN構築を行ったのでそのメモ。 1. 実施したこと VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。 2. 環境 �...
+                        VPS1台でインフラ勉強シリーズでVPN構築を行ったのでそのメモ。
+1. 実施したこと VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。
+ 
+  2. 環境 ・VPNソフトウェア：SoftEther VPN プロジェクト - SoftEther VPN プロジェクト
+・メモリ：１GB
+・CPU：仮想２コア
+・HDD：100GB
+・OS：CentOS7
+・サーバ仮想化：Vagrant(Utuntu13)
+ 3. SoftEtherのインストール インストール手順は公式ドキュメント通りなので簡単にコマンドのみ記述して...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/12/07/212156/">全文を読む</a>

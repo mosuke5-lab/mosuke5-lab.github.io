@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>サーバ on Goldstine研究所</title>
-    <link>https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90/</link>
-    <description>Recent content in サーバ on Goldstine研究所</description>
+    <title>Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90/index.xml</link>
+    <description>Recent content on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Mon, 02 Feb 2015 20:10:00 +0900</lastBuildDate>
     <atom:link href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
@@ -84,7 +83,6 @@ xinetdはinetdの拡張版で、アクセス制御などの機能を搭載して
 &lt;p&gt;まずはxinetdとvsftpをインストール&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ sudo yum install xinetd vsftpd 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;br&gt;
@@ -100,7 +98,6 @@ xinetdどうこうの前に、&lt;a class=&#34;keyword&#34; href=&#34;http://d.h
 Connected to 192.168.33.10.
 220 (vsFTPd 2.2.2)
 Name (192.168.33.10:username): 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h1&gt;2. xinetdの設定&lt;/h1&gt;
@@ -123,7 +120,6 @@ service ftp
         log_on_failure  += USERID
 }
  
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;設定項目については以下参照。&lt;br&gt;
@@ -151,7 +147,6 @@ xinetd (pid  3521) is running...
 
 $ sudo service vsftpd status
 vsftpd is stopped 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;br&gt;
@@ -169,7 +164,6 @@ Connected to 192.168.33.10.
 &lt;pre&gt;&lt;code&gt;$ sudo tail /var/log/message
 Jan  1 15:07:25 server xinetd[3335]: START: ftp pid=3337 from=::ffff:192.168.33.1
 Jan  1 15:07:28 server xinetd[3335]: EXIT: ftp status=1 pid=3337 duration=3(sec) 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;接続できているようだがその後すぐに切断されているようにみえる。
@@ -182,7 +176,6 @@ vsftpd側の設定を疑ってみた。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;$ sudo vim /etc/vsftpd/vsftpd.conf
 listen=NO
  
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;vsftpdのlistenの設定は以下のとおり。&lt;/p&gt;
@@ -221,7 +214,6 @@ vagrant   3559  2742  0 16:18 pts/0    00:00:00 grep ftp
 &amp;gt; 接続終了後
 $ ps -ef | grep ftp
 vagrant   3552  2742  0 16:17 pts/0    00:00:00 grep ftp 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;br&gt;
@@ -257,48 +249,47 @@ init(1)-+-VBoxService(1003)-+-{VBoxService}(1004)
       <pubDate>Fri, 28 Nov 2014 00:17:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2014/11/28/001748/</guid>
-      <description>
-
-&lt;p&gt;&lt;body&gt;
+      <description>&lt;p&gt;&lt;body&gt;
 &lt;p&gt;Ansibleを&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Vagrant&#34;&gt;Vagrant&lt;/a&gt;上でずっと使ってて、Playbookも完成したし本番サーバへ&amp;hellip;&lt;br&gt;
 と思ったところである初歩的な罠にハマった。&lt;/p&gt;
-&lt;p&gt;本番環境へPalybook実行！！&lt;/p&gt;
-```
-$ ansible-playbook playbook.yml -i hosts&lt;/p&gt;
+&lt;p&gt;本番環境へPalybook実行！！&lt;/p&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;lt;p&amp;gt;あれ、GATHERING FACTSで10分以上も待たされた...&amp;lt;br&amp;gt;
-しかも、エラー出た...&amp;lt;/p&amp;gt;
+&lt;pre&gt;&lt;code&gt;$ ansible-playbook playbook.yml -i hosts 
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;GATHERING FACTS
-failed to parse [ sudo via ansible, key= &amp;hellip;.. ]
-&lt;code&gt;
-&amp;lt;p&amp;gt;sudoできていない...？&amp;lt;/p&amp;gt;
-&amp;lt;p&amp;gt;playbook内のsudo: yesを外して実行。&amp;lt;/p&amp;gt;
-&amp;lt;p&amp;gt;GATHERING FACTSは通過。&amp;lt;br&amp;gt;
-しかし、当たり前だがsudo で実行すべき部分で失敗...&amp;lt;/p&amp;gt;
-&amp;lt;p&amp;gt;とても単純なことに気づいた...&amp;lt;br&amp;gt;
-・&amp;lt;a class=&amp;quot;keyword&amp;quot; href=&amp;quot;http://d.hatena.ne.jp/keyword/Vagrant&amp;quot;&amp;gt;Vagrant&amp;lt;/a&amp;gt;環境ではsudoのパスワードを要求されない&amp;lt;br&amp;gt;
-・本番環境はsudoのパスワードを要求されること&amp;lt;br&amp;gt;
-・sudoのパスワードを入力するようにしていなかったこと&amp;lt;/p&amp;gt;
-&amp;lt;p&amp;gt;というわけで-Kをつけて実行&amp;lt;/p&amp;gt;
-&lt;/code&gt;
-$ ansible-playbook playbook.yml -i hosts -K&lt;/p&gt;
+&lt;p&gt;&lt;p&gt;あれ、GATHERING FACTSで10分以上も待たされた&amp;hellip;&lt;br&gt;
+しかも、エラー出た&amp;hellip;&lt;/p&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;lt;p&amp;gt;うまくいった...&amp;lt;/p&amp;gt;
-&amp;lt;p&amp;gt;完全なる私のミスなんだが、ただ-Kオプションを忘れるだけで、一回の実行に10分ほども待たされるのは…。&amp;lt;br&amp;gt;
-しかもGATHERING FACTSで止まっているときはCtl+Cで中断も聞かなかった。&amp;lt;/p&amp;gt;
-&amp;lt;p&amp;gt;要注意ですね。。。&amp;lt;/p&amp;gt;
-&amp;lt;br&amp;gt;
-&amp;lt;p&amp;gt;ちなみに、こんな方法で解決もできる。&amp;lt;br&amp;gt;
-sudoのパスワードを聞かれなくして対応。&amp;lt;/p&amp;gt;
+&lt;pre&gt;&lt;code&gt;GATHERING FACTS
+failed to parse [ sudo via ansible, key= ..... ] 
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h1 id=&#34;visudo:e62e8b218521d80b052b676f1c595d9b&#34;&gt;visudo&lt;/h1&gt;
+&lt;p&gt;&lt;p&gt;sudoできていない&amp;hellip;？&lt;/p&gt;
+&lt;p&gt;playbook内のsudo: yesを外して実行。&lt;/p&gt;
+&lt;p&gt;GATHERING FACTSは通過。&lt;br&gt;
+しかし、当たり前だがsudo で実行すべき部分で失敗&amp;hellip;&lt;/p&gt;
+&lt;p&gt;とても単純なことに気づいた&amp;hellip;&lt;br&gt;
+・&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Vagrant&#34;&gt;Vagrant&lt;/a&gt;環境ではsudoのパスワードを要求されない&lt;br&gt;
+・本番環境はsudoのパスワードを要求されること&lt;br&gt;
+・sudoのパスワードを入力するようにしていなかったこと&lt;/p&gt;
+&lt;p&gt;というわけで-Kをつけて実行&lt;/p&gt;&lt;/p&gt;
 
-&lt;p&gt;user_name ALL=(ALL) NOPASSWD: ALL
-```
-&lt;/body&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ ansible-playbook playbook.yml -i hosts -K 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;p&gt;うまくいった&amp;hellip;&lt;/p&gt;
+&lt;p&gt;完全なる私のミスなんだが、ただ-Kオプションを忘れるだけで、一回の実行に10分ほども待たされるのは…。&lt;br&gt;
+しかもGATHERING FACTSで止まっているときはCtl+Cで中断も聞かなかった。&lt;/p&gt;
+&lt;p&gt;要注意ですね。。。&lt;/p&gt;
+&lt;br&gt;
+&lt;p&gt;ちなみに、こんな方法で解決もできる。&lt;br&gt;
+sudoのパスワードを聞かれなくして対応。&lt;/p&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# visudo
+user_name ALL=(ALL) NOPASSWD: ALL 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/body&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -314,28 +305,29 @@ sudoのパスワードを聞かれなくして対応。&amp;lt;/p&amp;gt;
 これが面倒だったので多段&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;の設定をして、一発で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;接続できるようにした。&lt;/p&gt;
 &lt;p&gt;以下の図で言うと、web10, web11(192.168.33.&lt;sup&gt;10&lt;/sup&gt;&amp;frasl;&lt;sub&gt;11&lt;/sub&gt;)に一発で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;できるようにする。&lt;br&gt;
 &lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141109/20141109170337.png&#34; alt=&#34;f:id:mosuke5:20141109170337p:plain&#34; title=&#34;f:id:mosuke5:20141109170337p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;クライアントPC側に以下の設定をした。&lt;/p&gt;
-```
-$ vim ~/.ssh/config
+&lt;p&gt;クライアントPC側に以下の設定をした。&lt;/p&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ vim ~/.ssh/config
 host gateway
     HostName xxxxx.xxx
-    User username&lt;/p&gt;
+    User username
 
-&lt;p&gt;Host web10
+Host web10
     HostName 192.168.33.10
     User vagrant
-    ProxyCommand ssh -W %h:%p gateway&lt;/p&gt;
+    ProxyCommand ssh -W %h:%p gateway
 
-&lt;p&gt;Host web11
+Host web11
     HostName 192.168.33.11
     User vagrant
-    ProxyCommand ssh -W %h:%p gateway&lt;/p&gt;
+    ProxyCommand ssh -W %h:%p gateway
 
-&lt;p&gt;##これで以下で接続可能
+##これで以下で接続可能
 $ ssh web10
-$ ssh  web11
-```
-&lt;p&gt;簡単でした。&lt;/p&gt;
+$ ssh  web11 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;p&gt;簡単でした。&lt;/p&gt;
 &lt;/body&gt;&lt;/p&gt;
 </description>
     </item>

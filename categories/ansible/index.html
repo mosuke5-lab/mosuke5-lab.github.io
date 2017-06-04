@@ -8,7 +8,7 @@
     <meta name="description" content="mosuke5&#39;s blog">
     <link rel="canonical" href="https://blog.mosuke.tech/categories/ansible/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Ansible &middot; Goldstine研究所">
@@ -74,7 +74,13 @@
                     </header>
 
                     <div class="post-description">
-                        Vagrant×Ansibleで開発環境を作っているみなさんは、 どんなふうにそれを実現していますか？ きっといくつかのやり方、考え方があると思います。 例えば、ご自身のPCにAnsibleをインストールしてVagrantの仮想環境にプロビジョ�...
+                        Vagrant×Ansibleで開発環境を作っているみなさんは、 どんなふうにそれを実現していますか？
+きっといくつかのやり方、考え方があると思います。
+例えば、ご自身のPCにAnsibleをインストールしてVagrantの仮想環境にプロビジョニングしているとか。
+Vagrantで立てた仮想環境にAnsibleを入れて実行するとか。
+本ブログでは下記３つのVagrant×Ansibleのやり方に注目し、
+そのメリット・デメリットについて自分なりにまとめます。
+ ホストにAnsibleをインストールして利用する ゲストにAnsibleをインストールして利用する Ansible実行用のゲストを作っ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2016/01/25/222150/">全文を読む</a>
@@ -100,7 +106,12 @@
                     </header>
 
                     <div class="post-description">
-                        はじめに 私が開発しているシステムでは、Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。 そして、serverspecを使って、インフラテストも行っています。 しかし、その運用にい�...
+                        はじめに
+私が開発しているシステムでは、Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。 そして、serverspecを使って、インフラテストも行っています。
+しかし、その運用にいくつか課題点がありました。
+その課題点についてと、課題点へ対策したことについて書きます。
+課題だったこと (課題1) デプロイとテストをそれぞれ実行していた Ansibleでのデプロイとserverspecのテストはそれぞれ別のコマンドで実行していました。
+$ ansible-playbook site.yml -i $ bundle exec rake serversp...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/12/17/192554/">全文を読む</a>
@@ -126,7 +137,14 @@
                     </header>
 
                     <div class="post-description">
-                        1. はじめに Vim::Factoryの開発や、仕事などでAnsibleを使うことが多いのだが、 その実行速度があまりでないことに不満をもっていて、どうしたら早くできるか考えていました。 調べると、ControlMasterを利用してSSHのコネクショ�...
+                        1. はじめに
+Vim::Factoryの開発や、仕事などでAnsibleを使うことが多いのだが、
+その実行速度があまりでないことに不満をもっていて、どうしたら早くできるか考えていました。
+調べると、ControlMasterを利用してSSHのコネクションを再利用するとか、pipelineの機能を利用するとかでてくる。
+が、それによってどのくらいの効果が得られるのかよくわからないし、仕組みもよくわかっていなかったので、仕組みの理解と実行速度の実験をした。
+もう少し余談をすると、
+ControlMasterを有効にすれば早くなることは前から知っていたが、
+最近MacをEl Capitanに変えて...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/12/01/181304/">全文を読む</a>
@@ -152,7 +170,16 @@
                     </header>
 
                     <div class="post-description">
-                        タイトルの通りで、なにも特別なことはない内容。 そして、9月も終わりなのに今月はひとつも記事を書いていなかった。 KVMを使って仮想のゲストサーバを立てたが、 ゲストサーバはホストサーバと通信する用の（外に出�...
+                        タイトルの通りで、なにも特別なことはない内容。
+そして、9月も終わりなのに今月はひとつも記事を書いていなかった。
+KVMを使って仮想のゲストサーバを立てたが、
+ゲストサーバはホストサーバと通信する用の（外に出る場合にはNAT通信で）IPアドレスしか持っていない状況で、
+Ansibleの実行対象としたかったのが背景。
+ホストサーバにAnsibleをいれるわけにもいかず、ホストサーバを踏み台にして、
+Ansibleを打ちたかったというもの。
+
+ SSHの設定ファイルを作る &#34;Ansibleで&#34; と書いたが要はSSHです。
+まずはSSHで踏み台サーバを経由してAnsible実行対象サーバへ接続できる...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/09/25/232751/">全文を読む</a>
@@ -178,7 +205,10 @@
                     </header>
 
                     <div class="post-description">
-                        CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にハマったことをまとめた。 本質的にはAnsibleというよりLinux RPMパッケージのはなし。 ついでに、しょっぼいgithubを公開しました。 (1) 本記事を書く...
+                        CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にハマったことをまとめた。
+本質的にはAnsibleというよりLinux RPMパッケージのはなし。
+ついでに、しょっぼいgithubを公開しました。
+(1) 本記事を書くに至った経緯  Ansibleでmysqlを使ったサーバを構築(CentOS6.5)することになった。   MySQLのバージョンは5.6を採用した。    MySQLの公式rpmをダウンロードしインストールした。  インストールしたもの：MySQL-client, MySQL-devel, MySQL-server, MySQL...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/04/15/171127/">全文を読む</a>
@@ -204,7 +234,15 @@
                     </header>
 
                     <div class="post-description">
-                        Ansibleでソースコードインストールする際とか すでにインストールされているかのチェックなどで、 シェルコマンドを実行してその結果で判断したい時がある。 ぼくがよくやる例では以下とか。 - name: check httpd installed command...
+                        Ansibleでソースコードインストールする際とか
+すでにインストールされているかのチェックなどで、
+シェルコマンドを実行してその結果で判断したい時がある。
+ぼくがよくやる例では以下とか。
+- name: check httpd installed command: which httpd ignore_errors: true  なんですが...
+こうやってしまうと、仮に既にインストールされていて、正常なときでも&#34;changed&#34;と表示されてしまう。
+これでは、本当にchangedなものなのか、わからなくなってくる。
+これを解決するのにchaged_whenを使うといい。
+- name: c...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/02/02/201008/">全文を読む</a>
@@ -230,7 +268,13 @@
                     </header>
 
                     <div class="post-description">
-                        AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&amp;hellip; と思ったところである初歩的な罠にハマった。 本番環境へPalybook実行！！ ``` $ ansible-playbook playbook.yml -i hosts &amp;lt;p&amp;gt;あれ、GATHERING FACTSで10分以上も待�...
+                        AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&amp;hellip;
+と思ったところである初歩的な罠にハマった。
+本番環境へPalybook実行！！
+$ ansible-playbook playbook.yml -i hosts  あれ、GATHERING FACTSで10分以上も待たされた&amp;hellip;
+しかも、エラー出た&amp;hellip;
+GATHERING FACTS failed to parse [ sudo via ansible, key= ..... ]  sudoできていない&amp;hellip;？
+playbook内のsudo: yesを外...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/28/001748/">全文を読む</a>
@@ -256,7 +300,12 @@
                     </header>
 
                     <div class="post-description">
-                        AnsibleのPlaybookを書いていると、ワイルドカードを含んだコマンドを実行したい時がある。 そんなときあるところでハマった。 Apacheをソースインストールして、パスを/usr/sbinにリンクを貼ろうとして以下を実行した。 - command...
+                        AnsibleのPlaybookを書いていると、ワイルドカードを含んだコマンドを実行したい時がある。
+そんなときあるところでハマった。
+Apacheをソースインストールして、パスを/usr/sbinにリンクを貼ろうとして以下を実行した。
+- command: ln -s /usr/local/httpd/bin/* /usr/sbin  /usr/sbin内に「*」というリンクが貼られてしまった。
+* -&amp;gt; /usr/local/httpd/bin  どうやらcommandモジュールはワイルドカードに対応していないよう。
+ワイルドカードを使いたいときはshellモジュールを利用すると良い...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/18/225542/">全文を読む</a>
@@ -282,7 +331,18 @@
                     </header>
 
                     <div class="post-description">
-                        最近、Ansibleを使い始めたのだが、yumやapt-getでインストールできるものはいいけど、 どうしてもソースインストールが必要な場合がある。 ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。 まず、あたり�...
+                        最近、Ansibleを使い始めたのだが、yumやapt-getでインストールできるものはいいけど、
+どうしてもソースインストールが必要な場合がある。
+ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。
+まず、あたりまえだが、ソースインストールを行うには以下のフローを踏まなければいけな。
+1. ソースファイルの取得(tarで固められていると仮定)
+2. tarファイルの解凍
+3. 解答してできたディレクトリへ移動
+4. configure
+5. make
+6. make install
+また、Ansibleでは何回もPlaybookを実行していくため、
+すでにインストールさ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/16/153223/">全文を読む</a>

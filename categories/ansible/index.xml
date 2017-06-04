@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Ansible on Goldstine研究所</title>
-    <link>https://blog.mosuke.tech/categories/ansible/</link>
-    <description>Recent content in Ansible on Goldstine研究所</description>
+    <title>Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/ansible/index.xml</link>
+    <description>Recent content on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Mon, 25 Jan 2016 22:21:00 +0900</lastBuildDate>
     <atom:link href="https://blog.mosuke.tech/categories/ansible/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
@@ -131,7 +130,6 @@ Ansibleを使ってプロダクション環境にデプロイするユーザに�
 
 &lt;pre&gt;&lt;code&gt;$ ansible-playbook site.yml -i 
 $ bundle exec rake serverspec 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;2つ実行することが面倒であり、面倒であるがゆえにserverspecの実行を怠ったりしていました。&lt;br&gt;
@@ -156,7 +154,6 @@ serverspecでも&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/ke
 
 &lt;pre&gt;&lt;code&gt;ansible -playbook site.yml -i --extra-args=&#39;ansible_sudo_pass=xxxxxxxx&#39;
 bundle exec rake serverspec SUDO_PASSWORD=xxxxxxxx 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;ですが、おわかりの通り、&lt;b&gt;コマンドの履歴にもパスワードが残ります&lt;/b&gt;。&lt;br&gt;
@@ -281,7 +278,6 @@ Pipelining機能をなしの状態だと、このファイル転送とファイ�
 &amp;lt;192.168.33.100&amp;gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&amp;quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&amp;quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c &#39;mkdir -p $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321 &amp;amp;&amp;amp; chmod a+rx $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321 &amp;amp;&amp;amp; echo $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321&#39;
 &amp;lt;192.168.33.100&amp;gt; PUT /var/folders/7_/d_dwdlcx1m95mn_846x30xb40000gn/T/tmpc8amAw TO /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/command
 &amp;lt;192.168.33.100&amp;gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&amp;quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&amp;quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c &#39;sudo -k &amp;amp;&amp;amp; sudo -E -S -p &amp;quot;[sudo via ansible, key=koibtlgpbiprbaihcqxiqgcnnreofxuo] password: &amp;quot; -u root /bin/sh -c &#39;&amp;quot;&#39;&amp;quot;&#39;echo BECOME-SUCCESS-koibtlgpbiprbaihcqxiqgcnnreofxuo; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/command; rm -rf /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/ &amp;gt;/dev/null 2&amp;gt;&amp;amp;1&#39;&amp;quot;&#39;&amp;quot;&#39;&#39; 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Pipiliningの機能を有効にすると、タスク実行ごとのモジュールファイルの転送と削除をしなくなる。&lt;br&gt;
@@ -350,7 +346,6 @@ transport = ssh
 [ssh_connection]
 pipeline = false
 ssh_args = -o ControlMaster=no 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;② ControlMaster: &lt;b&gt;&lt;span style=&#34;color: #ff0000&#34;&gt;有効&lt;/span&gt;&lt;/b&gt; ＆ pipeline: &lt;b&gt;無効&lt;/b&gt;&lt;/p&gt;
@@ -371,7 +366,6 @@ transport = ssh
 [ssh_connection]
 pipeline = true
 ssh_args = -o ControlMaster=auto -o ControlPersist=300s 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2&gt;実行コマンド&lt;/h2&gt;
@@ -455,7 +449,6 @@ Host ansible-target
     HostName 192.168.33.10
     User xxxxx
     ProxyCommand ssh -W %h:%p yyyyy@hostserver 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;上記のファイルを使って多段&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;できることを確認します。&lt;/p&gt;
@@ -612,48 +605,47 @@ mysql_rpms:
       <pubDate>Fri, 28 Nov 2014 00:17:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2014/11/28/001748/</guid>
-      <description>
-
-&lt;p&gt;&lt;body&gt;
+      <description>&lt;p&gt;&lt;body&gt;
 &lt;p&gt;Ansibleを&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Vagrant&#34;&gt;Vagrant&lt;/a&gt;上でずっと使ってて、Playbookも完成したし本番サーバへ&amp;hellip;&lt;br&gt;
 と思ったところである初歩的な罠にハマった。&lt;/p&gt;
-&lt;p&gt;本番環境へPalybook実行！！&lt;/p&gt;
-```
-$ ansible-playbook playbook.yml -i hosts&lt;/p&gt;
+&lt;p&gt;本番環境へPalybook実行！！&lt;/p&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;lt;p&amp;gt;あれ、GATHERING FACTSで10分以上も待たされた...&amp;lt;br&amp;gt;
-しかも、エラー出た...&amp;lt;/p&amp;gt;
+&lt;pre&gt;&lt;code&gt;$ ansible-playbook playbook.yml -i hosts 
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;GATHERING FACTS
-failed to parse [ sudo via ansible, key= &amp;hellip;.. ]
-&lt;code&gt;
-&amp;lt;p&amp;gt;sudoできていない...？&amp;lt;/p&amp;gt;
-&amp;lt;p&amp;gt;playbook内のsudo: yesを外して実行。&amp;lt;/p&amp;gt;
-&amp;lt;p&amp;gt;GATHERING FACTSは通過。&amp;lt;br&amp;gt;
-しかし、当たり前だがsudo で実行すべき部分で失敗...&amp;lt;/p&amp;gt;
-&amp;lt;p&amp;gt;とても単純なことに気づいた...&amp;lt;br&amp;gt;
-・&amp;lt;a class=&amp;quot;keyword&amp;quot; href=&amp;quot;http://d.hatena.ne.jp/keyword/Vagrant&amp;quot;&amp;gt;Vagrant&amp;lt;/a&amp;gt;環境ではsudoのパスワードを要求されない&amp;lt;br&amp;gt;
-・本番環境はsudoのパスワードを要求されること&amp;lt;br&amp;gt;
-・sudoのパスワードを入力するようにしていなかったこと&amp;lt;/p&amp;gt;
-&amp;lt;p&amp;gt;というわけで-Kをつけて実行&amp;lt;/p&amp;gt;
-&lt;/code&gt;
-$ ansible-playbook playbook.yml -i hosts -K&lt;/p&gt;
+&lt;p&gt;&lt;p&gt;あれ、GATHERING FACTSで10分以上も待たされた&amp;hellip;&lt;br&gt;
+しかも、エラー出た&amp;hellip;&lt;/p&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;lt;p&amp;gt;うまくいった...&amp;lt;/p&amp;gt;
-&amp;lt;p&amp;gt;完全なる私のミスなんだが、ただ-Kオプションを忘れるだけで、一回の実行に10分ほども待たされるのは…。&amp;lt;br&amp;gt;
-しかもGATHERING FACTSで止まっているときはCtl+Cで中断も聞かなかった。&amp;lt;/p&amp;gt;
-&amp;lt;p&amp;gt;要注意ですね。。。&amp;lt;/p&amp;gt;
-&amp;lt;br&amp;gt;
-&amp;lt;p&amp;gt;ちなみに、こんな方法で解決もできる。&amp;lt;br&amp;gt;
-sudoのパスワードを聞かれなくして対応。&amp;lt;/p&amp;gt;
+&lt;pre&gt;&lt;code&gt;GATHERING FACTS
+failed to parse [ sudo via ansible, key= ..... ] 
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h1 id=&#34;visudo:e62e8b218521d80b052b676f1c595d9b&#34;&gt;visudo&lt;/h1&gt;
+&lt;p&gt;&lt;p&gt;sudoできていない&amp;hellip;？&lt;/p&gt;
+&lt;p&gt;playbook内のsudo: yesを外して実行。&lt;/p&gt;
+&lt;p&gt;GATHERING FACTSは通過。&lt;br&gt;
+しかし、当たり前だがsudo で実行すべき部分で失敗&amp;hellip;&lt;/p&gt;
+&lt;p&gt;とても単純なことに気づいた&amp;hellip;&lt;br&gt;
+・&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Vagrant&#34;&gt;Vagrant&lt;/a&gt;環境ではsudoのパスワードを要求されない&lt;br&gt;
+・本番環境はsudoのパスワードを要求されること&lt;br&gt;
+・sudoのパスワードを入力するようにしていなかったこと&lt;/p&gt;
+&lt;p&gt;というわけで-Kをつけて実行&lt;/p&gt;&lt;/p&gt;
 
-&lt;p&gt;user_name ALL=(ALL) NOPASSWD: ALL
-```
-&lt;/body&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ ansible-playbook playbook.yml -i hosts -K 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;p&gt;うまくいった&amp;hellip;&lt;/p&gt;
+&lt;p&gt;完全なる私のミスなんだが、ただ-Kオプションを忘れるだけで、一回の実行に10分ほども待たされるのは…。&lt;br&gt;
+しかもGATHERING FACTSで止まっているときはCtl+Cで中断も聞かなかった。&lt;/p&gt;
+&lt;p&gt;要注意ですね。。。&lt;/p&gt;
+&lt;br&gt;
+&lt;p&gt;ちなみに、こんな方法で解決もできる。&lt;br&gt;
+sudoのパスワードを聞かれなくして対応。&lt;/p&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# visudo
+user_name ALL=(ALL) NOPASSWD: ALL 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/body&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -674,24 +666,25 @@ sudoのパスワードを聞かれなくして対応。&amp;lt;/p&amp;gt;
 &lt;p&gt;/usr/sbin内に「*」というリンクが貼られてしまった。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;* -&amp;gt; /usr/local/httpd/bin 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;p&gt;どうやらcommandモジュールは&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EF%A5%A4%A5%EB%A5%C9%A5%AB%A1%BC%A5%C9&#34;&gt;ワイルドカード&lt;/a&gt;に対応していないよう。&lt;br&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EF%A5%A4%A5%EB%A5%C9%A5%AB%A1%BC%A5%C9&#34;&gt;ワイルドカード&lt;/a&gt;を使いたいときはshellモジュールを利用すると良い。&lt;/p&gt;
-&lt;code&gt;yaml
-- shell: ln -s /usr/local/httpd/bin/* /usr/sbin
-&lt;/code&gt;
-&lt;p&gt;また、&lt;em&gt;というリンクを消すときは要注意（笑）&lt;/p&gt;
-```
-$ rm ./&lt;/em&gt;&lt;/p&gt;
+&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EF%A5%A4%A5%EB%A5%C9%A5%AB%A1%BC%A5%C9&#34;&gt;ワイルドカード&lt;/a&gt;を使いたいときはshellモジュールを利用すると良い。&lt;/p&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;lt;p&amp;gt;とやってしまうとあたりまえだがやばいので&amp;lt;/p&amp;gt;
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;- shell: ln -s /usr/local/httpd/bin/* /usr/sbin
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;$ rm ./¥*
-```
-&lt;p&gt;こうですね…&lt;/p&gt;
+&lt;p&gt;&lt;p&gt;また、*というリンクを消すときは要注意（笑）&lt;/p&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ rm ./* 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;p&gt;とやってしまうとあたりまえだがやばいので&lt;/p&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ rm ./¥* 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;p&gt;こうですね…&lt;/p&gt;
 &lt;/body&gt;&lt;/p&gt;
 </description>
     </item>

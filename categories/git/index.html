@@ -8,7 +8,7 @@
     <meta name="description" content="mosuke5&#39;s blog">
     <link rel="canonical" href="https://blog.mosuke.tech/categories/git/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Git &middot; Goldstine研究所">
@@ -74,7 +74,14 @@
                     </header>
 
                     <div class="post-description">
-                        Gitレポジトリを作って、複数人で開発をしていた。 しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、 Push, PullするときにPermission errorで怒られまくる。 ユーザには共通のグル�...
+                        Gitレポジトリを作って、複数人で開発をしていた。
+しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、
+Push, PullするときにPermission errorで怒られまくる。
+ユーザには共通のグループを作っていたのに…なんでだっけ…
+気づけばレポジトリを作るとき以下のようにしていた。
+$ git init --bare  複数人で共有するときには以下のようにするべきであった。
+$ git init --bare --shared  では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。
+調べると「setgid」というキーワ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/20/230334/">全文を読む</a>

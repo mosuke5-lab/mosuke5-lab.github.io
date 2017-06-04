@@ -8,7 +8,7 @@
     <meta name="description" content="mosuke5&#39;s blog">
     <link rel="canonical" href="https://blog.mosuke.tech/categories/nginx/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Nginx &middot; Goldstine研究所">
@@ -74,7 +74,12 @@
                     </header>
 
                     <div class="post-description">
-                        ただのめも。 もともとApache&#43;PHPで動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになった。（理由はここではどうでもいいので書かない） つまり、Nginx-&amp;gt;Apache-&amp;gt;PHPという構成になった。 よくあるこ...
+                        ただのめも。
+もともとApache&#43;PHPで動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになった。（理由はここではどうでもいいので書かない）
+つまり、Nginx-&amp;gt;Apache-&amp;gt;PHPという構成になった。
+よくあることだが、Apacheからみるとすべてリバースプロキシから通信がきているので、 接続元のIPアドレスがすべてリバースプロキシのものになる。
+HTTPヘッダーに接続元のIPアドレスを追加しアプリ側（PHP）で受け取ろうとしたときのめも。
+リバースプロキシ側でHTTPヘッダー追加 まず、そもそもデフォルトのNginxの設定では接続元のIPアドレスを...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2016/07/26/215939/">全文を読む</a>
@@ -100,7 +105,11 @@
                     </header>
 
                     <div class="post-description">
-                        普段Nginxを使ってはいるものの、その仕組やなぜNignxを使うべきなのかというところがあまりわかっていなかったので、 改めてNginxを入門しその仕組などについて調べてみた。 勉強不足もあって、間違ってることもあるかも�...
+                        普段Nginxを使ってはいるものの、その仕組やなぜNignxを使うべきなのかというところがあまりわかっていなかったので、 改めてNginxを入門しその仕組などについて調べてみた。
+勉強不足もあって、間違ってることもあるかもしれないがその際は教えて下さい。
+1. C10K問題 まず、Nginxを理解する上でC10K問題について知る必要がある。
+C10K問題とは下記の問題のことだ。
+ハードウェアの性能上は問題がなくても、クライアント数があまりにも多くなるとサーバがパンクする問題のこと。 C は「Client（クライアント）」の頭文字、10K は「1 万台」を意味する。「クライアント 1 万台問題」...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2016/06/04/180122/">全文を読む</a>
@@ -126,7 +135,17 @@
                     </header>
 
                     <div class="post-description">
-                        ロードバランシングとかクラスタリングとかリバースプロキシとか、 業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりない。 自分で構築してみたいなーと思いつつもあたりまえだけど、�...
+                        ロードバランシングとかクラスタリングとかリバースプロキシとか、
+業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりない。
+自分で構築してみたいなーと思いつつもあたりまえだけど、サーバやネットワーク機器をそう簡単に調達もできない。
+お金も当然ない。
+というわけで、さくらVPSで仮想化つかってロードバランシングとかクラスタリングとかリバースプロキシとか勉強しましょうという「サーバインフラ会」を友人と始めた。
+その第１回目のメモ。
+第1回 サーバ複数台構成、Nginxでリバースプロキシ構築
+第2回 HAProxyでロードバランサ構築
+
+
+1. 使用した環境 まず今回利用した...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/10/09/230555/">全文を読む</a>

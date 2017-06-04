@@ -8,7 +8,7 @@
     <meta name="description" content=" Ethernetシールドを使ってネットワークへ繋げる。 とりあえずは、スモールステップでPCとの1対1の通信。       PCとの1対1通信      構成図   Arduinoソースコード  #include &lt;SPI.h&gt;">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2014/09/13/111537/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="【Ethernetシールド】Arduinoをネットワークへ繋げる(1) &middot; Goldstine研究所">
@@ -134,16 +134,16 @@ Request timeout for icmp_seq 0
 <p>構成図<br>
 <span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140913/20140913110038.png" alt="f:id:mosuke5:20140913110038p:plain" title="f:id:mosuke5:20140913110038p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a>ルータから有線LANケーブルを伸ばし<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>に結線。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>による<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>の取得はとても容易で以下のようにマックアドレスを指定するのみ。</p>
-```
-Ethernet.begin(mac)</p>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>による<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>の取得はとても容易で以下のようにマックアドレスを指定するのみ。</p></p>
 
-<pre><code>&lt;p&gt;以下は&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/Arduino&quot;&gt;Arduino&lt;/a&gt;公式サイトに則って実施したもの。&lt;br&gt;
-&lt;a href=&quot;http://arduino.cc/en/Tutorial/DhcpAddressPrinter&quot;&gt;Arduino - DhcpAddressPrinter&lt;/a&gt;&lt;br&gt;
-&lt;/p&gt;
+<pre><code>Ethernet.begin(mac) 
+</code></pre>
 
-```c
-#include &lt;SPI.h&gt;
+<p>以下は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>公式サイトに則って実施したもの。<br>
+<a href="http://arduino.cc/en/Tutorial/DhcpAddressPrinter">Arduino - DhcpAddressPrinter</a><br>
+</p>
+
+<pre><code class="language-c">#include &lt;SPI.h&gt;
 #include &lt;Ethernet.h&gt;
 
 //Mac Address Static

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Docker on Goldstine研究所</title>
-    <link>https://blog.mosuke.tech/categories/docker/</link>
-    <description>Recent content in Docker on Goldstine研究所</description>
+    <title>Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/docker/index.xml</link>
+    <description>Recent content on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sun, 03 Jul 2016 22:45:00 +0900</lastBuildDate>
     <atom:link href="https://blog.mosuke.tech/categories/docker/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
@@ -183,7 +182,6 @@ httpのリクエストが来てからdockerコンテナを立ち上げても十�
 &lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ssh&#34;&gt;ssh&lt;/a&gt;でリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;ssh user@host &#39;docker run -t -i image_name /bin/bash&#39; 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;そうすると&lt;/p&gt;
@@ -231,7 +229,6 @@ httpのリクエストが来てからdockerコンテナを立ち上げても十�
 &lt;p&gt;docker runに-uオプションがあるし、これで余裕！と思った。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;[host] $ sudo docker run -u=user_name -i -t image_name /bin/bash 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;しかし…以下を確認してみると…&lt;/p&gt;
@@ -251,7 +248,6 @@ httpのリクエストが来てからdockerコンテナを立ち上げても十�
 &lt;p&gt;ディレクトリはどうやら-wオプションで解決できるようだが…&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;[host] $ sudo docker run -u=user_name -w /home/user_name -i -t image_name /bin/bash 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;pre&gt;&lt;code&gt;[docker] $ pwd

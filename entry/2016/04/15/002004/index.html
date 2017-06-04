@@ -8,7 +8,7 @@
     <meta name="description" content=" tmuxの入門は何度目だろうか… SoftwareDesignの2015年7月号を見ながら、何度目かの入門をしたのでメモする。 ブログに書いたので、これで運用にのりそうだ。  tmuxってなに？  公式ページ(http://tmux.gi">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2016/04/15/002004/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="今度こそ入門するtmux &middot; Goldstine研究所">
@@ -94,7 +94,6 @@ SoftwareDesignの2015年7月号を見ながら、何度目かの入門をした�
 <pre><code>$ brew install tmux
 $ tmux -V
 tmux 2.1 
-
 </code></pre>
 
 <h1>起動</h1>
@@ -148,7 +147,6 @@ tmuxを起動した状態で<code>Ctrl-b</code>+<code>d</code>を押してみよ
 
 <pre><code>$ tmux ls
 0: 1 windows (created Thu Apr 14 21:26:19 2016) [129x32] 
-
 </code></pre>
 
 <p>ではアタッチしてみよう。下記で元のtmuxに戻ってくるはずです。</p>
@@ -167,7 +165,6 @@ tmuxを使わずにpstreeコマンドを打つと、<a class="keyword" href="htt
 <pre><code>$ pstree -p
 systemd(1)
     ├─sshd(13589)─┬─sshd(15066)───sshd(15068)───bash(15069)───pstree(15115) 
-
 </code></pre>
 
 <p>一方、tmuxを起動し、tmux上でpstreeを実行すると、<a class="keyword" href="http://d.hatena.ne.jp/keyword/sshd">sshd</a>のプロセスの下にはtmuxが動いており、<br>

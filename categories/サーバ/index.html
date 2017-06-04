@@ -6,9 +6,9 @@
     <title>サーバ &middot; Goldstine研究所</title>
 
     <meta name="description" content="mosuke5&#39;s blog">
-    <link rel="canonical" href="https://blog.mosuke.tech/categories/e382b5e383bce38390/">
+    <link rel="canonical" href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="サーバ &middot; Goldstine研究所">
@@ -74,7 +74,15 @@
                     </header>
 
                     <div class="post-description">
-                        Ansibleでソースコードインストールする際とか すでにインストールされているかのチェックなどで、 シェルコマンドを実行してその結果で判断したい時がある。 ぼくがよくやる例では以下とか。 - name: check httpd installed command...
+                        Ansibleでソースコードインストールする際とか
+すでにインストールされているかのチェックなどで、
+シェルコマンドを実行してその結果で判断したい時がある。
+ぼくがよくやる例では以下とか。
+- name: check httpd installed command: which httpd ignore_errors: true  なんですが...
+こうやってしまうと、仮に既にインストールされていて、正常なときでも&#34;changed&#34;と表示されてしまう。
+これでは、本当にchangedなものなのか、わからなくなってくる。
+これを解決するのにchaged_whenを使うといい。
+- name: c...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/02/02/201008/">全文を読む</a>
@@ -100,7 +108,16 @@
                     </header>
 
                     <div class="post-description">
-                        使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。 そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させ�...
+                        使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。
+そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させることが可能らしい。
+ということで、そのスーパーサーバとやらを実際に触ってみた。
+スーパーサーバというとinetdとxinetdがあるらしいが、
+xinetdはinetdの拡張版で、アクセス制御などの機能を搭載しているとのこと。
+今回はxinetdを設定してみる。
+1. 事前準備 【環境】
+Vagrantで構築したCentOS 6.5
+(仮想環境のIPアドレスは192.168.33.10)
+まずは...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/01/02/013658/">全文を読む</a>
@@ -126,7 +143,13 @@
                     </header>
 
                     <div class="post-description">
-                        AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&amp;hellip; と思ったところである初歩的な罠にハマった。 本番環境へPalybook実行！！ ``` $ ansible-playbook playbook.yml -i hosts &amp;lt;p&amp;gt;あれ、GATHERING FACTSで10分以上も待�...
+                        AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&amp;hellip;
+と思ったところである初歩的な罠にハマった。
+本番環境へPalybook実行！！
+$ ansible-playbook playbook.yml -i hosts  あれ、GATHERING FACTSで10分以上も待たされた&amp;hellip;
+しかも、エラー出た&amp;hellip;
+GATHERING FACTS failed to parse [ sudo via ansible, key= ..... ]  sudoできていない&amp;hellip;？
+playbook内のsudo: yesを外...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/28/001748/">全文を読む</a>
@@ -152,7 +175,13 @@
                     </header>
 
                     <div class="post-description">
-                        VPS1台でインフラ勉強の会で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てたが、 仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければならない。 これが面倒だったので多...
+                        VPS1台でインフラ勉強の会で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てたが、
+仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければならない。
+これが面倒だったので多段SSHの設定をして、一発でSSH接続できるようにした。
+以下の図で言うと、web10, web11(192.168.33.10&amp;frasl;11)に一発でSSHできるようにする。
+
+クライアントPC側に以下の設定をした。
+$ vim ~/.ssh/config host gateway HostName xxxxx.xxx User username Host web10 Hos...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/09/172745/">全文を読む</a>
@@ -178,7 +207,14 @@
                     </header>
 
                     <div class="post-description">
-                        2012年07月18日から契約していたVPSサーバを本日解約した。 約２年間の契約していたわけだがちょっと振り返るといろいろあったなーと思う。 ぼくがまだ大学３年のとき、ソーシャルブックマークサービスをリリースしたの�...
+                        2012年07月18日から契約していたVPSサーバを本日解約した。
+約２年間の契約していたわけだがちょっと振り返るといろいろあったなーと思う。
+ぼくがまだ大学３年のとき、ソーシャルブックマークサービスをリリースしたのだが、
+その時はまだエンジニア初心者で、VPSではなく共有サーバを利用していた。
+そんなプロジェクトが終わり、次のサービス(Twitterの解析ツール)の開発で初めてVPS環境を与えられたのだが、
+サーバ構築など右も左もわからなかったので、自分の勉強用環境としてVPSを契約。VPS環境で行ったこと&amp;gt;
+プロダクトとしては次の３つくらい作った
+・Amazonの最安値段通知サービス...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/05/18/142838/">全文を読む</a>

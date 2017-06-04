@@ -8,7 +8,7 @@
     <meta name="description" content=" 今更FuelPHP感はあるのだが、 postgresql利用時のFuelPHPのmigration導入について、注意点をまとめた。 でも、結論は納得がいっていない。  0. 前提  下記の環境で行ったものです。 PHP: 5.5.7 Fu">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/06/17/212852/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="PostgreSQL環境でFuelPHPのDBマイグレーションを使う &middot; Goldstine研究所">
@@ -122,7 +122,6 @@ LINE 5: )DEFAULT CHARACTER SET utf8;
 &quot;name&quot; varchar(50) NOT NULL,
 &quot;migration&quot; varchar(100) DEFAULT '' NOT NULL
 )DEFAULT CHARACTER SET utf8;&quot; 
-
 </code></pre>
 
 <h1>理由</h1>
@@ -155,7 +154,6 @@ LINE 5: )DEFAULT CHARACTER SET utf8;
 <p>簡単に言うとdbのコンフィグで、charsetをnullにすると<code>DEFAULT CHARACTER SET xxx</code>部分が発行されない。</p>
 
 <pre><code>'charset' =&gt; NULL, 
-
 </code></pre>
 
 <h1>2. PRIMARY KEYの問題</h1>

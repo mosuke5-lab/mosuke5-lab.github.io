@@ -8,7 +8,7 @@
     <meta name="description" content="mosuke5&#39;s blog">
     <link rel="canonical" href="https://blog.mosuke.tech/archive/2015/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="2015 &middot; Goldstine研究所">
@@ -74,7 +74,14 @@
                     </header>
 
                     <div class="post-description">
-                        1. はじめに ぼくはフロントエンドは本業ではありません。 jsはあまり好きではありません。 そしてAjax通信後にhtmlをアウトプットする際にjsの変数の中にhtmlを書いていくソースコードがもっと好きではありません。(後述) �...
+                        1. はじめに
+ぼくはフロントエンドは本業ではありません。
+jsはあまり好きではありません。
+そしてAjax通信後にhtmlをアウトプットする際にjsの変数の中にhtmlを書いていくソースコードがもっと好きではありません。(後述)
+それをJSテンプレートエンジンを使ってシンプルにしてみたって話です。 （JsRenderの使い方を書いたものではありません。）
+2. Ajaxが嫌いだった理由 Ajaxはユーザ体感的にはいいのだけれど、
+Ajaxの結果受け取ったjsonなどのデータを使ってhtmlを出力とかやるとソースコードが煩雑になるので嫌いだった。
+例としてAjaxで/xxxxxにリクエストを投...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/06/13/231917/">全文を読む</a>
@@ -100,7 +107,15 @@
                     </header>
 
                     <div class="post-description">
-                        他人の家のインターネットを環境を整えて分かった無線LANルータのことがあったのでまとめる。 我が家のインターネット環境は以下のような構成になっている。 この構成では無線LANルータはL3とL2の両方の機器として働いて...
+                        他人の家のインターネットを環境を整えて分かった無線LANルータのことがあったのでまとめる。
+我が家のインターネット環境は以下のような構成になっている。 
+この構成では無線LANルータはL3とL2の両方の機器として働いている。
+グローバルIPとプライベートIPの両方を持っており、
+プライベートIPからの通信をグローバル側へルーティングする機能と、
+LAN内の複数の端末に接続する機能として。
+一方、この前、他の人の家のインターネット環境を整えたのだが、
+以下のような構成だった。 
+１つめの構成と決定的に違うところは、VDSLモデムにルータ機能もついていること。 この場合は無線LANルーターはL2の...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/05/24/220226/">全文を読む</a>
@@ -126,7 +141,11 @@
                     </header>
 
                     <div class="post-description">
-                        Sinatraアプリケーションで、JSファイルを圧縮するsinatra-assetpackを利用していて、 production環境で動作させようとしたら動かなくなってしまった問題について調査した。 起こったこと Sinatraを使ってアプリケーションを作って�...
+                        Sinatraアプリケーションで、JSファイルを圧縮するsinatra-assetpackを利用していて、
+production環境で動作させようとしたら動かなくなってしまった問題について調査した。
+起こったこと Sinatraを使ってアプリケーションを作っていて、development環境で完成したので、 prorudction環境で動作させようとしたら、jsのエラーが出るようになってしまい、正常に動かなくなった。
+アクセスすると、以下のエラーがでる。要はjqueryがないとのこと。
+Uncaught ReferenceError: $ is not defined  jQueryはもちろん...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/05/08/174732/">全文を読む</a>
@@ -152,7 +171,10 @@
                     </header>
 
                     <div class="post-description">
-                        CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にハマったことをまとめた。 本質的にはAnsibleというよりLinux RPMパッケージのはなし。 ついでに、しょっぼいgithubを公開しました。 (1) 本記事を書く...
+                        CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にハマったことをまとめた。
+本質的にはAnsibleというよりLinux RPMパッケージのはなし。
+ついでに、しょっぼいgithubを公開しました。
+(1) 本記事を書くに至った経緯  Ansibleでmysqlを使ったサーバを構築(CentOS6.5)することになった。   MySQLのバージョンは5.6を採用した。    MySQLの公式rpmをダウンロードしインストールした。  インストールしたもの：MySQL-client, MySQL-devel, MySQL-server, MySQL...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/04/15/171127/">全文を読む</a>
@@ -178,7 +200,14 @@
                     </header>
 
                     <div class="post-description">
-                        SSHのエージェントフォワードした後に、接続したユーザとは別のユーザでgit cloneしたいことがあった。 それについて調べていく中で学習したことや検討したことについてまとめた。 0. 前提 ローカルのPC(Mac)上で、Vagrantを使�...
+                        SSHのエージェントフォワードした後に、接続したユーザとは別のユーザでgit cloneしたいことがあった。
+それについて調べていく中で学習したことや検討したことについてまとめた。
+0. 前提 ローカルのPC(Mac)上で、Vagrantを使用してCentOS7の仮想サーバ(testsv)を立ち上げている。
+&amp;lt;IPアドレス&amp;gt;
+ローカルPC：192.168.33.1
+仮想サーバ：192.168.33.100
+本記事上での「git cloneする」とは、「プライベートのGitレポジトリからSSHを利用してクローンする」ということを指す。
+1. SSHのエージェントフォワードを利用したい...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/04/05/212518/">全文を読む</a>
@@ -204,7 +233,11 @@
                     </header>
 
                     <div class="post-description">
-                        bunlderを使ったWebアプリをプロダクション環境で動かすときに、アプリの起動をどうやって実現しているだろうか。 Apache Passengerを使う場合には、Apacheの起動がアプリの起動につながるので、 アプリの起動はあまり気にしな�...
+                        bunlderを使ったWebアプリをプロダクション環境で動かすときに、アプリの起動をどうやって実現しているだろうか。
+Apache Passengerを使う場合には、Apacheの起動がアプリの起動につながるので、 アプリの起動はあまり気にしなかったかもしれない。
+しかし、例えばNginx × Unicorn/thinの構成などの場合はUnicornやthinの起動もしなければいけなくなってくる。
+（あるいはこのようなケースがあるかは謎だが、Unicornやthinを単体で動かそうとしている場合など）
+Unicornやthin（例ではthinを扱うが本質は同じ）の自動起動を実現する際の勘所、注...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/02/22/211316/">全文を読む</a>
@@ -230,7 +263,14 @@
                     </header>
 
                     <div class="post-description">
-                        FTPやSFTPでの転送モードの話。 ついこの前、WinSCPを利用している人が転送モードを選んでいて、 「SFTPには転送モードはないと思っていたのに、転送モードを選んでいる！？」 と疑問に思ったのでその辺りまとめた。 FTPのバ...
+                        FTPやSFTPでの転送モードの話。
+ついこの前、WinSCPを利用している人が転送モードを選んでいて、
+「SFTPには転送モードはないと思っていたのに、転送モードを選んでいる！？」
+と疑問に思ったのでその辺りまとめた。
+ FTPのバイナリーモードとアスキーモード 入社しはじめの頃、それまでSFTPしかほとんど使ったことなかったので、
+先輩に「FTPではバイナリーモードを使って…」と言われて、意味が理解できなかったときがあったのを思い出す。
+FTPにはファイル転送モードが２つあって、ちゃんと理解していないと思わぬところで痛い目にあう。
+ バイナリーモード：ファイルの改行コードを変換せず転送する...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/02/17/220526/">全文を読む</a>
@@ -256,7 +296,14 @@
                     </header>
 
                     <div class="post-description">
-                        SSHローカルフォワードの話。 前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。 SSHでローカルポートフォワードを実際に試す - Goldstine研究所 1. やりたいこと https...
+                        SSHローカルフォワードの話。
+前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。
+SSHでローカルポートフォワードを実際に試す - Goldstine研究所
+1. やりたいこと httpsでしか接続を許可していないサーバへ、SSHローカルフォワーディングを使って接続しようした。
+（直接疎通性がないためにポートフォワーディングする必要があった。）
+2. 行ったこと httpsでしか接続ができないので、ローカル端末のポート5000を接続したいサーバのポート443に飛ばせばおっけーと思って、
+下記のようにssh接続とブラウザから接続を行った。
+ss...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/02/11/172123/">全文を読む</a>
@@ -282,7 +329,13 @@
                     </header>
 
                     <div class="post-description">
-                        自分がハマったのでメモ。 リモートのサーバでdocker runを実行し(/bin/bash)、ローカル側でシェルを操作したかった。 sshでリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。 ssh user@host &#39;docker run -t -i ...
+                        自分がハマったのでメモ。
+リモートのサーバでdocker runを実行し(/bin/bash)、ローカル側でシェルを操作したかった。
+sshでリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。
+ssh user@host &#39;docker run -t -i image_name /bin/bash&#39;  そうすると
+[root@0c6742f02bd9 ~]# [root@0c6742f02bd9 ~]# ^[[A^[[A^[[C  エンターを押すと2行されるし、矢印キーはキーコードがでてしまう。
+これを解消するのには以下のようにすればいい。
+ssh -t us...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/02/07/144208/">全文を読む</a>
@@ -308,7 +361,15 @@
                     </header>
 
                     <div class="post-description">
-                        Ansibleでソースコードインストールする際とか すでにインストールされているかのチェックなどで、 シェルコマンドを実行してその結果で判断したい時がある。 ぼくがよくやる例では以下とか。 - name: check httpd installed command...
+                        Ansibleでソースコードインストールする際とか
+すでにインストールされているかのチェックなどで、
+シェルコマンドを実行してその結果で判断したい時がある。
+ぼくがよくやる例では以下とか。
+- name: check httpd installed command: which httpd ignore_errors: true  なんですが...
+こうやってしまうと、仮に既にインストールされていて、正常なときでも&#34;changed&#34;と表示されてしまう。
+これでは、本当にchangedなものなのか、わからなくなってくる。
+これを解決するのにchaged_whenを使うといい。
+- name: c...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/02/02/201008/">全文を読む</a>

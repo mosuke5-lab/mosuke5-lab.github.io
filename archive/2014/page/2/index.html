@@ -8,7 +8,7 @@
     <meta name="description" content="mosuke5&#39;s blog">
     <link rel="canonical" href="https://blog.mosuke.tech/archive/2014/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="2014 &middot; Goldstine研究所">
@@ -74,7 +74,8 @@
                     </header>
 
                     <div class="post-description">
-                        自宅サーバを公開するときに使うDDNSや固定IP。 それが必要な理由について図解的にまとめ。それだけ。...
+                        自宅サーバを公開するときに使うDDNSや固定IP。
+それが必要な理由について図解的にまとめ。それだけ。...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/10/19/170854/">全文を読む</a>
@@ -100,7 +101,17 @@
                     </header>
 
                     <div class="post-description">
-                        ロードバランシングとかクラスタリングとかリバースプロキシとか、 業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりない。 自分で構築してみたいなーと思いつつもあたりまえだけど、�...
+                        ロードバランシングとかクラスタリングとかリバースプロキシとか、
+業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりない。
+自分で構築してみたいなーと思いつつもあたりまえだけど、サーバやネットワーク機器をそう簡単に調達もできない。
+お金も当然ない。
+というわけで、さくらVPSで仮想化つかってロードバランシングとかクラスタリングとかリバースプロキシとか勉強しましょうという「サーバインフラ会」を友人と始めた。
+その第１回目のメモ。
+第1回 サーバ複数台構成、Nginxでリバースプロキシ構築
+第2回 HAProxyでロードバランサ構築
+
+
+1. 使用した環境 まず今回利用した...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/10/09/230555/">全文を読む</a>
@@ -126,7 +137,12 @@
                     </header>
 
                     <div class="post-description">
-                        最近VPSのOSをcentos7にしたのだが、なかなか手付かずでiptablesの設定も放置していた… （sshの最低限の設定はしていたが、ほんとうに良くない…） 久しぶりに手が空いたので設定するかーと思いきや まず/etc/sysconfig/iptablesが�...
+                        最近VPSのOSをcentos7にしたのだが、なかなか手付かずでiptablesの設定も放置していた…
+（sshの最低限の設定はしていたが、ほんとうに良くない…）
+久しぶりに手が空いたので設定するかーと思いきや
+まず/etc/sysconfig/iptablesがないし&amp;hellip;
+Cent7からのsystemctlでiptablesのサービスを確認してもでてこないし…
+# systemctl status iptables iptables.service Loaded: not-found (Reason: No such file or directory) Active: inac...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/09/20/180326/">全文を読む</a>
@@ -152,7 +168,18 @@
                     </header>
 
                     <div class="post-description">
-                        最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。 例えば以下の状況を考える。 【やりたいこと】 「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」 【DBの構造】 カラ...
+                        最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。
+例えば以下の状況を考える。
+【やりたいこと】
+「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」
+【DBの構造】
+カラム名：型
+date : datetime
+value : int
+※また、下記ではSinatra上で行っているが、他の言語でも同様のことがいえる。
+(1) 簡単なAPIのようなものを利用する 先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、
+これが一番複雑にならずに良いと思ったということ。
+Sinatra側で/csvにアクセスするとcs...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/09/15/135611/">全文を読む</a>
@@ -178,7 +205,9 @@
                     </header>
 
                     <div class="post-description">
-                        2014年8月2日(土)に大学時代の研究室の同期・後輩を巻き込んでArduino勉強会を行った。 Arduinoをほとんど触ったことのないメンバーで実施したのだが、初心者でもプロダクトを作り上げられるところまでできた。 その勉強会の...
+                        2014年8月2日(土)に大学時代の研究室の同期・後輩を巻き込んでArduino勉強会を行った。
+Arduinoをほとんど触ったことのないメンバーで実施したのだが、初心者でもプロダクトを作り上げられるところまでできた。
+その勉強会の簡単な資料を掲載。...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/09/13/214414/">全文を読む</a>
@@ -204,7 +233,13 @@
                     </header>
 
                     <div class="post-description">
-                        Ethernetシールドを使ってネットワークへ繋げる。 とりあえずは、スモールステップでPCとの1対1の通信。 PCとの1対1通信 構成図 Arduinoソースコード #include &amp;lt;SPI.h&amp;gt; #include &amp;lt;Ethernet.h&amp;gt; byte MAC[] = {0x90,0xA2,0xDA,0x0F,0x8B,0xA2}; byte IP...
+                        Ethernetシールドを使ってネットワークへ繋げる。
+とりあえずは、スモールステップでPCとの1対1の通信。
+PCとの1対1通信 構成図
+
+Arduinoソースコード
+#include &amp;lt;SPI.h&amp;gt; #include &amp;lt;Ethernet.h&amp;gt; byte MAC[] = {0x90,0xA2,0xDA,0x0F,0x8B,0xA2}; byte IP[] = {192,168,11,3}; void setup() { Ethernet.begin(MAC,IP); } void loop() { }  疎通確認
+======= ```  4f3b2c72e32161...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/09/13/111537/">全文を読む</a>
@@ -230,7 +265,14 @@
                     </header>
 
                     <div class="post-description">
-                        前々からArduino自体はもっていたし、ちょろっと触ったことはあったのだが、 大学時代の研究室の仲間とArduino勉強会をやることになり、それに向けて友人と再入門したのでそのときのメモ。 Arduino入門にこれだけは知ってお�...
+                        前々からArduino自体はもっていたし、ちょろっと触ったことはあったのだが、
+大学時代の研究室の仲間とArduino勉強会をやることになり、それに向けて友人と再入門したのでそのときのメモ。
+Arduino入門にこれだけは知っておきたい事項をプログラム形式にまとめた。
+もちろん、不足部分もたくさんあるが、これだけわかれば楽しめるようになるかも。
+以下が入門プログラム。
+ LEDの点灯 PCとArduino間のシリアル通信 超音波距離センサの利用 超音波距離センサとLEDの組み合わせ Processingとの連携 電池でArduinoを動作させる  【用意したもの】
+基本は以下の２つ
+Ardui...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/07/21/231946/">全文を読む</a>
@@ -256,7 +298,14 @@
                     </header>
 
                     <div class="post-description">
-                        2012年07月18日から契約していたVPSサーバを本日解約した。 約２年間の契約していたわけだがちょっと振り返るといろいろあったなーと思う。 ぼくがまだ大学３年のとき、ソーシャルブックマークサービスをリリースしたの�...
+                        2012年07月18日から契約していたVPSサーバを本日解約した。
+約２年間の契約していたわけだがちょっと振り返るといろいろあったなーと思う。
+ぼくがまだ大学３年のとき、ソーシャルブックマークサービスをリリースしたのだが、
+その時はまだエンジニア初心者で、VPSではなく共有サーバを利用していた。
+そんなプロジェクトが終わり、次のサービス(Twitterの解析ツール)の開発で初めてVPS環境を与えられたのだが、
+サーバ構築など右も左もわからなかったので、自分の勉強用環境としてVPSを契約。VPS環境で行ったこと&amp;gt;
+プロダクトとしては次の３つくらい作った
+・Amazonの最安値段通知サービス...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/05/18/142838/">全文を読む</a>
@@ -282,7 +331,9 @@
                     </header>
 
                     <div class="post-description">
-                        ぼくはネットワーク構成については素人です。 大量のトラフィックをさばくためにロードバランサを使うがロードバランサが耐えられない量のトラフィックにはどうするか。 ちょっと疑問に思ったので素人なりにちょろっ�...
+                        ぼくはネットワーク構成については素人です。
+大量のトラフィックをさばくためにロードバランサを使うがロードバランサが耐えられない量のトラフィックにはどうするか。
+ちょっと疑問に思ったので素人なりにちょろっと考えてみた。...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/05/17/221824/">全文を読む</a>
@@ -308,7 +359,12 @@
                     </header>
 
                     <div class="post-description">
-                        表題の通りER図作成ツールというものを使ってみた。 開発をやる現場では当たり前のように使われているのかもしれないけど、ぼくは使ったことなかったです。 ER図とかテーブル構造はExcelでまとめて管理していました。 き...
+                        表題の通りER図作成ツールというものを使ってみた。
+開発をやる現場では当たり前のように使われているのかもしれないけど、ぼくは使ったことなかったです。
+ER図とかテーブル構造はExcelでまとめて管理していました。
+きっかけは、ソフトウエアデザインを読んでいてER図作成ツールなるものがでてきたので、便利そうと思ってぐぐってみた。
+調べると主なフリーのER図作成ツールは以下があるっぽい。
+ DBDesigner A5-SQLmk-2 AmaterasERD  MySQL Workbench ERMaster  (参考)http://treeapps.hatenablog.com/entry/201...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/05/06/192424/">全文を読む</a>

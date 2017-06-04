@@ -6,9 +6,9 @@
     <title>インフラ &middot; Goldstine研究所</title>
 
     <meta name="description" content="mosuke5&#39;s blog">
-    <link rel="canonical" href="https://blog.mosuke.tech/categories/e382a4e383b3e38395e383a9/">
+    <link rel="canonical" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="インフラ &middot; Goldstine研究所">
@@ -74,7 +74,14 @@
                     </header>
 
                     <div class="post-description">
-                        SSHローカルフォワードの話。 前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。 SSHでローカルポートフォワードを実際に試す - Goldstine研究所 1. やりたいこと https...
+                        SSHローカルフォワードの話。
+前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。
+SSHでローカルポートフォワードを実際に試す - Goldstine研究所
+1. やりたいこと httpsでしか接続を許可していないサーバへ、SSHローカルフォワーディングを使って接続しようした。
+（直接疎通性がないためにポートフォワーディングする必要があった。）
+2. 行ったこと httpsでしか接続ができないので、ローカル端末のポート5000を接続したいサーバのポート443に飛ばせばおっけーと思って、
+下記のようにssh接続とブラウザから接続を行った。
+ss...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/02/11/172123/">全文を読む</a>
@@ -100,7 +107,13 @@
                     </header>
 
                     <div class="post-description">
-                        自分がハマったのでメモ。 リモートのサーバでdocker runを実行し(/bin/bash)、ローカル側でシェルを操作したかった。 sshでリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。 ssh user@host &#39;docker run -t -i ...
+                        自分がハマったのでメモ。
+リモートのサーバでdocker runを実行し(/bin/bash)、ローカル側でシェルを操作したかった。
+sshでリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。
+ssh user@host &#39;docker run -t -i image_name /bin/bash&#39;  そうすると
+[root@0c6742f02bd9 ~]# [root@0c6742f02bd9 ~]# ^[[A^[[A^[[C  エンターを押すと2行されるし、矢印キーはキーコードがでてしまう。
+これを解消するのには以下のようにすればいい。
+ssh -t us...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/02/07/144208/">全文を読む</a>
@@ -126,7 +139,15 @@
                     </header>
 
                     <div class="post-description">
-                        Ansibleでソースコードインストールする際とか すでにインストールされているかのチェックなどで、 シェルコマンドを実行してその結果で判断したい時がある。 ぼくがよくやる例では以下とか。 - name: check httpd installed command...
+                        Ansibleでソースコードインストールする際とか
+すでにインストールされているかのチェックなどで、
+シェルコマンドを実行してその結果で判断したい時がある。
+ぼくがよくやる例では以下とか。
+- name: check httpd installed command: which httpd ignore_errors: true  なんですが...
+こうやってしまうと、仮に既にインストールされていて、正常なときでも&#34;changed&#34;と表示されてしまう。
+これでは、本当にchangedなものなのか、わからなくなってくる。
+これを解決するのにchaged_whenを使うといい。
+- name: c...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/02/02/201008/">全文を読む</a>
@@ -152,7 +173,10 @@
                     </header>
 
                     <div class="post-description">
-                        dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、 特定のユーザでログインした状態のコンテナを作りたいという場面に遭遇した。 &amp;lt;やりたいこと&amp;gt; 特定のユーザでログインした状態のシェルを�...
+                        dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、
+特定のユーザでログインした状態のコンテナを作りたいという場面に遭遇した。
+&amp;lt;やりたいこと&amp;gt;  特定のユーザでログインした状態のシェルを提供すること その際、ユーザの.bash_profile（あるいあは.bashrc）を読み込んだ状態であること  .bash_profileに記載したPATHやaliasを使いたい ユーザのログインシェルを利用したい（カスタマイズされたシェルとか）    docker runに-uオプションがあるし、これで余裕！と思った。
+[host] $ sudo docker run ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/01/24/213255/">全文を読む</a>
@@ -178,7 +202,17 @@
                     </header>
 
                     <div class="post-description">
-                        SSH・・・ いろんなことができる&amp;rdquo;らしい&amp;rdquo;ということは知っていたし、 例えばポートフォワーディングなんていうこともできるのも知っている。 でもそれがどんなものなのか自分の手で試したことはないし、 なんと...
+                        SSH・・・
+いろんなことができる&amp;rdquo;らしい&amp;rdquo;ということは知っていたし、
+例えばポートフォワーディングなんていうこともできるのも知っている。
+でもそれがどんなものなのか自分の手で試したことはないし、
+なんとなくただのサーバログインツールとして利用していた。
+サーバインフラ技術に興味を持つようになっていろんなことを勉強していると、
+ポートフォワーディングは必須な技術であることも感じ、
+年末の持て余す時間を使ってSSHのローカルポートフォワードを試してみたのでメモする。
+環境とやりたいこと 
+ローカルPCからexample.jpは以下で接続できる状態。
+[local pc] ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/12/31/170545/">全文を読む</a>
@@ -204,7 +238,16 @@
                     </header>
 
                     <div class="post-description">
-                        VPS1台でインフラ勉強シリーズでVPN構築を行ったのでそのメモ。 1. 実施したこと VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。 2. 環境 �...
+                        VPS1台でインフラ勉強シリーズでVPN構築を行ったのでそのメモ。
+1. 実施したこと VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。
+ 
+  2. 環境 ・VPNソフトウェア：SoftEther VPN プロジェクト - SoftEther VPN プロジェクト
+・メモリ：１GB
+・CPU：仮想２コア
+・HDD：100GB
+・OS：CentOS7
+・サーバ仮想化：Vagrant(Utuntu13)
+ 3. SoftEtherのインストール インストール手順は公式ドキュメント通りなので簡単にコマンドのみ記述して...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/12/07/212156/">全文を読む</a>
@@ -230,7 +273,13 @@
                     </header>
 
                     <div class="post-description">
-                        AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&amp;hellip; と思ったところである初歩的な罠にハマった。 本番環境へPalybook実行！！ ``` $ ansible-playbook playbook.yml -i hosts &amp;lt;p&amp;gt;あれ、GATHERING FACTSで10分以上も待�...
+                        AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&amp;hellip;
+と思ったところである初歩的な罠にハマった。
+本番環境へPalybook実行！！
+$ ansible-playbook playbook.yml -i hosts  あれ、GATHERING FACTSで10分以上も待たされた&amp;hellip;
+しかも、エラー出た&amp;hellip;
+GATHERING FACTS failed to parse [ sudo via ansible, key= ..... ]  sudoできていない&amp;hellip;？
+playbook内のsudo: yesを外...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/28/001748/">全文を読む</a>
@@ -256,7 +305,12 @@
                     </header>
 
                     <div class="post-description">
-                        AnsibleのPlaybookを書いていると、ワイルドカードを含んだコマンドを実行したい時がある。 そんなときあるところでハマった。 Apacheをソースインストールして、パスを/usr/sbinにリンクを貼ろうとして以下を実行した。 - command...
+                        AnsibleのPlaybookを書いていると、ワイルドカードを含んだコマンドを実行したい時がある。
+そんなときあるところでハマった。
+Apacheをソースインストールして、パスを/usr/sbinにリンクを貼ろうとして以下を実行した。
+- command: ln -s /usr/local/httpd/bin/* /usr/sbin  /usr/sbin内に「*」というリンクが貼られてしまった。
+* -&amp;gt; /usr/local/httpd/bin  どうやらcommandモジュールはワイルドカードに対応していないよう。
+ワイルドカードを使いたいときはshellモジュールを利用すると良い...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/18/225542/">全文を読む</a>
@@ -282,7 +336,18 @@
                     </header>
 
                     <div class="post-description">
-                        最近、Ansibleを使い始めたのだが、yumやapt-getでインストールできるものはいいけど、 どうしてもソースインストールが必要な場合がある。 ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。 まず、あたり�...
+                        最近、Ansibleを使い始めたのだが、yumやapt-getでインストールできるものはいいけど、
+どうしてもソースインストールが必要な場合がある。
+ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。
+まず、あたりまえだが、ソースインストールを行うには以下のフローを踏まなければいけな。
+1. ソースファイルの取得(tarで固められていると仮定)
+2. tarファイルの解凍
+3. 解答してできたディレクトリへ移動
+4. configure
+5. make
+6. make install
+また、Ansibleでは何回もPlaybookを実行していくため、
+すでにインストールさ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/16/153223/">全文を読む</a>
@@ -308,7 +373,13 @@
                     </header>
 
                     <div class="post-description">
-                        VPS1台でインフラ勉強の会で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てたが、 仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければならない。 これが面倒だったので多...
+                        VPS1台でインフラ勉強の会で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てたが、
+仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければならない。
+これが面倒だったので多段SSHの設定をして、一発でSSH接続できるようにした。
+以下の図で言うと、web10, web11(192.168.33.10&amp;frasl;11)に一発でSSHできるようにする。
+
+クライアントPC側に以下の設定をした。
+$ vim ~/.ssh/config host gateway HostName xxxxx.xxx User username Host web10 Hos...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/09/172745/">全文を読む</a>
@@ -322,7 +393,7 @@
       
     <span class="post-list-pagination-item post-list-pagination-item-current">Page 1 of 2</span>
     
-      <a href="/categories/e382a4e383b3e38395e383a9/page/2/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
+      <a href="/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/page/2/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>
       </a>
     

@@ -8,7 +8,7 @@
     <meta name="description" content="mosuke5&#39;s blog">
     <link rel="canonical" href="https://blog.mosuke.tech/categories/docker/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Docker &middot; Goldstine研究所">
@@ -74,7 +74,8 @@
                     </header>
 
                     <div class="post-description">
-                        7月6日の会社のエンジニアイベントでLTするやつ、先にあげておく。 自分の中でのネタとしては古いけど、話すのはなんだかんだ初。...
+                        7月6日の会社のエンジニアイベントでLTするやつ、先にあげておく。
+自分の中でのネタとしては古いけど、話すのはなんだかんだ初。...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2016/07/03/224531/">全文を読む</a>
@@ -100,7 +101,15 @@
                     </header>
 
                     <div class="post-description">
-                        2014年の秋から@mogulla3と定期的にインフラ関連技術の勉強会をやってきましたが、 インプットの勉強会だけでは飽き足らず、いつしかサービスを作る中でインフラ関連技術を駆使し勉強したいと思うように… そして、普段使...
+                        2014年の秋から@mogulla3と定期的にインフラ関連技術の勉強会をやってきましたが、
+インプットの勉強会だけでは飽き足らず、いつしかサービスを作る中でインフラ関連技術を駆使し勉強したいと思うように…
+そして、普段使っているVimを題材に、
+vimの設定をブラウザ上で即体感できるサービス Vim::Factory
+を開発しました。
+本記事はVim::Factoryの簡単な紹介と技術的な仕組みについて記述しています。
+Vim::Factoryはこちら。
+http://vimfactory.com/
+1. Vim::Factoryについて 1-1. Vim::Factoryってなに？？ Vim...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/07/19/135844/">全文を読む</a>
@@ -126,7 +135,13 @@
                     </header>
 
                     <div class="post-description">
-                        自分がハマったのでメモ。 リモートのサーバでdocker runを実行し(/bin/bash)、ローカル側でシェルを操作したかった。 sshでリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。 ssh user@host &#39;docker run -t -i ...
+                        自分がハマったのでメモ。
+リモートのサーバでdocker runを実行し(/bin/bash)、ローカル側でシェルを操作したかった。
+sshでリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。
+ssh user@host &#39;docker run -t -i image_name /bin/bash&#39;  そうすると
+[root@0c6742f02bd9 ~]# [root@0c6742f02bd9 ~]# ^[[A^[[A^[[C  エンターを押すと2行されるし、矢印キーはキーコードがでてしまう。
+これを解消するのには以下のようにすればいい。
+ssh -t us...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/02/07/144208/">全文を読む</a>
@@ -152,7 +167,10 @@
                     </header>
 
                     <div class="post-description">
-                        dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、 特定のユーザでログインした状態のコンテナを作りたいという場面に遭遇した。 &amp;lt;やりたいこと&amp;gt; 特定のユーザでログインした状態のシェルを�...
+                        dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、
+特定のユーザでログインした状態のコンテナを作りたいという場面に遭遇した。
+&amp;lt;やりたいこと&amp;gt;  特定のユーザでログインした状態のシェルを提供すること その際、ユーザの.bash_profile（あるいあは.bashrc）を読み込んだ状態であること  .bash_profileに記載したPATHやaliasを使いたい ユーザのログインシェルを利用したい（カスタマイズされたシェルとか）    docker runに-uオプションがあるし、これで余裕！と思った。
+[host] $ sudo docker run ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/01/24/213255/">全文を読む</a>

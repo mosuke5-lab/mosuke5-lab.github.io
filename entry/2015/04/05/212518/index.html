@@ -8,7 +8,7 @@
     <meta name="description" content=" SSHのエージェントフォワードした後に、接続したユーザとは別のユーザでgit cloneしたいことがあった。 それについて調べていく中で学習したことや検討したことについてまとめた。  0. 前提  ローカルのPC(Mac)上で、Vagra">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/04/05/212518/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="SSHエージェントフォワード後に他のユーザでgit cloneする(鍵を使う)ことに関する考察 &middot; Goldstine研究所">
@@ -104,7 +104,6 @@ Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
 [vagrant@testsv ~]$
 [vagrant@testsv ~]$ ls -l /tmp | grep ssh
 drwx------. 2 vagrant    vagrant    23  4月  4 11:35 ssh-skQVHsUCHU 
-
 </code></pre>
 
 <p><br>
@@ -134,7 +133,6 @@ Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
 USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
 vagrant  pts/0    192.168.33.1     11:35    1.00s  0.04s  0.01s ssh -A vagrant@192.168.33.100
 vagrant  pts/1    192.168.33.100   11:50    1.00s  0.01s  0.00s w 
-
 </code></pre>
 
 <p>wコマンドの結果の3行目のFROMをみるとわかるが、接続元が変わるわけではない。</p>
@@ -160,7 +158,6 @@ sudo後に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA
 
 <pre><code>[vagrant@testsv ~]$ sudo env | grep -i ssh
 　(なにも表示されない) 
-
 </code></pre>
 
 <p><br>
@@ -186,7 +183,6 @@ remote: Total 27 (delta 13), reused 0 (delta 0)
 Receiving objects: 100% (27/27), done.
 Resolving deltas: 100% (13/13), done.
 Checking connectivity... done. 
-
 </code></pre>
 
 <p>予想通り成功しました！</p>
@@ -221,7 +217,6 @@ fatal: Could not read from remote repository.
 
 Please make sure you have the correct access rights
 and the repository exists. 
-
 </code></pre>
 
 <p><br>

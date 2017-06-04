@@ -8,7 +8,7 @@
     <meta name="description" content="mosuke5&#39;s blog">
     <link rel="canonical" href="https://blog.mosuke.tech/archive/2014/">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="2014 &middot; Goldstine研究所">
@@ -74,7 +74,17 @@
                     </header>
 
                     <div class="post-description">
-                        SSH・・・ いろんなことができる&amp;rdquo;らしい&amp;rdquo;ということは知っていたし、 例えばポートフォワーディングなんていうこともできるのも知っている。 でもそれがどんなものなのか自分の手で試したことはないし、 なんと...
+                        SSH・・・
+いろんなことができる&amp;rdquo;らしい&amp;rdquo;ということは知っていたし、
+例えばポートフォワーディングなんていうこともできるのも知っている。
+でもそれがどんなものなのか自分の手で試したことはないし、
+なんとなくただのサーバログインツールとして利用していた。
+サーバインフラ技術に興味を持つようになっていろんなことを勉強していると、
+ポートフォワーディングは必須な技術であることも感じ、
+年末の持て余す時間を使ってSSHのローカルポートフォワードを試してみたのでメモする。
+環境とやりたいこと 
+ローカルPCからexample.jpは以下で接続できる状態。
+[local pc] ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/12/31/170545/">全文を読む</a>
@@ -100,7 +110,14 @@
                     </header>
 
                     <div class="post-description">
-                        自作PCを作ったのでその材料と参考資料などを簡単にまとめる。 すべての部品は秋葉原のツクモで揃えた。 パソコン・ゲームPC・自作パソコンなら【TSUKUMO】 わけがあって荷物はすべて手で運んだのだが、かなり重くなるの�...
+                        自作PCを作ったのでその材料と参考資料などを簡単にまとめる。
+すべての部品は秋葉原のツクモで揃えた。
+パソコン・ゲームPC・自作パソコンなら【TSUKUMO】 わけがあって荷物はすべて手で運んだのだが、かなり重くなるので郵送をおすすめする。
+以下買ったパーツ一式や用意した道具。
+ちなみに全部で54000円程度でした。（お店で買うとセット割などがあったため）
+材料・パーツ一式 マザーボード 
+ASUSTeK Intel H97チップセット搭載マザーボード H97-PRO 【ATX】
+  出版社/メーカー: Asustek   発売日: 2014/05/17  メディア: Personal Com...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/12/29/154251/">全文を読む</a>
@@ -126,7 +143,16 @@
                     </header>
 
                     <div class="post-description">
-                        VPS1台でインフラ勉強シリーズでVPN構築を行ったのでそのメモ。 1. 実施したこと VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。 2. 環境 �...
+                        VPS1台でインフラ勉強シリーズでVPN構築を行ったのでそのメモ。
+1. 実施したこと VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。
+ 
+  2. 環境 ・VPNソフトウェア：SoftEther VPN プロジェクト - SoftEther VPN プロジェクト
+・メモリ：１GB
+・CPU：仮想２コア
+・HDD：100GB
+・OS：CentOS7
+・サーバ仮想化：Vagrant(Utuntu13)
+ 3. SoftEtherのインストール インストール手順は公式ドキュメント通りなので簡単にコマンドのみ記述して...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/12/07/212156/">全文を読む</a>
@@ -152,7 +178,13 @@
                     </header>
 
                     <div class="post-description">
-                        AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&amp;hellip; と思ったところである初歩的な罠にハマった。 本番環境へPalybook実行！！ ``` $ ansible-playbook playbook.yml -i hosts &amp;lt;p&amp;gt;あれ、GATHERING FACTSで10分以上も待�...
+                        AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&amp;hellip;
+と思ったところである初歩的な罠にハマった。
+本番環境へPalybook実行！！
+$ ansible-playbook playbook.yml -i hosts  あれ、GATHERING FACTSで10分以上も待たされた&amp;hellip;
+しかも、エラー出た&amp;hellip;
+GATHERING FACTS failed to parse [ sudo via ansible, key= ..... ]  sudoできていない&amp;hellip;？
+playbook内のsudo: yesを外...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/28/001748/">全文を読む</a>
@@ -178,7 +210,15 @@
                     </header>
 
                     <div class="post-description">
-                        もろもろな理由のためにGithubが利用できないことも多くあると思う。 というわけでGithubクローンのGitlabを試しに立ててみたが、簡単すぎでした… GitLab | Open source software to collaborate on code 環境 さくらVPS 1Gプラン OS：CentOS7 イ�...
+                        もろもろな理由のためにGithubが利用できないことも多くあると思う。
+というわけでGithubクローンのGitlabを試しに立ててみたが、簡単すぎでした…
+GitLab | Open source software to collaborate on code
+環境
+さくらVPS 1Gプラン
+OS：CentOS7
+インストール
+基本的にはドキュメントに書いてある以下のとおりで終わり。
+$ curl -O https://downloads-packages.s3.amazonaws.com/centos-7.0.1406/gitlab-7.5.1_omnibus.5.2.0.ci-1.el7...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/22/190648/">全文を読む</a>
@@ -204,7 +244,14 @@
                     </header>
 
                     <div class="post-description">
-                        Gitレポジトリを作って、複数人で開発をしていた。 しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、 Push, PullするときにPermission errorで怒られまくる。 ユーザには共通のグル�...
+                        Gitレポジトリを作って、複数人で開発をしていた。
+しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、
+Push, PullするときにPermission errorで怒られまくる。
+ユーザには共通のグループを作っていたのに…なんでだっけ…
+気づけばレポジトリを作るとき以下のようにしていた。
+$ git init --bare  複数人で共有するときには以下のようにするべきであった。
+$ git init --bare --shared  では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。
+調べると「setgid」というキーワ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/20/230334/">全文を読む</a>
@@ -230,7 +277,12 @@
                     </header>
 
                     <div class="post-description">
-                        AnsibleのPlaybookを書いていると、ワイルドカードを含んだコマンドを実行したい時がある。 そんなときあるところでハマった。 Apacheをソースインストールして、パスを/usr/sbinにリンクを貼ろうとして以下を実行した。 - command...
+                        AnsibleのPlaybookを書いていると、ワイルドカードを含んだコマンドを実行したい時がある。
+そんなときあるところでハマった。
+Apacheをソースインストールして、パスを/usr/sbinにリンクを貼ろうとして以下を実行した。
+- command: ln -s /usr/local/httpd/bin/* /usr/sbin  /usr/sbin内に「*」というリンクが貼られてしまった。
+* -&amp;gt; /usr/local/httpd/bin  どうやらcommandモジュールはワイルドカードに対応していないよう。
+ワイルドカードを使いたいときはshellモジュールを利用すると良い...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/18/225542/">全文を読む</a>
@@ -256,7 +308,18 @@
                     </header>
 
                     <div class="post-description">
-                        最近、Ansibleを使い始めたのだが、yumやapt-getでインストールできるものはいいけど、 どうしてもソースインストールが必要な場合がある。 ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。 まず、あたり�...
+                        最近、Ansibleを使い始めたのだが、yumやapt-getでインストールできるものはいいけど、
+どうしてもソースインストールが必要な場合がある。
+ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。
+まず、あたりまえだが、ソースインストールを行うには以下のフローを踏まなければいけな。
+1. ソースファイルの取得(tarで固められていると仮定)
+2. tarファイルの解凍
+3. 解答してできたディレクトリへ移動
+4. configure
+5. make
+6. make install
+また、Ansibleでは何回もPlaybookを実行していくため、
+すでにインストールさ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/16/153223/">全文を読む</a>
@@ -282,7 +345,13 @@
                     </header>
 
                     <div class="post-description">
-                        VPS1台でインフラ勉強の会で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てたが、 仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければならない。 これが面倒だったので多...
+                        VPS1台でインフラ勉強の会で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てたが、
+仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければならない。
+これが面倒だったので多段SSHの設定をして、一発でSSH接続できるようにした。
+以下の図で言うと、web10, web11(192.168.33.10&amp;frasl;11)に一発でSSHできるようにする。
+
+クライアントPC側に以下の設定をした。
+$ vim ~/.ssh/config host gateway HostName xxxxx.xxx User username Host web10 Hos...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/09/172745/">全文を読む</a>
@@ -308,7 +377,17 @@
                     </header>
 
                     <div class="post-description">
-                        前回の【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築に続き、同様の環境を用いて、ロードバランサ構築を行った。 ロードバランサの構築にはHAProxyを利用した。 1. 環境 前回同様で、さくらVPSの1G...
+                        前回の【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築に続き、同様の環境を用いて、ロードバランサ構築を行った。
+ロードバランサの構築にはHAProxyを利用した。
+1. 環境 前回同様で、さくらVPSの1GBのプラン1台のみ。
+・メモリ：１GB
+・CPU：仮想２コア
+・HDD：100GB
+・OS：CentOS7
+・サーバ仮想化：Vagrant(Utuntu13)
+・ロードバランサ：HAProxy - The Reliable, High Performance TCP/HTTP Load Balancer
+ 2. 構成図 
+ 3. ロードバランサの構築 ■ホストサ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/09/171436/">全文を読む</a>

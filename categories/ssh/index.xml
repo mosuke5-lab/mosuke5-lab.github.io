@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Ssh on Goldstine研究所</title>
-    <link>https://blog.mosuke.tech/categories/ssh/</link>
-    <description>Recent content in Ssh on Goldstine研究所</description>
+    <title>Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/ssh/index.xml</link>
+    <description>Recent content on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Tue, 01 Dec 2015 18:13:00 +0900</lastBuildDate>
     <atom:link href="https://blog.mosuke.tech/categories/ssh/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
@@ -51,7 +50,6 @@ Pipelining機能をなしの状態だと、このファイル転送とファイ�
 &amp;lt;192.168.33.100&amp;gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&amp;quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&amp;quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c &#39;mkdir -p $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321 &amp;amp;&amp;amp; chmod a+rx $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321 &amp;amp;&amp;amp; echo $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321&#39;
 &amp;lt;192.168.33.100&amp;gt; PUT /var/folders/7_/d_dwdlcx1m95mn_846x30xb40000gn/T/tmpc8amAw TO /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/command
 &amp;lt;192.168.33.100&amp;gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&amp;quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&amp;quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c &#39;sudo -k &amp;amp;&amp;amp; sudo -E -S -p &amp;quot;[sudo via ansible, key=koibtlgpbiprbaihcqxiqgcnnreofxuo] password: &amp;quot; -u root /bin/sh -c &#39;&amp;quot;&#39;&amp;quot;&#39;echo BECOME-SUCCESS-koibtlgpbiprbaihcqxiqgcnnreofxuo; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/command; rm -rf /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/ &amp;gt;/dev/null 2&amp;gt;&amp;amp;1&#39;&amp;quot;&#39;&amp;quot;&#39;&#39; 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Pipiliningの機能を有効にすると、タスク実行ごとのモジュールファイルの転送と削除をしなくなる。&lt;br&gt;
@@ -120,7 +118,6 @@ transport = ssh
 [ssh_connection]
 pipeline = false
 ssh_args = -o ControlMaster=no 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;② ControlMaster: &lt;b&gt;&lt;span style=&#34;color: #ff0000&#34;&gt;有効&lt;/span&gt;&lt;/b&gt; ＆ pipeline: &lt;b&gt;無効&lt;/b&gt;&lt;/p&gt;
@@ -141,7 +138,6 @@ transport = ssh
 [ssh_connection]
 pipeline = true
 ssh_args = -o ControlMaster=auto -o ControlPersist=300s 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2&gt;実行コマンド&lt;/h2&gt;
@@ -225,7 +221,6 @@ Host ansible-target
     HostName 192.168.33.10
     User xxxxx
     ProxyCommand ssh -W %h:%p yyyyy@hostserver 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;上記のファイルを使って多段&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;できることを確認します。&lt;/p&gt;
@@ -298,7 +293,6 @@ ssh_args = -F sshconfig
 下記を実行しないと&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Mac&#34;&gt;Mac&lt;/a&gt;で接続すると「互換性のないバージョンです」的なこといわれました…すいません。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ gsettings set org.gnome.Vino require-encryption false 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;設定ができたら、きちんとサーバとして&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VNC&#34;&gt;VNC&lt;/a&gt;接続を待ち受けているか確認します。&lt;/p&gt;
@@ -383,7 +377,6 @@ Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
 [vagrant@testsv ~]$
 [vagrant@testsv ~]$ ls -l /tmp | grep ssh
 drwx------. 2 vagrant    vagrant    23  4月  4 11:35 ssh-skQVHsUCHU 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;br&gt;
@@ -413,7 +406,6 @@ Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
 USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
 vagrant  pts/0    192.168.33.1     11:35    1.00s  0.04s  0.01s ssh -A vagrant@192.168.33.100
 vagrant  pts/1    192.168.33.100   11:50    1.00s  0.01s  0.00s w 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;wコマンドの結果の3行目のFROMをみるとわかるが、接続元が変わるわけではない。&lt;/p&gt;
@@ -439,7 +431,6 @@ sudo後に&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/
 
 &lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ sudo env | grep -i ssh
 　(なにも表示されない) 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;br&gt;
@@ -465,7 +456,6 @@ remote: Total 27 (delta 13), reused 0 (delta 0)
 Receiving objects: 100% (27/27), done.
 Resolving deltas: 100% (13/13), done.
 Checking connectivity... done. 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;予想通り成功しました！&lt;/p&gt;
@@ -500,7 +490,6 @@ fatal: Could not read from remote repository.
 
 Please make sure you have the correct access rights
 and the repository exists. 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;br&gt;
@@ -563,7 +552,6 @@ Checking connectivity... done.
 下記のように&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ssh&#34;&gt;ssh&lt;/a&gt;接続とブラウザから接続を行った。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;ssh -L5000:web-host:443 user@ssh-host 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;※web-host: 今回&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/https&#34;&gt;https&lt;/a&gt;で接続したサーバ&lt;br&gt;
@@ -617,7 +605,6 @@ URLのはじめの&amp;lt;http(s)&amp;gt;の部分は&lt;b&gt;&lt;a class=&#34;k
 &lt;p&gt;ローカルPCからexample.jpは以下で接続できる状態。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;[local pc] $ ssh username@example.jp 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;またWebサーバのポート番号は80で、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPS&#34;&gt;VPS&lt;/a&gt;のホストサーバからはWebサーバへ接続できる。&lt;br&gt;
@@ -679,28 +666,29 @@ http通信だから暗号化はされていないのだろうか？&lt;br&gt;
 これが面倒だったので多段&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;の設定をして、一発で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;接続できるようにした。&lt;/p&gt;
 &lt;p&gt;以下の図で言うと、web10, web11(192.168.33.&lt;sup&gt;10&lt;/sup&gt;&amp;frasl;&lt;sub&gt;11&lt;/sub&gt;)に一発で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;できるようにする。&lt;br&gt;
 &lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141109/20141109170337.png&#34; alt=&#34;f:id:mosuke5:20141109170337p:plain&#34; title=&#34;f:id:mosuke5:20141109170337p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;クライアントPC側に以下の設定をした。&lt;/p&gt;
-```
-$ vim ~/.ssh/config
+&lt;p&gt;クライアントPC側に以下の設定をした。&lt;/p&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ vim ~/.ssh/config
 host gateway
     HostName xxxxx.xxx
-    User username&lt;/p&gt;
+    User username
 
-&lt;p&gt;Host web10
+Host web10
     HostName 192.168.33.10
     User vagrant
-    ProxyCommand ssh -W %h:%p gateway&lt;/p&gt;
+    ProxyCommand ssh -W %h:%p gateway
 
-&lt;p&gt;Host web11
+Host web11
     HostName 192.168.33.11
     User vagrant
-    ProxyCommand ssh -W %h:%p gateway&lt;/p&gt;
+    ProxyCommand ssh -W %h:%p gateway
 
-&lt;p&gt;##これで以下で接続可能
+##これで以下で接続可能
 $ ssh web10
-$ ssh  web11
-```
-&lt;p&gt;簡単でした。&lt;/p&gt;
+$ ssh  web11 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;p&gt;簡単でした。&lt;/p&gt;
 &lt;/body&gt;&lt;/p&gt;
 </description>
     </item>

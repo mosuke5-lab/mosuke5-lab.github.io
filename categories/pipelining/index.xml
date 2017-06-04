@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Pipelining on Goldstine研究所</title>
-    <link>https://blog.mosuke.tech/categories/pipelining/</link>
-    <description>Recent content in Pipelining on Goldstine研究所</description>
+    <title>Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/pipelining/index.xml</link>
+    <description>Recent content on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Tue, 01 Dec 2015 18:13:00 +0900</lastBuildDate>
     <atom:link href="https://blog.mosuke.tech/categories/pipelining/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
@@ -51,7 +50,6 @@ Pipelining機能をなしの状態だと、このファイル転送とファイ�
 &amp;lt;192.168.33.100&amp;gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&amp;quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&amp;quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c &#39;mkdir -p $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321 &amp;amp;&amp;amp; chmod a+rx $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321 &amp;amp;&amp;amp; echo $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321&#39;
 &amp;lt;192.168.33.100&amp;gt; PUT /var/folders/7_/d_dwdlcx1m95mn_846x30xb40000gn/T/tmpc8amAw TO /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/command
 &amp;lt;192.168.33.100&amp;gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&amp;quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&amp;quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c &#39;sudo -k &amp;amp;&amp;amp; sudo -E -S -p &amp;quot;[sudo via ansible, key=koibtlgpbiprbaihcqxiqgcnnreofxuo] password: &amp;quot; -u root /bin/sh -c &#39;&amp;quot;&#39;&amp;quot;&#39;echo BECOME-SUCCESS-koibtlgpbiprbaihcqxiqgcnnreofxuo; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/command; rm -rf /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/ &amp;gt;/dev/null 2&amp;gt;&amp;amp;1&#39;&amp;quot;&#39;&amp;quot;&#39;&#39; 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Pipiliningの機能を有効にすると、タスク実行ごとのモジュールファイルの転送と削除をしなくなる。&lt;br&gt;
@@ -120,7 +118,6 @@ transport = ssh
 [ssh_connection]
 pipeline = false
 ssh_args = -o ControlMaster=no 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;② ControlMaster: &lt;b&gt;&lt;span style=&#34;color: #ff0000&#34;&gt;有効&lt;/span&gt;&lt;/b&gt; ＆ pipeline: &lt;b&gt;無効&lt;/b&gt;&lt;/p&gt;
@@ -141,7 +138,6 @@ transport = ssh
 [ssh_connection]
 pipeline = true
 ssh_args = -o ControlMaster=auto -o ControlPersist=300s 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2&gt;実行コマンド&lt;/h2&gt;
