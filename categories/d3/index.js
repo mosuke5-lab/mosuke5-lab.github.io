@@ -6,6 +6,7 @@
     <title>D3.Js &middot; Goldstine研究所</title>
 
     <meta name="description" content="mosuke5&#39;s blog">
+    <link rel="canonical" href="https://blog.mosuke.tech/categories/d3/index.js/">
 
     <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
