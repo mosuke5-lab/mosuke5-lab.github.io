@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Goldstine研究所</title>
-    <link>https://blog.mosuke.tech/categories/git/index.xml</link>
-    <description>Recent content on Goldstine研究所</description>
+    <title>Git on Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/git/</link>
+    <description>Recent content in Git on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <atom:link href="https://blog.mosuke.tech/categories/git/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 20 Nov 2014 23:03:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://blog.mosuke.tech/categories/git/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>後からGitレポジトリを共有設定に。sharedオプションの仕組みについて</title>
@@ -14,53 +17,21 @@
       <pubDate>Thu, 20 Nov 2014 23:03:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2014/11/20/230334/</guid>
-      <description>&lt;p&gt;&lt;body&gt;
-&lt;p&gt;Git&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&#34;&gt;レポジトリ&lt;/a&gt;を作って、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD&#34;&gt;複数人&lt;/a&gt;で開発をしていた。&lt;br&gt;
-しかし、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&#34;&gt;レポジトリ&lt;/a&gt;の中に作成されるファイルやディレクトリが個人のグループになってしまい、&lt;br&gt;
-Push, PullするときにPermission &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/error&#34;&gt;error&lt;/a&gt;で怒られまくる。&lt;/p&gt;
-&lt;p&gt;ユーザには共通のグループを作っていたのに…なんでだっけ…&lt;/p&gt;
-&lt;p&gt;気づけば&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&#34;&gt;レポジトリ&lt;/a&gt;を作るとき以下のようにしていた。&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ git init --bare 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD&#34;&gt;複数人&lt;/a&gt;で共有するときには以下のようにするべきであった。&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ git init --bare --shared 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。&lt;br&gt;
-調べると「&lt;b&gt;setgid&lt;/b&gt;」というキーワードに辿り着いた。&lt;br&gt;
-setgidの権限を付けておくと、そのディレクトリに作成されたファイルの所有グループは、そのディレクトリの所有グループになる。&lt;/p&gt;
-&lt;p&gt;以下のようにchmodでsetgidを付けることができる。&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ chmod g+s dir_name 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;setgidがつくとあまり馴染みのない権限がつく。&lt;br&gt;
-「drwxrw&lt;span style=&#34;color: #ff40ff&#34;&gt;&lt;b&gt;s&lt;/b&gt;&lt;/span&gt;r-x」&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ls -l 
-drwxrwsr-x  4 user  group  136 11 16 22:49 test_dir 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;そして、すでに共有設定なしで作ってしまった&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&#34;&gt;レポジトリ&lt;/a&gt;では以下のように対応可能。&lt;br&gt;
-（新しく&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&#34;&gt;レポジトリ&lt;/a&gt;つくるのはめんどいので…）&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;##Gigレポジトリ内のディレクトリに
-$ chmod -R g+s ./branches
-$ chmod -R g+s ./hooks
-$ chmod -R g+s ./info
-$ chmod -R g+s ./objects
-$ chmod -R g+s ./refs
-$ vim .git/config
-  ##[core内に]以下を付け加えておいた
-  [core]
-       repositoryformatversion = 0 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/body&gt;&lt;/p&gt;
-</description>
+      <description>Gitレポジトリを作って、複数人で開発をしていた。
+しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、
+Push, PullするときにPermission errorで怒られまくる。
+ユーザには共通のグループを作っていたのに…なんでだっけ…
+気づけばレポジトリを作るとき以下のようにしていた。
+$ git init --bare  複数人で共有するときには以下のようにするべきであった。
+$ git init --bare --shared  では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。
+調べると「setgid」というキーワードに辿り着いた。
+setgidの権限を付けておくと、そのディレクトリに作成されたファイルの所有グループは、そのディレクトリの所有グループになる。
+以下のようにchmodでsetgidを付けることができる。
+$ chmod g+s dir_name  setgidがつくとあまり馴染みのない権限がつく。
+「drwxrwsr-x」
+$ ls -l drwxrwsr-x 4 user group 136 11 16 22:49 test_dir  そして、すでに共有設定なしで作ってしまったレポジトリでは以下のように対応可能。
+（新しくレポジトリつくるのはめんどいので…）
+##Gigレポジトリ内のディレクトリに $ chmod -R g+s ./branches $ chmod -R g+s ./hooks $ chmod -R g+s ./info $ chmod -R g+s ./objects $ chmod -R g+s .</description>
     </item>
     
   </channel>

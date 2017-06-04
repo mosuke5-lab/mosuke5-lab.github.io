@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Goldstine研究所</title>
-    <link>https://blog.mosuke.tech/categories/linux/index.xml</link>
-    <description>Recent content on Goldstine研究所</description>
+    <title>Linux on Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/linux/</link>
+    <description>Recent content in Linux on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <atom:link href="https://blog.mosuke.tech/categories/linux/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 31 Jul 2015 21:15:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://blog.mosuke.tech/categories/linux/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Packerやる前にKickstartはじめよう</title>
@@ -14,176 +17,33 @@
       <pubDate>Fri, 31 Jul 2015 21:15:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2015/07/31/211542/</guid>
-      <description>&lt;p&gt;&lt;body&gt;
-&lt;h1&gt;1.はじめに&lt;/h1&gt;&lt;/p&gt;
-
-&lt;p&gt;開発環境はVirualboxを使った&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Vagrant&#34;&gt;Vagrant&lt;/a&gt;を利用しているが、&lt;br&gt;
-本番環境は&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/AWS&#34;&gt;AWS&lt;/a&gt;だったり&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/KVM&#34;&gt;KVM&lt;/a&gt;だったり違う仮想化機構で動作しているなんてことよくあると思います。&lt;br&gt;
-そういう環境下でどのように開発環境と本番環境の差分をなくしていますか？&lt;/p&gt;
-
-&lt;p&gt;わたしの場合、基本的にAnsibleを使ってプロビジョニングをしていますが、&lt;br&gt;
-そのプロビジョニング前のベースが異なってしまって困ることがよくあります。&lt;br&gt;
-一般に公開されているVagrantBox使ったら余計な設定が入っていたとか、すでにパッケージが入っていたとか…&lt;/p&gt;
-
-&lt;p&gt;そんな問題を解決しようとPackerを使おう！って考えました。&lt;br&gt;
-ですが、Packerも当たり前だけど魔法ではなく、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Kickstart&#34;&gt;Kickstart&lt;/a&gt;などの自動インストールが前提なので、&lt;br&gt;
-Packerをやる前に&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Kickstart&#34;&gt;Kickstart&lt;/a&gt;を学習せよ、、、ということに気づきました。&lt;/p&gt;
-
-&lt;p&gt;ということで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Kickstart&#34;&gt;Kickstart&lt;/a&gt;をはじめたよってことです。&lt;/p&gt;
-
-&lt;h1&gt;2.&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/kickstart&#34;&gt;kickstart&lt;/a&gt;ってなに&lt;/h1&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/kickstart&#34;&gt;kickstart&lt;/a&gt;はOSのインストールを自動化する仕組みです。&lt;br&gt;
-anaconda社が提供するインストールの仕組みで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Redhat&#34;&gt;Redhat&lt;/a&gt;系のOSが採用しているものです。&lt;br&gt;
-ですので&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Ubuntu&#34;&gt;Ubuntu&lt;/a&gt;だとPreseedっていう別の仕組みだそうです。（詳しくありませんっ）&lt;/p&gt;
-
-&lt;p&gt;で、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Kickstart&#34;&gt;Kickstart&lt;/a&gt;でなにができるかというと...&lt;/p&gt;
-
-&lt;p&gt;OSのインストールをしたことがある方ならわかるかと思いますが、&lt;br&gt;
-普通にDVDなどからインストールすると、&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;言語はなににしますかー？&lt;/li&gt;
-&lt;li&gt;ホスト名なににしますかー？&lt;/li&gt;
-&lt;li&gt;パッケージはなにをいれますかー？&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;とか、聞かれて選択していく必要があります。
-この作業を自動化できるのが&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/kickstart&#34;&gt;kickstart&lt;/a&gt;です。&lt;/p&gt;
-
-&lt;p&gt;URLのようなもの。
-&lt;iframe src=&#34;//hatenablog-parts.com/embed?url=http%3A%2F%2Fkajuhome.com%2Fcentos6_inst.shtml&#34; title=&#34;はじめての自宅サーバ構築 - Fedora/CentOS - CentOS6 のインストール手順&#34; class=&#34;embed-card embed-webcard&#34; scrolling=&#34;no&#34; frameborder=&#34;0&#34; style=&#34;display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;&#34;&gt;&lt;a href=&#34;http://kajuhome.com/centos6_inst.shtml&#34;&gt;はじめての自宅サーバ構築 - Fedora/CentOS - CentOS6 のインストール手順&lt;/a&gt;&lt;/iframe&gt;&lt;cite class=&#34;hatena-citation&#34;&gt;&lt;a href=&#34;http://kajuhome.com/centos6_inst.shtml&#34;&gt;kajuhome.com&lt;/a&gt;&lt;/cite&gt;&lt;/p&gt;
-
-&lt;h1&gt;(おまけ)Ansible, Chef, Puppetとの違い？&lt;/h1&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/kickstart&#34;&gt;kickstart&lt;/a&gt;にはプロビジョニング機能もついているため、&lt;br&gt;
-AnsibleとかChefとかPuppetとの違いは？住み分けは？と思うかもしれません。&lt;br&gt;
-明確に、住み分けが決まっているわけではありませんが、
-個人的にはAnsibleやChefを実行する前の最低限の設定を&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/kickstart&#34;&gt;kickstart&lt;/a&gt;にやらせようと思っています。&lt;br&gt;
-（一般的かとは思いますが…？）&lt;/p&gt;
-
-&lt;p&gt;Lee ThompsonのProvisioning Toolchainを参考にKiskstarのやる範囲をまとめると。
-&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150731/20150731223953.jpg&#34; alt=&#34;f:id:mosuke5:20150731223953j:plain&#34; title=&#34;f:id:mosuke5:20150731223953j:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;iframe src=&#34;//hatenablog-parts.com/embed?url=http%3A%2F%2Fen.oreilly.com%2Fvelocity-mar2010%2Fpublic%2Fschedule%2Fdetail%2F14180&#34; title=&#34;Provisioning Toolchain: Web Performance and Operations - Velocity Online Conference - March 17, 2010 - O&#39;Reilly Media&#34; class=&#34;embed-card embed-webcard&#34; scrolling=&#34;no&#34; frameborder=&#34;0&#34; style=&#34;display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;&#34;&gt;&lt;a href=&#34;http://en.oreilly.com/velocity-mar2010/public/schedule/detail/14180&#34;&gt;Provisioning Toolchain: Web Performance and Operations - Velocity Online Conference - March 17, 2010 - O&#39;Reilly Media&lt;/a&gt;&lt;/iframe&gt;&lt;cite class=&#34;hatena-citation&#34;&gt;&lt;a href=&#34;http://en.oreilly.com/velocity-mar2010/public/schedule/detail/14180&#34;&gt;en.oreilly.com&lt;/a&gt;&lt;/cite&gt;&lt;/p&gt;
-
-&lt;h1&gt;3.Hello &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Kickstart&#34;&gt;Kickstart&lt;/a&gt;!!&lt;/h1&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Virtualbox&#34;&gt;Virtualbox&lt;/a&gt;を使って&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Kickstart&#34;&gt;Kickstart&lt;/a&gt;を試しました。&lt;/p&gt;
-
-&lt;h1&gt;3-1.用意したもの&lt;/h1&gt;
-
-&lt;ul&gt;
-&lt;li&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Virtualbox&#34;&gt;Virtualbox&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;自分の環境は&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Mac&#34;&gt;Mac&lt;/a&gt;で、バージョンは5.0&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;OSのisoファイル
-
-&lt;ul&gt;
-&lt;li&gt;
-&lt;a href=&#34;http://isoredirect.centos.org/centos/7/isos/x86_64/CentOS-7-x86_64-DVD-1503-01.iso&#34;&gt;CentOS Mirror&lt;/a&gt; ここからダウンロードしました&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/kickstart&#34;&gt;kickstart&lt;/a&gt;ファイル
-
-&lt;ul&gt;
-&lt;li&gt;ネットワーク上においてhttpでアクセスできるようにしておきました&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;利用した&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/kickstart&#34;&gt;kickstart&lt;/a&gt;ファイル。自分の学習のためコメントを多く残しました。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# アップグレードするかインストールするか
-install
-
-# インストールタイプの設定
-# CD-ROM経由かネットワーク経由かとか
-cdrom
-
-# 言語設定
-lang ja_JP.UTF-8
-
-# キーボード設定
-keyboard jp106
-
-# ネットワーク設定
-# /etc/sysconfig/network-scripts/ifcfg-xxxx 部分
-network --onboot yes --device eth0 --bootproto dhcp --noipv6
-
-# rootのパスワード
-# xxxxxx部分はopensslコマンドで作成するといい
-# $openssl passwd -1
-rootpw --iscrypted xxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-# iptablesの設定
-# プロビジョニングで設定するのでここでは無効にしておく
-firewall --disabled
-
-# 認証オプション
-authconfig --enableshadow --passalgo=sha512
-
-# SELinuxの設定
-# こちらも詳細はプロビジョニングで設定するので無効にしておく
-selinux --disabled
-
-# タイムゾーン
-timezone --utc Asia/Tokyo
-
-# ブートローダのインストール方法
-bootloader --location=mbr --driveorder=sda --append=&amp;quot;nomodeset crashkernel=auto rhgb quiet&amp;quot;
-
-# 設定後にリブート
-reboot
-
-# パーティション設定
-clearpart --linux --drives=sda
-autopart
-
-# インストールパッケージ選択
-%packages --nobase
-@core
-
-%end 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3&gt;参考になったもの&lt;/h3&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Redhat&#34;&gt;Redhat&lt;/a&gt;社のインストールガイドがよくまとまっていた。&lt;br&gt;
-特に&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/kickstart&#34;&gt;kickstart&lt;/a&gt;ファイルについては下記あたりが役立ちます。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/6/html/Installation_Guide/s1-kickstart2-options.html&#34;&gt;32.4. キックスタートのオプション&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/6/html/Installation_Guide/s1-kickstart2-packageselection.html&#34;&gt;32.5. パッケージの選択&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h1&gt;3-2.&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/kickstart&#34;&gt;kickstart&lt;/a&gt;ファイルの使い方&lt;/h1&gt;
-
-&lt;p&gt;しかし、OSインストール前なのにどうやってファイルを使うのか…？&lt;br&gt;
-はじめ戸惑いました…&lt;/p&gt;
-
-&lt;p&gt;実は以下の方法で利用できます。&lt;/p&gt;
-
-&lt;p&gt;OSのisoファイルで起動するとこの画面がでるやろ。
-&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150802/20150802125544.png&#34; alt=&#34;f:id:mosuke5:20150802125544p:plain&#34; title=&#34;f:id:mosuke5:20150802125544p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
-
-&lt;p&gt;そして、ここでTabをおすと、なにか入力できるが画面が出てきて。&lt;br&gt;
-そこに、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/kickstart&#34;&gt;kickstart&lt;/a&gt;ファイルのパスを入力してやる。
-&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150802/20150802125630.png&#34; alt=&#34;f:id:mosuke5:20150802125630p:plain&#34; title=&#34;f:id:mosuke5:20150802125630p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
-
-&lt;p&gt;これで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Kickstart&#34;&gt;Kickstart&lt;/a&gt;完了や。&lt;/p&gt;
-
-&lt;h1&gt;4.最後に&lt;/h1&gt;
-
-&lt;p&gt;&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Kickstart&#34;&gt;Kickstart&lt;/a&gt;入門したし、次はPackerをやりたいと思います。&lt;br&gt;
-が、ふと思ったのが、自分の用途だとPackerではなく&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Kickstart&#34;&gt;Kickstart&lt;/a&gt;で十分かもなーとか思ったり思わなかったり…&lt;/p&gt;
-&lt;/body&gt;&lt;/p&gt;
-</description>
+      <description>1.はじめに
+開発環境はVirualboxを使ったVagrantを利用しているが、
+本番環境はAWSだったりKVMだったり違う仮想化機構で動作しているなんてことよくあると思います。
+そういう環境下でどのように開発環境と本番環境の差分をなくしていますか？
+わたしの場合、基本的にAnsibleを使ってプロビジョニングをしていますが、
+そのプロビジョニング前のベースが異なってしまって困ることがよくあります。
+一般に公開されているVagrantBox使ったら余計な設定が入っていたとか、すでにパッケージが入っていたとか…
+そんな問題を解決しようとPackerを使おう！って考えました。
+ですが、Packerも当たり前だけど魔法ではなく、Kickstartなどの自動インストールが前提なので、
+Packerをやる前にKickstartを学習せよ、、、ということに気づきました。
+ということでKickstartをはじめたよってことです。
+2.kickstartってなに kickstartはOSのインストールを自動化する仕組みです。
+anaconda社が提供するインストールの仕組みでRedhat系のOSが採用しているものです。
+ですのでUbuntuだとPreseedっていう別の仕組みだそうです。（詳しくありませんっ）
+で、Kickstartでなにができるかというと...
+OSのインストールをしたことがある方ならわかるかと思いますが、
+普通にDVDなどからインストールすると、
+ 言語はなににしますかー？ ホスト名なににしますかー？ パッケージはなにをいれますかー？  とか、聞かれて選択していく必要があります。 この作業を自動化できるのがkickstartです。
+URLのようなもの。 はじめての自宅サーバ構築 - Fedora/CentOS - CentOS6 のインストール手順kajuhome.com
+(おまけ)Ansible, Chef, Puppetとの違い？ kickstartにはプロビジョニング機能もついているため、
+AnsibleとかChefとかPuppetとの違いは？住み分けは？と思うかもしれません。
+明確に、住み分けが決まっているわけではありませんが、 個人的にはAnsibleやChefを実行する前の最低限の設定をkickstartにやらせようと思っています。
+（一般的かとは思いますが…？）
+Lee ThompsonのProvisioning Toolchainを参考にKiskstarのやる範囲をまとめると。 
+Provisioning Toolchain: Web Performance and Operations - Velocity Online Conference - March 17, 2010 - O&#39;Reilly Mediaen.oreilly.com
+3.Hello Kickstart!! Virtualboxを使ってKickstartを試しました。
+3-1.用意したもの   Virtualbox  自分の環境はMacで、バージョンは5.</description>
     </item>
     
     <item>
@@ -192,84 +52,22 @@ autopart
       <pubDate>Wed, 15 Apr 2015 17:11:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2015/04/15/171127/</guid>
-      <description>&lt;p&gt;&lt;body&gt;
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/CentOS&#34;&gt;CentOS&lt;/a&gt; 6.5環境でAnsibleを使って最新の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL&#34;&gt;MySQL&lt;/a&gt;のセットアップをしようと思った際にハマったことをまとめた。&lt;br&gt;
-本質的にはAnsibleというより&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Linux&#34;&gt;Linux&lt;/a&gt; &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/RPM&#34;&gt;RPM&lt;/a&gt;パッケージのはなし。&lt;br&gt;
-ついでに、しょっぼい&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/github&#34;&gt;github&lt;/a&gt;を公開しました。&lt;/p&gt;&lt;/p&gt;
-
-&lt;h1&gt;(1) 本記事を書くに至った経緯&lt;/h1&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Ansibleで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/mysql&#34;&gt;mysql&lt;/a&gt;を使ったサーバを構築(CentOS6.5)することになった。
-
-&lt;ul&gt;
-&lt;li&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL&#34;&gt;MySQL&lt;/a&gt;のバージョンは5.6を採用した。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL&#34;&gt;MySQL&lt;/a&gt;の公式&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/rpm&#34;&gt;rpm&lt;/a&gt;をダウンロードしインストールした。
-
-&lt;ul&gt;
-&lt;li&gt;インストールしたもの：&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL&#34;&gt;MySQL&lt;/a&gt;-client, &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL&#34;&gt;MySQL&lt;/a&gt;-devel, &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL&#34;&gt;MySQL&lt;/a&gt;-server, &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL&#34;&gt;MySQL&lt;/a&gt;-shared&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL&#34;&gt;MySQL&lt;/a&gt;-sharedをインストールする際にデフォルトの&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/mysql&#34;&gt;mysql&lt;/a&gt;-libsと競合&lt;/li&gt;
-&lt;li&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/mysql&#34;&gt;mysql&lt;/a&gt;-libsをアンインストールし再インストール&lt;/li&gt;
-&lt;li&gt;Ansibleで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL&#34;&gt;MySQL&lt;/a&gt;の操作をするには&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL-python&#34;&gt;MySQL-python&lt;/a&gt;が必要なのでインストール&lt;/li&gt;
-&lt;li&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL-python&#34;&gt;MySQL-python&lt;/a&gt;をインストールするにはさっきアンインストールした&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/mysql&#34;&gt;mysql&lt;/a&gt;-libsが必要…(困った)&lt;/li&gt;
-&lt;li&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL&#34;&gt;MySQL&lt;/a&gt;-shared-compatの存在に気づく&lt;/li&gt;
-&lt;li&gt;備忘録に書いておくか…&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h1&gt;(2) &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL&#34;&gt;MySQL&lt;/a&gt;-shared-compatの存在&lt;/h1&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/mysql&#34;&gt;mysql&lt;/a&gt;-libsは多くのパッケージの依存となっており、公式のMySQL5.6をインストールすることで、&lt;br&gt;
-他のパッケージがいれられない状況となっていた。&lt;br&gt;
-そんな状況を解決するために&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL&#34;&gt;MySQL&lt;/a&gt;-shared-compatというパッケージが用意されていた。&lt;br&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL&#34;&gt;MySQL&lt;/a&gt;-shared-compatは「過去の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL&#34;&gt;MySQL&lt;/a&gt;バージョン向けの共有クライアントライブラリが納められているもの」だ。&lt;/p&gt;
-
-&lt;p&gt;詳細は下記参照をおすすめ。&lt;br&gt;
-&lt;a href=&#34;http://y-ken.hatenablog.com/entry/inside-of-libmysqlclient-with-mysql-shared-compat&#34;&gt;MySQL-5.5.6から仕様が変わった「MySQL-shared-compat」の中身を徹底解剖 - Y-Ken Studio&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;ちなみに&#34;compat&#34;という単語がよく使われるが&#34;compatibility&#34;の略で「互換性」とかそういう意味。&lt;/p&gt;
-
-&lt;h1&gt;(3) &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Github&#34;&gt;Github&lt;/a&gt;で公開しました&lt;/h1&gt;
-
-&lt;p&gt;内容は今のところ死ぬほど薄いのだが、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MySQL&#34;&gt;MySQL&lt;/a&gt;をインストールするansibleを公開しました。
-&lt;a href=&#34;https://github.com/mosuke5/mysql-ansible&#34;&gt;mosuke5/mysql-ansible · GitHub&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;内容はあれだが、特徴としては、インターネット上から&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/RPM&#34;&gt;RPM&lt;/a&gt;をダウンロードしてインストールする際に、&lt;br&gt;
-Ansibleでも「ダウンロード」→「インストール」の流れを踏む人が多いが、以下のようにするとシンプルになる。&lt;br&gt;
-varsでインストールしたい&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/rpm&#34;&gt;rpm&lt;/a&gt;やその取得先を記述しておいて、task側では&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/yum&#34;&gt;yum&lt;/a&gt;でnameにvarsで定義した変数を読むだけでできる。&lt;/p&gt;
-
-&lt;p&gt;role/&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/mysql&#34;&gt;mysql&lt;/a&gt;/vars/main.yml&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;mysql_url: http://ftp.jaist.ac.jp/pub/mysql/Downloads/MySQL-5.6
-mysql_ver: &amp;quot;5.6.24-1&amp;quot;
-mysql_rpms:
-  - MySQL-client-{{ mysql_ver }}.el6.x86_64.rpm
-  - MySQL-shared-compat-{{ mysql_ver }}.el6.x86_64.rpm
-  - MySQL-shared-{{ mysql_ver }}.el6.x86_64.rpm
-  - MySQL-devel-{{ mysql_ver }}.el6.x86_64.rpm
-  - MySQL-server-{{ mysql_ver }}.el6.x86_64.rpm
- 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;role/&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/mysql&#34;&gt;mysql&lt;/a&gt;/tasks/main.yml&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;- name: Install MySQL without MySQL-shared
-  yum: name={{ mysql_url}}/{{ item }}
-  with_items: mysql_rpms
- 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/body&gt;&lt;/p&gt;
-</description>
+      <description>CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にハマったことをまとめた。
+本質的にはAnsibleというよりLinux RPMパッケージのはなし。
+ついでに、しょっぼいgithubを公開しました。
+(1) 本記事を書くに至った経緯  Ansibleでmysqlを使ったサーバを構築(CentOS6.5)することになった。   MySQLのバージョンは5.6を採用した。    MySQLの公式rpmをダウンロードしインストールした。  インストールしたもの：MySQL-client, MySQL-devel, MySQL-server, MySQL-shared    MySQL-sharedをインストールする際にデフォルトのmysql-libsと競合  mysql-libsをアンインストールし再インストール AnsibleでMySQLの操作をするにはMySQL-pythonが必要なのでインストール  MySQL-pythonをインストールするにはさっきアンインストールしたmysql-libsが必要…(困った)  MySQL-shared-compatの存在に気づく 備忘録に書いておくか…  (2) MySQL-shared-compatの存在 mysql-libsは多くのパッケージの依存となっており、公式のMySQL5.6をインストールすることで、
+他のパッケージがいれられない状況となっていた。
+そんな状況を解決するためにMySQL-shared-compatというパッケージが用意されていた。
+MySQL-shared-compatは「過去のMySQLバージョン向けの共有クライアントライブラリが納められているもの」だ。
+詳細は下記参照をおすすめ。
+MySQL-5.5.6から仕様が変わった「MySQL-shared-compat」の中身を徹底解剖 - Y-Ken Studio
+ちなみに&#34;compat&#34;という単語がよく使われるが&#34;compatibility&#34;の略で「互換性」とかそういう意味。
+(3) Githubで公開しました 内容は今のところ死ぬほど薄いのだが、MySQLをインストールするansibleを公開しました。 mosuke5/mysql-ansible · GitHub
+内容はあれだが、特徴としては、インターネット上からRPMをダウンロードしてインストールする際に、
+Ansibleでも「ダウンロード」→「インストール」の流れを踏む人が多いが、以下のようにするとシンプルになる。
+varsでインストールしたいrpmやその取得先を記述しておいて、task側ではyumでnameにvarsで定義した変数を読むだけでできる。
+role/mysql/vars/main.yml
+mysql_url: http://ftp.jaist.ac.jp/pub/mysql/Downloads/MySQL-5.6 mysql_ver: &amp;quot;5.6.24-1&amp;quot; mysql_rpms: - MySQL-client-{{ mysql_ver }}.el6.x86_64.rpm - MySQL-shared-compat-{{ mysql_ver }}.el6.x86_64.rpm - MySQL-shared-{{ mysql_ver }}.</description>
     </item>
     
     <item>
@@ -278,189 +76,24 @@ mysql_rpms:
       <pubDate>Sun, 05 Apr 2015 21:25:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2015/04/05/212518/</guid>
-      <description>&lt;p&gt;&lt;body&gt;
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;のエージェントフォワードした後に、接続したユーザとは別のユーザでgit cloneしたいことがあった。&lt;br&gt;
-それについて調べていく中で学習したことや検討したことについてまとめた。&lt;/p&gt;&lt;/p&gt;
-
-&lt;h1&gt;0. 前提&lt;/h1&gt;
-
-&lt;p&gt;ローカルのPC(&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Mac&#34;&gt;Mac&lt;/a&gt;)上で、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Vagrant&#34;&gt;Vagrant&lt;/a&gt;を使用してCentOS7の仮想サーバ(testsv)を立ち上げている。&lt;/p&gt;
-
-&lt;p&gt;&amp;lt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&#34;&gt;IPアドレス&lt;/a&gt;&amp;gt;&lt;br&gt;
-ローカルPC：192.168.33.1&lt;br&gt;
-仮想サーバ：192.168.33.100&lt;/p&gt;
-
-&lt;p&gt;本記事上での「git cloneする」とは、「プライベートのGit&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&#34;&gt;レポジトリ&lt;/a&gt;から&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;を利用してクローンする」ということを指す。&lt;/p&gt;
-
-&lt;h1&gt;1. &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;のエージェントフォワードを利用したい理由&lt;/h1&gt;
-
-&lt;p&gt;まず、そもそもなぜ&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;のエージェントフォワードをする必要があったのか。&lt;br&gt;
-最近では多くの方がご存知かつ利用していることだと思うが、仮想のサーバ上でgitを利用するときによく利用する。&lt;br&gt;
-(もちろんそれだけの用途ではありません)&lt;/p&gt;
-
-&lt;p&gt;仮想サーバを作るたびに&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;の鍵を生成して、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Github&#34;&gt;Github&lt;/a&gt;等に登録するのが手間なので、&lt;br&gt;
-ローカルのPCの鍵を他のサーバへ引き継ぐことでgit clone等を可能にするのだ。&lt;/p&gt;
-
-&lt;h1&gt;2. &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;エージェントフォワード利用時の挙動&lt;/h1&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;のエージェントフォワードで利用される認証情報は、接続先サーバの/tmp以下に保存されます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[myuser@localpc ~]$ ssh -A vagrant@192.168.33.100
-Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
-[vagrant@testsv ~]$
-[vagrant@testsv ~]$ ls -l /tmp | grep ssh
-drwx------. 2 vagrant    vagrant    23  4月  4 11:35 ssh-skQVHsUCHU 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;
-また、接続ユーザには&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;_AUTH_SOCKという&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;ができ、どの認証情報を利用するか記述がされます。&lt;br&gt;
-実際に確認してみる。&lt;br&gt;
-確認方法は、envコマンドで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;一覧を表示し、そのなかで&#34;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ssh&#34;&gt;ssh&lt;/a&gt;&#34;を含むものを&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/grep&#34;&gt;grep&lt;/a&gt;。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ env | grep -i ssh
-SSH_AUTH_SOCK=/tmp/ssh-skQVHsUCHU/agent.9034
-SSH_CLIENT=&#39;192.168.33.1 58017 22&#39;
-SSH_CONNECTION=&#39;192.168.33.1 58017 192.168.33.100 22&#39;
-SSH_TTY=/dev/pts/0 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;
-ちなみにエージェントフォワードは、認証エージェントに登録されている&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%C8%EB%CC%A9%B8%B0&#34;&gt;秘密鍵&lt;/a&gt;を&lt;br&gt;
-ログイン先のサーバから利用できるようにする機能であり、接続元自体が変わるわけではない。&lt;br&gt;
-試しにエージェントフォワードで接続したサーバ先から、更に&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ssh&#34;&gt;ssh&lt;/a&gt;をして、その接続状況をみてみる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[myuser@localpc ~]$ ssh -A vagrant@192.168.33.100
-Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
-[vagrant@testsv ~]$ ssh -A vagrant@192.168.33.100
-Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
-[vagrant@testsv ~]$
-[vagrant@testsv ~]$ w
- 11:50:17 up  1:55,  2 users,  load average: 0.00, 0.01, 0.05
-USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
-vagrant  pts/0    192.168.33.1     11:35    1.00s  0.04s  0.01s ssh -A vagrant@192.168.33.100
-vagrant  pts/1    192.168.33.100   11:50    1.00s  0.01s  0.00s w 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;wコマンドの結果の3行目のFROMをみるとわかるが、接続元が変わるわけではない。&lt;/p&gt;
-
-&lt;h1&gt;3. &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;エージェントフォワードで接続後にrootユーザでgit cloneする&lt;/h1&gt;
-
-&lt;p&gt;例えば、rootでしかアクセスできないディレクトリにgit cloneしたいと思い、&lt;br&gt;
-以下のようにsudoをつけてgit cloneしてみる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ sudo git clone git@xxxxx.xxx:yyyy/zzzzzz.git /root/hoge
-Permission denied (publickey).
-fatal: Could not read from remote repository.
-
-Please make sure you have the correct access rights
-and the repository exists. 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;sudoをつけてgit cloneしようとすると、エージェントフォワードしたのにアクセス権がありませんと言われてしまった。&lt;br&gt;
-なぜエージェントフォワードしたのにgit cloneできないのだろうか？&lt;/p&gt;
-
-&lt;p&gt;一般的な設定ではsudo実行すると、ユーザの&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;はrootユーザへ引き継がれず、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;_AUTH_SOCKがないことがわかる。&lt;br&gt;
-sudo後に&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;がどうなっているか確認してみる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ sudo env | grep -i ssh
-　(なにも表示されない) 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;
-sudo実行しても、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;_AUTH_SOCKを引き継ぎたい！&lt;br&gt;
-実はsudoで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;を引き継ぐ方法がある。-Eのオプションを付けると&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;を引き継ぐことが可能だ。&lt;br&gt;
-以下のように&lt;code&gt;sudo -E&lt;/code&gt;とすると...&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ sudo -E env | grep -i ssh
-SSH_CLIENT=192.168.33.100 60051 22
-SSH_TTY=/dev/pts/1
-SSH_AUTH_SOCK=/tmp/ssh-qhGLsXBURp/agent.9113
-SSH_CONNECTION=192.168.33.100 60051 192.168.33.100 22 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;
-&lt;code&gt;sudo -E&lt;/code&gt;で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;が引き継げ、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;_AUTH_SOCKが引き継げるので、-Eをつけてsudo git cloneをトライする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ sudo -E git clone git@xxxxx.xxx:yyyy/zzzzzz.git /root/hoge
-Cloning into &#39;zzzzzz&#39;...
-remote: Counting objects: 27, done.
-remote: Compressing objects: 100% (26/26), done.
-remote: Total 27 (delta 13), reused 0 (delta 0)
-Receiving objects: 100% (27/27), done.
-Resolving deltas: 100% (13/13), done.
-Checking connectivity... done. 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;予想通り成功しました！&lt;/p&gt;
-
-&lt;h3&gt;(余談) suもsudoと同じ考え方ができる&lt;/h3&gt;
-
-&lt;p&gt;sudoだけではなくsuでのユーザ切り替えについても同じことが言える。&lt;br&gt;
-rootユーザへ切り替えるとき、よく&lt;code&gt;su -&lt;/code&gt;とハイフンをつけると思う。&lt;br&gt;
-ハイフンをつけると、ログインシェルを使用してユーザを切り替えるので、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;の引き継ぎは行われない。&lt;/p&gt;
-
-&lt;h1&gt;4. rootユーザでない他のユーザでgit cloneする&lt;/h1&gt;
-
-&lt;p&gt;続いて、rootユーザではない別の一般ユーザでのgit cloneについて考える。&lt;br&gt;
-rootユーザの時と同じ要領で、sudoコマンドを利用しotheruserという別のユーザでgit cloneをしてみる。&lt;/p&gt;
-
-&lt;p&gt;まずは、sudoコマンドでは-uでユーザの指定ができるので、otheruserに切り替えた際の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;をみてみる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ sudo -E -u otheruser env | grep -i ssh
-SSH_CLIENT=192.168.33.100 60051 22
-SSH_TTY=/dev/pts/1
-SSH_AUTH_SOCK=/tmp/ssh-qhGLsXBURp/agent.9113
-SSH_CONNECTION=192.168.33.100 60051 192.168.33.100 22 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;
-rootの時と同様で予想通りな感じ。
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;_AUTH_SOCKも引き継げているし、git clone可能だと思い以下を実行すると。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo -E -u otheruser git clone git@xxxxx.xxx:yyyy/zzzzzz.git /home/otheruser
-Permission denied (publickey).
-fatal: Could not read from remote repository.
-
-Please make sure you have the correct access rights
-and the repository exists. 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;
-rootユーザの時とは異なってgit cloneは不可…&lt;/p&gt;
-
-&lt;p&gt;でも理由はいたって簡単。&lt;br&gt;
-/tmp以下に保存されている認証情報は、所有者は接続したユーザで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%D1%A1%BC%A5%DF%A5%C3%A5%B7%A5%E7%A5%F3&#34;&gt;パーミッション&lt;/a&gt;は600なのだ。&lt;br&gt;
-つまり、otheruserではこの認証情報は読みこめないのである。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ ls -l /tmp | grep ssh
-drwx------. 2 vagrant    vagrant    23  4月  4 11:35 ssh-skQVHsUCHU 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;重要な情報なので、アクセス権は妥当ですよね。&lt;br&gt;
-試しにアクセス権を変えてみるとgit cloneは可能だ。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ chmod -R 777 /tmp/ssh-skQVHsUCHU
-[vagrant@testsv ~]$ sudo -E -u otheruser git clone git@xxxxx.xxx:yyyy/zzzzzz.git /home/otheruser
-Cloning into &#39;zzzzzz&#39;...
-remote: Counting objects: 27, done.
-remote: Compressing objects: 100% (26/26), done.
-remote: Total 27 (delta 13), reused 0 (delta 0)
-Receiving objects: 100% (27/27), done.
-Resolving deltas: 100% (13/13), done.
-Checking connectivity... done. 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1&gt;5. まとめ&lt;/h1&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;のエージェントフォワードした際の動きと、重要な観点については抑えられた。&lt;br&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;エージェントフォワードの仕組みを見ていくことで、&lt;br&gt;
-うかつにエージェントフォワードは利用してはいけない理由も見えてきた。&lt;/p&gt;
-
-&lt;p&gt;&lt;p&gt;また、本題の「&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;エージェントフォワード後に、接続したユーザとは別のユーザでgit cloneしたい」だが、
-そもそもそういうことをすることはNGということらしい。&lt;br&gt;
-別のもっと賢い方法を考えろってことのようでした。&lt;/p&gt;
-&lt;/body&gt;&lt;/p&gt;
-</description>
+      <description>SSHのエージェントフォワードした後に、接続したユーザとは別のユーザでgit cloneしたいことがあった。
+それについて調べていく中で学習したことや検討したことについてまとめた。
+0. 前提 ローカルのPC(Mac)上で、Vagrantを使用してCentOS7の仮想サーバ(testsv)を立ち上げている。
+&amp;lt;IPアドレス&amp;gt;
+ローカルPC：192.168.33.1
+仮想サーバ：192.168.33.100
+本記事上での「git cloneする」とは、「プライベートのGitレポジトリからSSHを利用してクローンする」ということを指す。
+1. SSHのエージェントフォワードを利用したい理由 まず、そもそもなぜSSHのエージェントフォワードをする必要があったのか。
+最近では多くの方がご存知かつ利用していることだと思うが、仮想のサーバ上でgitを利用するときによく利用する。
+(もちろんそれだけの用途ではありません)
+仮想サーバを作るたびにSSHの鍵を生成して、Github等に登録するのが手間なので、
+ローカルのPCの鍵を他のサーバへ引き継ぐことでgit clone等を可能にするのだ。
+2. SSHエージェントフォワード利用時の挙動 SSHのエージェントフォワードで利用される認証情報は、接続先サーバの/tmp以下に保存されます。
+[myuser@localpc ~]$ ssh -A vagrant@192.168.33.100 Last login: Sat Apr 4 xx:xx:xx 2015 from 192.168.33.1 [vagrant@testsv ~]$ [vagrant@testsv ~]$ ls -l /tmp | grep ssh drwx------. 2 vagrant vagrant 23 4月 4 11:35 ssh-skQVHsUCHU  
+また、接続ユーザにはSSH_AUTH_SOCKという環境変数ができ、どの認証情報を利用するか記述がされます。
+実際に確認してみる。
+確認方法は、envコマンドで環境変数一覧を表示し、そのなかで&#34;ssh&#34;を含むものをgrep。
+[vagrant@testsv ~]$ env | grep -i ssh SSH_AUTH_SOCK=/tmp/ssh-skQVHsUCHU/agent.9034 SSH_CLIENT=&#39;192.168.33.1 58017 22&#39; SSH_CONNECTION=&#39;192.</description>
     </item>
     
     <item>
@@ -469,222 +102,28 @@ Checking connectivity... done.
       <pubDate>Sun, 22 Feb 2015 21:13:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2015/02/22/211316/</guid>
-      <description>&lt;p&gt;&lt;body&gt;
-&lt;p&gt;bunlderを使ったWebアプリをプロダクション環境で動かすときに、アプリの起動をどうやって実現しているだろうか。&lt;/p&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Apache&#34;&gt;Apache&lt;/a&gt; Passengerを使う場合には、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Apache&#34;&gt;Apache&lt;/a&gt;の起動がアプリの起動につながるので、
-アプリの起動はあまり気にしなかったかもしれない。&lt;/p&gt;
-
-&lt;p&gt;しかし、例えばNginx × &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Unicorn&#34;&gt;Unicorn&lt;/a&gt;/thinの構成などの場合は&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Unicorn&#34;&gt;Unicorn&lt;/a&gt;やthinの起動もしなければいけなくなってくる。&lt;br&gt;
-（あるいはこのようなケースがあるかは謎だが、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Unicorn&#34;&gt;Unicorn&lt;/a&gt;やthinを単体で動かそうとしている場合など）&lt;/p&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Unicorn&#34;&gt;Unicorn&lt;/a&gt;やthin（例ではthinを扱うが本質は同じ）の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%BC%AB%C6%B0%B5%AF%C6%B0&#34;&gt;自動起動&lt;/a&gt;を実現する際の勘所、注意事項をまとめた。&lt;/p&gt;
-
-&lt;h1&gt;0. 前提&lt;/h1&gt;
-
-&lt;ul&gt;
-&lt;li&gt;CentOS6.5上で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Ruby&#34;&gt;Ruby&lt;/a&gt;でのWebアプリケーションを作っている。&lt;/li&gt;
-&lt;li&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0&#34;&gt;アプリケーションサーバ&lt;/a&gt;はthinを利用している。&lt;/li&gt;
-&lt;li&gt;また、gemパッケージ管理にbundlerを利用している。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h1&gt;1. 開発環境でよくするアプリの起動&lt;/h1&gt;
-
-&lt;p&gt;開発環境では、アプリケーションのログの閲覧性なども兼ねて以下のようにアプリを起動していた。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ bundle exec rackup
-$ bundle exec thin start 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;でも、これではいつまでたってもプロダクション環境での利用はできません。&lt;/p&gt;
-
-&lt;h1&gt;2. 上記方法ではプロダクション環境で利用できない理由&lt;/h1&gt;
-
-&lt;p&gt;当然のことながら、プロダクション環境ではいちいち手動でコマンドを実行しアプリケーションを立ち上げるわけにはいかない。&lt;br&gt;
-例えば、なんらかの理由でサーバが再起動してしまった場合には、&lt;br&gt;
-このままではアプリケーションが自動的に立ち上がらないため、サービスの停止につながってしまう。&lt;/p&gt;
-
-&lt;p&gt;ではどうするのか？&lt;br&gt;
-以下の状態であることがプロダクション環境では理想なのではないだろうか？&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;オリジナルアプリケーションもserviceコマンドで起動・停止ができる
-
-&lt;ul&gt;
-&lt;li&gt;他のサービスと同様の操作方法が可能なのでわかりやすい&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;サーバ立ち上げ時にサービスが自動で起動される&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h1&gt;3. 起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;を作ろう&lt;/h1&gt;
-
-&lt;p&gt;上記の状態にもっていくためには、起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;を作らなければならない。&lt;/p&gt;
-
-&lt;p&gt;起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;を作る…！？&lt;br&gt;
-「作ったことないし、すぐには作れないよ〜」って思うかもしれないが、&lt;br&gt;
-サンプルはたくさんあるし、よく見てみるとそれほど難しくはない。&lt;/p&gt;
-
-&lt;p&gt;thinを使ったサンプルを探そうと思うと数は少ないが、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Unicorn&#34;&gt;Unicorn&lt;/a&gt;も同じ仕組なので、
-&#34;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/unicorn&#34;&gt;unicorn&lt;/a&gt; init script&#34;なんて検索をかけてもいろいろでてくるのでおすすめ。&lt;/p&gt;
-
-&lt;p&gt;参考ししたもの&lt;br&gt;
-&lt;a href=&#34;https://gist.github.com/sbeam/3454488&#34;&gt;https://gist.github.com/sbeam/3454488&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;上を参考にしながら、こんな起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;を作ってみた。（未完成版）&lt;br&gt;
-これを&lt;code&gt;/etc/init.d&lt;/code&gt;以下へ配置する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;#!/bin/bash
-
-### BEGIN CHKCONFIG INFO
-# chkconfig: 2345 55 25
-# description: sample-app
-### END CHKCONFIG INFO
-
-SCRIPT_NAME=/etc/init.d/sample-app
-CONFIG_PATH=/path/to/config
-BUNDLE_CMD=/usr/local/bin/bundle
-
-bundle_exec_thin ()
-{
-    for CONFIG_FILE in &amp;quot;$CONFIG_PATH/*.yml&amp;quot;; do
-        SITE_DIR=`awk &#39;/^chdir:/ { print $2; }&#39; $CONFIG_FILE`
-        cd $SITE_DIR
-        $BUNDLE_CMD exec thin $1 -C $CONFIG_FILE
-    done
-}
-
-
-case &amp;quot;$1&amp;quot; in
-  start)
-        bundle_exec_thin start
-        ;;
-  stop)
-        bundle_exec_thin stop
-        ;;
-  restart)
-        bundle_exec_thin restart
-        ;;
-  *)
-        echo &amp;quot;Usage: $SCRIPT_NAME {start|stop|restart}&amp;quot; &amp;gt;&amp;amp;2
-        exit 3
-        ;;
-esac
-
-:
- 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;も完成したし、実際にserviceコマンドで実行してみる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo service sample-app start
-/usr/bin/env: ruby: No such file or directory 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;んん。。。起動せず、撃沈…&lt;/p&gt;
-
-&lt;h3&gt;起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;を作る上での注意&lt;/h3&gt;
-
-&lt;p&gt;起動しなかった原因に移る前に、起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;を作る上での注意点を１つ。&lt;br&gt;
-chkconfigで認識させるためには冒頭のCHKCONFIG INFO部分(&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B3%A5%E1%A5%F3%A5%C8%A5%A2%A5%A6%A5%C8&#34;&gt;コメントアウト&lt;/a&gt;部分)も重要になってくる。&lt;br&gt;
-CHKCONFIG INFO部分を書かないままchkconfigでaddしようとすると以下のように怒られます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo chkconfig --add sample-app
-service sample-app does not support chkconfig 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1&gt;4. serviceコマンド実行時のPATHのはなし&lt;/h1&gt;
-
-&lt;p&gt;なぜ、serviceコマンドでthinを起動できなかったのか。&lt;br&gt;
-調べていくと意外なことがわかった。&lt;br&gt;
-serviceコマンドを実行すると中で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;のPATHが上書きされてしまう。&lt;/p&gt;
-
-&lt;p&gt;【参照】&lt;br&gt;
-&lt;a href=&#34;http://heartbeats.jp/hbblog/2013/06/service-start-stop.html&#34;&gt;デーモンの起動・終了にはserviceコマンドを利用しよう - インフラエンジニアway - Powered by HEARTBEATS&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;試しに、起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;内にPATHの出力を仕込んで確かめてみる。&lt;br&gt;
-起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;に&lt;code&gt;echo $PATH&lt;/code&gt;を仕込んだ。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo service sample-app start
-/sbin:/usr/sbin:/bin:/usr/bin 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;内でbundleや&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ruby&#34;&gt;ruby&lt;/a&gt;がインストールされているディレクトリに&lt;br&gt;
-PATHを通すことで、解決することにした。&lt;br&gt;
-（もっと美しい方法があれば教えて下さい。。。）&lt;/p&gt;
-
-&lt;h1&gt;5. 起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;修正(完成版)&lt;/h1&gt;
-
-&lt;p&gt;上記の通り起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;を修正したものが以下。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;#!/bin/bash
-
-### BEGIN CHKCONFIG INFO
-# chkconfig: 2345 55 25
-# description: sample-app
-### END CHKCONFIG INFO
-
-# 以下を追加
-export PATH=/usr/local/bin:$PATH
-
-SCRIPT_NAME=/etc/init.d/sample-app
-CONFIG_PATH=/path/to/config
-BUNDLE_CMD=/usr/local/bin/bundle
-
-bundle_exec_thin ()
-{
-    for CONFIG_FILE in &amp;quot;$CONFIG_PATH/*.yml&amp;quot;; do
-        SITE_DIR=`awk &#39;/^chdir:/ { print $2; }&#39; $CONFIG_FILE`
-        cd $SITE_DIR
-        $BUNDLE_CMD exec thin $1 -C $CONFIG_FILE
-    done
-}
-
-
-case &amp;quot;$1&amp;quot; in
-  start)
-        bundle_exec_thin start
-        ;;
-  stop)
-        bundle_exec_thin stop
-        ;;
-  restart)
-        bundle_exec_thin restart
-        ;;
-  *)
-        echo &amp;quot;Usage: $SCRIPT_NAME {start|stop|restart}&amp;quot; &amp;gt;&amp;amp;2
-        exit 3
-        ;;
-esac
-
-:
- 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;(PATHを通したのでbundleコマンドはフルパスでなくても大丈夫ですよ...)&lt;/p&gt;
-
-&lt;p&gt;最後に起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;を&lt;code&gt;/etc/init.d&lt;/code&gt;以下に配置し、
-忘れずにchkconfigに登録しましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo chkconfig --add sample-app 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1&gt;【おまけ】sudo だと&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ruby&#34;&gt;ruby&lt;/a&gt;やgem、bundleが使えない？&lt;/h1&gt;
-
-&lt;p&gt;rootユーザでは&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ruby&#34;&gt;ruby&lt;/a&gt;やgem, bundleが使えるけど、sudoで実行すると使えない…&lt;br&gt;
-という悩みの人も多いのではないだろうか。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo gem install xxxxx
-sudo: gem: command not found 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;sudoでの実行はrootユーザで実行することなのになぜ実行できないか。&lt;br&gt;
-これはsudoを使うときに/usr/local/binが許可されていないからだ。&lt;br&gt;
-visudoでsecure_pathの設定を見直すとよい。&lt;br&gt;
-&lt;a href=&#34;http://www.xmisao.com/2013/10/11/sudoers-secure_path.html&#34;&gt;sudoersのsecure_pathについて &amp;ndash; ぺけみさお&lt;/a&gt;&lt;/p&gt;
-&lt;/body&gt;&lt;/p&gt;
-</description>
+      <description>bunlderを使ったWebアプリをプロダクション環境で動かすときに、アプリの起動をどうやって実現しているだろうか。
+Apache Passengerを使う場合には、Apacheの起動がアプリの起動につながるので、 アプリの起動はあまり気にしなかったかもしれない。
+しかし、例えばNginx × Unicorn/thinの構成などの場合はUnicornやthinの起動もしなければいけなくなってくる。
+（あるいはこのようなケースがあるかは謎だが、Unicornやthinを単体で動かそうとしている場合など）
+Unicornやthin（例ではthinを扱うが本質は同じ）の自動起動を実現する際の勘所、注意事項をまとめた。
+0. 前提  CentOS6.5上でRubyでのWebアプリケーションを作っている。  アプリケーションサーバはthinを利用している。 また、gemパッケージ管理にbundlerを利用している。  1. 開発環境でよくするアプリの起動 開発環境では、アプリケーションのログの閲覧性なども兼ねて以下のようにアプリを起動していた。
+$ bundle exec rackup $ bundle exec thin start  でも、これではいつまでたってもプロダクション環境での利用はできません。
+2. 上記方法ではプロダクション環境で利用できない理由 当然のことながら、プロダクション環境ではいちいち手動でコマンドを実行しアプリケーションを立ち上げるわけにはいかない。
+例えば、なんらかの理由でサーバが再起動してしまった場合には、
+このままではアプリケーションが自動的に立ち上がらないため、サービスの停止につながってしまう。
+ではどうするのか？
+以下の状態であることがプロダクション環境では理想なのではないだろうか？
+ オリジナルアプリケーションもserviceコマンドで起動・停止ができる  他のサービスと同様の操作方法が可能なのでわかりやすい   サーバ立ち上げ時にサービスが自動で起動される  3. 起動スクリプトを作ろう 上記の状態にもっていくためには、起動スクリプトを作らなければならない。
+起動スクリプトを作る…！？
+「作ったことないし、すぐには作れないよ〜」って思うかもしれないが、
+サンプルはたくさんあるし、よく見てみるとそれほど難しくはない。
+thinを使ったサンプルを探そうと思うと数は少ないが、Unicornも同じ仕組なので、 &#34;unicorn init script&#34;なんて検索をかけてもいろいろでてくるのでおすすめ。
+参考ししたもの
+https://gist.github.com/sbeam/3454488
+上を参考にしながら、こんな起動スクリプトを作ってみた。（未完成版）
+これを/etc/init.d以下へ配置する。
+#!/bin/bash ### BEGIN CHKCONFIG INFO # chkconfig: 2345 55 25 # description: sample-app ### END CHKCONFIG INFO SCRIPT_NAME=/etc/init.</description>
     </item>
     
     <item>
@@ -693,191 +132,31 @@ visudoでsecure_pathの設定を見直すとよい。&lt;br&gt;
       <pubDate>Fri, 02 Jan 2015 01:36:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2015/01/02/013658/</guid>
-      <description>&lt;p&gt;&lt;body&gt;
-&lt;p&gt;使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。&lt;br&gt;
-そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させることが可能らしい。&lt;/p&gt;&lt;/p&gt;
-
-&lt;p&gt;ということで、そのスーパーサーバとやらを実際に触ってみた。&lt;/p&gt;
-
-&lt;p&gt;スーパーサーバというとinetdとxinetdがあるらしいが、&lt;br&gt;
-xinetdはinetdの拡張版で、アクセス制御などの機能を搭載しているとのこと。&lt;/p&gt;
-
-&lt;p&gt;今回はxinetdを設定してみる。&lt;/p&gt;
-
-&lt;h1&gt;1. 事前準備&lt;/h1&gt;
-
-&lt;p&gt;【環境】&lt;br&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Vagrant&#34;&gt;Vagrant&lt;/a&gt;で構築した&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/CentOS&#34;&gt;CentOS&lt;/a&gt; 6.5&lt;br&gt;
-(仮想環境の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&#34;&gt;IPアドレス&lt;/a&gt;は192.168.33.10)&lt;/p&gt;
-
-&lt;p&gt;まずはスーパーサーバで管理するサービスを考えなければならない。&lt;br&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;とかhttpはどう考えてもスーパーサーバの管理するようなものではないだろうし…&lt;br&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/FTP&#34;&gt;FTP&lt;/a&gt;や&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/telnet&#34;&gt;telnet&lt;/a&gt;、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/POP3&#34;&gt;POP3&lt;/a&gt;なんかのサービスに利用されることが多いそう？（このへんよくわかない）&lt;/p&gt;
-
-&lt;p&gt;今回は&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/FTP&#34;&gt;FTP&lt;/a&gt;をスーパーサーバの管理対象とした。&lt;br&gt;
-※本来は&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4&#34;&gt;複数&lt;/a&gt;のサービスを管理対象とするからこそ意味がある。&lt;/p&gt;
-
-&lt;p&gt;まずはxinetdとvsftpをインストール&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo yum install xinetd vsftpd 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;
-xinetdどうこうの前に、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ftp&#34;&gt;ftp&lt;/a&gt;接続がきちんとできるか確認するのでサービスを起動。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo service vsftpd start 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;
-ローカルPCから接続できることを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ftp 192.168.33.10
-Connected to 192.168.33.10.
-220 (vsFTPd 2.2.2)
-Name (192.168.33.10:username): 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1&gt;2. xinetdの設定&lt;/h1&gt;
-
-&lt;p&gt;xinetdの基本設定は/etc/xinetd.confにかかれており、&lt;br&gt;
-xinetdで管理する各サービスの設定は/etc/xinetd.d/配下に書く方式。&lt;/p&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ftp&#34;&gt;ftp&lt;/a&gt;の設定を以下の通りにした。&lt;br&gt;
-&#34;service&#34;のあとに書くサービス名称は/etc/servicesに定義されているものを記載する。&lt;br&gt;
-vsftpとか書いても動かないので注意。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vim /etc/xinetd.d/ftp
-service ftp
-{
-        disable         = no
-        socket_type     = stream
-        wait            = no
-        user            = root
-        server          = /usr/sbin/vsftpd
-        log_on_failure  += USERID
-}
- 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;設定項目については以下参照。&lt;br&gt;
-&lt;a href=&#34;https://www.express.nec.co.jp/linux/distributions/knowledge/network/xinetd.html&#34;&gt;xinetd の設定&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;これでxinetdを起動&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo service xinetd start 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3&gt;(補足) /etc/servicesってなにもの？&lt;/h3&gt;
-
-&lt;p&gt;/etc/servicesがなにか気になったので一応調べると。&lt;/p&gt;
-
-&lt;blockquote&gt;&lt;p&gt;サービス名とそこで使われるポート番号、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB&#34;&gt;プロトコル&lt;/a&gt;(&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/tcp&#34;&gt;tcp&lt;/a&gt;/&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/udp&#34;&gt;udp&lt;/a&gt;)との 対応関係を記述したファイルが /etc/services です。
-このファイルは 単なるサービス名のデータベースで、それ自体では何の働きもありませ んが、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/netstat&#34;&gt;netstat&lt;/a&gt; コマンドや次の inetd などで参照されます。
-(&lt;a href=&#34;http://www.wakhok.ac.jp/~kanayama/summer/02/site/node43.html&#34;&gt;http://www.wakhok.ac.jp/~kanayama/summer/02/site/node43.html&lt;/a&gt;)&lt;/p&gt;&lt;/blockquote&gt;
-
-&lt;h1&gt;3. xinetdを使って&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/FTP&#34;&gt;FTP&lt;/a&gt;で接続してみる&lt;/h1&gt;
-
-&lt;p&gt;xinetdが&lt;b&gt;&#34;起動している&#34;&lt;/b&gt;ことと、vsftpdが&lt;b&gt;&#34;起動していない&#34;&lt;/b&gt;ことを確認しておく。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo service xinetd status
-xinetd (pid  3521) is running...
-
-$ sudo service vsftpd status
-vsftpd is stopped 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;
-ローカルPCから&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/FTP&#34;&gt;FTP&lt;/a&gt;接続をしてみる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ftp 192.168.33.10
-Connected to 192.168.33.10.
-421 Service not available, remote server has closed connection. 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;あれ、接続が切られた…&lt;/p&gt;
-
-&lt;p&gt;syslogを確認してみると。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo tail /var/log/message
-Jan  1 15:07:25 server xinetd[3335]: START: ftp pid=3337 from=::ffff:192.168.33.1
-Jan  1 15:07:28 server xinetd[3335]: EXIT: ftp status=1 pid=3337 duration=3(sec) 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;接続できているようだがその後すぐに切断されているようにみえる。
-vsftpd側の設定を疑ってみた。&lt;/p&gt;
-
-&lt;h1&gt;4. vsftpdの設定&lt;/h1&gt;
-
-&lt;p&gt;vsftpd側で以下の設定をいじる必要があった。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vim /etc/vsftpd/vsftpd.conf
-listen=NO
- 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;vsftpdのlistenの設定は以下のとおり。&lt;/p&gt;
-
-&lt;blockquote&gt;&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/FTP&#34;&gt;FTP&lt;/a&gt; コントロールポート (21) への接続要求を vsftpd 自身で見張るか。
-YES の状態を「&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%BF%A5%F3%A5%C9%A5%A2%A5%ED%A1%BC%A5%F3&#34;&gt;スタンドアローン&lt;/a&gt;モード」と呼ぶ。
-inetd や後述の &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/tcpserver&#34;&gt;tcpserver&lt;/a&gt; を経由する場合は NO にする。
-(&lt;a href=&#34;http://www.asahi-net.or.jp/~aa4t-nngk/ftpd.html&#34;&gt;http://www.asahi-net.or.jp/~aa4t-nngk/ftpd.html&lt;/a&gt;)&lt;/p&gt;&lt;/blockquote&gt;
-
-&lt;h1&gt;5. &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/FTP&#34;&gt;FTP&lt;/a&gt;接続の再チャレンジ&lt;/h1&gt;
-
-&lt;p&gt;ローカルPCから再度&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/FTP&#34;&gt;FTP&lt;/a&gt;接続を試みる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ftp 192.168.33.10
-Connected to 192.168.33.10.
-220 (vsFTPd 2.2.2)
-Name (192.168.33.10:username): 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;つながった！&lt;br&gt;
-&lt;span style=&#34;font-size: 150%&#34;&gt;&lt;b&gt;vsftpdサービスを停止しているのに&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ftp&#34;&gt;ftp&lt;/a&gt;接続ができる！&lt;/b&gt;&lt;/span&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ftp&#34;&gt;ftp&lt;/a&gt;接続前と接続中、接続後でプロセスを確認してみる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;gt; 接続前
-$ ps -ef | grep ftp
-vagrant   3552  2742  0 16:17 pts/0    00:00:00 grep ftp
-
-&amp;gt; 接続中
-&amp;gt; 接続中のみvsftpdのプロセスが立ち上がっている。
-$ ps -ef | grep ftp
-nobody    3555  3521  0 16:18 ?        00:00:00 vsftpd
-vagrant   3557  3555  0 16:18 ?        00:00:00 vsftpd
-vagrant   3559  2742  0 16:18 pts/0    00:00:00 grep ftp
-
-&amp;gt; 接続終了後
-$ ps -ef | grep ftp
-vagrant   3552  2742  0 16:17 pts/0    00:00:00 grep ftp 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;
-プロセスツリーを見てみると、xinetdプロセスがvsftpdを起動していることがわかる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;gt; 接続前
-$ pstree -p
-init(1)-+-VBoxService(1003)-+-{VBoxService}(1004)
-        |
-        | (略)
-        |
-        `-xinetd(3521)
-
-&amp;gt; 接続中
-$ pstree -p
-init(1)-+-VBoxService(1003)-+-{VBoxService}(1004)
-        |
-        | (略)
-        |
-        `-xinetd(3521)---vsftpd(3562)---vsftpd(3563) 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;&lt;br&gt;
-サービスを起動しておかなくてもxinetd経由で起動できるんですね。&lt;br&gt;
-これはこれで使い道あるかもしれぬ。&lt;/p&gt;
-&lt;/body&gt;&lt;/p&gt;
-</description>
+      <description>使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。
+そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させることが可能らしい。
+ということで、そのスーパーサーバとやらを実際に触ってみた。
+スーパーサーバというとinetdとxinetdがあるらしいが、
+xinetdはinetdの拡張版で、アクセス制御などの機能を搭載しているとのこと。
+今回はxinetdを設定してみる。
+1. 事前準備 【環境】
+Vagrantで構築したCentOS 6.5
+(仮想環境のIPアドレスは192.168.33.10)
+まずはスーパーサーバで管理するサービスを考えなければならない。
+SSHとかhttpはどう考えてもスーパーサーバの管理するようなものではないだろうし…
+FTPやtelnet、POP3なんかのサービスに利用されることが多いそう？（このへんよくわかない）
+今回はFTPをスーパーサーバの管理対象とした。
+※本来は複数のサービスを管理対象とするからこそ意味がある。
+まずはxinetdとvsftpをインストール
+$ sudo yum install xinetd vsftpd  
+xinetdどうこうの前に、ftp接続がきちんとできるか確認するのでサービスを起動。
+$ sudo service vsftpd start  
+ローカルPCから接続できることを確認する。
+$ ftp 192.168.33.10 Connected to 192.168.33.10. 220 (vsFTPd 2.2.2) Name (192.168.33.10:username):  2. xinetdの設定 xinetdの基本設定は/etc/xinetd.confにかかれており、
+xinetdで管理する各サービスの設定は/etc/xinetd.d/配下に書く方式。
+ftpの設定を以下の通りにした。
+&#34;service&#34;のあとに書くサービス名称は/etc/servicesに定義されているものを記載する。
+vsftpとか書いても動かないので注意。
+$ sudo vim /etc/xinetd.d/ftp service ftp { disable = no socket_type = stream wait = no user = root server = /usr/sbin/vsftpd log_on_failure += USERID }  設定項目については以下参照。</description>
     </item>
     
     <item>
@@ -886,53 +165,21 @@ init(1)-+-VBoxService(1003)-+-{VBoxService}(1004)
       <pubDate>Thu, 20 Nov 2014 23:03:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2014/11/20/230334/</guid>
-      <description>&lt;p&gt;&lt;body&gt;
-&lt;p&gt;Git&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&#34;&gt;レポジトリ&lt;/a&gt;を作って、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD&#34;&gt;複数人&lt;/a&gt;で開発をしていた。&lt;br&gt;
-しかし、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&#34;&gt;レポジトリ&lt;/a&gt;の中に作成されるファイルやディレクトリが個人のグループになってしまい、&lt;br&gt;
-Push, PullするときにPermission &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/error&#34;&gt;error&lt;/a&gt;で怒られまくる。&lt;/p&gt;
-&lt;p&gt;ユーザには共通のグループを作っていたのに…なんでだっけ…&lt;/p&gt;
-&lt;p&gt;気づけば&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&#34;&gt;レポジトリ&lt;/a&gt;を作るとき以下のようにしていた。&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ git init --bare 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD&#34;&gt;複数人&lt;/a&gt;で共有するときには以下のようにするべきであった。&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ git init --bare --shared 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。&lt;br&gt;
-調べると「&lt;b&gt;setgid&lt;/b&gt;」というキーワードに辿り着いた。&lt;br&gt;
-setgidの権限を付けておくと、そのディレクトリに作成されたファイルの所有グループは、そのディレクトリの所有グループになる。&lt;/p&gt;
-&lt;p&gt;以下のようにchmodでsetgidを付けることができる。&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ chmod g+s dir_name 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;setgidがつくとあまり馴染みのない権限がつく。&lt;br&gt;
-「drwxrw&lt;span style=&#34;color: #ff40ff&#34;&gt;&lt;b&gt;s&lt;/b&gt;&lt;/span&gt;r-x」&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ls -l 
-drwxrwsr-x  4 user  group  136 11 16 22:49 test_dir 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;そして、すでに共有設定なしで作ってしまった&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&#34;&gt;レポジトリ&lt;/a&gt;では以下のように対応可能。&lt;br&gt;
-（新しく&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&#34;&gt;レポジトリ&lt;/a&gt;つくるのはめんどいので…）&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;##Gigレポジトリ内のディレクトリに
-$ chmod -R g+s ./branches
-$ chmod -R g+s ./hooks
-$ chmod -R g+s ./info
-$ chmod -R g+s ./objects
-$ chmod -R g+s ./refs
-$ vim .git/config
-  ##[core内に]以下を付け加えておいた
-  [core]
-       repositoryformatversion = 0 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/body&gt;&lt;/p&gt;
-</description>
+      <description>Gitレポジトリを作って、複数人で開発をしていた。
+しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、
+Push, PullするときにPermission errorで怒られまくる。
+ユーザには共通のグループを作っていたのに…なんでだっけ…
+気づけばレポジトリを作るとき以下のようにしていた。
+$ git init --bare  複数人で共有するときには以下のようにするべきであった。
+$ git init --bare --shared  では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。
+調べると「setgid」というキーワードに辿り着いた。
+setgidの権限を付けておくと、そのディレクトリに作成されたファイルの所有グループは、そのディレクトリの所有グループになる。
+以下のようにchmodでsetgidを付けることができる。
+$ chmod g+s dir_name  setgidがつくとあまり馴染みのない権限がつく。
+「drwxrwsr-x」
+$ ls -l drwxrwsr-x 4 user group 136 11 16 22:49 test_dir  そして、すでに共有設定なしで作ってしまったレポジトリでは以下のように対応可能。
+（新しくレポジトリつくるのはめんどいので…）
+##Gigレポジトリ内のディレクトリに $ chmod -R g+s ./branches $ chmod -R g+s ./hooks $ chmod -R g+s ./info $ chmod -R g+s ./objects $ chmod -R g+s .</description>
     </item>
     
     <item>
@@ -941,195 +188,18 @@ $ vim .git/config
       <pubDate>Sun, 09 Nov 2014 17:14:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2014/11/09/171436/</guid>
-      <description>&lt;p&gt;&lt;body&gt;
-&lt;p&gt;前回の&lt;a href=&#34;https://blog.mosuke.tech/entry/2014/10/09/230555&#34;&gt;【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築&lt;/a&gt;に続き、同様の環境を用いて、ロードバランサ構築を行った。&lt;br&gt;
-ロードバランサの構築にはHAProxyを利用した。&lt;/p&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;div class=&#34;section&#34;&gt;
-    &lt;h3&gt;1. 環境&lt;/h3&gt;
-    &lt;p&gt;前回同様で、さくら&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPS&#34;&gt;VPS&lt;/a&gt;の1GBのプラン1台のみ。&lt;br&gt;
-・メモリ：１GB&lt;br&gt;
-・CPU：仮想２コア&lt;br&gt;
-・HDD：100GB&lt;br&gt;
-・OS：CentOS7&lt;br&gt;
-・サーバ仮想化：&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Vagrant&#34;&gt;Vagrant&lt;/a&gt;(Utuntu13)&lt;br&gt;
-・ロードバランサ：&lt;a href=&#34;http://www.haproxy.org/&#34;&gt;HAProxy - The Reliable, High Performance TCP/HTTP Load Balancer&lt;/a&gt;&lt;br&gt;
-&lt;/p&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;/div&gt;
-&lt;div class=&#34;section&#34;&gt;
-    &lt;h3&gt;2. 構成図&lt;/h3&gt;
-    &lt;p&gt;&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141109/20141109170337.png&#34; alt=&#34;f:id:mosuke5:20141109170337p:plain&#34; title=&#34;f:id:mosuke5:20141109170337p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;br&gt;
-&lt;/p&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;/div&gt;
-&lt;div class=&#34;section&#34;&gt;
-    &lt;h3&gt;3. ロードバランサの構築&lt;/h3&gt;
-    &lt;p&gt;■ホストサーバ側の設定&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;#HAProxyインストール
-$ sudo yum install haproxy
-
-#設定はすごく簡単で以下のファイルのみ。実際に
-$ sudo vim /etc/haproxy/haproxy.cfg
-
-#---------------------------------------------------------------------
-# Example configuration for a possible web application.  See the
-# full configuration options online.
-#
-#   http://haproxy.1wt.eu/download/1.4/doc/configuration.txt
-#
-#---------------------------------------------------------------------
-
-#---------------------------------------------------------------------
-# Global settings
-#---------------------------------------------------------------------
-global
-
-    log         127.0.0.1 local6 debug
-
-    chroot      /var/lib/haproxy
-    pidfile     /var/run/haproxy.pid
-    maxconn     4000
-    user        haproxy
-    group       haproxy
-    daemon
-
-    # turn on stats unix socket
-    stats socket /var/lib/haproxy/stats
-
-#---------------------------------------------------------------------
-# common defaults that all the &#39;listen&#39; and &#39;backend&#39; sections will
-# use if not designated in their block
-#---------------------------------------------------------------------
-defaults
-
-    ##ロードバランサの動作モード。tcpにするとL4ロードバランサになる。httpにするとL7ロードバランサ。
-    mode                    http
-    log                     global
-    option              log-health-checks
-    option                  httplog
-    option                  dontlognull
-    
-    ##ヘルスチェック用のhtmlファイルをWebサーバ側に設置している。設置については後述。
-    option httpchk GET /health_check.html HTTP/1.0\r\nUser-agent:\ Proxy-Check
-
-    option http-server-close
-    option forwardfor       except 127.0.0.0/8
-    option                  redispatch
-    retries                 3
-    timeout http-request    10s
-    timeout queue           1m
-    timeout connect         10s
-    timeout client          1m
-    timeout server          1m
-    timeout http-keep-alive 10s
-    timeout check           10s
-    maxconn                 3000
-
-#---------------------------------------------------------------------
-# main frontend which proxys to the backends
-#---------------------------------------------------------------------
-frontend  main *:80
-    default_backend             hoge
-
-#---------------------------------------------------------------------
-# round robin balancing between the various backends
-#---------------------------------------------------------------------
-backend hoge
-    balance     roundrobin
-    server      web10 192.168.33.10:80 check inter 3000 fall 2 rise 2
-    server      web11 192.168.33.11:80 check inter 3000 fall 2 rise 2 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;L4, L7のロードバランサについては以下参照。&lt;br&gt;
-&lt;a href=&#34;http://www.atmarkit.co.jp/ait/articles/0302/05/news001.html&#34;&gt;ロードバランサの本質（1）：パケットフローから負荷分散の基本を理解する - ＠IT&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;ロードバランサ側でhttpのリクエストを返していないことを意味づけるために&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/apache&#34;&gt;apache&lt;/a&gt;, nginxを停止しておく。&lt;br&gt;
-（特に意味は無いが念押し確認のため）&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl stop nginx
-$ sudo systemctl stop httpd 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;HAProxyのログをsyslogに残すように設定する。&lt;br&gt;
-ただしメインのmessageではなく、独自のファイルに書くために以下の設定。&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;##ログの格納場所作成
-$ sudo mkdir /var/log/haproxy
-
-##syslogの設定変更
-$ vim /etc/rsyslog.d/haproxy.conf
-   $ModLoad imudp
-   $UDPServerRun 514
-   $template Haproxy,&amp;quot;%msg%\n&amp;quot;
-   local6.* -/var/log/haproxy/haproxy.log;Haproxy
-
-$ vim /etc/sysconfig/rsyslog
-以下を追加
-SYSLOGD_OPTIONS=&amp;quot;-r&amp;quot;
-
-## haproxyの起動
-$ sudo systemctl start haproxy 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;&lt;br&gt;
-■Webサーバの設定&lt;br&gt;
-仮想でのWebサーバ構築は省くが、Apache2をインストールしただけである。&lt;br&gt;
-仮想でのサーバ構築は前回を参照。&lt;br&gt;
-&lt;a href=&#34;https://blog.mosuke.tech/entry/2014/10/09/230555&#34;&gt;【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築&lt;/a&gt;&lt;br&gt;
-&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;## /var/www/html配下にヘルスチェック用のhtml設置
-$ sudo touch health_check.html 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/div&gt;
-&lt;div class=&#34;section&#34;&gt;
-    &lt;h3&gt;4. 動作試験&lt;/h3&gt;
-    &lt;p&gt;ブラウザよりホストサーバへアクセス。&lt;br&gt;
-きちんとロードバランスされていることを確認。&lt;/p&gt;
-&lt;p&gt;HAProxy側のログは以下のとおり。&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo tail -f /var/log/haproxy/haproxy.conf
-
-##起動した時。L7のhealt checkが走っている
-Proxy main started.
-Proxy hoge started.
-Health check for server hoge/web10 succeeded, reason: Layer7 check passed, code: 200, info: &amp;quot;OK&amp;quot;, check duration: 33ms, status: 2/2 UP.
-Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &amp;quot;OK&amp;quot;, check duration: 12ms, status: 2/2 UP.
-
-##webサーバ側でapacheを停止
-Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &amp;quot;Not Found&amp;quot;, check duration: 13ms, status: 1/2 UP.
-Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &amp;quot;Not Found&amp;quot;, check duration: 8ms, status: 0/2 DOWN.
-
-##webサーバ側でhealth_check.htmlを削除した時も同様に
-Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &amp;quot;Not Found&amp;quot;, check duration: 13ms, status: 1/2 UP.
-Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &amp;quot;Not Found&amp;quot;, check duration: 8ms, status: 0/2 DOWN.
-
-##webサーバ側でhealth_check.htmlを復活させた時
-Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &amp;quot;OK&amp;quot;, check duration: 8ms, status: 1/2 DOWN.
-Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &amp;quot;OK&amp;quot;, check duration: 6ms, status: 2/2 UP.
-Server hoge/web11 is UP. 2 active and 0 backup servers online. 0 sessions requeued, 0 total in queue. 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;Webサーバ側の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Apache&#34;&gt;Apache&lt;/a&gt;ログを見てみると。&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo tail -f /var/log/apache2/access.log
-
-##ロードバランサからのヘルスチェックが来ていることがわかる。
-192.168.33.1 - - [09/Nov/2014:08:07:43 +0000] &amp;quot;GET /health_check.html HTTP/1.0&amp;quot; 200 276 &amp;quot;-&amp;quot; &amp;quot;Proxy-Check&amp;quot;
-192.168.33.1 - - [09/Nov/2014:08:07:46 +0000] &amp;quot;GET /health_check.html HTTP/1.0&amp;quot; 200 276 &amp;quot;-&amp;quot; &amp;quot;Proxy-Check&amp;quot;
-192.168.33.1 - - [09/Nov/2014:08:07:49 +0000] &amp;quot;GET /health_check.html HTTP/1.0&amp;quot; 200 276 &amp;quot;-&amp;quot; &amp;quot;Proxy-Check&amp;quot;
-192.168.33.1 - - [09/Nov/2014:08:07:52 +0000] &amp;quot;GET /health_check.html HTTP/1.0&amp;quot; 200 276 &amp;quot;-&amp;quot; &amp;quot;Proxy-Check&amp;quot;
-
-##Webからのアクセスが来た場合
-##SorceのIPはロードバランサにIPになっているが、UserAgentなど書き込まれていることを確認。
-192.168.33.1 - - [09/Nov/2014:08:10:06 +0000] &amp;quot;GET / HTTP/1.1&amp;quot; 200 488 &amp;quot;-&amp;quot; &amp;quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10) AppleWebKit/600.1.25 (KHTML, like Gecko) Version/8.0 Safari/600.1.25&amp;quot; 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/div&gt;
-&lt;/body&gt;&lt;/p&gt;
-</description>
+      <description>前回の【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築に続き、同様の環境を用いて、ロードバランサ構築を行った。
+ロードバランサの構築にはHAProxyを利用した。
+1. 環境 前回同様で、さくらVPSの1GBのプラン1台のみ。
+・メモリ：１GB
+・CPU：仮想２コア
+・HDD：100GB
+・OS：CentOS7
+・サーバ仮想化：Vagrant(Utuntu13)
+・ロードバランサ：HAProxy - The Reliable, High Performance TCP/HTTP Load Balancer
+ 2. 構成図 
+ 3. ロードバランサの構築 ■ホストサーバ側の設定
+#HAProxyインストール $ sudo yum install haproxy #設定はすごく簡単で以下のファイルのみ。実際に $ sudo vim /etc/haproxy/haproxy.cfg #--------------------------------------------------------------------- # Example configuration for a possible web application. See the # full configuration options online. # # http://haproxy.1wt.eu/download/1.4/doc/configuration.txt # #--------------------------------------------------------------------- #--------------------------------------------------------------------- # Global settings #--------------------------------------------------------------------- global log 127.0.0.1 local6 debug chroot /var/lib/haproxy pidfile /var/run/haproxy.</description>
     </item>
     
     <item>
@@ -1138,183 +208,34 @@ Server hoge/web11 is UP. 2 active and 0 backup servers online. 0 sessions requeu
       <pubDate>Thu, 09 Oct 2014 23:05:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2014/10/09/230555/</guid>
-      <description>&lt;p&gt;&lt;body&gt;
-&lt;p&gt;ロードバランシングとか&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF%A5%EA%A5%F3%A5%B0&#34;&gt;クラスタリング&lt;/a&gt;とかリバースプロキシとか、&lt;br&gt;
-業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりない。&lt;/p&gt;
-&lt;p&gt;自分で構築してみたいなーと思いつつもあたりまえだけど、サーバやネットワーク機器をそう簡単に調達もできない。&lt;br&gt;
-お金も当然ない。&lt;/p&gt;
-&lt;p&gt;というわけで、さくら&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPS&#34;&gt;VPS&lt;/a&gt;で仮想化つかってロードバランシングとか&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF%A5%EA%A5%F3%A5%B0&#34;&gt;クラスタリング&lt;/a&gt;とかリバースプロキシとか勉強しましょうという「サーバインフラ会」を友人と始めた。&lt;br&gt;
-その第１回目のメモ。&lt;/p&gt;
-&lt;p&gt;第1回 サーバ&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4&#34;&gt;複数&lt;/a&gt;台構成、Nginxでリバースプロキシ構築&lt;br&gt;
-第2回 &lt;a href=&#34;https://blog.mosuke.tech/entry/2014/11/09/171436&#34;&gt;HAProxyでロードバランサ構築&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;div style=&#34;border: solid 1px #dddddd;&#34;&gt;&lt;/div&gt;&lt;/p&gt;
+      <description>ロードバランシングとかクラスタリングとかリバースプロキシとか、
+業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりない。
+自分で構築してみたいなーと思いつつもあたりまえだけど、サーバやネットワーク機器をそう簡単に調達もできない。
+お金も当然ない。
+というわけで、さくらVPSで仮想化つかってロードバランシングとかクラスタリングとかリバースプロキシとか勉強しましょうという「サーバインフラ会」を友人と始めた。
+その第１回目のメモ。
+第1回 サーバ複数台構成、Nginxでリバースプロキシ構築
+第2回 HAProxyでロードバランサ構築
 
-&lt;p&gt;&lt;div class=&#34;section&#34;&gt;
-    &lt;h2&gt;1. 使用した環境&lt;/h2&gt;
-    &lt;p&gt;まず今回利用した環境は以下のとおり。&lt;br&gt;
-さくら&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPS&#34;&gt;VPS&lt;/a&gt;の1GBのプラン。&lt;br&gt;
-・メモリ：１GB&lt;br&gt;
-・CPU：仮想２コア&lt;br&gt;
-・HDD：100GB&lt;br&gt;
-・OS：CentOS7&lt;br&gt;
-・仮想化：&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Vagrant&#34;&gt;Vagrant&lt;/a&gt;&lt;br&gt;
-　→dockerなどもはじめ検討していたが、コンテナ型仮想化だとサーバ感がでないので、よりサーバとして意識できる&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Vagrant&#34;&gt;Vagrant&lt;/a&gt;を採用&lt;/p&gt;
-&lt;p&gt;【参考】&lt;br&gt;
-&lt;a href=&#34;http://vps.sakura.ad.jp/specification.html&#34;&gt;料金・サービス仕様 | VPS（仮想専用サーバ）は「さくらのVPS」&lt;/a&gt;&lt;br&gt;
-&lt;/p&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;/div&gt;
-&lt;div class=&#34;section&#34;&gt;
-    &lt;h2&gt;2. 完成イメージ・物理イメージ&lt;/h2&gt;
-    &lt;p&gt;&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140930/20140930210924.png&#34; alt=&#34;f:id:mosuke5:20140930210924p:plain&#34; title=&#34;f:id:mosuke5:20140930210924p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;div style=&#34;border: solid 1px #dddddd;&#34;&gt;&lt;/div&gt;
-&lt;p&gt;&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140930/20140930210914.png&#34; alt=&#34;f:id:mosuke5:20140930210914p:plain&#34; title=&#34;f:id:mosuke5:20140930210914p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;br&gt;
-&lt;/p&gt;&lt;/p&gt;
+1. 使用した環境 まず今回利用した環境は以下のとおり。
+さくらVPSの1GBのプラン。
+・メモリ：１GB
+・CPU：仮想２コア
+・HDD：100GB
+・OS：CentOS7
+・仮想化：Vagrant
+→dockerなどもはじめ検討していたが、コンテナ型仮想化だとサーバ感がでないので、よりサーバとして意識できるVagrantを採用
+【参考】
+料金・サービス仕様 | VPS（仮想専用サーバ）は「さくらのVPS」
+ 2. 完成イメージ・物理イメージ 
 
-&lt;p&gt;&lt;/div&gt;
-&lt;div class=&#34;section&#34;&gt;
-    &lt;h2&gt;3. &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Vagrant&#34;&gt;Vagrant&lt;/a&gt;でWebサーバ２台分を構築する&lt;/h2&gt;
-    &lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Vagrant&#34;&gt;Vagrant&lt;/a&gt;の詳細な利用方法は公式ドキュメントをみてもらうとするが、セットアップまでのひととおりの流れと注意点のみ記載する。&lt;br&gt;
-&lt;a href=&#34;https://docs.vagrantup.com/v2/&#34;&gt;Vagrant Documentation&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;今回はWebサーバ２台を仮想で実現するので、それぞれweb1, web2とする。&lt;br&gt;
-それぞれのディレクトリを作成。&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;## web1, web2のディレクトリ作成
-$ pwd
-/home/vagrant
-$ mkdir web1
-$ mkdir web2
-
-## 仮想化で利用するOSイメージをダウンロード
-$ vagrant box add ubuntu1310 ¥
-http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-13.10_chef-provisionerless.box
-
-## web1サーバ構築
-$ cd web1
-$ vagrant init ubuntu1310
-
-## ほぼほぼデフォルトの設定だが以下２つだけは設定を行った。
-$ vim Vagrantfile
-# (1)プライベートアドレスの割り当て。
-config.vm.network &amp;quot;private_network&amp;quot;, ip: &amp;quot;192.168.33.10&amp;quot;
-
-# (2)1GBしかメモリがないのでこの設定をしないと２つ仮想化するとだいぶ大変なことになりました。
-config.vm.provider &amp;quot;virtualbox&amp;quot; do |vb|
-     vb.customize [&amp;quot;modifyvm&amp;quot;, :id, &amp;quot;--memory&amp;quot;, &amp;quot;128&amp;quot;]
-end
-
-$ vagrant ssh
  
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;同様にweb2においても同じことを行った。&lt;/p&gt;
-&lt;p&gt;また、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/vagrant&#34;&gt;vagrant&lt;/a&gt;では一般的に対象のディレクトリで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/vagrant&#34;&gt;vagrant&lt;/a&gt; &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ssh&#34;&gt;ssh&lt;/a&gt;を利用してサーバに入るが、&lt;br&gt;
-今回はプライベートアドレスも振ってあるし、物理サーバとしてイメージしているので以下のようにしてサーバにはいるようにした。&lt;/p&gt;
-```
-$ ssh vagrant@192.168.33.10  # web1への接続
-$ ssh vagrant@192.168.33.11  # web2への接続 
-```
-&lt;p&gt;ホストサーバ側の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BF%A1%BC%A5%D5%A5%A7%A5%A4%A5%B9&#34;&gt;インターフェイス&lt;/a&gt;情報をみると。&lt;/p&gt;
-```
-# cent7なので以下コマンドだがifconfig -aのこと
-$ ip a 
-(中略)
-5: vboxnet0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UNKNOWN qlen 1000
-    link/ether 0a:00:27:00:00:00 brd ff:ff:ff:ff:ff:ff
-    inet 192.168.33.1/24 brd 192.168.33.255 scope global vboxnet0
-       valid_lft forever preferred_lft forever
-    inet 192.168.56.101/24 brd 192.168.56.255 scope global dynamic vboxnet0
-       valid_lft 839sec preferred_lft 839sec
-    inet6 fe80::800:27ff:fe00:0/64 scope link
-       valid_lft forever preferred_lft forever 
-```
-&lt;p&gt;vboxnet0という仮想の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BF%A1%BC%A5%D5%A5%A7%A5%A4%A5%B9&#34;&gt;インターフェイス&lt;/a&gt;が作成され、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&#34;&gt;IPアドレス&lt;/a&gt;も192.168.33.1が振られていることを確認。&lt;/p&gt;
-&lt;p&gt;ルーティングテーブルも確認しておくと&lt;/p&gt;
-```
-$ netstat -rn
-Kernel IP routing table
-Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
-0.0.0.0         153.120.2.1     0.0.0.0         UG        0 0          0 eth0
-153.120.2.0     0.0.0.0         255.255.254.0   U         0 0          0 eth0
-192.168.33.0    0.0.0.0         255.255.255.0   U         0 0          0 vboxnet0 
-```
-&lt;p&gt;192.168.33.0/24行はvboxnet0から出るように設定されている。&lt;/p&gt;
-&lt;p&gt;上の物理イメージに詳細書き込むと以下。&lt;br&gt;
-&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141006/20141006000246.png&#34; alt=&#34;f:id:mosuke5:20141006000246p:plain&#34; title=&#34;f:id:mosuke5:20141006000246p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;div style=&#34;border: solid 1px #dddddd;&#34;&gt;&lt;/div&gt;
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Apache&#34;&gt;Apache&lt;/a&gt;のみインスールする必要があるので、&lt;br&gt;
-web1, web2で以下を実施。（プロビジョニングしたほうが後々楽です。）&lt;/p&gt;
-```
-$ sudo apt-get apache2
-
-##どちらがweb1でどちらがweb2か区別するために以下ファイルは変えておきます。
-$ sudo vim /var/www/index.html
-#Web1とかWeb2とかわかりやすい文言を入れておきます。
-
-##Apache起動
-$ sudo service apache2 start
-
-##Apache起動確認
-$ curl localhost
-　上記で変更したindex.htmlの内容が表示されること  
-```
-&lt;p&gt;これでWebサーバの準備は完了。&lt;/p&gt;
-
-&lt;p&gt;&lt;/div&gt;
-&lt;div class=&#34;section&#34;&gt;
-    &lt;h2&gt;4, Nginxでリバースプロキシサーバを構築する&lt;/h2&gt;
-    &lt;p&gt;Nginx初めて触ったがとてもシンプル。&lt;br&gt;
-今回はNginxをリバースプロキシとして利用したので、proxy.confを作成するだけ。&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;##インスール
-$ sudo yum install nginx
-
-## /etc/nginx以下に設定ファイルなどあること確認
-$ ls /etc/nginx
-
-## プロキシ構築のための設定ファイル作成
-$ cd /etc/nginx/conf.d
-$ sudo vim proxy.conf
-server {
-
-    # /web1にアクセスが来た時
-    location /web1 {
-
-	proxy_http_version 1.1;
-
-	#受け渡す際のヘッダ情報を指定
-	proxy_set_header Host $host:$server_port;
-	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded_Proto http;
-
-        # 飛ばす先のURL(Web1サーバ)
-        proxy_pass http://192.168.33.10/;
-    }
-
-    # /web2にアクセスが来た時
-    location /web2 {
-
-	proxy_http_version 1.1;
-
-	#受け渡す際のヘッダ情報を指定
-	proxy_set_header Host $host:$server_port;
-	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded_Proto http;
-
-        # 飛ばす先のURL(Web2サーバ)
-	proxy_pass http://192.168.33.11/;
-    }
-}
-
-## あとは起動させるのみ
-$ sudo systemctl enable nginx
-$ sudo systemctl start nginx 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/div&gt;
-&lt;/body&gt;&lt;/p&gt;
-</description>
+ 3. VagrantでWebサーバ２台分を構築する Vagrantの詳細な利用方法は公式ドキュメントをみてもらうとするが、セットアップまでのひととおりの流れと注意点のみ記載する。
+Vagrant Documentation
+今回はWebサーバ２台を仮想で実現するので、それぞれweb1, web2とする。
+それぞれのディレクトリを作成。
+## web1, web2のディレクトリ作成 $ pwd /home/vagrant $ mkdir web1 $ mkdir web2 ## 仮想化で利用するOSイメージをダウンロード $ vagrant box add ubuntu1310 ¥ http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-13.10_chef-provisionerless.box ## web1サーバ構築 $ cd web1 $ vagrant init ubuntu1310 ## ほぼほぼデフォルトの設定だが以下２つだけは設定を行った。 $ vim Vagrantfile # (1)プライベートアドレスの割り当て。 config.</description>
     </item>
     
     <item>
@@ -1323,125 +244,16 @@ $ sudo systemctl start nginx
       <pubDate>Sat, 20 Sep 2014 18:03:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2014/09/20/180326/</guid>
-      <description>&lt;p&gt;&lt;body&gt;
-&lt;p&gt;最近&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPS&#34;&gt;VPS&lt;/a&gt;のOSをcentos7にしたのだが、なかなか手付かずで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/iptables&#34;&gt;iptables&lt;/a&gt;の設定も放置していた…&lt;br&gt;
-（&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ssh&#34;&gt;ssh&lt;/a&gt;の最低限の設定はしていたが、ほんとうに良くない…）&lt;/p&gt;
-&lt;p&gt;久しぶりに手が空いたので設定するかーと思いきや&lt;br&gt;
-まず/etc/sysconfig/&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/iptables&#34;&gt;iptables&lt;/a&gt;がないし&amp;hellip;&lt;/p&gt;
-&lt;p&gt;Cent7からのsystemctlで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/iptables&#34;&gt;iptables&lt;/a&gt;のサービスを確認してもでてこないし…&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# systemctl status iptables
-iptables.service
-   Loaded: not-found (Reason: No such file or directory)
-   Active: inactive (dead)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;というわけで、調べてみると、まず&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/iptables&#34;&gt;iptables&lt;/a&gt;.serviceをインスールしないといけないとのこと。&lt;br&gt;
-そして、centos7からはfirewalldがデフォルトでオンになっているからオフにしないといけない。&lt;br&gt;
-（いけないわけではないけど両方使う意味が無いので。）&lt;/p&gt;
-&lt;br&gt;
-&lt;p&gt;まずは&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/iptables&#34;&gt;iptables&lt;/a&gt;-serviceをインスールし、firewalldをオフ、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/iptables&#34;&gt;iptables&lt;/a&gt;をオンとした。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# yum install iptables-services
-# systemctl status firewalld
-   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled)
-   Active: active (running) since Sat 2014-09-20 17:47:11 JST; 4s ago
- Main PID: 11162 (firewalld)
-   CGroup: /system.slice/firewalld.service
-           └─11162 /usr/bin/python -Es /usr/sbin/firewalld --nofork --nopid
-
-#
-# systemctl stop firewalld
-#
-# systemctl status firewalld
-   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled)
-   Active: inactive (dead)
-
-#
-#systemctl disable firewalld
-#
-#systemctl enable iptables
-#systemctl start iptables
-#
-#systemctl status iptables
-   Loaded: loaded (/usr/lib/systemd/system/iptables.service; enabled)
-   Active: inactive (dead) since Sat 2014-09-20 17:47:10 JST; 2min 48s ago
-  Process: 11139 ExecStop=/usr/libexec/iptables/iptables.init stop (code=exited, status=0/SUCCESS)
-  Process: 10096 ExecStart=/usr/libexec/iptables/iptables.init start (code=exited, status=0/SUCCESS)
- Main PID: 10096 (code=exited, status=0/SUCCESS)
-....
-
-# 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/iptables&#34;&gt;iptables&lt;/a&gt;の設定はいつもどおり。&lt;br&gt;
-CentOS7の新しいコマンドに戸惑ったので一部メモ。&lt;/p&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;h2&gt;service, chkconfigコマンドはsystemctlコマンドへ&lt;/h2&gt;service, chkconfigコマンドは推奨されずsystemctlコマンドへ切り替わった。&lt;br&gt;
-試しにchkconfigコマンドを利用すると…&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# chkconfig --list
-Note: This output shows SysV services only and does not include native
-      systemd services. SysV configuration data might be overridden by native
-      systemd configuration.
-
-      If you want to list systemd services use &#39;systemctl list-unit-files&#39;.
-      To see services enabled on particular target use
-      &#39;systemctl list-dependencies [target]&#39;.
-
-iprdump        	0:off	1:off	2:on	3:on	4:on	5:on	6:off
-iprinit        	0:off	1:off	2:on	3:on	4:on	5:on	6:off
-iprupdate      	0:off	1:off	2:on	3:on	4:on	5:on	6:off
-netconsole     	0:off	1:off	2:off	3:off	4:off	5:off	6:off
-network        	0:off	1:off	2:on	3:on	4:on	5:on	6:off
-pmcd           	0:off	1:off	2:off	3:off	4:off	5:off	6:off
-pmie           	0:off	1:off	2:off	3:off	4:off	5:off	6:off
-pmlogger       	0:off	1:off	2:off	3:off	4:off	5:off	6:off
-pmmgr          	0:off	1:off	2:off	3:off	4:off	5:off	6:off
-pmproxy        	0:off	1:off	2:off	3:off	4:off	5:off	6:off
-pmwebd         	0:off	1:off	2:off	3:off	4:off	5:off	6:off
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;blockquote&gt;
-    &lt;p&gt;&amp;ldquo;If you want to list systemd services use &amp;lsquo;systemctl list-unit-files&amp;rsquo;.&amp;rdquo;&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;systemdのサービスを表示したければ、systemctl list-unit-filesを利用せよとのこと。&lt;br&gt;
-試しに打つと以下のように表示される&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# systemctl list-unit-files
-UNIT FILE                                   STATE
-proc-sys-fs-binfmt_misc.automount           static
-dev-hugepages.mount                         static
-dev-mqueue.mount                            static
-proc-fs-nfsd.mount                          static
-proc-sys-fs-binfmt_misc.mount               static
-sys-fs-fuse-connections.mount               static
-sys-kernel-config.mount                     static
-sys-kernel-debug.mount                      static
-tmp.mount                                   disabled
-var-lib-nfs-rpc_pipefs.mount                static
-brandbot.path                               disabled
-....
- 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;また、サービスの起動・停止・状態確認などは&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# service &amp;lt;service name&amp;gt; &amp;lt;start/stop/restart/status&amp;gt;
-　↓
-# systemctl &amp;lt;start/stop/restart/status&amp;gt; &amp;lt;service name&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;そして、サービスの起動オプションの設定は&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# chkconfig &amp;lt;service name&amp;gt; &amp;lt;on/off&amp;gt;
-   ↓
-# systemctl &amp;lt;enable/disable&amp;gt; &amp;lt;service name&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;まずはこんなところ。&lt;/p&gt;
-&lt;/body&gt;&lt;/p&gt;
-</description>
+      <description>最近VPSのOSをcentos7にしたのだが、なかなか手付かずでiptablesの設定も放置していた…
+（sshの最低限の設定はしていたが、ほんとうに良くない…）
+久しぶりに手が空いたので設定するかーと思いきや
+まず/etc/sysconfig/iptablesがないし&amp;hellip;
+Cent7からのsystemctlでiptablesのサービスを確認してもでてこないし…
+# systemctl status iptables iptables.service Loaded: not-found (Reason: No such file or directory) Active: inactive (dead)  というわけで、調べてみると、まずiptables.serviceをインスールしないといけないとのこと。
+そして、centos7からはfirewalldがデフォルトでオンになっているからオフにしないといけない。
+（いけないわけではないけど両方使う意味が無いので。）
+まずはiptables-serviceをインスールし、firewalldをオフ、iptablesをオンとした。
+# yum install iptables-services # systemctl status firewalld Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled) Active: active (running) since Sat 2014-09-20 17:47:11 JST; 4s ago Main PID: 11162 (firewalld) CGroup: /system.slice/firewalld.service └─11162 /usr/bin/python -Es /usr/sbin/firewalld --nofork --nopid # # systemctl stop firewalld # # systemctl status firewalld Loaded: loaded (/usr/lib/systemd/system/firewalld.</description>
     </item>
     
   </channel>

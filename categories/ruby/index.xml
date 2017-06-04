@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Goldstine研究所</title>
-    <link>https://blog.mosuke.tech/categories/ruby/index.xml</link>
-    <description>Recent content on Goldstine研究所</description>
+    <title>Ruby on Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/ruby/</link>
+    <description>Recent content in Ruby on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <atom:link href="https://blog.mosuke.tech/categories/ruby/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 06 Mar 2016 14:05:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://blog.mosuke.tech/categories/ruby/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>【錦織圭も分析】ATP TennisのデータスクレイパーGem作った</title>
@@ -14,145 +17,22 @@
       <pubDate>Sun, 06 Mar 2016 14:05:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2016/03/06/140531/</guid>
-      <description>&lt;p&gt;&lt;body&gt;
-&lt;h1&gt;背景&lt;/h1&gt;&lt;/p&gt;
-
-&lt;p&gt;このブログは基本的に技術ブログとしてやっているので、&lt;br&gt;
-テニスの話題ははじめてだが、テニスがすごく好きだ。
-特に、プロの試合の観戦はとても好きだ。&lt;/p&gt;
-
-&lt;p&gt;2005年からずーっと見てて、欠かさずすべての試合結果はチェックしている。&lt;/p&gt;
-
-&lt;p&gt;数年前から、テニス選手をある指標から分析したいなと思っていた。
-例えば、&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;ランキングは高くないけど、爆発するとトップ選手に勝つ力を持っているかどうか&lt;/li&gt;
-&lt;li&gt;自分より格下の選手に負けることが少ないかどうか&lt;/li&gt;
-&lt;li&gt;小さい大会ではあまり勝てないけど、大舞台で勝てる選手かどうか&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;これから伸びそうな選手かどうかなどをデータ的にみたかった。&lt;br&gt;
-ATPの公式サイトにもいくつか統計情報が載っているが、自分が大事と思う指標で分析したいと思っていた。&lt;/p&gt;
-
-&lt;p&gt;まずは、データを取得しなければいけないので、それで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EC%A5%A4%A5%D4%A5%F3%A5%B0&#34;&gt;スクレイピング&lt;/a&gt;のライブラリを作るにいたった。&lt;/p&gt;
-
-&lt;h1&gt;AtpScraper&lt;/h1&gt;
-
-&lt;p&gt;AtpScraperは男子のプロテニスの公式サイトである、&lt;a href=&#34;http://www.atpworldtour.com&#34;&gt;ATPのサイト&lt;/a&gt;から情報を&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EC%A5%A4%A5%D4%A5%F3%A5%B0&#34;&gt;スクレイピング&lt;/a&gt;してくれる&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Ruby&#34;&gt;Ruby&lt;/a&gt;ライブラリだ。&lt;/p&gt;
-
-&lt;p&gt;&lt;iframe src=&#34;//hatenablog-parts.com/embed?url=https%3A%2F%2Fgithub.com%2Fmosuke5%2Fatp_scraper&#34; title=&#34;mosuke5/atp_scraper&#34; class=&#34;embed-card embed-webcard&#34; scrolling=&#34;no&#34; frameborder=&#34;0&#34; style=&#34;display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;&#34;&gt;&lt;/iframe&gt;&lt;cite class=&#34;hatena-citation&#34;&gt;&lt;a href=&#34;https://github.com/mosuke5/atp_scraper&#34;&gt;github.com&lt;/a&gt;&lt;/cite&gt;&lt;/p&gt;
-
-&lt;p&gt;現時点では、ぼくが今欲している機能しか実装していないが、下記ができる。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;シングルスのランキングの取得&lt;/li&gt;
-&lt;li&gt;プレイヤーの対戦レコードの取得&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;一例だが、どんなふうに利用できるかのせる。&lt;/p&gt;
-
-&lt;h3&gt;シングルスのランキング取得&lt;/h3&gt;
-
-&lt;p&gt;デフォルトだとトップ100のランキングを取得する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;pry(main)&amp;gt; AtpScraper::Get.singles_ranking
-=&amp;gt; [{:ranking=&amp;gt;&amp;quot;1&amp;quot;,
-  :player_name=&amp;gt;&amp;quot;Novak Djokovic&amp;quot;,
-  :player_url_name=&amp;gt;&amp;quot;novak-djokovic&amp;quot;,
-  :player_id=&amp;gt;&amp;quot;d643&amp;quot;,
-  :points=&amp;gt;&amp;quot;16580&amp;quot;},
- {:ranking=&amp;gt;&amp;quot;2&amp;quot;,
-  :player_name=&amp;gt;&amp;quot;Andy Murray&amp;quot;,
-  :player_url_name=&amp;gt;&amp;quot;andy-murray&amp;quot;,
-  :player_id=&amp;gt;&amp;quot;mc10&amp;quot;,
-  :points=&amp;gt;&amp;quot;8765&amp;quot;},
- {:ranking=&amp;gt;&amp;quot;3&amp;quot;,
-  :player_name=&amp;gt;&amp;quot;Roger Federer&amp;quot;,
-  :player_url_name=&amp;gt;&amp;quot;roger-federer&amp;quot;,
-  :player_id=&amp;gt;&amp;quot;f324&amp;quot;,
-  :points=&amp;gt;&amp;quot;8295&amp;quot;},
-
-(略)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;下記のようにすれば、50位から60位のランキングを取得できる。&lt;br&gt;
-（※引数の指定の仕方がアレなのは突っ込まないこと）&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;pry(main)&amp;gt; AtpScraper::Get.singles_ranking(&amp;quot;50-60&amp;quot;)
-=&amp;gt; [{:ranking=&amp;gt;&amp;quot;50&amp;quot;,
-  :player_name=&amp;gt;&amp;quot;Lukas Rosol&amp;quot;,
-  :player_url_name=&amp;gt;&amp;quot;lukas-rosol&amp;quot;,
-  :player_id=&amp;gt;&amp;quot;r685&amp;quot;,
-  :points=&amp;gt;&amp;quot;897&amp;quot;},
- {:ranking=&amp;gt;&amp;quot;51&amp;quot;,
-  :player_name=&amp;gt;&amp;quot;Federico Delbonis&amp;quot;,
-  :player_url_name=&amp;gt;&amp;quot;federico-delbonis&amp;quot;,
-  :player_id=&amp;gt;&amp;quot;d874&amp;quot;,
-  :points=&amp;gt;&amp;quot;895&amp;quot;},
-
-(略)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B6%D3%BF%A5%B7%BD&#34;&gt;錦織圭&lt;/a&gt;の対戦レコード取得&lt;/h3&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B6%D3%BF%A5%B7%BD&#34;&gt;錦織圭&lt;/a&gt;の2016年の対戦レコードを見たいと思えば下記のように取得できる。&lt;br&gt;
-（第一引数の&lt;code&gt;n552&lt;/code&gt;は選手のIDのようなもので、これは上のランキングの取得時に手に入るのでそこで確認しなければいけない）&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;pry(main)&amp;gt; AtpScraper::Get.player_activity(&amp;quot;n552&amp;quot;, 2016)
-=&amp;gt; [{:year=&amp;gt;&amp;quot;2016&amp;quot;,
-  :player_name=&amp;gt;&amp;quot;Kei Nishikori&amp;quot;,
-  :player_rank=&amp;gt;&amp;quot;6&amp;quot;,
-  :opponent_name=&amp;gt;&amp;quot;Sam Querrey&amp;quot;,
-  :opponent_rank=&amp;gt;&amp;quot;43&amp;quot;,
-  :round=&amp;gt;&amp;quot;Round of 16&amp;quot;,
-  :score=&amp;gt;&amp;quot;46 36&amp;quot;,
-  :win_loss=&amp;gt;&amp;quot;L&amp;quot;,
-  :tournament_name=&amp;gt;&amp;quot;Abierto Mexicano Telcel&amp;quot;,
-  :tournament_category=&amp;gt;&amp;quot;500&amp;quot;,
-  :tournament_location=&amp;gt;&amp;quot;Acapulco, Mexico&amp;quot;,
-  :tournament_start_date=&amp;gt;&amp;quot;2016.02.22&amp;quot;,
-  :tournament_end_date=&amp;gt;&amp;quot;2016.02.27&amp;quot;,
-  :tournament_surface=&amp;gt;&amp;quot;Hard&amp;quot;,
-  :tournament_surface_inout=&amp;gt;&amp;quot;Outdoor&amp;quot;},
- {:year=&amp;gt;&amp;quot;2016&amp;quot;,
-  :player_name=&amp;gt;&amp;quot;Kei Nishikori&amp;quot;,
-  :player_rank=&amp;gt;&amp;quot;6&amp;quot;,
-  :opponent_name=&amp;gt;&amp;quot;Thiemo de Bakker&amp;quot;,
-  :opponent_rank=&amp;gt;&amp;quot;105&amp;quot;,
-  :round=&amp;gt;&amp;quot;Round of 32&amp;quot;,
-  :score=&amp;gt;&amp;quot;60 63&amp;quot;,
-  :win_loss=&amp;gt;&amp;quot;W&amp;quot;,
-  :tournament_name=&amp;gt;&amp;quot;Abierto Mexicano Telcel&amp;quot;,
-  :tournament_category=&amp;gt;&amp;quot;500&amp;quot;,
-  :tournament_location=&amp;gt;&amp;quot;Acapulco, Mexico&amp;quot;,
-  :tournament_start_date=&amp;gt;&amp;quot;2016.02.22&amp;quot;,
-  :tournament_end_date=&amp;gt;&amp;quot;2016.02.27&amp;quot;,
-  :tournament_surface=&amp;gt;&amp;quot;Hard&amp;quot;,
-  :tournament_surface_inout=&amp;gt;&amp;quot;Outdoor&amp;quot;},
-
-(略)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;もし、過去のすべての&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B6%D3%BF%A5%B7%BD&#34;&gt;錦織圭&lt;/a&gt;の対戦レコードを取得したければ下記で取得できる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;pry(main)&amp;gt; AtpScraper::Get.player_activity(&amp;quot;n552&amp;quot;, &amp;quot;all&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;対戦レコードは１対戦ごとのレコードになっている。&lt;br&gt;
-トーナメントごとにまとめたりはしていない。&lt;/p&gt;
-
-&lt;h1&gt;これから&lt;/h1&gt;
-
-&lt;p&gt;データ取得ライブラリを作ったので、これからこれを使った分析をしていこうと思っている。&lt;br&gt;
-分析結果が見れるサービスを作るかもしれないし作らないかもしれない。&lt;/p&gt;
-
-&lt;p&gt;また、データ取得について要望があれば受け付けるし、プルリクをしてくれてもOKです。&lt;/p&gt;
-
-&lt;p&gt;&lt;p&gt;&lt;a href=&#34;https://github.com/mosuke5/atp_scraper&#34;&gt;GitHub - mosuke5/atp_scraper: atp_scraper is a tool scraping tennis data from atpworldtour.com.&lt;/a&gt;&lt;/p&gt;
-&lt;/body&gt;&lt;/p&gt;
-</description>
+      <description>背景
+このブログは基本的に技術ブログとしてやっているので、
+テニスの話題ははじめてだが、テニスがすごく好きだ。 特に、プロの試合の観戦はとても好きだ。
+2005年からずーっと見てて、欠かさずすべての試合結果はチェックしている。
+数年前から、テニス選手をある指標から分析したいなと思っていた。 例えば、
+ ランキングは高くないけど、爆発するとトップ選手に勝つ力を持っているかどうか 自分より格下の選手に負けることが少ないかどうか 小さい大会ではあまり勝てないけど、大舞台で勝てる選手かどうか  これから伸びそうな選手かどうかなどをデータ的にみたかった。
+ATPの公式サイトにもいくつか統計情報が載っているが、自分が大事と思う指標で分析したいと思っていた。
+まずは、データを取得しなければいけないので、それでスクレイピングのライブラリを作るにいたった。
+AtpScraper AtpScraperは男子のプロテニスの公式サイトである、ATPのサイトから情報をスクレイピングしてくれるRubyライブラリだ。
+github.com
+現時点では、ぼくが今欲している機能しか実装していないが、下記ができる。
+ シングルスのランキングの取得 プレイヤーの対戦レコードの取得  一例だが、どんなふうに利用できるかのせる。
+シングルスのランキング取得 デフォルトだとトップ100のランキングを取得する。
+pry(main)&amp;gt; AtpScraper::Get.singles_ranking =&amp;gt; [{:ranking=&amp;gt;&amp;quot;1&amp;quot;, :player_name=&amp;gt;&amp;quot;Novak Djokovic&amp;quot;, :player_url_name=&amp;gt;&amp;quot;novak-djokovic&amp;quot;, :player_id=&amp;gt;&amp;quot;d643&amp;quot;, :points=&amp;gt;&amp;quot;16580&amp;quot;}, {:ranking=&amp;gt;&amp;quot;2&amp;quot;, :player_name=&amp;gt;&amp;quot;Andy Murray&amp;quot;, :player_url_name=&amp;gt;&amp;quot;andy-murray&amp;quot;, :player_id=&amp;gt;&amp;quot;mc10&amp;quot;, :points=&amp;gt;&amp;quot;8765&amp;quot;}, {:ranking=&amp;gt;&amp;quot;3&amp;quot;, :player_name=&amp;gt;&amp;quot;Roger Federer&amp;quot;, :player_url_name=&amp;gt;&amp;quot;roger-federer&amp;quot;, :player_id=&amp;gt;&amp;quot;f324&amp;quot;, :points=&amp;gt;&amp;quot;8295&amp;quot;}, (略)  下記のようにすれば、50位から60位のランキングを取得できる。
+（※引数の指定の仕方がアレなのは突っ込まないこと）
+pry(main)&amp;gt; AtpScraper::Get.singles_ranking(&amp;quot;50-60&amp;quot;) =&amp;gt; [{:ranking=&amp;gt;&amp;quot;50&amp;quot;, :player_name=&amp;gt;&amp;quot;Lukas Rosol&amp;quot;, :player_url_name=&amp;gt;&amp;quot;lukas-rosol&amp;quot;, :player_id=&amp;gt;&amp;quot;r685&amp;quot;, :points=&amp;gt;&amp;quot;897&amp;quot;}, {:ranking=&amp;gt;&amp;quot;51&amp;quot;, :player_name=&amp;gt;&amp;quot;Federico Delbonis&amp;quot;, :player_url_name=&amp;gt;&amp;quot;federico-delbonis&amp;quot;, :player_id=&amp;gt;&amp;quot;d874&amp;quot;, :points=&amp;gt;&amp;quot;895&amp;quot;}, (略)   錦織圭の対戦レコード取得 錦織圭の2016年の対戦レコードを見たいと思えば下記のように取得できる。</description>
     </item>
     
     <item>
@@ -161,113 +41,17 @@ ATPの公式サイトにもいくつか統計情報が載っているが、自�
       <pubDate>Fri, 08 May 2015 17:47:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2015/05/08/174732/</guid>
-      <description>&lt;p&gt;&lt;body&gt;
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Sinatra&#34;&gt;Sinatra&lt;/a&gt;アプリケーションで、JSファイルを圧縮する&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/sinatra&#34;&gt;sinatra&lt;/a&gt;-assetpackを利用していて、&lt;br&gt;
-production環境で動作させようとしたら動かなくなってしまった問題について調査した。&lt;/p&gt;&lt;/p&gt;
-
-&lt;h1&gt;起こったこと&lt;/h1&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Sinatra&#34;&gt;Sinatra&lt;/a&gt;を使ってアプリケーションを作っていて、development環境で完成したので、
-prorudction環境で動作させようとしたら、jsのエラーが出るようになってしまい、正常に動かなくなった。&lt;/p&gt;
-
-&lt;p&gt;アクセスすると、以下のエラーがでる。要は&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/jquery&#34;&gt;jquery&lt;/a&gt;がないとのこと。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Uncaught ReferenceError: $ is not defined 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/jQuery&#34;&gt;jQuery&lt;/a&gt;はもちろん読み込ませてるし、なんでproduction環境でだけ？？？&lt;/p&gt;
-
-&lt;h1&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9&#34;&gt;ソースコード&lt;/a&gt;&lt;/h1&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/sinatra&#34;&gt;sinatra&lt;/a&gt;のメインアプリケーションであるapp.rbには以下のように、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/sinatra&#34;&gt;sinatra&lt;/a&gt;-assetpackを利用してjsを読み込んでいる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;assets do
-  serve &#39;/js&#39;, from: &#39;public/js&#39;
-  serve &#39;/bower_components&#39;, from: &#39;bower_components&#39;
-
-  js :app, &#39;/js/app.js&#39;, [
-    &#39;/js/index.js&#39;,
-  ]
-
-  js :libs, &#39;/js/libs.js&#39;, [
-    &#39;/bower_components/jquery/dist/jquery.js&#39;,
-    &#39;/bower_components/bootstrap/dist/js/bootstrap.js&#39;,
-  ]
-
-  js_compression :jsmin
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;layout.erbにはもちろん、libs.jsが先に来るように記述している。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;&amp;lt;%= js :libs %&amp;gt;
-&amp;lt;%= js :app %&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/sinatra&#34;&gt;sinatra&lt;/a&gt;-assetpackの挙動&lt;/h1&gt;
-
-&lt;p&gt;productionでのみ発生する&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD&#34;&gt;事象&lt;/a&gt;なので、改めて&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/sinatra&#34;&gt;sinatra&lt;/a&gt;-assetpackのproduction環境時の挙動を確認した。&lt;br&gt;
-production環境では、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4&#34;&gt;複数&lt;/a&gt;のjsファイルを1つのファイルにまとめ、圧縮を行う。&lt;/p&gt;
-
-&lt;h4&gt;development環境&lt;/h4&gt;
-
-&lt;p&gt;３つのjsファイルがあったら以下のように３つ別々に読み込まれる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;script type=&#39;text/javascript&#39; src=&#39;https://blog.mosuke.tech/js/vendor/jquery.283479.js&#39;&amp;gt;&amp;lt;/script&amp;gt;
-&amp;lt;script type=&#39;text/javascript&#39; src=&#39;https://blog.mosuke.tech/js/vendor/underscore.589491.js&#39;&amp;gt;&amp;lt;/script&amp;gt;
-&amp;lt;script type=&#39;text/javascript&#39; src=&#39;https://blog.mosuke.tech/js/app/main.589491.js&#39;&amp;gt;&amp;lt;/script&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4&gt;production環境&lt;/h4&gt;
-
-&lt;p&gt;３つあったjsファイルは1つにまとめられ、また圧縮される。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;script type=&#39;text/javascript&#39; src=&#39;https://blog.mosuke.tech/js/app.589491.js&#39;&amp;gt;&amp;lt;/script&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;詳細はこちら&lt;br&gt;
-&lt;a href=&#34;https://github.com/rstacruz/sinatra-assetpack#results&#34;&gt;rstacruz/sinatra-assetpack · GitHub&lt;/a&gt;&lt;/p&gt;
-
-&lt;h1&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD&#34;&gt;事象&lt;/a&gt;の理由&lt;/h1&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Chrome&#34;&gt;Chrome&lt;/a&gt;の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%C7%A5%D0%A5%C3%A5%B0&#34;&gt;デバッグ&lt;/a&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB&#34;&gt;ツール&lt;/a&gt;のNetworkでファイルのダウンロード状況を確認してみると意外なことがわかった。
-&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150508/20150508171833.png&#34; alt=&#34;f:id:mosuke5:20150508171833p:plain&#34; title=&#34;f:id:mosuke5:20150508171833p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
-
-&lt;p&gt;画像が小さくて見づらいかもしれないが、
-5行目と6行目のapp.jsとlibs.jsで先にlibs.jsを読み込んでいるのに、おそらく圧縮とダウンロードに時間がかかり、&lt;br&gt;
-app.jsのほうが先にダウンロードが終わっている。&lt;/p&gt;
-
-&lt;p&gt;libs.jsには&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/jQuery&#34;&gt;jQuery&lt;/a&gt;などが含まれていて、app.js内で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/jQuery&#34;&gt;jQuery&lt;/a&gt;を利用する。&lt;br&gt;
-よって、先にapp.jsが読み込まれてしまったことで、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/jQuery&#34;&gt;jQuery&lt;/a&gt;がねーぞ！と怒られてしまったのである。&lt;/p&gt;
-
-&lt;h1&gt;対策と考慮&lt;/h1&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/sinatra&#34;&gt;sinatra&lt;/a&gt;-assetpackなどを利用して、jsを圧縮する際には、
-ファイルを1つにまとめたり圧縮したりする時間がかかることを十分に考慮しなければいけない。&lt;/p&gt;
-
-&lt;p&gt;あまり賢い手段をは言えないが、libs.jsとapp.jsひとつにまとめることで今回の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD&#34;&gt;事象&lt;/a&gt;は避けられる。
-app.rb&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;assets do
-  serve &#39;/js&#39;, from: &#39;public/js&#39;
-  serve &#39;/bower_components&#39;, from: &#39;bower_components&#39;
-
-  js :app, &#39;/js/app.js&#39;, [
-    &#39;/bower_components/jquery/dist/jquery.js&#39;,
-    &#39;/bower_components/bootstrap/dist/js/bootstrap.js&#39;,
-    &#39;/js/index.js&#39;,
-  ]
-
-  js_compression :jsmin
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;また、事前に圧縮しておいて、ダウンロードだけする状態にしてもいいかもしれない。&lt;br&gt;
-&lt;a href=&#34;https://github.com/rstacruz/sinatra-assetpack#precompile&#34;&gt;rstacruz/sinatra-assetpack · GitHub&lt;/a&gt;&lt;/p&gt;
-&lt;/body&gt;&lt;/p&gt;
-</description>
+      <description>Sinatraアプリケーションで、JSファイルを圧縮するsinatra-assetpackを利用していて、
+production環境で動作させようとしたら動かなくなってしまった問題について調査した。
+起こったこと Sinatraを使ってアプリケーションを作っていて、development環境で完成したので、 prorudction環境で動作させようとしたら、jsのエラーが出るようになってしまい、正常に動かなくなった。
+アクセスすると、以下のエラーがでる。要はjqueryがないとのこと。
+Uncaught ReferenceError: $ is not defined  jQueryはもちろん読み込ませてるし、なんでproduction環境でだけ？？？
+ソースコード sinatraのメインアプリケーションであるapp.rbには以下のように、sinatra-assetpackを利用してjsを読み込んでいる。
+assets do serve &#39;/js&#39;, from: &#39;public/js&#39; serve &#39;/bower_components&#39;, from: &#39;bower_components&#39; js :app, &#39;/js/app.js&#39;, [ &#39;/js/index.js&#39;, ] js :libs, &#39;/js/libs.js&#39;, [ &#39;/bower_components/jquery/dist/jquery.js&#39;, &#39;/bower_components/bootstrap/dist/js/bootstrap.js&#39;, ] js_compression :jsmin end  layout.erbにはもちろん、libs.jsが先に来るように記述している。
+&amp;lt;%= js :libs %&amp;gt; &amp;lt;%= js :app %&amp;gt;   sinatra-assetpackの挙動 productionでのみ発生する事象なので、改めてsinatra-assetpackのproduction環境時の挙動を確認した。
+production環境では、複数のjsファイルを1つのファイルにまとめ、圧縮を行う。
+development環境 ３つのjsファイルがあったら以下のように３つ別々に読み込まれる。
+&amp;lt;script type=&#39;text/javascript&#39; src=&#39;https://blog.mosuke.tech/js/vendor/jquery.283479.js&#39;&amp;gt;&amp;lt;/script&amp;gt; &amp;lt;script type=&#39;text/javascript&#39; src=&#39;https://blog.mosuke.tech/js/vendor/underscore.589491.js&#39;&amp;gt;&amp;lt;/script&amp;gt; &amp;lt;script type=&#39;text/javascript&#39; src=&#39;https://blog.mosuke.tech/js/app/main.589491.js&#39;&amp;gt;&amp;lt;/script&amp;gt;  production環境 ３つあったjsファイルは1つにまとめられ、また圧縮される。</description>
     </item>
     
     <item>
@@ -276,222 +60,28 @@ end
       <pubDate>Sun, 22 Feb 2015 21:13:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2015/02/22/211316/</guid>
-      <description>&lt;p&gt;&lt;body&gt;
-&lt;p&gt;bunlderを使ったWebアプリをプロダクション環境で動かすときに、アプリの起動をどうやって実現しているだろうか。&lt;/p&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Apache&#34;&gt;Apache&lt;/a&gt; Passengerを使う場合には、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Apache&#34;&gt;Apache&lt;/a&gt;の起動がアプリの起動につながるので、
-アプリの起動はあまり気にしなかったかもしれない。&lt;/p&gt;
-
-&lt;p&gt;しかし、例えばNginx × &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Unicorn&#34;&gt;Unicorn&lt;/a&gt;/thinの構成などの場合は&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Unicorn&#34;&gt;Unicorn&lt;/a&gt;やthinの起動もしなければいけなくなってくる。&lt;br&gt;
-（あるいはこのようなケースがあるかは謎だが、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Unicorn&#34;&gt;Unicorn&lt;/a&gt;やthinを単体で動かそうとしている場合など）&lt;/p&gt;
-
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Unicorn&#34;&gt;Unicorn&lt;/a&gt;やthin（例ではthinを扱うが本質は同じ）の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%BC%AB%C6%B0%B5%AF%C6%B0&#34;&gt;自動起動&lt;/a&gt;を実現する際の勘所、注意事項をまとめた。&lt;/p&gt;
-
-&lt;h1&gt;0. 前提&lt;/h1&gt;
-
-&lt;ul&gt;
-&lt;li&gt;CentOS6.5上で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Ruby&#34;&gt;Ruby&lt;/a&gt;でのWebアプリケーションを作っている。&lt;/li&gt;
-&lt;li&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0&#34;&gt;アプリケーションサーバ&lt;/a&gt;はthinを利用している。&lt;/li&gt;
-&lt;li&gt;また、gemパッケージ管理にbundlerを利用している。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h1&gt;1. 開発環境でよくするアプリの起動&lt;/h1&gt;
-
-&lt;p&gt;開発環境では、アプリケーションのログの閲覧性なども兼ねて以下のようにアプリを起動していた。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ bundle exec rackup
-$ bundle exec thin start 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;でも、これではいつまでたってもプロダクション環境での利用はできません。&lt;/p&gt;
-
-&lt;h1&gt;2. 上記方法ではプロダクション環境で利用できない理由&lt;/h1&gt;
-
-&lt;p&gt;当然のことながら、プロダクション環境ではいちいち手動でコマンドを実行しアプリケーションを立ち上げるわけにはいかない。&lt;br&gt;
-例えば、なんらかの理由でサーバが再起動してしまった場合には、&lt;br&gt;
-このままではアプリケーションが自動的に立ち上がらないため、サービスの停止につながってしまう。&lt;/p&gt;
-
-&lt;p&gt;ではどうするのか？&lt;br&gt;
-以下の状態であることがプロダクション環境では理想なのではないだろうか？&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;オリジナルアプリケーションもserviceコマンドで起動・停止ができる
-
-&lt;ul&gt;
-&lt;li&gt;他のサービスと同様の操作方法が可能なのでわかりやすい&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;サーバ立ち上げ時にサービスが自動で起動される&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h1&gt;3. 起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;を作ろう&lt;/h1&gt;
-
-&lt;p&gt;上記の状態にもっていくためには、起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;を作らなければならない。&lt;/p&gt;
-
-&lt;p&gt;起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;を作る…！？&lt;br&gt;
-「作ったことないし、すぐには作れないよ〜」って思うかもしれないが、&lt;br&gt;
-サンプルはたくさんあるし、よく見てみるとそれほど難しくはない。&lt;/p&gt;
-
-&lt;p&gt;thinを使ったサンプルを探そうと思うと数は少ないが、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Unicorn&#34;&gt;Unicorn&lt;/a&gt;も同じ仕組なので、
-&#34;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/unicorn&#34;&gt;unicorn&lt;/a&gt; init script&#34;なんて検索をかけてもいろいろでてくるのでおすすめ。&lt;/p&gt;
-
-&lt;p&gt;参考ししたもの&lt;br&gt;
-&lt;a href=&#34;https://gist.github.com/sbeam/3454488&#34;&gt;https://gist.github.com/sbeam/3454488&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;上を参考にしながら、こんな起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;を作ってみた。（未完成版）&lt;br&gt;
-これを&lt;code&gt;/etc/init.d&lt;/code&gt;以下へ配置する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;#!/bin/bash
-
-### BEGIN CHKCONFIG INFO
-# chkconfig: 2345 55 25
-# description: sample-app
-### END CHKCONFIG INFO
-
-SCRIPT_NAME=/etc/init.d/sample-app
-CONFIG_PATH=/path/to/config
-BUNDLE_CMD=/usr/local/bin/bundle
-
-bundle_exec_thin ()
-{
-    for CONFIG_FILE in &amp;quot;$CONFIG_PATH/*.yml&amp;quot;; do
-        SITE_DIR=`awk &#39;/^chdir:/ { print $2; }&#39; $CONFIG_FILE`
-        cd $SITE_DIR
-        $BUNDLE_CMD exec thin $1 -C $CONFIG_FILE
-    done
-}
-
-
-case &amp;quot;$1&amp;quot; in
-  start)
-        bundle_exec_thin start
-        ;;
-  stop)
-        bundle_exec_thin stop
-        ;;
-  restart)
-        bundle_exec_thin restart
-        ;;
-  *)
-        echo &amp;quot;Usage: $SCRIPT_NAME {start|stop|restart}&amp;quot; &amp;gt;&amp;amp;2
-        exit 3
-        ;;
-esac
-
-:
- 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;も完成したし、実際にserviceコマンドで実行してみる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo service sample-app start
-/usr/bin/env: ruby: No such file or directory 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;んん。。。起動せず、撃沈…&lt;/p&gt;
-
-&lt;h3&gt;起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;を作る上での注意&lt;/h3&gt;
-
-&lt;p&gt;起動しなかった原因に移る前に、起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;を作る上での注意点を１つ。&lt;br&gt;
-chkconfigで認識させるためには冒頭のCHKCONFIG INFO部分(&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B3%A5%E1%A5%F3%A5%C8%A5%A2%A5%A6%A5%C8&#34;&gt;コメントアウト&lt;/a&gt;部分)も重要になってくる。&lt;br&gt;
-CHKCONFIG INFO部分を書かないままchkconfigでaddしようとすると以下のように怒られます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo chkconfig --add sample-app
-service sample-app does not support chkconfig 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1&gt;4. serviceコマンド実行時のPATHのはなし&lt;/h1&gt;
-
-&lt;p&gt;なぜ、serviceコマンドでthinを起動できなかったのか。&lt;br&gt;
-調べていくと意外なことがわかった。&lt;br&gt;
-serviceコマンドを実行すると中で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;のPATHが上書きされてしまう。&lt;/p&gt;
-
-&lt;p&gt;【参照】&lt;br&gt;
-&lt;a href=&#34;http://heartbeats.jp/hbblog/2013/06/service-start-stop.html&#34;&gt;デーモンの起動・終了にはserviceコマンドを利用しよう - インフラエンジニアway - Powered by HEARTBEATS&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;試しに、起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;内にPATHの出力を仕込んで確かめてみる。&lt;br&gt;
-起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;に&lt;code&gt;echo $PATH&lt;/code&gt;を仕込んだ。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo service sample-app start
-/sbin:/usr/sbin:/bin:/usr/bin 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;内でbundleや&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ruby&#34;&gt;ruby&lt;/a&gt;がインストールされているディレクトリに&lt;br&gt;
-PATHを通すことで、解決することにした。&lt;br&gt;
-（もっと美しい方法があれば教えて下さい。。。）&lt;/p&gt;
-
-&lt;h1&gt;5. 起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;修正(完成版)&lt;/h1&gt;
-
-&lt;p&gt;上記の通り起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;を修正したものが以下。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;#!/bin/bash
-
-### BEGIN CHKCONFIG INFO
-# chkconfig: 2345 55 25
-# description: sample-app
-### END CHKCONFIG INFO
-
-# 以下を追加
-export PATH=/usr/local/bin:$PATH
-
-SCRIPT_NAME=/etc/init.d/sample-app
-CONFIG_PATH=/path/to/config
-BUNDLE_CMD=/usr/local/bin/bundle
-
-bundle_exec_thin ()
-{
-    for CONFIG_FILE in &amp;quot;$CONFIG_PATH/*.yml&amp;quot;; do
-        SITE_DIR=`awk &#39;/^chdir:/ { print $2; }&#39; $CONFIG_FILE`
-        cd $SITE_DIR
-        $BUNDLE_CMD exec thin $1 -C $CONFIG_FILE
-    done
-}
-
-
-case &amp;quot;$1&amp;quot; in
-  start)
-        bundle_exec_thin start
-        ;;
-  stop)
-        bundle_exec_thin stop
-        ;;
-  restart)
-        bundle_exec_thin restart
-        ;;
-  *)
-        echo &amp;quot;Usage: $SCRIPT_NAME {start|stop|restart}&amp;quot; &amp;gt;&amp;amp;2
-        exit 3
-        ;;
-esac
-
-:
- 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;(PATHを通したのでbundleコマンドはフルパスでなくても大丈夫ですよ...)&lt;/p&gt;
-
-&lt;p&gt;最後に起動&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8&#34;&gt;スクリプト&lt;/a&gt;を&lt;code&gt;/etc/init.d&lt;/code&gt;以下に配置し、
-忘れずにchkconfigに登録しましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo chkconfig --add sample-app 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1&gt;【おまけ】sudo だと&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ruby&#34;&gt;ruby&lt;/a&gt;やgem、bundleが使えない？&lt;/h1&gt;
-
-&lt;p&gt;rootユーザでは&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ruby&#34;&gt;ruby&lt;/a&gt;やgem, bundleが使えるけど、sudoで実行すると使えない…&lt;br&gt;
-という悩みの人も多いのではないだろうか。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo gem install xxxxx
-sudo: gem: command not found 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;p&gt;sudoでの実行はrootユーザで実行することなのになぜ実行できないか。&lt;br&gt;
-これはsudoを使うときに/usr/local/binが許可されていないからだ。&lt;br&gt;
-visudoでsecure_pathの設定を見直すとよい。&lt;br&gt;
-&lt;a href=&#34;http://www.xmisao.com/2013/10/11/sudoers-secure_path.html&#34;&gt;sudoersのsecure_pathについて &amp;ndash; ぺけみさお&lt;/a&gt;&lt;/p&gt;
-&lt;/body&gt;&lt;/p&gt;
-</description>
+      <description>bunlderを使ったWebアプリをプロダクション環境で動かすときに、アプリの起動をどうやって実現しているだろうか。
+Apache Passengerを使う場合には、Apacheの起動がアプリの起動につながるので、 アプリの起動はあまり気にしなかったかもしれない。
+しかし、例えばNginx × Unicorn/thinの構成などの場合はUnicornやthinの起動もしなければいけなくなってくる。
+（あるいはこのようなケースがあるかは謎だが、Unicornやthinを単体で動かそうとしている場合など）
+Unicornやthin（例ではthinを扱うが本質は同じ）の自動起動を実現する際の勘所、注意事項をまとめた。
+0. 前提  CentOS6.5上でRubyでのWebアプリケーションを作っている。  アプリケーションサーバはthinを利用している。 また、gemパッケージ管理にbundlerを利用している。  1. 開発環境でよくするアプリの起動 開発環境では、アプリケーションのログの閲覧性なども兼ねて以下のようにアプリを起動していた。
+$ bundle exec rackup $ bundle exec thin start  でも、これではいつまでたってもプロダクション環境での利用はできません。
+2. 上記方法ではプロダクション環境で利用できない理由 当然のことながら、プロダクション環境ではいちいち手動でコマンドを実行しアプリケーションを立ち上げるわけにはいかない。
+例えば、なんらかの理由でサーバが再起動してしまった場合には、
+このままではアプリケーションが自動的に立ち上がらないため、サービスの停止につながってしまう。
+ではどうするのか？
+以下の状態であることがプロダクション環境では理想なのではないだろうか？
+ オリジナルアプリケーションもserviceコマンドで起動・停止ができる  他のサービスと同様の操作方法が可能なのでわかりやすい   サーバ立ち上げ時にサービスが自動で起動される  3. 起動スクリプトを作ろう 上記の状態にもっていくためには、起動スクリプトを作らなければならない。
+起動スクリプトを作る…！？
+「作ったことないし、すぐには作れないよ〜」って思うかもしれないが、
+サンプルはたくさんあるし、よく見てみるとそれほど難しくはない。
+thinを使ったサンプルを探そうと思うと数は少ないが、Unicornも同じ仕組なので、 &#34;unicorn init script&#34;なんて検索をかけてもいろいろでてくるのでおすすめ。
+参考ししたもの
+https://gist.github.com/sbeam/3454488
+上を参考にしながら、こんな起動スクリプトを作ってみた。（未完成版）
+これを/etc/init.d以下へ配置する。
+#!/bin/bash ### BEGIN CHKCONFIG INFO # chkconfig: 2345 55 25 # description: sample-app ### END CHKCONFIG INFO SCRIPT_NAME=/etc/init.</description>
     </item>
     
     <item>
@@ -500,88 +90,25 @@ visudoでsecure_pathの設定を見直すとよい。&lt;br&gt;
       <pubDate>Mon, 15 Sep 2014 13:56:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2014/09/15/135611/</guid>
-      <description>&lt;p&gt;&lt;body&gt;
-&lt;p&gt;最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。&lt;br&gt;
-例えば以下の状況を考える。&lt;br&gt;
-【やりたいこと】&lt;br&gt;
-「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」&lt;/p&gt;
-&lt;p&gt;【DBの構造】&lt;br&gt;
-&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%AB%A5%E9%A5%E0%CC%BE&#34;&gt;カラム名&lt;/a&gt;：型&lt;br&gt;
-　date : datetime&lt;br&gt;
-　value : int&lt;/p&gt;
-&lt;p&gt;※また、下記では&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Sinatra&#34;&gt;Sinatra&lt;/a&gt;上で行っているが、他の言語でも同様のことがいえる。&lt;/p&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;div class=&#34;section&#34;&gt;
-    &lt;h3&gt;(1) 簡単な&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/API&#34;&gt;API&lt;/a&gt;のようなものを利用する&lt;/h3&gt;
-    &lt;p&gt;先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、&lt;br&gt;
-これが一番複雑にならずに良いと思ったということ。&lt;/p&gt;
-&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Sinatra&#34;&gt;Sinatra&lt;/a&gt;側で/&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/csv&#34;&gt;csv&lt;/a&gt;にアクセスすると&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/csv&#34;&gt;csv&lt;/a&gt;ファイルをダウンロードできるようにする。&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;#Sinatra側
-get &#39;/csv&#39; do
-    content_type &#39;application/csv&#39;
-    attachment &#39;download.csv&#39;
-
-    #DBからデータ取得(Activerecord利用)
-    @data   = Model.all()
-
-    #出力するCSVデータの変数。csvヘッダーを先につけている。
-    @csv = &amp;quot;date,value\n&amp;quot;
-
-    #DBのデータをCSVの形にして格納
-    @data.each do |d|
-        @csv += d.date.to_s + &amp;quot;,&amp;quot; + d.value.to_s + &amp;quot;\n&amp;quot;
-    end
-    
-    #csvtest.erbというビューに出力
-    erb :csvtest, :layout =&amp;gt; false
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;csvtest.erb&lt;/p&gt;
-```ruby
-&lt;%= @csv %&gt;
-```
-&lt;p&gt;こうすることで&#34;&lt;a href=&#34;http://*****/csv&#34;&gt;http://*****/csv&lt;/a&gt;&#34;にアクセスすると&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/csv&#34;&gt;csv&lt;/a&gt;ファイルとしてダウンロードできる状態になる。&lt;br&gt;
-条件指定をしてデータをダウンロードできるようにしたい場合はGETでパラメータ指定できるようにすれば良いと思う。&lt;br&gt;
-（&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Sinatra&#34;&gt;Sinatra&lt;/a&gt;で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/CSV&#34;&gt;CSV&lt;/a&gt;ファイルを生成するところのコードがナンセンスだと思っているので、もっといい方法があるはず…）&lt;/p&gt;
-&lt;p&gt;また、今回は&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/csv&#34;&gt;csv&lt;/a&gt;にしているが&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/json&#34;&gt;json&lt;/a&gt;などの他の形式でも同様のことがいえる。&lt;/p&gt;
-&lt;p&gt;これをD3.js側で以下のように読み込ませる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;d3.csv(&amp;quot;/csv&amp;quot;, function(error, data) {
-    (中略)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;d3.jsの&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/csv&#34;&gt;csv&lt;/a&gt;を読み込ませる関数の引数にURLを指定してあげればそれで終了。&lt;/p&gt;
-
-&lt;p&gt;&lt;/div&gt;
-&lt;div class=&#34;section&#34;&gt;
-    &lt;h3&gt;(2) &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/javascript&#34;&gt;javascript&lt;/a&gt;コードの中で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Ruby&#34;&gt;Ruby&lt;/a&gt;変数を展開させる&lt;/h3&gt;
-    &lt;p&gt;d3.jsのdatasetの中で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Ruby&#34;&gt;Ruby&lt;/a&gt;の変数を展開させる。ビューに&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Javascript&#34;&gt;Javascript&lt;/a&gt;を書いているので、ビューの中で変数展開するのと同じ要領。&lt;br&gt;
-しかし、jsコードに&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Ruby&#34;&gt;Ruby&lt;/a&gt;コードも交じるので複雑になりがち。&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var dataset = [
-&amp;lt;% @data.each do |d| %&amp;gt;
-    {date:&amp;lt;%= d.date%&amp;gt;, value:&amp;lt;%= d.value %&amp;gt;},
-&amp;lt;% end %&amp;gt;
-];
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/div&gt;
-&lt;div class=&#34;section&#34;&gt;
-    &lt;h3&gt;(3) &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/CSV&#34;&gt;CSV&lt;/a&gt;ファイルをおいておく&lt;/h3&gt;
-    &lt;p&gt;こちらはリアルタイムな更新でなれけばこれはこれでありだと思う。&lt;br&gt;
-publicのフォルダに予め&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/csv&#34;&gt;csv&lt;/a&gt;ファイルを設置しておき、以下のようにd3.jsで読み込ませる。&lt;/p&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;d3.csv(&amp;quot;test.csv&amp;quot;, function(error, data) {
-    (中略)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/div&gt;
-&lt;/body&gt;&lt;/p&gt;
-</description>
+      <description>最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。
+例えば以下の状況を考える。
+【やりたいこと】
+「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」
+【DBの構造】
+カラム名：型
+date : datetime
+value : int
+※また、下記ではSinatra上で行っているが、他の言語でも同様のことがいえる。
+(1) 簡単なAPIのようなものを利用する 先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、
+これが一番複雑にならずに良いと思ったということ。
+Sinatra側で/csvにアクセスするとcsvファイルをダウンロードできるようにする。
+#Sinatra側 get &#39;/csv&#39; do content_type &#39;application/csv&#39; attachment &#39;download.csv&#39; #DBからデータ取得(Activerecord利用) @data = Model.all() #出力するCSVデータの変数。csvヘッダーを先につけている。 @csv = &amp;quot;date,value\n&amp;quot; #DBのデータをCSVの形にして格納 @data.each do |d| @csv += d.date.to_s + &amp;quot;,&amp;quot; + d.value.to_s + &amp;quot;\n&amp;quot; end #csvtest.erbというビューに出力 erb :csvtest, :layout =&amp;gt; false end  csvtest.erb
+```ruby ``` こうすることで&#34;http://*****/csv&#34;にアクセスするとcsvファイルとしてダウンロードできる状態になる。
+条件指定をしてデータをダウンロードできるようにしたい場合はGETでパラメータ指定できるようにすれば良いと思う。
+（SinatraでCSVファイルを生成するところのコードがナンセンスだと思っているので、もっといい方法があるはず…）
+また、今回はcsvにしているがjsonなどの他の形式でも同様のことがいえる。
+これをD3.js側で以下のように読み込ませる。
+d3.csv(&amp;quot;/csv&amp;quot;, function(error, data) { (中略) }  d3.</description>
     </item>
     
   </channel>
