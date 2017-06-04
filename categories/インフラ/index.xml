@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>インフラ on Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/</link>
+    <description>Recent content in インフラ on Goldstine研究所</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Wed, 11 Feb 2015 17:21:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>SSHポートフォワード、https接続をするときに間違えやすいこと</title>
+      <link>https://blog.mosuke.tech/entry/2015/02/11/172123/</link>
+      <pubDate>Wed, 11 Feb 2015 17:21:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2015/02/11/172123/</guid>
+      <description>SSHローカルフォワードの話。
+前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。
+SSHでローカルポートフォワードを実際に試す - Goldstine研究所
+1. やりたいこと httpsでしか接続を許可していないサーバへ、SSHローカルフォワーディングを使って接続しようした。
+（直接疎通性がないためにポートフォワーディングする必要があった。）
+2. 行ったこと httpsでしか接続ができないので、ローカル端末のポート5000を接続したいサーバのポート443に飛ばせばおっけーと思って、
+下記のようにssh接続とブラウザから接続を行った。
+ssh -L5000:web-host:443 user@ssh-host  ※web-host: 今回httpsで接続したサーバ
+※ssh-host: ssh接続先サーバ
+これでローカルフォワーディングの設定は終わったので、ブラウザから以下に接続するだけで終わりだと思っていた。
+http://localhost:5000  が、接続不可…なぜでしょう？
+3. 何が間違いだったか 正しくは以下で接続をしなければいけない。httpsが必要。
+https://localhost:5000  よーく考えればアタリマエのこと。
+URLのはじめの&amp;lt;http(s)&amp;gt;の部分はプロトコルで最後の&amp;lt;:5000&amp;gt;の部分はポート番号。
+httpsは443のポートを一般的に使うが、ポート443がhttpsというわけではない。
+あたりまえのことだし知っていることなんだけど、見落としがちかもしれない。</description>
+    </item>
+    
+    <item>
+      <title>リモートのサーバでdockerを起動させるときの端末割り当て</title>
+      <link>https://blog.mosuke.tech/entry/2015/02/07/144208/</link>
+      <pubDate>Sat, 07 Feb 2015 14:42:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2015/02/07/144208/</guid>
+      <description>自分がハマったのでメモ。
+リモートのサーバでdocker runを実行し(/bin/bash)、ローカル側でシェルを操作したかった。
+sshでリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。
+ssh user@host &#39;docker run -t -i image_name /bin/bash&#39;  そうすると
+[root@0c6742f02bd9 ~]# [root@0c6742f02bd9 ~]# ^[[A^[[A^[[C  エンターを押すと2行されるし、矢印キーはキーコードがでてしまう。
+これを解消するのには以下のようにすればいい。
+ssh -t user@host &#39;docker run -t -i image_name /bin/bash&#39;  -tとはなんなのか、なぜこのような事象が起きたのか、これからしっかり調べる。</description>
+    </item>
+    
+    <item>
+      <title>Ansible、コマンド実行結果を&amp;quot;ok&amp;quot;にする（冪等性を保つ方法）</title>
+      <link>https://blog.mosuke.tech/entry/2015/02/02/201008/</link>
+      <pubDate>Mon, 02 Feb 2015 20:10:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2015/02/02/201008/</guid>
+      <description>Ansibleでソースコードインストールする際とか
+すでにインストールされているかのチェックなどで、
+シェルコマンドを実行してその結果で判断したい時がある。
+ぼくがよくやる例では以下とか。
+- name: check httpd installed command: which httpd ignore_errors: true  なんですが...
+こうやってしまうと、仮に既にインストールされていて、正常なときでも&#34;changed&#34;と表示されてしまう。
+これでは、本当にchangedなものなのか、わからなくなってくる。
+これを解決するのにchaged_whenを使うといい。
+- name: check httpd installed command: which httpd ignore_errors: true changed_when: false  こうするとコマンドが成功した際には&#34;ok&#34;が表示される。
+これで、何も変化がないときにはokとskippingしかでないから、
+誰がみても結果がわかりやすいですね！
+秘伝のタレ回避！</description>
+    </item>
+    
+    <item>
+      <title>dockerで特定ユーザでログインした状態のシェル環境を提供する</title>
+      <link>https://blog.mosuke.tech/entry/2015/01/24/213255/</link>
+      <pubDate>Sat, 24 Jan 2015 21:32:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2015/01/24/213255/</guid>
+      <description>dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、
+特定のユーザでログインした状態のコンテナを作りたいという場面に遭遇した。
+&amp;lt;やりたいこと&amp;gt;  特定のユーザでログインした状態のシェルを提供すること その際、ユーザの.bash_profile（あるいあは.bashrc）を読み込んだ状態であること  .bash_profileに記載したPATHやaliasを使いたい ユーザのログインシェルを利用したい（カスタマイズされたシェルとか）    docker runに-uオプションがあるし、これで余裕！と思った。
+[host] $ sudo docker run -u=user_name -i -t image_name /bin/bash  しかし…以下を確認してみると…
+[docker] $ pwd [docker] $ echo $PATH [docker] $ alias  ディレクトリは &#34;/&#34; だし、PATHも通ってない。
+どうやら.bash_profileなどは読んでいないようだ。普通にログインした状態とは違う。
+dockerで-uでユーザを指定し場合、指定したuserでコマンドを実行するが、
+サーバにユーザでログインしてからコマンドを実行するわけではないらしい。
+ディレクトリはどうやら-wオプションで解決できるようだが…
+[host] $ sudo docker run -u=user_name -w /home/user_name -i -t image_name /bin/bash  [docker] $ pwd /home/user_name  ディレクトリはおっけーだが、当然ながら依然として.bash_profileはダメ。
+そこでふと思いついた。-uも-wもいらない。
+あの手があるではないか…！！
+[host] $ sudo docker run -i -t image_name su - username  suでスイッチユーザすれば.</description>
+    </item>
+    
+    <item>
+      <title>SSHでローカルポートフォワードを実際に試す</title>
+      <link>https://blog.mosuke.tech/entry/2014/12/31/170545/</link>
+      <pubDate>Wed, 31 Dec 2014 17:05:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2014/12/31/170545/</guid>
+      <description>SSH・・・
+いろんなことができる&amp;rdquo;らしい&amp;rdquo;ということは知っていたし、
+例えばポートフォワーディングなんていうこともできるのも知っている。
+でもそれがどんなものなのか自分の手で試したことはないし、
+なんとなくただのサーバログインツールとして利用していた。
+サーバインフラ技術に興味を持つようになっていろんなことを勉強していると、
+ポートフォワーディングは必須な技術であることも感じ、
+年末の持て余す時間を使ってSSHのローカルポートフォワードを試してみたのでメモする。
+環境とやりたいこと 
+ローカルPCからexample.jpは以下で接続できる状態。
+[local pc] $ ssh username@example.jp  またWebサーバのポート番号は80で、VPSのホストサーバからはWebサーバへ接続できる。
+CUIなのでわかりづらいがcurlを打つとHello Worldが返ってきている。
+[example.jp] $ curl 192.168.33.10 &amp;lt;html&amp;gt;&amp;lt;body&amp;gt;&amp;lt;h1&amp;gt;Hello World! Virtual Web Server&amp;lt;/h1&amp;gt; &amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;  ローカルポートフォワードの実行 ローカルPCから以下を実行する。
+以下のコマンドは、
+ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす
+といったもの。
+[local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp  この状態でブラウザからhttp://localhost:8888にアクセスすると
+なんと、ローカルホストにつないだはずが、example.jp上の仮想Webサーバのhtmlがうつっているではないか…
+
+セキュリティはどうなの？ ローカルの端末からhttpで仮想のWebサーバに接続しているけど、セキュリティはだいじょうぶなのだろうか？
+http通信だから暗号化はされていないのだろうか？
+なんて疑問もあるが、それは問題ない。
+SSHでローカルPCからリモートホスト(example.jp)までトンネルをはり、
+そのなかをhttpで通信しているから全く問題なしといえる。
+ローカルポートフォワードを利用する場合は、おそらく表には出したくないけど、
+ローカルから接続したいなどの要件の時に使うと思うけど、SSHできちんと暗号化しているので安心。
+最後に SSHでできることはこの他にもたくさんある。
+ポートフォワードだけみても他にも「リモートポートフォワード」や「ダイナミックポートフォワード」などがある。
+リモートポートなどはいまぱっと試せる環境がなかったのでおいおい実践してみる…
+SSHをただのログインツールだけに留めるのは今年で終わりにしよう…</description>
+    </item>
+    
+    <item>
+      <title>【VPS1台でインフラ勉強】SoftEtherを使ってVPN構築</title>
+      <link>https://blog.mosuke.tech/entry/2014/12/07/212156/</link>
+      <pubDate>Sun, 07 Dec 2014 21:21:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2014/12/07/212156/</guid>
+      <description>VPS1台でインフラ勉強シリーズでVPN構築を行ったのでそのメモ。
+1. 実施したこと VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。
+ 
+  2. 環境 ・VPNソフトウェア：SoftEther VPN プロジェクト - SoftEther VPN プロジェクト
+・メモリ：１GB
+・CPU：仮想２コア
+・HDD：100GB
+・OS：CentOS7
+・サーバ仮想化：Vagrant(Utuntu13)
+ 3. SoftEtherのインストール インストール手順は公式ドキュメント通りなので簡単にコマンドのみ記述しておく。
+7.3 Linux へのインストールと初期設定 - SoftEther VPN プロジェクト
+【ダウンロードしたもの】
+ここから環境に応じて対象のソフトウェアを選ぶ
+SoftEther ダウンロード センター
+・コンポーネント：SoftEther VPN Server
+・プラットフォーム：Linux
+・CPU：Intel x86 / AMD64(64bit)
+## ダウンロード $ wget ttp://jp.softether-download.com/files/softether/v4.08-9449-rtm-2014.06.08-tree/Linux/SoftEther%20VPN%20Server/64bit%20-%20Intel%20x64%20or%20AMD64/softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz ## 解凍 $ tar zxvf softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz ## 実行可能ファイル作成 $ cd vpnserver/ $ sudo make ## /usr/localへ配置 $ sudo mv vpnserver /usr/local ## パーミッション変更 ### 基本的には600。実行ファイルのみ700 $ cd /usr/local/vpnserver $ sudo chown root:root .</description>
+    </item>
+    
+    <item>
+      <title>Ansible, sudoパスワード要求を忘れただけでめんどくなる</title>
+      <link>https://blog.mosuke.tech/entry/2014/11/28/001748/</link>
+      <pubDate>Fri, 28 Nov 2014 00:17:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2014/11/28/001748/</guid>
+      <description>AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&amp;hellip;
+と思ったところである初歩的な罠にハマった。
+本番環境へPalybook実行！！
+$ ansible-playbook playbook.yml -i hosts  あれ、GATHERING FACTSで10分以上も待たされた&amp;hellip;
+しかも、エラー出た&amp;hellip;
+GATHERING FACTS failed to parse [ sudo via ansible, key= ..... ]  sudoできていない&amp;hellip;？
+playbook内のsudo: yesを外して実行。
+GATHERING FACTSは通過。
+しかし、当たり前だがsudo で実行すべき部分で失敗&amp;hellip;
+とても単純なことに気づいた&amp;hellip;
+・Vagrant環境ではsudoのパスワードを要求されない
+・本番環境はsudoのパスワードを要求されること
+・sudoのパスワードを入力するようにしていなかったこと
+というわけで-Kをつけて実行
+$ ansible-playbook playbook.yml -i hosts -K  うまくいった&amp;hellip;
+完全なる私のミスなんだが、ただ-Kオプションを忘れるだけで、一回の実行に10分ほども待たされるのは…。
+しかもGATHERING FACTSで止まっているときはCtl+Cで中断も聞かなかった。
+要注意ですね。。。
+ちなみに、こんな方法で解決もできる。
+sudoのパスワードを聞かれなくして対応。
+# visudo user_name ALL=(ALL) NOPASSWD: ALL</description>
+    </item>
+    
+    <item>
+      <title>Ansible、コマンドでワイルドカードを使うときの注意</title>
+      <link>https://blog.mosuke.tech/entry/2014/11/18/225542/</link>
+      <pubDate>Tue, 18 Nov 2014 22:55:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2014/11/18/225542/</guid>
+      <description>AnsibleのPlaybookを書いていると、ワイルドカードを含んだコマンドを実行したい時がある。
+そんなときあるところでハマった。
+Apacheをソースインストールして、パスを/usr/sbinにリンクを貼ろうとして以下を実行した。
+- command: ln -s /usr/local/httpd/bin/* /usr/sbin  /usr/sbin内に「*」というリンクが貼られてしまった。
+* -&amp;gt; /usr/local/httpd/bin  どうやらcommandモジュールはワイルドカードに対応していないよう。
+ワイルドカードを使いたいときはshellモジュールを利用すると良い。
+- shell: ln -s /usr/local/httpd/bin/* /usr/sbin  また、*というリンクを消すときは要注意（笑）
+$ rm ./*  とやってしまうとあたりまえだがやばいので
+$ rm ./¥*  こうですね…</description>
+    </item>
+    
+    <item>
+      <title>Ansible、ソースインストールする際のPalybookの書き方</title>
+      <link>https://blog.mosuke.tech/entry/2014/11/16/153223/</link>
+      <pubDate>Sun, 16 Nov 2014 15:32:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2014/11/16/153223/</guid>
+      <description>最近、Ansibleを使い始めたのだが、yumやapt-getでインストールできるものはいいけど、
+どうしてもソースインストールが必要な場合がある。
+ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。
+まず、あたりまえだが、ソースインストールを行うには以下のフローを踏まなければいけな。
+1. ソースファイルの取得(tarで固められていると仮定)
+2. tarファイルの解凍
+3. 解答してできたディレクトリへ移動
+4. configure
+5. make
+6. make install
+また、Ansibleでは何回もPlaybookを実行していくため、
+すでにインストールされている場合は、インストールをスキップする必要がある。
+yumやapt-getで管理されていれば上記を心配することはないのだが、やはりソースインストールだとこの壁がある。
+※パッケージ化しろよ！というツッコミは禁止
+今回は例として、ubuntu13にemacsをソースインストールするのを例としてみた。
+環境 【Ansible実行側】
+さくらVPSの1G
+OS: Centos 7
+IPアドレス:192.168.33.1
+【設定対象側】
+上記さくらVPS上にたてたVagrantの仮想サーバ
+OS: Ubuntu 13.10
+IPアドレス:192.168.33.100
+ Playbook 以下playbookの例。
+--- - hosts: 192.168.33.100 user: vagrant sudo: yes vars: src_dir: /usr/local/src emacs_ver: emacs-23.4 tasks: ## emacsのソースファイルを取得済みか確認 - name: check exist emacs source file command: ls -l {{src_dir}}/{{emacs_ver}}.tar.gz ignore_errors: True register: result1 ## emacsのソースファイル取得。ただし、すでに取得済みならスキップ - name: get emacs source file command: chdir={{src_dir}} wget http://mirror.</description>
+    </item>
+    
+    <item>
+      <title>【VPS1台でインフラ勉強】多段SSH設定（おまけ）</title>
+      <link>https://blog.mosuke.tech/entry/2014/11/09/172745/</link>
+      <pubDate>Sun, 09 Nov 2014 17:27:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2014/11/09/172745/</guid>
+      <description>VPS1台でインフラ勉強の会で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てたが、
+仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければならない。
+これが面倒だったので多段SSHの設定をして、一発でSSH接続できるようにした。
+以下の図で言うと、web10, web11(192.168.33.10&amp;frasl;11)に一発でSSHできるようにする。
+
+クライアントPC側に以下の設定をした。
+$ vim ~/.ssh/config host gateway HostName xxxxx.xxx User username Host web10 HostName 192.168.33.10 User vagrant ProxyCommand ssh -W %h:%p gateway Host web11 HostName 192.168.33.11 User vagrant ProxyCommand ssh -W %h:%p gateway ##これで以下で接続可能 $ ssh web10 $ ssh web11  簡単でした。</description>
+    </item>
+    
+    <item>
+      <title>【VPS1台でインフラ勉強】HAProxyでロードバランサーを構築</title>
+      <link>https://blog.mosuke.tech/entry/2014/11/09/171436/</link>
+      <pubDate>Sun, 09 Nov 2014 17:14:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2014/11/09/171436/</guid>
+      <description>前回の【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築に続き、同様の環境を用いて、ロードバランサ構築を行った。
+ロードバランサの構築にはHAProxyを利用した。
+1. 環境 前回同様で、さくらVPSの1GBのプラン1台のみ。
+・メモリ：１GB
+・CPU：仮想２コア
+・HDD：100GB
+・OS：CentOS7
+・サーバ仮想化：Vagrant(Utuntu13)
+・ロードバランサ：HAProxy - The Reliable, High Performance TCP/HTTP Load Balancer
+ 2. 構成図 
+ 3. ロードバランサの構築 ■ホストサーバ側の設定
+#HAProxyインストール $ sudo yum install haproxy #設定はすごく簡単で以下のファイルのみ。実際に $ sudo vim /etc/haproxy/haproxy.cfg #--------------------------------------------------------------------- # Example configuration for a possible web application. See the # full configuration options online. # # http://haproxy.1wt.eu/download/1.4/doc/configuration.txt # #--------------------------------------------------------------------- #--------------------------------------------------------------------- # Global settings #--------------------------------------------------------------------- global log 127.0.0.1 local6 debug chroot /var/lib/haproxy pidfile /var/run/haproxy.</description>
+    </item>
+    
+    <item>
+      <title>自宅サーバ公開時などのDDNS、固定IPについて整理</title>
+      <link>https://blog.mosuke.tech/entry/2014/10/19/170854/</link>
+      <pubDate>Sun, 19 Oct 2014 17:08:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2014/10/19/170854/</guid>
+      <description>自宅サーバを公開するときに使うDDNSや固定IP。
+それが必要な理由について図解的にまとめ。それだけ。</description>
+    </item>
+    
+    <item>
+      <title>【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築</title>
+      <link>https://blog.mosuke.tech/entry/2014/10/09/230555/</link>
+      <pubDate>Thu, 09 Oct 2014 23:05:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2014/10/09/230555/</guid>
+      <description>ロードバランシングとかクラスタリングとかリバースプロキシとか、
+業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりない。
+自分で構築してみたいなーと思いつつもあたりまえだけど、サーバやネットワーク機器をそう簡単に調達もできない。
+お金も当然ない。
+というわけで、さくらVPSで仮想化つかってロードバランシングとかクラスタリングとかリバースプロキシとか勉強しましょうという「サーバインフラ会」を友人と始めた。
+その第１回目のメモ。
+第1回 サーバ複数台構成、Nginxでリバースプロキシ構築
+第2回 HAProxyでロードバランサ構築
+
+
+1. 使用した環境 まず今回利用した環境は以下のとおり。
+さくらVPSの1GBのプラン。
+・メモリ：１GB
+・CPU：仮想２コア
+・HDD：100GB
+・OS：CentOS7
+・仮想化：Vagrant
+→dockerなどもはじめ検討していたが、コンテナ型仮想化だとサーバ感がでないので、よりサーバとして意識できるVagrantを採用
+【参考】
+料金・サービス仕様 | VPS（仮想専用サーバ）は「さくらのVPS」
+ 2. 完成イメージ・物理イメージ 
+
+ 
+ 3. VagrantでWebサーバ２台分を構築する Vagrantの詳細な利用方法は公式ドキュメントをみてもらうとするが、セットアップまでのひととおりの流れと注意点のみ記載する。
+Vagrant Documentation
+今回はWebサーバ２台を仮想で実現するので、それぞれweb1, web2とする。
+それぞれのディレクトリを作成。
+## web1, web2のディレクトリ作成 $ pwd /home/vagrant $ mkdir web1 $ mkdir web2 ## 仮想化で利用するOSイメージをダウンロード $ vagrant box add ubuntu1310 ¥ http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-13.10_chef-provisionerless.box ## web1サーバ構築 $ cd web1 $ vagrant init ubuntu1310 ## ほぼほぼデフォルトの設定だが以下２つだけは設定を行った。 $ vim Vagrantfile # (1)プライベートアドレスの割り当て。 config.</description>
+    </item>
+    
+  </channel>
+</rss>

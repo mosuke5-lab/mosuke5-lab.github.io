@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Dbマイグレーション on Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/db%E3%83%9E%E3%82%A4%E3%82%B0%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3/</link>
+    <description>Recent content in Dbマイグレーション on Goldstine研究所</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Wed, 17 Jun 2015 21:28:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://blog.mosuke.tech/categories/db%E3%83%9E%E3%82%A4%E3%82%B0%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>PostgreSQL環境でFuelPHPのDBマイグレーションを使う</title>
+      <link>https://blog.mosuke.tech/entry/2015/06/17/212852/</link>
+      <pubDate>Wed, 17 Jun 2015 21:28:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2015/06/17/212852/</guid>
+      <description>今更FuelPHP感はあるのだが、
+postgresql利用時のFuelPHPのmigration導入について、注意点をまとめた。
+でも、結論は納得がいっていない。
+0. 前提 下記の環境で行ったものです。
+PHP: 5.5.7
+FuelPHP: 1.7
+Postgresql: 9.4
+1. テーブル文字コードの問題 事象 公式サイトのサンプルの通りはじめにapp/migrations/001_example.phpを作り、migrationを実行した。
+app/migrations/001_example.phpの作成
+&amp;lt;?php namespace Fuel\Migrations; class Example { function up() { \DBUtil::create_table(&#39;posts&#39;, array( &#39;id&#39; =&amp;gt; array(&#39;type&#39; =&amp;gt; &#39;int&#39;, &#39;constraint&#39; =&amp;gt; 5), &#39;title&#39; =&amp;gt; array(&#39;type&#39; =&amp;gt; &#39;varchar&#39;, &#39;constraint&#39; =&amp;gt; 100), &#39;body&#39; =&amp;gt; array(&#39;type&#39; =&amp;gt; &#39;text&#39;), ), array(&#39;id&#39;)); } function down() { \DBUtil::drop_table(&#39;posts&#39;); } }  マイグレーション実行すると以下のエラーに襲われた。
+$ php oil refine migrate Uncaught exception Fuel\Core\Database_Exception: SQLSTATE[42601]: Syntax error: 7 ERROR: syntax error at or near &amp;quot;DEFAULT&amp;quot; LINE 5: )DEFAULT CHARACTER SET utf8; ^ with query: &amp;quot;CREATE TABLE IF NOT EXISTS &amp;quot;migration&amp;quot; ( &amp;quot;type&amp;quot; varchar(25) NOT NULL, &amp;quot;name&amp;quot; varchar(50) NOT NULL, &amp;quot;migration&amp;quot; varchar(100) DEFAULT &#39;&#39; NOT NULL )DEFAULT CHARACTER SET utf8;&amp;quot;  理由 しょっぱなから躓くわけだが…</description>
+    </item>
+    
+  </channel>
+</rss>

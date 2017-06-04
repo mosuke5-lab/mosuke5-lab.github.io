@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>スケールアウト on Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/%E3%82%B9%E3%82%B1%E3%83%BC%E3%83%AB%E3%82%A2%E3%82%A6%E3%83%88/</link>
+    <description>Recent content in スケールアウト on Goldstine研究所</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Wed, 04 Jan 2017 22:35:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://blog.mosuke.tech/categories/%E3%82%B9%E3%82%B1%E3%83%BC%E3%83%AB%E3%82%A2%E3%82%A6%E3%83%88/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>クラウド上でのWordPressのスケールアウトを考える</title>
+      <link>https://blog.mosuke.tech/entry/2017/01/04/223544/</link>
+      <pubDate>Wed, 04 Jan 2017 22:35:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2017/01/04/223544/</guid>
+      <description>複数台サーバでのWordPressの構築・運用について考える。
+実際に、とあるクラウドで分散環境のWordPressを構築したのでその知見をまとめる。
+なるべく特定のクラウドに特価しないものとして記載したい。
+やりたいこと  スケールアウトできるWordPress環境を作る  SSLに対応する HTTP/2に対応する  AWSなどのクラウド環境で構築する  アーキテクチャ まず先に全体のアーキテクチャ図から示す。
+これから各項目について解説していく。
+
+ SSL・HTTP/2への対応 まずSSLへの対応だが、通常ならばロードバランサをSSLの終端とし下記のような構成にすることが多いだろう。
+この場合はロードバランサをL7のものとして稼働させる。
+
+しかし、HTTP/2に対応しようと思うと事情は異なってくる。
+（もちろん、最近ではAWSのALBのようにHTTP/2に対応する製品がでてきているのは承知だが。）
+現在のパブリッククラウドで利用できるロードバランサの多くはまだHTTP/2に対応していない。
+そのため、ロードバランサをL4として稼働させ、配下のWebサーバにてHTTP/2を処理する必要がでてくる。
+この場合、ロードバランサはTCPでポート443を待ち受けるようにし、配下のWebサーバへポート443のままでフォワードすればいい。
+
+クラウド環境ではWebサーバがスケールすることは前提にいれることがおおい。
+そのため、この場合のSSL証明書はN台に対応した製品を買う必要がある。
+例えば以下のような製品など。
+ SureServer for クラウド｜Cybertrust.ne.jp  データベースの分離 分散環境でのWordpressでは共通したコンテンツを配信するため、データベースはもちろんWebサーバとは分離したほうがいい。
+それぞれのWebサーバは共通のデータベースを見に行くべきだ。
+データベースを自前で冗長化しても構わないが、それなりの運用コストがかかることは容易に想像がつくので、
+クラウドのマネージドデータベースサービスを利用した。
+ Amazon RDS（クラウドでのリレーショナルデータベースサービス） | AWS ApsaraDB for RDS - データベースホスティング | Alibaba Cloud  管理画面 管理画面のみを分離するアーキテクチャも考えられるが、ここではそうしないこととする。
+管理画面へのログインセッションの保持は、別途KVS(RedisやMemcached)に保存してもいいと思う。
+ですが、WordPress4.0以降ではデフォルトではMySQLへセッションを保存するので必須の対応ではないといえる。
+github.com
+記事で使うアップロード画像などの対応 管理画面から記事を投稿するとする。
+記事のデータはデータベースに保存されるためどのWebサーバからも記事を参照できる。
+しかし、記事に含まれる画像データはどうだろうか。
+通常のWordpressでは管理画面サーバの/wp-content/uploads以下に画像を保存する。
+複数台Webサーバがある状態で、たまたまアクセスしているサーバに画像を保存しても、他のサーバからは参照することができない。
+これに対するソリューションはいくつかあるだろう。
+例えば、rsyncなどを使って他のサーバと画像ファイルを同期するとか、画像用のストレージを用意しNFSで参照するとか。
+冗長化の観点からもここはオブジェクトストレージのサービスを利用するのがいいだろう。
+例えば、下記のような製品だ。</description>
+    </item>
+    
+  </channel>
+</rss>

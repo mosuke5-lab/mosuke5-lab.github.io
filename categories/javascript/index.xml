@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Javascript on Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/javascript/</link>
+    <description>Recent content in Javascript on Goldstine研究所</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Sat, 13 Jun 2015 23:19:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://blog.mosuke.tech/categories/javascript/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Ajaxの嫌いだった部分をJsRenderで心地良くした</title>
+      <link>https://blog.mosuke.tech/entry/2015/06/13/231917/</link>
+      <pubDate>Sat, 13 Jun 2015 23:19:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2015/06/13/231917/</guid>
+      <description>1. はじめに
+ぼくはフロントエンドは本業ではありません。
+jsはあまり好きではありません。
+そしてAjax通信後にhtmlをアウトプットする際にjsの変数の中にhtmlを書いていくソースコードがもっと好きではありません。(後述)
+それをJSテンプレートエンジンを使ってシンプルにしてみたって話です。 （JsRenderの使い方を書いたものではありません。）
+2. Ajaxが嫌いだった理由 Ajaxはユーザ体感的にはいいのだけれど、
+Ajaxの結果受け取ったjsonなどのデータを使ってhtmlを出力とかやるとソースコードが煩雑になるので嫌いだった。
+例としてAjaxで/xxxxxにリクエストを投げて、その結果(jsonデータ)を使ってhtmlを出力するものを考えると。
+/* jsonデータは下記が返ってくるとする [ { id: &#39;1&#39;, name: &#39;らーめん&#39;, text: &#39;らーめんはやっぱり濃厚鶏そばです。&#39; }, { id: &#39;2&#39;, name: &#39;うどん&#39;, text: &#39;うどんはやっぱり釜揚げうどんです。&#39; } ] */ $.ajax({ type: &amp;quot;GET&amp;quot;, url: &amp;quot;/xxxxx&amp;quot;, dataType: &amp;quot;json&amp;quot;, success: function(data){ var html = &#39;&#39;; data.forEach(function (e) { html += &#39;&amp;lt;div id=&amp;quot;&#39; + e.id + &#39;&amp;quot;&amp;gt;&#39;; html += &#39;&amp;lt;h1&amp;gt;&#39; + e.name + &#39;&amp;lt;/h1&amp;gt;&#39;; html += &#39;&amp;lt;p&amp;gt;&#39; + e.text + &#39;&amp;lt;/p&amp;gt;&#39;; html += &#39;&amp;lt;/div&amp;gt;&#39;; }); $(&amp;quot;#result&amp;quot;).</description>
+    </item>
+    
+  </channel>
+</rss>

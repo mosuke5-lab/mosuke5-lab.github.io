@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Db on Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/db/</link>
+    <description>Recent content in Db on Goldstine研究所</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Wed, 16 Mar 2016 17:54:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://blog.mosuke.tech/categories/db/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>DBのViewの使いどころの検討</title>
+      <link>https://blog.mosuke.tech/entry/2016/03/16/175431/</link>
+      <pubDate>Wed, 16 Mar 2016 17:54:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2016/03/16/175431/</guid>
+      <description>ある実装についてどのように実装するか悩んだ。
+その悩んだ過程や実装案をメモする。似たようなケースの実装案として参考になればと思う。
+状況 ある申請に対して、検査Aと検査Bを行い、その検査状態・検査日時を管理・閲覧するシステムがあるとする。 申請のテーブルは下記とする。
+ id: int name: varchar(20) # どうでもいいので無視していい check_a: datetime # 検査すると実施した日時がはいる check_b: datetime # 検査すると実施した日時がはいる  UIとして下記のように表示したいと考えている。
+   番号 状態 名前 検査A 検査B     1 検査完了 xxxxxx 2016/03/01 10:00  2016/03/01 12:00   2 検査未完了 xxxxxx -  -    3 検査途中 xxxxxx 2016/03/01 13:00  -    4 検査途中 xxxxxx -  2016/03/01 15:00     ※SQLアンチパターンだろ！？ そもそもSQLアンチパターンの「マルチカラムアトリビュート」じゃないの？と思うかもしれない。</description>
+    </item>
+    
+  </channel>
+</rss>

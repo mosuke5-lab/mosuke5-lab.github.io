@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Nginx on Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/nginx/</link>
+    <description>Recent content in Nginx on Goldstine研究所</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Tue, 26 Jul 2016 21:59:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://blog.mosuke.tech/categories/nginx/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>【めも】httpヘッダー、x-forwarded-forとか任意のヘッダーとか</title>
+      <link>https://blog.mosuke.tech/entry/2016/07/26/215939/</link>
+      <pubDate>Tue, 26 Jul 2016 21:59:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2016/07/26/215939/</guid>
+      <description>ただのめも。
+もともとApache+PHPで動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになった。（理由はここではどうでもいいので書かない）
+つまり、Nginx-&amp;gt;Apache-&amp;gt;PHPという構成になった。
+よくあることだが、Apacheからみるとすべてリバースプロキシから通信がきているので、 接続元のIPアドレスがすべてリバースプロキシのものになる。
+HTTPヘッダーに接続元のIPアドレスを追加しアプリ側（PHP）で受け取ろうとしたときのめも。
+リバースプロキシ側でHTTPヘッダー追加 まず、そもそもデフォルトのNginxの設定では接続元のIPアドレスをHTTPヘッダーに含まれない。
+ググればすぐに設定方法自体はでてくる。
+X-Forwarded-Forというヘッダー名にNginxでもっている変数$proxy_add_x_forwarded_forをつっこむ。
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  設定は簡単なんだけど、そもそもX-Forwarded-Forなんていうヘッダーあったっけ。。。？
+Wikipediaでみる。
+X-Forwarded-For (XFF) とは、HTTPヘッダフィールドの一つ。HTTPプロキシサーバまたは負荷分散装置（ロードバランサ）を経由してウェブサーバに接続するクライアントの送信元IPアドレスを特定する際のデファクトスタンダードである。 （略）RFCの標準的なヘッダフィールドではないが、IETFのネットワーク作業部会 (Network Working Group) は2011年10月より同種のHTTPヘッダForwardedの標準化作業を開始した[1]。
+ なるほど、RFCの標準ではないけど、一般的なものなんですね。
+ phpでX-Forwarded-Forを受け取る というわけで、おりゃ！
+echo $_SERVER[&#39;X-Forwarded-For&#39;];  エラー...
+※普段PHP使ってないのがバレますね。
+サーバ変数とりあえず、全部はきだす。
+&amp;lt;?php var_dump($_SERVER); # array(x) { [&amp;quot;HTTP_X_FORWARDED_FOR&amp;quot;] =&amp;gt; string(12) &amp;quot;192.168.33.1&amp;quot; ...... }  HTTP先頭についてて、大文字になってて、ハイフンがアンスコに変わっている。
+あたりまえだけどこれはPHPの仕様でいいんだよな...？
+&amp;lt;?php var_dump(getallheaders()); # array(x) { [&amp;quot;X-Forwarded-For&amp;quot;] =&amp;gt; string(12) &amp;quot;192.168.33.1&amp;quot; ...... }  サーバ変数にいれるときに、変わるんだわ。
+念のためtcpdumpで軽く確認してみる $ sudo yum install tcpdump $ tcpdump dst port 80 -X # ながいんで適当に端折りました 11:04:01.</description>
+    </item>
+    
+    <item>
+      <title>Nginxの仕組みについて入門</title>
+      <link>https://blog.mosuke.tech/entry/2016/06/04/180122/</link>
+      <pubDate>Sat, 04 Jun 2016 18:01:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2016/06/04/180122/</guid>
+      <description>普段Nginxを使ってはいるものの、その仕組やなぜNignxを使うべきなのかというところがあまりわかっていなかったので、 改めてNginxを入門しその仕組などについて調べてみた。
+勉強不足もあって、間違ってることもあるかもしれないがその際は教えて下さい。
+1. C10K問題 まず、Nginxを理解する上でC10K問題について知る必要がある。
+C10K問題とは下記の問題のことだ。
+ハードウェアの性能上は問題がなくても、クライアント数があまりにも多くなるとサーバがパンクする問題のこと。 C は「Client（クライアント）」の頭文字、10K は「1 万台」を意味する。「クライアント 1 万台問題」ともいわれる。
+（C10K 問題とは - はてなキーワード より引用）
+ 2. 従来のWebサーバのアーキテクチャ  prefork Apacheのデフォルトのアーキテクチャなどで採用されている。
+特徴としては、１リクエストに対して１プロセスが処理する。
+すなわち同時接続が 1000であれば 1000個のプロセスが必要となる。
+
+worker リクエストはスレッドが処理する。
+スレッドは１プロセスのなかで複数立ち上げることができる。
+プロセス数は少なくて済むが、同時接続が1000であれば1000個のスレッドが必要となる。
+Apacheで指定可能なアーキテクチャの１つ。
+
+いずれにしても、1000の同時接続があれば、1000のプロセスやスレッドが必要ということだ。
+プロセス/スレッド数が多くなってくると「コンテキストスイッチ」が多く発生し、処理が遅くなってしまう。
+ コンテキストスイッチとは コンテキストスイッチとは、コンピュータの処理装置（CPU）が現在実行している処理の流れ（プロセス、スレッド）を一時停止し、別のものに切り替えて実行を再開すること。
+（コンテキストスイッチとは｜コンテキストスイッチング｜context switch - 意味/定義 ： IT用語辞典 より引用）
+ 3. Nginxのアーキテクチャ  NginxがC10K 問題を解決するために開発されたともいわれている。
+上記のような課題を解決するようなアーキテクチャを採用している。
+
+ワーカプロセスがリクエストを処理する。
+前述のpreforkやworkerと決定的に違うところは、１つのワーカプロセスが複数のリクエストを処理するということだ。
+また、マスタープロセスはワーカプロセスの立ち上げや、制御、管理などが主な仕事。
+Nginxを終了あるいは再起動、設定ファイルを再読み込みして変更を反映するなど。
+下記のような仕組みがNginxの高速化（C10K問題対応）を可能としている。
+シングルスレッド 接続ごとにプロセスやスレッドを立ち上げていては、C10K問題に対応できない。
+そこで、Nginxは１つのスレッドで処理を行うようにしている。
+それにより、コンテキストスイッチと呼ばれるCPUの切り替え処理が発生しない。
+正確に言うと、完全に１スレッドで処理するわけではなく図にあるようにワーカプロセス自体はマルチプロセス化できる。
+イベント駆動 通常のプログラムは上から書かれた順に実行されますよね。
+イベ ント駆動で動作するプログラムは何かしらのイベントが発生するまで待機し、発生したイベントの種類に応じて実行される。</description>
+    </item>
+    
+    <item>
+      <title>【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築</title>
+      <link>https://blog.mosuke.tech/entry/2014/10/09/230555/</link>
+      <pubDate>Thu, 09 Oct 2014 23:05:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2014/10/09/230555/</guid>
+      <description>ロードバランシングとかクラスタリングとかリバースプロキシとか、
+業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりない。
+自分で構築してみたいなーと思いつつもあたりまえだけど、サーバやネットワーク機器をそう簡単に調達もできない。
+お金も当然ない。
+というわけで、さくらVPSで仮想化つかってロードバランシングとかクラスタリングとかリバースプロキシとか勉強しましょうという「サーバインフラ会」を友人と始めた。
+その第１回目のメモ。
+第1回 サーバ複数台構成、Nginxでリバースプロキシ構築
+第2回 HAProxyでロードバランサ構築
+
+
+1. 使用した環境 まず今回利用した環境は以下のとおり。
+さくらVPSの1GBのプラン。
+・メモリ：１GB
+・CPU：仮想２コア
+・HDD：100GB
+・OS：CentOS7
+・仮想化：Vagrant
+→dockerなどもはじめ検討していたが、コンテナ型仮想化だとサーバ感がでないので、よりサーバとして意識できるVagrantを採用
+【参考】
+料金・サービス仕様 | VPS（仮想専用サーバ）は「さくらのVPS」
+ 2. 完成イメージ・物理イメージ 
+
+ 
+ 3. VagrantでWebサーバ２台分を構築する Vagrantの詳細な利用方法は公式ドキュメントをみてもらうとするが、セットアップまでのひととおりの流れと注意点のみ記載する。
+Vagrant Documentation
+今回はWebサーバ２台を仮想で実現するので、それぞれweb1, web2とする。
+それぞれのディレクトリを作成。
+## web1, web2のディレクトリ作成 $ pwd /home/vagrant $ mkdir web1 $ mkdir web2 ## 仮想化で利用するOSイメージをダウンロード $ vagrant box add ubuntu1310 ¥ http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-13.10_chef-provisionerless.box ## web1サーバ構築 $ cd web1 $ vagrant init ubuntu1310 ## ほぼほぼデフォルトの設定だが以下２つだけは設定を行った。 $ vim Vagrantfile # (1)プライベートアドレスの割り当て。 config.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Gem on Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/gem/</link>
+    <description>Recent content in Gem on Goldstine研究所</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Sun, 06 Mar 2016 14:05:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://blog.mosuke.tech/categories/gem/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>【錦織圭も分析】ATP TennisのデータスクレイパーGem作った</title>
+      <link>https://blog.mosuke.tech/entry/2016/03/06/140531/</link>
+      <pubDate>Sun, 06 Mar 2016 14:05:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2016/03/06/140531/</guid>
+      <description>背景
+このブログは基本的に技術ブログとしてやっているので、
+テニスの話題ははじめてだが、テニスがすごく好きだ。 特に、プロの試合の観戦はとても好きだ。
+2005年からずーっと見てて、欠かさずすべての試合結果はチェックしている。
+数年前から、テニス選手をある指標から分析したいなと思っていた。 例えば、
+ ランキングは高くないけど、爆発するとトップ選手に勝つ力を持っているかどうか 自分より格下の選手に負けることが少ないかどうか 小さい大会ではあまり勝てないけど、大舞台で勝てる選手かどうか  これから伸びそうな選手かどうかなどをデータ的にみたかった。
+ATPの公式サイトにもいくつか統計情報が載っているが、自分が大事と思う指標で分析したいと思っていた。
+まずは、データを取得しなければいけないので、それでスクレイピングのライブラリを作るにいたった。
+AtpScraper AtpScraperは男子のプロテニスの公式サイトである、ATPのサイトから情報をスクレイピングしてくれるRubyライブラリだ。
+github.com
+現時点では、ぼくが今欲している機能しか実装していないが、下記ができる。
+ シングルスのランキングの取得 プレイヤーの対戦レコードの取得  一例だが、どんなふうに利用できるかのせる。
+シングルスのランキング取得 デフォルトだとトップ100のランキングを取得する。
+pry(main)&amp;gt; AtpScraper::Get.singles_ranking =&amp;gt; [{:ranking=&amp;gt;&amp;quot;1&amp;quot;, :player_name=&amp;gt;&amp;quot;Novak Djokovic&amp;quot;, :player_url_name=&amp;gt;&amp;quot;novak-djokovic&amp;quot;, :player_id=&amp;gt;&amp;quot;d643&amp;quot;, :points=&amp;gt;&amp;quot;16580&amp;quot;}, {:ranking=&amp;gt;&amp;quot;2&amp;quot;, :player_name=&amp;gt;&amp;quot;Andy Murray&amp;quot;, :player_url_name=&amp;gt;&amp;quot;andy-murray&amp;quot;, :player_id=&amp;gt;&amp;quot;mc10&amp;quot;, :points=&amp;gt;&amp;quot;8765&amp;quot;}, {:ranking=&amp;gt;&amp;quot;3&amp;quot;, :player_name=&amp;gt;&amp;quot;Roger Federer&amp;quot;, :player_url_name=&amp;gt;&amp;quot;roger-federer&amp;quot;, :player_id=&amp;gt;&amp;quot;f324&amp;quot;, :points=&amp;gt;&amp;quot;8295&amp;quot;}, (略)  下記のようにすれば、50位から60位のランキングを取得できる。
+（※引数の指定の仕方がアレなのは突っ込まないこと）
+pry(main)&amp;gt; AtpScraper::Get.singles_ranking(&amp;quot;50-60&amp;quot;) =&amp;gt; [{:ranking=&amp;gt;&amp;quot;50&amp;quot;, :player_name=&amp;gt;&amp;quot;Lukas Rosol&amp;quot;, :player_url_name=&amp;gt;&amp;quot;lukas-rosol&amp;quot;, :player_id=&amp;gt;&amp;quot;r685&amp;quot;, :points=&amp;gt;&amp;quot;897&amp;quot;}, {:ranking=&amp;gt;&amp;quot;51&amp;quot;, :player_name=&amp;gt;&amp;quot;Federico Delbonis&amp;quot;, :player_url_name=&amp;gt;&amp;quot;federico-delbonis&amp;quot;, :player_id=&amp;gt;&amp;quot;d874&amp;quot;, :points=&amp;gt;&amp;quot;895&amp;quot;}, (略)   錦織圭の対戦レコード取得 錦織圭の2016年の対戦レコードを見たいと思えば下記のように取得できる。</description>
+    </item>
+    
+  </channel>
+</rss>

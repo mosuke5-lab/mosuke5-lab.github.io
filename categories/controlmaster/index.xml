@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Controlmaster on Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/controlmaster/</link>
+    <description>Recent content in Controlmaster on Goldstine研究所</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Tue, 01 Dec 2015 18:13:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://blog.mosuke.tech/categories/controlmaster/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Ansible、実行速度高速化の実験。ControlMasterとPipeliningについて</title>
+      <link>https://blog.mosuke.tech/entry/2015/12/01/181304/</link>
+      <pubDate>Tue, 01 Dec 2015 18:13:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2015/12/01/181304/</guid>
+      <description>1. はじめに
+Vim::Factoryの開発や、仕事などでAnsibleを使うことが多いのだが、
+その実行速度があまりでないことに不満をもっていて、どうしたら早くできるか考えていました。
+調べると、ControlMasterを利用してSSHのコネクションを再利用するとか、pipelineの機能を利用するとかでてくる。
+が、それによってどのくらいの効果が得られるのかよくわからないし、仕組みもよくわかっていなかったので、仕組みの理解と実行速度の実験をした。
+もう少し余談をすると、
+ControlMasterを有効にすれば早くなることは前から知っていたが、
+最近MacをEl Capitanに変えてから「なんか最近Ansibleはやいな〜」とか思っていて、
+「OpenSSHのバージョンもあがったし、まさか。。。」と思って今にいきついている。
+ControlMasterについて OpenSSH は、1 つの接続で複数のセッションを共有する(束ねる)「コントロール マスター」と呼ばれる機能を持っています。コントロールマスターを使用すると、 リモートホストに接続する最初のセッションは制御用のセッション(マスターセッショ ンと呼ばれます)として利用され、制御用のソケットを作成します。セッションを 共有する SSH クライアントは、この制御用のソケットを通じてリモートホストと 接続し通信を行います。
+出典：「OpenSSH実践入門」
+ 上記のように、１つの接続で複数のセッションを共有するため、
+Ansibleのようにタスク実行ごとにSSH接続するような場合には大きな効果を得ることができる。
+Pipeliningについて Pipelining機能の説明の前に、軽くAnsibleの実行までの流れを説明する。
+Ansibleは対象サーバにSSHログインしたあと実行するタスクのモジュールをファイルとして転送しそれを実行する。
+Pipelining機能をなしの状態だと、このファイル転送とファイルの削除を１タスクごとに行う。
+ansibleを-vvvvオプションをつけて実行するとわかるが、
+４行目でファイルのPUT（転送）を、５行目の最後の方にrm -rfでディレクトリ・ファイルの削除を行っている。
+&amp;lt;192.168.33.100&amp;gt; ESTABLISH CONNECTION FOR USER: deploy &amp;lt;192.168.33.100&amp;gt; REMOTE_MODULE command ls -l /root &amp;lt;192.168.33.100&amp;gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&amp;quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&amp;quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c &#39;mkdir -p $HOME/.</description>
+    </item>
+    
+  </channel>
+</rss>

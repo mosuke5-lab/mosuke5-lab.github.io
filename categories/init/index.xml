@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Init on Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/init/</link>
+    <description>Recent content in Init on Goldstine研究所</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Sun, 22 Feb 2015 21:13:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://blog.mosuke.tech/categories/init/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Ruby, thin(bundler利用)を使った環境でのアプリの自動起動設定</title>
+      <link>https://blog.mosuke.tech/entry/2015/02/22/211316/</link>
+      <pubDate>Sun, 22 Feb 2015 21:13:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2015/02/22/211316/</guid>
+      <description>bunlderを使ったWebアプリをプロダクション環境で動かすときに、アプリの起動をどうやって実現しているだろうか。
+Apache Passengerを使う場合には、Apacheの起動がアプリの起動につながるので、 アプリの起動はあまり気にしなかったかもしれない。
+しかし、例えばNginx × Unicorn/thinの構成などの場合はUnicornやthinの起動もしなければいけなくなってくる。
+（あるいはこのようなケースがあるかは謎だが、Unicornやthinを単体で動かそうとしている場合など）
+Unicornやthin（例ではthinを扱うが本質は同じ）の自動起動を実現する際の勘所、注意事項をまとめた。
+0. 前提  CentOS6.5上でRubyでのWebアプリケーションを作っている。  アプリケーションサーバはthinを利用している。 また、gemパッケージ管理にbundlerを利用している。  1. 開発環境でよくするアプリの起動 開発環境では、アプリケーションのログの閲覧性なども兼ねて以下のようにアプリを起動していた。
+$ bundle exec rackup $ bundle exec thin start  でも、これではいつまでたってもプロダクション環境での利用はできません。
+2. 上記方法ではプロダクション環境で利用できない理由 当然のことながら、プロダクション環境ではいちいち手動でコマンドを実行しアプリケーションを立ち上げるわけにはいかない。
+例えば、なんらかの理由でサーバが再起動してしまった場合には、
+このままではアプリケーションが自動的に立ち上がらないため、サービスの停止につながってしまう。
+ではどうするのか？
+以下の状態であることがプロダクション環境では理想なのではないだろうか？
+ オリジナルアプリケーションもserviceコマンドで起動・停止ができる  他のサービスと同様の操作方法が可能なのでわかりやすい   サーバ立ち上げ時にサービスが自動で起動される  3. 起動スクリプトを作ろう 上記の状態にもっていくためには、起動スクリプトを作らなければならない。
+起動スクリプトを作る…！？
+「作ったことないし、すぐには作れないよ〜」って思うかもしれないが、
+サンプルはたくさんあるし、よく見てみるとそれほど難しくはない。
+thinを使ったサンプルを探そうと思うと数は少ないが、Unicornも同じ仕組なので、 &#34;unicorn init script&#34;なんて検索をかけてもいろいろでてくるのでおすすめ。
+参考ししたもの
+https://gist.github.com/sbeam/3454488
+上を参考にしながら、こんな起動スクリプトを作ってみた。（未完成版）
+これを/etc/init.d以下へ配置する。
+#!/bin/bash ### BEGIN CHKCONFIG INFO # chkconfig: 2345 55 25 # description: sample-app ### END CHKCONFIG INFO SCRIPT_NAME=/etc/init.</description>
+    </item>
+    
+  </channel>
+</rss>

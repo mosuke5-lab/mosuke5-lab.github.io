@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ロードバランサ on Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/%E3%83%AD%E3%83%BC%E3%83%89%E3%83%90%E3%83%A9%E3%83%B3%E3%82%B5/</link>
+    <description>Recent content in ロードバランサ on Goldstine研究所</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Sun, 09 Nov 2014 17:14:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://blog.mosuke.tech/categories/%E3%83%AD%E3%83%BC%E3%83%89%E3%83%90%E3%83%A9%E3%83%B3%E3%82%B5/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>【VPS1台でインフラ勉強】HAProxyでロードバランサーを構築</title>
+      <link>https://blog.mosuke.tech/entry/2014/11/09/171436/</link>
+      <pubDate>Sun, 09 Nov 2014 17:14:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2014/11/09/171436/</guid>
+      <description>前回の【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築に続き、同様の環境を用いて、ロードバランサ構築を行った。
+ロードバランサの構築にはHAProxyを利用した。
+1. 環境 前回同様で、さくらVPSの1GBのプラン1台のみ。
+・メモリ：１GB
+・CPU：仮想２コア
+・HDD：100GB
+・OS：CentOS7
+・サーバ仮想化：Vagrant(Utuntu13)
+・ロードバランサ：HAProxy - The Reliable, High Performance TCP/HTTP Load Balancer
+ 2. 構成図 
+ 3. ロードバランサの構築 ■ホストサーバ側の設定
+#HAProxyインストール $ sudo yum install haproxy #設定はすごく簡単で以下のファイルのみ。実際に $ sudo vim /etc/haproxy/haproxy.cfg #--------------------------------------------------------------------- # Example configuration for a possible web application. See the # full configuration options online. # # http://haproxy.1wt.eu/download/1.4/doc/configuration.txt # #--------------------------------------------------------------------- #--------------------------------------------------------------------- # Global settings #--------------------------------------------------------------------- global log 127.0.0.1 local6 debug chroot /var/lib/haproxy pidfile /var/run/haproxy.</description>
+    </item>
+    
+  </channel>
+</rss>

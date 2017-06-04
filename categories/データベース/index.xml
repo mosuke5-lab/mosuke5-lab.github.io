@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>データベース on Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9/</link>
+    <description>Recent content in データベース on Goldstine研究所</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Wed, 16 Mar 2016 17:54:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://blog.mosuke.tech/categories/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>DBのViewの使いどころの検討</title>
+      <link>https://blog.mosuke.tech/entry/2016/03/16/175431/</link>
+      <pubDate>Wed, 16 Mar 2016 17:54:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2016/03/16/175431/</guid>
+      <description>ある実装についてどのように実装するか悩んだ。
+その悩んだ過程や実装案をメモする。似たようなケースの実装案として参考になればと思う。
+状況 ある申請に対して、検査Aと検査Bを行い、その検査状態・検査日時を管理・閲覧するシステムがあるとする。 申請のテーブルは下記とする。
+ id: int name: varchar(20) # どうでもいいので無視していい check_a: datetime # 検査すると実施した日時がはいる check_b: datetime # 検査すると実施した日時がはいる  UIとして下記のように表示したいと考えている。
+   番号 状態 名前 検査A 検査B     1 検査完了 xxxxxx 2016/03/01 10:00  2016/03/01 12:00   2 検査未完了 xxxxxx -  -    3 検査途中 xxxxxx 2016/03/01 13:00  -    4 検査途中 xxxxxx -  2016/03/01 15:00     ※SQLアンチパターンだろ！？ そもそもSQLアンチパターンの「マルチカラムアトリビュート」じゃないの？と思うかもしれない。</description>
+    </item>
+    
+    <item>
+      <title>【SQLテーブル結合】INNER JOIN とWHERE結合の違いについて その２</title>
+      <link>https://blog.mosuke.tech/entry/2014/02/28/233025/</link>
+      <pubDate>Fri, 28 Feb 2014 23:30:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2014/02/28/233025/</guid>
+      <description>前回の「【SQLテーブル結合】INNER JOIN とWHERE結合の違いについて」の続き。
+やはりFROM句の後にテーブルを複数書いてWHEREで結合させるのはナンセンスだと思う。
+例えば、内部結合に加え、外部結合もある場合を考える。
+WHERE型
+SELECT * FROM table1, table2 #←結合させたいもの LEFT OUTER JOIN ( ・ ・ &amp;lt;副問い合わせとか長いSQLが入ると想定&amp;gt; ・ ・ ) AS sub ON table1.id=sub.id AND table2.id=sub.id WHERE table1.id=table2.id #←結合条件  table1とtable2を内部結合させたいのに、
+肝心の何と何を結合させるかの部分の&amp;rdquo;WHERE table1.id=table2.id&amp;rdquo;が離れてしまい、
+SQL文全体として何をしたいかわかりずらい。
+一方、INNER JOINなら
+SELECT * FROM table1 INNER JOIN table2 ON table1.id=table2.id #←結合させたいものと結合条件が一緒 LEFT OUTER JOIN ( ・ ・ &amp;lt;副問い合わせとか長いSQLが入ると想定&amp;gt; ・ ・ ) AS sub ON table1.id=sub.id  上記のように、結合させたいテーブルと結合させる条件がくっつくため、
+全体としてなにをしたいかわかりやすい気がする。
+慣れの問題なのかもしれんが、圧倒的にINNER JOINだろ…</description>
+    </item>
+    
+  </channel>
+</rss>

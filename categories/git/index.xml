@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Git on Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/git/</link>
+    <description>Recent content in Git on Goldstine研究所</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Thu, 20 Nov 2014 23:03:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://blog.mosuke.tech/categories/git/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>後からGitレポジトリを共有設定に。sharedオプションの仕組みについて</title>
+      <link>https://blog.mosuke.tech/entry/2014/11/20/230334/</link>
+      <pubDate>Thu, 20 Nov 2014 23:03:00 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2014/11/20/230334/</guid>
+      <description>Gitレポジトリを作って、複数人で開発をしていた。
+しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、
+Push, PullするときにPermission errorで怒られまくる。
+ユーザには共通のグループを作っていたのに…なんでだっけ…
+気づけばレポジトリを作るとき以下のようにしていた。
+$ git init --bare  複数人で共有するときには以下のようにするべきであった。
+$ git init --bare --shared  では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。
+調べると「setgid」というキーワードに辿り着いた。
+setgidの権限を付けておくと、そのディレクトリに作成されたファイルの所有グループは、そのディレクトリの所有グループになる。
+以下のようにchmodでsetgidを付けることができる。
+$ chmod g+s dir_name  setgidがつくとあまり馴染みのない権限がつく。
+「drwxrwsr-x」
+$ ls -l drwxrwsr-x 4 user group 136 11 16 22:49 test_dir  そして、すでに共有設定なしで作ってしまったレポジトリでは以下のように対応可能。
+（新しくレポジトリつくるのはめんどいので…）
+##Gigレポジトリ内のディレクトリに $ chmod -R g+s ./branches $ chmod -R g+s ./hooks $ chmod -R g+s ./info $ chmod -R g+s ./objects $ chmod -R g+s .</description>
+    </item>
+    
+  </channel>
+</rss>
