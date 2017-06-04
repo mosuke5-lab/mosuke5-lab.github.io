@@ -7,9 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Tue, 01 Dec 2015 18:13:00 +0900</lastBuildDate>
-    
-	<atom:link href="https://blog.mosuke.tech/categories/ssh/index.xml" rel="self" type="application/rss+xml" />
-    
+    <atom:link href="https://blog.mosuke.tech/categories/ssh/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Ansible、実行速度高速化の実験。ControlMasterとPipeliningについて</title>
@@ -17,25 +15,177 @@
       <pubDate>Tue, 01 Dec 2015 18:13:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2015/12/01/181304/</guid>
-      <description>1. はじめに
-Vim::Factoryの開発や、仕事などでAnsibleを使うことが多いのだが、
-その実行速度があまりでないことに不満をもっていて、どうしたら早くできるか考えていました。
-調べると、ControlMasterを利用してSSHのコネクションを再利用するとか、pipelineの機能を利用するとかでてくる。
-が、それによってどのくらいの効果が得られるのかよくわからないし、仕組みもよくわかっていなかったので、仕組みの理解と実行速度の実験をした。
-もう少し余談をすると、
-ControlMasterを有効にすれば早くなることは前から知っていたが、
-最近MacをEl Capitanに変えてから「なんか最近Ansibleはやいな〜」とか思っていて、
-「OpenSSHのバージョンもあがったし、まさか。。。」と思って今にいきついている。
-ControlMasterについて OpenSSH は、1 つの接続で複数のセッションを共有する(束ねる)「コントロール マスター」と呼ばれる機能を持っています。コントロールマスターを使用すると、 リモートホストに接続する最初のセッションは制御用のセッション(マスターセッショ ンと呼ばれます)として利用され、制御用のソケットを作成します。セッションを 共有する SSH クライアントは、この制御用のソケットを通じてリモートホストと 接続し通信を行います。
-出典：「OpenSSH実践入門」
- 上記のように、１つの接続で複数のセッションを共有するため、
-Ansibleのようにタスク実行ごとにSSH接続するような場合には大きな効果を得ることができる。
-Pipeliningについて Pipelining機能の説明の前に、軽くAnsibleの実行までの流れを説明する。
-Ansibleは対象サーバにSSHログインしたあと実行するタスクのモジュールをファイルとして転送しそれを実行する。
-Pipelining機能をなしの状態だと、このファイル転送とファイルの削除を１タスクごとに行う。
-ansibleを-vvvvオプションをつけて実行するとわかるが、
-４行目でファイルのPUT（転送）を、５行目の最後の方にrm -rfでディレクトリ・ファイルの削除を行っている。
-&amp;lt;192.168.33.100&amp;gt; ESTABLISH CONNECTION FOR USER: deploy &amp;lt;192.168.33.100&amp;gt; REMOTE_MODULE command ls -l /root &amp;lt;192.168.33.100&amp;gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&amp;quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&amp;quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c &#39;mkdir -p $HOME/.</description>
+      <description>&lt;p&gt;&lt;body&gt;
+&lt;h1&gt;1. はじめに&lt;/h1&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Vim&#34;&gt;Vim&lt;/a&gt;::Factoryの開発や、仕事などでAnsibleを使うことが多いのだが、&lt;br&gt;
+その実行速度があまりでないことに不満をもっていて、どうしたら早くできるか考えていました。&lt;br&gt;
+調べると、ControlMasterを利用して&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;のコネクションを再利用するとか、pipelineの機能を利用するとかでてくる。&lt;/p&gt;
+
+&lt;p&gt;が、それによってどのくらいの効果が得られるのかよくわからないし、仕組みもよくわかっていなかったので、仕組みの理解と実行速度の実験をした。&lt;/p&gt;
+
+&lt;p&gt;もう少し余談をすると、&lt;br&gt;
+ControlMasterを有効にすれば早くなることは前から知っていたが、&lt;br&gt;
+最近&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Mac&#34;&gt;Mac&lt;/a&gt;をEl Capitanに変えてから「なんか最近Ansibleはやいな〜」とか思っていて、&lt;br&gt;
+「OpenSSHのバージョンもあがったし、まさか。。。」と思って今にいきついている。&lt;/p&gt;
+
+&lt;h2&gt;ControlMasterについて&lt;/h2&gt;
+
+&lt;blockquote&gt;&lt;p&gt;OpenSSH は、1 つの接続で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4&#34;&gt;複数&lt;/a&gt;のセッションを共有する(束ねる)「コントロール マスター」と呼ばれる機能を持っています。コントロールマスターを使用すると、 &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EA%A5%E2%A1%BC%A5%C8%A5%DB%A5%B9%A5%C8&#34;&gt;リモートホスト&lt;/a&gt;に接続する最初のセッションは制御用のセッション(マスターセッショ ンと呼ばれます)として利用され、制御用のソケットを作成します。セッションを 共有する &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt; クライアントは、この制御用のソケットを通じて&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EA%A5%E2%A1%BC%A5%C8%A5%DB%A5%B9%A5%C8&#34;&gt;リモートホスト&lt;/a&gt;と 接続し通信を行います。&lt;br&gt;
+出典：「&lt;a href=&#34;http://www.amazon.co.jp/OpenSSH-%E5%AE%9F%E8%B7%B5-Software-Design-plus/dp/4774168076&#34;&gt;OpenSSH実践入門&lt;/a&gt;」&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;上記のように、１つの接続で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4&#34;&gt;複数&lt;/a&gt;のセッションを共有するため、&lt;br&gt;
+Ansibleのようにタスク実行ごとに&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;接続するような場合には大きな効果を得ることができる。&lt;/p&gt;
+
+&lt;h2&gt;Pipeliningについて&lt;/h2&gt;
+
+&lt;p&gt;Pipelining機能の説明の前に、軽くAnsibleの実行までの流れを説明する。&lt;br&gt;
+Ansibleは対象サーバに&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;ログインしたあと実行するタスクのモジュールをファイルとして転送しそれを実行する。&lt;br&gt;
+Pipelining機能をなしの状態だと、このファイル転送とファイルの削除を１タスクごとに行う。&lt;/p&gt;
+
+&lt;p&gt;ansibleを&lt;code&gt;-vvvv&lt;/code&gt;オプションをつけて実行するとわかるが、&lt;br&gt;
+４行目でファイルの&lt;code&gt;PUT&lt;/code&gt;（転送）を、５行目の最後の方に&lt;code&gt;rm -rf&lt;/code&gt;でディレクトリ・ファイルの削除を行っている。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;192.168.33.100&amp;gt; ESTABLISH CONNECTION FOR USER: deploy
+&amp;lt;192.168.33.100&amp;gt; REMOTE_MODULE command ls -l /root
+&amp;lt;192.168.33.100&amp;gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&amp;quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&amp;quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c &#39;mkdir -p $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321 &amp;amp;&amp;amp; chmod a+rx $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321 &amp;amp;&amp;amp; echo $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321&#39;
+&amp;lt;192.168.33.100&amp;gt; PUT /var/folders/7_/d_dwdlcx1m95mn_846x30xb40000gn/T/tmpc8amAw TO /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/command
+&amp;lt;192.168.33.100&amp;gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&amp;quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&amp;quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c &#39;sudo -k &amp;amp;&amp;amp; sudo -E -S -p &amp;quot;[sudo via ansible, key=koibtlgpbiprbaihcqxiqgcnnreofxuo] password: &amp;quot; -u root /bin/sh -c &#39;&amp;quot;&#39;&amp;quot;&#39;echo BECOME-SUCCESS-koibtlgpbiprbaihcqxiqgcnnreofxuo; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/command; rm -rf /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/ &amp;gt;/dev/null 2&amp;gt;&amp;amp;1&#39;&amp;quot;&#39;&amp;quot;&#39;&#39; 
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Pipiliningの機能を有効にすると、タスク実行ごとのモジュールファイルの転送と削除をしなくなる。&lt;br&gt;
+そのため、実効速度があがるのです。&lt;/p&gt;
+
+&lt;p&gt;下記はPipeliningを有効にした際の出力。&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;でタスクを実行しているだけなのがわかる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;192.168.33.100&amp;gt; ESTABLISH CONNECTION FOR USER: deploy
+&amp;lt;192.168.33.100&amp;gt; REMOTE_MODULE command ls -l /root
+&amp;lt;192.168.33.100&amp;gt; EXEC ssh -C -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&amp;quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&amp;quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=deploy -o ConnectTimeout=10 192.168.33.100 /bin/sh -c &#39;sudo -k &amp;amp;&amp;amp; sudo -E -S -p &amp;quot;[sudo via ansible, key=kjtoopnjepksibiitumqfycsoldadiws] password: &amp;quot; -u root /bin/sh -c &#39;&amp;quot;&#39;&amp;quot;&#39;echo BECOME-SUCCESS-kjtoopnjepksibiitumqfycsoldadiws; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python&#39;&amp;quot;&#39;&amp;quot;&#39;&#39; 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://docs.ansible.com/ansible/intro_configuration.html#pipelining&#34;&gt;Configuration file — Ansible Documentation&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1&gt;2. 実験方法&lt;/h1&gt;
+
+&lt;p&gt;下記の３パターンでどれだけ実行速度に差があるか確認してみた。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;① ControlMaster: &lt;b&gt;無効&lt;/b&gt; ＆ pipeline: &lt;b&gt;無効&lt;/b&gt;
+&lt;/li&gt;
+&lt;li&gt;② ControlMaster: &lt;b&gt;&lt;span style=&#34;color: #ff0000&#34;&gt;有効&lt;/span&gt;&lt;/b&gt; ＆ pipeline: &lt;b&gt;無効&lt;/b&gt;
+&lt;/li&gt;
+&lt;li&gt;③ ControlMaster: &lt;b&gt;&lt;span style=&#34;color: #ff0000&#34;&gt;有効&lt;/span&gt;&lt;/b&gt; ＆ pipeline: &lt;b&gt;&lt;span style=&#34;color: #ff0000&#34;&gt;有効&lt;/span&gt;&lt;/b&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;実行環境&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;クライアント
+
+&lt;ul&gt;
+&lt;li&gt;ハードウェア：&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/MacBook%20Air&#34;&gt;MacBook Air&lt;/a&gt; (13-inch, Mid 2012)&lt;/li&gt;
+&lt;li&gt;プロセッサ：1.8 GHz &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Intel&#34;&gt;Intel&lt;/a&gt; &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Core%20i5&#34;&gt;Core i5&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;メモリ：4 GB 1600 MHz DDR3&lt;/li&gt;
+&lt;li&gt;OS：El Capitan&lt;/li&gt;
+&lt;li&gt;OpenSSH：OpenSSH_6.9p1, LibreSSL 2.1.7&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;サーバ
+
+&lt;ul&gt;
+&lt;li&gt;ハードウェア：&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Vagrant&#34;&gt;Vagrant&lt;/a&gt;による仮想環境。メモリ１GB。&lt;/li&gt;
+&lt;li&gt;OS： &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/CentOS&#34;&gt;CentOS&lt;/a&gt; 7.0&lt;/li&gt;
+&lt;li&gt;ネットワーク：プライベートの&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&#34;&gt;IPアドレス&lt;/a&gt;をふっています&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;実行タスク&lt;/h2&gt;
+
+&lt;p&gt;ネットワーク環境やタスクの実行時間に左右されないように、&lt;br&gt;
+&lt;code&gt;ls -l /&lt;/code&gt;を実行するタスクを300個用意した。&lt;/p&gt;
+
+&lt;h2&gt;設定&lt;/h2&gt;
+
+&lt;p&gt;ansible.cfgを下記のように書いてためした。&lt;/p&gt;
+
+&lt;p&gt;① ControlMaster: &lt;b&gt;無効&lt;/b&gt; ＆ pipeline: &lt;b&gt;無効&lt;/b&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[defaults]
+transport = ssh
+
+[ssh_connection]
+pipeline = false
+ssh_args = -o ControlMaster=no 
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;② ControlMaster: &lt;b&gt;&lt;span style=&#34;color: #ff0000&#34;&gt;有効&lt;/span&gt;&lt;/b&gt; ＆ pipeline: &lt;b&gt;無効&lt;/b&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[defaults]
+transport = ssh
+
+[ssh_connection]
+pipeline = false
+ssh_args = -o ControlMaster=auto -o ControlPersist=300s 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;③ ControlMaster: &lt;b&gt;&lt;span style=&#34;color: #ff0000&#34;&gt;有効&lt;/span&gt;&lt;/b&gt; ＆ pipeline: &lt;b&gt;&lt;span style=&#34;color: #ff0000&#34;&gt;有効&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[defaults]
+transport = ssh
+
+[ssh_connection]
+pipeline = true
+ssh_args = -o ControlMaster=auto -o ControlPersist=300s 
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2&gt;実行コマンド&lt;/h2&gt;
+
+&lt;p&gt;実行時間を図るために、下記のようにコマンドを実行した。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ date; ansible-playbook site.yml ; date
+※ansible-playbookコマンドは環境に合わせてオプションとかつけてください。 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1&gt;3. 結果&lt;/h1&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:center;&#34;&gt; ControlMaster &lt;/th&gt;
+&lt;th style=&#34;text-align:center;&#34;&gt; Pipelining &lt;/th&gt;
+&lt;th style=&#34;text-align:center;&#34;&gt; 実行時間 &lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center;&#34;&gt; ✕       &lt;/td&gt;
+&lt;td style=&#34;text-align:center;&#34;&gt;        ✕ &lt;/td&gt;
+&lt;td style=&#34;text-align:center;&#34;&gt;     6分38秒    &lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center;&#34;&gt; ◯       &lt;/td&gt;
+&lt;td style=&#34;text-align:center;&#34;&gt;        ✕&lt;/td&gt;
+&lt;td style=&#34;text-align:center;&#34;&gt;     1分31秒   &lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center;&#34;&gt; ◯       &lt;/td&gt;
+&lt;td style=&#34;text-align:center;&#34;&gt;        ◯&lt;/td&gt;
+&lt;td style=&#34;text-align:center;&#34;&gt;     &lt;span style=&#34;color: #ff0000&#34;&gt;&lt;b&gt;52秒&lt;/b&gt;&lt;/span&gt;   &lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;&lt;p&gt;結果は明らかでした。&lt;br&gt;
+実際の環境ではタスクの実行時間などがあるため、この数字のように6倍はやくなるとかそういうことではないが、&lt;br&gt;
+&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EA%A5%E2%A1%BC%A5%C8%A5%DB%A5%B9%A5%C8&#34;&gt;リモートホスト&lt;/a&gt;への接続回数が多くなればなるほど大きな差が生まれそうです。&lt;/p&gt;
+&lt;/body&gt;&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -44,26 +194,58 @@ ansibleを-vvvvオプションをつけて実行するとわかるが、
       <pubDate>Fri, 25 Sep 2015 23:27:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2015/09/25/232751/</guid>
-      <description>タイトルの通りで、なにも特別なことはない内容。
-そして、9月も終わりなのに今月はひとつも記事を書いていなかった。
-KVMを使って仮想のゲストサーバを立てたが、
-ゲストサーバはホストサーバと通信する用の（外に出る場合にはNAT通信で）IPアドレスしか持っていない状況で、
-Ansibleの実行対象としたかったのが背景。
-ホストサーバにAnsibleをいれるわけにもいかず、ホストサーバを踏み台にして、
-Ansibleを打ちたかったというもの。
+      <description>&lt;p&gt;&lt;body&gt;
+&lt;p&gt;タイトルの通りで、なにも特別なことはない内容。&lt;br&gt;
+そして、9月も終わりなのに今月はひとつも記事を書いていなかった。&lt;/p&gt;&lt;/p&gt;
 
- SSHの設定ファイルを作る &#34;Ansibleで&#34; と書いたが要はSSHです。
-まずはSSHで踏み台サーバを経由してAnsible実行対象サーバへ接続できるように準備しました。
-これはいわゆる「多段SSH」というやつで、以前にもブログに書いたので復習です。
-【VPS1台でインフラ勉強】多段SSH設定（おまけ） - Goldstine研究所
-一般的には~/.ssh/configにこういった設定は書いたりもしますが、
-Ansible実行の場合、端末に依存したくなかったので、
-Ansibleレポジトリに別途ファイルを作ることにした。
-## sshconfigという名前のファイルにした Host ansible-target HostName 192.168.33.10 User xxxxx ProxyCommand ssh -W %h:%p yyyyy@hostserver  上記のファイルを使って多段SSHできることを確認します。
-$ ssh -F sshconfig ansible-target  Ansible実行時にSSH設定ファイルを利用する ここまで来たらとても簡単で、
-ansible.cfgに下記を追記し、ansible実行時に上記のsshconfigを読み込まれるようにしました。
-ansible.cfg
-[ssh_connection] ssh_args = -F sshconfig</description>
+&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/KVM&#34;&gt;KVM&lt;/a&gt;を使って仮想のゲストサーバを立てたが、&lt;br&gt;
+ゲストサーバはホストサーバと通信する用の（外に出る場合にはNAT通信で）&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&#34;&gt;IPアドレス&lt;/a&gt;しか持っていない状況で、&lt;br&gt;
+Ansibleの実行対象としたかったのが背景。&lt;/p&gt;
+
+&lt;p&gt;ホストサーバにAnsibleをいれるわけにもいかず、ホストサーバを踏み台にして、&lt;br&gt;
+Ansibleを打ちたかったというもの。&lt;/p&gt;
+
+&lt;p&gt;&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150925/20150925232414.png&#34; alt=&#34;f:id:mosuke5:20150925232414p:plain&#34; title=&#34;f:id:mosuke5:20150925232414p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
+
+&lt;h1&gt;
+&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;の設定ファイルを作る&lt;/h1&gt;
+
+&lt;p&gt;&#34;Ansibleで&#34; と書いたが要は&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;です。&lt;br&gt;
+まずは&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;で踏み台サーバを経由してAnsible実行対象サーバへ接続できるように準備しました。&lt;br&gt;
+これはいわゆる「多段&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;」というやつで、以前にもブログに書いたので復習です。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2014/11/09/172745&#34;&gt;【VPS1台でインフラ勉強】多段SSH設定（おまけ） - Goldstine研究所&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;一般的には&lt;code&gt;~/.ssh/config&lt;/code&gt;にこういった設定は書いたりもしますが、&lt;br&gt;
+Ansible実行の場合、&lt;b&gt;&lt;u&gt;端末に依存したくなかった&lt;/u&gt;&lt;/b&gt;ので、&lt;br&gt;
+Ansible&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&#34;&gt;レポジトリ&lt;/a&gt;に別途ファイルを作ることにした。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;## sshconfigという名前のファイルにした
+Host ansible-target
+    HostName 192.168.33.10
+    User xxxxx
+    ProxyCommand ssh -W %h:%p yyyyy@hostserver 
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上記のファイルを使って多段&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;できることを確認します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh -F sshconfig ansible-target 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1&gt;Ansible実行時に&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;設定ファイルを利用する&lt;/h1&gt;
+
+&lt;p&gt;ここまで来たらとても簡単で、&lt;br&gt;
+ansible.cfgに下記を追記し、ansible実行時に上記のsshconfigを読み込まれるようにしました。&lt;/p&gt;
+
+&lt;p&gt;ansible.cfg&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[ssh_connection]
+ssh_args = -F sshconfig 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/body&gt;&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -72,26 +254,95 @@ ansible.cfg
       <pubDate>Thu, 13 Aug 2015 00:04:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2015/08/13/000440/</guid>
-      <description>完全に自分のための備忘録。内容はわりと薄め。
-やったこと 最近、自作したPCにUbuntuをいれて使っているのだけど、
-デスクトップPCなので、部屋でしか操作することができません。
-他の部屋からノートPCでUbuntuを触れたらいいなーと思いその環境を整えることをしました。
-主にやったことは以下の通りです。
-  VNCサーバ構築について ノートPC（Mac）からのVNC接続について  SSHローカルポートフォワードを使ってのセキュアな接続について   UbuntuでのVNCサーバ構築について 今回利用しているUbuntuは「Ubuntu Desktop 14.04」です。
-また、VNCの実現は標準でインストールされているvinoを使って行いました。
-ご存知の方も多くいるかもしれませんが、vinoでのVNCは簡易的なもので、サーバ側のユーザがログアウトしていると使えません。
-ですので、会社などでの利用には耐えないと思います。
-ユーザーをログアウトせずにロック状態にしていれば使えます。
-まずはデスクトップ共有の設定をします。
-「デスクトップの共有」のアプリケーションを起動します。 
-接続毎に要求するようにすると、サーバ側で毎度許可が必要なので、オフにします。
-パスワードの設定はしておきましょう。
-同じLANをつかんでる人に簡単に奪われてしまいますので。
+      <description>&lt;p&gt;&lt;body&gt;
+&lt;p&gt;完全に自分のための備忘録。内容はわりと薄め。&lt;/p&gt;&lt;/p&gt;
 
-ちょっと詳細な意味を把握していないのですが、
-下記を実行しないとMacで接続すると「互換性のないバージョンです」的なこといわれました…すいません。
-$ gsettings set org.gnome.Vino require-encryption false  設定ができたら、きちんとサーバとしてVNC接続を待ち受けているか確認します。
-% sudo lsof -i:5900 COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME vino-serv 24414 mosuke5 13u IPv6 156661 0t0 TCP *:5900 (LISTEN) vino-serv 24414 mosuke5 14u IPv4 156662 0t0 TCP *:5900 (LISTEN) % ps -ef | grep vino mosuke5 24414 24226 0 12:30 ?</description>
+&lt;h1&gt;やったこと&lt;/h1&gt;
+
+&lt;p&gt;最近、自作したPCに&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Ubuntu&#34;&gt;Ubuntu&lt;/a&gt;をいれて使っているのだけど、&lt;br&gt;
+デスクトップPCなので、部屋でしか操作することができません。&lt;/p&gt;
+
+&lt;p&gt;他の部屋からノートPCで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Ubuntu&#34;&gt;Ubuntu&lt;/a&gt;を触れたらいいなーと思いその環境を整えることをしました。&lt;/p&gt;
+
+&lt;p&gt;主にやったことは以下の通りです。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VNC&#34;&gt;VNC&lt;/a&gt;サーバ構築について&lt;/li&gt;
+&lt;li&gt;ノートPC（&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Mac&#34;&gt;Mac&lt;/a&gt;）からの&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VNC&#34;&gt;VNC&lt;/a&gt;接続について&lt;/li&gt;
+&lt;li&gt;
+&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;ローカルポートフォワードを使ってのセキュアな接続について&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1&gt;
+&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Ubuntu&#34;&gt;Ubuntu&lt;/a&gt;での&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VNC&#34;&gt;VNC&lt;/a&gt;サーバ構築について&lt;/h1&gt;
+
+&lt;p&gt;今回利用している&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Ubuntu&#34;&gt;Ubuntu&lt;/a&gt;は「&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Ubuntu&#34;&gt;Ubuntu&lt;/a&gt; Desktop 14.04」です。&lt;br&gt;
+また、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VNC&#34;&gt;VNC&lt;/a&gt;の実現は標準でインストールされているvinoを使って行いました。&lt;/p&gt;
+
+&lt;p&gt;ご存知の方も多くいるかもしれませんが、vinoでの&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VNC&#34;&gt;VNC&lt;/a&gt;は簡易的なもので、サーバ側のユーザがログアウトしていると使えません。&lt;br&gt;
+ですので、会社などでの利用には耐えないと思います。&lt;br&gt;
+ユーザーをログアウトせずにロック状態にしていれば使えます。&lt;/p&gt;
+
+&lt;p&gt;まずはデスクトップ共有の設定をします。&lt;br&gt;
+「デスクトップの共有」のアプリケーションを起動します。
+&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150809/20150809132410.png&#34; alt=&#34;f:id:mosuke5:20150809132410p:plain&#34; title=&#34;f:id:mosuke5:20150809132410p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;接続毎に要求するようにすると、サーバ側で毎度許可が必要なので、オフにします。&lt;br&gt;
+パスワードの設定はしておきましょう。&lt;br&gt;
+同じLANをつかんでる人に簡単に奪われてしまいますので。&lt;/p&gt;
+
+&lt;p&gt;&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150809/20150809132421.png&#34; alt=&#34;f:id:mosuke5:20150809132421p:plain&#34; title=&#34;f:id:mosuke5:20150809132421p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;ちょっと詳細な意味を把握していないのですが、&lt;br&gt;
+下記を実行しないと&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Mac&#34;&gt;Mac&lt;/a&gt;で接続すると「互換性のないバージョンです」的なこといわれました…すいません。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ gsettings set org.gnome.Vino require-encryption false 
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;設定ができたら、きちんとサーバとして&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VNC&#34;&gt;VNC&lt;/a&gt;接続を待ち受けているか確認します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;% sudo lsof -i:5900
+COMMAND     PID    USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+vino-serv 24414 mosuke5   13u  IPv6 156661      0t0  TCP *:5900 (LISTEN)
+vino-serv 24414 mosuke5   14u  IPv4 156662      0t0  TCP *:5900 (LISTEN)
+
+% ps -ef | grep vino
+mosuke5  24414 24226  0 12:30 ?        00:00:21 /usr/lib/vino/vino-server --sm-disable
+mosuke5  25456 24470  0 13:19 pts/11   00:00:00 grep vino 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1&gt;
+&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Mac&#34;&gt;Mac&lt;/a&gt;から&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VNC&#34;&gt;VNC&lt;/a&gt;接続する&lt;/h1&gt;
+
+&lt;p&gt;これをやるまで知らなかったのですが、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Mac&#34;&gt;Mac&lt;/a&gt;には標準で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VNC&#34;&gt;VNC&lt;/a&gt;クライアントがついています。&lt;br&gt;
+&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/vnc&#34;&gt;vnc&lt;/a&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB&#34;&gt;プロトコル&lt;/a&gt;で対象のサーバの&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&#34;&gt;IPアドレス&lt;/a&gt;を入れれば接続できます。
+&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150812/20150812225515.png&#34; alt=&#34;f:id:mosuke5:20150812225515p:plain&#34; title=&#34;f:id:mosuke5:20150812225515p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;
+&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150812/20150812225126.png&#34; alt=&#34;f:id:mosuke5:20150812225126p:plain&#34; title=&#34;f:id:mosuke5:20150812225126p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
+
+&lt;h1&gt;
+&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;ローカルフォワードを使ってセキュアな通信をする&lt;/h1&gt;
+
+&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VNC&#34;&gt;VNC&lt;/a&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB&#34;&gt;プロトコル&lt;/a&gt;は通信の内容を暗号化しません。&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/telnet&#34;&gt;telnet&lt;/a&gt;と同様で、非常に危険です。&lt;br&gt;
+家のLAN内で利用するので、正直ここまでする必要は全くないのだが、&lt;br&gt;
+より応用的な使い方に備えてと、復習を兼ねて&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;のローカルフォワードを利用してセキュアに&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VNC&#34;&gt;VNC&lt;/a&gt;を使ってみます。&lt;/p&gt;
+
+&lt;p&gt;復習と書いたのは以前に、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;のローカルフォワードについてはまとめたからです。&lt;/p&gt;
+&lt;a href=&#34;https://blog.mosuke.tech/entry/2014/12/31/170545/&#34;&gt;SSHでローカルポートフォワードを実際に試す - Goldstine研究所&lt;/a&gt;
+
+&lt;p&gt;まずは、ローカルフォワードの&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;接続。&lt;br&gt;
+意味は「自分の端末のポート8888に来た通信は、192.168.11.5からみて&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/localhost&#34;&gt;localhost&lt;/a&gt;のポート5900にとばします」です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh -L8888:localhost:5900 mosuke5@192.168.11.5 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上のコマンドで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;接続した状態でなら、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/localhost&#34;&gt;localhost&lt;/a&gt;のポート8888が利用できます。
+&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150812/20150812224539.png&#34; alt=&#34;f:id:mosuke5:20150812224539p:plain&#34; title=&#34;f:id:mosuke5:20150812224539p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;p&gt;これでセキュアな&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VNC&#34;&gt;VNC&lt;/a&gt;の完成。&lt;/p&gt;
+&lt;/body&gt;&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -100,24 +351,194 @@ $ gsettings set org.gnome.Vino require-encryption false  設定ができたら�
       <pubDate>Sun, 05 Apr 2015 21:25:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2015/04/05/212518/</guid>
-      <description>SSHのエージェントフォワードした後に、接続したユーザとは別のユーザでgit cloneしたいことがあった。
-それについて調べていく中で学習したことや検討したことについてまとめた。
-0. 前提 ローカルのPC(Mac)上で、Vagrantを使用してCentOS7の仮想サーバ(testsv)を立ち上げている。
-&amp;lt;IPアドレス&amp;gt;
-ローカルPC：192.168.33.1
-仮想サーバ：192.168.33.100
-本記事上での「git cloneする」とは、「プライベートのGitレポジトリからSSHを利用してクローンする」ということを指す。
-1. SSHのエージェントフォワードを利用したい理由 まず、そもそもなぜSSHのエージェントフォワードをする必要があったのか。
-最近では多くの方がご存知かつ利用していることだと思うが、仮想のサーバ上でgitを利用するときによく利用する。
-(もちろんそれだけの用途ではありません)
-仮想サーバを作るたびにSSHの鍵を生成して、Github等に登録するのが手間なので、
-ローカルのPCの鍵を他のサーバへ引き継ぐことでgit clone等を可能にするのだ。
-2. SSHエージェントフォワード利用時の挙動 SSHのエージェントフォワードで利用される認証情報は、接続先サーバの/tmp以下に保存されます。
-[myuser@localpc ~]$ ssh -A vagrant@192.168.33.100 Last login: Sat Apr 4 xx:xx:xx 2015 from 192.168.33.1 [vagrant@testsv ~]$ [vagrant@testsv ~]$ ls -l /tmp | grep ssh drwx------. 2 vagrant vagrant 23 4月 4 11:35 ssh-skQVHsUCHU  
-また、接続ユーザにはSSH_AUTH_SOCKという環境変数ができ、どの認証情報を利用するか記述がされます。
-実際に確認してみる。
-確認方法は、envコマンドで環境変数一覧を表示し、そのなかで&#34;ssh&#34;を含むものをgrep。
-[vagrant@testsv ~]$ env | grep -i ssh SSH_AUTH_SOCK=/tmp/ssh-skQVHsUCHU/agent.9034 SSH_CLIENT=&#39;192.168.33.1 58017 22&#39; SSH_CONNECTION=&#39;192.</description>
+      <description>&lt;p&gt;&lt;body&gt;
+&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;のエージェントフォワードした後に、接続したユーザとは別のユーザでgit cloneしたいことがあった。&lt;br&gt;
+それについて調べていく中で学習したことや検討したことについてまとめた。&lt;/p&gt;&lt;/p&gt;
+
+&lt;h1&gt;0. 前提&lt;/h1&gt;
+
+&lt;p&gt;ローカルのPC(&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Mac&#34;&gt;Mac&lt;/a&gt;)上で、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Vagrant&#34;&gt;Vagrant&lt;/a&gt;を使用してCentOS7の仮想サーバ(testsv)を立ち上げている。&lt;/p&gt;
+
+&lt;p&gt;&amp;lt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&#34;&gt;IPアドレス&lt;/a&gt;&amp;gt;&lt;br&gt;
+ローカルPC：192.168.33.1&lt;br&gt;
+仮想サーバ：192.168.33.100&lt;/p&gt;
+
+&lt;p&gt;本記事上での「git cloneする」とは、「プライベートのGit&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&#34;&gt;レポジトリ&lt;/a&gt;から&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;を利用してクローンする」ということを指す。&lt;/p&gt;
+
+&lt;h1&gt;1. &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;のエージェントフォワードを利用したい理由&lt;/h1&gt;
+
+&lt;p&gt;まず、そもそもなぜ&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;のエージェントフォワードをする必要があったのか。&lt;br&gt;
+最近では多くの方がご存知かつ利用していることだと思うが、仮想のサーバ上でgitを利用するときによく利用する。&lt;br&gt;
+(もちろんそれだけの用途ではありません)&lt;/p&gt;
+
+&lt;p&gt;仮想サーバを作るたびに&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;の鍵を生成して、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Github&#34;&gt;Github&lt;/a&gt;等に登録するのが手間なので、&lt;br&gt;
+ローカルのPCの鍵を他のサーバへ引き継ぐことでgit clone等を可能にするのだ。&lt;/p&gt;
+
+&lt;h1&gt;2. &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;エージェントフォワード利用時の挙動&lt;/h1&gt;
+
+&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;のエージェントフォワードで利用される認証情報は、接続先サーバの/tmp以下に保存されます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[myuser@localpc ~]$ ssh -A vagrant@192.168.33.100
+Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
+[vagrant@testsv ~]$
+[vagrant@testsv ~]$ ls -l /tmp | grep ssh
+drwx------. 2 vagrant    vagrant    23  4月  4 11:35 ssh-skQVHsUCHU 
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;
+また、接続ユーザには&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;_AUTH_SOCKという&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;ができ、どの認証情報を利用するか記述がされます。&lt;br&gt;
+実際に確認してみる。&lt;br&gt;
+確認方法は、envコマンドで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;一覧を表示し、そのなかで&#34;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ssh&#34;&gt;ssh&lt;/a&gt;&#34;を含むものを&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/grep&#34;&gt;grep&lt;/a&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ env | grep -i ssh
+SSH_AUTH_SOCK=/tmp/ssh-skQVHsUCHU/agent.9034
+SSH_CLIENT=&#39;192.168.33.1 58017 22&#39;
+SSH_CONNECTION=&#39;192.168.33.1 58017 192.168.33.100 22&#39;
+SSH_TTY=/dev/pts/0 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;
+ちなみにエージェントフォワードは、認証エージェントに登録されている&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%C8%EB%CC%A9%B8%B0&#34;&gt;秘密鍵&lt;/a&gt;を&lt;br&gt;
+ログイン先のサーバから利用できるようにする機能であり、接続元自体が変わるわけではない。&lt;br&gt;
+試しにエージェントフォワードで接続したサーバ先から、更に&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ssh&#34;&gt;ssh&lt;/a&gt;をして、その接続状況をみてみる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[myuser@localpc ~]$ ssh -A vagrant@192.168.33.100
+Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
+[vagrant@testsv ~]$ ssh -A vagrant@192.168.33.100
+Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
+[vagrant@testsv ~]$
+[vagrant@testsv ~]$ w
+ 11:50:17 up  1:55,  2 users,  load average: 0.00, 0.01, 0.05
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+vagrant  pts/0    192.168.33.1     11:35    1.00s  0.04s  0.01s ssh -A vagrant@192.168.33.100
+vagrant  pts/1    192.168.33.100   11:50    1.00s  0.01s  0.00s w 
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;wコマンドの結果の3行目のFROMをみるとわかるが、接続元が変わるわけではない。&lt;/p&gt;
+
+&lt;h1&gt;3. &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;エージェントフォワードで接続後にrootユーザでgit cloneする&lt;/h1&gt;
+
+&lt;p&gt;例えば、rootでしかアクセスできないディレクトリにgit cloneしたいと思い、&lt;br&gt;
+以下のようにsudoをつけてgit cloneしてみる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ sudo git clone git@xxxxx.xxx:yyyy/zzzzzz.git /root/hoge
+Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists. 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;sudoをつけてgit cloneしようとすると、エージェントフォワードしたのにアクセス権がありませんと言われてしまった。&lt;br&gt;
+なぜエージェントフォワードしたのにgit cloneできないのだろうか？&lt;/p&gt;
+
+&lt;p&gt;一般的な設定ではsudo実行すると、ユーザの&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;はrootユーザへ引き継がれず、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;_AUTH_SOCKがないことがわかる。&lt;br&gt;
+sudo後に&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;がどうなっているか確認してみる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ sudo env | grep -i ssh
+　(なにも表示されない) 
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;
+sudo実行しても、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;_AUTH_SOCKを引き継ぎたい！&lt;br&gt;
+実はsudoで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;を引き継ぐ方法がある。-Eのオプションを付けると&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;を引き継ぐことが可能だ。&lt;br&gt;
+以下のように&lt;code&gt;sudo -E&lt;/code&gt;とすると...&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ sudo -E env | grep -i ssh
+SSH_CLIENT=192.168.33.100 60051 22
+SSH_TTY=/dev/pts/1
+SSH_AUTH_SOCK=/tmp/ssh-qhGLsXBURp/agent.9113
+SSH_CONNECTION=192.168.33.100 60051 192.168.33.100 22 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;
+&lt;code&gt;sudo -E&lt;/code&gt;で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;が引き継げ、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;_AUTH_SOCKが引き継げるので、-Eをつけてsudo git cloneをトライする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ sudo -E git clone git@xxxxx.xxx:yyyy/zzzzzz.git /root/hoge
+Cloning into &#39;zzzzzz&#39;...
+remote: Counting objects: 27, done.
+remote: Compressing objects: 100% (26/26), done.
+remote: Total 27 (delta 13), reused 0 (delta 0)
+Receiving objects: 100% (27/27), done.
+Resolving deltas: 100% (13/13), done.
+Checking connectivity... done. 
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;予想通り成功しました！&lt;/p&gt;
+
+&lt;h3&gt;(余談) suもsudoと同じ考え方ができる&lt;/h3&gt;
+
+&lt;p&gt;sudoだけではなくsuでのユーザ切り替えについても同じことが言える。&lt;br&gt;
+rootユーザへ切り替えるとき、よく&lt;code&gt;su -&lt;/code&gt;とハイフンをつけると思う。&lt;br&gt;
+ハイフンをつけると、ログインシェルを使用してユーザを切り替えるので、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;の引き継ぎは行われない。&lt;/p&gt;
+
+&lt;h1&gt;4. rootユーザでない他のユーザでgit cloneする&lt;/h1&gt;
+
+&lt;p&gt;続いて、rootユーザではない別の一般ユーザでのgit cloneについて考える。&lt;br&gt;
+rootユーザの時と同じ要領で、sudoコマンドを利用しotheruserという別のユーザでgit cloneをしてみる。&lt;/p&gt;
+
+&lt;p&gt;まずは、sudoコマンドでは-uでユーザの指定ができるので、otheruserに切り替えた際の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4&#34;&gt;環境変数&lt;/a&gt;をみてみる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ sudo -E -u otheruser env | grep -i ssh
+SSH_CLIENT=192.168.33.100 60051 22
+SSH_TTY=/dev/pts/1
+SSH_AUTH_SOCK=/tmp/ssh-qhGLsXBURp/agent.9113
+SSH_CONNECTION=192.168.33.100 60051 192.168.33.100 22 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;
+rootの時と同様で予想通りな感じ。
+&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;_AUTH_SOCKも引き継げているし、git clone可能だと思い以下を実行すると。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E -u otheruser git clone git@xxxxx.xxx:yyyy/zzzzzz.git /home/otheruser
+Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists. 
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;
+rootユーザの時とは異なってgit cloneは不可…&lt;/p&gt;
+
+&lt;p&gt;でも理由はいたって簡単。&lt;br&gt;
+/tmp以下に保存されている認証情報は、所有者は接続したユーザで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%D1%A1%BC%A5%DF%A5%C3%A5%B7%A5%E7%A5%F3&#34;&gt;パーミッション&lt;/a&gt;は600なのだ。&lt;br&gt;
+つまり、otheruserではこの認証情報は読みこめないのである。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ ls -l /tmp | grep ssh
+drwx------. 2 vagrant    vagrant    23  4月  4 11:35 ssh-skQVHsUCHU 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;重要な情報なので、アクセス権は妥当ですよね。&lt;br&gt;
+試しにアクセス権を変えてみるとgit cloneは可能だ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[vagrant@testsv ~]$ chmod -R 777 /tmp/ssh-skQVHsUCHU
+[vagrant@testsv ~]$ sudo -E -u otheruser git clone git@xxxxx.xxx:yyyy/zzzzzz.git /home/otheruser
+Cloning into &#39;zzzzzz&#39;...
+remote: Counting objects: 27, done.
+remote: Compressing objects: 100% (26/26), done.
+remote: Total 27 (delta 13), reused 0 (delta 0)
+Receiving objects: 100% (27/27), done.
+Resolving deltas: 100% (13/13), done.
+Checking connectivity... done. 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1&gt;5. まとめ&lt;/h1&gt;
+
+&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;のエージェントフォワードした際の動きと、重要な観点については抑えられた。&lt;br&gt;
+&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;エージェントフォワードの仕組みを見ていくことで、&lt;br&gt;
+うかつにエージェントフォワードは利用してはいけない理由も見えてきた。&lt;/p&gt;
+
+&lt;p&gt;&lt;p&gt;また、本題の「&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;エージェントフォワード後に、接続したユーザとは別のユーザでgit cloneしたい」だが、
+そもそもそういうことをすることはNGということらしい。&lt;br&gt;
+別のもっと賢い方法を考えろってことのようでした。&lt;/p&gt;
+&lt;/body&gt;&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -126,22 +547,49 @@ $ gsettings set org.gnome.Vino require-encryption false  設定ができたら�
       <pubDate>Wed, 11 Feb 2015 17:21:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2015/02/11/172123/</guid>
-      <description>SSHローカルフォワードの話。
-前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。
-SSHでローカルポートフォワードを実際に試す - Goldstine研究所
-1. やりたいこと httpsでしか接続を許可していないサーバへ、SSHローカルフォワーディングを使って接続しようした。
-（直接疎通性がないためにポートフォワーディングする必要があった。）
-2. 行ったこと httpsでしか接続ができないので、ローカル端末のポート5000を接続したいサーバのポート443に飛ばせばおっけーと思って、
-下記のようにssh接続とブラウザから接続を行った。
-ssh -L5000:web-host:443 user@ssh-host  ※web-host: 今回httpsで接続したサーバ
-※ssh-host: ssh接続先サーバ
-これでローカルフォワーディングの設定は終わったので、ブラウザから以下に接続するだけで終わりだと思っていた。
-http://localhost:5000  が、接続不可…なぜでしょう？
-3. 何が間違いだったか 正しくは以下で接続をしなければいけない。httpsが必要。
-https://localhost:5000  よーく考えればアタリマエのこと。
-URLのはじめの&amp;lt;http(s)&amp;gt;の部分はプロトコルで最後の&amp;lt;:5000&amp;gt;の部分はポート番号。
-httpsは443のポートを一般的に使うが、ポート443がhttpsというわけではない。
-あたりまえのことだし知っていることなんだけど、見落としがちかもしれない。</description>
+      <description>&lt;p&gt;&lt;body&gt;
+&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;ローカルフォワードの話。&lt;br&gt;
+前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。&lt;br&gt;
+&lt;a href=&#34;https://blog.mosuke.tech/entry/2014/12/31/170545&#34;&gt;SSHでローカルポートフォワードを実際に試す - Goldstine研究所&lt;/a&gt;&lt;/p&gt;&lt;/p&gt;
+
+&lt;h1&gt;1. やりたいこと&lt;/h1&gt;
+
+&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/https&#34;&gt;https&lt;/a&gt;でしか接続を許可していないサーバへ、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;ローカルフォワーディングを使って接続しようした。&lt;br&gt;
+（直接疎通性がないためにポートフォワーディングする必要があった。）&lt;/p&gt;
+
+&lt;h1&gt;2. 行ったこと&lt;/h1&gt;
+
+&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/https&#34;&gt;https&lt;/a&gt;でしか接続ができないので、ローカル端末のポート5000を接続したいサーバのポート443に飛ばせばおっけーと思って、&lt;br&gt;
+下記のように&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ssh&#34;&gt;ssh&lt;/a&gt;接続とブラウザから接続を行った。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ssh -L5000:web-host:443 user@ssh-host 
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;※web-host: 今回&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/https&#34;&gt;https&lt;/a&gt;で接続したサーバ&lt;br&gt;
+※&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ssh&#34;&gt;ssh&lt;/a&gt;-host: &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ssh&#34;&gt;ssh&lt;/a&gt;接続先サーバ&lt;/p&gt;
+
+&lt;p&gt;これでローカルフォワーディングの設定は終わったので、ブラウザから以下に接続するだけで終わりだと思っていた。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;http://localhost:5000 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;が、接続不可…なぜでしょう？&lt;/p&gt;
+
+&lt;h1&gt;3. 何が間違いだったか&lt;/h1&gt;
+
+&lt;p&gt;正しくは以下で接続をしなければいけない。http&lt;b&gt;&lt;span style=&#34;color: #ff0000&#34;&gt;s&lt;/span&gt;&lt;/b&gt;が必要。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;https://localhost:5000 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;よーく考えればアタリマエのこと。&lt;br&gt;
+URLのはじめの&amp;lt;http(s)&amp;gt;の部分は&lt;b&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB&#34;&gt;プロトコル&lt;/a&gt;&lt;/b&gt;で最後の&amp;lt;:5000&amp;gt;の部分は&lt;b&gt;ポート番号&lt;/b&gt;。&lt;br&gt;
+&lt;u&gt;&lt;b&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/https&#34;&gt;https&lt;/a&gt;は443のポートを一般的に使うが、ポート443が&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/https&#34;&gt;https&lt;/a&gt;というわけではない。&lt;/b&gt;&lt;/u&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;p&gt;あたりまえのことだし知っていることなんだけど、見落としがちかもしれない。&lt;/p&gt;
+&lt;/body&gt;&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -150,36 +598,73 @@ httpsは443のポートを一般的に使うが、ポート443がhttpsという�
       <pubDate>Wed, 31 Dec 2014 17:05:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2014/12/31/170545/</guid>
-      <description>SSH・・・
-いろんなことができる&amp;rdquo;らしい&amp;rdquo;ということは知っていたし、
-例えばポートフォワーディングなんていうこともできるのも知っている。
-でもそれがどんなものなのか自分の手で試したことはないし、
-なんとなくただのサーバログインツールとして利用していた。
-サーバインフラ技術に興味を持つようになっていろんなことを勉強していると、
-ポートフォワーディングは必須な技術であることも感じ、
-年末の持て余す時間を使ってSSHのローカルポートフォワードを試してみたのでメモする。
-環境とやりたいこと 
-ローカルPCからexample.jpは以下で接続できる状態。
-[local pc] $ ssh username@example.jp  またWebサーバのポート番号は80で、VPSのホストサーバからはWebサーバへ接続できる。
-CUIなのでわかりづらいがcurlを打つとHello Worldが返ってきている。
-[example.jp] $ curl 192.168.33.10 &amp;lt;html&amp;gt;&amp;lt;body&amp;gt;&amp;lt;h1&amp;gt;Hello World! Virtual Web Server&amp;lt;/h1&amp;gt; &amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;  ローカルポートフォワードの実行 ローカルPCから以下を実行する。
-以下のコマンドは、
-ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす
-といったもの。
-[local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp  この状態でブラウザからhttp://localhost:8888にアクセスすると
-なんと、ローカルホストにつないだはずが、example.jp上の仮想Webサーバのhtmlがうつっているではないか…
+      <description>&lt;p&gt;&lt;body&gt;
+&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;・・・&lt;br&gt;
+いろんなことができる&amp;rdquo;らしい&amp;rdquo;ということは知っていたし、&lt;br&gt;
+例えばポートフォワーディングなんていうこともできるのも知っている。&lt;/p&gt;&lt;/p&gt;
 
-セキュリティはどうなの？ ローカルの端末からhttpで仮想のWebサーバに接続しているけど、セキュリティはだいじょうぶなのだろうか？
-http通信だから暗号化はされていないのだろうか？
-なんて疑問もあるが、それは問題ない。
-SSHでローカルPCからリモートホスト(example.jp)までトンネルをはり、
-そのなかをhttpで通信しているから全く問題なしといえる。
-ローカルポートフォワードを利用する場合は、おそらく表には出したくないけど、
-ローカルから接続したいなどの要件の時に使うと思うけど、SSHできちんと暗号化しているので安心。
-最後に SSHでできることはこの他にもたくさんある。
-ポートフォワードだけみても他にも「リモートポートフォワード」や「ダイナミックポートフォワード」などがある。
-リモートポートなどはいまぱっと試せる環境がなかったのでおいおい実践してみる…
-SSHをただのログインツールだけに留めるのは今年で終わりにしよう…</description>
+&lt;p&gt;でもそれがどんなものなのか自分の手で試したことはないし、&lt;br&gt;
+なんとなくただのサーバログイン&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB&#34;&gt;ツール&lt;/a&gt;として利用していた。&lt;/p&gt;
+
+&lt;p&gt;サーバインフラ技術に興味を持つようになっていろんなことを勉強していると、&lt;br&gt;
+ポートフォワーディングは必須な技術であることも感じ、&lt;br&gt;
+年末の持て余す時間を使って&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;のローカルポートフォワードを試してみたのでメモする。&lt;/p&gt;
+
+&lt;h1&gt;環境とやりたいこと&lt;/h1&gt;
+
+&lt;p&gt;&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141231/20141231162958.png&#34; alt=&#34;f:id:mosuke5:20141231162958p:plain&#34; title=&#34;f:id:mosuke5:20141231162958p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;ローカルPCからexample.jpは以下で接続できる状態。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[local pc] $ ssh username@example.jp 
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;またWebサーバのポート番号は80で、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPS&#34;&gt;VPS&lt;/a&gt;のホストサーバからはWebサーバへ接続できる。&lt;br&gt;
+&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/CUI&#34;&gt;CUI&lt;/a&gt;なのでわかりづらいが&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/curl&#34;&gt;curl&lt;/a&gt;を打つと&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Hello%20World&#34;&gt;Hello World&lt;/a&gt;が返ってきている。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[example.jp] $ curl 192.168.33.10
+&amp;lt;html&amp;gt;&amp;lt;body&amp;gt;&amp;lt;h1&amp;gt;Hello World! Virtual Web Server&amp;lt;/h1&amp;gt;
+&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1&gt;ローカルポートフォワードの実行&lt;/h1&gt;
+
+&lt;p&gt;ローカルPCから以下を実行する。&lt;br&gt;
+以下のコマンドは、&lt;br&gt;
+&lt;b&gt;ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす&lt;/b&gt;&lt;br&gt;
+といったもの。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;この状態でブラウザから&lt;code&gt;http://localhost:8888&lt;/code&gt;にアクセスすると&lt;br&gt;
+
+&lt;p&gt;なんと、ローカルホストにつないだはずが、example.jp上の仮想Webサーバのhtmlがうつっているではないか…&lt;/p&gt;
+
+&lt;p&gt;&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141231/20141231163932.png&#34; alt=&#34;f:id:mosuke5:20141231163932p:plain&#34; title=&#34;f:id:mosuke5:20141231163932p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34; style=&#34;border:solid 1px #ddd;&#34;&gt;&lt;/span&gt;&lt;/p&gt;
+
+&lt;h1&gt;セキュリティはどうなの？&lt;/h1&gt;
+
+&lt;p&gt;ローカルの端末からhttpで仮想のWebサーバに接続しているけど、セキュリティはだいじょうぶなのだろうか？&lt;br&gt;
+http通信だから暗号化はされていないのだろうか？&lt;br&gt;
+なんて疑問もあるが、それは問題ない。&lt;/p&gt;
+
+&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;でローカルPCから&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%EA%A5%E2%A1%BC%A5%C8%A5%DB%A5%B9%A5%C8&#34;&gt;リモートホスト&lt;/a&gt;(example.jp)までトンネルをはり、&lt;br&gt;
+そのなかをhttpで通信しているから全く問題なしといえる。&lt;/p&gt;
+
+&lt;p&gt;ローカルポートフォワードを利用する場合は、おそらく表には出したくないけど、&lt;br&gt;
+ローカルから接続したいなどの要件の時に使うと思うけど、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;できちんと暗号化しているので安心。&lt;/p&gt;
+
+&lt;h1&gt;最後に&lt;/h1&gt;
+
+&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;でできることはこの他にもたくさんある。&lt;br&gt;
+ポートフォワードだけみても他にも「リモートポートフォワード」や「ダイナミックポートフォワード」などがある。&lt;br&gt;
+リモートポートなどはいまぱっと試せる環境がなかったのでおいおい実践してみる…&lt;/p&gt;
+
+&lt;p&gt;&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;をただのログイン&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB&#34;&gt;ツール&lt;/a&gt;だけに留めるのは今年で終わりにしよう…&lt;/p&gt;
+&lt;/body&gt;&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -188,13 +673,36 @@ SSHをただのログインツールだけに留めるのは今年で終わり�
       <pubDate>Sun, 09 Nov 2014 17:27:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2014/11/09/172745/</guid>
-      <description>VPS1台でインフラ勉強の会で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てたが、
-仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければならない。
-これが面倒だったので多段SSHの設定をして、一発でSSH接続できるようにした。
-以下の図で言うと、web10, web11(192.168.33.10&amp;frasl;11)に一発でSSHできるようにする。
+      <description>&lt;p&gt;&lt;body&gt;
+&lt;p&gt;VPS1台でインフラ勉強の会で、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPS&#34;&gt;VPS&lt;/a&gt;のホストサーバ上に仮想でさらにいつくかのサーバを立てたが、&lt;br&gt;
+仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更に&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;をしなければならない。&lt;br&gt;
+これが面倒だったので多段&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;の設定をして、一発で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;接続できるようにした。&lt;/p&gt;
+&lt;p&gt;以下の図で言うと、web10, web11(192.168.33.&lt;sup&gt;10&lt;/sup&gt;&amp;frasl;&lt;sub&gt;11&lt;/sub&gt;)に一発で&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/SSH&#34;&gt;SSH&lt;/a&gt;できるようにする。&lt;br&gt;
+&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141109/20141109170337.png&#34; alt=&#34;f:id:mosuke5:20141109170337p:plain&#34; title=&#34;f:id:mosuke5:20141109170337p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;クライアントPC側に以下の設定をした。&lt;/p&gt;
+```
+$ vim ~/.ssh/config
+host gateway
+    HostName xxxxx.xxx
+    User username&lt;/p&gt;
 
-クライアントPC側に以下の設定をした。
-$ vim ~/.ssh/config host gateway HostName xxxxx.xxx User username Host web10 HostName 192.168.33.10 User vagrant ProxyCommand ssh -W %h:%p gateway Host web11 HostName 192.168.33.11 User vagrant ProxyCommand ssh -W %h:%p gateway ##これで以下で接続可能 $ ssh web10 $ ssh web11  簡単でした。</description>
+&lt;p&gt;Host web10
+    HostName 192.168.33.10
+    User vagrant
+    ProxyCommand ssh -W %h:%p gateway&lt;/p&gt;
+
+&lt;p&gt;Host web11
+    HostName 192.168.33.11
+    User vagrant
+    ProxyCommand ssh -W %h:%p gateway&lt;/p&gt;
+
+&lt;p&gt;##これで以下で接続可能
+$ ssh web10
+$ ssh  web11
+```
+&lt;p&gt;簡単でした。&lt;/p&gt;
+&lt;/body&gt;&lt;/p&gt;
+</description>
     </item>
     
   </channel>

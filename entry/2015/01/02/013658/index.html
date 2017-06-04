@@ -7,7 +7,7 @@
 
     <meta name="description" content=" 使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。 そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させることが可能らしい。  ということで、">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="スーパーサーバってなに？ xinetdでサービスを常駐起動せずに利用する &middot; Goldstine研究所">
@@ -98,6 +98,7 @@ xinetdはinetdの拡張版で、アクセス制御などの機能を搭載して
 <p>まずはxinetdとvsftpをインストール</p>
 
 <pre><code>$ sudo yum install xinetd vsftpd 
+
 </code></pre>
 
 <p><br>
@@ -113,6 +114,7 @@ xinetdどうこうの前に、<a class="keyword" href="http://d.hatena.ne.jp/key
 Connected to 192.168.33.10.
 220 (vsFTPd 2.2.2)
 Name (192.168.33.10:username): 
+
 </code></pre>
 
 <h1>2. xinetdの設定</h1>
@@ -135,6 +137,7 @@ service ftp
         log_on_failure  += USERID
 }
  
+
 </code></pre>
 
 <p>設定項目については以下参照。<br>
@@ -162,6 +165,7 @@ xinetd (pid  3521) is running...
 
 $ sudo service vsftpd status
 vsftpd is stopped 
+
 </code></pre>
 
 <p><br>
@@ -179,6 +183,7 @@ Connected to 192.168.33.10.
 <pre><code>$ sudo tail /var/log/message
 Jan  1 15:07:25 server xinetd[3335]: START: ftp pid=3337 from=::ffff:192.168.33.1
 Jan  1 15:07:28 server xinetd[3335]: EXIT: ftp status=1 pid=3337 duration=3(sec) 
+
 </code></pre>
 
 <p>接続できているようだがその後すぐに切断されているようにみえる。
@@ -191,6 +196,7 @@ vsftpd側の設定を疑ってみた。</p>
 <pre><code>$ sudo vim /etc/vsftpd/vsftpd.conf
 listen=NO
  
+
 </code></pre>
 
 <p>vsftpdのlistenの設定は以下のとおり。</p>
@@ -229,6 +235,7 @@ vagrant   3559  2742  0 16:18 pts/0    00:00:00 grep ftp
 &gt; 接続終了後
 $ ps -ef | grep ftp
 vagrant   3552  2742  0 16:17 pts/0    00:00:00 grep ftp 
+
 </code></pre>
 
 <p><br>

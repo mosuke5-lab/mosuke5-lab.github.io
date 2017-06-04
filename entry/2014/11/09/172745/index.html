@@ -7,7 +7,7 @@
 
     <meta name="description" content=" VPS1台でインフラ勉強の会で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てたが、 仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければならない。 これが面倒だったので多段SSHの設定をして、">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="【VPS1台でインフラ勉強】多段SSH設定（おまけ） &middot; Goldstine研究所">
@@ -77,29 +77,28 @@
 これが面倒だったので多段<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>の設定をして、一発で<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>接続できるようにした。</p>
 <p>以下の図で言うと、web10, web11(192.168.33.<sup>10</sup>&frasl;<sub>11</sub>)に一発で<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>できるようにする。<br>
 <span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141109/20141109170337.png" alt="f:id:mosuke5:20141109170337p:plain" title="f:id:mosuke5:20141109170337p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p>クライアントPC側に以下の設定をした。</p></p>
-
-<pre><code>$ vim ~/.ssh/config
+<p>クライアントPC側に以下の設定をした。</p>
+```
+$ vim ~/.ssh/config
 host gateway
     HostName xxxxx.xxx
-    User username
+    User username</p>
 
-Host web10
+<p>Host web10
     HostName 192.168.33.10
     User vagrant
-    ProxyCommand ssh -W %h:%p gateway
+    ProxyCommand ssh -W %h:%p gateway</p>
 
-Host web11
+<p>Host web11
     HostName 192.168.33.11
     User vagrant
-    ProxyCommand ssh -W %h:%p gateway
+    ProxyCommand ssh -W %h:%p gateway</p>
 
-##これで以下で接続可能
+<p>##これで以下で接続可能
 $ ssh web10
-$ ssh  web11 
-</code></pre>
-
-<p><p>簡単でした。</p>
+$ ssh  web11
+```
+<p>簡単でした。</p>
 </body></p>
 
                     </div>

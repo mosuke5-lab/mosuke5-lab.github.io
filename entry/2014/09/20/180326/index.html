@@ -7,7 +7,7 @@
 
     <meta name="description" content=" 最近VPSのOSをcentos7にしたのだが、なかなか手付かずでiptablesの設定も放置していた… （sshの最低限の設定はしていたが、ほんとうに良くない…）  久しぶりに手が空いたので設定するかーと思いきや まず/etc/sysco">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="CentOS7, iptables設定でハマった &middot; Goldstine研究所">
@@ -122,13 +122,14 @@ iptables.service
 # 
 </code></pre>
 
-<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>の設定はいつもどおり。<br>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>の設定はいつもどおり。<br>
 CentOS7の新しいコマンドに戸惑ったので一部メモ。</p>
 <p></p>
 <h2>service, chkconfigコマンドはsystemctlコマンドへ</h2>service, chkconfigコマンドは推奨されずsystemctlコマンドへ切り替わった。<br>
-試しにchkconfigコマンドを利用すると…</p>
+試しにchkconfigコマンドを利用すると…
 
-<pre><code># chkconfig --list
+```
+# chkconfig --list
 Note: This output shows SysV services only and does not include native
       systemd services. SysV configuration data might be overridden by native
       systemd configuration.
@@ -148,13 +149,13 @@ pmlogger       	0:off	1:off	2:off	3:off	4:off	5:off	6:off
 pmmgr          	0:off	1:off	2:off	3:off	4:off	5:off	6:off
 pmproxy        	0:off	1:off	2:off	3:off	4:off	5:off	6:off
 pmwebd         	0:off	1:off	2:off	3:off	4:off	5:off	6:off
-</code></pre>
+```
 
-<p><blockquote>
-    <p>&ldquo;If you want to list systemd services use &lsquo;systemctl list-unit-files&rsquo;.&rdquo;</p>
+<blockquote>
+    <p>"If you want to list systemd services use 'systemctl list-unit-files'."</p>
 </blockquote>
 <p>systemdのサービスを表示したければ、systemctl list-unit-filesを利用せよとのこと。<br>
-試しに打つと以下のように表示される</p></p>
+試しに打つと以下のように表示される</p>
 
 <pre><code># systemctl list-unit-files
 UNIT FILE                                   STATE
@@ -173,14 +174,14 @@ brandbot.path                               disabled
  
 </code></pre>
 
-<p><p>また、サービスの起動・停止・状態確認などは</p></p>
+<p>また、サービスの起動・停止・状態確認などは</p>
 
 <pre><code># service &lt;service name&gt; &lt;start/stop/restart/status&gt;
 　↓
 # systemctl &lt;start/stop/restart/status&gt; &lt;service name&gt;
 </code></pre>
 
-<p><p>そして、サービスの起動オプションの設定は</p></p>
+<p>そして、サービスの起動オプションの設定は</p>
 
 <pre><code># chkconfig &lt;service name&gt; &lt;on/off&gt;
    ↓

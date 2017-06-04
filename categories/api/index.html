@@ -7,7 +7,7 @@
 
     <meta name="description" content="mosuke5&#39;s blog">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Api &middot; Goldstine研究所">
@@ -73,20 +73,7 @@
                     </header>
 
                     <div class="post-description">
-                        はじめに 最近ブログをはてなブログからHugoへ移行した。
-HugoのフロントにCloudFlareを利用している。
-ブログ移行についてはこちらを参照。
-「はてなブログからHugoに移行。その際に行ったあれこれ。」
-コンテンツをアップロードした場合などにCloudFlareのキャッシュを削除したく、
-APIを利用して効率よく作業できる環境を整えた。
-使い方 CloudFlareのAPIドキュメントはかなり充実している。
-キャッシュの全削除については下記に記載がある。
-https://api.cloudflare.com/#zone-purge-all-files
-利用方法をみると、DELETE /zones/:identifier/purge_cacheとあるが、
-:identifierがなんのことかはじめわからずはじめ苦戦した。
-identifierの確認 identifierは下記APIで確認できる。
-このAPIで返ってくるはじめのidがidenitiferだ。
-curl -X GET &quot;https://api.cloudflare.com/client/v4/zones \ ?name=&lt;your site&gt; \ &amp;status=active \ &amp;page=1 \ &amp;per_page=20 \ &amp;order=status \ &amp;direction=desc \ &amp;match=all&quot; \ -H &quot;X-Auth-Email: &lt;your email&gt;&quot; \ -H &quot;X-Auth-Key: &lt;your api key&gt;&quot; \ -H &quot;Content-Type: application/json&quot;  { &quot;result&quot;: [ { &quot;id&quot;: &quot;xxxxxxxxxxxxxxxxxxxxxxx&quot;, &quot;name&quot;: &quot;mosuke.tech&quot;, &quot;status&quot;: &quot;active&quot;, &quot;paused&quot;: false, &quot;type&quot;: &quot;full&quot;, &quot;development_mode&quot;: 0, &quot;name_servers&quot;: [ &quot;rudy.
+                        はじめに 最近ブログをはてなブログからHugoへ移行した。 HugoのフロントにCloudFlareを利用している。 ブログ移行についてはこちらを参照。 「はてなブログからHugoに移行。その際に行ったあれこれ。」 コンテンツをアップロードした場合などにCloudFlareのキャッシュを削除したく、 APIを利用して効率よく作業できる環境を整えた。 使い方 CloudFlareのAPIドキュメントはかなり充実している。 キャッシュの全削除については下記に記載がある。 https://api.cloudflare.com/#zone-purge-all-files 利用方法をみると、DELETE /zones/:identifier/purge_cacheとあるが、 :identifierがなんのことかはじめわからずはじめ苦戦した。 identifierの確認 identifierは下記APIで確認できる。 このAPIで返ってくるはじめのidがidenitiferだ。 curl -X GET &quot;https://api.cloudflare.com/client/v4/zones \ ?name=&lt;your site&gt; \ &amp;status=active \ &amp;page=1 \ &amp;per_page=20 \ &amp;order=status \ &amp;direction=desc \ &amp;match=all&quot; \ -H &quot;X-Auth-Email: &lt;your email&gt;&quot; \ -H &quot;X-Auth-Key: &lt;your api key&gt;&quot; \ -H &quot;Content-Type: application/json&quot; { &quot;result&quot;: [ { &quot;id&quot;: &quot;xxxxxxxxxxxxxxxxxxxxxxx&quot;, &quot;name&quot;: &quot;mosuke.tech&quot;, &quot;status&quot;: &quot;active&quot;, &quot;paused&quot;: false, &quot;type&quot;: &quot;full&quot;, &quot;development_mode&quot;: 0, &quot;name_servers&quot;: [ &quot;rudy.ns.cloudflare.com&quot;, &quot;sofia.ns.cloudflare.com&quot; ], ...
                     </div>
                 </section>
                 

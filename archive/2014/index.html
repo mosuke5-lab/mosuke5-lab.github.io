@@ -7,7 +7,7 @@
 
     <meta name="description" content="mosuke5&#39;s blog">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="2014 &middot; Goldstine研究所">
@@ -73,36 +73,7 @@
                     </header>
 
                     <div class="post-description">
-                        SSH・・・
-いろんなことができる&rdquo;らしい&rdquo;ということは知っていたし、
-例えばポートフォワーディングなんていうこともできるのも知っている。
-でもそれがどんなものなのか自分の手で試したことはないし、
-なんとなくただのサーバログインツールとして利用していた。
-サーバインフラ技術に興味を持つようになっていろんなことを勉強していると、
-ポートフォワーディングは必須な技術であることも感じ、
-年末の持て余す時間を使ってSSHのローカルポートフォワードを試してみたのでメモする。
-環境とやりたいこと 
-ローカルPCからexample.jpは以下で接続できる状態。
-[local pc] $ ssh username@example.jp  またWebサーバのポート番号は80で、VPSのホストサーバからはWebサーバへ接続できる。
-CUIなのでわかりづらいがcurlを打つとHello Worldが返ってきている。
-[example.jp] $ curl 192.168.33.10 &lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello World! Virtual Web Server&lt;/h1&gt; &lt;/body&gt;&lt;/html&gt;  ローカルポートフォワードの実行 ローカルPCから以下を実行する。
-以下のコマンドは、
-ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす
-といったもの。
-[local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp  この状態でブラウザからhttp://localhost:8888にアクセスすると
-なんと、ローカルホストにつないだはずが、example.jp上の仮想Webサーバのhtmlがうつっているではないか…
-
-セキュリティはどうなの？ ローカルの端末からhttpで仮想のWebサーバに接続しているけど、セキュリティはだいじょうぶなのだろうか？
-http通信だから暗号化はされていないのだろうか？
-なんて疑問もあるが、それは問題ない。
-SSHでローカルPCからリモートホスト(example.jp)までトンネルをはり、
-そのなかをhttpで通信しているから全く問題なしといえる。
-ローカルポートフォワードを利用する場合は、おそらく表には出したくないけど、
-ローカルから接続したいなどの要件の時に使うと思うけど、SSHできちんと暗号化しているので安心。
-最後に SSHでできることはこの他にもたくさんある。
-ポートフォワードだけみても他にも「リモートポートフォワード」や「ダイナミックポートフォワード」などがある。
-リモートポートなどはいまぱっと試せる環境がなかったのでおいおい実践してみる…
-SSHをただのログインツールだけに留めるのは今年で終わりにしよう…
+                        SSH・・・ いろんなことができる&rdquo;らしい&rdquo;ということは知っていたし、 例えばポートフォワーディングなんていうこともできるのも知っている。 でもそれがどんなものなのか自分の手で試したことはないし、 なんとなくただのサーバログインツールとして利用していた。 サーバインフラ技術に興味を持つようになっていろんなことを勉強していると、 ポートフォワーディングは必須な技術であることも感じ、 年末の持て余す時間を使ってSSHのローカルポートフォワードを試してみたのでメモする。 環境とやりたいこと ローカルPCからexample.jpは以下で接続できる状態。 [local pc] $ ssh username@example.jp またWebサーバのポート番号は80で、VPSのホストサーバからはWebサーバへ接続できる。 CUIなのでわかりづらいがcurlを打つとHello Worldが返ってきている。 [example.jp] $ curl 192.168.33.10 &lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello World! Virtual Web Server&lt;/h1&gt; &lt;/body&gt;&lt;/html&gt; ローカルポートフォワードの実行 ローカルPCから以下を実行する。 以下のコマンドは、 ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす といったもの。 [local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp この状態でブラウザからhttp://localhost:8888にアクセスすると なんと、ローカルホストにつないだはずが、example.jp上の仮想Webサーバのhtmlがうつっているではないか… セキュリティはどうなの？ ローカルの端末からhttpで仮想のWebサーバに接続しているけど、セキュリティはだいじょうぶなのだろうか？ http通信だから暗号化はされていないのだろうか？ なんて疑問もあるが、それは問題ない。 SSHでローカルPCからリモートホスト(example.jp)までトンネルをはり、 そのなかをhttpで通信しているから全く問題なしといえる。 ローカルポートフォワードを利用する場合は、おそらく表には出したくないけど、 ローカルから接続したいなどの要件の時に使うと思うけど、SSHできちんと暗号化しているので安心。 最後に SSHでできることはこの他にもたくさんある。 ポートフォワードだけみても他にも「リモートポートフォワード」や「ダイナミックポートフォワード」などがある。 リモートポートなどはいまぱっと試せる環境がなかったのでおいおい実践してみる… SSHをただのログインツールだけに留めるのは今年で終わりにしよう…
                     </div>
                 </section>
                 
@@ -125,17 +96,7 @@ SSHをただのログインツールだけに留めるのは今年で終わり�
                     </header>
 
                     <div class="post-description">
-                        自作PCを作ったのでその材料と参考資料などを簡単にまとめる。
-すべての部品は秋葉原のツクモで揃えた。
-パソコン・ゲームPC・自作パソコンなら【TSUKUMO】 わけがあって荷物はすべて手で運んだのだが、かなり重くなるので郵送をおすすめする。
-以下買ったパーツ一式や用意した道具。
-ちなみに全部で54000円程度でした。（お店で買うとセット割などがあったため）
-材料・パーツ一式 マザーボード 
-ASUSTeK Intel H97チップセット搭載マザーボード H97-PRO 【ATX】
-  出版社/メーカー: Asustek   発売日: 2014/05/17  メディア: Personal Computers この商品を含むブログを見る      CPU 
-Intel CPU Core-i3-4160 3.60GHz 3Mキャッシュ LGA1150 BX80646I34160 【BOX】
-  出版社/メーカー: インテル   発売日: 2014/07/27  メディア: Personal Computers この商品を含むブログを見る    
- メモリ 価格.com - Team TED38192M1600C11DC [DDR3 PC3-12800 4GB 2枚組] 価格比較
+                        自作PCを作ったのでその材料と参考資料などを簡単にまとめる。 すべての部品は秋葉原のツクモで揃えた。 パソコン・ゲームPC・自作パソコンなら【TSUKUMO】 わけがあって荷物はすべて手で運んだのだが、かなり重くなるので郵送をおすすめする。 以下買ったパーツ一式や用意した道具。 ちなみに全部で54000円程度でした。（お店で買うとセット割などがあったため） 材料・パーツ一式 マザーボード ASUSTeK Intel H97チップセット搭載マザーボード H97-PRO 【ATX】 出版社/メーカー: Asustek 発売日: 2014/05/17 メディア: Personal Computers この商品を含むブログを見る CPU Intel CPU Core-i3-4160 3.60GHz 3Mキャッシュ LGA1150 BX80646I34160 【BOX】 出版社/メーカー: インテル 発売日: 2014/07/27 メディア: Personal Computers この商品を含むブログを見る メモリ 価格.com - Team TED38192M1600C11DC [DDR3 PC3-12800 4GB 2枚組] 価格比較 HDD 【Amazon.co.jp限定】WD Blue 3.5inch 7,200rpm 1.0TB 64MBキャッシュ SATA3.0 WD10EZEX/N 【フラストレーションフリーパッケージ(FFP)】 出版社/メーカー: Western Digital メディア: Personal Computers クリック: 5回 この商品を含むブログを見る 光学式ドライブ ASUSTeK CyberLink Power2Go 8、E-Greenソフト付き内蔵ドライブ 出版社/メーカー: Asustek 発売日: 2014/11/12 メディア: Personal Computers この商品を含むブログを見る 電源ユニット グラフィックボードも積んでいないし、ゲームとかもやる予定はないので430Wで十分。 また、PCケースも大きめのものを選ぶ予定だったので大きさも気にしなくてオッケーでした。 ENERMAX エナーマックス PC電源 Revolution X&rsquo;t 430W ERX430AWT 出版社/メーカー: ENERMAX 発売日: 2014/08/02 メディア: 付属品 この商品を含むブログを見る ケース SharkoonミドルタワーPCケース サイドクリアウィンドウ グリーン SHA-T28-G-V3/A 出版社/メーカー: Sharkoon メディア: Personal Computers この商品を含むブログ (1件) を見る 参考にした書籍 PC自作の鉄則!
                     </div>
                 </section>
                 
@@ -158,24 +119,7 @@ Intel CPU Core-i3-4160 3.60GHz 3Mキャッシュ LGA1150 BX80646I34160 【BOX】
                     </header>
 
                     <div class="post-description">
-                        VPS1台でインフラ勉強シリーズでVPN構築を行ったのでそのメモ。
-1. 実施したこと VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。
- 
-  2. 環境 ・VPNソフトウェア：SoftEther VPN プロジェクト - SoftEther VPN プロジェクト
-・メモリ：１GB
-・CPU：仮想２コア
-・HDD：100GB
-・OS：CentOS7
-・サーバ仮想化：Vagrant(Utuntu13)
- 3. SoftEtherのインストール インストール手順は公式ドキュメント通りなので簡単にコマンドのみ記述しておく。
-7.3 Linux へのインストールと初期設定 - SoftEther VPN プロジェクト
-【ダウンロードしたもの】
-ここから環境に応じて対象のソフトウェアを選ぶ
-SoftEther ダウンロード センター
-・コンポーネント：SoftEther VPN Server
-・プラットフォーム：Linux
-・CPU：Intel x86 / AMD64(64bit)
-## ダウンロード $ wget ttp://jp.softether-download.com/files/softether/v4.08-9449-rtm-2014.06.08-tree/Linux/SoftEther%20VPN%20Server/64bit%20-%20Intel%20x64%20or%20AMD64/softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz ## 解凍 $ tar zxvf softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz ## 実行可能ファイル作成 $ cd vpnserver/ $ sudo make ## /usr/localへ配置 $ sudo mv vpnserver /usr/local ## パーミッション変更 ### 基本的には600。実行ファイルのみ700 $ cd /usr/local/vpnserver $ sudo chown root:root .
+                        VPS1台でインフラ勉強シリーズでVPN構築を行ったのでそのメモ。 1. 実施したこと VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。 2. 環境 ・VPNソフトウェア：SoftEther VPN プロジェクト - SoftEther VPN プロジェクト ・メモリ：１GB ・CPU：仮想２コア ・HDD：100GB ・OS：CentOS7 ・サーバ仮想化：Vagrant(Utuntu13) 3. SoftEtherのインストール インストール手順は公式ドキュメント通りなので簡単にコマンドのみ記述しておく。 7.3 Linux へのインストールと初期設定 - SoftEther VPN プロジェクト 【ダウンロードしたもの】 ここから環境に応じて対象のソフトウェアを選ぶ SoftEther ダウンロード センター ・コンポーネント：SoftEther VPN Server ・プラットフォーム：Linux ・CPU：Intel x86 / AMD64(64bit) ## ダウンロード $ wget ttp://jp.softether-download.com/files/softether/v4.08-9449-rtm-2014.06.08-tree/Linux/SoftEther%20VPN%20Server/64bit%20-%20Intel%20x64%20or%20AMD64/softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz ## 解凍 $ tar zxvf softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz ## 実行可能ファイル作成 $ cd vpnserver/ $ sudo make ## /usr/localへ配置 $ sudo mv vpnserver /usr/local ## パーミッション変更 ### 基本的には600。実行ファイルのみ700 $ cd /usr/local/vpnserver $ sudo chown root:root ./* $ sudo chmod 600 ./* $ sudo chmod 700 ./vpncmd $ sudo chmod 700 ./vpnserver ## 動作チェック $ sudo ./vpncmd 1.
                     </div>
                 </section>
                 
@@ -198,27 +142,7 @@ SoftEther ダウンロード センター
                     </header>
 
                     <div class="post-description">
-                        AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&hellip;
-と思ったところである初歩的な罠にハマった。
-本番環境へPalybook実行！！
-$ ansible-playbook playbook.yml -i hosts  あれ、GATHERING FACTSで10分以上も待たされた&hellip;
-しかも、エラー出た&hellip;
-GATHERING FACTS failed to parse [ sudo via ansible, key= ..... ]  sudoできていない&hellip;？
-playbook内のsudo: yesを外して実行。
-GATHERING FACTSは通過。
-しかし、当たり前だがsudo で実行すべき部分で失敗&hellip;
-とても単純なことに気づいた&hellip;
-・Vagrant環境ではsudoのパスワードを要求されない
-・本番環境はsudoのパスワードを要求されること
-・sudoのパスワードを入力するようにしていなかったこと
-というわけで-Kをつけて実行
-$ ansible-playbook playbook.yml -i hosts -K  うまくいった&hellip;
-完全なる私のミスなんだが、ただ-Kオプションを忘れるだけで、一回の実行に10分ほども待たされるのは…。
-しかもGATHERING FACTSで止まっているときはCtl+Cで中断も聞かなかった。
-要注意ですね。。。
-ちなみに、こんな方法で解決もできる。
-sudoのパスワードを聞かれなくして対応。
-# visudo user_name ALL=(ALL) NOPASSWD: ALL
+                        AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&hellip; と思ったところである初歩的な罠にハマった。 本番環境へPalybook実行！！ ``` $ ansible-playbook playbook.yml -i hosts &lt;p&gt;あれ、GATHERING FACTSで10分以上も待たされた...&lt;br&gt; しかも、エラー出た...&lt;/p&gt; GATHERING FACTS failed to parse [ sudo via ansible, key= &hellip;.. ] &lt;p&gt;sudoできていない...？&lt;/p&gt; &lt;p&gt;playbook内のsudo: yesを外して実行。&lt;/p&gt; &lt;p&gt;GATHERING FACTSは通過。&lt;br&gt; しかし、当たり前だがsudo で実行すべき部分で失敗...&lt;/p&gt; &lt;p&gt;とても単純なことに気づいた...&lt;br&gt; ・&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/Vagrant&quot;&gt;Vagrant&lt;/a&gt;環境ではsudoのパスワードを要求されない&lt;br&gt; ・本番環境はsudoのパスワードを要求されること&lt;br&gt; ・sudoのパスワードを入力するようにしていなかったこと&lt;/p&gt; &lt;p&gt;というわけで-Kをつけて実行&lt;/p&gt; $ ansible-playbook playbook.yml -i hosts -K &lt;p&gt;うまくいった...&lt;/p&gt; &lt;p&gt;完全なる私のミスなんだが、ただ-Kオプションを忘れるだけで、一回の実行に10分ほども待たされるのは…。&lt;br&gt; しかもGATHERING FACTSで止まっているときはCtl+Cで中断も聞かなかった。&lt;/p&gt; &lt;p&gt;要注意ですね。。。&lt;/p&gt; &lt;br&gt; &lt;p&gt;ちなみに、こんな方法で解決もできる。&lt;br&gt; sudoのパスワードを聞かれなくして対応。&lt;/p&gt; visudo user_name ALL=(ALL) NOPASSWD: ALL ```
                     </div>
                 </section>
                 
@@ -241,15 +165,7 @@ sudoのパスワードを聞かれなくして対応。
                     </header>
 
                     <div class="post-description">
-                        もろもろな理由のためにGithubが利用できないことも多くあると思う。
-というわけでGithubクローンのGitlabを試しに立ててみたが、簡単すぎでした…
-GitLab | Open source software to collaborate on code
-環境
-さくらVPS 1Gプラン
-OS：CentOS7
-インストール
-基本的にはドキュメントに書いてある以下のとおりで終わり。
-$ curl -O https://downloads-packages.s3.amazonaws.com/centos-7.0.1406/gitlab-7.5.1_omnibus.5.2.0.ci-1.el7.x86_64.rpm $ sudo yum install openssh-server $ sudo systemctl enable sshd $ sudo systemctl start sshd $ sudo yum install postfix $ sudo systemctl enable postfix $ sudo systemctl start postfix $ sudo rpm -i gitlab-7.5.1_omnibus.5.2.0.ci-1.el7.x86_64.rpm $ sudo gitlab-ctl reconfigure $ sudo firewall-cmd --permanent --add-service=http # open up the firewall for HTTP and SSH requests $ sudo systemctl reload firewalld  しかし１つ気をつけないといけないことがある。
+                        もろもろな理由のためにGithubが利用できないことも多くあると思う。 というわけでGithubクローンのGitlabを試しに立ててみたが、簡単すぎでした… GitLab | Open source software to collaborate on code 環境 さくらVPS 1Gプラン OS：CentOS7 インストール 基本的にはドキュメントに書いてある以下のとおりで終わり。 ``` $ curl -O https://downloads-packages.s3.amazonaws.com/centos-7.0.1406/gitlab-7.5.1_omnibus.5.2.0.ci-1.el7.x86_64.rpm $ sudo yum install openssh-server $ sudo systemctl enable sshd $ sudo systemctl start sshd $ sudo yum install postfix $ sudo systemctl enable postfix $ sudo systemctl start postfix $ sudo rpm -i gitlab-7.5.1_omnibus.5.2.0.ci-1.el7.x86_64.rpm $ sudo gitlab-ctl reconfigure $ sudo firewall-cmd &ndash;permanent &ndash;add-service=http # open up the
                     </div>
                 </section>
                 
@@ -272,21 +188,7 @@ $ curl -O https://downloads-packages.s3.amazonaws.com/centos-7.0.1406/gitlab-7.5
                     </header>
 
                     <div class="post-description">
-                        Gitレポジトリを作って、複数人で開発をしていた。
-しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、
-Push, PullするときにPermission errorで怒られまくる。
-ユーザには共通のグループを作っていたのに…なんでだっけ…
-気づけばレポジトリを作るとき以下のようにしていた。
-$ git init --bare  複数人で共有するときには以下のようにするべきであった。
-$ git init --bare --shared  では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。
-調べると「setgid」というキーワードに辿り着いた。
-setgidの権限を付けておくと、そのディレクトリに作成されたファイルの所有グループは、そのディレクトリの所有グループになる。
-以下のようにchmodでsetgidを付けることができる。
-$ chmod g+s dir_name  setgidがつくとあまり馴染みのない権限がつく。
-「drwxrwsr-x」
-$ ls -l drwxrwsr-x 4 user group 136 11 16 22:49 test_dir  そして、すでに共有設定なしで作ってしまったレポジトリでは以下のように対応可能。
-（新しくレポジトリつくるのはめんどいので…）
-##Gigレポジトリ内のディレクトリに $ chmod -R g+s ./branches $ chmod -R g+s ./hooks $ chmod -R g+s ./info $ chmod -R g+s ./objects $ chmod -R g+s .
+                        Gitレポジトリを作って、複数人で開発をしていた。 しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、 Push, PullするときにPermission errorで怒られまくる。 ユーザには共通のグループを作っていたのに…なんでだっけ… 気づけばレポジトリを作るとき以下のようにしていた。 ``` $ git init &ndash;bare &lt;p&gt;&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD&quot;&gt;複数人&lt;/a&gt;で共有するときには以下のようにするべきであった。&lt;/p&gt; $ git init &ndash;bare &ndash;shared &lt;p&gt;では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。&lt;br&gt; 調べると「&lt;b&gt;setgid&lt;/b&gt;」というキーワードに辿り着いた。&lt;br&gt; setgidの権限を付けておくと、そのディレクトリに作成されたファイルの所有グループは、そのディレクトリの所有グループになる。&lt;/p&gt; &lt;p&gt;以下のようにchmodでsetgidを付けることができる。&lt;/p&gt; $ chmod g+s dir_name &lt;p&gt;setgidがつくとあまり馴染みのない権限がつく。&lt;br&gt; 「drwxrw&lt;span style=&quot;color: #ff40ff&quot;&gt;&lt;b&gt;s&lt;/b&gt;&lt;/span&gt;r-x」&lt;/p&gt; $ ls -l drwxrwsr-x 4 user group 136 11 16 22:49 test_dir &lt;p&gt;そして、すでに共有設定なしで作ってしまった&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&quot;&gt;レポジトリ&lt;/a&gt;では以下のように対応可能。&lt;br&gt; （新しく&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&quot;&gt;レポジトリ&lt;/a&gt;つくるのはめんどいので…）&lt;/p&gt; ##Gigレポジトリ内のディレクトリに $ chmod -R g+s ./branches $ chmod -R g+s ./hooks $ chmod -R g+s ./info $ chmod -R g+s
                     </div>
                 </section>
                 
@@ -309,15 +211,7 @@ $ ls -l drwxrwsr-x 4 user group 136 11 16 22:49 test_dir  そして、すでに�
                     </header>
 
                     <div class="post-description">
-                        AnsibleのPlaybookを書いていると、ワイルドカードを含んだコマンドを実行したい時がある。
-そんなときあるところでハマった。
-Apacheをソースインストールして、パスを/usr/sbinにリンクを貼ろうとして以下を実行した。
-- command: ln -s /usr/local/httpd/bin/* /usr/sbin  /usr/sbin内に「*」というリンクが貼られてしまった。
-* -&gt; /usr/local/httpd/bin  どうやらcommandモジュールはワイルドカードに対応していないよう。
-ワイルドカードを使いたいときはshellモジュールを利用すると良い。
-- shell: ln -s /usr/local/httpd/bin/* /usr/sbin  また、*というリンクを消すときは要注意（笑）
-$ rm ./*  とやってしまうとあたりまえだがやばいので
-$ rm ./¥*  こうですね…
+                        AnsibleのPlaybookを書いていると、ワイルドカードを含んだコマンドを実行したい時がある。 そんなときあるところでハマった。 Apacheをソースインストールして、パスを/usr/sbinにリンクを貼ろうとして以下を実行した。 - command: ln -s /usr/local/httpd/bin/* /usr/sbin /usr/sbin内に「*」というリンクが貼られてしまった。 * -&gt; /usr/local/httpd/bin どうやらcommandモジュールはワイルドカードに対応していないよう。 ワイルドカードを使いたいときはshellモジュールを利用すると良い。 yaml - shell: ln -s /usr/local/httpd/bin/* /usr/sbin また、というリンクを消すときは要注意（笑） ``` $ rm ./ &lt;p&gt;とやってしまうとあたりまえだがやばいので&lt;/p&gt; $ rm ./¥* ``` こうですね…
                     </div>
                 </section>
                 
@@ -340,31 +234,7 @@ $ rm ./¥*  こうですね…
                     </header>
 
                     <div class="post-description">
-                        最近、Ansibleを使い始めたのだが、yumやapt-getでインストールできるものはいいけど、
-どうしてもソースインストールが必要な場合がある。
-ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。
-まず、あたりまえだが、ソースインストールを行うには以下のフローを踏まなければいけな。
-1. ソースファイルの取得(tarで固められていると仮定)
-2. tarファイルの解凍
-3. 解答してできたディレクトリへ移動
-4. configure
-5. make
-6. make install
-また、Ansibleでは何回もPlaybookを実行していくため、
-すでにインストールされている場合は、インストールをスキップする必要がある。
-yumやapt-getで管理されていれば上記を心配することはないのだが、やはりソースインストールだとこの壁がある。
-※パッケージ化しろよ！というツッコミは禁止
-今回は例として、ubuntu13にemacsをソースインストールするのを例としてみた。
-環境 【Ansible実行側】
-さくらVPSの1G
-OS: Centos 7
-IPアドレス:192.168.33.1
-【設定対象側】
-上記さくらVPS上にたてたVagrantの仮想サーバ
-OS: Ubuntu 13.10
-IPアドレス:192.168.33.100
- Playbook 以下playbookの例。
---- - hosts: 192.168.33.100 user: vagrant sudo: yes vars: src_dir: /usr/local/src emacs_ver: emacs-23.4 tasks: ## emacsのソースファイルを取得済みか確認 - name: check exist emacs source file command: ls -l {{src_dir}}/{{emacs_ver}}.tar.gz ignore_errors: True register: result1 ## emacsのソースファイル取得。ただし、すでに取得済みならスキップ - name: get emacs source file command: chdir={{src_dir}} wget http://mirror.
+                        最近、Ansibleを使い始めたのだが、yumやapt-getでインストールできるものはいいけど、 どうしてもソースインストールが必要な場合がある。 ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。 まず、あたりまえだが、ソースインストールを行うには以下のフローを踏まなければいけな。 1. ソースファイルの取得(tarで固められていると仮定) 2. tarファイルの解凍 3. 解答してできたディレクトリへ移動 4. configure 5. make 6. make install また、Ansibleでは何回もPlaybookを実行していくため、 すでにインストールされている場合は、インストールをスキップする必要がある。 yumやapt-getで管理されていれば上記を心配することはないのだが、やはりソースインストールだとこの壁がある。 ※パッケージ化しろよ！というツッコミは禁止 今回は例として、ubuntu13にemacsをソースインストールするのを例としてみた。 環境 【Ansible実行側】 さくらVPSの1G OS: Centos 7 IPアドレス:192.168.33.1 【設定対象側】 上記さくらVPS上にたてたVagrantの仮想サーバ OS: Ubuntu 13.10 IPアドレス:192.168.33.100 Playbook 以下playbookの例。 --- - hosts: 192.168.33.100 user: vagrant sudo: yes vars: src_dir: /usr/local/src emacs_ver: emacs-23.4 tasks: ## emacsのソースファイルを取得済みか確認 - name: check exist emacs source file command: ls -l {{src_dir}}/{{emacs_ver}}.tar.gz ignore_errors: True register: result1 ## emacsのソースファイル取得。ただし、すでに取得済みならスキップ
                     </div>
                 </section>
                 
@@ -387,13 +257,7 @@ IPアドレス:192.168.33.100
                     </header>
 
                     <div class="post-description">
-                        VPS1台でインフラ勉強の会で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てたが、
-仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければならない。
-これが面倒だったので多段SSHの設定をして、一発でSSH接続できるようにした。
-以下の図で言うと、web10, web11(192.168.33.10&frasl;11)に一発でSSHできるようにする。
-
-クライアントPC側に以下の設定をした。
-$ vim ~/.ssh/config host gateway HostName xxxxx.xxx User username Host web10 HostName 192.168.33.10 User vagrant ProxyCommand ssh -W %h:%p gateway Host web11 HostName 192.168.33.11 User vagrant ProxyCommand ssh -W %h:%p gateway ##これで以下で接続可能 $ ssh web10 $ ssh web11  簡単でした。
+                        VPS1台でインフラ勉強の会で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てたが、 仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければならない。 これが面倒だったので多段SSHの設定をして、一発でSSH接続できるようにした。 以下の図で言うと、web10, web11(192.168.33.10&frasl;11)に一発でSSHできるようにする。 クライアントPC側に以下の設定をした。 ``` $ vim ~/.ssh/config host gateway HostName xxxxx.xxx User username Host web10 HostName 192.168.33.10 User vagrant ProxyCommand ssh -W %h:%p gateway Host web11 HostName 192.168.33.11 User vagrant ProxyCommand ssh -W %h:%p gateway ##これで以下で接続可能 $ ssh web10 $ ssh web11 ``` 簡単でした。
                     </div>
                 </section>
                 
@@ -416,18 +280,7 @@ $ vim ~/.ssh/config host gateway HostName xxxxx.xxx User username Host web10 Hos
                     </header>
 
                     <div class="post-description">
-                        前回の【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築に続き、同様の環境を用いて、ロードバランサ構築を行った。
-ロードバランサの構築にはHAProxyを利用した。
-1. 環境 前回同様で、さくらVPSの1GBのプラン1台のみ。
-・メモリ：１GB
-・CPU：仮想２コア
-・HDD：100GB
-・OS：CentOS7
-・サーバ仮想化：Vagrant(Utuntu13)
-・ロードバランサ：HAProxy - The Reliable, High Performance TCP/HTTP Load Balancer
- 2. 構成図 
- 3. ロードバランサの構築 ■ホストサーバ側の設定
-#HAProxyインストール $ sudo yum install haproxy #設定はすごく簡単で以下のファイルのみ。実際に $ sudo vim /etc/haproxy/haproxy.cfg #--------------------------------------------------------------------- # Example configuration for a possible web application. See the # full configuration options online. # # http://haproxy.1wt.eu/download/1.4/doc/configuration.txt # #--------------------------------------------------------------------- #--------------------------------------------------------------------- # Global settings #--------------------------------------------------------------------- global log 127.0.0.1 local6 debug chroot /var/lib/haproxy pidfile /var/run/haproxy.
+                        前回の【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築に続き、同様の環境を用いて、ロードバランサ構築を行った。 ロードバランサの構築にはHAProxyを利用した。 1. 環境 前回同様で、さくらVPSの1GBのプラン1台のみ。 ・メモリ：１GB ・CPU：仮想２コア ・HDD：100GB ・OS：CentOS7 ・サーバ仮想化：Vagrant(Utuntu13) ・ロードバランサ：HAProxy - The Reliable, High Performance TCP/HTTP Load Balancer 2. 構成図 3. ロードバランサの構築 ■ホストサーバ側の設定 ``` #HAProxyインストール $ sudo yum install haproxy #設定はすごく簡単で以下のファイルのみ。実際に $ sudo vim /etc/haproxy/haproxy.cfg #&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash; Example configuration for a possible web application. See the full configuration options online. # http://haproxy.1wt.eu/download/1.4/doc/configuration.txt # #&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash; #&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash; Global settings #&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash; global log 127.0.0.1 local6 debug chroot /var/lib/haproxy pidfile /var/run/haproxy.pid maxconn 4000 user haproxy group haproxy daemon # turn on stats unix socket stats socket /var/lib/haproxy/stats #&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash; common defaults that all the &lsquo;listen&rsquo; and &lsquo;backend&rsquo; sections will use if not designated in their block #&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash; defaults ##ロードバランサの動作モード。tcpにするとL4ロードバランサになる。httpにするとL7ロードバランサ。 mode http log global option log-health-checks option httplog option dontlognull ##ヘルスチェック用のhtmlファイルをWebサーバ側に設置している。設置については後述。 option httpchk GET /health_check.html HTTP/1.0\r\nUser-agent:\ Proxy-Check option http-server-close option forwardfor except 127.0.0.0/8 option redispatch retries 3 timeout http-request 10s timeout queue 1m timeout connect 10s timeout client 1m timeout server 1m timeout http-keep-alive 10s timeout check 10s maxconn 3000 #&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash; main frontend which proxys to the backends #&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash; frontend main *:80 default_backend hoge #&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash; round robin balancing between the various backends #&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash; backend hoge balance roundrobin server web10 192.168.33.10:80 check inter 3000 fall 2 rise 2 server web11 192.168.33.11:80 check inter 3000 fall 2 rise 2 &lt;p&gt;L4, L7のロードバランサについては以下参照。&lt;br&gt; &lt;a href=&quot;http://www.atmarkit.co.jp/ait/articles/0302/05/news001.html&quot;&gt;ロードバランサの本質（1）：パケットフローから負荷分散の基本を理解する - ＠IT&lt;/a&gt;&lt;/p&gt; &lt;p&gt;ロードバランサ側でhttpのリクエストを返していないことを意味づけるために&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/apache&quot;&gt;apache&lt;/a&gt;, nginxを停止しておく。&lt;br&gt; （特に意味は無いが念押し確認のため）&lt;/p&gt; $ sudo systemctl stop nginx $ sudo systemctl stop httpd &lt;p&gt;HAProxyのログをsyslogに残すように設定する。&lt;br&gt; ただしメインのmessageではなく、独自のファイルに書くために以下の設定。&lt;/p&gt; ##ログの格納場所作成 $ sudo mkdir /var/log/haproxy ##syslogの設定変更 $ vim /etc/rsyslog.d/haproxy.conf $ModLoad imudp $UDPServerRun 514 $template Haproxy,&ldquo;%msg%\n&rdquo; local6.* -/var/log/haproxy/haproxy.log;Haproxy $ vim /etc/sysconfig/rsyslog 以下を追加 SYSLOGD_OPTIONS=&ldquo;-r&rdquo; haproxyの起動 $ sudo systemctl start haproxy &lt;p&gt;&lt;br&gt; ■Webサーバの設定&lt;br&gt; 仮想でのWebサーバ構築は省くが、Apache2をインストールしただけである。&lt;br&gt; 仮想でのサーバ構築は前回を参照。&lt;br&gt; &lt;a href=&quot;https://blog.mosuke.tech/entry/2014/10/09/230555&quot;&gt;【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築&lt;/a&gt;&lt;br&gt; &lt;/p&gt; /var/www/html配下にヘルスチェック用のhtml設置 $ sudo touch health_check.html &lt;/div&gt; &lt;div class=&quot;section&quot;&gt; &lt;h3&gt;4.
                     </div>
                 </section>
                 

@@ -7,7 +7,7 @@
 
     <meta name="description" content="mosuke5&#39;s blog">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="エージェントフォワード &middot; Goldstine研究所">
@@ -73,24 +73,7 @@
                     </header>
 
                     <div class="post-description">
-                        SSHのエージェントフォワードした後に、接続したユーザとは別のユーザでgit cloneしたいことがあった。
-それについて調べていく中で学習したことや検討したことについてまとめた。
-0. 前提 ローカルのPC(Mac)上で、Vagrantを使用してCentOS7の仮想サーバ(testsv)を立ち上げている。
-&lt;IPアドレス&gt;
-ローカルPC：192.168.33.1
-仮想サーバ：192.168.33.100
-本記事上での「git cloneする」とは、「プライベートのGitレポジトリからSSHを利用してクローンする」ということを指す。
-1. SSHのエージェントフォワードを利用したい理由 まず、そもそもなぜSSHのエージェントフォワードをする必要があったのか。
-最近では多くの方がご存知かつ利用していることだと思うが、仮想のサーバ上でgitを利用するときによく利用する。
-(もちろんそれだけの用途ではありません)
-仮想サーバを作るたびにSSHの鍵を生成して、Github等に登録するのが手間なので、
-ローカルのPCの鍵を他のサーバへ引き継ぐことでgit clone等を可能にするのだ。
-2. SSHエージェントフォワード利用時の挙動 SSHのエージェントフォワードで利用される認証情報は、接続先サーバの/tmp以下に保存されます。
-[myuser@localpc ~]$ ssh -A vagrant@192.168.33.100 Last login: Sat Apr 4 xx:xx:xx 2015 from 192.168.33.1 [vagrant@testsv ~]$ [vagrant@testsv ~]$ ls -l /tmp | grep ssh drwx------. 2 vagrant vagrant 23 4月 4 11:35 ssh-skQVHsUCHU  
-また、接続ユーザにはSSH_AUTH_SOCKという環境変数ができ、どの認証情報を利用するか記述がされます。
-実際に確認してみる。
-確認方法は、envコマンドで環境変数一覧を表示し、そのなかで"ssh"を含むものをgrep。
-[vagrant@testsv ~]$ env | grep -i ssh SSH_AUTH_SOCK=/tmp/ssh-skQVHsUCHU/agent.9034 SSH_CLIENT='192.168.33.1 58017 22' SSH_CONNECTION='192.
+                        SSHのエージェントフォワードした後に、接続したユーザとは別のユーザでgit cloneしたいことがあった。 それについて調べていく中で学習したことや検討したことについてまとめた。 0. 前提 ローカルのPC(Mac)上で、Vagrantを使用してCentOS7の仮想サーバ(testsv)を立ち上げている。 &lt;IPアドレス&gt; ローカルPC：192.168.33.1 仮想サーバ：192.168.33.100 本記事上での「git cloneする」とは、「プライベートのGitレポジトリからSSHを利用してクローンする」ということを指す。 1. SSHのエージェントフォワードを利用したい理由 まず、そもそもなぜSSHのエージェントフォワードをする必要があったのか。 最近では多くの方がご存知かつ利用していることだと思うが、仮想のサーバ上でgitを利用するときによく利用する。 (もちろんそれだけの用途ではありません) 仮想サーバを作るたびにSSHの鍵を生成して、Github等に登録するのが手間なので、 ローカルのPCの鍵を他のサーバへ引き継ぐことでgit clone等を可能にするのだ。 2. SSHエージェントフォワード利用時の挙動 SSHのエージェントフォワードで利用される認証情報は、接続先サーバの/tmp以下に保存されます。 [myuser@localpc ~]$ ssh -A vagrant@192.168.33.100 Last login: Sat Apr 4 xx:xx:xx 2015 from 192.168.33.1 [vagrant@testsv ~]$ [vagrant@testsv ~]$ ls -l /tmp | grep ssh drwx------. 2 vagrant vagrant 23 4月 4 11:35 ssh-skQVHsUCHU また、接続ユーザにはSSH_AUTH_SOCKという環境変数ができ、どの認証情報を利用するか記述がされます。 実際に確認してみる。 確認方法は、envコマンドで環境変数一覧を表示し、そのなかで"ssh"を含むものをgrep。 [vagrant@testsv ~]$ env | grep -i ssh SSH_AUTH_SOCK=/tmp/ssh-skQVHsUCHU/agent.9034 SSH_CLIENT='192.168.33.1 58017 22' SSH_CONNECTION='192.168.33.1 58017 192.168.33.100 22' SSH_TTY=/dev/pts/0 ちなみにエージェントフォワードは、認証エージェントに登録されている秘密鍵を ログイン先のサーバから利用できるようにする機能であり、接続元自体が変わるわけではない。 試しにエージェントフォワードで接続したサーバ先から、更にsshをして、その接続状況をみてみる。 [myuser@localpc ~]$ ssh -A vagrant@192.168.33.100 Last login: Sat Apr 4 xx:xx:xx 2015 from 192.168.33.1 [vagrant@testsv ~]$ ssh -A vagrant@192.168.33.100 Last login: Sat Apr 4 xx:xx:xx 2015 from 192.168.33.1 [vagrant@testsv ~]$ [vagrant@testsv ~]$ w 11:50:17 up 1:55, 2 users, load average: 0.00, 0.01, 0.05 USER TTY FROM LOGIN@ IDLE JCPU PCPU WHAT vagrant pts/0 192.168.33.1 11:35 1.00s 0.04s 0.01s ssh -A vagrant@192.168.33.100 vagrant pts/1 192.168.33.100 11:50 1.00s 0.01s 0.00s w wコマンドの結果の3行目のFROMをみるとわかるが、接続元が変わるわけではない。 3.
                     </div>
                 </section>
                 

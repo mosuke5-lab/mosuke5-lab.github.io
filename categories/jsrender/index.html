@@ -7,7 +7,7 @@
 
     <meta name="description" content="mosuke5&#39;s blog">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Jsrender &middot; Goldstine研究所">
@@ -73,15 +73,7 @@
                     </header>
 
                     <div class="post-description">
-                        1. はじめに
-ぼくはフロントエンドは本業ではありません。
-jsはあまり好きではありません。
-そしてAjax通信後にhtmlをアウトプットする際にjsの変数の中にhtmlを書いていくソースコードがもっと好きではありません。(後述)
-それをJSテンプレートエンジンを使ってシンプルにしてみたって話です。 （JsRenderの使い方を書いたものではありません。）
-2. Ajaxが嫌いだった理由 Ajaxはユーザ体感的にはいいのだけれど、
-Ajaxの結果受け取ったjsonなどのデータを使ってhtmlを出力とかやるとソースコードが煩雑になるので嫌いだった。
-例としてAjaxで/xxxxxにリクエストを投げて、その結果(jsonデータ)を使ってhtmlを出力するものを考えると。
-/* jsonデータは下記が返ってくるとする [ { id: '1', name: 'らーめん', text: 'らーめんはやっぱり濃厚鶏そばです。' }, { id: '2', name: 'うどん', text: 'うどんはやっぱり釜揚げうどんです。' } ] */ $.ajax({ type: &quot;GET&quot;, url: &quot;/xxxxx&quot;, dataType: &quot;json&quot;, success: function(data){ var html = ''; data.forEach(function (e) { html += '&lt;div id=&quot;' + e.id + '&quot;&gt;'; html += '&lt;h1&gt;' + e.name + '&lt;/h1&gt;'; html += '&lt;p&gt;' + e.text + '&lt;/p&gt;'; html += '&lt;/div&gt;'; }); $(&quot;#result&quot;).
+                        1. はじめに ぼくはフロントエンドは本業ではありません。 jsはあまり好きではありません。 そしてAjax通信後にhtmlをアウトプットする際にjsの変数の中にhtmlを書いていくソースコードがもっと好きではありません。(後述) それをJSテンプレートエンジンを使ってシンプルにしてみたって話です。 （JsRenderの使い方を書いたものではありません。） 2. Ajaxが嫌いだった理由 Ajaxはユーザ体感的にはいいのだけれど、 Ajaxの結果受け取ったjsonなどのデータを使ってhtmlを出力とかやるとソースコードが煩雑になるので嫌いだった。 例としてAjaxで/xxxxxにリクエストを投げて、その結果(jsonデータ)を使ってhtmlを出力するものを考えると。 /* jsonデータは下記が返ってくるとする [ { id: '1', name: 'らーめん', text: 'らーめんはやっぱり濃厚鶏そばです。' }, { id: '2', name: 'うどん', text: 'うどんはやっぱり釜揚げうどんです。' } ] */ $.ajax({ type: &quot;GET&quot;, url: &quot;/xxxxx&quot;, dataType: &quot;json&quot;, success: function(data){ var html = ''; data.forEach(function (e) { html += '&lt;div id=&quot;' + e.id + '&quot;&gt;'; html += '&lt;h1&gt;' + e.name + '&lt;/h1&gt;'; html += '&lt;p&gt;' + e.text + '&lt;/p&gt;'; html += '&lt;/div&gt;'; }); $(&quot;#result&quot;).append(html); }, }) jsの変数の中にhtmlが含まれる。 そう、jsの変数の中にhtmlが！！ この規模ならまだいいが、もう少しhtmlが肥大化してくると最悪である。 これがどうしても許せない。 3.jsのテンプレートエンジンを使ってみた 上の問題をなんとかできないかと思っていたところ、jsのテンプレートエンジンにいきついた。 jsのテンプレートエンジンは多数あるのだが今回はJsRenderを採用し、ajaxを心地よく使うことができるようになった。 JsRender/JsViews 3-1.
                     </div>
                 </section>
                 

@@ -7,7 +7,7 @@
 
     <meta name="description" content=" はじめに  私が開発しているシステムでは、Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。そして、serverspecを使って、インフラテストも行っています。 しかし、その運用にいくつか課題点">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="インフラのデプロイとテストを同時実行できるようにしてHappyになった &middot; Goldstine研究所">
@@ -88,6 +88,7 @@
 
 <pre><code>$ ansible-playbook site.yml -i 
 $ bundle exec rake serverspec 
+
 </code></pre>
 
 <p>2つ実行することが面倒であり、面倒であるがゆえにserverspecの実行を怠ったりしていました。<br>
@@ -112,6 +113,7 @@ serverspecでも<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6
 
 <pre><code>ansible -playbook site.yml -i --extra-args='ansible_sudo_pass=xxxxxxxx'
 bundle exec rake serverspec SUDO_PASSWORD=xxxxxxxx 
+
 </code></pre>
 
 <p>ですが、おわかりの通り、<b>コマンドの履歴にもパスワードが残ります</b>。<br>

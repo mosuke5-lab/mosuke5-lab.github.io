@@ -7,7 +7,7 @@
 
     <meta name="description" content=" Gitレポジトリを作って、複数人で開発をしていた。 しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、 Push, PullするときにPermission errorで怒られまくる。  ユーザには共通">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="後からGitレポジトリを共有設定に。sharedオプションの仕組みについて &middot; Goldstine研究所">
@@ -76,35 +76,33 @@
 しかし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>の中に作成されるファイルやディレクトリが個人のグループになってしまい、<br>
 Push, PullするときにPermission <a class="keyword" href="http://d.hatena.ne.jp/keyword/error">error</a>で怒られまくる。</p>
 <p>ユーザには共通のグループを作っていたのに…なんでだっけ…</p>
-<p>気づけば<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>を作るとき以下のようにしていた。</p></p>
+<p>気づけば<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>を作るとき以下のようにしていた。</p>
+```
+$ git init &ndash;bare</p>
 
-<pre><code>$ git init --bare 
+<pre><code>&lt;p&gt;&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD&quot;&gt;複数人&lt;/a&gt;で共有するときには以下のようにするべきであった。&lt;/p&gt;
 </code></pre>
 
-<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD">複数人</a>で共有するときには以下のようにするべきであった。</p></p>
+<p>$ git init &ndash;bare &ndash;shared
+<code>
+&lt;p&gt;では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。&lt;br&gt;
+調べると「&lt;b&gt;setgid&lt;/b&gt;」というキーワードに辿り着いた。&lt;br&gt;
+setgidの権限を付けておくと、そのディレクトリに作成されたファイルの所有グループは、そのディレクトリの所有グループになる。&lt;/p&gt;
+&lt;p&gt;以下のようにchmodでsetgidを付けることができる。&lt;/p&gt;
+</code>
+$ chmod g+s dir_name</p>
 
-<pre><code>$ git init --bare --shared 
+<pre><code>&lt;p&gt;setgidがつくとあまり馴染みのない権限がつく。&lt;br&gt;
+「drwxrw&lt;span style=&quot;color: #ff40ff&quot;&gt;&lt;b&gt;s&lt;/b&gt;&lt;/span&gt;r-x」&lt;/p&gt;
 </code></pre>
 
-<p><p>では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。<br>
-調べると「<b>setgid</b>」というキーワードに辿り着いた。<br>
-setgidの権限を付けておくと、そのディレクトリに作成されたファイルの所有グループは、そのディレクトリの所有グループになる。</p>
-<p>以下のようにchmodでsetgidを付けることができる。</p></p>
-
-<pre><code>$ chmod g+s dir_name 
-</code></pre>
-
-<p><p>setgidがつくとあまり馴染みのない権限がつく。<br>
-「drwxrw<span style="color: #ff40ff"><b>s</b></span>r-x」</p></p>
-
-<pre><code>$ ls -l 
-drwxrwsr-x  4 user  group  136 11 16 22:49 test_dir 
-</code></pre>
-
-<p><p>そして、すでに共有設定なしで作ってしまった<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>では以下のように対応可能。<br>
-（新しく<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>つくるのはめんどいので…）</p></p>
-
-<pre><code>##Gigレポジトリ内のディレクトリに
+<p>$ ls -l
+drwxrwsr-x  4 user  group  136 11 16 22:49 test_dir
+<code>
+&lt;p&gt;そして、すでに共有設定なしで作ってしまった&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&quot;&gt;レポジトリ&lt;/a&gt;では以下のように対応可能。&lt;br&gt;
+（新しく&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&quot;&gt;レポジトリ&lt;/a&gt;つくるのはめんどいので…）&lt;/p&gt;
+</code>
+##Gigレポジトリ内のディレクトリに
 $ chmod -R g+s ./branches
 $ chmod -R g+s ./hooks
 $ chmod -R g+s ./info
@@ -113,10 +111,9 @@ $ chmod -R g+s ./refs
 $ vim .git/config
   ##[core内に]以下を付け加えておいた
   [core]
-       repositoryformatversion = 0 
-</code></pre>
-
-<p></body></p>
+       repositoryformatversion = 0
+```
+</body></p>
 
                     </div>
                     

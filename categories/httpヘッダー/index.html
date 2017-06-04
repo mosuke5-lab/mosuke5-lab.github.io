@@ -7,7 +7,7 @@
 
     <meta name="description" content="mosuke5&#39;s blog">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Httpヘッダー &middot; Goldstine研究所">
@@ -73,26 +73,7 @@
                     </header>
 
                     <div class="post-description">
-                        ただのめも。
-もともとApache+PHPで動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになった。（理由はここではどうでもいいので書かない）
-つまり、Nginx-&gt;Apache-&gt;PHPという構成になった。
-よくあることだが、Apacheからみるとすべてリバースプロキシから通信がきているので、 接続元のIPアドレスがすべてリバースプロキシのものになる。
-HTTPヘッダーに接続元のIPアドレスを追加しアプリ側（PHP）で受け取ろうとしたときのめも。
-リバースプロキシ側でHTTPヘッダー追加 まず、そもそもデフォルトのNginxの設定では接続元のIPアドレスをHTTPヘッダーに含まれない。
-ググればすぐに設定方法自体はでてくる。
-X-Forwarded-Forというヘッダー名にNginxでもっている変数$proxy_add_x_forwarded_forをつっこむ。
-proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  設定は簡単なんだけど、そもそもX-Forwarded-Forなんていうヘッダーあったっけ。。。？
-Wikipediaでみる。
-X-Forwarded-For (XFF) とは、HTTPヘッダフィールドの一つ。HTTPプロキシサーバまたは負荷分散装置（ロードバランサ）を経由してウェブサーバに接続するクライアントの送信元IPアドレスを特定する際のデファクトスタンダードである。 （略）RFCの標準的なヘッダフィールドではないが、IETFのネットワーク作業部会 (Network Working Group) は2011年10月より同種のHTTPヘッダForwardedの標準化作業を開始した[1]。
- なるほど、RFCの標準ではないけど、一般的なものなんですね。
- phpでX-Forwarded-Forを受け取る というわけで、おりゃ！
-echo $_SERVER['X-Forwarded-For'];  エラー...
-※普段PHP使ってないのがバレますね。
-サーバ変数とりあえず、全部はきだす。
-&lt;?php var_dump($_SERVER); # array(x) { [&quot;HTTP_X_FORWARDED_FOR&quot;] =&gt; string(12) &quot;192.168.33.1&quot; ...... }  HTTP先頭についてて、大文字になってて、ハイフンがアンスコに変わっている。
-あたりまえだけどこれはPHPの仕様でいいんだよな...？
-&lt;?php var_dump(getallheaders()); # array(x) { [&quot;X-Forwarded-For&quot;] =&gt; string(12) &quot;192.168.33.1&quot; ...... }  サーバ変数にいれるときに、変わるんだわ。
-念のためtcpdumpで軽く確認してみる $ sudo yum install tcpdump $ tcpdump dst port 80 -X # ながいんで適当に端折りました 11:04:01.
+                        ただのめも。 もともとApache+PHPで動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになった。（理由はここではどうでもいいので書かない） つまり、Nginx-&gt;Apache-&gt;PHPという構成になった。 よくあることだが、Apacheからみるとすべてリバースプロキシから通信がきているので、 接続元のIPアドレスがすべてリバースプロキシのものになる。 HTTPヘッダーに接続元のIPアドレスを追加しアプリ側（PHP）で受け取ろうとしたときのめも。 リバースプロキシ側でHTTPヘッダー追加 まず、そもそもデフォルトのNginxの設定では接続元のIPアドレスをHTTPヘッダーに含まれない。 ググればすぐに設定方法自体はでてくる。 X-Forwarded-Forというヘッダー名にNginxでもっている変数$proxy_add_x_forwarded_forをつっこむ。 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 設定は簡単なんだけど、そもそもX-Forwarded-Forなんていうヘッダーあったっけ。。。？ Wikipediaでみる。 X-Forwarded-For (XFF) とは、HTTPヘッダフィールドの一つ。HTTPプロキシサーバまたは負荷分散装置（ロードバランサ）を経由してウェブサーバに接続するクライアントの送信元IPアドレスを特定する際のデファクトスタンダードである。 （略）RFCの標準的なヘッダフィールドではないが、IETFのネットワーク作業部会 (Network Working Group) は2011年10月より同種のHTTPヘッダForwardedの標準化作業を開始した[1]。 なるほど、RFCの標準ではないけど、一般的なものなんですね。 phpでX-Forwarded-Forを受け取る というわけで、おりゃ！ echo $_SERVER['X-Forwarded-For']; エラー... ※普段PHP使ってないのがバレますね。 サーバ変数とりあえず、全部はきだす。 &lt;?php var_dump($_SERVER); # array(x) { [&quot;HTTP_X_FORWARDED_FOR&quot;] =&gt; string(12) &quot;192.168.33.1&quot; ...... } HTTP先頭についてて、大文字になってて、ハイフンがアンスコに変わっている。 あたりまえだけどこれはPHPの仕様でいいんだよな...？ &lt;?php var_dump(getallheaders()); # array(x) { [&quot;X-Forwarded-For&quot;] =&gt; string(12) &quot;192.168.33.1&quot; ...... } サーバ変数にいれるときに、変わるんだわ。 念のためtcpdumpで軽く確認してみる $ sudo yum install tcpdump $ tcpdump dst port 80 -X # ながいんで適当に端折りました 11:04:01.883209 IP 10.0.2.15.43038 &gt; 192.168.0.10.54655: Flags [.], seq 802:1603, ack 1, win 14600, length 1460 (略) 0x0000: 4500 0355 c705 0000 3706 24ca adc2 265f 1.0..X-Forwarded 0x0010: c0a8 000a 0050 d57f 51ad 1e62 e596 78a4 -For:.192.168.33 0x0020: 8018 0137 8dbe 0000 0101 080a d1dc c19e .1..Host:.xxxxxx いたいた。 Nginxからプロキシされるときはちゃんとヘッダー名は"X-Forwarded-For "になっていること確認。 任意の適当なHTTPヘッダーつけてみた proxy_set_header my-header 'hogefugafoobar'; var_dump($_SERVER); # array(35) { [&quot;HTTP_MY_HEADER&quot;] =&gt; string(14) &quot;hogefugafoobar&quot; ......
                     </div>
                 </section>
                 

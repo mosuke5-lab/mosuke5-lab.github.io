@@ -7,9 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Mon, 29 May 2017 20:06:31 +0900</lastBuildDate>
-    
-	<atom:link href="https://blog.mosuke.tech/categories/hugo/index.xml" rel="self" type="application/rss+xml" />
-    
+    <atom:link href="https://blog.mosuke.tech/categories/hugo/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>CloudFlare APIを使ってキャッシュを削除する</title>
@@ -17,20 +15,84 @@
       <pubDate>Mon, 29 May 2017 20:06:31 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2017/05/29/how_to_use_cloudflare_api/</guid>
-      <description>はじめに 最近ブログをはてなブログからHugoへ移行した。
-HugoのフロントにCloudFlareを利用している。
-ブログ移行についてはこちらを参照。
-「はてなブログからHugoに移行。その際に行ったあれこれ。」
-コンテンツをアップロードした場合などにCloudFlareのキャッシュを削除したく、
-APIを利用して効率よく作業できる環境を整えた。
-使い方 CloudFlareのAPIドキュメントはかなり充実している。
-キャッシュの全削除については下記に記載がある。
-https://api.cloudflare.com/#zone-purge-all-files
-利用方法をみると、DELETE /zones/:identifier/purge_cacheとあるが、
-:identifierがなんのことかはじめわからずはじめ苦戦した。
-identifierの確認 identifierは下記APIで確認できる。
-このAPIで返ってくるはじめのidがidenitiferだ。
-curl -X GET &amp;quot;https://api.cloudflare.com/client/v4/zones \ ?name=&amp;lt;your site&amp;gt; \ &amp;amp;status=active \ &amp;amp;page=1 \ &amp;amp;per_page=20 \ &amp;amp;order=status \ &amp;amp;direction=desc \ &amp;amp;match=all&amp;quot; \ -H &amp;quot;X-Auth-Email: &amp;lt;your email&amp;gt;&amp;quot; \ -H &amp;quot;X-Auth-Key: &amp;lt;your api key&amp;gt;&amp;quot; \ -H &amp;quot;Content-Type: application/json&amp;quot;  { &amp;quot;result&amp;quot;: [ { &amp;quot;id&amp;quot;: &amp;quot;xxxxxxxxxxxxxxxxxxxxxxx&amp;quot;, &amp;quot;name&amp;quot;: &amp;quot;mosuke.tech&amp;quot;, &amp;quot;status&amp;quot;: &amp;quot;active&amp;quot;, &amp;quot;paused&amp;quot;: false, &amp;quot;type&amp;quot;: &amp;quot;full&amp;quot;, &amp;quot;development_mode&amp;quot;: 0, &amp;quot;name_servers&amp;quot;: [ &amp;quot;rudy.</description>
+      <description>
+
+&lt;h1 id=&#34;はじめに:e4a3dd16fa46b2d60f7389ce23065fde&#34;&gt;はじめに&lt;/h1&gt;
+
+&lt;p&gt;最近ブログをはてなブログからHugoへ移行した。&lt;br /&gt;
+HugoのフロントにCloudFlareを利用している。&lt;br /&gt;
+ブログ移行についてはこちらを参照。&lt;br /&gt;
+「&lt;a href=&#34;https://blog.mosuke.tech/entry/2017/05/28/blog_migration/&#34;&gt;はてなブログからHugoに移行。その際に行ったあれこれ。&lt;/a&gt;」&lt;/p&gt;
+
+&lt;p&gt;コンテンツをアップロードした場合などにCloudFlareのキャッシュを削除したく、&lt;br /&gt;
+APIを利用して効率よく作業できる環境を整えた。&lt;/p&gt;
+
+&lt;h1 id=&#34;使い方:e4a3dd16fa46b2d60f7389ce23065fde&#34;&gt;使い方&lt;/h1&gt;
+
+&lt;p&gt;CloudFlareのAPIドキュメントはかなり充実している。&lt;br /&gt;
+キャッシュの全削除については下記に記載がある。&lt;br /&gt;
+&lt;a href=&#34;https://api.cloudflare.com/#zone-purge-all-files&#34;&gt;https://api.cloudflare.com/#zone-purge-all-files&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;利用方法をみると、&lt;code&gt;DELETE /zones/:identifier/purge_cache&lt;/code&gt;とあるが、&lt;br /&gt;
+&lt;code&gt;:identifier&lt;/code&gt;がなんのことかはじめわからずはじめ苦戦した。&lt;/p&gt;
+
+&lt;h2 id=&#34;identifierの確認:e4a3dd16fa46b2d60f7389ce23065fde&#34;&gt;identifierの確認&lt;/h2&gt;
+
+&lt;p&gt;&lt;code&gt;identifier&lt;/code&gt;は下記APIで確認できる。&lt;br /&gt;
+このAPIで返ってくるはじめの&lt;code&gt;id&lt;/code&gt;が&lt;code&gt;idenitifer&lt;/code&gt;だ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;curl -X GET &amp;quot;https://api.cloudflare.com/client/v4/zones \
+    ?name=&amp;lt;your site&amp;gt; \
+    &amp;amp;status=active \
+    &amp;amp;page=1 \
+    &amp;amp;per_page=20 \
+    &amp;amp;order=status \
+    &amp;amp;direction=desc \
+    &amp;amp;match=all&amp;quot; \
+    -H &amp;quot;X-Auth-Email: &amp;lt;your email&amp;gt;&amp;quot; \
+    -H &amp;quot;X-Auth-Key: &amp;lt;your api key&amp;gt;&amp;quot; \
+    -H &amp;quot;Content-Type: application/json&amp;quot; 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;result&amp;quot;: [
+    {
+      &amp;quot;id&amp;quot;: &amp;quot;xxxxxxxxxxxxxxxxxxxxxxx&amp;quot;,
+      &amp;quot;name&amp;quot;: &amp;quot;mosuke.tech&amp;quot;,
+      &amp;quot;status&amp;quot;: &amp;quot;active&amp;quot;,
+      &amp;quot;paused&amp;quot;: false,
+      &amp;quot;type&amp;quot;: &amp;quot;full&amp;quot;,
+      &amp;quot;development_mode&amp;quot;: 0,
+      &amp;quot;name_servers&amp;quot;: [
+        &amp;quot;rudy.ns.cloudflare.com&amp;quot;,
+        &amp;quot;sofia.ns.cloudflare.com&amp;quot;
+      ],
+      ...
+      (中略)
+      ...
+    }
+  ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;キャッシュの削除:e4a3dd16fa46b2d60f7389ce23065fde&#34;&gt;キャッシュの削除&lt;/h2&gt;
+
+&lt;p&gt;うえで手に入れた&lt;code&gt;identifier&lt;/code&gt;を使って、ドキュメント通り&lt;code&gt;purge_cache&lt;/code&gt;を実行するだけだ。&lt;br /&gt;
+このAPIをデプロイの過程に組み込み効率よく運用できている。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;curl -X DELETE &amp;quot;https://api.cloudflare.com/client/v4/zones/&amp;lt;identifier&amp;gt;/purge_cache&amp;quot; \
+     -H &amp;quot;X-Auth-Email: &amp;lt;your email&amp;gt;&amp;quot; \
+     -H &amp;quot;X-Auth-Key: &amp;lt;your api key&amp;gt;&amp;quot; \
+     -H &amp;quot;Content-Type: application/json&amp;quot; \
+     --data &#39;{&amp;quot;purge_everything&amp;quot;:true}&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;さいごに:e4a3dd16fa46b2d60f7389ce23065fde&#34;&gt;さいごに&lt;/h2&gt;
+
+&lt;p&gt;最近のサービスではめずらしくないが、APIに対応しているのはやはりいい。&lt;br /&gt;
+毎度全キャッシュを消してしまっているのはどうかとは思うがそこは今後の改善点だ。&lt;br /&gt;
+本件とは関係ないがCloudFlareはterraformにも対応しているし、かなり運用には便利そう。&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -39,33 +101,188 @@ curl -X GET &amp;quot;https://api.cloudflare.com/client/v4/zones \ ?name=&amp;lt
       <pubDate>Sun, 28 May 2017 13:02:14 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2017/05/28/blog_migration/</guid>
-      <description>1.はじめに 2017年5月27日に2014年2月から約3年3ヶ月程度使ってきたはてなブログからHugoを使ったブログへ移行をした。
-長らく使いやすいブログを提供してきたはてなさんにはとても感謝している。
-はてなブログはとても魅力なブログプラットフォームであると感じているし、いまでもそう思うのだけれどいくつかの判断をした結果Hugoへの移行を決めた。
-本記事では、移行を決めた理由や移行する際に行ったこと、Hugoの実行環境などを紹介する。
-2.Hugoに移行した理由 Hugoに移行した理由というか、はてなブログから別のところに移行しようとした理由になるのだが、
-端的に言うと以下のとおりだ。
- 常時SSL化したかった HTTP/2に対応したかった 独自ドメイン(mosuke.tech)を利用したかった  Hugo以外にももちろん他のツールやサイトも検討を行った。
- はてなブログPro jekyll medium  まず、はてなブログProだが、もっとも手間がかからず独自ドメイン利用もできてよかったのだが、
-SSL化とHTTP/2化はやはり難しかったので外部を検討した。
-次にGithub製のJelyllだが、Github Pagesとの相性もよくはじめに検討はじめたものだった。
-Ruby製ということもあり、自分に馴染みのあるツールで最有力候補だった。
-しかし、後発のHugoの完成度の高さ、コンパイルの速さ、気に入ったテンプレートがあった、という理由でHugoに劣った。
-最後にmediumだが、自前で構築することなくやりたいことのすべてを実現していた。
-正直一番いいのではないかとも思う（笑）
-最終的には、よりカスタマイズ度の高いHugoを選んだ。特にこれといった理由はない。
-ちょうどGo言語をやってみたいモチベーションがあったので、これをきっかけに勉強がはかどればいいなぁくらいの気持ちはあった。
-3.移行に際して行ったこと 3-1.Hugoでのサイト構築、アーキテクチャ Github上でHugoを管理し、コンパイルしてできたPublicファイルを、Github Pages対応の別のレポジトリで管理。
-独自ドメイン利用、SSL対応、HTTP/2対応するためにフロントにCloudFlareを利用した。
-後述するが、CloudFlareはとても便利なツールだが、キャッシュの扱いは気をつけてなければいけない。
-図にすると以下のとおりだ。
-3-2.記事の移行 はてなブログはそのままのこし、新規に書くブログからHugoへ移行することも検討したが、
-せっかくなのではてなブログ時代に書いた記事もすべて移行することを決めた。
-はてなブログからデータのエクスポートができる。
-エクスポートしたファイルを簡単なスクリプトを作ってHugoファイルへの変換を行った。（Github mosuke5/hatena-blog-parser）
-正直このツールは汎用的なものではない。このスクリプトだけではうまく行かない部分も多数ある。
-いくぶんかsedなど使って（たまに手動編集・・・）して整えた。。
-はてなブログのエクスポートファイルのフォーマット -------- AUTHOR: mosuke5 TITLE: 万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する BASENAME: 2017/03/18/182252 STATUS: Publish ALLOW COMMENTS: 1 CONVERT BREAKS: 0 DATE: 03/18/2017 18:22:52 CATEGORY: オブジェクトストレージ CATEGORY: ObjectStorage CATEGORY: クラウド CATEGORY: S3 IMAGE: https://cdn-ak.</description>
+      <description>
+
+&lt;h1 id=&#34;1-はじめに:a42d734d96400169bf761303cfe99adf&#34;&gt;1.はじめに&lt;/h1&gt;
+
+&lt;p&gt;2017年5月27日に2014年2月から約3年3ヶ月程度使ってきたはてなブログからHugoを使ったブログへ移行をした。&lt;br /&gt;
+長らく使いやすいブログを提供してきたはてなさんにはとても感謝している。&lt;br /&gt;
+はてなブログはとても魅力なブログプラットフォームであると感じているし、いまでもそう思うのだけれどいくつかの判断をした結果Hugoへの移行を決めた。&lt;br /&gt;
+本記事では、移行を決めた理由や移行する際に行ったこと、Hugoの実行環境などを紹介する。&lt;/p&gt;
+
+&lt;h1 id=&#34;2-hugoに移行した理由:a42d734d96400169bf761303cfe99adf&#34;&gt;2.Hugoに移行した理由&lt;/h1&gt;
+
+&lt;p&gt;Hugoに移行した理由というか、はてなブログから別のところに移行しようとした理由になるのだが、&lt;br /&gt;
+端的に言うと以下のとおりだ。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;常時SSL化したかった&lt;/li&gt;
+&lt;li&gt;HTTP/2に対応したかった&lt;/li&gt;
+&lt;li&gt;独自ドメイン(mosuke.tech)を利用したかった&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Hugo以外にももちろん他のツールやサイトも検討を行った。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;はてなブログPro&lt;/li&gt;
+&lt;li&gt;jekyll&lt;/li&gt;
+&lt;li&gt;medium&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;まず、はてなブログProだが、もっとも手間がかからず独自ドメイン利用もできてよかったのだが、&lt;br /&gt;
+SSL化とHTTP/2化はやはり難しかったので外部を検討した。&lt;/p&gt;
+
+&lt;p&gt;次にGithub製のJelyllだが、Github Pagesとの相性もよくはじめに検討はじめたものだった。&lt;br /&gt;
+Ruby製ということもあり、自分に馴染みのあるツールで最有力候補だった。&lt;br /&gt;
+しかし、後発のHugoの完成度の高さ、コンパイルの速さ、気に入ったテンプレートがあった、という理由でHugoに劣った。&lt;/p&gt;
+
+&lt;p&gt;最後にmediumだが、自前で構築することなくやりたいことのすべてを実現していた。&lt;br /&gt;
+正直一番いいのではないかとも思う（笑）&lt;br /&gt;
+最終的には、よりカスタマイズ度の高いHugoを選んだ。特にこれといった理由はない。&lt;br /&gt;
+ちょうどGo言語をやってみたいモチベーションがあったので、これをきっかけに勉強がはかどればいいなぁくらいの気持ちはあった。&lt;/p&gt;
+
+&lt;h1 id=&#34;3-移行に際して行ったこと:a42d734d96400169bf761303cfe99adf&#34;&gt;3.移行に際して行ったこと&lt;/h1&gt;
+
+&lt;h2 id=&#34;3-1-hugoでのサイト構築-アーキテクチャ:a42d734d96400169bf761303cfe99adf&#34;&gt;3-1.Hugoでのサイト構築、アーキテクチャ&lt;/h2&gt;
+
+&lt;p&gt;Github上でHugoを管理し、コンパイルしてできたPublicファイルを、Github Pages対応の別のレポジトリで管理。&lt;br /&gt;
+独自ドメイン利用、SSL対応、HTTP/2対応するためにフロントにCloudFlareを利用した。&lt;br /&gt;
+後述するが、CloudFlareはとても便利なツールだが、キャッシュの扱いは気をつけてなければいけない。&lt;br /&gt;
+図にすると以下のとおりだ。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://blog.mosuke.tech/image/hugo-architecture.png&#34; alt=&#34;hugo-architecture&#34; /&gt;
+&lt;/p&gt;
+
+&lt;h2 id=&#34;3-2-記事の移行:a42d734d96400169bf761303cfe99adf&#34;&gt;3-2.記事の移行&lt;/h2&gt;
+
+&lt;p&gt;はてなブログはそのままのこし、新規に書くブログからHugoへ移行することも検討したが、&lt;br /&gt;
+せっかくなのではてなブログ時代に書いた記事もすべて移行することを決めた。&lt;/p&gt;
+
+&lt;p&gt;はてなブログからデータのエクスポートができる。&lt;br /&gt;
+&lt;img src=&#34;https://blog.mosuke.tech/image/hatena-blog-entry-export.png&#34; alt=&#34;hatena-blog-entry-export&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;エクスポートしたファイルを簡単なスクリプトを作ってHugoファイルへの変換を行った。（&lt;a href=&#34;https://github.com/mosuke5/hatena-blog-parser&#34;&gt;Github mosuke5/hatena-blog-parser&lt;/a&gt;）&lt;br /&gt;
+正直このツールは汎用的なものではない。このスクリプトだけではうまく行かない部分も多数ある。&lt;br /&gt;
+いくぶんかsedなど使って（たまに手動編集・・・）して整えた。。&lt;/p&gt;
+
+&lt;h3 id=&#34;はてなブログのエクスポートファイルのフォーマット:a42d734d96400169bf761303cfe99adf&#34;&gt;はてなブログのエクスポートファイルのフォーマット&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;--------
+AUTHOR: mosuke5
+TITLE: 万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する
+BASENAME: 2017/03/18/182252
+STATUS: Publish
+ALLOW COMMENTS: 1
+CONVERT BREAKS: 0
+DATE: 03/18/2017 18:22:52
+CATEGORY: オブジェクトストレージ
+CATEGORY: ObjectStorage
+CATEGORY: クラウド
+CATEGORY: S3
+IMAGE: https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20170318/20170318164020.jpg
+-----
+BODY:
+&amp;lt;h2&amp;gt;1.はじめに&amp;lt;/h2&amp;gt;
+
+&amp;lt;p&amp;gt;&amp;lt;a class=&amp;quot;keyword&amp;quot; href=&amp;quot;http://d.hatena.ne.jp/keyword/Amazon%20S3&amp;quot;&amp;gt;Amazon S3&amp;lt;/a&amp;gt;をはじめとして、オブジェクトストレージが身近になってきています。&amp;lt;br/&amp;gt;
+各&amp;lt;a class=&amp;quot;keyword&amp;quot; href=&amp;quot;http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9&amp;quot;&amp;gt;クラウド&amp;lt;/a&amp;gt;ベンダーはオブジェクトストレージサービスを提供しています。&amp;lt;/p&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;変換後のhugoファイルフォーマット:a42d734d96400169bf761303cfe99adf&#34;&gt;変換後のHugoファイルフォーマット&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;+++
+Categories = [&amp;quot;オブジェクトストレージ&amp;quot;, &amp;quot;ObjectStorage&amp;quot;, &amp;quot;クラウド&amp;quot;, &amp;quot;S3&amp;quot;]
+Description = &amp;quot; 1.はじめに  Amazon S3をはじめとして、オブジェクトストレージが身近になってきています。 各クラウドベンダーはオブジェクトストレージサービスを提供しています。   Amazon S3  Azure Blob Storage  G&amp;quot;
+Tags = [&amp;quot;オブジェクトストレージ&amp;quot;, &amp;quot;ObjectStorage&amp;quot;, &amp;quot;クラウド&amp;quot;, &amp;quot;S3&amp;quot;]
+date = &amp;quot;2017-03-18T18:22:00+9:00&amp;quot;
+title = &amp;quot;万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する&amp;quot;
+author = &amp;quot;m通知osuke5&amp;quot;
+archive = [&amp;quot;2017&amp;quot;]
++++
+
+&amp;lt;h2&amp;gt;1.はじめに&amp;lt;/h2&amp;gt;
+
+&amp;lt;p&amp;gt;&amp;lt;a class=&amp;quot;keyword&amp;quot; href=&amp;quot;http://d.hatena.ne.jp/keyword/Amazon%20S3&amp;quot;&amp;gt;Amazon S3&amp;lt;/a&amp;gt;をはじめとして、オブジェクトストレージが身近になってきています。&amp;lt;br/&amp;gt;
+各&amp;lt;a class=&amp;quot;keyword&amp;quot; href=&amp;quot;http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9&amp;quot;&amp;gt;クラウド&amp;lt;/a&amp;gt;ベンダーはオブジェクトストレージサービスを提供しています。&amp;lt;/p&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;3-3-リダイレクト関連:a42d734d96400169bf761303cfe99adf&#34;&gt;3-3.リダイレクト関連&lt;/h2&gt;
+
+&lt;h3 id=&#34;1-リダイレクト処理:a42d734d96400169bf761303cfe99adf&#34;&gt;(1)リダイレクト処理&lt;/h3&gt;
+
+&lt;p&gt;はてなブログのデザイン設定から「ヘッダー」→「タイトル下」に、ブログ移転をお知らせする文言とリダイレクト処理を書いた。&lt;br /&gt;
+これですべてのページのタイトル下に「ブログ移転しました。5秒後にリダイレクトします。（リンク先URL）」が表示し、5秒後にリダイレクトするようにした。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot;font-size: 150%; color: blue;&amp;quot;&amp;gt;ブログ移転しました。5秒後にリダイレクトします。&amp;lt;/span&amp;gt;&amp;lt;br /&amp;gt;
+&amp;lt;script type=&amp;quot;text/javascript&amp;quot; language=&amp;quot;javascript&amp;quot;&amp;gt;
+// 新urlの作成
+var domain = &amp;quot;https://blog.mosuke.tech&amp;quot;;
+var path = location.pathname; // パスの整形
+var url = domain + path; 
+
+// リンクhtmlの出力
+document.write(&amp;quot;&amp;lt;a href=\&amp;quot;&amp;quot; + url + &amp;quot;\&amp;quot;&amp;gt;&amp;quot; + url + &amp;quot;&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;&amp;quot;);
+
+// リダイレクト
+setTimeout(&amp;quot;redirect()&amp;quot;, 5000);  // 5 sec
+function redirect(){
+   location.href = url; 
+}
+&amp;lt;/script&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;2-スマホサイトでのリダイレクト:a42d734d96400169bf761303cfe99adf&#34;&gt;(2)スマホサイトでのリダイレクト&lt;/h3&gt;
+
+&lt;p&gt;スマホで開いた時にも同様の動作をして欲しかったのだが、私の設定ではもともと、&lt;br /&gt;
+スマホは別デザインとなっていて、うえで設定したJSが実行されない。&lt;br /&gt;
+スマホ用でHTML/JSを埋め込むのは有料プランでしかできず、&lt;br /&gt;
+「詳細設定」の「レスポンシブデザイン」にチェックを入れることで、スマホで表示した場合もPCと同じ画面を出すようにして対応した。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[x] レスポンシブデザイン
+スマートフォンでもPCと同じデザイン設定でブログを表示します。レスポンシブデザインのテーマを設定しているときのみ使用してください。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;3-googleへのアドレス変更通知:a42d734d96400169bf761303cfe99adf&#34;&gt;(3)Googleへのアドレス変更通知&lt;/h3&gt;
+
+&lt;p&gt;一般的にブログのドメイン変更を行った場合は、&lt;br /&gt;
+変更元のサイトで301リダイレクトを行ってGoogleに恒久的にサイトが移動したことを伝える。&lt;br /&gt;
+しかし、はてなブログを利用しているとWebサーバレベルでの変更はできず、301リダイレクトができない。&lt;br /&gt;
+Canonicalを変更したりしたが、うまくGoogle Search Consoleに変更を読み取らせることができなかった。&lt;br /&gt;
+（いい方法あったら教えてください…）&lt;/p&gt;
+
+&lt;p&gt;なので結局、移行時の手順は以下で進めた。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;新サイト(blog.mosuke.tech)を公開&lt;/li&gt;
+&lt;li&gt;はてなブログにJavaScriptによるリダイレクト処理追加&lt;/li&gt;
+&lt;li&gt;はてなブログへのクローリングを拒否&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;3-4-cloudflareのキャッシュ削除:a42d734d96400169bf761303cfe99adf&#34;&gt;3-4.CloudFlareのキャッシュ削除&lt;/h2&gt;
+
+&lt;p&gt;フロントにCloudFlareを利用していると書いた。&lt;br /&gt;
+Hugoは静的ブログサイトなので、基本的にCloudFlare側で全てキャッシュする。&lt;br /&gt;
+そのため、ブログ記事の更新やデザインの本番への反映が時間かかる。&lt;/p&gt;
+
+&lt;p&gt;CloudFlareは便利なものでapiを用意している。&lt;br /&gt;
+簡単だが、以下のようなキャッシュ全削除スクリプトを用意した。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;#!/bin/sh
+curl -X DELETE &amp;quot;https://api.cloudflare.com/client/v4/zones/$1/purge_cache&amp;quot; \
+     -H &amp;quot;X-Auth-Email: $2&amp;quot; \
+     -H &amp;quot;X-Auth-Key: $3&amp;quot; \
+     -H &amp;quot;Content-Type: application/json&amp;quot; \
+     --data &#39;{&amp;quot;purge_everything&amp;quot;:true}&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;4-今後の課題:a42d734d96400169bf761303cfe99adf&#34;&gt;4.今後の課題&lt;/h1&gt;
+
+&lt;p&gt;まずは新しいHugoの環境でブログを書いて、課題点など洗いだしていく必要がある。&lt;br /&gt;
+あとは、はてなブログからの移行でだいぶSEOあたり下がったと思う。&lt;br /&gt;
+そのあたりの挽回をどうするかはこれからの検討課題。&lt;br /&gt;
+あとは、デプロイからCloudFlareのキャッシュ削除の流れはぜひ自動化していきたい。&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -74,10 +291,107 @@ Ruby製ということもあり、自分に馴染みのあるツールで最有�
       <pubDate>Sun, 07 May 2017 20:58:01 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/first-blog/</guid>
-      <description> Goldstine研究所移行の検討。 フォーマット確認する
-あいうえお(スペース2つで改行)
-かきくけこ
-h1タイトル # hogege def hoge puts &amp;quot;hello hugo&amp;quot; end  package main import &amp;quot;fmt&amp;quot; func main() { fmt.Println(&amp;quot;hello, world&amp;quot;) }  h2タイトル  list1  list1-1 list1-1-1 list1-1-2 list1-2  list2 list3  h3タイトル  list-number1 list-number2 list-number3     Left align Right align Center align     This This This   column column column   will will will   be be be   left right center   aligned aligned aligned    Image </description>
+      <description>
+
+&lt;p&gt;Goldstine研究所移行の検討。
+フォーマット確認する&lt;/p&gt;
+
+&lt;p&gt;あいうえお(スペース2つで改行)&lt;br /&gt;
+かきくけこ&lt;/p&gt;
+
+&lt;h1 id=&#34;h1タイトル:71bff0de63c5140bca369a9943a83779&#34;&gt;h1タイトル&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;# hogege
+def hoge
+  puts &amp;quot;hello hugo&amp;quot;
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;package main
+
+import &amp;quot;fmt&amp;quot;
+
+func main() {
+    fmt.Println(&amp;quot;hello, world&amp;quot;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;h2タイトル:71bff0de63c5140bca369a9943a83779&#34;&gt;h2タイトル&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;list1
+
+&lt;ul&gt;
+&lt;li&gt;list1-1&lt;/li&gt;
+&lt;li&gt;list1-1-1&lt;/li&gt;
+&lt;li&gt;list1-1-2&lt;/li&gt;
+&lt;li&gt;list1-2&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;list2&lt;/li&gt;
+&lt;li&gt;list3&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;h3タイトル:71bff0de63c5140bca369a9943a83779&#34;&gt;h3タイトル&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;list-number1&lt;/li&gt;
+&lt;li&gt;list-number2&lt;/li&gt;
+&lt;li&gt;list-number3&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;Left align&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;Right align&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Center align&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;This&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;This&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;This&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;column&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;column&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;column&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;will&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;will&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;will&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;be&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;be&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;be&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;left&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;right&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;center&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;aligned&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;aligned&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;aligned&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h1 id=&#34;image:71bff0de63c5140bca369a9943a83779&#34;&gt;Image&lt;/h1&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://blog.mosuke.tech/image/apple-touch-icon.png&#34; alt=&#34;image&#34; /&gt;
+&lt;/p&gt;
+</description>
     </item>
     
   </channel>

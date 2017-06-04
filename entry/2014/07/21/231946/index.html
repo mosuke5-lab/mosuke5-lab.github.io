@@ -7,7 +7,7 @@
 
     <meta name="description" content=" 前々からArduino自体はもっていたし、ちょろっと触ったことはあったのだが、 大学時代の研究室の仲間とArduino勉強会をやることになり、それに向けて友人と再入門したのでそのときのメモ。 Arduino入門にこれだけは知っておきたい事">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="【これだけは抑えておきたい】Arduino入門まとめ &middot; Goldstine研究所">
@@ -186,12 +186,13 @@ void loop(){
 </code></pre>
 
 <p>出力結果</p>
-```
-hoge1
+
+<pre><code>hoge1
 hoge2
 hoge3
  .... 
-```
+</code></pre>
+
 <p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140721/20140721103544.png" alt="f:id:mosuke5:20140721103544p:plain" title="f:id:mosuke5:20140721103544p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 <p></p>
 <h2>3. 超音波距離センサの利用</h2>次のステップとしてセンサーの利用を行った。<br>
@@ -199,8 +200,8 @@ hoge3
 ここでは超音波距離センサを利用するが、大事なことはセンサーの種類ではなく、センサーを利用した入力である。<p>【作ったもの】<br>
 超音波距離センサにて測定した物体との距離をシリアルモニターで表示するもの。</p>
 <p>【<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>】</p>
-```c
-// 送信側のピン番号
+
+<pre><code class="language-c">// 送信側のピン番号
 const int TRIGPIN = 8; 
 
 // 受信側のピン番号
@@ -239,12 +240,12 @@ void loop() {
   
   //シリアルモニタへ出力
   Serial.print(dis);
-  Serial.println(" cm");
+  Serial.println(&quot; cm&quot;);
   
   delay(500);
   
 }
-```
+</code></pre>
 
 <p>【回路】<br>
 <span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140721/20140721220559.png" alt="f:id:mosuke5:20140721220559p:plain" title="f:id:mosuke5:20140721220559p:plain" class="hatena-fotolife" itemprop="image"></span></p>
@@ -375,7 +376,7 @@ void loop() {
 }
 </code></pre>
 
-<p><p>【Processing側】</p></p>
+<p>【Processing側】</p>
 
 <pre><code class="language-c">import processing.serial.*;
 

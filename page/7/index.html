@@ -7,7 +7,7 @@
 
     <meta name="description" content="mosuke5&#39;s blog">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Goldstine研究所 &middot; Goldstine研究所">
@@ -89,33 +89,35 @@
     <h3>(1) 簡単な<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>のようなものを利用する</h3>
     <p>先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、<br>
 これが一番複雑にならずに良いと思ったということ。</p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>側で/<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>にアクセスすると<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルをダウンロードできるようにする。</p></p>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>側で/<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>にアクセスすると<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルをダウンロードできるようにする。</p>
+```ruby
+#Sinatra側
+get &lsquo;/csv&rsquo; do
+    content_type &lsquo;application/csv&rsquo;
+    attachment &lsquo;download.csv&rsquo;</p>
 
-<pre><code class="language-ruby">#Sinatra側
-get '/csv' do
-    content_type 'application/csv'
-    attachment 'download.csv'
+<pre><code>#DBからデータ取得(Activerecord利用)
+@data   = Model.all()
 
-    #DBからデータ取得(Activerecord利用)
-    @data   = Model.all()
+#出力するCSVデータの変数。csvヘッダーを先につけている。
+@csv = &quot;date,value\n&quot;
 
-    #出力するCSVデータの変数。csvヘッダーを先につけている。
-    @csv = &quot;date,value\n&quot;
-
-    #DBのデータをCSVの形にして格納
-    @data.each do |d|
-        @csv += d.date.to_s + &quot;,&quot; + d.value.to_s + &quot;\n&quot;
-    end
-    
-    #csvtest.erbというビューに出力
-    erb :csvtest, :layout =&gt; false
+#DBのデータをCSVの形にして格納
+@data.each do |d|
+    @csv += d.date.to_s + &quot;,&quot; + d.value.to_s + &quot;\n&quot;
 end
+
+#csvtest.erbというビューに出力
+erb :csvtest, :layout =&gt; false
 </code></pre>
 
-<p>csvtest.erb</p>
+<p>end</p>
+
+<pre><code>&lt;p&gt;csvtest.erb&lt;/p&gt;
 ```ruby
-<%= @csv %>
-```
+&lt;%= @csv %&gt;
+</code></pre>
+
 <p>こうすることで"<a href="http://*****/csv">http://*****/csv</a>"にアクセスすると<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルとしてダウンロードできる状態になる。<br>
 条件指定をしてデータをダウンロードできるようにしたい場合はGETでパラメータ指定できるようにすれば良いと思う。<br>
 （<a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/CSV">CSV</a>ファイルを生成するところのコードがナンセンスだと思っているので、もっといい方法があるはず…）</p>
@@ -133,22 +135,22 @@ end
 <div class="section">
     <h3>(2) <a class="keyword" href="http://d.hatena.ne.jp/keyword/javascript">javascript</a>コードの中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>変数を展開させる</h3>
     <p>d3.jsのdatasetの中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>の変数を展開させる。ビューに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Javascript">Javascript</a>を書いているので、ビューの中で変数展開するのと同じ要領。<br>
-しかし、jsコードに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>コードも交じるので複雑になりがち。</p></p>
-
-<pre><code class="language-javascript">var dataset = [
+しかし、jsコードに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>コードも交じるので複雑になりがち。</p>
+```javascript
+var dataset = [
 &lt;% @data.each do |d| %&gt;
     {date:&lt;%= d.date%&gt;, value:&lt;%= d.value %&gt;},
 &lt;% end %&gt;
-];
-</code></pre>
+];</p>
 
-<p></div>
-<div class="section">
-    <h3>(3) <a class="keyword" href="http://d.hatena.ne.jp/keyword/CSV">CSV</a>ファイルをおいておく</h3>
-    <p>こちらはリアルタイムな更新でなれけばこれはこれでありだと思う。<br>
-publicのフォルダに予め<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルを設置しておき、以下のようにd3.jsで読み込ませる。</p></p>
+<pre><code>&lt;/div&gt;
+&lt;div class=&quot;section&quot;&gt;
+    &lt;h3&gt;(3) &lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/CSV&quot;&gt;CSV&lt;/a&gt;ファイルをおいておく&lt;/h3&gt;
+    &lt;p&gt;こちらはリアルタイムな更新でなれけばこれはこれでありだと思う。&lt;br&gt;
+publicのフォルダに予め&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/csv&quot;&gt;csv&lt;/a&gt;ファイルを設置しておき、以下のようにd3.jsで読み込ませる。&lt;/p&gt;
 
-<pre><code class="language-javascript">d3.csv(&quot;test.csv&quot;, function(error, data) {
+```javascript
+d3.csv(&quot;test.csv&quot;, function(error, data) {
     (中略)
 }
 </code></pre>
@@ -273,16 +275,16 @@ Request timeout for icmp_seq 0
 <p>構成図<br>
 <span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140913/20140913110038.png" alt="f:id:mosuke5:20140913110038p:plain" title="f:id:mosuke5:20140913110038p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a>ルータから有線LANケーブルを伸ばし<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>に結線。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>による<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>の取得はとても容易で以下のようにマックアドレスを指定するのみ。</p></p>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>による<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>の取得はとても容易で以下のようにマックアドレスを指定するのみ。</p>
+```
+Ethernet.begin(mac)</p>
 
-<pre><code>Ethernet.begin(mac) 
-</code></pre>
+<pre><code>&lt;p&gt;以下は&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/Arduino&quot;&gt;Arduino&lt;/a&gt;公式サイトに則って実施したもの。&lt;br&gt;
+&lt;a href=&quot;http://arduino.cc/en/Tutorial/DhcpAddressPrinter&quot;&gt;Arduino - DhcpAddressPrinter&lt;/a&gt;&lt;br&gt;
+&lt;/p&gt;
 
-<p>以下は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>公式サイトに則って実施したもの。<br>
-<a href="http://arduino.cc/en/Tutorial/DhcpAddressPrinter">Arduino - DhcpAddressPrinter</a><br>
-</p>
-
-<pre><code class="language-c">#include &lt;SPI.h&gt;
+```c
+#include &lt;SPI.h&gt;
 #include &lt;Ethernet.h&gt;
 
 //Mac Address Static
@@ -462,12 +464,13 @@ void loop(){
 </code></pre>
 
 <p>出力結果</p>
-```
-hoge1
+
+<pre><code>hoge1
 hoge2
 hoge3
  .... 
-```
+</code></pre>
+
 <p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140721/20140721103544.png" alt="f:id:mosuke5:20140721103544p:plain" title="f:id:mosuke5:20140721103544p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 <p></p>
 <h2>3. 超音波距離センサの利用</h2>次のステップとしてセンサーの利用を行った。<br>
@@ -475,8 +478,8 @@ hoge3
 ここでは超音波距離センサを利用するが、大事なことはセンサーの種類ではなく、センサーを利用した入力である。<p>【作ったもの】<br>
 超音波距離センサにて測定した物体との距離をシリアルモニターで表示するもの。</p>
 <p>【<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>】</p>
-```c
-// 送信側のピン番号
+
+<pre><code class="language-c">// 送信側のピン番号
 const int TRIGPIN = 8; 
 
 // 受信側のピン番号
@@ -515,12 +518,12 @@ void loop() {
   
   //シリアルモニタへ出力
   Serial.print(dis);
-  Serial.println(" cm");
+  Serial.println(&quot; cm&quot;);
   
   delay(500);
   
 }
-```
+</code></pre>
 
 <p>【回路】<br>
 <span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140721/20140721220559.png" alt="f:id:mosuke5:20140721220559p:plain" title="f:id:mosuke5:20140721220559p:plain" class="hatena-fotolife" itemprop="image"></span></p>
@@ -651,7 +654,7 @@ void loop() {
 }
 </code></pre>
 
-<p><p>【Processing側】</p></p>
+<p>【Processing側】</p>
 
 <pre><code class="language-c">import processing.serial.*;
 
@@ -1090,10 +1093,10 @@ WHERE table1.id=table2.id #←結合条件
  
 </code></pre>
 
-<p><p>table1とtable2を内部結合させたいのに、<br>
-肝心の何と何を結合させるかの部分の&rdquo;WHERE table1.id=table2.id&rdquo;が離れてしまい、<br>
+<p>table1とtable2を内部結合させたいのに、<br>
+肝心の何と何を結合させるかの部分の"WHERE table1.id=table2.id"が離れてしまい、<br>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>文全体として何をしたいかわかりずらい。</p>
-<p>一方、INNER JOINなら</p></p>
+<p>一方、INNER JOINなら</p>
 
 <pre><code class="language-mysql">SELECT * 
 FROM table1

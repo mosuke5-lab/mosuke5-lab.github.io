@@ -7,7 +7,7 @@
 
     <meta name="description" content=" 1. はじめに  Vim::Factoryの開発や、仕事などでAnsibleを使うことが多いのだが、 その実行速度があまりでないことに不満をもっていて、どうしたら早くできるか考えていました。 調べると、ControlMasterを利用して">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Ansible、実行速度高速化の実験。ControlMasterとPipeliningについて &middot; Goldstine研究所">
@@ -107,6 +107,7 @@ Pipelining機能をなしの状態だと、このファイル転送とファイ�
 &lt;192.168.33.100&gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c 'mkdir -p $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321 &amp;&amp; chmod a+rx $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321 &amp;&amp; echo $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321'
 &lt;192.168.33.100&gt; PUT /var/folders/7_/d_dwdlcx1m95mn_846x30xb40000gn/T/tmpc8amAw TO /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/command
 &lt;192.168.33.100&gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c 'sudo -k &amp;&amp; sudo -E -S -p &quot;[sudo via ansible, key=koibtlgpbiprbaihcqxiqgcnnreofxuo] password: &quot; -u root /bin/sh -c '&quot;'&quot;'echo BECOME-SUCCESS-koibtlgpbiprbaihcqxiqgcnnreofxuo; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/command; rm -rf /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/ &gt;/dev/null 2&gt;&amp;1'&quot;'&quot;'' 
+
 </code></pre>
 
 <p>Pipiliningの機能を有効にすると、タスク実行ごとのモジュールファイルの転送と削除をしなくなる。<br>
@@ -175,6 +176,7 @@ transport = ssh
 [ssh_connection]
 pipeline = false
 ssh_args = -o ControlMaster=no 
+
 </code></pre>
 
 <p>② ControlMaster: <b><span style="color: #ff0000">有効</span></b> ＆ pipeline: <b>無効</b></p>
@@ -195,6 +197,7 @@ transport = ssh
 [ssh_connection]
 pipeline = true
 ssh_args = -o ControlMaster=auto -o ControlPersist=300s 
+
 </code></pre>
 
 <h2>実行コマンド</h2>

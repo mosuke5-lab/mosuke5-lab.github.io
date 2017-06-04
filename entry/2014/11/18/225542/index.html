@@ -7,7 +7,7 @@
 
     <meta name="description" content=" AnsibleのPlaybookを書いていると、ワイルドカードを含んだコマンドを実行したい時がある。 そんなときあるところでハマった。  Apacheをソースインストールして、パスを/usr/sbinにリンクを貼ろうとして以下を実行した。">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Ansible、コマンドでワイルドカードを使うときの注意 &middot; Goldstine研究所">
@@ -82,25 +82,24 @@
 <p>/usr/sbin内に「*」というリンクが貼られてしまった。</p>
 
 <pre><code>* -&gt; /usr/local/httpd/bin 
+
 </code></pre>
 
 <p><p>どうやらcommandモジュールは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EF%A5%A4%A5%EB%A5%C9%A5%AB%A1%BC%A5%C9">ワイルドカード</a>に対応していないよう。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EF%A5%A4%A5%EB%A5%C9%A5%AB%A1%BC%A5%C9">ワイルドカード</a>を使いたいときはshellモジュールを利用すると良い。</p></p>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EF%A5%A4%A5%EB%A5%C9%A5%AB%A1%BC%A5%C9">ワイルドカード</a>を使いたいときはshellモジュールを利用すると良い。</p>
+<code>yaml
+- shell: ln -s /usr/local/httpd/bin/* /usr/sbin
+</code>
+<p>また、<em>というリンクを消すときは要注意（笑）</p>
+```
+$ rm ./</em></p>
 
-<pre><code class="language-yaml">- shell: ln -s /usr/local/httpd/bin/* /usr/sbin
+<pre><code>&lt;p&gt;とやってしまうとあたりまえだがやばいので&lt;/p&gt;
 </code></pre>
 
-<p><p>また、*というリンクを消すときは要注意（笑）</p></p>
-
-<pre><code>$ rm ./* 
-</code></pre>
-
-<p><p>とやってしまうとあたりまえだがやばいので</p></p>
-
-<pre><code>$ rm ./¥* 
-</code></pre>
-
-<p><p>こうですね…</p>
+<p>$ rm ./¥*
+```
+<p>こうですね…</p>
 </body></p>
 
                     </div>

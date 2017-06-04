@@ -7,7 +7,7 @@
 
     <meta name="description" content="mosuke5&#39;s blog">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Vpn &middot; Goldstine研究所">
@@ -73,24 +73,7 @@
                     </header>
 
                     <div class="post-description">
-                        VPS1台でインフラ勉強シリーズでVPN構築を行ったのでそのメモ。
-1. 実施したこと VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。
- 
-  2. 環境 ・VPNソフトウェア：SoftEther VPN プロジェクト - SoftEther VPN プロジェクト
-・メモリ：１GB
-・CPU：仮想２コア
-・HDD：100GB
-・OS：CentOS7
-・サーバ仮想化：Vagrant(Utuntu13)
- 3. SoftEtherのインストール インストール手順は公式ドキュメント通りなので簡単にコマンドのみ記述しておく。
-7.3 Linux へのインストールと初期設定 - SoftEther VPN プロジェクト
-【ダウンロードしたもの】
-ここから環境に応じて対象のソフトウェアを選ぶ
-SoftEther ダウンロード センター
-・コンポーネント：SoftEther VPN Server
-・プラットフォーム：Linux
-・CPU：Intel x86 / AMD64(64bit)
-## ダウンロード $ wget ttp://jp.softether-download.com/files/softether/v4.08-9449-rtm-2014.06.08-tree/Linux/SoftEther%20VPN%20Server/64bit%20-%20Intel%20x64%20or%20AMD64/softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz ## 解凍 $ tar zxvf softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz ## 実行可能ファイル作成 $ cd vpnserver/ $ sudo make ## /usr/localへ配置 $ sudo mv vpnserver /usr/local ## パーミッション変更 ### 基本的には600。実行ファイルのみ700 $ cd /usr/local/vpnserver $ sudo chown root:root .
+                        VPS1台でインフラ勉強シリーズでVPN構築を行ったのでそのメモ。 1. 実施したこと VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。 2. 環境 ・VPNソフトウェア：SoftEther VPN プロジェクト - SoftEther VPN プロジェクト ・メモリ：１GB ・CPU：仮想２コア ・HDD：100GB ・OS：CentOS7 ・サーバ仮想化：Vagrant(Utuntu13) 3. SoftEtherのインストール インストール手順は公式ドキュメント通りなので簡単にコマンドのみ記述しておく。 7.3 Linux へのインストールと初期設定 - SoftEther VPN プロジェクト 【ダウンロードしたもの】 ここから環境に応じて対象のソフトウェアを選ぶ SoftEther ダウンロード センター ・コンポーネント：SoftEther VPN Server ・プラットフォーム：Linux ・CPU：Intel x86 / AMD64(64bit) ## ダウンロード $ wget ttp://jp.softether-download.com/files/softether/v4.08-9449-rtm-2014.06.08-tree/Linux/SoftEther%20VPN%20Server/64bit%20-%20Intel%20x64%20or%20AMD64/softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz ## 解凍 $ tar zxvf softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz ## 実行可能ファイル作成 $ cd vpnserver/ $ sudo make ## /usr/localへ配置 $ sudo mv vpnserver /usr/local ## パーミッション変更 ### 基本的には600。実行ファイルのみ700 $ cd /usr/local/vpnserver $ sudo chown root:root ./* $ sudo chmod 600 ./* $ sudo chmod 700 ./vpncmd $ sudo chmod 700 ./vpnserver ## 動作チェック $ sudo ./vpncmd 1.
                     </div>
                 </section>
                 

@@ -7,7 +7,7 @@
 
     <meta name="description" content=" dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、 特定のユーザでログインした状態のコンテナを作りたいという場面に遭遇した。やりたいこと 特定のユーザでログインした状態のシェルを提供するこ">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="dockerで特定ユーザでログインした状態のシェル環境を提供する &middot; Goldstine研究所">
@@ -91,6 +91,7 @@
 <p>docker runに-uオプションがあるし、これで余裕！と思った。</p>
 
 <pre><code>[host] $ sudo docker run -u=user_name -i -t image_name /bin/bash 
+
 </code></pre>
 
 <p>しかし…以下を確認してみると…</p>
@@ -110,6 +111,7 @@
 <p>ディレクトリはどうやら-wオプションで解決できるようだが…</p>
 
 <pre><code>[host] $ sudo docker run -u=user_name -w /home/user_name -i -t image_name /bin/bash 
+
 </code></pre>
 
 <pre><code>[docker] $ pwd

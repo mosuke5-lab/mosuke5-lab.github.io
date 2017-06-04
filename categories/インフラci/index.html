@@ -7,7 +7,7 @@
 
     <meta name="description" content="mosuke5&#39;s blog">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="インフラci &middot; Goldstine研究所">
@@ -73,16 +73,7 @@
                     </header>
 
                     <div class="post-description">
-                        ※執筆後、業務でもserverspecを利用し始めたのもあり、業務レベルでの実践例も追記している。
-運営中のVim::Factoryでserverspecを使ったインフラテストを導入したので、 導入理由や工夫している点、悩んでいる点について記述します。
-Vim::Factoryについてはこっちみてね。 DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った - Goldstine研究所 1. serverspecってなによ 詳しくは公式サイトや書籍などを参考にして欲しいですが、
-「サーバの状態をコードで自動的にテスト・確認するためのツール」です。
-Serverspec - Home
-例えば、ApacheでWebサーバを組んでいるサーバがあったとして、下記の要件で動いているとします。
-  apacheがインストールされていること  apacheが起動していること、自動起動する設定であること ポート80があいていること  この要件をサーバが満たしているかコードでテストします。
-上記の例だとこんなコードを書きます。
-describe package('httpd') do it { should be_installed } end describe service('httpd') do it { should be_enabled } it { should be_running } end describe port(80) do it { should be_listening } end  各種テストの立ち位置 
- serverspecは、サーバの状態（正しく設定されたか）を確認するためのテストツールです サーバの振る舞いのテストは別のツールを使うことをおすすめします また、監視も一種のテストと言えます 一般的には監視はその実行頻度の高さから、振る舞いを監視することが多い 監視ツールで、Configファイルが正しいかは見ない  2. なんで導入したの？ serverspecを導入したのには大きく2つの理由があります。
+                        ※執筆後、業務でもserverspecを利用し始めたのもあり、業務レベルでの実践例も追記している。 運営中のVim::Factoryでserverspecを使ったインフラテストを導入したので、 導入理由や工夫している点、悩んでいる点について記述します。 Vim::Factoryについてはこっちみてね。 DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った - Goldstine研究所 1. serverspecってなによ 詳しくは公式サイトや書籍などを参考にして欲しいですが、 「サーバの状態をコードで自動的にテスト・確認するためのツール」です。 Serverspec - Home 例えば、ApacheでWebサーバを組んでいるサーバがあったとして、下記の要件で動いているとします。 apacheがインストールされていること apacheが起動していること、自動起動する設定であること ポート80があいていること この要件をサーバが満たしているかコードでテストします。 上記の例だとこんなコードを書きます。 describe package('httpd') do it { should be_installed } end describe service('httpd') do it { should be_enabled } it { should be_running } end describe port(80) do it { should be_listening } end 各種テストの立ち位置 serverspecは、サーバの状態（正しく設定されたか）を確認するためのテストツールです サーバの振る舞いのテストは別のツールを使うことをおすすめします また、監視も一種のテストと言えます 一般的には監視はその実行頻度の高さから、振る舞いを監視することが多い 監視ツールで、Configファイルが正しいかは見ない 2. なんで導入したの？ serverspecを導入したのには大きく2つの理由があります。 (その１) インフラのテスト駆動開発を支えるため Vim::Factoryは趣味で開発・運用しているサービスで、まだ作りたての発展途上のサービスです。 （作って公開してからは日が経っている気もしますが、週1の開発なので…） そのため、今後もインフラコードをガンガン修正していくことを想定しています。 ですので、その開発、リファクタリングを支えるべく、テスト駆動開発で行えるようにするためです。 (その２) インフラテストの必要性を深く理解するため 「インフラテストの必要性を深く理解するため」です。 必要性があるから導入したんじゃにないの？と思われるかもしれませんが、 ぼくはまだインフラテストの本当の必要性を理解できていないと思っています。 実は、はじめこんな風に思っていましたし、今でも少し思う部分もある。 ansibleやchefで実行結果がOKならそれでテストも兼ねているのでは？ 実際にどんな項目をテストすればいいか、考えてみた時にピンと来ない… 実際に試してみないと、その本質が見えてこないと思っているので、 導入してみて自分の肌で感じようと思っています。 個人的なお話なのでみなさんには関係のない話ではありますが、 Vim::Factoryの開発は企業でもなければ営利目的でもありません。 「週末にインフラ技術のインプット勉強をしていたが、それだけでは飽きてきて、 サービスを開発・運用していくなかでインフラ技術を磨いていきたい」 というものだったので、こういった実験も大歓迎だったのです。 3.
                     </div>
                 </section>
                 

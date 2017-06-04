@@ -7,7 +7,7 @@
 
     <meta name="description" content="はてなブログからHugoに移行した。移行した理由は移行に際して行ったことをご紹介します。例えば、Hugoを運用するアーキテクチャや移行時に利用したスクリプトや注意事項など。">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="はてなブログからHugoに移行。その際に行ったあれこれ。 &middot; Goldstine研究所">
@@ -73,14 +73,14 @@
                     <div class="post-description">
                         
 
-<h1 id="1-はじめに">1.はじめに</h1>
+<h1 id="1-はじめに:a42d734d96400169bf761303cfe99adf">1.はじめに</h1>
 
 <p>2017年5月27日に2014年2月から約3年3ヶ月程度使ってきたはてなブログからHugoを使ったブログへ移行をした。<br />
 長らく使いやすいブログを提供してきたはてなさんにはとても感謝している。<br />
 はてなブログはとても魅力なブログプラットフォームであると感じているし、いまでもそう思うのだけれどいくつかの判断をした結果Hugoへの移行を決めた。<br />
 本記事では、移行を決めた理由や移行する際に行ったこと、Hugoの実行環境などを紹介する。</p>
 
-<h1 id="2-hugoに移行した理由">2.Hugoに移行した理由</h1>
+<h1 id="2-hugoに移行した理由:a42d734d96400169bf761303cfe99adf">2.Hugoに移行した理由</h1>
 
 <p>Hugoに移行した理由というか、はてなブログから別のところに移行しようとした理由になるのだが、<br />
 端的に言うと以下のとおりだ。</p>
@@ -111,30 +111,32 @@ Ruby製ということもあり、自分に馴染みのあるツールで最有�
 最終的には、よりカスタマイズ度の高いHugoを選んだ。特にこれといった理由はない。<br />
 ちょうどGo言語をやってみたいモチベーションがあったので、これをきっかけに勉強がはかどればいいなぁくらいの気持ちはあった。</p>
 
-<h1 id="3-移行に際して行ったこと">3.移行に際して行ったこと</h1>
+<h1 id="3-移行に際して行ったこと:a42d734d96400169bf761303cfe99adf">3.移行に際して行ったこと</h1>
 
-<h2 id="3-1-hugoでのサイト構築-アーキテクチャ">3-1.Hugoでのサイト構築、アーキテクチャ</h2>
+<h2 id="3-1-hugoでのサイト構築-アーキテクチャ:a42d734d96400169bf761303cfe99adf">3-1.Hugoでのサイト構築、アーキテクチャ</h2>
 
 <p>Github上でHugoを管理し、コンパイルしてできたPublicファイルを、Github Pages対応の別のレポジトリで管理。<br />
 独自ドメイン利用、SSL対応、HTTP/2対応するためにフロントにCloudFlareを利用した。<br />
 後述するが、CloudFlareはとても便利なツールだが、キャッシュの扱いは気をつけてなければいけない。<br />
 図にすると以下のとおりだ。</p>
 
-<p><img src="/image/hugo-architecture.png" alt="hugo-architecture" /></p>
+<p><img src="/image/hugo-architecture.png" alt="hugo-architecture" />
+</p>
 
-<h2 id="3-2-記事の移行">3-2.記事の移行</h2>
+<h2 id="3-2-記事の移行:a42d734d96400169bf761303cfe99adf">3-2.記事の移行</h2>
 
 <p>はてなブログはそのままのこし、新規に書くブログからHugoへ移行することも検討したが、<br />
 せっかくなのではてなブログ時代に書いた記事もすべて移行することを決めた。</p>
 
 <p>はてなブログからデータのエクスポートができる。<br />
-<img src="/image/hatena-blog-entry-export.png" alt="hatena-blog-entry-export" /></p>
+<img src="/image/hatena-blog-entry-export.png" alt="hatena-blog-entry-export" />
+</p>
 
 <p>エクスポートしたファイルを簡単なスクリプトを作ってHugoファイルへの変換を行った。（<a href="https://github.com/mosuke5/hatena-blog-parser">Github mosuke5/hatena-blog-parser</a>）<br />
 正直このツールは汎用的なものではない。このスクリプトだけではうまく行かない部分も多数ある。<br />
 いくぶんかsedなど使って（たまに手動編集・・・）して整えた。。</p>
 
-<h3 id="はてなブログのエクスポートファイルのフォーマット">はてなブログのエクスポートファイルのフォーマット</h3>
+<h3 id="はてなブログのエクスポートファイルのフォーマット:a42d734d96400169bf761303cfe99adf">はてなブログのエクスポートファイルのフォーマット</h3>
 
 <pre><code>--------
 AUTHOR: mosuke5
@@ -157,7 +159,7 @@ BODY:
 各&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9&quot;&gt;クラウド&lt;/a&gt;ベンダーはオブジェクトストレージサービスを提供しています。&lt;/p&gt;
 </code></pre>
 
-<h3 id="変換後のhugoファイルフォーマット">変換後のHugoファイルフォーマット</h3>
+<h3 id="変換後のhugoファイルフォーマット:a42d734d96400169bf761303cfe99adf">変換後のHugoファイルフォーマット</h3>
 
 <pre><code>+++
 Categories = [&quot;オブジェクトストレージ&quot;, &quot;ObjectStorage&quot;, &quot;クラウド&quot;, &quot;S3&quot;]
@@ -175,9 +177,9 @@ archive = [&quot;2017&quot;]
 各&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9&quot;&gt;クラウド&lt;/a&gt;ベンダーはオブジェクトストレージサービスを提供しています。&lt;/p&gt;
 </code></pre>
 
-<h2 id="3-3-リダイレクト関連">3-3.リダイレクト関連</h2>
+<h2 id="3-3-リダイレクト関連:a42d734d96400169bf761303cfe99adf">3-3.リダイレクト関連</h2>
 
-<h3 id="1-リダイレクト処理">(1)リダイレクト処理</h3>
+<h3 id="1-リダイレクト処理:a42d734d96400169bf761303cfe99adf">(1)リダイレクト処理</h3>
 
 <p>はてなブログのデザイン設定から「ヘッダー」→「タイトル下」に、ブログ移転をお知らせする文言とリダイレクト処理を書いた。<br />
 これですべてのページのタイトル下に「ブログ移転しました。5秒後にリダイレクトします。（リンク先URL）」が表示し、5秒後にリダイレクトするようにした。</p>
@@ -200,7 +202,7 @@ function redirect(){
 &lt;/script&gt;
 </code></pre>
 
-<h3 id="2-スマホサイトでのリダイレクト">(2)スマホサイトでのリダイレクト</h3>
+<h3 id="2-スマホサイトでのリダイレクト:a42d734d96400169bf761303cfe99adf">(2)スマホサイトでのリダイレクト</h3>
 
 <p>スマホで開いた時にも同様の動作をして欲しかったのだが、私の設定ではもともと、<br />
 スマホは別デザインとなっていて、うえで設定したJSが実行されない。<br />
@@ -211,7 +213,7 @@ function redirect(){
 スマートフォンでもPCと同じデザイン設定でブログを表示します。レスポンシブデザインのテーマを設定しているときのみ使用してください。
 </code></pre>
 
-<h3 id="3-googleへのアドレス変更通知">(3)Googleへのアドレス変更通知</h3>
+<h3 id="3-googleへのアドレス変更通知:a42d734d96400169bf761303cfe99adf">(3)Googleへのアドレス変更通知</h3>
 
 <p>一般的にブログのドメイン変更を行った場合は、<br />
 変更元のサイトで301リダイレクトを行ってGoogleに恒久的にサイトが移動したことを伝える。<br />
@@ -227,7 +229,7 @@ Canonicalを変更したりしたが、うまくGoogle Search Consoleに変更�
 <li>はてなブログへのクローリングを拒否</li>
 </ol>
 
-<h2 id="3-4-cloudflareのキャッシュ削除">3-4.CloudFlareのキャッシュ削除</h2>
+<h2 id="3-4-cloudflareのキャッシュ削除:a42d734d96400169bf761303cfe99adf">3-4.CloudFlareのキャッシュ削除</h2>
 
 <p>フロントにCloudFlareを利用していると書いた。<br />
 Hugoは静的ブログサイトなので、基本的にCloudFlare側で全てキャッシュする。<br />
@@ -244,7 +246,7 @@ curl -X DELETE &quot;https://api.cloudflare.com/client/v4/zones/$1/purge_cache&q
      --data '{&quot;purge_everything&quot;:true}'
 </code></pre>
 
-<h1 id="4-今後の課題">4.今後の課題</h1>
+<h1 id="4-今後の課題:a42d734d96400169bf761303cfe99adf">4.今後の課題</h1>
 
 <p>まずは新しいHugoの環境でブログを書いて、課題点など洗いだしていく必要がある。<br />
 あとは、はてなブログからの移行でだいぶSEOあたり下がったと思う。<br />

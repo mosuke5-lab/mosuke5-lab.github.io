@@ -7,7 +7,7 @@
 
     <meta name="description" content="mosuke5&#39;s blog">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Xinetd &middot; Goldstine研究所">
@@ -73,31 +73,7 @@
                     </header>
 
                     <div class="post-description">
-                        使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。
-そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させることが可能らしい。
-ということで、そのスーパーサーバとやらを実際に触ってみた。
-スーパーサーバというとinetdとxinetdがあるらしいが、
-xinetdはinetdの拡張版で、アクセス制御などの機能を搭載しているとのこと。
-今回はxinetdを設定してみる。
-1. 事前準備 【環境】
-Vagrantで構築したCentOS 6.5
-(仮想環境のIPアドレスは192.168.33.10)
-まずはスーパーサーバで管理するサービスを考えなければならない。
-SSHとかhttpはどう考えてもスーパーサーバの管理するようなものではないだろうし…
-FTPやtelnet、POP3なんかのサービスに利用されることが多いそう？（このへんよくわかない）
-今回はFTPをスーパーサーバの管理対象とした。
-※本来は複数のサービスを管理対象とするからこそ意味がある。
-まずはxinetdとvsftpをインストール
-$ sudo yum install xinetd vsftpd  
-xinetdどうこうの前に、ftp接続がきちんとできるか確認するのでサービスを起動。
-$ sudo service vsftpd start  
-ローカルPCから接続できることを確認する。
-$ ftp 192.168.33.10 Connected to 192.168.33.10. 220 (vsFTPd 2.2.2) Name (192.168.33.10:username):  2. xinetdの設定 xinetdの基本設定は/etc/xinetd.confにかかれており、
-xinetdで管理する各サービスの設定は/etc/xinetd.d/配下に書く方式。
-ftpの設定を以下の通りにした。
-"service"のあとに書くサービス名称は/etc/servicesに定義されているものを記載する。
-vsftpとか書いても動かないので注意。
-$ sudo vim /etc/xinetd.d/ftp service ftp { disable = no socket_type = stream wait = no user = root server = /usr/sbin/vsftpd log_on_failure += USERID }  設定項目については以下参照。
+                        使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。 そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させることが可能らしい。 ということで、そのスーパーサーバとやらを実際に触ってみた。 スーパーサーバというとinetdとxinetdがあるらしいが、 xinetdはinetdの拡張版で、アクセス制御などの機能を搭載しているとのこと。 今回はxinetdを設定してみる。 1. 事前準備 【環境】 Vagrantで構築したCentOS 6.5 (仮想環境のIPアドレスは192.168.33.10) まずはスーパーサーバで管理するサービスを考えなければならない。 SSHとかhttpはどう考えてもスーパーサーバの管理するようなものではないだろうし… FTPやtelnet、POP3なんかのサービスに利用されることが多いそう？（このへんよくわかない） 今回はFTPをスーパーサーバの管理対象とした。 ※本来は複数のサービスを管理対象とするからこそ意味がある。 まずはxinetdとvsftpをインストール $ sudo yum install xinetd vsftpd xinetdどうこうの前に、ftp接続がきちんとできるか確認するのでサービスを起動。 $ sudo service vsftpd start ローカルPCから接続できることを確認する。 $ ftp 192.168.33.10 Connected to 192.168.33.10. 220 (vsFTPd 2.2.2) Name (192.168.33.10:username): 2. xinetdの設定 xinetdの基本設定は/etc/xinetd.confにかかれており、 xinetdで管理する各サービスの設定は/etc/xinetd.d/配下に書く方式。 ftpの設定を以下の通りにした。 "service"のあとに書くサービス名称は/etc/servicesに定義されているものを記載する。 vsftpとか書いても動かないので注意。 $ sudo vim /etc/xinetd.d/ftp service ftp { disable = no socket_type = stream wait = no user = root server = /usr/sbin/vsftpd log_on_failure += USERID } 設定項目については以下参照。 xinetd の設定 これでxinetdを起動 $ sudo service xinetd start (補足) /etc/servicesってなにもの？ /etc/servicesがなにか気になったので一応調べると。 サービス名とそこで使われるポート番号、プロトコル(tcp/udp)との 対応関係を記述したファイルが /etc/services です。 このファイルは 単なるサービス名のデータベースで、それ自体では何の働きもありませ んが、netstat コマンドや次の inetd などで参照されます。 (http://www.wakhok.ac.jp/~kanayama/summer/02/site/node43.html) 3.
                     </div>
                 </section>
                 
