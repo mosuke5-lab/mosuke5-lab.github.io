@@ -74,7 +74,10 @@
                     </header>
 
                     <div class="post-description">
-                        趣味で作っているアプリ(Rails)があるのだが、はじめHerokuで運用しようと検討していたが、 データ量が多いためすぐにHobbyプランでは対応できなくなってしまった。 仕方ないので、別のアプリで持っているVPSをProduction環境とすることにしたのだが、 せっかくなのでherokuもうまく使いたいなーと思ってステージング環境として使うことにした。 そのときにやったことをメモする。 Staging環境の設定を作る Railsではデフォルトではdevelopment, test, productionの環境を持っている。 そこに今回、stagingという環境を追加した。 そして、herokuではデフォルトではproductionを利用するようになっているのでstagingに切り替えるだけ。 Rails側はstaging環境追加。 $ vim config/database.yml # 下記を追加した staging: &lt;&lt;: *default adapter: postgresql encoding: unicode database: pool: 5 username: password: $ vim config/enviroments/staging.rb # 基本的にはproduction.rbをコピーし、必要に応じて設定を変更 $ vim config/secrets.yml # 必要に応じてstagingを追加 heroku側はステージングへの切り替え。 $ heroku config --app app-name # デフォではproductionになってる RAILS_ENV: production $ heroku config:set RAILS_ENV=staging --app app-name $ heroku config --app app-name RAILS_ENV: staging Basic認証 ステージング環境なので、外部から簡単にアクセス出来ないようにBasic認証をかけた。 いくつかやり方があると思うが、app/controllers/application_controller.rbに設定を追加した。 ユーザ名とパスワードをベタ書きだとGithubに上げてる場合は丸見えになってしまうので環境変数でやりましょう。 http_basic_authenticate_with :name =&gt; ENV['BASIC_AUTH_USERNAME'],
+                        趣味で作っているアプリ(Rails)があるのだが、はじめHerokuで運用しようと検討していたが、 データ量が多いためすぐにHobbyプランでは対応できなくなってしまった。 仕方ないので、別のアプリで持っているVPSをProduction環境と...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2016/03/28/181636/">全文を読む</a>
                     </div>
                 </section>
                 

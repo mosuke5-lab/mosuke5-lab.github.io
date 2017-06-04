@@ -74,7 +74,10 @@
                     </header>
 
                     <div class="post-description">
-                        ある実装についてどのように実装するか悩んだ。 その悩んだ過程や実装案をメモする。似たようなケースの実装案として参考になればと思う。 状況 ある申請に対して、検査Aと検査Bを行い、その検査状態・検査日時を管理・閲覧するシステムがあるとする。 申請のテーブルは下記とする。 id: int name: varchar(20) # どうでもいいので無視していい check_a: datetime # 検査すると実施した日時がはいる check_b: datetime # 検査すると実施した日時がはいる UIとして下記のように表示したいと考えている。 番号 状態 名前 検査A 検査B 1 検査完了 xxxxxx 2016/03/01 10:00 2016/03/01 12:00 2 検査未完了 xxxxxx - - 3 検査途中 xxxxxx 2016/03/01 13:00 - 4 検査途中 xxxxxx - 2016/03/01 15:00 ※SQLアンチパターンだろ！？ そもそもSQLアンチパターンの「マルチカラムアトリビュート」じゃないの？と思うかもしれない。 この場合は、この設計が一番という前提でお願いしたい。 www.amazon.co.jp 実装の検討 いくつかの実装パターンを検討した。 結果的に今回は実装案４のViewを使うのがいいのではないかと考えた。 が、Viewにもデメリットがある。必ずしもViewがいいというものではないことは留意。 (実装案１) SQL側で頑張る まず、データを取り出す際にSQLで頑張ることを思いつくはずだ。 例えば以下みたいに。 select id, name, case when check_a is null and check_b is null then '検査未完了' when check_a is not null and check_b is not null then '検査完了 ' else '検査途中' end as check_status from request これが悪いとはいわない。 だが、例えば同じような表示方法で他の条件式で取得したい時があるだろう。 select id, name, case when check_a is null and check_b is null then '検査未完了' when check_a is not null and check_b is not null then '検査完了 ' else '検査途中' end as check_status from request where name = 'xxxxx' もし、ソースコードの中に同じ形なのに条件だけがことなるSQLが出てきてしまったら、 ヤバイと感じてくるはずだ。 そして、ActiveRecordのようなORマッパーを使っている場合、 case文などを利用し始めた時点で、生SQLを書かなければいけなくなる。 これも不吉な感じがしてくる。 (実装案２) 受け取った側で頑張る SQLが複雑になるのがいやなら、プログラミング言語側で頑張ることもできる。 とりあえずデータは全部生でもらっておいて select * from request; HTML出力の時に頑張る。(下記はRubyのERB想定で記述) &lt;% if(request.check_a.nil?
+                        ある実装についてどのように実装するか悩んだ。 その悩んだ過程や実装案をメモする。似たようなケースの実装案として参考になればと思う。 状況 ある申請に対して、検査Aと検査Bを行い、その検査状態・検査日時を管理�...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2016/03/16/175431/">全文を読む</a>
                     </div>
                 </section>
                 
@@ -97,7 +100,10 @@
                     </header>
 
                     <div class="post-description">
-                        前回の「【SQLテーブル結合】INNER JOIN とWHERE結合の違いについて」の続き。 やはりFROM句の後にテーブルを複数書いてWHEREで結合させるのはナンセンスだと思う。 例えば、内部結合に加え、外部結合もある場合を考える。 WHERE型 SELECT * FROM table1, table2 #←結合させたいもの LEFT OUTER JOIN ( ・ ・ &lt;副問い合わせとか長いSQLが入ると想定&gt; ・ ・ ) AS sub ON table1.id=sub.id AND table2.id=sub.id WHERE table1.id=table2.id #←結合条件 table1とtable2を内部結合させたいのに、 肝心の何と何を結合させるかの部分の"WHERE table1.id=table2.id"が離れてしまい、 SQL文全体として何をしたいかわかりずらい。 一方、INNER JOINなら SELECT * FROM table1 INNER JOIN table2 ON table1.id=table2.id #←結合させたいものと結合条件が一緒 LEFT OUTER JOIN ( ・ ・ &lt;副問い合わせとか長いSQLが入ると想定&gt; ・ ・ ) AS sub ON table1.id=sub.id 上記のように、結合させたいテーブルと結合させる条件がくっつくため、 全体としてなにをしたいかわかりやすい気がする。 慣れの問題なのかもしれんが、圧倒的にINNER JOINだろ…
+                        前回の「【SQLテーブル結合】INNER JOIN とWHERE結合の違いについて」の続き。 やはりFROM句の後にテーブルを複数書いてWHEREで結合させるのはナンセンスだと思う。 例えば、内部結合に加え、外部結合もある場合を考える。 WHERE...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/02/28/233025/">全文を読む</a>
                     </div>
                 </section>
                 

@@ -74,7 +74,10 @@
                     </header>
 
                     <div class="post-description">
-                        Sinatraアプリケーションで、JSファイルを圧縮するsinatra-assetpackを利用していて、 production環境で動作させようとしたら動かなくなってしまった問題について調査した。 起こったこと Sinatraを使ってアプリケーションを作っていて、development環境で完成したので、 prorudction環境で動作させようとしたら、jsのエラーが出るようになってしまい、正常に動かなくなった。 アクセスすると、以下のエラーがでる。要はjqueryがないとのこと。 Uncaught ReferenceError: $ is not defined jQueryはもちろん読み込ませてるし、なんでproduction環境でだけ？？？ ソースコード sinatraのメインアプリケーションであるapp.rbには以下のように、sinatra-assetpackを利用してjsを読み込んでいる。 assets do serve '/js', from: 'public/js' serve '/bower_components', from: 'bower_components' js :app, '/js/app.js', [ '/js/index.js', ] js :libs, '/js/libs.js', [ '/bower_components/jquery/dist/jquery.js', '/bower_components/bootstrap/dist/js/bootstrap.js', ] js_compression :jsmin end layout.erbにはもちろん、libs.jsが先に来るように記述している。 &lt;%= js :libs %&gt; &lt;%= js :app %&gt; sinatra-assetpackの挙動 productionでのみ発生する事象なので、改めてsinatra-assetpackのproduction環境時の挙動を確認した。 production環境では、複数のjsファイルを1つのファイルにまとめ、圧縮を行う。 development環境 ３つのjsファイルがあったら以下のように３つ別々に読み込まれる。 &lt;script type='text/javascript' src='/js/vendor/jquery.283479.js'&gt;&lt;/script&gt; &lt;script type='text/javascript' src='/js/vendor/underscore.589491.js'&gt;&lt;/script&gt; &lt;script type='text/javascript' src='/js/app/main.589491.js'&gt;&lt;/script&gt; production環境 ３つあったjsファイルは1つにまとめられ、また圧縮される。 &lt;script type='text/javascript' src='/js/app.589491.js'&gt;&lt;/script&gt; 詳細はこちら
+                        Sinatraアプリケーションで、JSファイルを圧縮するsinatra-assetpackを利用していて、 production環境で動作させようとしたら動かなくなってしまった問題について調査した。 起こったこと Sinatraを使ってアプリケーションを作って�...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2015/05/08/174732/">全文を読む</a>
                     </div>
                 </section>
                 
@@ -97,7 +100,10 @@
                     </header>
 
                     <div class="post-description">
-                        最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。 例えば以下の状況を考える。 【やりたいこと】 「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」 【DBの構造】 カラム名：型 date : datetime value : int ※また、下記ではSinatra上で行っているが、他の言語でも同様のことがいえる。 (1) 簡単なAPIのようなものを利用する 先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、 これが一番複雑にならずに良いと思ったということ。 Sinatra側で/csvにアクセスするとcsvファイルをダウンロードできるようにする。 ```ruby #Sinatra側 get &lsquo;/csv&rsquo; do content_type &lsquo;application/csv&rsquo; attachment &lsquo;download.csv&rsquo; #DBからデータ取得(Activerecord利用) @data = Model.all() #出力するCSVデータの変数。csvヘッダーを先につけている。 @csv = &quot;date,value\n&quot; #DBのデータをCSVの形にして格納 @data.each do |d| @csv += d.date.to_s + &quot;,&quot; + d.value.to_s + &quot;\n&quot; end #csvtest.erbというビューに出力 erb :csvtest, :layout =&gt; false end &lt;p&gt;csvtest.erb&lt;/p&gt; ```ruby &lt;%= @csv %&gt; こうすることで"http://*****/csv"にアクセスするとcsvファイルとしてダウンロードできる状態になる。 条件指定をしてデータをダウンロードできるようにしたい場合はGETでパラメータ指定できるようにすれば良いと思う。 （SinatraでCSVファイルを生成するところのコードがナンセンスだと思っているので、もっといい方法があるはず…） また、今回はcsvにしているがjsonなどの他の形式でも同様のことがいえる。 これをD3.js側で以下のように読み込ませる。 d3.csv(&quot;/csv&quot;, function(error, data) {
+                        最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。 例えば以下の状況を考える。 【やりたいこと】 「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」 【DBの構造】 カラ...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/09/15/135611/">全文を読む</a>
                     </div>
                 </section>
                 

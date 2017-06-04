@@ -74,7 +74,10 @@
                     </header>
 
                     <div class="post-description">
-                        今更FuelPHP感はあるのだが、 postgresql利用時のFuelPHPのmigration導入について、注意点をまとめた。 でも、結論は納得がいっていない。 0. 前提 下記の環境で行ったものです。 PHP: 5.5.7 FuelPHP: 1.7 Postgresql: 9.4 1. テーブル文字コードの問題 事象 公式サイトのサンプルの通りはじめにapp/migrations/001_example.phpを作り、migrationを実行した。 app/migrations/001_example.phpの作成 &lt;?php namespace Fuel\Migrations; class Example { function up() { \DBUtil::create_table('posts', array( 'id' =&gt; array('type' =&gt; 'int', 'constraint' =&gt; 5), 'title' =&gt; array('type' =&gt; 'varchar', 'constraint' =&gt; 100), 'body' =&gt; array('type' =&gt; 'text'), ), array('id')); } function down() { \DBUtil::drop_table('posts'); } } マイグレーション実行すると以下のエラーに襲われた。 $ php oil refine migrate Uncaught exception Fuel\Core\Database_Exception: SQLSTATE[42601]: Syntax error: 7 ERROR: syntax error at or near &quot;DEFAULT&quot; LINE 5: )DEFAULT CHARACTER SET utf8; ^ with query: &quot;CREATE TABLE IF NOT EXISTS &quot;migration&quot; ( &quot;type&quot; varchar(25) NOT NULL, &quot;name&quot; varchar(50) NOT NULL, &quot;migration&quot; varchar(100) DEFAULT '' NOT NULL )DEFAULT CHARACTER SET utf8;&quot; 理由 しょっぱなから躓くわけだが… 初めてマイグレーションを実行する際にはマイグレーション管理用のテーブルを作る。 そのテーブルを作るSQLが下記の通り発行されている。 CREATE TABLE IF NOT EXISTS &quot;migration&quot; ( &quot;type&quot; varchar(25) NOT NULL, &quot;name&quot; varchar(50) NOT NULL, &quot;migration&quot; varchar(100) DEFAULT '' NOT NULL )DEFAULT CHARACTER SET utf8; 理由は単純で、postgresqlのcreate tableでは次のdefault構文は利用できないから。 create table xxxx ( ) default character set xxx; なぜ、利用できない構文のSQLが発行されたのか？ それは単にFuelPHPの問題です。次期バージョンでは解決されることを祈る。 解決方法 解決方法は下記の記事がわかりやすかった。 FuelPHP で PDOによるPostgreSQL接続の罠 - Qiitaqiita.com 簡単に言うとdbのコンフィグで、charsetをnullにするとDEFAULT CHARACTER SET xxx部分が発行されない。 'charset' =&gt; NULL, 2.
+                        今更FuelPHP感はあるのだが、 postgresql利用時のFuelPHPのmigration導入について、注意点をまとめた。 でも、結論は納得がいっていない。 0. 前提 下記の環境で行ったものです。 PHP: 5.5.7 FuelPHP: 1.7 Postgresql: 9.4 1. テーブル文字コード...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2015/06/17/212852/">全文を読む</a>
                     </div>
                 </section>
                 

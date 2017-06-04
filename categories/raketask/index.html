@@ -74,7 +74,10 @@
                     </header>
 
                     <div class="post-description">
-                        はじめに 私が開発しているシステムでは、Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。 そして、serverspecを使って、インフラテストも行っています。 しかし、その運用にいくつか課題点がありました。 その課題点についてと、課題点へ対策したことについて書きます。 課題だったこと (課題1) デプロイとテストをそれぞれ実行していた Ansibleでのデプロイとserverspecのテストはそれぞれ別のコマンドで実行していました。 $ ansible-playbook site.yml -i $ bundle exec rake serverspec 2つ実行することが面倒であり、面倒であるがゆえにserverspecの実行を怠ったりしていました。 これではテストの効果があまり発揮できませんね。 (課題2) sudoパスワードをうまく管理できなかった 上のような課題1について、真っ先に以下の様にコマンドを続けることを思いつきました。 $ ansible -playbook site.yml -i ; bundle exec rake serverspec ですが、これだとansible実行終了後にserverspecを実行する際にsudoパスワードが再度聞かれるため、 コマンドを打ったまま「放置」ができませんでした。 ※もちろん、sudoパスワードを要求しないようにユーザ設定をすればできますが、多くの場合ではセキュリティ上難しかったりすると思います。ssh接続は鍵認証、sudoには必ずパスワードを要求するようにしています。 Ansibleもserverspecにもコマンド実行時にsudoパスワードを記述する方法があります。 Ansibleでは、ansible.cfgにsudo_passwordを記述、あるいはコマンド実行時に--extra-argsでsudoパスワードを指定できます。 serverspecでも環境変数でSUDO_PASSWORDが指定できます。 例 ） ansible -playbook site.yml -i --extra-args='ansible_sudo_pass=xxxxxxxx' bundle exec rake serverspec SUDO_PASSWORD=xxxxxxxx ですが、おわかりの通り、コマンドの履歴にもパスワードが残ります。 なのであまり良い方法ではないと思っています。 (課題3) タスクの実行方法がバラバラ デプロイはansibleコマンドで実行、テストはrakeで実行、他のタスクはシェルスクリプト。。。 といったように、タスクによって実行方法が異なってしまう状況になっていました。 運用的にとても不便でしたので、１つに統一したいと思っていました。 いい感じに同時に実行してくれるRakeタスクを作った 上で述べたような課題点をクリアするように、下記の要件を満たすように工夫をしました。 デプロイ、テストが同じ形式で実行できる sudoパスワードをベタ書きすることなく実行できる sudoパスワードの入力を一回だけにする 結論は、すべてRakeタスクで実行できるようにしました。 タスク一覧を見ると以下の様な感じになりました。（※実行結果は例であり実際の内容とは少し異なる。） $ bundle exec rake -T
+                        はじめに 私が開発しているシステムでは、Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。 そして、serverspecを使って、インフラテストも行っています。 しかし、その運用にい�...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2015/12/17/192554/">全文を読む</a>
                     </div>
                 </section>
                 

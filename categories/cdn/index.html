@@ -74,7 +74,10 @@
                     </header>
 
                     <div class="post-description">
-                        今更ながらgithubページでプロフィールサイトを作った。 (もう少しデザインブラッシュアップしたい…) mosuke tech また、独自ドメイン（カスタムドメイン）の設定やその仕組みをおっている時に、 独自ドメイン適応時の通信について面白いことがわかったのでかく。 求めていたもの ブログとか作ったプロダクトをまとめたかった 極力シンプルでメンテしやすいものがよかった でもレスポンシブなデザインがよかった どのようにつくったか 上の条件を満たすために以下の２パターンのどっちで作ろうか迷った。 Jekyllなどを使いテンプレートを使って作る CSSフレームワークのみ利用し、あとは自分で作る １ページだけのシンプルなプロフィールサイトがよかったので、 Jekyllとか複雑なものは利用したくないと考えた。 また、CSSフレームワークだが、いつもよくTwitterBootstrapを使っているので、 それ以外のものでやってみようと考えた。 その結果、行き着いたのがSkeletonだった。 Skeletonは"A dead simple, responsive boilerplate."をうたっているものでよかった。 カスタムドメインの設定 デフォルトだとmosuke5.github.ioのURLが利用できる。 しかし、この前mosuke.techといういい感じのドメインを安く手に入れてたので、カスタムドメインの設定を行うことにした。 カスタムドメインの設定方法は以下のみだ。 レポジトリにCNAMEファイルを作成する $ echo mosuke.tech &gt; CNAME DNSの設定：Aレコードに192.30.252.153と192.30.252.154を追加 (本家ドキュメント) Setting up an apex domain - User Documentation カスタムドメイン設定時の通信について カスタムドメインがどのような仕組みで実現されているのか気になって、 いろいろと調べている時にあることに気づいた。 Aレコードに登録したIPアドレスを逆引きで調べると、pages.github.comが出てくるが、 pages.github.comをdigすると違う結果が返ってくる。 $ dig -x 192.30.252.153 ;; ANSWER SECTION: 153.252.30.192.in-addr.arpa. 3600 IN PTR pages.github.com. $ dig pages.github.com ;; ANSWER SECTION: pages.github.com. 900 IN CNAME github.map.fastly.net.
+                        今更ながらgithubページでプロフィールサイトを作った。 (もう少しデザインブラッシュアップしたい…) mosuke tech また、独自ドメイン（カスタムドメイン）の設定やその仕組みをおっている時に、 独自ドメイン適応時の通信�...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2016/03/19/232437/">全文を読む</a>
                     </div>
                 </section>
                 

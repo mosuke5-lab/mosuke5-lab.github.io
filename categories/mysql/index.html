@@ -74,7 +74,10 @@
                     </header>
 
                     <div class="post-description">
-                        CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にハマったことをまとめた。 本質的にはAnsibleというよりLinux RPMパッケージのはなし。 ついでに、しょっぼいgithubを公開しました。 (1) 本記事を書くに至った経緯 Ansibleでmysqlを使ったサーバを構築(CentOS6.5)することになった。 MySQLのバージョンは5.6を採用した。 MySQLの公式rpmをダウンロードしインストールした。 インストールしたもの：MySQL-client, MySQL-devel, MySQL-server, MySQL-shared MySQL-sharedをインストールする際にデフォルトのmysql-libsと競合 mysql-libsをアンインストールし再インストール AnsibleでMySQLの操作をするにはMySQL-pythonが必要なのでインストール MySQL-pythonをインストールするにはさっきアンインストールしたmysql-libsが必要…(困った) MySQL-shared-compatの存在に気づく 備忘録に書いておくか… (2) MySQL-shared-compatの存在 mysql-libsは多くのパッケージの依存となっており、公式のMySQL5.6をインストールすることで、 他のパッケージがいれられない状況となっていた。 そんな状況を解決するためにMySQL-shared-compatというパッケージが用意されていた。 MySQL-shared-compatは「過去のMySQLバージョン向けの共有クライアントライブラリが納められているもの」だ。 詳細は下記参照をおすすめ。 MySQL-5.5.6から仕様が変わった「MySQL-shared-compat」の中身を徹底解剖 - Y-Ken Studio ちなみに"compat"という単語がよく使われるが"compatibility"の略で「互換性」とかそういう意味。 (3) Githubで公開しました 内容は今のところ死ぬほど薄いのだが、MySQLをインストールするansibleを公開しました。 mosuke5/mysql-ansible · GitHub 内容はあれだが、特徴としては、インターネット上からRPMをダウンロードしてインストールする際に、 Ansibleでも「ダウンロード」→「インストール」の流れを踏む人が多いが、以下のようにするとシンプルになる。 varsでインストールしたいrpmやその取得先を記述しておいて、task側ではyumでnameにvarsで定義した変数を読むだけでできる。 role/mysql/vars/main.yml mysql_url: http://ftp.jaist.ac.jp/pub/mysql/Downloads/MySQL-5.6 mysql_ver: &quot;5.6.24-1&quot; mysql_rpms: - MySQL-client-{{ mysql_ver }}.el6.x86_64.rpm - MySQL-shared-compat-{{ mysql_ver }}.el6.x86_64.rpm - MySQL-shared-{{ mysql_ver }}.el6.x86_64.rpm - MySQL-devel-{{ mysql_ver }}.el6.x86_64.rpm - MySQL-server-{{ mysql_ver }}.el6.x86_64.rpm role/mysql/tasks/main.yml - name:
+                        CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にハマったことをまとめた。 本質的にはAnsibleというよりLinux RPMパッケージのはなし。 ついでに、しょっぼいgithubを公開しました。 (1) 本記事を書く...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2015/04/15/171127/">全文を読む</a>
                     </div>
                 </section>
                 

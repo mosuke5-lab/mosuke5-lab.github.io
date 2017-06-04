@@ -74,7 +74,10 @@
                     </header>
 
                     <div class="post-description">
-                        Gitレポジトリを作って、複数人で開発をしていた。 しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、 Push, PullするときにPermission errorで怒られまくる。 ユーザには共通のグループを作っていたのに…なんでだっけ… 気づけばレポジトリを作るとき以下のようにしていた。 ``` $ git init &ndash;bare &lt;p&gt;&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD&quot;&gt;複数人&lt;/a&gt;で共有するときには以下のようにするべきであった。&lt;/p&gt; $ git init &ndash;bare &ndash;shared &lt;p&gt;では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。&lt;br&gt; 調べると「&lt;b&gt;setgid&lt;/b&gt;」というキーワードに辿り着いた。&lt;br&gt; setgidの権限を付けておくと、そのディレクトリに作成されたファイルの所有グループは、そのディレクトリの所有グループになる。&lt;/p&gt; &lt;p&gt;以下のようにchmodでsetgidを付けることができる。&lt;/p&gt; $ chmod g+s dir_name &lt;p&gt;setgidがつくとあまり馴染みのない権限がつく。&lt;br&gt; 「drwxrw&lt;span style=&quot;color: #ff40ff&quot;&gt;&lt;b&gt;s&lt;/b&gt;&lt;/span&gt;r-x」&lt;/p&gt; $ ls -l drwxrwsr-x 4 user group 136 11 16 22:49 test_dir &lt;p&gt;そして、すでに共有設定なしで作ってしまった&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&quot;&gt;レポジトリ&lt;/a&gt;では以下のように対応可能。&lt;br&gt; （新しく&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA&quot;&gt;レポジトリ&lt;/a&gt;つくるのはめんどいので…）&lt;/p&gt; ##Gigレポジトリ内のディレクトリに $ chmod -R g+s ./branches $ chmod -R g+s ./hooks $ chmod -R g+s ./info $ chmod -R g+s
+                        Gitレポジトリを作って、複数人で開発をしていた。 しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、 Push, PullするときにPermission errorで怒られまくる。 ユーザには共通のグル�...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/11/20/230334/">全文を読む</a>
                     </div>
                 </section>
                 

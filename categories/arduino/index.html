@@ -74,7 +74,10 @@
                     </header>
 
                     <div class="post-description">
-                        Ethernetシールドを使ってネットワークへ繋げる。 とりあえずは、スモールステップでPCとの1対1の通信。 PCとの1対1通信 構成図 Arduinoソースコード #include &lt;SPI.h&gt; #include &lt;Ethernet.h&gt; byte MAC[] = {0x90,0xA2,0xDA,0x0F,0x8B,0xA2}; byte IP[] = {192,168,11,3}; void setup() { Ethernet.begin(MAC,IP); } void loop() { } 疎通確認 ======= ``` 4f3b2c72e32161441359f6d2116c410a27a8faaf % ping 192.168.100.3 PING 192.168.100.3 (192.168.100.3): 56 data bytes Request timeout for icmp_seq 0 64 bytes from 192.168.100.3: icmp_seq=1 ttl=128 time=0.576 ms 64 bytes from 192.168.100.3: icmp_seq=2 ttl=128 time=0.425 ms 64 bytes from 192.168.100.3: icmp_seq=3 ttl=128 time=0.302 ms ``` Ping確認ヨシ!! 一応ARPテーブルを見ておく。 ======= ``` 4f3b2c72e32161441359f6d2116c410a27a8faaf % arp -a ?
+                        Ethernetシールドを使ってネットワークへ繋げる。 とりあえずは、スモールステップでPCとの1対1の通信。 PCとの1対1通信 構成図 Arduinoソースコード #include &amp;lt;SPI.h&amp;gt; #include &amp;lt;Ethernet.h&amp;gt; byte MAC[] = {0x90,0xA2,0xDA,0x0F,0x8B,0xA2}; byte IP...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/09/13/111537/">全文を読む</a>
                     </div>
                 </section>
                 
@@ -97,7 +100,10 @@
                     </header>
 
                     <div class="post-description">
-                        前々からArduino自体はもっていたし、ちょろっと触ったことはあったのだが、 大学時代の研究室の仲間とArduino勉強会をやることになり、それに向けて友人と再入門したのでそのときのメモ。 Arduino入門にこれだけは知っておきたい事項をプログラム形式にまとめた。 もちろん、不足部分もたくさんあるが、これだけわかれば楽しめるようになるかも。 以下が入門プログラム。 LEDの点灯 PCとArduino間のシリアル通信 超音波距離センサの利用 超音波距離センサとLEDの組み合わせ Processingとの連携 電池でArduinoを動作させる 【用意したもの】 基本は以下の２つ Arduinoをはじめようキット 出版社/メーカー: スイッチサイエンス メディア: エレクトロニクス 購入: 64人 クリック: 1,164回 この商品を含むブログ (51件) を見る みんなのArduino入門：拡張キット 出版社/メーカー: スイッチサイエンス メディア: エレクトロニクス この商品を含むブログを見る 【参考にした書籍】 Arduinoをはじめよう 第2版 (Make:PROJECTS) 作者: Massimo Banzi,船田巧 出版社/メーカー: オライリージャパン 発売日: 2012/03/16 メディア: 単行本（ソフトカバー） 購入: 9人 クリック: 27回 この商品を含むブログ (10件) を見る みんなのArduino入門 作者: 高本孝頼 出版社/メーカー: リックテレコム 発売日: 2014/02/17 メディア: 単行本（ソフトカバー） この商品を含むブログを見る 1. LEDの点灯まずはじめの第一歩はLEDの点灯。 これはArduino標準搭載の「スケッチの例」を利用。 利用したスケッチ：スケッチの例⇒01.Basic⇒BlinkLEDのプラス側を13番に、マイナス側をGNDに挿せば完成。 2. PCとArduino間のシリアル通信センサーで取得したデータ等をPC側に渡すシリアル通信。 まずは最初なので、Arduino本体側で文字列を適当に出力させてそれを表示する。はじめは&rdquo;hoge&ldquo;だけを出力させたのだが、ひたすらhogeが並ぶだけなのでArduino側の処理がよく見えなかったので、 以下のサンプルのようにした。また、回路側はなにもいじっていない。 int i = 0; void setup(){ //シリアル通信の宣言 Serial.begin(9600); } void loop(){ Serial.print(&quot;hoge&quot;); Serial.println(i); i++; delay(300); } 出力結果 hoge1 hoge2 hoge3 ....
+                        前々からArduino自体はもっていたし、ちょろっと触ったことはあったのだが、 大学時代の研究室の仲間とArduino勉強会をやることになり、それに向けて友人と再入門したのでそのときのメモ。 Arduino入門にこれだけは知ってお�...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/07/21/231946/">全文を読む</a>
                     </div>
                 </section>
                 

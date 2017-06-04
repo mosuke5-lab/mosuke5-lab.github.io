@@ -74,7 +74,10 @@
                     </header>
 
                     <div class="post-description">
-                        最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。 例えば以下の状況を考える。 【やりたいこと】 「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」 【DBの構造】 カラム名：型 date : datetime value : int ※また、下記ではSinatra上で行っているが、他の言語でも同様のことがいえる。 (1) 簡単なAPIのようなものを利用する 先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、 これが一番複雑にならずに良いと思ったということ。 Sinatra側で/csvにアクセスするとcsvファイルをダウンロードできるようにする。 ```ruby #Sinatra側 get &lsquo;/csv&rsquo; do content_type &lsquo;application/csv&rsquo; attachment &lsquo;download.csv&rsquo; #DBからデータ取得(Activerecord利用) @data = Model.all() #出力するCSVデータの変数。csvヘッダーを先につけている。 @csv = &quot;date,value\n&quot; #DBのデータをCSVの形にして格納 @data.each do |d| @csv += d.date.to_s + &quot;,&quot; + d.value.to_s + &quot;\n&quot; end #csvtest.erbというビューに出力 erb :csvtest, :layout =&gt; false end &lt;p&gt;csvtest.erb&lt;/p&gt; ```ruby &lt;%= @csv %&gt; こうすることで"http://*****/csv"にアクセスするとcsvファイルとしてダウンロードできる状態になる。 条件指定をしてデータをダウンロードできるようにしたい場合はGETでパラメータ指定できるようにすれば良いと思う。 （SinatraでCSVファイルを生成するところのコードがナンセンスだと思っているので、もっといい方法があるはず…） また、今回はcsvにしているがjsonなどの他の形式でも同様のことがいえる。 これをD3.js側で以下のように読み込ませる。 d3.csv(&quot;/csv&quot;, function(error, data) {
+                        最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。 例えば以下の状況を考える。 【やりたいこと】 「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」 【DBの構造】 カラ...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/09/15/135611/">全文を読む</a>
                     </div>
                 </section>
                 

@@ -74,7 +74,10 @@
                     </header>
 
                     <div class="post-description">
-                        データベースには、トランザクションが持つべき特性であるACID特性というものを備えている。 ACID特性 A Atomicity 原始性 C Consistency 一貫性 I Isolation 隔離性 D Dirability 耐久性 ACID特性については詳しく書かないが、その中に隔離性という以下の特性がある。 「複数のトランザクションを並行して実行しても直列に実行した時と同じ結果になる。 また、トランザクション実行中は変更前の状態として見える。」 しかし、複数のトランザクションを並列で実行すると、その隔離性を満たさない現象が発生することがある。 その現象は主に３つある。 1. ダーティリード[概要] あるトランザクションの処理中に、別のユーザがそのトランザクションでまだコミットしてないデータを読み込んでしまう現象のこと。 Q. 何が問題なの？ A. 例えばそのトランザクションがロールバックしたとすると、存在しない処理のデータを読み込んでいることになってしまう。[対策] 対策はシンプルで、まだコミットしていないデータは読み込めないようにするだけ。 つまり、データを更新するときは「排他ロック」をかけるようにするということ。 2. ノンリピータブルリード[概要] 同一トランザクション内で、一度読み込んだデータを再読み込みすると値が異なる現象。[対策] データを読み込むときには「共有ロック」をかけるようにするということ。 共有ロック中は他トランザクションから更新はできなくなるのでノンリピータブルリードは起きない。 3. ファントムリード[概要] あるトランザクションが複数行ある結果を返す検索条件で問合せを2度実行する間に、 コミットされた別のトランザクションによってその条件を満たす新しい行が挿入されたり、削除された行がでたりする現象。[対策] 検索結果の範囲に対してロックをかけること。 上記現象が起こらないようにトランザクションの分離レベルが用意されている。 トランザクションの分離レベルと、現象に発生の有無 分離レベル ダーティリード ノンリピータブルリード ファントムリード Read Uncommitted あり あり あり Read Committed なし あり あり Repeatable Read なし なし あり Serializable なし なし なし ここでひとつの疑問が… Q. どの現象も起こらないSerializableに設定してしまえば…！？当然だがそう簡単にはいかない。 上の「トランザクションの分離レベルと、現象に発生の有無」でいえば したにいけばいくほど、処理負担が大きく実行スピードが遅くなります。つまりは、トランザクションの分離レベルと実行スピードはトレードオフ。 そのときそのときの特徴に合わせて分離レベルを選ばなければならない。 ちなみに、MySQLのInnoDBではデフォルトはRepeatable
+                        データベースには、トランザクションが持つべき特性であるACID特性というものを備えている。 ACID特性 A Atomicity 原始性 C Consistency 一貫性 I Isolation 隔離性 D Dirability 耐久性 ACID特性については詳しく書かないが、その中に隔離...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/03/30/004337/">全文を読む</a>
                     </div>
                 </section>
                 
@@ -97,7 +100,10 @@
                     </header>
 
                     <div class="post-description">
-                        VLAN、Trunkそれぞれを一部分的に切り出した説明はよくあるが、 それらが組み合わさった実践的な構成についてあまり書いてないので、例を考えて載せてみる。 (1) L2スイッチに２つのシステムのサーバ（それぞれが冗長構成）がある。 (2) それぞれのシステムはVLANで切られている (3) L2-L2間、L3-L2間はTrunkを使用(Vlan100,200) (4) L3インターフェースはサブインタフェース利用 (5) L3の冗長はHSRPを利用 ほかにいろいろ思いついたら、付け加えます。
+                        VLAN、Trunkそれぞれを一部分的に切り出した説明はよくあるが、 それらが組み合わさった実践的な構成についてあまり書いてないので、例を考えて載せてみる。 (1) L2スイッチに２つのシステムのサーバ（それぞれが冗長構成�...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/03/09/212520/">全文を読む</a>
                     </div>
                 </section>
                 
@@ -120,7 +126,10 @@
                     </header>
 
                     <div class="post-description">
-                        前回の「【SQLテーブル結合】INNER JOIN とWHERE結合の違いについて」の続き。 やはりFROM句の後にテーブルを複数書いてWHEREで結合させるのはナンセンスだと思う。 例えば、内部結合に加え、外部結合もある場合を考える。 WHERE型 SELECT * FROM table1, table2 #←結合させたいもの LEFT OUTER JOIN ( ・ ・ &lt;副問い合わせとか長いSQLが入ると想定&gt; ・ ・ ) AS sub ON table1.id=sub.id AND table2.id=sub.id WHERE table1.id=table2.id #←結合条件 table1とtable2を内部結合させたいのに、 肝心の何と何を結合させるかの部分の"WHERE table1.id=table2.id"が離れてしまい、 SQL文全体として何をしたいかわかりずらい。 一方、INNER JOINなら SELECT * FROM table1 INNER JOIN table2 ON table1.id=table2.id #←結合させたいものと結合条件が一緒 LEFT OUTER JOIN ( ・ ・ &lt;副問い合わせとか長いSQLが入ると想定&gt; ・ ・ ) AS sub ON table1.id=sub.id 上記のように、結合させたいテーブルと結合させる条件がくっつくため、 全体としてなにをしたいかわかりやすい気がする。 慣れの問題なのかもしれんが、圧倒的にINNER JOINだろ…
+                        前回の「【SQLテーブル結合】INNER JOIN とWHERE結合の違いについて」の続き。 やはりFROM句の後にテーブルを複数書いてWHEREで結合させるのはナンセンスだと思う。 例えば、内部結合に加え、外部結合もある場合を考える。 WHERE...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/02/28/233025/">全文を読む</a>
                     </div>
                 </section>
                 
@@ -143,7 +152,10 @@
                     </header>
 
                     <div class="post-description">
-                        テーブルを内部結合するとき、いつもINNER JOINを使って書いていたが、 「FROM句のあとに複数のテーブルを書いてWHERE句で絞り込む」やり方があることを知った。 INNER JOIN型 SELECT * FROM table1 INNER JOIN table2 ON table1.id=table2.id WHERE型 SELECT * FROM table1 table2 WHERE table1.id=table2.id 結果的には同じだし、調べる限りだとどちらが良いとかメリット・デメリットとかないそう。 個人的には「何に何を結合しているのかわかりやすい」という点からINNER JOIN型をおすすめしたいところ。 DBスペシャリストの本とか問題みてるとだいたいWHERE型なので戸惑う…
+                        テーブルを内部結合するとき、いつもINNER JOINを使って書いていたが、 「FROM句のあとに複数のテーブルを書いてWHERE句で絞り込む」やり方があることを知った。 INNER JOIN型 SELECT * FROM table1 INNER JOIN table2 ON table1.id=table2.id WHERE型...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/02/28/232846/">全文を読む</a>
                     </div>
                 </section>
                 

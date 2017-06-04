@@ -74,7 +74,10 @@
                     </header>
 
                     <div class="post-description">
-                        SSHローカルフォワードの話。 前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。 SSHでローカルポートフォワードを実際に試す - Goldstine研究所 1. やりたいこと httpsでしか接続を許可していないサーバへ、SSHローカルフォワーディングを使って接続しようした。 （直接疎通性がないためにポートフォワーディングする必要があった。） 2. 行ったこと httpsでしか接続ができないので、ローカル端末のポート5000を接続したいサーバのポート443に飛ばせばおっけーと思って、 下記のようにssh接続とブラウザから接続を行った。 ssh -L5000:web-host:443 user@ssh-host ※web-host: 今回httpsで接続したサーバ ※ssh-host: ssh接続先サーバ これでローカルフォワーディングの設定は終わったので、ブラウザから以下に接続するだけで終わりだと思っていた。 http://localhost:5000 が、接続不可…なぜでしょう？ 3. 何が間違いだったか 正しくは以下で接続をしなければいけない。httpsが必要。 https://localhost:5000 よーく考えればアタリマエのこと。 URLのはじめの&lt;http(s)&gt;の部分はプロトコルで最後の&lt;:5000&gt;の部分はポート番号。 httpsは443のポートを一般的に使うが、ポート443がhttpsというわけではない。 あたりまえのことだし知っていることなんだけど、見落としがちかもしれない。
+                        SSHローカルフォワードの話。 前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。 SSHでローカルポートフォワードを実際に試す - Goldstine研究所 1. やりたいこと https...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2015/02/11/172123/">全文を読む</a>
                     </div>
                 </section>
                 
@@ -97,7 +100,10 @@
                     </header>
 
                     <div class="post-description">
-                        自分がハマったのでメモ。 リモートのサーバでdocker runを実行し(/bin/bash)、ローカル側でシェルを操作したかった。 sshでリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。 ssh user@host 'docker run -t -i image_name /bin/bash' そうすると [root@0c6742f02bd9 ~]# [root@0c6742f02bd9 ~]# ^[[A^[[A^[[C エンターを押すと2行されるし、矢印キーはキーコードがでてしまう。 これを解消するのには以下のようにすればいい。 ssh -t user@host 'docker run -t -i image_name /bin/bash' -tとはなんなのか、なぜこのような事象が起きたのか、これからしっかり調べる。
+                        自分がハマったのでメモ。 リモートのサーバでdocker runを実行し(/bin/bash)、ローカル側でシェルを操作したかった。 sshでリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。 ssh user@host &#39;docker run -t -i ...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2015/02/07/144208/">全文を読む</a>
                     </div>
                 </section>
                 
@@ -120,7 +126,10 @@
                     </header>
 
                     <div class="post-description">
-                        Ansibleでソースコードインストールする際とか すでにインストールされているかのチェックなどで、 シェルコマンドを実行してその結果で判断したい時がある。 ぼくがよくやる例では以下とか。 - name: check httpd installed command: which httpd ignore_errors: true なんですが... こうやってしまうと、仮に既にインストールされていて、正常なときでも"changed"と表示されてしまう。 これでは、本当にchangedなものなのか、わからなくなってくる。 これを解決するのにchaged_whenを使うといい。 - name: check httpd installed command: which httpd ignore_errors: true changed_when: false こうするとコマンドが成功した際には"ok"が表示される。 これで、何も変化がないときにはokとskippingしかでないから、 誰がみても結果がわかりやすいですね！ 秘伝のタレ回避！
+                        Ansibleでソースコードインストールする際とか すでにインストールされているかのチェックなどで、 シェルコマンドを実行してその結果で判断したい時がある。 ぼくがよくやる例では以下とか。 - name: check httpd installed command...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2015/02/02/201008/">全文を読む</a>
                     </div>
                 </section>
                 
@@ -143,7 +152,10 @@
                     </header>
 
                     <div class="post-description">
-                        dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、 特定のユーザでログインした状態のコンテナを作りたいという場面に遭遇した。 &lt;やりたいこと&gt; 特定のユーザでログインした状態のシェルを提供すること その際、ユーザの.bash_profile（あるいあは.bashrc）を読み込んだ状態であること .bash_profileに記載したPATHやaliasを使いたい ユーザのログインシェルを利用したい（カスタマイズされたシェルとか） docker runに-uオプションがあるし、これで余裕！と思った。 [host] $ sudo docker run -u=user_name -i -t image_name /bin/bash しかし…以下を確認してみると… [docker] $ pwd [docker] $ echo $PATH [docker] $ alias ディレクトリは "/" だし、PATHも通ってない。 どうやら.bash_profileなどは読んでいないようだ。普通にログインした状態とは違う。 dockerで-uでユーザを指定し場合、指定したuserでコマンドを実行するが、 サーバにユーザでログインしてからコマンドを実行するわけではないらしい。 ディレクトリはどうやら-wオプションで解決できるようだが… [host] $ sudo docker run -u=user_name -w /home/user_name -i -t image_name /bin/bash [docker] $ pwd /home/user_name ディレクトリはおっけーだが、 当然ながら依然として.bash_profileはダメ。 そこでふと思いついた。-uも-wもいらない。 あの手があるではないか…！！ [host] $ sudo docker run -i -t image_name su - username suでスイッチユーザすれば.bash_profileもホームディレクトリも全部解決だ！！
+                        dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、 特定のユーザでログインした状態のコンテナを作りたいという場面に遭遇した。 &amp;lt;やりたいこと&amp;gt; 特定のユーザでログインした状態のシェルを�...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2015/01/24/213255/">全文を読む</a>
                     </div>
                 </section>
                 
@@ -166,7 +178,10 @@
                     </header>
 
                     <div class="post-description">
-                        使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。 そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させることが可能らしい。 ということで、そのスーパーサーバとやらを実際に触ってみた。 スーパーサーバというとinetdとxinetdがあるらしいが、 xinetdはinetdの拡張版で、アクセス制御などの機能を搭載しているとのこと。 今回はxinetdを設定してみる。 1. 事前準備 【環境】 Vagrantで構築したCentOS 6.5 (仮想環境のIPアドレスは192.168.33.10) まずはスーパーサーバで管理するサービスを考えなければならない。 SSHとかhttpはどう考えてもスーパーサーバの管理するようなものではないだろうし… FTPやtelnet、POP3なんかのサービスに利用されることが多いそう？（このへんよくわかない） 今回はFTPをスーパーサーバの管理対象とした。 ※本来は複数のサービスを管理対象とするからこそ意味がある。 まずはxinetdとvsftpをインストール $ sudo yum install xinetd vsftpd xinetdどうこうの前に、ftp接続がきちんとできるか確認するのでサービスを起動。 $ sudo service vsftpd start ローカルPCから接続できることを確認する。 $ ftp 192.168.33.10 Connected to 192.168.33.10. 220 (vsFTPd 2.2.2) Name (192.168.33.10:username): 2. xinetdの設定 xinetdの基本設定は/etc/xinetd.confにかかれており、 xinetdで管理する各サービスの設定は/etc/xinetd.d/配下に書く方式。 ftpの設定を以下の通りにした。 "service"のあとに書くサービス名称は/etc/servicesに定義されているものを記載する。 vsftpとか書いても動かないので注意。 $ sudo vim /etc/xinetd.d/ftp service ftp { disable = no socket_type = stream wait = no user = root server = /usr/sbin/vsftpd log_on_failure += USERID } 設定項目については以下参照。 xinetd の設定 これでxinetdを起動 $ sudo service xinetd start (補足) /etc/servicesってなにもの？ /etc/servicesがなにか気になったので一応調べると。 サービス名とそこで使われるポート番号、プロトコル(tcp/udp)との 対応関係を記述したファイルが /etc/services です。 このファイルは 単なるサービス名のデータベースで、それ自体では何の働きもありませ んが、netstat コマンドや次の inetd などで参照されます。 (http://www.wakhok.ac.jp/~kanayama/summer/02/site/node43.html) 3.
+                        使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。 そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させ�...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2015/01/02/013658/">全文を読む</a>
                     </div>
                 </section>
                 
@@ -189,7 +204,10 @@
                     </header>
 
                     <div class="post-description">
-                        2015年になってしまいました。 2014年に技術分野で印象に残ってること３つを思い返してみる。 1. インフラ会 @mogulla3と軽いノリで始めたインフラ会。 普段触らない、あるいは触ったとしてもすでに構築された環境で触ることの多いインフラ技術について 土日を使って自らの手で構築してみるといった会。 10月くらいから初めて以下を実際にやってみた。 仮想化 ：Docker, Vagrant リバースプロキシ ：Nginx ロードバランサー ：HAProxy クラスタリング ：Pacemaker+corosync(heartbeat) VPN ：SoftEther 構成管理ツール ：Ansible 自作PC やったことについては全てではないがブログにまとめている。 【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築 - Goldstine研究所 【VPS1台でインフラ勉強】HAProxyでロードバランサーを構築 - Goldstine研究所 【VPS1台でインフラ勉強】SoftEtherを使ってVPN構築 - Goldstine研究所 【年末遊び】秋葉原で自作PCパーツ集めて作った - Goldstine研究所 このインフラ会では３つを目標にしてたけど、これが仕事でも本当に役立った。 会もそうだが、目標にしていたマインドは今後もぜひ続けていきたい。 "なんとなく知っている"をなくす 考える引き出しをふやす 自らの手で実践する &lt;大変参考になった書籍&gt; [24時間365日] サーバ/インフラを支える技術 ?スケーラビリティ、ハイパフォーマンス、省力運用 (WEB+DB PRESS plusシリーズ) 作者: 安井真伸,横川和哉,ひろせまさあき,伊藤直也,田中慎司,勝見祐己 出版社/メーカー: 技術評論社 発売日: 2008/08/07 メディア: 単行本（ソフトカバー） 購入: 133人 クリック: 2,270回 この商品を含むブログ (289件) を見る 2. システム導入工事（工事監督マン） 仕事では主に社内SEなのだが、社内SEの仕事をしていると新規設備の導入工事なんかもまれにある。（IaaSとかつかってないので） 新規システムの導入で、データセンターへのサーバラックの立架工事など、インフラ機器の導入にいくつも立ち会った。 もちろんだが、私自身は工事をするわけではなく、あくまで立ち会い・監督の立場。 システム・ソフトウェア系の世界からは少し離れてるがインフラマンとしてはいい経験だった。 こんな仕事のおかげさまで、関西や北陸・四国など全国いろいろと行く機会があって、名物もかなり食べた笑 あとで、特に美味しかった名物料理を紹介するｗ 工事で一番大事なのはなんといっても「安全」。 安全第一である。 データセンターには無数のサーバやケーブルがある。もちろん自分が担当でないシステムの設備がたくさんある。 工事の際に過って、他の設備・機器・ケーブルを壊してしてしまった、切ってしまったなんていったらシャレにならない… 機器ならまだよいが、人的被害を出してしまったら… そのためにも以下をきちんとしておくことが最重要。 事前の現地調査 工事場所はどこか？ 対象機器はどれか？場所はどこか？(ケーブルなどの接続先) 十分な場所はあるか？ 段差などの危険ポイントはどこか？ 荷物はどうやって運ぶか？ 工事内容の手順書・確認項目 上でよく確認したポイントが踏まえてあるか？ 実施する内容は明確か？ 監督側としてなにをどう確認すればいいか明確か？ 現地の人とのネゴり あとはいろいろと聞けるようにデータセンター管理者と仲良くしておきましょう笑 ラックの立架といっても、電気もひかなければいけないので、電気工事もある。 あまりにも電気的知識がなさすぎて電気の入門の本も買ってしまった… 電気がわかる本 (なるほどナットク!) 作者: 松原洋平 出版社/メーカー: オーム社 発売日: 2001/03 メディア: 単行本 この商品を含むブログを見る 3.
+                        2015年になってしまいました。 2014年に技術分野で印象に残ってること３つを思い返してみる。 1. インフラ会 @mogulla3と軽いノリで始めたインフラ会。 普段触らない、あるいは触ったとしてもすでに構築された環境で触ること...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2015/01/01/161826/">全文を読む</a>
                     </div>
                 </section>
                 
@@ -212,7 +230,10 @@
                     </header>
 
                     <div class="post-description">
-                        SSH・・・ いろんなことができる&rdquo;らしい&rdquo;ということは知っていたし、 例えばポートフォワーディングなんていうこともできるのも知っている。 でもそれがどんなものなのか自分の手で試したことはないし、 なんとなくただのサーバログインツールとして利用していた。 サーバインフラ技術に興味を持つようになっていろんなことを勉強していると、 ポートフォワーディングは必須な技術であることも感じ、 年末の持て余す時間を使ってSSHのローカルポートフォワードを試してみたのでメモする。 環境とやりたいこと ローカルPCからexample.jpは以下で接続できる状態。 [local pc] $ ssh username@example.jp またWebサーバのポート番号は80で、VPSのホストサーバからはWebサーバへ接続できる。 CUIなのでわかりづらいがcurlを打つとHello Worldが返ってきている。 [example.jp] $ curl 192.168.33.10 &lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello World! Virtual Web Server&lt;/h1&gt; &lt;/body&gt;&lt;/html&gt; ローカルポートフォワードの実行 ローカルPCから以下を実行する。 以下のコマンドは、 ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす といったもの。 [local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp この状態でブラウザからhttp://localhost:8888にアクセスすると なんと、ローカルホストにつないだはずが、example.jp上の仮想Webサーバのhtmlがうつっているではないか… セキュリティはどうなの？ ローカルの端末からhttpで仮想のWebサーバに接続しているけど、セキュリティはだいじょうぶなのだろうか？ http通信だから暗号化はされていないのだろうか？ なんて疑問もあるが、それは問題ない。 SSHでローカルPCからリモートホスト(example.jp)までトンネルをはり、 そのなかをhttpで通信しているから全く問題なしといえる。 ローカルポートフォワードを利用する場合は、おそらく表には出したくないけど、 ローカルから接続したいなどの要件の時に使うと思うけど、SSHできちんと暗号化しているので安心。 最後に SSHでできることはこの他にもたくさんある。 ポートフォワードだけみても他にも「リモートポートフォワード」や「ダイナミックポートフォワード」などがある。 リモートポートなどはいまぱっと試せる環境がなかったのでおいおい実践してみる… SSHをただのログインツールだけに留めるのは今年で終わりにしよう…
+                        SSH・・・ いろんなことができる&amp;rdquo;らしい&amp;rdquo;ということは知っていたし、 例えばポートフォワーディングなんていうこともできるのも知っている。 でもそれがどんなものなのか自分の手で試したことはないし、 なんと...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/12/31/170545/">全文を読む</a>
                     </div>
                 </section>
                 
@@ -235,7 +256,10 @@
                     </header>
 
                     <div class="post-description">
-                        自作PCを作ったのでその材料と参考資料などを簡単にまとめる。 すべての部品は秋葉原のツクモで揃えた。 パソコン・ゲームPC・自作パソコンなら【TSUKUMO】 わけがあって荷物はすべて手で運んだのだが、かなり重くなるので郵送をおすすめする。 以下買ったパーツ一式や用意した道具。 ちなみに全部で54000円程度でした。（お店で買うとセット割などがあったため） 材料・パーツ一式 マザーボード ASUSTeK Intel H97チップセット搭載マザーボード H97-PRO 【ATX】 出版社/メーカー: Asustek 発売日: 2014/05/17 メディア: Personal Computers この商品を含むブログを見る CPU Intel CPU Core-i3-4160 3.60GHz 3Mキャッシュ LGA1150 BX80646I34160 【BOX】 出版社/メーカー: インテル 発売日: 2014/07/27 メディア: Personal Computers この商品を含むブログを見る メモリ 価格.com - Team TED38192M1600C11DC [DDR3 PC3-12800 4GB 2枚組] 価格比較 HDD 【Amazon.co.jp限定】WD Blue 3.5inch 7,200rpm 1.0TB 64MBキャッシュ SATA3.0 WD10EZEX/N 【フラストレーションフリーパッケージ(FFP)】 出版社/メーカー: Western Digital メディア: Personal Computers クリック: 5回 この商品を含むブログを見る 光学式ドライブ ASUSTeK CyberLink Power2Go 8、E-Greenソフト付き内蔵ドライブ 出版社/メーカー: Asustek 発売日: 2014/11/12 メディア: Personal Computers この商品を含むブログを見る 電源ユニット グラフィックボードも積んでいないし、ゲームとかもやる予定はないので430Wで十分。 また、PCケースも大きめのものを選ぶ予定だったので大きさも気にしなくてオッケーでした。 ENERMAX エナーマックス PC電源 Revolution X&rsquo;t 430W ERX430AWT 出版社/メーカー: ENERMAX 発売日: 2014/08/02 メディア: 付属品 この商品を含むブログを見る ケース SharkoonミドルタワーPCケース サイドクリアウィンドウ グリーン SHA-T28-G-V3/A 出版社/メーカー: Sharkoon メディア: Personal Computers この商品を含むブログ (1件) を見る 参考にした書籍 PC自作の鉄則!
+                        自作PCを作ったのでその材料と参考資料などを簡単にまとめる。 すべての部品は秋葉原のツクモで揃えた。 パソコン・ゲームPC・自作パソコンなら【TSUKUMO】 わけがあって荷物はすべて手で運んだのだが、かなり重くなるの�...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/12/29/154251/">全文を読む</a>
                     </div>
                 </section>
                 
@@ -258,7 +282,10 @@
                     </header>
 
                     <div class="post-description">
-                        VPS1台でインフラ勉強シリーズでVPN構築を行ったのでそのメモ。 1. 実施したこと VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。 2. 環境 ・VPNソフトウェア：SoftEther VPN プロジェクト - SoftEther VPN プロジェクト ・メモリ：１GB ・CPU：仮想２コア ・HDD：100GB ・OS：CentOS7 ・サーバ仮想化：Vagrant(Utuntu13) 3. SoftEtherのインストール インストール手順は公式ドキュメント通りなので簡単にコマンドのみ記述しておく。 7.3 Linux へのインストールと初期設定 - SoftEther VPN プロジェクト 【ダウンロードしたもの】 ここから環境に応じて対象のソフトウェアを選ぶ SoftEther ダウンロード センター ・コンポーネント：SoftEther VPN Server ・プラットフォーム：Linux ・CPU：Intel x86 / AMD64(64bit) ## ダウンロード $ wget ttp://jp.softether-download.com/files/softether/v4.08-9449-rtm-2014.06.08-tree/Linux/SoftEther%20VPN%20Server/64bit%20-%20Intel%20x64%20or%20AMD64/softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz ## 解凍 $ tar zxvf softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz ## 実行可能ファイル作成 $ cd vpnserver/ $ sudo make ## /usr/localへ配置 $ sudo mv vpnserver /usr/local ## パーミッション変更 ### 基本的には600。実行ファイルのみ700 $ cd /usr/local/vpnserver $ sudo chown root:root ./* $ sudo chmod 600 ./* $ sudo chmod 700 ./vpncmd $ sudo chmod 700 ./vpnserver ## 動作チェック $ sudo ./vpncmd 1.
+                        VPS1台でインフラ勉強シリーズでVPN構築を行ったのでそのメモ。 1. 実施したこと VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。 2. 環境 �...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/12/07/212156/">全文を読む</a>
                     </div>
                 </section>
                 
@@ -281,7 +308,10 @@
                     </header>
 
                     <div class="post-description">
-                        AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&hellip; と思ったところである初歩的な罠にハマった。 本番環境へPalybook実行！！ ``` $ ansible-playbook playbook.yml -i hosts &lt;p&gt;あれ、GATHERING FACTSで10分以上も待たされた...&lt;br&gt; しかも、エラー出た...&lt;/p&gt; GATHERING FACTS failed to parse [ sudo via ansible, key= &hellip;.. ] &lt;p&gt;sudoできていない...？&lt;/p&gt; &lt;p&gt;playbook内のsudo: yesを外して実行。&lt;/p&gt; &lt;p&gt;GATHERING FACTSは通過。&lt;br&gt; しかし、当たり前だがsudo で実行すべき部分で失敗...&lt;/p&gt; &lt;p&gt;とても単純なことに気づいた...&lt;br&gt; ・&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/Vagrant&quot;&gt;Vagrant&lt;/a&gt;環境ではsudoのパスワードを要求されない&lt;br&gt; ・本番環境はsudoのパスワードを要求されること&lt;br&gt; ・sudoのパスワードを入力するようにしていなかったこと&lt;/p&gt; &lt;p&gt;というわけで-Kをつけて実行&lt;/p&gt; $ ansible-playbook playbook.yml -i hosts -K &lt;p&gt;うまくいった...&lt;/p&gt; &lt;p&gt;完全なる私のミスなんだが、ただ-Kオプションを忘れるだけで、一回の実行に10分ほども待たされるのは…。&lt;br&gt; しかもGATHERING FACTSで止まっているときはCtl+Cで中断も聞かなかった。&lt;/p&gt; &lt;p&gt;要注意ですね。。。&lt;/p&gt; &lt;br&gt; &lt;p&gt;ちなみに、こんな方法で解決もできる。&lt;br&gt; sudoのパスワードを聞かれなくして対応。&lt;/p&gt; visudo user_name ALL=(ALL) NOPASSWD: ALL ```
+                        AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&amp;hellip; と思ったところである初歩的な罠にハマった。 本番環境へPalybook実行！！ ``` $ ansible-playbook playbook.yml -i hosts &amp;lt;p&amp;gt;あれ、GATHERING FACTSで10分以上も待�...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/11/28/001748/">全文を読む</a>
                     </div>
                 </section>
                 
