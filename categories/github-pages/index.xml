@@ -6,10 +6,32 @@
     <description>Recent content in Github Pages on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sat, 19 Mar 2016 23:24:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 04 Jun 2017 14:47:15 +0900</lastBuildDate>
     
 	<atom:link href="https://blog.mosuke.tech/categories/github-pages/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Werckerを使ってHugo&#43;Github PagesのCI/CD環境を整備する</title>
+      <link>https://blog.mosuke.tech/entry/2017/06/04/hugo_deployment_with_wercker/</link>
+      <pubDate>Sun, 04 Jun 2017 14:47:15 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2017/06/04/hugo_deployment_with_wercker/</guid>
+      <description>以前、はてなブログからHugoを使ったサイトに移行したことを書いた。
+こちら参照：はてなブログからHugoに移行。その際に行ったあれこれ。
+今回、Hugoで記事を更新してからデプロイまでの流れをWerckerを使って自動化したので紹介する。
+概要 今までは下記のフローでデプロイを行っていた。
+一部シェルスクリプトにして自動化していたが、hugoファイルを管理するレポジトリとGithub Pages用の
+２つのレポジトリへのコミットが必要で手間がかかっていた。
+ hugoファイル側で記事更新、デザイン変更 更新のコミット、プッシュ hugoコマンドでビルド /public以下のファイルをgithub pages用のレポジトリへコピー github pages用レポジトリーへ移動してコミット、プッシュ CloudFlareのキャッシュ削除  このフローをWerckerを利用して下記のように変更した。
+ hugoファイル側で記事更新、デザイン変更 更新のコミット、プッシュ Werckerでビルド Werckerでビルド結果をGithub pages用レポジトリへプッシュ WerckerでCloudFlareのキャッシュ削除やSlack通知  Werckerを使っていわゆるCI/CDのフローを組むことで、
+hugo側のファイル・レポジトリ管理をするだけでよくなった。
+werckerの設定 wercker.yml まず、wercker.ymlから記述する。
+Werckerを利用するには自分のレポジトリにwercker.ymlを配置する必要があり、
+このファイルに記述のとおりに自動化処理を行わせる。
+本記事ではWerckerの細かい話は割愛するが、以下がwercker.ymlだ。
+box: debian build: steps: - install-packages: packages: git - script: name: download theme code: | $(git clone https://github.com/dplesca/purehugo ./themes/purehugo) - arjen/hugo-build: version: &amp;quot;0.20&amp;quot; theme: purehugo flags: --buildDrafts=false after-steps: - slack-notifier: channel: $SLACK_CHANNEL url: $SLACK_URL username: wercker_bot deploy: steps: - install-packages: packages: git ssh-client curl - leipert/git-push: gh_oauth: $GIT_TOKEN repo: mosuke5-lab/mosuke5-lab.</description>
+    </item>
     
     <item>
       <title>Github Pagesを今更作った話と、独自ドメイン適応時の通信のこと</title>

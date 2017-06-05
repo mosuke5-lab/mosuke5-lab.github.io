@@ -3,18 +3,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tech &middot; Goldstine研究所(仮)</title>
+    <title>Tech &middot; Goldstine研究所</title>
 
     <meta name="description" content="mosuke5&#39;s blog">
+    <link rel="canonical" href="https://blog.mosuke.tech/tags/tech/">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.20" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="Tech &middot; Goldstine研究所(仮)">
+    <meta name="twitter:title" content="Tech &middot; Goldstine研究所">
     <meta name="twitter:description" content="mosuke5&#39;s blog">
 
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Tech &middot; Goldstine研究所(仮)">
+    <meta property="og:title" content="Tech &middot; Goldstine研究所">
     <meta property="og:description" content="mosuke5&#39;s blog">
 
     <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
@@ -25,7 +26,7 @@
     <link rel="stylesheet" href="https://blog.mosuke.tech/css/mosuke5.css">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
 
-    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所(仮)" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
     <link rel="icon" type="image/png" href="/image/favicon.png">
 </head>
 <body>
@@ -35,7 +36,7 @@
     <div class="sidebar pure-u-1 pure-u-md-1-4">
     <div class="header">
         <hgroup>
-            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所(仮)</a></h1>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
             <h2 class="brand-tagline"> mosuke5&#39;s blog </h2>
         </hgroup>
 
@@ -43,14 +44,6 @@
             <ul class="nav-list">
                 
                 
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://mosuke.tech ">About mosuke5</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://blog.mosuke.tech/index.xml"><i class="fa fa-rss"></i> rss</a>
-                </li>
             </ul>
         </nav>
     </div>
@@ -62,11 +55,11 @@
             
             <div class="posts">
                 
-                <h1 class="content-subhead">22 Feb 2015, 21:13</h1>
+                <h1 class="content-subhead">28 Feb 2014, 23:28</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2015/02/22/211316/" class="post-title">Ruby, thin(bundler利用)を使った環境でのアプリの自動起動設定</a>
+                        <a href="https://blog.mosuke.tech/entry/2014/02/28/232846/" class="post-title">【SQL テーブル結合】INNER JOIN とWHERE結合の違いについて</a>
 
                         <p class="post-meta">
                             
@@ -75,180 +68,21 @@
                             
                                 under 
                                 
-                                <a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-init" href="https://blog.mosuke.tech/categories/init">init</a><a class="post-category post-category-自動起動" href="https://blog.mosuke.tech/categories/%E8%87%AA%E5%8B%95%E8%B5%B7%E5%8B%95">自動起動</a><a class="post-category post-category-Ruby" href="https://blog.mosuke.tech/categories/ruby">Ruby</a><a class="post-category post-category-thin" href="https://blog.mosuke.tech/categories/thin">thin</a><a class="post-category post-category-unicorn" href="https://blog.mosuke.tech/categories/unicorn">unicorn</a>
+                                
                             
                         </p>
                     </header>
 
                     <div class="post-description">
-                        bunlderを使ったWebアプリをプロダクション環境で動かすときに、アプリの起動をどうやって実現しているだろうか。
-Apache Passengerを使う場合には、Apacheの起動がアプリの起動につながるので、 アプリの起動はあまり気にしなかったかもしれない。
-しかし、例えばNginx × Unicorn/thinの構成などの場合はUnicornやthinの起動もしなければいけなくなってくる。
-（あるいはこのようなケースがあるかは謎だが、Unicornやthinを単体で動かそうとしている場合など）
-Unicornやthin（例ではthinを扱うが本質は同じ）の自動起動を実現する際の勘所、注意事項をまとめた。
-0. 前提  CentOS6.5上でRubyでのWebアプリケーションを作っている。  アプリケーションサーバはthinを利用している。 また、gemパッケージ管理にbundlerを利用している。  1. 開発環境でよくするアプリの起動 開発環境では、アプリケーションのログの閲覧性なども兼ねて以下のようにアプリを起動していた。
-$ bundle exec rackup $ bundle exec thin start  でも、これではいつまでたってもプロダクション環境での利用はできません。
-2. 上記方法ではプロダクション環境で利用できない理由 当然のことながら、プロダクション環境ではいちいち手動でコマンドを実行しアプリケーションを立ち上げるわけにはいかない。
-例えば、なんらかの理由でサーバが再起動してしまった場合には、
-このままではアプリケーションが自動的に立ち上がらないため、サービスの停止につながってしまう。
-ではどうするのか？
-以下の状態であることがプロダクション環境では理想なのではないだろうか？
- オリジナルアプリケーションもserviceコマンドで起動・停止ができる  他のサービスと同様の操作方法が可能なのでわかりやすい   サーバ立ち上げ時にサービスが自動で起動される  3. 起動スクリプトを作ろう 上記の状態にもっていくためには、起動スクリプトを作らなければならない。
-起動スクリプトを作る…！？
-「作ったことないし、すぐには作れないよ〜」って思うかもしれないが、
-サンプルはたくさんあるし、よく見てみるとそれほど難しくはない。
-thinを使ったサンプルを探そうと思うと数は少ないが、Unicornも同じ仕組なので、 "unicorn init script"なんて検索をかけてもいろいろでてくるのでおすすめ。
-参考ししたもの
-https://gist.github.com/sbeam/3454488
-上を参考にしながら、こんな起動スクリプトを作ってみた。（未完成版）
-これを/etc/init.d以下へ配置する。
-#!/bin/bash ### BEGIN CHKCONFIG INFO # chkconfig: 2345 55 25 # description: sample-app ### END CHKCONFIG INFO SCRIPT_NAME=/etc/init.
+                        テーブルを内部結合するとき、いつもINNER JOINを使って書いていたが、
+「FROM句のあとに複数のテーブルを書いてWHERE句で絞り込む」やり方があることを知った。
+INNER JOIN型
+SELECT * FROM table1 INNER JOIN table2 ON table1.id=table2.id  WHERE型
+SELECT * FROM table1 table2 WHERE table1.id=table2.id  結果的には同じだし、調べる限りだとどちらが良いとかメリット・デメリットとかないそう。
+個人的には「何に何を結合しているのかわかりやすい」という点からINN...
                     </div>
-                </section>
-                
-                <h1 class="content-subhead">17 Feb 2015, 22:05</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/02/17/220526/" class="post-title">勘違いしやすいFTPとSFTPの転送モードの話</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-SFTP" href="https://blog.mosuke.tech/categories/sftp">SFTP</a><a class="post-category post-category-FTP" href="https://blog.mosuke.tech/categories/ftp">FTP</a><a class="post-category post-category-転送モード" href="https://blog.mosuke.tech/categories/%E8%BB%A2%E9%80%81%E3%83%A2%E3%83%BC%E3%83%89">転送モード</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        FTPやSFTPでの転送モードの話。
-ついこの前、WinSCPを利用している人が転送モードを選んでいて、
-「SFTPには転送モードはないと思っていたのに、転送モードを選んでいる！？」
-と疑問に思ったのでその辺りまとめた。
- FTPのバイナリーモードとアスキーモード 入社しはじめの頃、それまでSFTPしかほとんど使ったことなかったので、
-先輩に「FTPではバイナリーモードを使って…」と言われて、意味が理解できなかったときがあったのを思い出す。
-FTPにはファイル転送モードが２つあって、ちゃんと理解していないと思わぬところで痛い目にあう。
- バイナリーモード：ファイルの改行コードを変換せず転送する。  アスキーモード：OS側で異なる改行コードを自動的に修正して転送する。  FTPでは標準ではアスキーモードのため、なにも考えずにファイルを送るとファイルが壊れてしまったりする。
-昔にミスしたのはWindowsからLinuxへtar.gzファイルをアスキーモードで送って、解凍したらファイルが壊れていたが、
-それに気付かず壊れたファイルをサーバへ設置してしまったとか。
-SFTPには転送モードはあるのか？ SFTPを普段から使ってる人は転送モードなんて気にしたことあまりないと思う。
-FTPでは気にしなければいけない転送モード、SFTPでは気にしなくていいのだろうか？
-結論から言うと、SFTPには転送モードはないので、気にする必要はない。
-SFTPでは、FTPでいうバイナリーモードでファイル転送をするようだ。
-sftpコマンドのマニュアルにも特に転送モードについては記述がないのがわかる。
-http://www.unixuser.org/~euske/doc/openssh/jman/sftp.html
-SFTPでも転送モードを選択できる場合がある！？ ここで、SFTPにも転送モードはあるぞ！？と疑問を思った人もいるかもしれない。
-確かにWinSCPなどファイル転送ソフトを使っていると転送モードを選ぶことができる場合もある。
-しかし、勘違いしてはいけないのが、
-転送モードを選ぶことができるのはSFTPの機能ではなくてファイル転送ソフトの機能であるということだ。
-まとめ ファイル転送でよく使われるFTPやSFTP。
-それぞれに違いはあるし、それを利用するソフトウェアによっても違いがある。
-何が何を行っているか把握し、思わぬミスを減らしましょう。
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">11 Feb 2015, 17:21</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/02/11/172123/" class="post-title">SSHポートフォワード、https接続をするときに間違えやすいこと</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-ポートフォワード" href="https://blog.mosuke.tech/categories/%E3%83%9D%E3%83%BC%E3%83%88%E3%83%95%E3%82%A9%E3%83%AF%E3%83%BC%E3%83%89">ポートフォワード</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        SSHローカルフォワードの話。
-前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。
-SSHでローカルポートフォワードを実際に試す - Goldstine研究所
-1. やりたいこと httpsでしか接続を許可していないサーバへ、SSHローカルフォワーディングを使って接続しようした。
-（直接疎通性がないためにポートフォワーディングする必要があった。）
-2. 行ったこと httpsでしか接続ができないので、ローカル端末のポート5000を接続したいサーバのポート443に飛ばせばおっけーと思って、
-下記のようにssh接続とブラウザから接続を行った。
-ssh -L5000:web-host:443 user@ssh-host  ※web-host: 今回httpsで接続したサーバ
-※ssh-host: ssh接続先サーバ
-これでローカルフォワーディングの設定は終わったので、ブラウザから以下に接続するだけで終わりだと思っていた。
-http://localhost:5000  が、接続不可…なぜでしょう？
-3. 何が間違いだったか 正しくは以下で接続をしなければいけない。httpsが必要。
-https://localhost:5000  よーく考えればアタリマエのこと。
-URLのはじめの&lt;http(s)&gt;の部分はプロトコルで最後の&lt;:5000&gt;の部分はポート番号。
-httpsは443のポートを一般的に使うが、ポート443がhttpsというわけではない。
-あたりまえのことだし知っていることなんだけど、見落としがちかもしれない。
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">07 Feb 2015, 14:42</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/02/07/144208/" class="post-title">リモートのサーバでdockerを起動させるときの端末割り当て</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-docker" href="https://blog.mosuke.tech/categories/docker">docker</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        自分がハマったのでメモ。
-リモートのサーバでdocker runを実行し(/bin/bash)、ローカル側でシェルを操作したかった。
-sshでリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。
-ssh user@host 'docker run -t -i image_name /bin/bash'  そうすると
-[root@0c6742f02bd9 ~]# [root@0c6742f02bd9 ~]# ^[[A^[[A^[[C  エンターを押すと2行されるし、矢印キーはキーコードがでてしまう。
-これを解消するのには以下のようにすればいい。
-ssh -t user@host 'docker run -t -i image_name /bin/bash'  -tとはなんなのか、なぜこのような事象が起きたのか、これからしっかり調べる。
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">02 Feb 2015, 20:10</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/02/02/201008/" class="post-title">Ansible、コマンド実行結果を&amp;quot;ok&amp;quot;にする（冪等性を保つ方法）</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-サーバ" href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90">サーバ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        Ansibleでソースコードインストールする際とか
-すでにインストールされているかのチェックなどで、
-シェルコマンドを実行してその結果で判断したい時がある。
-ぼくがよくやる例では以下とか。
-- name: check httpd installed command: which httpd ignore_errors: true  なんですが...
-こうやってしまうと、仮に既にインストールされていて、正常なときでも"changed"と表示されてしまう。
-これでは、本当にchangedなものなのか、わからなくなってくる。
-これを解決するのにchaged_whenを使うといい。
-- name: check httpd installed command: which httpd ignore_errors: true changed_when: false  こうするとコマンドが成功した際には"ok"が表示される。
-これで、何も変化がないときにはokとskippingしかでないから、
-誰がみても結果がわかりやすいですね！
-秘伝のタレ回避！
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/02/28/232846/">全文を読む</a>
                     </div>
                 </section>
                 
@@ -261,11 +95,7 @@ ssh -t user@host 'docker run -t -i image_name /bin/bash'  -tとはなんなの�
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 8 of 14</span>
-    
-      <a href="/tags/tech/page/9/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
-        Older&nbsp;<i class="fa fa-angle-double-right"></i>
-      </a>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 8 of 8</span>
     
   </nav>
 </div>
@@ -287,7 +117,9 @@ ssh -t user@host 'docker run -t -i image_name /bin/bash'  -tとはなんなの�
         </script>
 		    <gcse:search></gcse:search>
     </div>
-    <a href="/archive/">Arvhive</a>
+    <a class="pure-button" href="https://mosuke.tech "><i class="fa fa-user"></i> mosuke5</a>
+    <a class="pure-button" href="/archive/"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml"><i class="fa fa-rss"></i> rss</a>
 </div>
 <div class="footer">
     <div class="pure-menu pure-menu-horizontal pure-menu-open">
@@ -308,7 +140,7 @@ ssh -t user@host 'docker run -t -i image_name /bin/bash'  -tとはなんなの�
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-ga('create', '', 'auto');
+ga('create', 'UA-99596316-1', 'auto');
 ga('send', 'pageview');
 
 </script>
