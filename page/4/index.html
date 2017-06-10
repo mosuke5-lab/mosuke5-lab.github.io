@@ -56,142 +56,6 @@
             <div class="posts">
                 
                 
-                <h1 class="content-subhead">22 Aug 2015, 22:30</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/08/22/223025/" class="post-title">(個人的) YAPC::Asia 2015ふりかえり</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-YAPC" href="https://blog.mosuke.tech/categories/yapc">YAPC</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>「ブログを書くまでが<a class="keyword" href="http://d.hatena.ne.jp/keyword/YAPC">YAPC</a>」</p></p>
-
-<p>というわけで、8/21, 22と<a class="keyword" href="http://d.hatena.ne.jp/keyword/YAPC">YAPC</a>に参加したので、そこでの学んだこと、気になったことなどを振り返ります。<br>
-しかし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/YAPC">YAPC</a>で聞いた公演内容を淡々とまとめるなどはしません。<br>
-単なる内容のまとめであれば、公開されているスライドなどをみるのが一番だと思いますので。</p>
-
-<p>以下３点を中心に振り返ってみます。</p>
-
-<ul>
-<li>インフラ関連セッションについて</li>
-<li>発表を聞いてよかった、今の自分に一番必要だったことについて</li>
-<li>興味を持ったことについて（CONBU）</li>
-</ul>
-
-<h1>インフラ関連セッションについて</h1>
-
-<p>意図的も半分くらいあるんだけど、なんとなくセッションを選んでいたら、インフラ関連のものが多くなりました。</p>
-
-<ul>
-<li><a href="http://yapcasia.org/2015/talk/show/9ec2791c-05e5-11e5-81fa-79c97d574c3a">世界展開する大規模ウェブサービスのデプロイを支える技術 - YAPC::Asia Tokyo 2015</a></li>
-<li><a href="http://yapcasia.org/2015/talk/show/b335dee0-09ad-11e5-8d7a-67dc7d574c3a">Consulと自作OSSを活用した100台規模のWebサービス運用 - YAPC::Asia Tokyo 2015</a></li>
-<li><a href="http://yapcasia.org/2015/talk/show/4f85e87a-f9ec-11e4-8262-8ab37d574c3a">3分でサービスのOSを入れ替える技術 - YAPC::Asia Tokyo 2015</a></li>
-<li><a href="http://yapcasia.org/2015/talk/show/f2816038-10ec-11e5-89bf-d7f07d574c3a">我々はどのように冗長化を失敗したのか - YAPC::Asia Tokyo 2015</a></li>
-</ul>
-
-<h2>デプロイについて</h2>
-
-<p>大規模サービスでのデプロイにおいて、一台一台のホストが<code>git clone</code>して、<code>bundle install</code>やらせてーとかやると、<br>
-時間もかかるし、並列的にgit cloneした際などgitサーバが負荷的に危なくなってくる。<br>
-なので、予めライブラリとかすべてインストールされたものをターボールなどにまとめておいて、<br>
-それをプルしてくる形式のデプロイについて多くの発表がありました。</p>
-
-<p>このデプロイ方法、並列で数百MBのファイルをダウンロードしても落ちないストーレジ（ようは<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>のS3）を前提に構築されている感がありました。<br>
-（というかそう言っていた）</p>
-
-<p>相変わらず<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>はせこいなーと思っています（笑）</p>
-
-<p>うちの環境では真似するのは難しいなーと思う部分もありますが、<br>
-それ以前にシステムの規模や用途によってデプロイのあり方も多種多様になることを改めて考えさせられました。<br>
-自分の環境にあった最適なデプロイ形態を探す日々がまた始まりそうですが、良いヒントになりそうなのはまちがいなしです。</p>
-
-<h2>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%B0%C7%AF%C1%AB%B5%DC">式年遷宮</a>インフラストラクチャ</h2>
-
-<p>Kenjiさんの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%B0%C7%AF%C1%AB%B5%DC">式年遷宮</a>インフラストラクチャ。
-この考え方、ぼくも一度考えたことはありますが、ここまで実践してみた経験談がきけたのは面白かった。</p>
-
-<p>いざというときに切り替わらない、切り替えられないという問題に対して、<br>
-自動ではないが、「切替訓練」ということで、定期的に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BE%E9%C4%B9%B2%BD">冗長化</a>の系を切り替えることはしてもいいのかなーと思ったりしています。</p>
-
-<h2>consulについて</h2>
-
-<p>実は、上であげた４つのセッション全てで共通していたのが<code>consul</code>を使っていた。</p>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=https%3A%2F%2Fwww.consul.io%2F" title="Consul by HashiCorp" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="https://www.consul.io/">Consul by HashiCorp</a></iframe><cite class="hatena-citation"><a href="https://www.consul.io/">www.consul.io</a></cite></p>
-
-<p>正直、consulについて、名前くらいしかしらなかったのに、ここまで利用されていたので、時代に乗り遅れている感を感じた。
-でも利用用途をみていくと、iaas環境で力を発揮するっぽいので、概要と用途だけ押さえておくか…といったところ。<br>
-今月中の課題です。</p>
-
-<h1>発表を聞いてよかった、今の自分に一番必要だったことについて</h1>
-
-<p>たくさん学びのあったなかで、なんだかんだいっても、koemuさんの発表が今の自分が一番考えていてることであり、<br>
-一番必要なことであったように感じた。</p>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fyapcasia.org%2F2015%2Ftalk%2Fshow%2F53aacc02-faca-11e4-8c2e-8ab37d574c3a" title="辛いことをやめる！から始まる業務改善とInfrastructure as Code - YAPC::Asia Tokyo 2015" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://yapcasia.org/2015/talk/show/53aacc02-faca-11e4-8c2e-8ab37d574c3a">辛いことをやめる！から始まる業務改善とInfrastructure as Code - YAPC::Asia Tokyo 2015</a></iframe><cite class="hatena-citation"><a href="http://yapcasia.org/2015/talk/show/53aacc02-faca-11e4-8c2e-8ab37d574c3a">yapcasia.org</a></cite></p>
-
-<p>実はkoemuさんのブログをたまにみていて、<br>
-いちど話を聞いてみたいなーと思っていた人であったので、とてもいい機会であった。</p>
-
-<p>特に個人的に響いたのが、次の２つのこと。</p>
-
-<ul>
-<li>CTO（という言い方をしていたが、要はキーパーソン）を味方につける働き方をする</li>
-<li>ハンズオンを大事にする</li>
-</ul>
-
-<p>キーパーソンにやりたいことを伝えて公認とするのは、いまもよくやっていることでぼくも大事にしていること。<br>
-だた、ハンズオンについてはうまくできていない部分も多くあったので見直していきたいポイントでした。</p>
-
-<p>また、個人的にこの手でよくやっているのが、「スモールステップ展開」。<br>
-一度に、あれもこれも新しいことやっていく、となると、どんなにサポートを厚くしてもなかなか浸透しなかったりしてしまう。<br>
-なので、新しいことやるときはスモールステップでひとつひとつやっていき、文化浸透してから次のことをやるという風にしている。</p>
-
-<h1>興味をもったことんついて（CONBU）</h1>
-
-<p>会場のネットワークを作ってくれたのがCONBUという団体でした。
-CONBU自体はソフトウェアデザインで特集されているのを見ていたので知ってはいましたが、ネットワークの品質の良さ、<br>
-そしてリアルタイムでのネットワークの状態を<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>提供の便利さなど肌身で感じました。</p>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fgihyo.jp%2Fmagazine%2FSD%2Farchive%2F2015%2F201503" title="Software Design 2015年3月号" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://gihyo.jp/magazine/SD/archive/2015/201503">Software Design 2015年3月号</a></iframe><cite class="hatena-citation"><a href="http://gihyo.jp/magazine/SD/archive/2015/201503">gihyo.jp</a></cite></p>
-
-<p>こちら、LTで<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiFi">WiFi</a> AP設置の速さを実演したもの。<br>
-でも、ほんとの現場では安全第一でやっていると思うので、その辺も一言いってくれてるとよかったかなと笑</p>
-
-<p></p>
-<blockquote class="twitter-tweet" lang="HASH(0x86c7010)">
-<p lang="ja" dir="ltr">突然目の前に無線APが生えてきた <a href="https://twitter.com/hashtag/yapcasia?src=hash">#yapcasia</a> <a href="http://t.co/UWcSzvRv08">pic.twitter.com/UWcSzvRv08</a></p>— ぷりんたいは求職中です、 (@spacepro_be) <a href="https://twitter.com/spacepro_be/status/635004222291902464">August 22, 2015</a>
-</blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<h1>最後に</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/YAPC">YAPC</a>は今年初参加でした。
-学びも多かったけど、それ以上にエンタメとしてとても楽しめました。</p>
-
-<p>小さいところからでも楽しく学べる作っていきたいですね。</p>
-
-<p><p>本当にスタッフのみなさんお疲れ様でした。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
                 <h1 class="content-subhead">13 Aug 2015, 00:04</h1>
                 <section class="post">
                     <header class="post-header">
@@ -1434,6 +1298,246 @@ Checking connectivity... done.
 <p><p>また、本題の「<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>エージェントフォワード後に、接続したユーザとは別のユーザでgit cloneしたい」だが、
 そもそもそういうことをすることはNGということらしい。<br>
 別のもっと賢い方法を考えろってことのようでした。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">22 Feb 2015, 21:13</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2015/02/22/211316/" class="post-title">Ruby, thin(bundler利用)を使った環境でのアプリの自動起動設定</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-init" href="https://blog.mosuke.tech/categories/init">init</a><a class="post-category post-category-自動起動" href="https://blog.mosuke.tech/categories/%E8%87%AA%E5%8B%95%E8%B5%B7%E5%8B%95">自動起動</a><a class="post-category post-category-Ruby" href="https://blog.mosuke.tech/categories/ruby">Ruby</a><a class="post-category post-category-thin" href="https://blog.mosuke.tech/categories/thin">thin</a><a class="post-category post-category-unicorn" href="https://blog.mosuke.tech/categories/unicorn">unicorn</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>bunlderを使ったWebアプリをプロダクション環境で動かすときに、アプリの起動をどうやって実現しているだろうか。</p></p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a> Passengerを使う場合には、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>の起動がアプリの起動につながるので、
+アプリの起動はあまり気にしなかったかもしれない。</p>
+
+<p>しかし、例えばNginx × <a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>/thinの構成などの場合は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>やthinの起動もしなければいけなくなってくる。<br>
+（あるいはこのようなケースがあるかは謎だが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>やthinを単体で動かそうとしている場合など）</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>やthin（例ではthinを扱うが本質は同じ）の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%AB%C6%B0%B5%AF%C6%B0">自動起動</a>を実現する際の勘所、注意事項をまとめた。</p>
+
+<h1>0. 前提</h1>
+
+<ul>
+<li>CentOS6.5上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>でのWebアプリケーションを作っている。</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>はthinを利用している。</li>
+<li>また、gemパッケージ管理にbundlerを利用している。</li>
+</ul>
+
+<h1>1. 開発環境でよくするアプリの起動</h1>
+
+<p>開発環境では、アプリケーションのログの閲覧性なども兼ねて以下のようにアプリを起動していた。</p>
+
+<pre><code>$ bundle exec rackup
+$ bundle exec thin start 
+</code></pre>
+
+<p>でも、これではいつまでたってもプロダクション環境での利用はできません。</p>
+
+<h1>2. 上記方法ではプロダクション環境で利用できない理由</h1>
+
+<p>当然のことながら、プロダクション環境ではいちいち手動でコマンドを実行しアプリケーションを立ち上げるわけにはいかない。<br>
+例えば、なんらかの理由でサーバが再起動してしまった場合には、<br>
+このままではアプリケーションが自動的に立ち上がらないため、サービスの停止につながってしまう。</p>
+
+<p>ではどうするのか？<br>
+以下の状態であることがプロダクション環境では理想なのではないだろうか？</p>
+
+<ul>
+<li>オリジナルアプリケーションもserviceコマンドで起動・停止ができる
+
+<ul>
+<li>他のサービスと同様の操作方法が可能なのでわかりやすい</li>
+</ul>
+</li>
+<li>サーバ立ち上げ時にサービスが自動で起動される</li>
+</ul>
+
+<h1>3. 起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作ろう</h1>
+
+<p>上記の状態にもっていくためには、起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作らなければならない。</p>
+
+<p>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作る…！？<br>
+「作ったことないし、すぐには作れないよ〜」って思うかもしれないが、<br>
+サンプルはたくさんあるし、よく見てみるとそれほど難しくはない。</p>
+
+<p>thinを使ったサンプルを探そうと思うと数は少ないが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>も同じ仕組なので、
+"<a class="keyword" href="http://d.hatena.ne.jp/keyword/unicorn">unicorn</a> init script"なんて検索をかけてもいろいろでてくるのでおすすめ。</p>
+
+<p>参考ししたもの<br>
+<a href="https://gist.github.com/sbeam/3454488">https://gist.github.com/sbeam/3454488</a></p>
+
+<p>上を参考にしながら、こんな起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作ってみた。（未完成版）<br>
+これを<code>/etc/init.d</code>以下へ配置する。</p>
+
+<pre><code class="language-sh">#!/bin/bash
+
+### BEGIN CHKCONFIG INFO
+# chkconfig: 2345 55 25
+# description: sample-app
+### END CHKCONFIG INFO
+
+SCRIPT_NAME=/etc/init.d/sample-app
+CONFIG_PATH=/path/to/config
+BUNDLE_CMD=/usr/local/bin/bundle
+
+bundle_exec_thin ()
+{
+    for CONFIG_FILE in &quot;$CONFIG_PATH/*.yml&quot;; do
+        SITE_DIR=`awk '/^chdir:/ { print $2; }' $CONFIG_FILE`
+        cd $SITE_DIR
+        $BUNDLE_CMD exec thin $1 -C $CONFIG_FILE
+    done
+}
+
+
+case &quot;$1&quot; in
+  start)
+        bundle_exec_thin start
+        ;;
+  stop)
+        bundle_exec_thin stop
+        ;;
+  restart)
+        bundle_exec_thin restart
+        ;;
+  *)
+        echo &quot;Usage: $SCRIPT_NAME {start|stop|restart}&quot; &gt;&amp;2
+        exit 3
+        ;;
+esac
+
+:
+ 
+</code></pre>
+
+<p>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>も完成したし、実際にserviceコマンドで実行してみる。</p>
+
+<pre><code>$ sudo service sample-app start
+/usr/bin/env: ruby: No such file or directory 
+</code></pre>
+
+<p>んん。。。起動せず、撃沈…</p>
+
+<h3>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作る上での注意</h3>
+
+<p>起動しなかった原因に移る前に、起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作る上での注意点を１つ。<br>
+chkconfigで認識させるためには冒頭のCHKCONFIG INFO部分(<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%E1%A5%F3%A5%C8%A5%A2%A5%A6%A5%C8">コメントアウト</a>部分)も重要になってくる。<br>
+CHKCONFIG INFO部分を書かないままchkconfigでaddしようとすると以下のように怒られます。</p>
+
+<pre><code>$ sudo chkconfig --add sample-app
+service sample-app does not support chkconfig 
+</code></pre>
+
+<h1>4. serviceコマンド実行時のPATHのはなし</h1>
+
+<p>なぜ、serviceコマンドでthinを起動できなかったのか。<br>
+調べていくと意外なことがわかった。<br>
+serviceコマンドを実行すると中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>のPATHが上書きされてしまう。</p>
+
+<p>【参照】<br>
+<a href="http://heartbeats.jp/hbblog/2013/06/service-start-stop.html">デーモンの起動・終了にはserviceコマンドを利用しよう - インフラエンジニアway - Powered by HEARTBEATS</a></p>
+
+<p>試しに、起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>内にPATHの出力を仕込んで確かめてみる。<br>
+起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>に<code>echo $PATH</code>を仕込んだ。</p>
+
+<pre><code>$ sudo service sample-app start
+/sbin:/usr/sbin:/bin:/usr/bin 
+</code></pre>
+
+<p>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>内でbundleや<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>がインストールされているディレクトリに<br>
+PATHを通すことで、解決することにした。<br>
+（もっと美しい方法があれば教えて下さい。。。）</p>
+
+<h1>5. 起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>修正(完成版)</h1>
+
+<p>上記の通り起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を修正したものが以下。</p>
+
+<pre><code class="language-sh">#!/bin/bash
+
+### BEGIN CHKCONFIG INFO
+# chkconfig: 2345 55 25
+# description: sample-app
+### END CHKCONFIG INFO
+
+# 以下を追加
+export PATH=/usr/local/bin:$PATH
+
+SCRIPT_NAME=/etc/init.d/sample-app
+CONFIG_PATH=/path/to/config
+BUNDLE_CMD=/usr/local/bin/bundle
+
+bundle_exec_thin ()
+{
+    for CONFIG_FILE in &quot;$CONFIG_PATH/*.yml&quot;; do
+        SITE_DIR=`awk '/^chdir:/ { print $2; }' $CONFIG_FILE`
+        cd $SITE_DIR
+        $BUNDLE_CMD exec thin $1 -C $CONFIG_FILE
+    done
+}
+
+
+case &quot;$1&quot; in
+  start)
+        bundle_exec_thin start
+        ;;
+  stop)
+        bundle_exec_thin stop
+        ;;
+  restart)
+        bundle_exec_thin restart
+        ;;
+  *)
+        echo &quot;Usage: $SCRIPT_NAME {start|stop|restart}&quot; &gt;&amp;2
+        exit 3
+        ;;
+esac
+
+:
+ 
+</code></pre>
+
+<p>(PATHを通したのでbundleコマンドはフルパスでなくても大丈夫ですよ...)</p>
+
+<p>最後に起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を<code>/etc/init.d</code>以下に配置し、
+忘れずにchkconfigに登録しましょう。</p>
+
+<pre><code>$ sudo chkconfig --add sample-app 
+</code></pre>
+
+<h1>【おまけ】sudo だと<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>やgem、bundleが使えない？</h1>
+
+<p>rootユーザでは<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>やgem, bundleが使えるけど、sudoで実行すると使えない…<br>
+という悩みの人も多いのではないだろうか。</p>
+
+<pre><code>$ sudo gem install xxxxx
+sudo: gem: command not found 
+</code></pre>
+
+<p><p>sudoでの実行はrootユーザで実行することなのになぜ実行できないか。<br>
+これはsudoを使うときに/usr/local/binが許可されていないからだ。<br>
+visudoでsecure_pathの設定を見直すとよい。<br>
+<a href="http://www.xmisao.com/2013/10/11/sudoers-secure_path.html">sudoersのsecure_pathについて &ndash; ぺけみさお</a></p>
 </body></p>
 
                     </div>
