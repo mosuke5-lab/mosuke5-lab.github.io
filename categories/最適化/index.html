@@ -3,19 +3,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entries &middot; Goldstine研究所</title>
+    <title>最適化 &middot; Goldstine研究所</title>
 
     <meta name="description" content="mosuke5&#39;s blog">
-    <link rel="canonical" href="https://blog.mosuke.tech/entry/">
+    <link rel="canonical" href="https://blog.mosuke.tech/categories/%E6%9C%80%E9%81%A9%E5%8C%96/">
 
     <meta name="generator" content="Hugo 0.20" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="Entries &middot; Goldstine研究所">
+    <meta name="twitter:title" content="最適化 &middot; Goldstine研究所">
     <meta name="twitter:description" content="mosuke5&#39;s blog">
 
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Entries &middot; Goldstine研究所">
+    <meta property="og:title" content="最適化 &middot; Goldstine研究所">
     <meta property="og:description" content="mosuke5&#39;s blog">
 
     <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
@@ -55,11 +55,11 @@
             
             <div class="posts">
                 
-                <h1 class="content-subhead">28 Feb 2014, 23:30</h1>
+                <h1 class="content-subhead">12 Jun 2017, 23:33</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2014/02/28/233025/" class="post-title">【SQLテーブル結合】INNER JOIN とWHERE結合の違いについて その２</a>
+                        <a href="https://blog.mosuke.tech/entry/2017/06/12/hugo_optimize_image/" class="post-title">Hugo、PageSpeed対策で自動で画像を圧縮する</a>
 
                         <p class="post-meta">
                             
@@ -68,68 +68,29 @@
                             
                                 under 
                                 
-                                <a class="post-category post-category-データベース" href="https://blog.mosuke.tech/categories/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9">データベース</a><a class="post-category post-category-SQL" href="https://blog.mosuke.tech/categories/sql">SQL</a>
+                                <a class="post-category post-category-Hugo" href="https://blog.mosuke.tech/categories/hugo">Hugo</a><a class="post-category post-category-PageSpeed" href="https://blog.mosuke.tech/categories/pagespeed">PageSpeed</a><a class="post-category post-category-最適化" href="https://blog.mosuke.tech/categories/%E6%9C%80%E9%81%A9%E5%8C%96">最適化</a><a class="post-category post-category-wercker" href="https://blog.mosuke.tech/categories/wercker">wercker</a>
                             
                         </p>
                     </header>
 
                     <div class="post-description">
-                        前回の「【SQLテーブル結合】INNER JOIN とWHERE結合の違いについて」の続き。
-やはりFROM句の後にテーブルを複数書いてWHEREで結合させるのはナンセンスだと思う。
-例えば、内部結合に加え、外部結合もある場合を考える。
-WHERE型
-SELECT * FROM table1, table2 #←結合させたいもの LEFT OUTER JOIN ( ・ ・ &amp;lt;副問い合わせとか長いSQLが入ると想定&amp;gt; ・ ・ ) AS sub ON table1.id=sub.id AND table2.id=sub.id WHERE table1.id=table2.id #←結合...
+                         はじめに 最近Hugoを使ったブログに移転した。
+「はてなブログからHugoに移行。その際に行ったあれこれ。」
+せっかくブログを運営するからにはSEOも少しがんばりたい。
+PageSpeedで画像を最適化できるよっていわれたので、画像を圧縮させようと思った。
+しかし、気がつくと忘れてしまったりするので、
+Werckerを使って自動で最適化させることにした。
+WerckerでのCI/CD環境 まず、Werckerを使ったCI/CD環境だが、こちらを参考にしてほしい。
+「Werckerを使ってHugo&#43;Github PagesのCI/CD環境を整備する」
+画像圧縮処理 ブログの中で使う画像は、J...
                     </div>
                     <div class="read-more-link">
-                        <a href="https://blog.mosuke.tech/entry/2014/02/28/233025/">全文を読む</a>
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">28 Feb 2014, 23:28</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/02/28/232846/" class="post-title">【SQL テーブル結合】INNER JOIN とWHERE結合の違いについて</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        テーブルを内部結合するとき、いつもINNER JOINを使って書いていたが、
-「FROM句のあとに複数のテーブルを書いてWHERE句で絞り込む」やり方があることを知った。
-INNER JOIN型
-SELECT * FROM table1 INNER JOIN table2 ON table1.id=table2.id  WHERE型
-SELECT * FROM table1 table2 WHERE table1.id=table2.id  結果的には同じだし、調べる限りだとどちらが良いとかメリット・デメリットとかないそう。
-個人的には「何に何を結合しているのかわかりやすい」という点からINN...
-                    </div>
-                    <div class="read-more-link">
-                        <a href="https://blog.mosuke.tech/entry/2014/02/28/232846/">全文を読む</a>
+                        <a href="https://blog.mosuke.tech/entry/2017/06/12/hugo_optimize_image/">全文を読む</a>
                     </div>
                 </section>
                 
             </div>
             
-<div class="pagination">
-  <nav role="pagination" class="post-list-pagination">
-      
-      <a href="/entry/page/7/" class="post-list-pagination-item pure-button post-list-pagination-item-prev">
-        <i class="fa fa-angle-double-left"></i>&nbsp;Newer
-      </a>
-      
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 8 of 8</span>
-    
-  </nav>
-</div>
-
 
             <hr class="footer-hr" />
 <div class="">

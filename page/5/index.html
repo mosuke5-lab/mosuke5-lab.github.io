@@ -56,6 +56,246 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">22 Feb 2015, 21:13</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2015/02/22/211316/" class="post-title">Ruby, thin(bundler利用)を使った環境でのアプリの自動起動設定</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-init" href="https://blog.mosuke.tech/categories/init">init</a><a class="post-category post-category-自動起動" href="https://blog.mosuke.tech/categories/%E8%87%AA%E5%8B%95%E8%B5%B7%E5%8B%95">自動起動</a><a class="post-category post-category-Ruby" href="https://blog.mosuke.tech/categories/ruby">Ruby</a><a class="post-category post-category-thin" href="https://blog.mosuke.tech/categories/thin">thin</a><a class="post-category post-category-unicorn" href="https://blog.mosuke.tech/categories/unicorn">unicorn</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>bunlderを使ったWebアプリをプロダクション環境で動かすときに、アプリの起動をどうやって実現しているだろうか。</p></p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a> Passengerを使う場合には、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>の起動がアプリの起動につながるので、
+アプリの起動はあまり気にしなかったかもしれない。</p>
+
+<p>しかし、例えばNginx × <a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>/thinの構成などの場合は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>やthinの起動もしなければいけなくなってくる。<br>
+（あるいはこのようなケースがあるかは謎だが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>やthinを単体で動かそうとしている場合など）</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>やthin（例ではthinを扱うが本質は同じ）の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%AB%C6%B0%B5%AF%C6%B0">自動起動</a>を実現する際の勘所、注意事項をまとめた。</p>
+
+<h1>0. 前提</h1>
+
+<ul>
+<li>CentOS6.5上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>でのWebアプリケーションを作っている。</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>はthinを利用している。</li>
+<li>また、gemパッケージ管理にbundlerを利用している。</li>
+</ul>
+
+<h1>1. 開発環境でよくするアプリの起動</h1>
+
+<p>開発環境では、アプリケーションのログの閲覧性なども兼ねて以下のようにアプリを起動していた。</p>
+
+<pre><code>$ bundle exec rackup
+$ bundle exec thin start 
+</code></pre>
+
+<p>でも、これではいつまでたってもプロダクション環境での利用はできません。</p>
+
+<h1>2. 上記方法ではプロダクション環境で利用できない理由</h1>
+
+<p>当然のことながら、プロダクション環境ではいちいち手動でコマンドを実行しアプリケーションを立ち上げるわけにはいかない。<br>
+例えば、なんらかの理由でサーバが再起動してしまった場合には、<br>
+このままではアプリケーションが自動的に立ち上がらないため、サービスの停止につながってしまう。</p>
+
+<p>ではどうするのか？<br>
+以下の状態であることがプロダクション環境では理想なのではないだろうか？</p>
+
+<ul>
+<li>オリジナルアプリケーションもserviceコマンドで起動・停止ができる
+
+<ul>
+<li>他のサービスと同様の操作方法が可能なのでわかりやすい</li>
+</ul>
+</li>
+<li>サーバ立ち上げ時にサービスが自動で起動される</li>
+</ul>
+
+<h1>3. 起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作ろう</h1>
+
+<p>上記の状態にもっていくためには、起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作らなければならない。</p>
+
+<p>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作る…！？<br>
+「作ったことないし、すぐには作れないよ〜」って思うかもしれないが、<br>
+サンプルはたくさんあるし、よく見てみるとそれほど難しくはない。</p>
+
+<p>thinを使ったサンプルを探そうと思うと数は少ないが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>も同じ仕組なので、
+"<a class="keyword" href="http://d.hatena.ne.jp/keyword/unicorn">unicorn</a> init script"なんて検索をかけてもいろいろでてくるのでおすすめ。</p>
+
+<p>参考ししたもの<br>
+<a href="https://gist.github.com/sbeam/3454488">https://gist.github.com/sbeam/3454488</a></p>
+
+<p>上を参考にしながら、こんな起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作ってみた。（未完成版）<br>
+これを<code>/etc/init.d</code>以下へ配置する。</p>
+
+<pre><code class="language-sh">#!/bin/bash
+
+### BEGIN CHKCONFIG INFO
+# chkconfig: 2345 55 25
+# description: sample-app
+### END CHKCONFIG INFO
+
+SCRIPT_NAME=/etc/init.d/sample-app
+CONFIG_PATH=/path/to/config
+BUNDLE_CMD=/usr/local/bin/bundle
+
+bundle_exec_thin ()
+{
+    for CONFIG_FILE in &quot;$CONFIG_PATH/*.yml&quot;; do
+        SITE_DIR=`awk '/^chdir:/ { print $2; }' $CONFIG_FILE`
+        cd $SITE_DIR
+        $BUNDLE_CMD exec thin $1 -C $CONFIG_FILE
+    done
+}
+
+
+case &quot;$1&quot; in
+  start)
+        bundle_exec_thin start
+        ;;
+  stop)
+        bundle_exec_thin stop
+        ;;
+  restart)
+        bundle_exec_thin restart
+        ;;
+  *)
+        echo &quot;Usage: $SCRIPT_NAME {start|stop|restart}&quot; &gt;&amp;2
+        exit 3
+        ;;
+esac
+
+:
+ 
+</code></pre>
+
+<p>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>も完成したし、実際にserviceコマンドで実行してみる。</p>
+
+<pre><code>$ sudo service sample-app start
+/usr/bin/env: ruby: No such file or directory 
+</code></pre>
+
+<p>んん。。。起動せず、撃沈…</p>
+
+<h3>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作る上での注意</h3>
+
+<p>起動しなかった原因に移る前に、起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作る上での注意点を１つ。<br>
+chkconfigで認識させるためには冒頭のCHKCONFIG INFO部分(<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%E1%A5%F3%A5%C8%A5%A2%A5%A6%A5%C8">コメントアウト</a>部分)も重要になってくる。<br>
+CHKCONFIG INFO部分を書かないままchkconfigでaddしようとすると以下のように怒られます。</p>
+
+<pre><code>$ sudo chkconfig --add sample-app
+service sample-app does not support chkconfig 
+</code></pre>
+
+<h1>4. serviceコマンド実行時のPATHのはなし</h1>
+
+<p>なぜ、serviceコマンドでthinを起動できなかったのか。<br>
+調べていくと意外なことがわかった。<br>
+serviceコマンドを実行すると中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>のPATHが上書きされてしまう。</p>
+
+<p>【参照】<br>
+<a href="http://heartbeats.jp/hbblog/2013/06/service-start-stop.html">デーモンの起動・終了にはserviceコマンドを利用しよう - インフラエンジニアway - Powered by HEARTBEATS</a></p>
+
+<p>試しに、起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>内にPATHの出力を仕込んで確かめてみる。<br>
+起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>に<code>echo $PATH</code>を仕込んだ。</p>
+
+<pre><code>$ sudo service sample-app start
+/sbin:/usr/sbin:/bin:/usr/bin 
+</code></pre>
+
+<p>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>内でbundleや<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>がインストールされているディレクトリに<br>
+PATHを通すことで、解決することにした。<br>
+（もっと美しい方法があれば教えて下さい。。。）</p>
+
+<h1>5. 起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>修正(完成版)</h1>
+
+<p>上記の通り起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を修正したものが以下。</p>
+
+<pre><code class="language-sh">#!/bin/bash
+
+### BEGIN CHKCONFIG INFO
+# chkconfig: 2345 55 25
+# description: sample-app
+### END CHKCONFIG INFO
+
+# 以下を追加
+export PATH=/usr/local/bin:$PATH
+
+SCRIPT_NAME=/etc/init.d/sample-app
+CONFIG_PATH=/path/to/config
+BUNDLE_CMD=/usr/local/bin/bundle
+
+bundle_exec_thin ()
+{
+    for CONFIG_FILE in &quot;$CONFIG_PATH/*.yml&quot;; do
+        SITE_DIR=`awk '/^chdir:/ { print $2; }' $CONFIG_FILE`
+        cd $SITE_DIR
+        $BUNDLE_CMD exec thin $1 -C $CONFIG_FILE
+    done
+}
+
+
+case &quot;$1&quot; in
+  start)
+        bundle_exec_thin start
+        ;;
+  stop)
+        bundle_exec_thin stop
+        ;;
+  restart)
+        bundle_exec_thin restart
+        ;;
+  *)
+        echo &quot;Usage: $SCRIPT_NAME {start|stop|restart}&quot; &gt;&amp;2
+        exit 3
+        ;;
+esac
+
+:
+ 
+</code></pre>
+
+<p>(PATHを通したのでbundleコマンドはフルパスでなくても大丈夫ですよ...)</p>
+
+<p>最後に起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を<code>/etc/init.d</code>以下に配置し、
+忘れずにchkconfigに登録しましょう。</p>
+
+<pre><code>$ sudo chkconfig --add sample-app 
+</code></pre>
+
+<h1>【おまけ】sudo だと<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>やgem、bundleが使えない？</h1>
+
+<p>rootユーザでは<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>やgem, bundleが使えるけど、sudoで実行すると使えない…<br>
+という悩みの人も多いのではないだろうか。</p>
+
+<pre><code>$ sudo gem install xxxxx
+sudo: gem: command not found 
+</code></pre>
+
+<p><p>sudoでの実行はrootユーザで実行することなのになぜ実行できないか。<br>
+これはsudoを使うときに/usr/local/binが許可されていないからだ。<br>
+visudoでsecure_pathの設定を見直すとよい。<br>
+<a href="http://www.xmisao.com/2013/10/11/sudoers-secure_path.html">sudoersのsecure_pathについて &ndash; ぺけみさお</a></p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">17 Feb 2015, 22:05</h1>
                 <section class="post">
                     <header class="post-header">
@@ -1137,290 +1377,6 @@ http通信だから暗号化はされていないのだろうか？<br>
     <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%E5%A5%BF%A5%A4%A5%F3%A5%BA%A5%B2%A1%BC%A5%C8">シュタインズゲート</a>のまゆしぃおすすめのメンチカツ屋にいきました。<br>
 ご飯を大盛りにするとすごい量出てくるので注意(笑)<br>
 <a href="http://tabelog.com/tokyo/A1310/A131001/13000352/">キッチン ジロー 外神田店 （kitichen JIRO） - 秋葉原/洋食 [食べログ]</a></p></p>
-
-<p></div>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">07 Dec 2014, 21:21</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/12/07/212156/" class="post-title">【VPS1台でインフラ勉強】SoftEtherを使ってVPN構築</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-VPN" href="https://blog.mosuke.tech/categories/vpn">VPN</a><a class="post-category post-category-SoftEther" href="https://blog.mosuke.tech/categories/softether">SoftEther</a><a class="post-category post-category-ネットワーク" href="https://blog.mosuke.tech/categories/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF">ネットワーク</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<p><body>
-<p>VPS1台でインフラ勉強シリーズで<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>構築を行ったのでそのメモ。</p></p>
-
-<p><div class="section">
-    <h2>1. 実施したこと</h2>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>のホストサーバを<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>サーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。</p></p>
-
-<p><div class="section">
-    <h3></h3>
-    <p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207200544.png" alt="f:id:mosuke5:20141207200544p:plain" title="f:id:mosuke5:20141207200544p:plain" class="hatena-fotolife" itemprop="image"></span><br>
-</p></p>
-
-<p></div>
-</div>
-<div class="section">
-    <h2>2. 環境</h2>
-    <p>・<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>ソフトウェア：<a href="https://ja.softether.org/">SoftEther VPN プロジェクト - SoftEther VPN プロジェクト</a><br>
-・メモリ：１GB<br>
-・CPU：仮想２コア<br>
-・HDD：100GB<br>
-・OS：CentOS7<br>
-・サーバ仮想化：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>(Utuntu13)</p></p>
-
-<p></div>
-<div class="section">
-    <h2>3. <a class="keyword" href="http://d.hatena.ne.jp/keyword/SoftEther">SoftEther</a>のインストール</h2>
-    <p>インストール手順は公式ドキュメント通りなので簡単にコマンドのみ記述しておく。<br>
-<a href="https://ja.softether.org/4-docs/1-manual/7/7.3">7.3 Linux へのインストールと初期設定 - SoftEther VPN プロジェクト</a></p>
-<p>【ダウンロードしたもの】<br>
-ここから環境に応じて対象のソフトウェアを選ぶ<br>
-<a href="http://www.softether-download.com/ja.aspx?product=softether">SoftEther ダウンロード センター</a></p>
-<p>・<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DD%A1%BC%A5%CD%A5%F3%A5%C8">コンポーネント</a>：<a class="keyword" href="http://d.hatena.ne.jp/keyword/SoftEther">SoftEther</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a> Server<br>
-・プラットフォーム：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Linux">Linux</a><br>
-・CPU：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Intel">Intel</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/x86">x86</a> / <a class="keyword" href="http://d.hatena.ne.jp/keyword/AMD64">AMD64</a>(64bit)</p></p>
-
-<pre><code>## ダウンロード
-$ wget ttp://jp.softether-download.com/files/softether/v4.08-9449-rtm-2014.06.08-tree/Linux/SoftEther%20VPN%20Server/64bit%20-%20Intel%20x64%20or%20AMD64/softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz
-
-## 解凍
-$ tar zxvf softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz
-
-## 実行可能ファイル作成
-$ cd vpnserver/
-$ sudo make
-
-## /usr/localへ配置
-$ sudo mv vpnserver /usr/local
-
-## パーミッション変更
-### 基本的には600。実行ファイルのみ700
-$ cd /usr/local/vpnserver
-$ sudo chown root:root ./*
-$ sudo chmod 600 ./*
-$ sudo chmod 700 ./vpncmd
-$ sudo chmod 700 ./vpnserver
-
-## 動作チェック
-$ sudo ./vpncmd
-1. VPN Server または VPN Bridge の管理
-2. VPN Client の管理
-3. VPN Tools コマンドの使用 (証明書作成や通信速度測定)
-
-1 - 3 を選択: 3
-
-VPN Tools&gt;
-##helpとうつと利用可能なコマンドが出る
-VPN Tools&gt; help
-下記の 6 個のコマンドが使用できます:
- About         - バージョン情報の表示
- Check         - SoftEther VPN の動作が可能かどうかチェックする
- MakeCert      - 新しい X.509 証明書と秘密鍵の作成 (1024 bit)
- MakeCert2048  - 新しい X.509 証明書と秘密鍵の作成 (2048 bit)
- TrafficClient - 通信スループット測定ツールクライアントの実行
- TrafficServer - 通信スループット測定ツールサーバーの実行
-VPN Tools&gt; 
-VPN Tools&gt; Check
-(略)
-すべてのチェックに合格しました。
-VPN Tools&gt; 
-VPN Tools&gt; exit
-
-##起動スクリプトの作成
-$ sudo vim /etc/init.d/vpnserver
-#!/bin/sh
-# chkconfig: 2345 99 01
-# description: SoftEther VPN Server
-DAEMON=/usr/local/vpnserver/vpnserver
-LOCK=/var/lock/subsys/vpnserver
-test -x $DAEMON || exit 0
-case &quot;$1&quot; in
-start)
-$DAEMON start
-touch $LOCK
-;;
-stop)
-$DAEMON stop
-rm $LOCK
-;;
-restart)
-$DAEMON stop
-sleep 3
-$DAEMON start
-;;
-*)
-echo &quot;Usage: $0 {start|stop|restart}&quot;
-exit 1
-esac
-exit 0
-
-##サービス登録
-$ sudo chkconfig --add vpnserver
-$ sudo chkconfig --list vpnserver
-vpnserver       0:off   1:off   2:on    3:on    4:on    5:on    6:off
-
-##起動
-$ sudo /etc/init.d/vpnserver start  
-</code></pre>
-
-<p></div>
-<div class="section">
-    <h2>4. 設定</h2></p>
-
-<p><div class="section">
-    <h4>(1)管理者パスワードの設定</h4>
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</p>
-
-<h1 id="pre-class-code-data-lang-data-unlink-vpnserverへ接続"><pre class="code" data-lang="" data-unlink> ## vpnserverへ接続</h1>
-
-<pre><code>## vpnserverへ接続
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; 4f3b2c72e32161441359f6d2116c410a27a8faaf
-$ sudo ./vpncmd localhost:443 /SERVER
-
-## 管理者パスワード設定
-VPN Server&gt; ServerPasswordSet 
-</code></pre>
-
-<p></div>
-<div class="section">
-    <h4>(2)仮想HUBの作成</h4>
-    <p>デフォルトで「default」という仮想がHUBがあるのでそれで構築。<br>
-自分の仮想HUBを作りたければHubCreateでつくれる。</p></p>
-
-<pre><code>VPN Server&gt; HubCreate 
-</code></pre>
-
-<p>※HELPコマンドがだいぶ使えるので使おう。日本語で書かれているのでわかりやすいです。</p>
-
-<pre><code>VPN Server&gt;HELP
-下記の 205 個のコマンドが使用できます:
- About                      - バージョン情報の表示
- AcAdd                      - 接続元 IP 制限リストにルールを追加 (IPv4)
- AcAdd6                     - 接続元 IP 制限リストにルールを追加 (IPv6)
- AcDel                      - 接続元 IP 制限リスト内のルールの削除
- AcList                     - 接続元 IP 制限リストのルール一覧の取得
-(...以下略) 
-</code></pre>
-
-<p></div>
-<div class="section">
-    <h4>(3) <a class="keyword" href="http://d.hatena.ne.jp/keyword/IPsec">IPsec</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a> サーバー機能の有効化</h4>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>のトンネリングをするにあたって事前共有鍵が必要なので作成する必要がある。</p></p>
-
-<pre><code>VPN Server&gt;IPsecEnable
-    IPsecEnable コマンド - IPsec VPN サーバー機能の有効化 / 無効化
-    L2TP over IPsec サーバー機能を有効 (yes / no): yes
-    Raw L2TP サーバー機能を有効 (yes / no): yes
-    EtherIP / L2TPv3 over IPsec サーバー機能を有効 (yes / no): yes
-    IPsec 事前共有鍵の文字列 (9 文字以下を推奨): *******
-    VPN 接続時に仮想 HUB 名が省略された場合のデフォルト仮想 HUB 名: Default 
-</code></pre>
-
-<p></div>
-<div class="section">
-    <h4>(4) グループとユーザの作成</h4>
-    <p>ユーザを作成するにはグループの作成が必要なので先にグループを作る。<br>
-また、ユーザを作ったでではパスワードが設定されないので忘れずにパスワード設定。</p></p>
-
-<pre><code>VPN Server&gt;Hub Default
-VPN Server/DEFAULT&gt;GroupCreate
-    GroupCreate コマンド - グループの作成
-    グループ名: mygroup
-    グループの本名: mygroup
-    グループの説明: mygroup
-
-VPN Server/DEFAULT&gt;UserCreate
-    UserCreate コマンド - ユーザーの作成
-    ユーザー名: myuser
-    参加するグループ名: mygroup
-    ユーザーの本名: myuser
-    ユーザーの説明: myuser
-    コマンドは正常に終了しました。
-
-## ユーザを作っただけではパスワードが設定されないので
-VPN Server/DEFAULT&gt; UserPasswordSet 
-</code></pre>
-
-<p></div>
-<div class="section">
-    <h4>(5) ローカルブリッジの設定</h4>
-    <p>次にローカルブリッジの設定をする。<br>
-ローカルブリッジは<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>の仮想ネットワークと、LAN の実ネットワーク（ここでは<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>ホストサーバと仮想Webサーバ間のローカルネットワーク）をつなげる設定です。<br>
-ローカルブリッジを行うLANカードを指定する必要があるが、ここでは仮想の「vboxnet0」を使用します。</p></p>
-
-<pre><code>VPN Server/DEFAULT&gt;BridgeCreate
-    BridgeCreate コマンド - ローカルブリッジ接続の作成
-    ブリッジする仮想 HUB 名: Default
-    ブリッジ先のデバイス名: vboxnet0 
-</code></pre>
-
-<p></div>
-<div class="section">
-    <h4>(6) <a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>の設定</h4>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>クライアント側に割り当てる<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>のレンジを決めてあげます。<br>
-今回は最小限構成で実現するため、ローカルの<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>は同一セグメントとしました。<br>
-192.168.33.0/24を利用セグメントとした。<br>
-また、サーバ側に割り当てているIPとバッティングしないように192.168.33.20以降を<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>のIPレンジとした。</p></p>
-
-<pre><code>##まずは有効化。これをやらないと「PPPサーバーとの接続が確立ができません」ってなってハマります。
-VPN Server/example&gt; SecureNatEnable
-
-VPN Server/DEFAULT&gt;DhcpSet
-    DhcpSet コマンド - SecureNAT 機能の仮想 DHCP サーバー機能の設定の変更
-    配布するアドレス帯の開始点: 192.168.33.20
-    配布するアドレス帯の終了点: 192.168.33.50
-    サブネットマスク: 255.255.255.0
-    リース期限 (秒): 7200
-    デフォルトゲートウェイ (未設定可):
-    DNS サーバー 1 (未設定可):
-    DNS サーバー 2 (未設定可):
-    ドメイン名:
-    ログの保存 (yes / no): yes 
-</code></pre>
-
-<p></div>
-</div>
-<div class="section">
-    <h2>5. <a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>接続試験</h2>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/iPhone">iPhone</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>の設定から以下のように設定をする。<br>
-アカウントの部分は「ユーザ名@仮想Hub名」にすること。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207212531.jpg" alt="f:id:mosuke5:20141207212531j:plain" title="f:id:mosuke5:20141207212531j:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<br>
-<p>接続すると、ローカルのIPが割り当てられていることを確認。<br>
-途中で切れているが192.168.33.21が割り当てられました。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207212546.jpg" alt="f:id:mosuke5:20141207212546j:plain" title="f:id:mosuke5:20141207212546j:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>につないだ状態でブラウザから192.168.33.10にアクセスすると”It works!!!”。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207212556.jpg" alt="f:id:mosuke5:20141207212556j:plain" title="f:id:mosuke5:20141207212556j:plain" class="hatena-fotolife" itemprop="image"></span><br>
-</p></p>
-
-<p></div>
-<div class="section">
-    <h2>6 最後に</h2>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>の構築そのものはなんとかできるが、やはり奥は深い。<br>
-挙動がまだ不安定な部分もあるので、きちんと仕組みを理解していくことと、<br>
-今回は<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>クライアント側とアクセス先サーバを同一セグメントとしたので、L3の設定などをして違うセグメントにもアクセスできるようにしていきたい。</p></p>
 
 <p></div>
 </body></p>

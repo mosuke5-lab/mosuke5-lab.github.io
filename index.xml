@@ -6,10 +6,37 @@
     <description>Recent content on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sun, 04 Jun 2017 14:47:15 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 12 Jun 2017 23:33:12 +0900</lastBuildDate>
     
 	<atom:link href="https://blog.mosuke.tech/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Hugo、PageSpeed対策で自動で画像を圧縮する</title>
+      <link>https://blog.mosuke.tech/entry/2017/06/12/hugo_optimize_image/</link>
+      <pubDate>Mon, 12 Jun 2017 23:33:12 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2017/06/12/hugo_optimize_image/</guid>
+      <description> はじめに 最近Hugoを使ったブログに移転した。
+「はてなブログからHugoに移行。その際に行ったあれこれ。」
+せっかくブログを運営するからにはSEOも少しがんばりたい。
+PageSpeedで画像を最適化できるよっていわれたので、画像を圧縮させようと思った。
+しかし、気がつくと忘れてしまったりするので、
+Werckerを使って自動で最適化させることにした。
+WerckerでのCI/CD環境 まず、Werckerを使ったCI/CD環境だが、こちらを参考にしてほしい。
+「Werckerを使ってHugo+Github PagesのCI/CD環境を整備する」
+画像圧縮処理 ブログの中で使う画像は、JPEGとPNGが混じっている。
+そのため、両方に対応して画像を圧縮する必要があった。
+画像の圧縮ツールはPageSpeedが推奨してきた、
+optipngとjpegtranを利用することにした。
+ OptiPNG: Advanced PNG Optimizer jpegtran  処理自体はいたってシンプル。
+次のシェル(optimize_image.sh)を用意した。
+#!/bin/sh find ./static/image/ -name &amp;quot;*.png&amp;quot; | xargs optipng -o5 find ./static/image/ -name &amp;quot;*.jpg&amp;quot; -type f -exec jpegtran -copy none -optimize -outfile {} {} \;  Werckerに組み込む wercker.ymlのbuildの段階で最適化を仕込めばおわり。
+ただし、すべての画像ファイルをデプロイのたびに最適化すると時間がかかる。
+定期的にローカルで圧縮してgitに更新しておいたほうがいいだろう。
+あくまで、忘れてしまった時のためにCIでまかなってくれるというスタンスで利用している。
+- script: name: optimize image size code: | sh ./scripts/optimize_image.sh  </description>
+    </item>
     
     <item>
       <title>Werckerを使ってHugo&#43;Github PagesのCI/CD環境を整備する</title>
