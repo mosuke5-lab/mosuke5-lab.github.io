@@ -3,18 +3,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goldstine研究所(仮) &middot; Goldstine研究所(仮)</title>
+    <title>Goldstine研究所 &middot; Goldstine研究所</title>
 
     <meta name="description" content="mosuke5&#39;s blog">
+    <link rel="canonical" href="https://blog.mosuke.tech/">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.20" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="Goldstine研究所(仮) &middot; Goldstine研究所(仮)">
+    <meta name="twitter:title" content="Goldstine研究所 &middot; Goldstine研究所">
     <meta name="twitter:description" content="mosuke5&#39;s blog">
 
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Goldstine研究所(仮) &middot; Goldstine研究所(仮)">
+    <meta property="og:title" content="Goldstine研究所 &middot; Goldstine研究所">
     <meta property="og:description" content="mosuke5&#39;s blog">
 
     <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
@@ -25,7 +26,7 @@
     <link rel="stylesheet" href="https://blog.mosuke.tech/css/mosuke5.css">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
 
-    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所(仮)" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
     <link rel="icon" type="image/png" href="/image/favicon.png">
 </head>
 <body>
@@ -35,7 +36,7 @@
     <div class="sidebar pure-u-1 pure-u-md-1-4">
     <div class="header">
         <hgroup>
-            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所(仮)</a></h1>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
             <h2 class="brand-tagline"> mosuke5&#39;s blog </h2>
         </hgroup>
 
@@ -43,14 +44,6 @@
             <ul class="nav-list">
                 
                 
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://mosuke.tech ">About mosuke5</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://blog.mosuke.tech/index.xml"><i class="fa fa-rss"></i> rss</a>
-                </li>
             </ul>
         </nav>
     </div>
@@ -61,6 +54,416 @@
         <div>
             
             <div class="posts">
+                
+                
+                <h1 class="content-subhead">16 Nov 2014, 15:32</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2014/11/16/153223/" class="post-title">Ansible、ソースインストールする際のPalybookの書き方</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>最近、Ansibleを使い始めたのだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/yum">yum</a>やapt-getでインストールできるものはいいけど、<br>
+どうしてもソースインストールが必要な場合がある。</p>
+<p>ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。</p>
+<p>まず、あたりまえだが、ソースインストールを行うには以下のフローを踏まなければいけな。<br>
+1. ソースファイルの取得(tarで固められていると仮定)<br>
+2. tarファイルの解凍<br>
+3. 解答してできたディレクトリへ移動<br>
+4. configure<br>
+5. make<br>
+6. make install</p>
+<p>また、Ansibleでは何回もPlaybookを実行していくため、<br>
+<b>すでにインストールされている場合は、インストールをスキップする</b>必要がある。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/yum">yum</a>やapt-getで管理されていれば上記を心配することはないのだが、やはりソースインストールだとこの壁がある。<br>
+※パッケージ化しろよ！というツッコミは禁止</p>
+<p>今回は例として、ubuntu13に<a class="keyword" href="http://d.hatena.ne.jp/keyword/emacs">emacs</a>をソースインストールするのを例としてみた。</p></p>
+
+<p><div class="section">
+    <h3>環境</h3>
+    <p>【Ansible実行側】<br>
+さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>の1G<br>
+OS: <a class="keyword" href="http://d.hatena.ne.jp/keyword/Centos">Centos</a> 7<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>:192.168.33.1</p>
+<p>【設定対象側】<br>
+上記さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>上にたてた<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>の仮想サーバ<br>
+OS: <a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a> 13.10<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>:192.168.33.100</p></p>
+
+<p></div>
+<div class="section">
+    <h3>Playbook</h3>
+    <p>以下playbookの例。</p></p>
+
+<pre><code class="language-yaml">---
+- hosts: 192.168.33.100
+  user: vagrant
+  sudo: yes
+
+  vars:
+    src_dir: /usr/local/src
+    emacs_ver: emacs-23.4
+
+  tasks:
+   ## emacsのソースファイルを取得済みか確認
+   - name: check exist emacs source file
+     command: ls -l {{src_dir}}/{{emacs_ver}}.tar.gz
+     ignore_errors: True
+     register: result1
+
+   ## emacsのソースファイル取得。ただし、すでに取得済みならスキップ
+   - name: get emacs source file
+     command: chdir={{src_dir}} wget http://mirror.jre655.com/GNU/emacs/{{emacs_ver}}.tar.gz
+     when: result1|failed
+
+   ## emacsのソースインストールを解凍
+   - name: get emacs source file
+     command: chdir={{src_dir}} tar xvf {{emacs_ver}}.tar.gz
+     when: result1|failed
+
+   ## emacsがインストールされているか確認
+   #  確認基準はemacsコマンドのpathが通っているかで判断した
+   - name: check emacs install
+     command: which emacs
+     ignore_errors: True
+     register: result2
+
+   ## emacsのインストール。ただしすでにemacsがインストールされいたらスキップ
+   - name: expand emacs src
+     command: chdir={{src_dir}} tar xvf {{emacs_ver}}.tar.gz
+     when: result2|failed
+
+   - name: comfigure emacs
+     command: chdir={{src_dir}}/{{emacs_ver}} ./configure
+     when: result2|failed
+
+   - name: make emacs
+     command: chdir={{src_dir}}/{{emacs_ver}} make
+     when: result2|failed
+
+   - name: install emacs
+     command: chdir={{src_dir}}/{{emacs_ver}} make install
+     when: result2|failed
+ 
+</code></pre>
+
+<p></div>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">09 Nov 2014, 17:27</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2014/11/09/172745/" class="post-title">【VPS1台でインフラ勉強】多段SSH設定（おまけ）</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-サーバ" href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90">サーバ</a><a class="post-category post-category-VPS" href="https://blog.mosuke.tech/categories/vps">VPS</a><a class="post-category post-category-Vagrant" href="https://blog.mosuke.tech/categories/vagrant">Vagrant</a><a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>VPS1台でインフラ勉強の会で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>のホストサーバ上に仮想でさらにいつくかのサーバを立てたが、<br>
+仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更に<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>をしなければならない。<br>
+これが面倒だったので多段<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>の設定をして、一発で<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>接続できるようにした。</p>
+<p>以下の図で言うと、web10, web11(192.168.33.<sup>10</sup>&frasl;<sub>11</sub>)に一発で<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>できるようにする。<br>
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141109/20141109170337.png" alt="f:id:mosuke5:20141109170337p:plain" title="f:id:mosuke5:20141109170337p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+<p>クライアントPC側に以下の設定をした。</p></p>
+
+<pre><code>$ vim ~/.ssh/config
+host gateway
+    HostName xxxxx.xxx
+    User username
+
+Host web10
+    HostName 192.168.33.10
+    User vagrant
+    ProxyCommand ssh -W %h:%p gateway
+
+Host web11
+    HostName 192.168.33.11
+    User vagrant
+    ProxyCommand ssh -W %h:%p gateway
+
+##これで以下で接続可能
+$ ssh web10
+$ ssh  web11 
+</code></pre>
+
+<p><p>簡単でした。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">09 Nov 2014, 17:14</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2014/11/09/171436/" class="post-title">【VPS1台でインフラ勉強】HAProxyでロードバランサーを構築</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-HAProxy" href="https://blog.mosuke.tech/categories/haproxy">HAProxy</a><a class="post-category post-category-VPS" href="https://blog.mosuke.tech/categories/vps">VPS</a><a class="post-category post-category-vagrant" href="https://blog.mosuke.tech/categories/vagrant">vagrant</a><a class="post-category post-category-ロードバランサ" href="https://blog.mosuke.tech/categories/%E3%83%AD%E3%83%BC%E3%83%89%E3%83%90%E3%83%A9%E3%83%B3%E3%82%B5">ロードバランサ</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>前回の<a href="https://blog.mosuke.tech/entry/2014/10/09/230555">【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築</a>に続き、同様の環境を用いて、ロードバランサ構築を行った。<br>
+ロードバランサの構築にはHAProxyを利用した。</p></p>
+
+<p><div class="section">
+    <h3>1. 環境</h3>
+    <p>前回同様で、さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>の1GBのプラン1台のみ。<br>
+・メモリ：１GB<br>
+・CPU：仮想２コア<br>
+・HDD：100GB<br>
+・OS：CentOS7<br>
+・サーバ仮想化：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>(Utuntu13)<br>
+・ロードバランサ：<a href="http://www.haproxy.org/">HAProxy - The Reliable, High Performance TCP/HTTP Load Balancer</a><br>
+</p></p>
+
+<p></div>
+<div class="section">
+    <h3>2. 構成図</h3>
+    <p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141109/20141109170337.png" alt="f:id:mosuke5:20141109170337p:plain" title="f:id:mosuke5:20141109170337p:plain" class="hatena-fotolife" itemprop="image"></span><br>
+</p></p>
+
+<p></div>
+<div class="section">
+    <h3>3. ロードバランサの構築</h3>
+    <p>■ホストサーバ側の設定</p></p>
+
+<pre><code>#HAProxyインストール
+$ sudo yum install haproxy
+
+#設定はすごく簡単で以下のファイルのみ。実際に
+$ sudo vim /etc/haproxy/haproxy.cfg
+
+#---------------------------------------------------------------------
+# Example configuration for a possible web application.  See the
+# full configuration options online.
+#
+#   http://haproxy.1wt.eu/download/1.4/doc/configuration.txt
+#
+#---------------------------------------------------------------------
+
+#---------------------------------------------------------------------
+# Global settings
+#---------------------------------------------------------------------
+global
+
+    log         127.0.0.1 local6 debug
+
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     4000
+    user        haproxy
+    group       haproxy
+    daemon
+
+    # turn on stats unix socket
+    stats socket /var/lib/haproxy/stats
+
+#---------------------------------------------------------------------
+# common defaults that all the 'listen' and 'backend' sections will
+# use if not designated in their block
+#---------------------------------------------------------------------
+defaults
+
+    ##ロードバランサの動作モード。tcpにするとL4ロードバランサになる。httpにするとL7ロードバランサ。
+    mode                    http
+    log                     global
+    option              log-health-checks
+    option                  httplog
+    option                  dontlognull
+    
+    ##ヘルスチェック用のhtmlファイルをWebサーバ側に設置している。設置については後述。
+    option httpchk GET /health_check.html HTTP/1.0\r\nUser-agent:\ Proxy-Check
+
+    option http-server-close
+    option forwardfor       except 127.0.0.0/8
+    option                  redispatch
+    retries                 3
+    timeout http-request    10s
+    timeout queue           1m
+    timeout connect         10s
+    timeout client          1m
+    timeout server          1m
+    timeout http-keep-alive 10s
+    timeout check           10s
+    maxconn                 3000
+
+#---------------------------------------------------------------------
+# main frontend which proxys to the backends
+#---------------------------------------------------------------------
+frontend  main *:80
+    default_backend             hoge
+
+#---------------------------------------------------------------------
+# round robin balancing between the various backends
+#---------------------------------------------------------------------
+backend hoge
+    balance     roundrobin
+    server      web10 192.168.33.10:80 check inter 3000 fall 2 rise 2
+    server      web11 192.168.33.11:80 check inter 3000 fall 2 rise 2 
+</code></pre>
+
+<p><p>L4, L7のロードバランサについては以下参照。<br>
+<a href="http://www.atmarkit.co.jp/ait/articles/0302/05/news001.html">ロードバランサの本質（1）：パケットフローから負荷分散の基本を理解する - ＠IT</a></p>
+<p>ロードバランサ側でhttpのリクエストを返していないことを意味づけるために<a class="keyword" href="http://d.hatena.ne.jp/keyword/apache">apache</a>, nginxを停止しておく。<br>
+（特に意味は無いが念押し確認のため）</p></p>
+
+<pre><code>$ sudo systemctl stop nginx
+$ sudo systemctl stop httpd 
+</code></pre>
+
+<p><p>HAProxyのログをsyslogに残すように設定する。<br>
+ただしメインのmessageではなく、独自のファイルに書くために以下の設定。</p></p>
+
+<pre><code>##ログの格納場所作成
+$ sudo mkdir /var/log/haproxy
+
+##syslogの設定変更
+$ vim /etc/rsyslog.d/haproxy.conf
+   $ModLoad imudp
+   $UDPServerRun 514
+   $template Haproxy,&quot;%msg%\n&quot;
+   local6.* -/var/log/haproxy/haproxy.log;Haproxy
+
+$ vim /etc/sysconfig/rsyslog
+以下を追加
+SYSLOGD_OPTIONS=&quot;-r&quot;
+
+## haproxyの起動
+$ sudo systemctl start haproxy 
+</code></pre>
+
+<p><p><br>
+■Webサーバの設定<br>
+仮想でのWebサーバ構築は省くが、Apache2をインストールしただけである。<br>
+仮想でのサーバ構築は前回を参照。<br>
+<a href="https://blog.mosuke.tech/entry/2014/10/09/230555">【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築</a><br>
+</p></p>
+
+<pre><code>## /var/www/html配下にヘルスチェック用のhtml設置
+$ sudo touch health_check.html 
+</code></pre>
+
+<p></div>
+<div class="section">
+    <h3>4. 動作試験</h3>
+    <p>ブラウザよりホストサーバへアクセス。<br>
+きちんとロードバランスされていることを確認。</p>
+<p>HAProxy側のログは以下のとおり。</p></p>
+
+<pre><code>$ sudo tail -f /var/log/haproxy/haproxy.conf
+
+##起動した時。L7のhealt checkが走っている
+Proxy main started.
+Proxy hoge started.
+Health check for server hoge/web10 succeeded, reason: Layer7 check passed, code: 200, info: &quot;OK&quot;, check duration: 33ms, status: 2/2 UP.
+Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &quot;OK&quot;, check duration: 12ms, status: 2/2 UP.
+
+##webサーバ側でapacheを停止
+Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &quot;Not Found&quot;, check duration: 13ms, status: 1/2 UP.
+Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &quot;Not Found&quot;, check duration: 8ms, status: 0/2 DOWN.
+
+##webサーバ側でhealth_check.htmlを削除した時も同様に
+Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &quot;Not Found&quot;, check duration: 13ms, status: 1/2 UP.
+Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &quot;Not Found&quot;, check duration: 8ms, status: 0/2 DOWN.
+
+##webサーバ側でhealth_check.htmlを復活させた時
+Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &quot;OK&quot;, check duration: 8ms, status: 1/2 DOWN.
+Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &quot;OK&quot;, check duration: 6ms, status: 2/2 UP.
+Server hoge/web11 is UP. 2 active and 0 backup servers online. 0 sessions requeued, 0 total in queue. 
+</code></pre>
+
+<p><p>Webサーバ側の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>ログを見てみると。</p></p>
+
+<pre><code>$ sudo tail -f /var/log/apache2/access.log
+
+##ロードバランサからのヘルスチェックが来ていることがわかる。
+192.168.33.1 - - [09/Nov/2014:08:07:43 +0000] &quot;GET /health_check.html HTTP/1.0&quot; 200 276 &quot;-&quot; &quot;Proxy-Check&quot;
+192.168.33.1 - - [09/Nov/2014:08:07:46 +0000] &quot;GET /health_check.html HTTP/1.0&quot; 200 276 &quot;-&quot; &quot;Proxy-Check&quot;
+192.168.33.1 - - [09/Nov/2014:08:07:49 +0000] &quot;GET /health_check.html HTTP/1.0&quot; 200 276 &quot;-&quot; &quot;Proxy-Check&quot;
+192.168.33.1 - - [09/Nov/2014:08:07:52 +0000] &quot;GET /health_check.html HTTP/1.0&quot; 200 276 &quot;-&quot; &quot;Proxy-Check&quot;
+
+##Webからのアクセスが来た場合
+##SorceのIPはロードバランサにIPになっているが、UserAgentなど書き込まれていることを確認。
+192.168.33.1 - - [09/Nov/2014:08:10:06 +0000] &quot;GET / HTTP/1.1&quot; 200 488 &quot;-&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10) AppleWebKit/600.1.25 (KHTML, like Gecko) Version/8.0 Safari/600.1.25&quot; 
+</code></pre>
+
+<p></div>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">19 Oct 2014, 17:08</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2014/10/19/170854/" class="post-title">自宅サーバ公開時などのDDNS、固定IPについて整理</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-ネットワーク" href="https://blog.mosuke.tech/categories/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF">ネットワーク</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%AB%C2%F0%A5%B5%A1%BC%A5%D0">自宅サーバ</a>を公開するときに使う<a class="keyword" href="http://d.hatena.ne.jp/keyword/DDNS">DDNS</a>や固定IP。<br>
+それが必要な理由について図解的にまとめ。それだけ。</p>
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141019/20141019170702.png" alt="f:id:mosuke5:20141019170702p:plain" title="f:id:mosuke5:20141019170702p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+</body></p>
+
+                    </div>
+                </section>
+                
                 
                 
                 <h1 class="content-subhead">09 Oct 2014, 23:05</h1>
@@ -82,9 +485,7 @@
                     </header>
 
                     <div class="post-description">
-                        
-
-<p><body>
+                        <p><body>
 <p>ロードバランシングとか<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF%A5%EA%A5%F3%A5%B0">クラスタリング</a>とかリバースプロキシとか、<br>
 業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりない。</p>
 <p>自分で構築してみたいなーと思いつつもあたりまえだけど、サーバやネットワーク機器をそう簡単に調達もできない。<br>
@@ -125,68 +526,67 @@
     <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>の詳細な利用方法は公式ドキュメントをみてもらうとするが、セットアップまでのひととおりの流れと注意点のみ記載する。<br>
 <a href="https://docs.vagrantup.com/v2/">Vagrant Documentation</a></p>
 <p>今回はWebサーバ２台を仮想で実現するので、それぞれweb1, web2とする。<br>
-それぞれのディレクトリを作成。</p>
-<pre class="code" data-lang="" data-unlink> ## web1, web2のディレクトリ作成
+それぞれのディレクトリを作成。</p></p>
+
+<pre><code>## web1, web2のディレクトリ作成
 $ pwd
 /home/vagrant
 $ mkdir web1
-$ mkdir web2</p>
+$ mkdir web2
 
-<h2 id="仮想化で利用するosイメージをダウンロード">仮想化で利用するOSイメージをダウンロード</h2>
+## 仮想化で利用するOSイメージをダウンロード
+$ vagrant box add ubuntu1310 ¥
+http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-13.10_chef-provisionerless.box
 
-<p>$ vagrant box add ubuntu1310 ¥
-<a href="http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-13.10_chef-provisionerless.box">http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-13.10_chef-provisionerless.box</a></p>
+## web1サーバ構築
+$ cd web1
+$ vagrant init ubuntu1310
 
-<h2 id="web1サーバ構築">web1サーバ構築</h2>
+## ほぼほぼデフォルトの設定だが以下２つだけは設定を行った。
+$ vim Vagrantfile
+# (1)プライベートアドレスの割り当て。
+config.vm.network &quot;private_network&quot;, ip: &quot;192.168.33.10&quot;
 
-<p>$ cd web1
-$ vagrant init ubuntu1310</p>
+# (2)1GBしかメモリがないのでこの設定をしないと２つ仮想化するとだいぶ大変なことになりました。
+config.vm.provider &quot;virtualbox&quot; do |vb|
+     vb.customize [&quot;modifyvm&quot;, :id, &quot;--memory&quot;, &quot;128&quot;]
+end
 
-<h2 id="ほぼほぼデフォルトの設定だが以下２つだけは設定を行った">ほぼほぼデフォルトの設定だが以下２つだけは設定を行った。</h2>
+$ vagrant ssh
+ 
+</code></pre>
 
-<p>$ vim Vagrantfile</p>
-
-<h1 id="1-プライベートアドレスの割り当て">(1)プライベートアドレスの割り当て。</h1>
-
-<p>config.vm.network &ldquo;private_network&rdquo;, ip: &ldquo;192.168.33.10&rdquo;</p>
-
-<h1 id="2-1gbしかメモリがないのでこの設定をしないと２つ仮想化するとだいぶ大変なことになりました">(2)1GBしかメモリがないのでこの設定をしないと２つ仮想化するとだいぶ大変なことになりました。</h1>
-
-<p>config.vm.provider &ldquo;virtualbox&rdquo; do |vb|
-     vb.customize [&ldquo;modifyvm&rdquo;, :id, &ldquo;&ndash;memory&rdquo;, &ldquo;128&rdquo;]
-end</p>
-
-<p>$ vagrant ssh</p>
-
-<p></pre>
 <p>同様にweb2においても同じことを行った。</p>
 <p>また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>では一般的に対象のディレクトリで<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>を利用してサーバに入るが、<br>
 今回はプライベートアドレスも振ってあるし、物理サーバとしてイメージしているので以下のようにしてサーバにはいるようにした。</p>
-<pre class="code" data-lang="" data-unlink> $ ssh vagrant@192.168.33.10  # web1への接続
-$ ssh vagrant@192.168.33.11  # web2への接続
-</pre>
+```
+$ ssh vagrant@192.168.33.10  # web1への接続
+$ ssh vagrant@192.168.33.11  # web2への接続 
+```
 <p>ホストサーバ側の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BF%A1%BC%A5%D5%A5%A7%A5%A4%A5%B9">インターフェイス</a>情報をみると。</p>
-<pre class="code" data-lang="" data-unlink> # cent7なので以下コマンドだがifconfig -aのこと
-$ ip a
+```
+# cent7なので以下コマンドだがifconfig -aのこと
+$ ip a 
 (中略)
-5: vboxnet0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UNKNOWN qlen 1000
+5: vboxnet0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UNKNOWN qlen 1000
     link/ether 0a:00:27:00:00:00 brd ff:ff:ff:ff:ff:ff
-    inet 192.168.33.<sup>1</sup>&frasl;<sub>24</sub> brd 192.168.33.255 scope global vboxnet0
+    inet 192.168.33.1/24 brd 192.168.33.255 scope global vboxnet0
        valid_lft forever preferred_lft forever
-    inet 192.168.56.<sup>101</sup>&frasl;<sub>24</sub> brd 192.168.56.255 scope global dynamic vboxnet0
+    inet 192.168.56.101/24 brd 192.168.56.255 scope global dynamic vboxnet0
        valid_lft 839sec preferred_lft 839sec
     inet6 fe80::800:27ff:fe00:0/64 scope link
-       valid_lft forever preferred_lft forever
-</pre>
+       valid_lft forever preferred_lft forever 
+```
 <p>vboxnet0という仮想の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BF%A1%BC%A5%D5%A5%A7%A5%A4%A5%B9">インターフェイス</a>が作成され、<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>も192.168.33.1が振られていることを確認。</p>
 <p>ルーティングテーブルも確認しておくと</p>
-<pre class="code" data-lang="" data-unlink> $ netstat -rn
+```
+$ netstat -rn
 Kernel IP routing table
 Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
 0.0.0.0         153.120.2.1     0.0.0.0         UG        0 0          0 eth0
 153.120.2.0     0.0.0.0         255.255.254.0   U         0 0          0 eth0
-192.168.33.0    0.0.0.0         255.255.255.0   U         0 0          0 vboxnet0
-</pre>
+192.168.33.0    0.0.0.0         255.255.255.0   U         0 0          0 vboxnet0 
+```
 <p>192.168.33.0/24行はvboxnet0から出るように設定されている。</p>
 <p>上の物理イメージに詳細書き込むと以下。<br>
 <span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141006/20141006000246.png" alt="f:id:mosuke5:20141006000246p:plain" title="f:id:mosuke5:20141006000246p:plain" class="hatena-fotolife" itemprop="image"></span></p>
@@ -194,483 +594,70 @@ Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
 <div style="border: solid 1px #dddddd;"></div>
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>のみインスールする必要があるので、<br>
 web1, web2で以下を実施。（プロビジョニングしたほうが後々楽です。）</p>
-<pre class="code" data-lang="" data-unlink> $ sudo apt-get apache2</p>
+```
+$ sudo apt-get apache2
 
-<p>##どちらがweb1でどちらがweb2か区別するために以下ファイルは変えておきます。
+##どちらがweb1でどちらがweb2か区別するために以下ファイルは変えておきます。
 $ sudo vim /var/www/index.html
-#Web1とかWeb2とかわかりやすい文言を入れておきます。</p>
+#Web1とかWeb2とかわかりやすい文言を入れておきます。
 
-<p>##Apache起動
-$ sudo service apache2 start</p>
+##Apache起動
+$ sudo service apache2 start
 
-<p>##Apache起動確認
+##Apache起動確認
 $ curl localhost
-　上記で変更したindex.htmlの内容が表示されること<br />
-</pre>
-<p>これでWebサーバの準備は完了。</p></p>
+　上記で変更したindex.htmlの内容が表示されること  
+```
+<p>これでWebサーバの準備は完了。</p>
 
 <p></div>
 <div class="section">
     <h2>4, Nginxでリバースプロキシサーバを構築する</h2>
     <p>Nginx初めて触ったがとてもシンプル。<br>
-今回はNginxをリバースプロキシとして利用したので、proxy.confを作成するだけ。</p>
-<pre class="code" data-lang="" data-unlink> ##インスール
-$ sudo yum install nginx</p>
+今回はNginxをリバースプロキシとして利用したので、proxy.confを作成するだけ。</p></p>
 
-<h2 id="etc-nginx以下に設定ファイルなどあること確認">/etc/nginx以下に設定ファイルなどあること確認</h2>
+<pre><code>##インスール
+$ sudo yum install nginx
 
-<p>$ ls /etc/nginx</p>
+## /etc/nginx以下に設定ファイルなどあること確認
+$ ls /etc/nginx
 
-<h2 id="プロキシ構築のための設定ファイル作成">プロキシ構築のための設定ファイル作成</h2>
-
-<p>$ cd /etc/nginx/conf.d
+## プロキシ構築のための設定ファイル作成
+$ cd /etc/nginx/conf.d
 $ sudo vim proxy.conf
-server {</p>
+server {
 
-<pre><code># /web1にアクセスが来た時
-location /web1 {
+    # /web1にアクセスが来た時
+    location /web1 {
 
-proxy_http_version 1.1;
+	proxy_http_version 1.1;
 
-#受け渡す際のヘッダ情報を指定
-proxy_set_header Host $host:$server_port;
-proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded_Proto http;
+	#受け渡す際のヘッダ情報を指定
+	proxy_set_header Host $host:$server_port;
+	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded_Proto http;
 
-    # 飛ばす先のURL(Web1サーバ)
-    proxy_pass http://192.168.33.10/;
+        # 飛ばす先のURL(Web1サーバ)
+        proxy_pass http://192.168.33.10/;
+    }
+
+    # /web2にアクセスが来た時
+    location /web2 {
+
+	proxy_http_version 1.1;
+
+	#受け渡す際のヘッダ情報を指定
+	proxy_set_header Host $host:$server_port;
+	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded_Proto http;
+
+        # 飛ばす先のURL(Web2サーバ)
+	proxy_pass http://192.168.33.11/;
+    }
 }
 
-# /web2にアクセスが来た時
-location /web2 {
-
-proxy_http_version 1.1;
-
-#受け渡す際のヘッダ情報を指定
-proxy_set_header Host $host:$server_port;
-proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded_Proto http;
-
-    # 飛ばす先のURL(Web2サーバ)
-proxy_pass http://192.168.33.11/;
-}
+## あとは起動させるのみ
+$ sudo systemctl enable nginx
+$ sudo systemctl start nginx 
 </code></pre>
-
-<p>}</p>
-
-<h2 id="あとは起動させるのみ">あとは起動させるのみ</h2>
-
-<p>$ sudo systemctl enable nginx
-$ sudo systemctl start nginx </pre>
-</div>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">20 Sep 2014, 18:03</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/09/20/180326/" class="post-title">CentOS7, iptables設定でハマった</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-CentOS7" href="https://blog.mosuke.tech/categories/centos7">CentOS7</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<p><body>
-<p>最近<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>のOSをcentos7にしたのだが、なかなか手付かずで<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>の設定も放置していた…<br>
-（<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>の最低限の設定はしていたが、ほんとうに良くない…）</p>
-<p>久しぶりに手が空いたので設定するかーと思いきや<br>
-まず/etc/sysconfig/<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>がないし&hellip;</p>
-<p>Cent7からのsystemctlで<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>のサービスを確認してもでてこないし…</p>
-<pre class="code" data-lang="" data-unlink> # systemctl status iptables
-iptables.service
-   Loaded: not-found (Reason: No such file or directory)
-   Active: inactive (dead)</p>
-
-<p></pre>
-<p>というわけで、調べてみると、まず<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>.serviceをインスールしないといけないとのこと。<br>
-そして、centos7からはfirewalldがデフォルトでオンになっているからオフにしないといけない。<br>
-（いけないわけではないけど両方使う意味が無いので。）</p>
-<br>
-<p>まずは<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>-serviceをインスールし、firewalldをオフ、<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>をオンとした。</p>
-<pre class="code" data-lang="" data-unlink> # yum install iptables-services
-#</p>
-
-<h1 id="systemctl-status-firewalld">systemctl status firewalld</h1>
-
-<p>Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled)
-   Active: active (running) since Sat 2014-09-20 17:47:11 JST; 4s ago
- Main PID: 11162 (firewalld)
-   CGroup: /system.slice/firewalld.service
-           └─11162 /usr/bin/python -Es /usr/sbin/firewalld &ndash;nofork &ndash;nopid</p>
-
-<p>#</p>
-
-<h1 id="systemctl-stop-firewalld">systemctl stop firewalld</h1>
-
-<p>#</p>
-
-<h1 id="systemctl-status-firewalld-1">systemctl status firewalld</h1>
-
-<p>Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled)
-   Active: inactive (dead)</p>
-
-<p>#
-#systemctl disable firewalld
-#
-#systemctl enable iptables
-#systemctl start iptables
-#
-#systemctl status iptables
-   Loaded: loaded (/usr/lib/systemd/system/iptables.service; enabled)
-   Active: inactive (dead) since Sat 2014-09-20 17:47:10 JST; 2min 48s ago
-  Process: 11139 ExecStop=/usr/libexec/iptables/iptables.init stop (code=exited, status=0/SUCCESS)
-  Process: 10096 ExecStart=/usr/libexec/iptables/iptables.init start (code=exited, status=0/SUCCESS)
- Main PID: 10096 (code=exited, status=0/SUCCESS)
-&hellip;.</p>
-
-<p></pre>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>の設定はいつもどおり。<br>
-CentOS7の新しいコマンドに戸惑ったので一部メモ。</p>
-<p></p>
-<h2>service, chkconfigコマンドはsystemctlコマンドへ</h2>service, chkconfigコマンドは推奨されずsystemctlコマンドへ切り替わった。<br>
-試しにchkconfigコマンドを利用すると…
-<pre class="code" data-lang="" data-unlink> # chkconfig &ndash;list
-Note: This output shows SysV services only and does not include native
-      systemd services. SysV configuration data might be overridden by native
-      systemd configuration.</p>
-
-<pre><code>  If you want to list systemd services use 'systemctl list-unit-files'.
-  To see services enabled on particular target use
-  'systemctl list-dependencies [target]'.
-</code></pre>
-
-<p>iprdump         0:off   1:off   2:on    3:on    4:on    5:on    6:off
-iprinit         0:off   1:off   2:on    3:on    4:on    5:on    6:off
-iprupdate       0:off   1:off   2:on    3:on    4:on    5:on    6:off
-netconsole      0:off   1:off   2:off   3:off   4:off   5:off   6:off
-network         0:off   1:off   2:on    3:on    4:on    5:on    6:off
-pmcd            0:off   1:off   2:off   3:off   4:off   5:off   6:off
-pmie            0:off   1:off   2:off   3:off   4:off   5:off   6:off
-pmlogger        0:off   1:off   2:off   3:off   4:off   5:off   6:off
-pmmgr           0:off   1:off   2:off   3:off   4:off   5:off   6:off
-pmproxy         0:off   1:off   2:off   3:off   4:off   5:off   6:off
-pmwebd          0:off   1:off   2:off   3:off   4:off   5:off   6:off
- </pre>
-    <blockquote>
-        <p>&ldquo;If you want to list systemd services use &lsquo;systemctl list-unit-files&rsquo;.&rdquo;</p></p>
-
-<pre><code>&lt;/blockquote&gt;
-</code></pre>
-
-<p><p>systemdのサービスを表示したければ、systemctl list-unit-filesを利用せよとのこと。<br>
-試しに打つと以下のように表示される</p>
-<pre class="code" data-lang="" data-unlink> # systemctl list-unit-files
-UNIT FILE                                   STATE
-proc-sys-fs-binfmt_misc.automount           static
-dev-hugepages.mount                         static
-dev-mqueue.mount                            static
-proc-fs-nfsd.mount                          static
-proc-sys-fs-binfmt_misc.mount               static
-sys-fs-fuse-connections.mount               static
-sys-kernel-config.mount                     static
-sys-kernel-debug.mount                      static
-tmp.mount                                   disabled
-var-lib-nfs-rpc_pipefs.mount                static
-brandbot.path                               disabled
-&hellip;.</p>
-
-<p></pre>
-<p>また、サービスの起動・停止・状態確認などは</p>
-<pre class="code" data-lang="" data-unlink> # service &lt;start/stop/restart/status&gt; &lt;service name&gt;
-　↓</p>
-
-<h1 id="systemctl-lt-start-stop-restart-status-gt-lt-service-name-gt">systemctl &lt;start/stop/restart/status&gt; &lt;service name&gt;</h1>
-
-<p></pre>
-<p>そして、サービスの起動オプションの設定は</p>
-<pre class="code" data-lang="" data-unlink> # chkconfig &lt;service name&gt; &lt;on/off&gt;
-   ↓</p>
-
-<h1 id="systemctl-lt-enable-disable-gt-lt-service-name-gt">systemctl &lt;enable/disable&gt; &lt;service name&gt;</h1>
-
-<p></pre>
-<p>まずはこんなところ。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">15 Sep 2014, 13:56</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/09/15/135611/" class="post-title">D3.js、DBからのデータ連携方法の検討</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-D3.js" href="https://blog.mosuke.tech/categories/d3.js">D3.js</a><a class="post-category post-category-Sinatra" href="https://blog.mosuke.tech/categories/sinatra">Sinatra</a><a class="post-category post-category-Ruby" href="https://blog.mosuke.tech/categories/ruby">Ruby</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。<br>
-例えば以下の状況を考える。<br>
-【やりたいこと】<br>
-「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」</p>
-<p>【DBの構造】<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AB%A5%E9%A5%E0%CC%BE">カラム名</a>：型<br>
-　date : datetime<br>
-　value : int</p>
-<p>※また、下記では<a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>上で行っているが、他の言語でも同様のことがいえる。</p></p>
-
-<p><div class="section">
-    <h3>(1) 簡単な<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>のようなものを利用する</h3>
-    <p>先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、<br>
-これが一番複雑にならずに良いと思ったということ。</p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>側で/<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>にアクセスすると<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルをダウンロードできるようにする。</p>
-<pre class="code lang-ruby" data-lang="ruby" data-unlink> #Sinatra側
-get &lsquo;/csv&rsquo; do</p>
-
-<pre><code>content_type 'application/csv'
-attachment 'download.csv'
-
-#DBからデータ取得(Activerecord利用)
-@data   = Model.all()
-
-#出力するCSVデータの変数。csvヘッダーを先につけている。
-@csv = &quot;date,value\n&quot;
-
-#DBのデータをCSVの形にして格納
-@data.each do |d|
-    @csv += d.date.to_s + &quot;,&quot; + d.value.to_s + &quot;\n&quot;
-end
-
-#csvtest.erbというビューに出力
-erb :csvtest, :layout =&amp;gt; false
-</code></pre>
-
-<p>end</p>
-
-<p></pre>
-<p>csvtest.erb</p>
-<pre class="code lang-ruby" data-lang="ruby" data-unlink> &lt;%= @csv %&gt;</p>
-
-<p></pre>
-<p>こうすることで&rdquo;<a href="http://*****/csv">http://*****/csv</a>&ldquo;にアクセスすると<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルとしてダウンロードできる状態になる。<br>
-条件指定をしてデータをダウンロードできるようにしたい場合はGETでパラメータ指定できるようにすれば良いと思う。<br>
-（<a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/CSV">CSV</a>ファイルを生成するところのコードがナンセンスだと思っているので、もっといい方法があるはず…）</p>
-<p>また、今回は<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>にしているが<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>などの他の形式でも同様のことがいえる。</p>
-<p>これをD3.js側で以下のように読み込ませる。</p>
-<pre class="code lang-javascript" data-lang="javascript" data-unlink> d3.csv(&ldquo;/csv&rdquo;, function(error, data) {</p>
-
-<pre><code>(中略)
-</code></pre>
-
-<p>}</p>
-
-<p></pre>
-<p>d3.jsの<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>を読み込ませる関数の引数にURLを指定してあげればそれで終了。</p></p>
-
-<p></div>
-<div class="section">
-    <h3>(2) <a class="keyword" href="http://d.hatena.ne.jp/keyword/javascript">javascript</a>コードの中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>変数を展開させる</h3>
-    <p>d3.jsのdatasetの中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>の変数を展開させる。ビューに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Javascript">Javascript</a>を書いているので、ビューの中で変数展開するのと同じ要領。<br>
-しかし、jsコードに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>コードも交じるので複雑になりがち。</p>
-<pre class="code lang-javascript" data-lang="javascript" data-unlink> var dataset = [
-&lt;% @data.each do |d| %&gt;
-    {date:&lt;%= d.date%&gt;, value:&lt;%= d.value %&gt;},
-&lt;% end %&gt;
-];
- </pre>
-</div>
-<div class="section">
-    <h3>(3) <a class="keyword" href="http://d.hatena.ne.jp/keyword/CSV">CSV</a>ファイルをおいておく</h3>
-    <p>こちらはリアルタイムな更新でなれけばこれはこれでありだと思う。<br>
-publicのフォルダに予め<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルを設置しておき、以下のようにd3.jsで読み込ませる。</p>
-<pre class="code lang-javascript" data-lang="javascript" data-unlink> d3.csv(&ldquo;test.csv&rdquo;, function(error, data) {</p>
-
-<pre><code>(中略)
-</code></pre>
-
-<p>}
- </pre>
-</div>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">13 Sep 2014, 21:44</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/09/13/214414/" class="post-title">2014/8/2 Arduino会を実施の報告</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>2014年8月2日(土)に大学時代の研究室の同期・後輩を巻き込んで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>勉強会を行った。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>をほとんど触ったことのないメンバーで実施したのだが、初心者でもプロダクトを作り上げられるところまでできた。<br>
-その勉強会の簡単な資料を掲載。</p>
-<p><script async class="speakerdeck-embed" data-id="04fb75c01d710132f325123486985575" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">13 Sep 2014, 11:15</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/09/13/111537/" class="post-title">【Ethernetシールド】Arduinoをネットワークへ繋げる(1)</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Arduino" href="https://blog.mosuke.tech/categories/arduino">Arduino</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ethernet">Ethernet</a>シールドを使ってネットワークへ繋げる。<br>
-とりあえずは、スモールステップでPCとの1対1の通信。</p></p>
-
-<p><div class="section">
-    <h3>PCとの1対1通信</h3>
-    <p>構成図<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140907/20140907231747.png" alt="f:id:mosuke5:20140907231747p:plain" title="f:id:mosuke5:20140907231747p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a></p></p>
-
-<pre><code class="language-c">#include &lt;SPI.h&gt;
-#include &lt;Ethernet.h&gt;
-
-byte MAC[] = {0x90,0xA2,0xDA,0x0F,0x8B,0xA2};
-byte IP[]  = {192,168,11,3};
-
-void setup()
-{
-  Ethernet.begin(MAC,IP);
-}
-
-void loop()
-{
-}
-</code></pre>
-
-<p>疎通確認</p>
-<pre class="code" data-lang="" data-unlink>
-% ping 192.168.100.3
-PING 192.168.100.3 (192.168.100.3): 56 data bytes
-Request timeout for icmp_seq 0
-64 bytes from 192.168.100.3: icmp_seq=1 ttl=128 time=0.576 ms
-64 bytes from 192.168.100.3: icmp_seq=2 ttl=128 time=0.425 ms
-64 bytes from 192.168.100.3: icmp_seq=3 ttl=128 time=0.302 ms 
-</pre>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ping">Ping</a>確認ヨシ!!</p>
-<p>一応<a class="keyword" href="http://d.hatena.ne.jp/keyword/ARP">ARP</a>テーブルを見ておく。</p>
-<pre class="code" data-lang="" data-unlink>
-% arp -a
-? (192.168.100.3) at 90:a2:da:f:8b:a2 on en4 ifscope [ethernet]
-? (192.168.100.255) at ff:ff:ff:ff:ff:ff on en4 ifscope [ethernet] 
-</pre>
-<p>マックアドレスの取得もヨシ!!</p>
-
-<p></div>
-<div class="section">
-    <h3>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>を使って家内LAN接続</h3>
-    <p>実運用では<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>を利用することが圧倒的に多いと思うが、こちらもとても簡単。</p>
-<p>構成図<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140913/20140913110038.png" alt="f:id:mosuke5:20140913110038p:plain" title="f:id:mosuke5:20140913110038p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a>ルータから有線LANケーブルを伸ばし<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>に結線。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>による<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>の取得はとても容易で以下のようにマックアドレスを指定するのみ。</p>
-<pre class="code" data-lang="" data-unlink> Ethernet.begin(mac)
-</pre>
-<p>以下は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>公式サイトに則って実施したもの。<br>
-<a href="http://arduino.cc/en/Tutorial/DhcpAddressPrinter">Arduino - DhcpAddressPrinter</a><br>
-</p></p>
-
-<pre><code class="language-c">#include &lt;SPI.h&gt;
-#include &lt;Ethernet.h&gt;
-
-//Mac Address Static
-byte mac[] = {0x90,0xA2,0xDA,0x0F,0x8B,0xA2};
-
-void setup()
-{
-  // Open serial communications and wait for port to open:
-  Serial.begin(9600);
-
-  // start the Ethernet connection:
-  if (Ethernet.begin(mac) == 0) {
-    Serial.println(&quot;Failed to configure Ethernet using DHCP&quot;);
-    // no point in carrying on, so do nothing forevermore:
-    for(;;)
-      ;
-      
-  }
-  // print your local IP address:
-  Serial.print(&quot;My IP address: &quot;);
-  for (byte thisByte = 0; thisByte &lt; 4; thisByte++) {
-    // print the value of each byte of the IP address:
-    Serial.print(Ethernet.localIP()[thisByte], DEC);
-    Serial.print(&quot;.&quot;); 
-  }
-  Serial.println();
-}
-
-void loop()
-{
-  Serial.println(&quot;abc&quot;);
-  delay(3000);
-}
-</code></pre>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>に<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>が割り当てられたかどうか確認するには、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a>ルータにアクセスし、マックアドレスと<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>のヒモ付のテーブルをみればよい。</p>
 
 <p></div>
 </body></p>
@@ -688,7 +675,7 @@ void loop()
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 12 of 14</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 12 of 15</span>
     
       <a href="/page/13/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>
@@ -714,7 +701,9 @@ void loop()
         </script>
 		    <gcse:search></gcse:search>
     </div>
-    <a href="/archive/">Arvhive</a>
+    <a class="pure-button" href="https://mosuke.tech "><i class="fa fa-user"></i> mosuke5</a>
+    <a class="pure-button" href="/archive/"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml"><i class="fa fa-rss"></i> rss</a>
 </div>
 <div class="footer">
     <div class="pure-menu pure-menu-horizontal pure-menu-open">
@@ -736,7 +725,7 @@ void loop()
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-ga('create', '', 'auto');
+ga('create', 'UA-99596316-1', 'auto');
 ga('send', 'pageview');
 
 </script>

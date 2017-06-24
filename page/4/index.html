@@ -56,11 +56,11 @@
             <div class="posts">
                 
                 
-                <h1 class="content-subhead">22 Aug 2015, 22:30</h1>
+                <h1 class="content-subhead">03 Jul 2016, 22:45</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2015/08/22/223025/" class="post-title">(個人的) YAPC::Asia 2015ふりかえり</a>
+                        <a href="https://blog.mosuke.tech/entry/2016/07/03/224531/" class="post-title">Vim::Factory、LTではなす</a>
 
                         <p class="post-meta">
                             
@@ -69,1163 +69,17 @@
                             
                                 under 
                                 
-                                <a class="post-category post-category-YAPC" href="https://blog.mosuke.tech/categories/yapc">YAPC</a>
+                                <a class="post-category post-category-vimfactory" href="https://blog.mosuke.tech/categories/vimfactory">vimfactory</a><a class="post-category post-category-vim::factory" href="https://blog.mosuke.tech/categories/vimfactory">vim::factory</a><a class="post-category post-category-docker" href="https://blog.mosuke.tech/categories/docker">docker</a>
                             
                         </p>
                     </header>
 
                     <div class="post-description">
                         <p><body>
-<p>「ブログを書くまでが<a class="keyword" href="http://d.hatena.ne.jp/keyword/YAPC">YAPC</a>」</p></p>
+<p>7月6日の会社のエンジニアイベントでLTするやつ、先にあげておく。<br>
+自分の中でのネタとしては古いけど、話すのはなんだかんだ初。</p></p>
 
-<p>というわけで、8/21, 22と<a class="keyword" href="http://d.hatena.ne.jp/keyword/YAPC">YAPC</a>に参加したので、そこでの学んだこと、気になったことなどを振り返ります。<br>
-しかし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/YAPC">YAPC</a>で聞いた公演内容を淡々とまとめるなどはしません。<br>
-単なる内容のまとめであれば、公開されているスライドなどをみるのが一番だと思いますので。</p>
-
-<p>以下３点を中心に振り返ってみます。</p>
-
-<ul>
-<li>インフラ関連セッションについて</li>
-<li>発表を聞いてよかった、今の自分に一番必要だったことについて</li>
-<li>興味を持ったことについて（CONBU）</li>
-</ul>
-
-<h1>インフラ関連セッションについて</h1>
-
-<p>意図的も半分くらいあるんだけど、なんとなくセッションを選んでいたら、インフラ関連のものが多くなりました。</p>
-
-<ul>
-<li><a href="http://yapcasia.org/2015/talk/show/9ec2791c-05e5-11e5-81fa-79c97d574c3a">世界展開する大規模ウェブサービスのデプロイを支える技術 - YAPC::Asia Tokyo 2015</a></li>
-<li><a href="http://yapcasia.org/2015/talk/show/b335dee0-09ad-11e5-8d7a-67dc7d574c3a">Consulと自作OSSを活用した100台規模のWebサービス運用 - YAPC::Asia Tokyo 2015</a></li>
-<li><a href="http://yapcasia.org/2015/talk/show/4f85e87a-f9ec-11e4-8262-8ab37d574c3a">3分でサービスのOSを入れ替える技術 - YAPC::Asia Tokyo 2015</a></li>
-<li><a href="http://yapcasia.org/2015/talk/show/f2816038-10ec-11e5-89bf-d7f07d574c3a">我々はどのように冗長化を失敗したのか - YAPC::Asia Tokyo 2015</a></li>
-</ul>
-
-<h2>デプロイについて</h2>
-
-<p>大規模サービスでのデプロイにおいて、一台一台のホストが<code>git clone</code>して、<code>bundle install</code>やらせてーとかやると、<br>
-時間もかかるし、並列的にgit cloneした際などgitサーバが負荷的に危なくなってくる。<br>
-なので、予めライブラリとかすべてインストールされたものをターボールなどにまとめておいて、<br>
-それをプルしてくる形式のデプロイについて多くの発表がありました。</p>
-
-<p>このデプロイ方法、並列で数百MBのファイルをダウンロードしても落ちないストーレジ（ようは<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>のS3）を前提に構築されている感がありました。<br>
-（というかそう言っていた）</p>
-
-<p>相変わらず<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>はせこいなーと思っています（笑）</p>
-
-<p>うちの環境では真似するのは難しいなーと思う部分もありますが、<br>
-それ以前にシステムの規模や用途によってデプロイのあり方も多種多様になることを改めて考えさせられました。<br>
-自分の環境にあった最適なデプロイ形態を探す日々がまた始まりそうですが、良いヒントになりそうなのはまちがいなしです。</p>
-
-<h2>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%B0%C7%AF%C1%AB%B5%DC">式年遷宮</a>インフラストラクチャ</h2>
-
-<p>Kenjiさんの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%B0%C7%AF%C1%AB%B5%DC">式年遷宮</a>インフラストラクチャ。
-この考え方、ぼくも一度考えたことはありますが、ここまで実践してみた経験談がきけたのは面白かった。</p>
-
-<p>いざというときに切り替わらない、切り替えられないという問題に対して、<br>
-自動ではないが、「切替訓練」ということで、定期的に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BE%E9%C4%B9%B2%BD">冗長化</a>の系を切り替えることはしてもいいのかなーと思ったりしています。</p>
-
-<h2>consulについて</h2>
-
-<p>実は、上であげた４つのセッション全てで共通していたのが<code>consul</code>を使っていた。</p>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=https%3A%2F%2Fwww.consul.io%2F" title="Consul by HashiCorp" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="https://www.consul.io/">Consul by HashiCorp</a></iframe><cite class="hatena-citation"><a href="https://www.consul.io/">www.consul.io</a></cite></p>
-
-<p>正直、consulについて、名前くらいしかしらなかったのに、ここまで利用されていたので、時代に乗り遅れている感を感じた。
-でも利用用途をみていくと、iaas環境で力を発揮するっぽいので、概要と用途だけ押さえておくか…といったところ。<br>
-今月中の課題です。</p>
-
-<h1>発表を聞いてよかった、今の自分に一番必要だったことについて</h1>
-
-<p>たくさん学びのあったなかで、なんだかんだいっても、koemuさんの発表が今の自分が一番考えていてることであり、<br>
-一番必要なことであったように感じた。</p>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fyapcasia.org%2F2015%2Ftalk%2Fshow%2F53aacc02-faca-11e4-8c2e-8ab37d574c3a" title="辛いことをやめる！から始まる業務改善とInfrastructure as Code - YAPC::Asia Tokyo 2015" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://yapcasia.org/2015/talk/show/53aacc02-faca-11e4-8c2e-8ab37d574c3a">辛いことをやめる！から始まる業務改善とInfrastructure as Code - YAPC::Asia Tokyo 2015</a></iframe><cite class="hatena-citation"><a href="http://yapcasia.org/2015/talk/show/53aacc02-faca-11e4-8c2e-8ab37d574c3a">yapcasia.org</a></cite></p>
-
-<p>実はkoemuさんのブログをたまにみていて、<br>
-いちど話を聞いてみたいなーと思っていた人であったので、とてもいい機会であった。</p>
-
-<p>特に個人的に響いたのが、次の２つのこと。</p>
-
-<ul>
-<li>CTO（という言い方をしていたが、要はキーパーソン）を味方につける働き方をする</li>
-<li>ハンズオンを大事にする</li>
-</ul>
-
-<p>キーパーソンにやりたいことを伝えて公認とするのは、いまもよくやっていることでぼくも大事にしていること。<br>
-だた、ハンズオンについてはうまくできていない部分も多くあったので見直していきたいポイントでした。</p>
-
-<p>また、個人的にこの手でよくやっているのが、「スモールステップ展開」。<br>
-一度に、あれもこれも新しいことやっていく、となると、どんなにサポートを厚くしてもなかなか浸透しなかったりしてしまう。<br>
-なので、新しいことやるときはスモールステップでひとつひとつやっていき、文化浸透してから次のことをやるという風にしている。</p>
-
-<h1>興味をもったことんついて（CONBU）</h1>
-
-<p>会場のネットワークを作ってくれたのがCONBUという団体でした。
-CONBU自体はソフトウェアデザインで特集されているのを見ていたので知ってはいましたが、ネットワークの品質の良さ、<br>
-そしてリアルタイムでのネットワークの状態を<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>提供の便利さなど肌身で感じました。</p>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fgihyo.jp%2Fmagazine%2FSD%2Farchive%2F2015%2F201503" title="Software Design 2015年3月号" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://gihyo.jp/magazine/SD/archive/2015/201503">Software Design 2015年3月号</a></iframe><cite class="hatena-citation"><a href="http://gihyo.jp/magazine/SD/archive/2015/201503">gihyo.jp</a></cite></p>
-
-<p>こちら、LTで<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiFi">WiFi</a> AP設置の速さを実演したもの。<br>
-でも、ほんとの現場では安全第一でやっていると思うので、その辺も一言いってくれてるとよかったかなと笑</p>
-
-<p></p>
-<blockquote class="twitter-tweet" lang="HASH(0x86c7010)">
-<p lang="ja" dir="ltr">突然目の前に無線APが生えてきた <a href="https://twitter.com/hashtag/yapcasia?src=hash">#yapcasia</a> <a href="http://t.co/UWcSzvRv08">pic.twitter.com/UWcSzvRv08</a></p>— ぷりんたいは求職中です、 (@spacepro_be) <a href="https://twitter.com/spacepro_be/status/635004222291902464">August 22, 2015</a>
-</blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<h1>最後に</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/YAPC">YAPC</a>は今年初参加でした。
-学びも多かったけど、それ以上にエンタメとしてとても楽しめました。</p>
-
-<p>小さいところからでも楽しく学べる作っていきたいですね。</p>
-
-<p><p>本当にスタッフのみなさんお疲れ様でした。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">13 Aug 2015, 00:04</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/08/13/000440/" class="post-title">デスクトップUbuntuにVNC接続。ついでにSSHローカルポートフォワードの復習。</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Ubuntu" href="https://blog.mosuke.tech/categories/ubuntu">Ubuntu</a><a class="post-category post-category-vnc" href="https://blog.mosuke.tech/categories/vnc">vnc</a><a class="post-category post-category-ポートフォワード" href="https://blog.mosuke.tech/categories/%E3%83%9D%E3%83%BC%E3%83%88%E3%83%95%E3%82%A9%E3%83%AF%E3%83%BC%E3%83%89">ポートフォワード</a><a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>完全に自分のための備忘録。内容はわりと薄め。</p></p>
-
-<h1>やったこと</h1>
-
-<p>最近、自作したPCに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>をいれて使っているのだけど、<br>
-デスクトップPCなので、部屋でしか操作することができません。</p>
-
-<p>他の部屋からノートPCで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>を触れたらいいなーと思いその環境を整えることをしました。</p>
-
-<p>主にやったことは以下の通りです。</p>
-
-<ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>サーバ構築について</li>
-<li>ノートPC（<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>）からの<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>接続について</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>ローカルポートフォワードを使ってのセキュアな接続について</li>
-</ul>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>での<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>サーバ構築について</h1>
-
-<p>今回利用している<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>は「<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a> Desktop 14.04」です。<br>
-また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>の実現は標準でインストールされているvinoを使って行いました。</p>
-
-<p>ご存知の方も多くいるかもしれませんが、vinoでの<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>は簡易的なもので、サーバ側のユーザがログアウトしていると使えません。<br>
-ですので、会社などでの利用には耐えないと思います。<br>
-ユーザーをログアウトせずにロック状態にしていれば使えます。</p>
-
-<p>まずはデスクトップ共有の設定をします。<br>
-「デスクトップの共有」のアプリケーションを起動します。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150809/20150809132410.png" alt="f:id:mosuke5:20150809132410p:plain" title="f:id:mosuke5:20150809132410p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>接続毎に要求するようにすると、サーバ側で毎度許可が必要なので、オフにします。<br>
-パスワードの設定はしておきましょう。<br>
-同じLANをつかんでる人に簡単に奪われてしまいますので。</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150809/20150809132421.png" alt="f:id:mosuke5:20150809132421p:plain" title="f:id:mosuke5:20150809132421p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>ちょっと詳細な意味を把握していないのですが、<br>
-下記を実行しないと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>で接続すると「互換性のないバージョンです」的なこといわれました…すいません。</p>
-
-<pre><code>$ gsettings set org.gnome.Vino require-encryption false 
-</code></pre>
-
-<p>設定ができたら、きちんとサーバとして<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>接続を待ち受けているか確認します。</p>
-
-<pre><code>% sudo lsof -i:5900
-COMMAND     PID    USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
-vino-serv 24414 mosuke5   13u  IPv6 156661      0t0  TCP *:5900 (LISTEN)
-vino-serv 24414 mosuke5   14u  IPv4 156662      0t0  TCP *:5900 (LISTEN)
-
-% ps -ef | grep vino
-mosuke5  24414 24226  0 12:30 ?        00:00:21 /usr/lib/vino/vino-server --sm-disable
-mosuke5  25456 24470  0 13:19 pts/11   00:00:00 grep vino 
-</code></pre>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>から<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>接続する</h1>
-
-<p>これをやるまで知らなかったのですが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>には標準で<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>クライアントがついています。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/vnc">vnc</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB">プロトコル</a>で対象のサーバの<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を入れれば接続できます。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150812/20150812225515.png" alt="f:id:mosuke5:20150812225515p:plain" title="f:id:mosuke5:20150812225515p:plain" class="hatena-fotolife" itemprop="image"></span>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150812/20150812225126.png" alt="f:id:mosuke5:20150812225126p:plain" title="f:id:mosuke5:20150812225126p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>ローカルフォワードを使ってセキュアな通信をする</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB">プロトコル</a>は通信の内容を暗号化しません。<a class="keyword" href="http://d.hatena.ne.jp/keyword/telnet">telnet</a>と同様で、非常に危険です。<br>
-家のLAN内で利用するので、正直ここまでする必要は全くないのだが、<br>
-より応用的な使い方に備えてと、復習を兼ねて<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のローカルフォワードを利用してセキュアに<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>を使ってみます。</p>
-
-<p>復習と書いたのは以前に、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のローカルフォワードについてはまとめたからです。</p>
-<a href="/entry/2014/12/31/170545/">SSHでローカルポートフォワードを実際に試す - Goldstine研究所</a>
-
-<p>まずは、ローカルフォワードの<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>接続。<br>
-意味は「自分の端末のポート8888に来た通信は、192.168.11.5からみて<a class="keyword" href="http://d.hatena.ne.jp/keyword/localhost">localhost</a>のポート5900にとばします」です。</p>
-
-<pre><code>$ ssh -L8888:localhost:5900 mosuke5@192.168.11.5 
-</code></pre>
-
-<p>上のコマンドで<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>接続した状態でなら、<a class="keyword" href="http://d.hatena.ne.jp/keyword/localhost">localhost</a>のポート8888が利用できます。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150812/20150812224539.png" alt="f:id:mosuke5:20150812224539p:plain" title="f:id:mosuke5:20150812224539p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p><p>これでセキュアな<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>の完成。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">31 Jul 2015, 21:15</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/07/31/211542/" class="post-title">Packerやる前にKickstartはじめよう</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-kickstart" href="https://blog.mosuke.tech/categories/kickstart">kickstart</a><a class="post-category post-category-virtualbox" href="https://blog.mosuke.tech/categories/virtualbox">virtualbox</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<h1>1.はじめに</h1></p>
-
-<p>開発環境はVirualboxを使った<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>を利用しているが、<br>
-本番環境は<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>だったり<a class="keyword" href="http://d.hatena.ne.jp/keyword/KVM">KVM</a>だったり違う仮想化機構で動作しているなんてことよくあると思います。<br>
-そういう環境下でどのように開発環境と本番環境の差分をなくしていますか？</p>
-
-<p>わたしの場合、基本的にAnsibleを使ってプロビジョニングをしていますが、<br>
-そのプロビジョニング前のベースが異なってしまって困ることがよくあります。<br>
-一般に公開されているVagrantBox使ったら余計な設定が入っていたとか、すでにパッケージが入っていたとか…</p>
-
-<p>そんな問題を解決しようとPackerを使おう！って考えました。<br>
-ですが、Packerも当たり前だけど魔法ではなく、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>などの自動インストールが前提なので、<br>
-Packerをやる前に<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>を学習せよ、、、ということに気づきました。</p>
-
-<p>ということで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>をはじめたよってことです。</p>
-
-<h1>2.<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ってなに</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>はOSのインストールを自動化する仕組みです。<br>
-anaconda社が提供するインストールの仕組みで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Redhat">Redhat</a>系のOSが採用しているものです。<br>
-ですので<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>だとPreseedっていう別の仕組みだそうです。（詳しくありませんっ）</p>
-
-<p>で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>でなにができるかというと...</p>
-
-<p>OSのインストールをしたことがある方ならわかるかと思いますが、<br>
-普通にDVDなどからインストールすると、</p>
-
-<ul>
-<li>言語はなににしますかー？</li>
-<li>ホスト名なににしますかー？</li>
-<li>パッケージはなにをいれますかー？</li>
-</ul>
-
-<p>とか、聞かれて選択していく必要があります。
-この作業を自動化できるのが<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>です。</p>
-
-<p>URLのようなもの。
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fkajuhome.com%2Fcentos6_inst.shtml" title="はじめての自宅サーバ構築 - Fedora/CentOS - CentOS6 のインストール手順" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://kajuhome.com/centos6_inst.shtml">はじめての自宅サーバ構築 - Fedora/CentOS - CentOS6 のインストール手順</a></iframe><cite class="hatena-citation"><a href="http://kajuhome.com/centos6_inst.shtml">kajuhome.com</a></cite></p>
-
-<h1>(おまけ)Ansible, Chef, Puppetとの違い？</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>にはプロビジョニング機能もついているため、<br>
-AnsibleとかChefとかPuppetとの違いは？住み分けは？と思うかもしれません。<br>
-明確に、住み分けが決まっているわけではありませんが、
-個人的にはAnsibleやChefを実行する前の最低限の設定を<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>にやらせようと思っています。<br>
-（一般的かとは思いますが…？）</p>
-
-<p>Lee ThompsonのProvisioning Toolchainを参考にKiskstarのやる範囲をまとめると。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150731/20150731223953.jpg" alt="f:id:mosuke5:20150731223953j:plain" title="f:id:mosuke5:20150731223953j:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fen.oreilly.com%2Fvelocity-mar2010%2Fpublic%2Fschedule%2Fdetail%2F14180" title="Provisioning Toolchain: Web Performance and Operations - Velocity Online Conference - March 17, 2010 - O'Reilly Media" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://en.oreilly.com/velocity-mar2010/public/schedule/detail/14180">Provisioning Toolchain: Web Performance and Operations - Velocity Online Conference - March 17, 2010 - O'Reilly Media</a></iframe><cite class="hatena-citation"><a href="http://en.oreilly.com/velocity-mar2010/public/schedule/detail/14180">en.oreilly.com</a></cite></p>
-
-<h1>3.Hello <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>!!</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Virtualbox">Virtualbox</a>を使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>を試しました。</p>
-
-<h1>3-1.用意したもの</h1>
-
-<ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Virtualbox">Virtualbox</a>
-
-<ul>
-<li>自分の環境は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>で、バージョンは5.0</li>
-</ul>
-</li>
-<li>OSのisoファイル
-
-<ul>
-<li>
-<a href="http://isoredirect.centos.org/centos/7/isos/x86_64/CentOS-7-x86_64-DVD-1503-01.iso">CentOS Mirror</a> ここからダウンロードしました</li>
-</ul>
-</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイル
-
-<ul>
-<li>ネットワーク上においてhttpでアクセスできるようにしておきました</li>
-</ul>
-</li>
-</ul>
-
-<p>利用した<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイル。自分の学習のためコメントを多く残しました。</p>
-
-<pre><code># アップグレードするかインストールするか
-install
-
-# インストールタイプの設定
-# CD-ROM経由かネットワーク経由かとか
-cdrom
-
-# 言語設定
-lang ja_JP.UTF-8
-
-# キーボード設定
-keyboard jp106
-
-# ネットワーク設定
-# /etc/sysconfig/network-scripts/ifcfg-xxxx 部分
-network --onboot yes --device eth0 --bootproto dhcp --noipv6
-
-# rootのパスワード
-# xxxxxx部分はopensslコマンドで作成するといい
-# $openssl passwd -1
-rootpw --iscrypted xxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-# iptablesの設定
-# プロビジョニングで設定するのでここでは無効にしておく
-firewall --disabled
-
-# 認証オプション
-authconfig --enableshadow --passalgo=sha512
-
-# SELinuxの設定
-# こちらも詳細はプロビジョニングで設定するので無効にしておく
-selinux --disabled
-
-# タイムゾーン
-timezone --utc Asia/Tokyo
-
-# ブートローダのインストール方法
-bootloader --location=mbr --driveorder=sda --append=&quot;nomodeset crashkernel=auto rhgb quiet&quot;
-
-# 設定後にリブート
-reboot
-
-# パーティション設定
-clearpart --linux --drives=sda
-autopart
-
-# インストールパッケージ選択
-%packages --nobase
-@core
-
-%end 
-</code></pre>
-
-<h3>参考になったもの</h3>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Redhat">Redhat</a>社のインストールガイドがよくまとまっていた。<br>
-特に<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイルについては下記あたりが役立ちます。</p>
-
-<ul>
-<li><a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/6/html/Installation_Guide/s1-kickstart2-options.html">32.4. キックスタートのオプション</a></li>
-<li><a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/6/html/Installation_Guide/s1-kickstart2-packageselection.html">32.5. パッケージの選択</a></li>
-</ul>
-
-<h1>3-2.<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイルの使い方</h1>
-
-<p>しかし、OSインストール前なのにどうやってファイルを使うのか…？<br>
-はじめ戸惑いました…</p>
-
-<p>実は以下の方法で利用できます。</p>
-
-<p>OSのisoファイルで起動するとこの画面がでるやろ。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150802/20150802125544.png" alt="f:id:mosuke5:20150802125544p:plain" title="f:id:mosuke5:20150802125544p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>そして、ここでTabをおすと、なにか入力できるが画面が出てきて。<br>
-そこに、<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイルのパスを入力してやる。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150802/20150802125630.png" alt="f:id:mosuke5:20150802125630p:plain" title="f:id:mosuke5:20150802125630p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>これで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>完了や。</p>
-
-<h1>4.最後に</h1>
-
-<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>入門したし、次はPackerをやりたいと思います。<br>
-が、ふと思ったのが、自分の用途だとPackerではなく<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>で十分かもなーとか思ったり思わなかったり…</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">19 Jul 2015, 13:58</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/07/19/135844/" class="post-title">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-vim" href="https://blog.mosuke.tech/categories/vim">vim</a><a class="post-category post-category-vim::factory" href="https://blog.mosuke.tech/categories/vimfactory">vim::factory</a><a class="post-category post-category-vimfactory" href="https://blog.mosuke.tech/categories/vimfactory">vimfactory</a><a class="post-category post-category-docker" href="https://blog.mosuke.tech/categories/docker">docker</a><a class="post-category post-category-websocket" href="https://blog.mosuke.tech/categories/websocket">websocket</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>2014年の秋から<code>@mogulla3</code>と定期的にインフラ関連技術の勉強会をやってきましたが、<br>
-インプットの勉強会だけでは飽き足らず、いつしかサービスを作る中でインフラ関連技術を駆使し勉強したいと思うように…</p></p>
-
-<p>そして、普段使っている<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を題材に、<br>
-<b><span style="font-size: 150%"><a class="keyword" href="http://d.hatena.ne.jp/keyword/vim">vim</a>の設定をブラウザ上で即体感できるサービス <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factory</span></b><br>
-を開発しました。</p>
-
-<p>本記事は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの簡単な紹介と技術的な仕組みについて記述しています。</p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryはこちら。<br>
-<a href="http://vimfactory.com/">http://vimfactory.com/</a></p>
-
-<h1>1. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryについて</h1>
-
-<h2>1-1. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryってなに？？</h2>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryは、選択した<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の設定を、ブラウザ上で「即体感」できるサービスです。<br>
-数多くあり複雑な<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の設定を容易にし、お気に入りの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>探しをサポートすることを目指しています。</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150719/20150719155723.png" alt="f:id:mosuke5:20150719155723p:plain" title="f:id:mosuke5:20150719155723p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<h2>1-2. なんで作ったの？</h2>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の設定ってたくさんあってどれを選んでいいかわからなかったり、<br>
-設定したもののどう変わったかイマイチわからなかったりしませんか？</p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の設定がどのように反映されるか、もっと簡単に体験したいと考えたからです。</p>
-
-<p>あと、例えば<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>で100star以上をつける人の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>をブラウザ上で体験できたらいいなと思っていて、<br>
-それを実現のための第一歩としてこのサービスを作りました。</p>
-
-<h2>1-3. このサービスの最大の特徴は？</h2>
-
-<p>このサービスの最大の特徴はなんといっても<b>「ブラウザ上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>が体感できること」</b>です。</p>
-
-<p>今までは<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の設定を試そうと思ったら、ネットで調べて自分の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>に反映させて…という作業が必要でしたが、<br>
-ブラウザ上で設定を即体感するという新しい体験を提供するために力を注いできました。<br>
-その実現方法については、後述しています。</p>
-
-<h2>1-4. 紹介動画</h2>
-
-<p>詳しくは、実際に試してもらうのが早いと思いますが、簡単な操作動画を用意してみました。<br>
-モバイルからこのサービスはちょっと使えないので、モバイルで読んでいる方は動画でお楽しみください(笑)<br>
-<iframe width="480" height="270" src="https://www.youtube.com/embed/j20agcBcAec?feature=oembed" frameborder="0" allowfullscreen></iframe><cite class="hatena-citation"><a href="https://www.youtube.com/watch?v=j20agcBcAec&amp;feature=youtu.be">www.youtube.com</a></cite></p>
-
-<h1>2. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの技術について</h1>
-
-<p>ここから<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの技術について一部ではありますがご紹介します。</p>
-
-<h2>2-1. ブラウザ上での<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を実現した技術</h2>
-
-<p>ブラウザ上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を実現しようと思うと、ぱっと思いつくのは<a class="keyword" href="http://d.hatena.ne.jp/keyword/JavaScript">JavaScript</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>そのものを実装してしまおうというものかもしれません。<br>
-ですが、JSで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を実装することってどれくらい難しいでしょうか？<br>
-少なくともぼくにはそんなことはできませんし、できたとして質の悪いものになってしまうと思います。</p>
-
-<p>そこで思いついたのが、一般的なターミナルソフトと同様にサーバ上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/vim">vim</a>を起動し、<br>
-そのターミナル情報をブラウザ上で表示するという方法です。<br>
-この方法であれば自ら<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を実装せずとも<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を再現できます。イメージは下記のとおりです。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150718/20150718230605.png" alt="f:id:mosuke5:20150718230605p:plain" title="f:id:mosuke5:20150718230605p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>また、サービスとして上記を行うには、接続してきたユーザごとに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を用意する必要があります。</p>
-
-<p>これらを実現するために利用したのが<b>Docker</b>と<b>WebSocket</b>です。<br>
-dockerコンテナ上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を起動し、そのターミナル情報をWebSocketでブラウザに送信するようにしました。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150720/20150720002840.png" alt="f:id:mosuke5:20150720002840p:plain" title="f:id:mosuke5:20150720002840p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>dockerはコンテナ型の仮想化なので起動がとてもはやく、<br>
-httpのリクエストが来てからdockerコンテナを立ち上げても十分なほどのはやさをもっています。</p>
-
-<h2>2-2. 全体構成</h2>
-
-<p>システムの全体構成は以下のような感じです。<br>
-※実際の役割は図のとおりですが、サーバはこんなに多くありません。</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150719/20150719124021.png" alt="f:id:mosuke5:20150719124021p:plain" title="f:id:mosuke5:20150719124021p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<h2>2-3. 利用した技術とか<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>のまとめ</h2>
-
-<p>振り返りも兼ねて利用した技術・<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>を一覧にまとめておきます。</p>
-
-<ul>
-<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a></li>
-<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a></li>
-<li>thin</li>
-<li>node.js</li>
-<li>Websocket</li>
-<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/memcached">memcached</a></li>
-<li>docker</li>
-<li>nginx</li>
-<li>centos7</li>
-<li>Ansible</li>
-<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a></li>
-<li>gitlab</li>
-<li>mackerel</li>
-<li>slack</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/esa">esa</a>.io(ドキュメント管理)</li>
-</ul>
-
-<h1>3. まとめ</h1>
-
-<p>このサービスで一番苦労したことはやっぱりブラウザ上での<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の実現部分です。<br>
-当初、このサービスを思いついた時、実現不可能だ…とあきらめました。<br>
-というのもJS（アプリケーションサイド）で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>をどう実装しようかしか考えていなかったからです。</p>
-
-<p>ですが、ふとしたときに上記の別の方法（インフラサイド）での実現方法を思いつきました。</p>
-
-<p>このサービスを作るきっかけは、インフラ技術のインプット勉強だけでは飽きたらず、<br>
-サービスを開発・運用していくなかでインフラ技術を磨いていきたいというものでしたが、<br>
-インプットの勉強があってこそインフラサイドからの実現方法を見つけられたようにも思いました。</p>
-
-<p>今後、運用を通してさらなるパワーアップができたらいいなと思います。</p>
-
-<h1>4. 最後に</h1>
-
-<p>最後になりますが、
-完全な趣味で作ってしまったサービスで、今後どのように展開していこうか何も考えていません。<br>
-まずは、このように公開し皆様に利用して頂いて、フィードバックなど頂いてから考えようと思っています。</p>
-
-<p>サービスに関するご意見等あれば、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Twitter">Twitter</a>やメールで書いてくれると大変嬉しいです。</p>
-
-<p>お問い合せはこちら:</p>
-
-<ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Twitter">Twitter</a>: <a href="https://twitter.com/mosuke5">もーすけ (@mosuke5) | Twitter</a> or <a href="https://twitter.com/mogulla3">もぐらマン (@mogulla3) | Twitter</a>
-</li>
-<li>e-mail: ilab.vimfactory+info@<a class="keyword" href="http://d.hatena.ne.jp/keyword/gmail">gmail</a>.com</li>
-</ul>
-
-<p>では、みなさんも<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>ライフを楽しみましょう！</p>
-
-<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryはこちら。<br>
-<a href="http://vimfactory.com/">http://vimfactory.com/</a></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">17 Jun 2015, 21:28</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/06/17/212852/" class="post-title">PostgreSQL環境でFuelPHPのDBマイグレーションを使う</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-php" href="https://blog.mosuke.tech/categories/php">php</a><a class="post-category post-category-fuelphp" href="https://blog.mosuke.tech/categories/fuelphp">fuelphp</a><a class="post-category post-category-DBマイグレーション" href="https://blog.mosuke.tech/categories/db%E3%83%9E%E3%82%A4%E3%82%B0%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3">DBマイグレーション</a><a class="post-category post-category-PostgreSQL" href="https://blog.mosuke.tech/categories/postgresql">PostgreSQL</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>今更<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>感はあるのだが、<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>利用時の<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>のmigration導入について、注意点をまとめた。<br>
-でも、結論は納得がいっていない。</p></p>
-
-<h1>0. 前提</h1>
-
-<p>下記の環境で行ったものです。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>: 5.5.7<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>: 1.7<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Postgresql">Postgresql</a>: 9.4</p>
-
-<h1>1. テーブル<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%B8%BB%FA%A5%B3%A1%BC%A5%C9">文字コード</a>の問題</h1>
-
-<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a></h1>
-
-<p>公式サイトのサンプルの通りはじめに<code>app/migrations/001_example.php</code>を作り、migrationを実行した。</p>
-
-<p><code>app/migrations/001_example.php</code>の作成</p>
-
-<pre><code class="language-php">&lt;?php
-namespace Fuel\Migrations;
-class Example
-{
-    function up()
-    {
-        \DBUtil::create_table('posts', array(
-            'id' =&gt; array('type' =&gt; 'int', 'constraint' =&gt; 5),
-            'title' =&gt; array('type' =&gt; 'varchar', 'constraint' =&gt; 100),
-            'body' =&gt; array('type' =&gt; 'text'),
-        ), array('id'));
-    }
-    
-    function down()
-    {
-        \DBUtil::drop_table('posts');
-    }
-}
-</code></pre>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>実行すると以下のエラーに襲われた。</p>
-
-<pre><code>$ php oil refine migrate
-Uncaught exception Fuel\Core\Database_Exception: SQLSTATE[42601]: Syntax error: 7 ERROR: syntax error at or near &quot;DEFAULT&quot;
-LINE 5: )DEFAULT CHARACTER SET utf8;
-^ with query: &quot;CREATE TABLE IF NOT EXISTS &quot;migration&quot; (
-&quot;type&quot; varchar(25) NOT NULL,
-&quot;name&quot; varchar(50) NOT NULL,
-&quot;migration&quot; varchar(100) DEFAULT '' NOT NULL
-)DEFAULT CHARACTER SET utf8;&quot; 
-</code></pre>
-
-<h1>理由</h1>
-
-<p>しょっぱなから躓くわけだが…</p>
-
-<p>初めて<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を実行する際には<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>管理用のテーブルを作る。<br>
-そのテーブルを作る<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が下記の通り発行されている。</p>
-
-<pre><code class="language-sql">CREATE TABLE IF NOT EXISTS &quot;migration&quot; (
-&quot;type&quot; varchar(25) NOT NULL,
-&quot;name&quot; varchar(50) NOT NULL,
-&quot;migration&quot; varchar(100) DEFAULT '' NOT NULL
-)DEFAULT CHARACTER SET utf8;
-</code></pre>
-
-<p>理由は単純で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>のcreate tableでは次のdefault構文は利用できないから。</p>
-
-<pre><code class="language-sql">create table xxxx ( ) default character set xxx;
-</code></pre>
-
-<p>なぜ、利用できない構文の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が発行されたのか？<br>
-それは単に<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>の問題です。次期バージョンでは解決されることを祈る。</p>
-
-<h1>解決方法</h1>
-
-<p>解決方法は下記の記事がわかりやすかった。
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fqiita.com%2Fhirobow%2Fitems%2F8c2c379b33f0040480b7" title="FuelPHP で PDOによるPostgreSQL接続の罠 - Qiita" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://qiita.com/hirobow/items/8c2c379b33f0040480b7">FuelPHP で PDOによるPostgreSQL接続の罠 - Qiita</a></iframe><cite class="hatena-citation"><a href="http://qiita.com/hirobow/items/8c2c379b33f0040480b7">qiita.com</a></cite></p>
-
-<p>簡単に言うとdbのコンフィグで、charsetをnullにすると<code>DEFAULT CHARACTER SET xxx</code>部分が発行されない。</p>
-
-<pre><code>'charset' =&gt; NULL, 
-</code></pre>
-
-<h1>2. PRIMARY KEYの問題</h1>
-
-<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a></h1>
-
-<p>1.の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%B8%BB%FA%A5%B3%A1%BC%A5%C9">文字コード</a>の問題は解決して、さあもう一度<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を！と思って実行するもさらなるエラーに阻まれる。</p>
-
-<pre><code>$ php oil refine migrate
-Uncaught exception Fuel\Core\Database_Exception: SQLSTATE[42601]: Syntax error: 7 ERROR: syntax error at or near &quot;(&quot;
-LINE 2: &quot;id&quot; int(5) NOT NULL,
-^ with query: &quot;CREATE TABLE IF NOT EXISTS &quot;users&quot; (
-&quot;id&quot; int(5) NOT NULL,
-&quot;name&quot; text NOT NULL,
-PRIMARY KEY &quot;id&quot; (&quot;id&quot;)
-);&quot; 
-</code></pre>
-
-<p>理由は1のときと一緒。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>では以下の構文は使えないのだ…</p>
-
-<pre><code>PRIMARY KEY &quot;id&quot; (&quot;id&quot;) 
-</code></pre>
-
-<h1>3. 結局</h1>
-
-<p>つまるところ<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>(すくなくとも1.7までは)では、<a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を行う環境がちゃんと整っていないということ。<br>
-しかたないので、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>は生<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を書くことにしました。</p>
-
-<p>PRIMARY KEYを後から別途で付与するとか考えたけど、<br>
-ほかにも罠がありそうだったので、安全な生<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を採用しました。<br>
-バージョン1.8では直っている?とのことだが、まだdevelopmentだったのでこれも見送り。</p>
-
-<p>うむ。。。</p>
-
-<p><p>&lt;参考&gt;
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fimprove-future.com%2Favailable-dbms-in-fuelphp.html" title="FuelPHP で使用可能なデータベース" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://improve-future.com/available-dbms-in-fuelphp.html">FuelPHP で使用可能なデータベース</a></iframe><cite class="hatena-citation"><a href="http://improve-future.com/available-dbms-in-fuelphp.html">improve-future.com</a></cite></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">13 Jun 2015, 23:19</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/06/13/231917/" class="post-title">Ajaxの嫌いだった部分をJsRenderで心地良くした</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-javascript" href="https://blog.mosuke.tech/categories/javascript">javascript</a><a class="post-category post-category-JsRender" href="https://blog.mosuke.tech/categories/jsrender">JsRender</a><a class="post-category post-category-ajax" href="https://blog.mosuke.tech/categories/ajax">ajax</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<h1>1. はじめに</h1></p>
-
-<p>ぼくはフロントエンドは本業ではありません。<br>
-jsはあまり好きではありません。<br>
-そして<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>通信後にhtmlをアウトプットする際にjsの変数の中にhtmlを書いていく<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>がもっと好きではありません。(後述)<br>
-それをJSテンプレートエンジンを使ってシンプルにしてみたって話です。
-（JsRenderの使い方を書いたものではありません。）</p>
-
-<h1>2. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>が嫌いだった理由</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>はユーザ体感的にはいいのだけれど、<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>の結果受け取った<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>などのデータを使ってhtmlを出力とかやると<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>が煩雑になるので嫌いだった。</p>
-
-<p>例として<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>で/xxxxxにリクエストを投げて、その結果(<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>データ)を使ってhtmlを出力するものを考えると。</p>
-
-<pre><code class="language-javascript">/* jsonデータは下記が返ってくるとする
-[
-    {
-        id: '1',
-        name: 'らーめん',
-        text: 'らーめんはやっぱり濃厚鶏そばです。'
-    },
-    {
-        id: '2',
-        name: 'うどん',
-        text: 'うどんはやっぱり釜揚げうどんです。'
-    }
-]
-*/
-$.ajax({
-  type: &quot;GET&quot;,
-  url: &quot;/xxxxx&quot;,
-  dataType: &quot;json&quot;,
-  success: function(data){
-    var html = '';
-    data.forEach(function (e) {
-      html += '&lt;div id=&quot;' + e.id + '&quot;&gt;';
-      html += '&lt;h1&gt;' + e.name + '&lt;/h1&gt;';
-      html += '&lt;p&gt;' + e.text + '&lt;/p&gt;';
-      html += '&lt;/div&gt;';
-    });
-    $(&quot;#result&quot;).append(html);
-  },
-})
-</code></pre>
-
-<p>jsの変数の中にhtmlが含まれる。<br>
-<b>そう、jsの変数の中にhtmlが！！</b><br>
-この規模ならまだいいが、もう少しhtmlが肥大化してくると最悪である。<br>
-これがどうしても許せない。</p>
-
-<h1>3.jsのテンプレートエンジンを使ってみた</h1>
-
-<p>上の問題をなんとかできないかと思っていたところ、jsのテンプレートエンジンにいきついた。<br>
-jsのテンプレートエンジンは多数あるのだが今回はJsRenderを採用し、<a class="keyword" href="http://d.hatena.ne.jp/keyword/ajax">ajax</a>を心地よく使うことができるようになった。</p>
-
-<p><a href="http://www.jsviews.com/">JsRender/JsViews</a></p>
-
-<h3>3-1. jsテンプレートエンジンの選定について</h3>
-
-<p>以下のまとめなど参考にするといいが、多数ある。
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fqiita.com%2FKumamon%2Fitems%2F7db7c8f5e5ace3b40874" title="JavaScriptテンプレートエンジンまとめ - Qiita" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://qiita.com/Kumamon/items/7db7c8f5e5ace3b40874">JavaScriptテンプレートエンジンまとめ - Qiita</a></iframe><cite class="hatena-citation"><a href="http://qiita.com/Kumamon/items/7db7c8f5e5ace3b40874">qiita.com</a></cite></p>
-
-<p>用途としては下記のような感じで選んだ。</p>
-
-<ul>
-<li>クライアントサイドで利用できる
-
-<ul>
-<li>特にサーバサイドで使える必要はなかった</li>
-</ul>
-</li>
-<li>簡単に利用できること。学習コストが低そうなこと</li>
-<li>for文やif文はつかえること</li>
-<li>プレ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB">コンパイル</a>とかは必要なかった</li>
-</ul>
-
-<h3>3-2. JsRenderを使えばここまで<a class="keyword" href="http://d.hatena.ne.jp/keyword/ajax">ajax</a>がシンプルになった</h3>
-
-<p>JsRenderを利用して先ほどの<a class="keyword" href="http://d.hatena.ne.jp/keyword/ajax">ajax</a>部分を書き直すと以下のようになる。</p>
-
-<h4>js側</h4>
-
-<pre><code class="language-javascript">$.ajax({
-  type: &quot;GET&quot;,
-  url: &quot;/xxxxx&quot;,
-  dataType: &quot;json&quot;,
-  success: function(data){
-    var template = $.templates(&quot;#result-template&quot;);   // テンプレートを指定
-    var htmlOutput = template.render(data);   //テンプレート内に変数展開
-    $(&quot;#result&quot;).html(htmlOutput);   //出力
-  },
-})
-</code></pre>
-
-<h4>html側</h4>
-
-<pre><code class="language-html">&lt;div id=&quot;result&quot;&gt;&lt;/div&gt;
-&lt;script id=&quot;result-template&quot; type=&quot;text/x-jsrender&quot;&gt;
-&lt;div id=&quot;{{:id}}&quot;&gt;
-  &lt;h1&gt;{{:name}}&lt;/h1&gt;
-  &lt;p&gt;{{:text}}&lt;/p&gt;
-&lt;/div&gt;
-&lt;/script&gt;
-</code></pre>
-
-<p>何が素晴らしいって、ロジックの部分と、ビュー部分を綺麗に分離できたこと。<br>
-いや、サーバサイドなら当たり前のようにやっていたことなんだけど、<br>
-JsRenderを使えばクライアントサイドでも簡単に実装できて最高でした。</p>
-
-<p><p>以上。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">24 May 2015, 22:02</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/05/24/220226/" class="post-title">他人の家のインターネットを環境を整えて分かった無線LANルータのこと</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-ネットワーク" href="https://blog.mosuke.tech/categories/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF">ネットワーク</a><a class="post-category post-category-無線LANルーター" href="https://blog.mosuke.tech/categories/%E7%84%A1%E7%B7%9Alan%E3%83%AB%E3%83%BC%E3%82%BF%E3%83%BC">無線LANルーター</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>他人の家のインターネットを環境を整えて分かった<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a>ルータのことがあったのでまとめる。</p></p>
-
-<p>我が家のインターネット環境は以下のような構成になっている。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150524/20150524215405.png" alt="f:id:mosuke5:20150524215405p:plain" title="f:id:mosuke5:20150524215405p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>この構成では<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a>ルータは<b>L3とL2の両方</b>の機器として働いている。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B0%A5%ED%A1%BC%A5%D0%A5%EBIP">グローバルIP</a>とプライベートIPの両方を持っており、<br>
-プライベートIPからの通信をグローバル側へルーティングする機能と、<br>
-LAN内の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">複数</a>の端末に接続する機能として。</p>
-
-<p>一方、この前、他の人の家のインターネット環境を整えたのだが、<br>
-以下のような構成だった。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150524/20150524214832.png" alt="f:id:mosuke5:20150524214832p:plain" title="f:id:mosuke5:20150524214832p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>１つめの構成と決定的に違うところは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VDSL">VDSL</a>モデムにルータ機能もついていること。
-この場合は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EB%A1%BC%A5%BF%A1%BC">ルーター</a>はL2の機器として働いている。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EB%A1%BC%A5%BF%A1%BC">ルーター</a>自体には<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>はなく、<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>管理を行っているのも上位のルータだ。</p>
-
-<p>この構成になるときは、一般的に光<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%C5%C5%CF%C3">IP電話</a>を利用するケースのようだ。<br>
-というのも、一般的な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EB%A1%BC%A5%BF%A1%BC">ルーター</a>には光<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%C5%C5%CF%C3">IP電話</a>につなぐことができず、<br>
-通信会社から貸与されるモデムルータを利用するため。</p>
-
-<p>余談だが、今家では実は下記のような構成にしている。<br>
-というのも、家の構造上、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VDSL">VDSL</a>がでているところが納戸のようなところで、<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EB%A1%BC%A5%BF%A1%BC">ルーター</a>を設置しても壁が多すぎるために電波が弱くなってしまう。<br>
-そのため、リビング側へ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EB%A1%BC%A5%BF%A1%BC">ルーター</a>を設置したかったからだ。</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150524/20150524215424.png" alt="f:id:mosuke5:20150524215424p:plain" title="f:id:mosuke5:20150524215424p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p><p>とても単純な話だが、<br>
-いろんなケースの家庭内インターネットの設定をすることで、<br>
-いろいろと気づくこともあった。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">08 May 2015, 17:47</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/05/08/174732/" class="post-title">sinatra-assetpackをproduction環境で使う時にはまったー</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-ruby" href="https://blog.mosuke.tech/categories/ruby">ruby</a><a class="post-category post-category-sinatra" href="https://blog.mosuke.tech/categories/sinatra">sinatra</a><a class="post-category post-category-sinatra-assetpack" href="https://blog.mosuke.tech/categories/sinatra-assetpack">sinatra-assetpack</a><a class="post-category post-category-jsminify" href="https://blog.mosuke.tech/categories/jsminify">jsminify</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>アプリケーションで、JSファイルを圧縮する<a class="keyword" href="http://d.hatena.ne.jp/keyword/sinatra">sinatra</a>-assetpackを利用していて、<br>
-production環境で動作させようとしたら動かなくなってしまった問題について調査した。</p></p>
-
-<h1>起こったこと</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>を使ってアプリケーションを作っていて、development環境で完成したので、
-prorudction環境で動作させようとしたら、jsのエラーが出るようになってしまい、正常に動かなくなった。</p>
-
-<p>アクセスすると、以下のエラーがでる。要は<a class="keyword" href="http://d.hatena.ne.jp/keyword/jquery">jquery</a>がないとのこと。</p>
-
-<pre><code>Uncaught ReferenceError: $ is not defined 
-</code></pre>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/jQuery">jQuery</a>はもちろん読み込ませてるし、なんでproduction環境でだけ？？？</p>
-
-<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a></h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/sinatra">sinatra</a>のメインアプリケーションであるapp.rbには以下のように、<a class="keyword" href="http://d.hatena.ne.jp/keyword/sinatra">sinatra</a>-assetpackを利用してjsを読み込んでいる。</p>
-
-<pre><code class="language-ruby">assets do
-  serve '/js', from: 'public/js'
-  serve '/bower_components', from: 'bower_components'
-
-  js :app, '/js/app.js', [
-    '/js/index.js',
-  ]
-
-  js :libs, '/js/libs.js', [
-    '/bower_components/jquery/dist/jquery.js',
-    '/bower_components/bootstrap/dist/js/bootstrap.js',
-  ]
-
-  js_compression :jsmin
-end
-</code></pre>
-
-<p>layout.erbにはもちろん、libs.jsが先に来るように記述している。</p>
-
-<pre><code class="language-ruby">&lt;%= js :libs %&gt;
-&lt;%= js :app %&gt;
-</code></pre>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/sinatra">sinatra</a>-assetpackの挙動</h1>
-
-<p>productionでのみ発生する<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a>なので、改めて<a class="keyword" href="http://d.hatena.ne.jp/keyword/sinatra">sinatra</a>-assetpackのproduction環境時の挙動を確認した。<br>
-production環境では、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">複数</a>のjsファイルを1つのファイルにまとめ、圧縮を行う。</p>
-
-<h4>development環境</h4>
-
-<p>３つのjsファイルがあったら以下のように３つ別々に読み込まれる。</p>
-
-<pre><code class="language-html">&lt;script type='text/javascript' src='/js/vendor/jquery.283479.js'&gt;&lt;/script&gt;
-&lt;script type='text/javascript' src='/js/vendor/underscore.589491.js'&gt;&lt;/script&gt;
-&lt;script type='text/javascript' src='/js/app/main.589491.js'&gt;&lt;/script&gt;
-</code></pre>
-
-<h4>production環境</h4>
-
-<p>３つあったjsファイルは1つにまとめられ、また圧縮される。</p>
-
-<pre><code class="language-html">&lt;script type='text/javascript' src='/js/app.589491.js'&gt;&lt;/script&gt;
-</code></pre>
-
-<p>詳細はこちら<br>
-<a href="https://github.com/rstacruz/sinatra-assetpack#results">rstacruz/sinatra-assetpack · GitHub</a></p>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a>の理由</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Chrome">Chrome</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%D0%A5%C3%A5%B0">デバッグ</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>のNetworkでファイルのダウンロード状況を確認してみると意外なことがわかった。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150508/20150508171833.png" alt="f:id:mosuke5:20150508171833p:plain" title="f:id:mosuke5:20150508171833p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>画像が小さくて見づらいかもしれないが、
-5行目と6行目のapp.jsとlibs.jsで先にlibs.jsを読み込んでいるのに、おそらく圧縮とダウンロードに時間がかかり、<br>
-app.jsのほうが先にダウンロードが終わっている。</p>
-
-<p>libs.jsには<a class="keyword" href="http://d.hatena.ne.jp/keyword/jQuery">jQuery</a>などが含まれていて、app.js内で<a class="keyword" href="http://d.hatena.ne.jp/keyword/jQuery">jQuery</a>を利用する。<br>
-よって、先にapp.jsが読み込まれてしまったことで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/jQuery">jQuery</a>がねーぞ！と怒られてしまったのである。</p>
-
-<h1>対策と考慮</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/sinatra">sinatra</a>-assetpackなどを利用して、jsを圧縮する際には、
-ファイルを1つにまとめたり圧縮したりする時間がかかることを十分に考慮しなければいけない。</p>
-
-<p>あまり賢い手段をは言えないが、libs.jsとapp.jsひとつにまとめることで今回の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a>は避けられる。
-app.rb</p>
-
-<pre><code class="language-ruby">assets do
-  serve '/js', from: 'public/js'
-  serve '/bower_components', from: 'bower_components'
-
-  js :app, '/js/app.js', [
-    '/bower_components/jquery/dist/jquery.js',
-    '/bower_components/bootstrap/dist/js/bootstrap.js',
-    '/js/index.js',
-  ]
-
-  js_compression :jsmin
-end
-</code></pre>
-
-<p><p>また、事前に圧縮しておいて、ダウンロードだけする状態にしてもいいかもしれない。<br>
-<a href="https://github.com/rstacruz/sinatra-assetpack#precompile">rstacruz/sinatra-assetpack · GitHub</a></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">15 Apr 2015, 17:11</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/04/15/171127/" class="post-title">Ansibleで最新のMySQLをインストールする際にハマったこと。MySQL-shared-compatのこと。</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-MySQL" href="https://blog.mosuke.tech/categories/mysql">MySQL</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/CentOS">CentOS</a> 6.5環境でAnsibleを使って最新の<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>のセットアップをしようと思った際にハマったことをまとめた。<br>
-本質的にはAnsibleというより<a class="keyword" href="http://d.hatena.ne.jp/keyword/Linux">Linux</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/RPM">RPM</a>パッケージのはなし。<br>
-ついでに、しょっぼい<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>を公開しました。</p></p>
-
-<h1>(1) 本記事を書くに至った経緯</h1>
-
-<ol>
-<li>Ansibleで<a class="keyword" href="http://d.hatena.ne.jp/keyword/mysql">mysql</a>を使ったサーバを構築(CentOS6.5)することになった。
-
-<ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>のバージョンは5.6を採用した。</li>
-</ul>
-</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>の公式<a class="keyword" href="http://d.hatena.ne.jp/keyword/rpm">rpm</a>をダウンロードしインストールした。
-
-<ul>
-<li>インストールしたもの：<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-client, <a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-devel, <a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-server, <a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-shared</li>
-</ul>
-</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-sharedをインストールする際にデフォルトの<a class="keyword" href="http://d.hatena.ne.jp/keyword/mysql">mysql</a>-libsと競合</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/mysql">mysql</a>-libsをアンインストールし再インストール</li>
-<li>Ansibleで<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>の操作をするには<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL-python">MySQL-python</a>が必要なのでインストール</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL-python">MySQL-python</a>をインストールするにはさっきアンインストールした<a class="keyword" href="http://d.hatena.ne.jp/keyword/mysql">mysql</a>-libsが必要…(困った)</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-shared-compatの存在に気づく</li>
-<li>備忘録に書いておくか…</li>
-</ol>
-
-<h1>(2) <a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-shared-compatの存在</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/mysql">mysql</a>-libsは多くのパッケージの依存となっており、公式のMySQL5.6をインストールすることで、<br>
-他のパッケージがいれられない状況となっていた。<br>
-そんな状況を解決するために<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-shared-compatというパッケージが用意されていた。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-shared-compatは「過去の<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>バージョン向けの共有クライアントライブラリが納められているもの」だ。</p>
-
-<p>詳細は下記参照をおすすめ。<br>
-<a href="http://y-ken.hatenablog.com/entry/inside-of-libmysqlclient-with-mysql-shared-compat">MySQL-5.5.6から仕様が変わった「MySQL-shared-compat」の中身を徹底解剖 - Y-Ken Studio</a></p>
-
-<p>ちなみに"compat"という単語がよく使われるが"compatibility"の略で「互換性」とかそういう意味。</p>
-
-<h1>(3) <a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>で公開しました</h1>
-
-<p>内容は今のところ死ぬほど薄いのだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>をインストールするansibleを公開しました。
-<a href="https://github.com/mosuke5/mysql-ansible">mosuke5/mysql-ansible · GitHub</a></p>
-
-<p>内容はあれだが、特徴としては、インターネット上から<a class="keyword" href="http://d.hatena.ne.jp/keyword/RPM">RPM</a>をダウンロードしてインストールする際に、<br>
-Ansibleでも「ダウンロード」→「インストール」の流れを踏む人が多いが、以下のようにするとシンプルになる。<br>
-varsでインストールしたい<a class="keyword" href="http://d.hatena.ne.jp/keyword/rpm">rpm</a>やその取得先を記述しておいて、task側では<a class="keyword" href="http://d.hatena.ne.jp/keyword/yum">yum</a>でnameにvarsで定義した変数を読むだけでできる。</p>
-
-<p>role/<a class="keyword" href="http://d.hatena.ne.jp/keyword/mysql">mysql</a>/vars/main.yml</p>
-
-<pre><code class="language-yaml">mysql_url: http://ftp.jaist.ac.jp/pub/mysql/Downloads/MySQL-5.6
-mysql_ver: &quot;5.6.24-1&quot;
-mysql_rpms:
-  - MySQL-client-{{ mysql_ver }}.el6.x86_64.rpm
-  - MySQL-shared-compat-{{ mysql_ver }}.el6.x86_64.rpm
-  - MySQL-shared-{{ mysql_ver }}.el6.x86_64.rpm
-  - MySQL-devel-{{ mysql_ver }}.el6.x86_64.rpm
-  - MySQL-server-{{ mysql_ver }}.el6.x86_64.rpm
- 
-</code></pre>
-
-<p>role/<a class="keyword" href="http://d.hatena.ne.jp/keyword/mysql">mysql</a>/tasks/main.yml</p>
-
-<pre><code class="language-yaml">- name: Install MySQL without MySQL-shared
-  yum: name={{ mysql_url}}/{{ item }}
-  with_items: mysql_rpms
- 
-</code></pre>
+<script async class="speakerdeck-embed" data-id="edf3569025fd4894867e772d5731a20f" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
 
 <p></body></p>
 
@@ -1234,11 +88,11 @@ mysql_rpms:
                 
                 
                 
-                <h1 class="content-subhead">05 Apr 2015, 21:25</h1>
+                <h1 class="content-subhead">25 Jun 2016, 11:30</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2015/04/05/212518/" class="post-title">SSHエージェントフォワード後に他のユーザでgit cloneする(鍵を使う)ことに関する考察</a>
+                        <a href="https://blog.mosuke.tech/entry/2016/06/25/113009/" class="post-title">IkaLog環境整えた。画面が突然映らなくなる事象とかについて</a>
 
                         <p class="post-meta">
                             
@@ -1247,193 +101,486 @@ mysql_rpms:
                             
                                 under 
                                 
-                                <a class="post-category post-category-CentOS7" href="https://blog.mosuke.tech/categories/centos7">CentOS7</a><a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a><a class="post-category post-category-エージェントフォワード" href="https://blog.mosuke.tech/categories/%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E3%83%95%E3%82%A9%E3%83%AF%E3%83%BC%E3%83%89">エージェントフォワード</a><a class="post-category post-category-sudo" href="https://blog.mosuke.tech/categories/sudo">sudo</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a>
+                                <a class="post-category post-category-スプラトゥーン" href="https://blog.mosuke.tech/categories/%E3%82%B9%E3%83%97%E3%83%A9%E3%83%88%E3%82%A5%E3%83%BC%E3%83%B3">スプラトゥーン</a><a class="post-category post-category-ikalog" href="https://blog.mosuke.tech/categories/ikalog">ikalog</a>
                             
                         </p>
                     </header>
 
                     <div class="post-description">
                         <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のエージェントフォワードした後に、接続したユーザとは別のユーザでgit cloneしたいことがあった。<br>
-それについて調べていく中で学習したことや検討したことについてまとめた。</p></p>
+<p>昔まで、人の家で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%D7%A5%E9%A5%C8%A5%A5%A1%BC%A5%F3">スプラトゥーン</a>をやったりたまに借りたりして楽しんでいたが、<br>
+ついにというか今更というか自宅用に買ってしまった。<br>
+ついでにという感じで、お金を注ぎ込んで、IkaLogを楽しめる環境も作った。</p></p>
 
-<h1>0. 前提</h1>
+<p>IkaLogあるととても楽しい。</p>
 
-<p>ローカルのPC(<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>)上で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>を使用してCentOS7の仮想サーバ(testsv)を立ち上げている。</p>
+<p>IkaLog環境はほぼ下記ブログを参考にしたので、詳しいことはかかないが、<br>
+全体図やハマったポイントなどを中心にまとめておく。</p>
 
-<p>&lt;<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>&gt;<br>
-ローカルPC：192.168.33.1<br>
-仮想サーバ：192.168.33.100</p>
+<p><a href="http://uriku.hatenablog.com/entry/2015/12/05/134411" target="_blank">雑記：Mac + IkaLog + stat.inkで戦績管理 - 新人SEの学習記録</a></p>
 
-<p>本記事上での「git cloneする」とは、「プライベートのGit<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>から<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>を利用してクローンする」ということを指す。</p>
+<h1>完成後写真</h1>
 
-<h1>1. <a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のエージェントフォワードを利用したい理由</h1>
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160625/20160625112118.png" alt="f:id:mosuke5:20160625112118p:plain" title="f:id:mosuke5:20160625112118p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 
-<p>まず、そもそもなぜ<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のエージェントフォワードをする必要があったのか。<br>
-最近では多くの方がご存知かつ利用していることだと思うが、仮想のサーバ上でgitを利用するときによく利用する。<br>
-(もちろんそれだけの用途ではありません)</p>
+<h1>図にしてわかりやすくすると</h1>
 
-<p>仮想サーバを作るたびに<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>の鍵を生成して、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>等に登録するのが手間なので、<br>
-ローカルのPCの鍵を他のサーバへ引き継ぐことでgit clone等を可能にするのだ。</p>
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160625/20160625112128.png" alt="f:id:mosuke5:20160625112128p:plain" title="f:id:mosuke5:20160625112128p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 
-<h1>2. <a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>エージェントフォワード利用時の挙動</h1>
+<h1>突然画面が映らなくなることが起きた！！</h1>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のエージェントフォワードで利用される認証情報は、接続先サーバの/tmp以下に保存されます。</p>
+<p>ゲームを楽しんでいた時突然、ディスプレーに画面が映らなくなることが度々あった。<br>
+ケーブルを抜き差ししても直らない。<br>
+ただ時間が経つと映るようになる・・・</p>
 
-<pre><code>[myuser@localpc ~]$ ssh -A vagrant@192.168.33.100
-Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
-[vagrant@testsv ~]$
-[vagrant@testsv ~]$ ls -l /tmp | grep ssh
-drwx------. 2 vagrant    vagrant    23  4月  4 11:35 ssh-skQVHsUCHU 
+<p>原因が最初わからなかったのだが、<br>
+どうやら<a class="keyword" href="http://d.hatena.ne.jp/keyword/HDMI">HDMI</a>スプリッターの電源供給が追いつかなくなった時になっていた。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/HDMI">HDMI</a>スプリッターは<a class="keyword" href="http://d.hatena.ne.jp/keyword/HDMI">HDMI</a>からある程度給電することができるので、はじめはそのまま利用していた。<br>
+だが、IkaLogを回し始めるとどうやら給電が追いつかなくなるようであった。</p>
+
+<p>説明書にも下記のように書いてあって、「あっ」って感じだった</p>
+
+<blockquote><p>入力機器側の電力不足により正常に表示できない場合に使用します。</p></blockquote>
+
+<p>USB経由で別途電源供給をするようになってから事象が発生しなくなった！</p>
+
+<p><p>※画面が映らなくなってガチマッチ何度負けたことか・・・</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">04 Jun 2016, 18:01</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2016/06/04/180122/" class="post-title">Nginxの仕組みについて入門</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Nginx" href="https://blog.mosuke.tech/categories/nginx">Nginx</a><a class="post-category post-category-webサーバ" href="https://blog.mosuke.tech/categories/web%E3%82%B5%E3%83%BC%E3%83%90">webサーバ</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>普段Nginxを使ってはいるものの、その仕組やなぜNignxを使うべきなのかというところがあまりわかっていなかったので、
+改めてNginxを入門しその仕組などについて調べてみた。<br>
+勉強不足もあって、間違ってることもあるかもしれないがその際は教えて下さい。</p></p>
+
+<h1>1. C10K問題</h1>
+
+<p>まず、Nginxを理解する上でC10K問題について知る必要がある。<br>
+C10K問題とは下記の問題のことだ。</p>
+
+<blockquote><p>ハードウェアの性能上は問題がなくても、クライアント数があまりにも多くなるとサーバがパンクする問題のこと。
+C は「Client（クライアント）」の頭文字、10K は「1 万台」を意味する。「クライアント 1 万台問題」ともいわれる。<br>
+（<a href="http://d.hatena.ne.jp/keyword/C10K%20%CC%E4%C2%EA">C10K 問題とは - はてなキーワード</a> より引用）</p></blockquote>
+
+<h1>2. 従来のWebサーバの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>
+</h1>
+
+<h1>prefork</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>のデフォルトの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>などで採用されている。<br>
+特徴としては、１リクエストに対して１プロセスが処理する。<br>
+すなわち同時接続が 1000であれば 1000個のプロセスが必要となる。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604171531.png" alt="f:id:mosuke5:20160604171531p:plain" title="f:id:mosuke5:20160604171531p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<h1>worker</h1>
+
+<p>リクエストはスレッドが処理する。<br>
+スレッドは１プロセスのなかで複数立ち上げることができる。<br>
+プロセス数は少なくて済むが、同時接続が1000であれば1000個のスレッドが必要となる。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>で指定可能な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>の１つ。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604171542.png" alt="f:id:mosuke5:20160604171542p:plain" title="f:id:mosuke5:20160604171542p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p>いずれにしても、1000の同時接続があれば、1000のプロセスやスレッドが必要ということだ。<br>
+プロセス/スレッド数が多くなってくると「<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%AD%A5%B9%A5%C8%A5%B9%A5%A4%A5%C3%A5%C1">コンテキストスイッチ</a>」が多く発生し、処理が遅くなってしまう。</p>
+
+<h3>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%AD%A5%B9%A5%C8%A5%B9%A5%A4%A5%C3%A5%C1">コンテキストスイッチ</a>とは</h3>
+
+<blockquote><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%AD%A5%B9%A5%C8%A5%B9%A5%A4%A5%C3%A5%C1">コンテキストスイッチ</a>とは、コンピュータの処理装置（CPU）が現在実行している処理の流れ（プロセス、スレッド）を一時停止し、別のものに切り替えて実行を再開すること。<br>
+（<a href="http://e-words.jp/w/%E3%82%B3%E3%83%B3%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81.html">コンテキストスイッチとは｜コンテキストスイッチング｜context switch - 意味/定義 ： IT用語辞典</a> より引用）</p></blockquote>
+
+<h1>3. Nginxの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>
+</h1>
+
+<p>Nginxが<a class="keyword" href="http://d.hatena.ne.jp/keyword/C10K%20%CC%E4%C2%EA">C10K 問題</a>を解決するために開発されたともいわれている。<br>
+上記のような課題を解決するような<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>を採用している。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604171559.png" alt="f:id:mosuke5:20160604171559p:plain" title="f:id:mosuke5:20160604171559p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p>ワーカプロセスがリクエストを処理する。<br>
+前述のpreforkやworkerと決定的に違うところは、１つのワーカプロセスが複数のリクエストを処理するということだ。</p>
+
+<p>また、マスタープロセスはワーカプロセスの立ち上げや、制御、管理などが主な仕事。<br>
+Nginxを終了あるいは再起動、設定ファイルを再読み込みして変更を反映するなど。</p>
+
+<p>下記のような仕組みがNginxの高速化（C10K問題対応）を可能としている。</p>
+
+<h1>シングルスレッド</h1>
+
+<p>接続ごとにプロセスやスレッドを立ち上げていては、C10K問題に対応できない。<br>
+そこで、Nginxは１つのスレッドで処理を行うようにしている。<br>
+それにより、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%AD%A5%B9%A5%C8%A5%B9%A5%A4%A5%C3%A5%C1">コンテキストスイッチ</a>と呼ばれるCPUの切り替え処理が発生しない。<br>
+正確に言うと、完全に１スレッドで処理するわけではなく図にあるようにワーカプロセス自体はマルチプロセス化できる。</p>
+
+<h1>イベント駆動</h1>
+
+<p>通常のプログラムは上から書かれた順に実行されますよね。<br>
+イベ ント駆動で動作するプログラムは何かしらのイベントが発生するまで待機し、発生したイベントの種類に応じて実行される。<br>
+ブラウザ上の<a class="keyword" href="http://d.hatena.ne.jp/keyword/JavaScript">JavaScript</a>の動きをイメージするとわかりやすいと思う。</p>
+
+<h1>非同期処理</h1>
+
+<p>一般的なwebサーバでは同期処理を行う。
+つまり、複数のリクエストがあったときに順番に処理していく。<br>
+そのため、１つのリクエストが遅いとそれに引きづられてあとのリクエストも遅くなる。<br>
+非同期処理では、リクエストがきたら他のリクエストの状況に関わらず処理を行う。</p>
+
+<h4>同期処理</h4>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604173212.png" alt="f:id:mosuke5:20160604173212p:plain" title="f:id:mosuke5:20160604173212p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<h4>非同期処理</h4>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604173226.png" alt="f:id:mosuke5:20160604173226p:plain" title="f:id:mosuke5:20160604173226p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<h1>向いていること / 向いていないこと</h1>
+
+<p>Nginxではイベント駆動で非同期的なIO処理によって、リクエストを完全に処理することを待たずに次から次へと処理を受け付けていきます。<br>
+そのため、１処理に時間のかかるものをNginx自身で行おうとするとキューがどんどん溜まってしまいます。<br>
+そのため、一般にアプリケーションの実行やデータベース処理などは向いていません。<br>
+一方で、軽量な静的データの配信やリバースプロキシなどに向いています。</p>
+
+<p>Nginxは、静的データの配信や、プロキシなどに特化させ、アプリケーションの実行などは別途<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>等で行わせることで有効活用できます。</p>
+
+<h2>向いていること</h2>
+
+<ul>
+<li>軽量データの大量配信</li>
+<li>ディスクI/Oの発生しないキャッシュ</li>
+<li>リバースプロキシ</li>
+<li>ロードバランサ</li>
+</ul>
+
+<h2>向いていないこと</h2>
+
+<ul>
+<li>アプリケーション実行</li>
+<li>データベース処理</li>
+<li>動画などの重たいデータの配信</li>
+</ul>
+
+<h1>4. 最後に</h1>
+
+<p>NginxやWebサーバについてより理解を深めるためには、<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/UNIX">UNIX</a>のプロセスやネットワーク<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>についての知識が足りないと感じた。。。</p>
+
+<p>というわけでこれを買ってみたが、978ページもあってとりあえず挫折＼(^o^)／</p>
+
+<p></p>
+<div class="hatena-asin-detail">
+<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4894712059/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/213B9PVJD1L._SL160_.jpg" class="hatena-asin-detail-image" alt="UNIXネットワークプログラミング〈Vol.1〉ネットワークAPI:ソケットとXTI" title="UNIXネットワークプログラミング〈Vol.1〉ネットワークAPI:ソケットとXTI"></a><div class="hatena-asin-detail-info">
+<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/4894712059/hatena-blog-22/">UNIXネットワークプログラミング〈Vol.1〉ネットワークAPI:ソケットとXTI</a></p>
+<ul>
+<li>
+<span class="hatena-asin-detail-label">作者:</span> W.リチャードスティーヴンス,W.Richard Stevens,篠田陽一</li>
+<li>
+<span class="hatena-asin-detail-label">出版社/メーカー:</span> ピアソンエデュケーション</li>
+<li>
+<span class="hatena-asin-detail-label">発売日:</span> 1999/07</li>
+<li>
+<span class="hatena-asin-detail-label">メディア:</span> 単行本</li>
+<li>
+<span class="hatena-asin-detail-label">購入</span>: 8人 <span class="hatena-asin-detail-label">クリック</span>: 151回</li>
+<li><a href="http://d.hatena.ne.jp/asin/4894712059/hatena-blog-22" target="_blank">この商品を含むブログ (37件) を見る</a></li>
+</ul>
+</div>
+<div class="hatena-asin-detail-foot"></div>
+</div>
+
+<p>まずはこれからはじめようと思う。。。</p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftatsu-zine.com%2Fbooks%2Fnaruhounix" title="なるほどUnixプロセス ― Rubyで学ぶUnixの基礎" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://tatsu-zine.com/books/naruhounix">tatsu-zine.com</a></cite></p>
+
+<h1>参考文献</h1>
+
+<ul>
+<li><a href="http://gihyo.jp/magazine/SD/archive/2014/201407">SoftwareDesign 2015年7月号</a></li>
+<li><a href="http://www.amazon.co.jp/nginx%E5%AE%9F%E8%B7%B5%E5%85%A5%E9%96%80-WEB-DB-PRESS-plus-%E4%B9%85%E4%BF%9D/dp/4774178667">Nginx実践入門</a></li>
+<li><a href="http://www.amazon.co.jp/24%E6%99%82%E9%96%93365%E6%97%A5-%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E3%82%92%E6%94%AF%E3%81%88%E3%82%8B%E6%8A%80%E8%A1%93-%E2%80%BE%E3%82%B9%E3%82%B1%E3%83%BC%E3%83%A9%E3%83%93%E3%83%AA%E3%83%86%E3%82%A3%E3%80%81%E3%83%8F%E3%82%A4%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E3%80%81%E7%9C%81%E5%8A%9B%E9%81%8B%E7%94%A8-PRESS-plus%E3%82%B7%E3%83%AA%E3%83%BC%E3%82%BA/dp/4774135666/ref=sr_1_1?s=books&amp;ie=UTF8&amp;qid=1465030268&amp;sr=1-1&amp;keywords=%E3%82%B5%E3%83%BC%E3%83%90%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E3%82%92%E6%94%AF%E3%81%88%E3%82%8B">[サーバインフラを支える技術](https://gihyo.jp/magazine/wdpress/plus/978-4-7741-3566-3)</a></li>
+<li><a href="http://blog.yuuk.io/entry/2015-webserver-architecture">2015年Webサーバアーキテクチャ序論 - ゆううきブログ</a></li>
+</ul>
+
+<p></body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">15 Apr 2016, 00:20</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2016/04/15/002004/" class="post-title">今度こそ入門するtmux</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-tmux" href="https://blog.mosuke.tech/categories/tmux">tmux</a><a class="post-category post-category-入門" href="https://blog.mosuke.tech/categories/%E5%85%A5%E9%96%80">入門</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>tmuxの入門は何度目だろうか…<br>
+SoftwareDesignの2015年7月号を見ながら、何度目かの入門をしたのでメモする。<br>
+ブログに書いたので、これで運用にのりそうだ。</p></p>
+
+<h1>tmuxってなに？</h1>
+
+<p>公式ページ(<a href="http://tmux.github.io/">http://tmux.github.io/</a>)から引用すると。</p>
+
+<blockquote><p>tmux is a terminal multiplexer. What is a terminal multiplexer? It <a class="keyword" href="http://d.hatena.ne.jp/keyword/lets">lets</a> you switch easily between several programs in one terminal, detach them (they keep running in the background) and reattach them to a different terminal. And do a lot more.<br>
+（訳）tmuxはターミナルマルチプレクサです。ターミナルマルチプレクサは複数のプログラムを容易に1つのターミナル上で切り替えられるようにします。またそれらのプログラムをバックグラウンドで動かしながらデタッチしたり、別のターミナルにアタッチすることができます。さらにいろいろなことができます。</p></blockquote>
+
+<h1>tmuxを使ってみる</h1>
+
+<h1>インストール</h1>
+
+<p>今回<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>の環境で行っています。<br>
+今日時点ではバージョン2.2まででていますが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/brew">brew</a>では2.1がインストールされました。</p>
+
+<pre><code>$ brew install tmux
+$ tmux -V
+tmux 2.1 
 </code></pre>
 
-<p><br>
-また、接続ユーザには<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>_AUTH_SOCKという<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>ができ、どの認証情報を利用するか記述がされます。<br>
-実際に確認してみる。<br>
-確認方法は、envコマンドで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>一覧を表示し、そのなかで"<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>"を含むものを<a class="keyword" href="http://d.hatena.ne.jp/keyword/grep">grep</a>。</p>
+<h1>起動</h1>
 
-<pre><code>[vagrant@testsv ~]$ env | grep -i ssh
-SSH_AUTH_SOCK=/tmp/ssh-skQVHsUCHU/agent.9034
-SSH_CLIENT='192.168.33.1 58017 22'
-SSH_CONNECTION='192.168.33.1 58017 192.168.33.100 22'
-SSH_TTY=/dev/pts/0 
+<p><code>$ tmux</code>と入力すると、tmuxが起動し<code>$ exit</code>で抜けることができます。<br>
+これから説明していきますが、tmuxの機能を利用するときプレフィックスキーを入力する必要があります。<br>
+デフォルトではプレフィックスキーは<code>Ctrl-b</code>になっています。</p>
+
+<h1>ウィンドウの作成、切り替え</h1>
+
+<p>１つのtmuxの中にウィンドウ（タブ機能と考えてください）を作って切り替えたりします。<br>
+<code>Ctrl-b</code>+<code>c</code>でウィンドウを作成できます。<br>
+ウィンドウを作成するとターミナルの下部分（ステータスバー）に表示されます。<br>
+*印があるのがいまいるウィンドウです。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160414/20160414233836.png" alt="f:id:mosuke5:20160414233836p:plain" title="f:id:mosuke5:20160414233836p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<h1>ウィンドウ分割</h1>
+
+<p>ウィンドウの分割もできます。開発するときに便利ですよね！<br>
+分割された画面をペインと言います。<br>
+<code>Ctrl-b</code>+<code>%</code>で縦に分割、<code>Ctrl-b</code>+<code>"</code>で横に分割できます。<br>
+ペイン間の移動は<code>Ctrl-b</code>+<code>o</code>。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160414/20160414230041.png" alt="f:id:mosuke5:20160414230041p:plain" title="f:id:mosuke5:20160414230041p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<h1>なにが嬉しいの？</h1>
+
+<p>まてまて、タブ機能もウィンドウ分割もiTerm2で全然できるよ？<br>
+ほら！？
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160414/20160414230301.png" alt="f:id:mosuke5:20160414230301p:plain" title="f:id:mosuke5:20160414230301p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p>tmuxのいいところはデタッチとアタッチ機能やカスタマイズ性の高さだと思う。<br>
+カスタマイズ性についてはまだそんなにわかってませんが。。。</p>
+
+<h1>デタッチとアタッチ</h1>
+
+<p>tmuxはターミナルを仮想化します。その威力を発揮するのがデタッチとアタッチ機能です。<br>
+tmuxを起動した状態で<code>Ctrl-b</code>+<code>d</code>を押してみよう。<br>
+そうすると下のステータスバーも消え、元のターミナルに戻ってきたと思う。<br>
+これをデタッチといい、tmuxが終了したわけではない。</p>
+
+<p>プロセスを確認すると、tmuxがまだ存在してることがわかる。</p>
+
+<pre><code>$ ps -ef | grep tmux
+  501 16038     1   0  9:26PM ??         0:02.26 tmux
+  501 17800 13345   0 11:53PM ttys005    0:00.00 grep tmux 
 </code></pre>
 
-<p><br>
-ちなみにエージェントフォワードは、認証エージェントに登録されている<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C8%EB%CC%A9%B8%B0">秘密鍵</a>を<br>
-ログイン先のサーバから利用できるようにする機能であり、接続元自体が変わるわけではない。<br>
-試しにエージェントフォワードで接続したサーバ先から、更に<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>をして、その接続状況をみてみる。</p>
+<p><code>tmux ls</code>で現在のtmuxのセッションの一覧がみれます。</p>
 
-<pre><code>[myuser@localpc ~]$ ssh -A vagrant@192.168.33.100
-Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
-[vagrant@testsv ~]$ ssh -A vagrant@192.168.33.100
-Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
-[vagrant@testsv ~]$
-[vagrant@testsv ~]$ w
- 11:50:17 up  1:55,  2 users,  load average: 0.00, 0.01, 0.05
-USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
-vagrant  pts/0    192.168.33.1     11:35    1.00s  0.04s  0.01s ssh -A vagrant@192.168.33.100
-vagrant  pts/1    192.168.33.100   11:50    1.00s  0.01s  0.00s w 
+<pre><code>$ tmux ls
+0: 1 windows (created Thu Apr 14 21:26:19 2016) [129x32] 
 </code></pre>
 
-<p>wコマンドの結果の3行目のFROMをみるとわかるが、接続元が変わるわけではない。</p>
+<p>ではアタッチしてみよう。下記で元のtmuxに戻ってくるはずです。</p>
 
-<h1>3. <a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>エージェントフォワードで接続後にrootユーザでgit cloneする</h1>
-
-<p>例えば、rootでしかアクセスできないディレクトリにgit cloneしたいと思い、<br>
-以下のようにsudoをつけてgit cloneしてみる。</p>
-
-<pre><code>[vagrant@testsv ~]$ sudo git clone git@xxxxx.xxx:yyyy/zzzzzz.git /root/hoge
-Permission denied (publickey).
-fatal: Could not read from remote repository.
-
-Please make sure you have the correct access rights
-and the repository exists. 
+<pre><code>$ tmux attach 
 </code></pre>
 
-<p>sudoをつけてgit cloneしようとすると、エージェントフォワードしたのにアクセス権がありませんと言われてしまった。<br>
-なぜエージェントフォワードしたのにgit cloneできないのだろうか？</p>
+<p>デタッチしている間もバックグラウンドでプログラムは動き続けています。<br>
+試しに、tmux上でvmstatなどを打ってデタッチしてアタッチすると動き続けていることがわかると思います。</p>
 
-<p>一般的な設定ではsudo実行すると、ユーザの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>はrootユーザへ引き継がれず、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>_AUTH_SOCKがないことがわかる。<br>
-sudo後に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>がどうなっているか確認してみる。</p>
+<h1>pstree見るといい</h1>
 
-<pre><code>[vagrant@testsv ~]$ sudo env | grep -i ssh
-　(なにも表示されない) 
+<p>tmuxの概念を理解するにはpstreeをみるといい。<br>
+tmuxを使わずにpstreeコマンドを打つと、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のプロセスの下でpstreeが動いているのがわかる。</p>
+
+<pre><code>$ pstree -p
+systemd(1)
+    ├─sshd(13589)─┬─sshd(15066)───sshd(15068)───bash(15069)───pstree(15115) 
 </code></pre>
 
-<p><br>
-sudo実行しても、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>_AUTH_SOCKを引き継ぎたい！<br>
-実はsudoで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>を引き継ぐ方法がある。-Eのオプションを付けると<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>を引き継ぐことが可能だ。<br>
-以下のように<code>sudo -E</code>とすると...</p>
+<p>一方、tmuxを起動し、tmux上でpstreeを実行すると、<a class="keyword" href="http://d.hatena.ne.jp/keyword/sshd">sshd</a>のプロセスの下にはtmuxが動いており、<br>
+pstreeコマンドはtmuxプロセスの下で動いている。</p>
 
-<pre><code>[vagrant@testsv ~]$ sudo -E env | grep -i ssh
-SSH_CLIENT=192.168.33.100 60051 22
-SSH_TTY=/dev/pts/1
-SSH_AUTH_SOCK=/tmp/ssh-qhGLsXBURp/agent.9113
-SSH_CONNECTION=192.168.33.100 60051 192.168.33.100 22 
+<pre><code>$ pstree -p
+systemd(1)
+    ├─sshd(13589)─┬─sshd(15066)───sshd(15068)───bash(15069)───tmux(15146)
+    └─tmux(15148)───bash(15149)───pstree(15168) 
 </code></pre>
 
-<p><br>
-<code>sudo -E</code>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>が引き継げ、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>_AUTH_SOCKが引き継げるので、-Eをつけてsudo git cloneをトライする。</p>
+<p>なにがいいたいかというと、tmuxの上で動かすプロセスは<a class="keyword" href="http://d.hatena.ne.jp/keyword/sshd">sshd</a>とは別プロセスで動いているということ。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>が切れても動作し続けるとはまあそういうことです。</p>
 
-<pre><code>[vagrant@testsv ~]$ sudo -E git clone git@xxxxx.xxx:yyyy/zzzzzz.git /root/hoge
-Cloning into 'zzzzzz'...
-remote: Counting objects: 27, done.
-remote: Compressing objects: 100% (26/26), done.
-remote: Total 27 (delta 13), reused 0 (delta 0)
-Receiving objects: 100% (27/27), done.
-Resolving deltas: 100% (13/13), done.
-Checking connectivity... done. 
+<h1>カスタマイズ</h1>
+
+<p>tmuxはカスタマイズ性に優れます（ようです）。<code>.tmux.conf</code>を修正することでカスタマイズ可能です。<br>
+今回は入門ということで、よく使いそうな基本設定だけしたが、これだけでも相当便利でした。</p>
+
+<ul>
+<li>プレフィックスキーを<code>Ctrl-t</code>とする</li>
+<li>ペインのサイズを<a class="keyword" href="http://d.hatena.ne.jp/keyword/vim">vim</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AD%A1%BC%A5%D0%A5%A4%A5%F3%A5%C9">キーバインド</a>で調整できるようにする</li>
+<li>ウィンドウの分割を<code>|</code>と<code>-</code>でできるようにする</li>
+</ul>
+
+<pre><code># プレフィックスキー
+unbind C-b
+set-option -g prefix C-t
+
+# paneのサイズ変更（Vimerにはかかせない）
+bind -r H resize-pane -L 5
+bind -r J resize-pane -D 5
+bind -r K resize-pane -U 5
+bind -r L resize-pane -R 5
+
+# window分割（わかりやすくていいね！）
+bind | split-window -h
+bind - split-window -v 
 </code></pre>
 
-<p>予想通り成功しました！</p>
+<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AD%A1%BC%A5%D0%A5%A4%A5%F3%A5%C9">キーバインド</a>でペインのサイズ自由自在！
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160415/20160415000811.gif" alt="f:id:mosuke5:20160415000811g:plain" title="f:id:mosuke5:20160415000811g:plain" class="hatena-fotolife" itemprop="image"></span></p>
+</body></p>
 
-<h3>(余談) suもsudoと同じ考え方ができる</h3>
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">28 Mar 2016, 18:16</h1>
+                <section class="post">
+                    <header class="post-header">
 
-<p>sudoだけではなくsuでのユーザ切り替えについても同じことが言える。<br>
-rootユーザへ切り替えるとき、よく<code>su -</code>とハイフンをつけると思う。<br>
-ハイフンをつけると、ログインシェルを使用してユーザを切り替えるので、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>の引き継ぎは行われない。</p>
+                        <a href="https://blog.mosuke.tech/entry/2016/03/28/181636/" class="post-title">HerokuをRailsアプリのステージング環境として使う</a>
 
-<h1>4. rootユーザでない他のユーザでgit cloneする</h1>
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Rails" href="https://blog.mosuke.tech/categories/rails">Rails</a><a class="post-category post-category-heroku" href="https://blog.mosuke.tech/categories/heroku">heroku</a><a class="post-category post-category-ステージング" href="https://blog.mosuke.tech/categories/%E3%82%B9%E3%83%86%E3%83%BC%E3%82%B8%E3%83%B3%E3%82%B0">ステージング</a><a class="post-category post-category-staging" href="https://blog.mosuke.tech/categories/staging">staging</a>
+                            
+                        </p>
+                    </header>
 
-<p>続いて、rootユーザではない別の一般ユーザでのgit cloneについて考える。<br>
-rootユーザの時と同じ要領で、sudoコマンドを利用しotheruserという別のユーザでgit cloneをしてみる。</p>
+                    <div class="post-description">
+                        <p><body>
+<p>趣味で作っているアプリ(<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>)があるのだが、はじめHerokuで運用しようと検討していたが、 <br>
+データ量が多いためすぐにHobbyプランでは対応できなくなってしまった。<br>
+仕方ないので、別のアプリで持っている<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>をProduction環境とすることにしたのだが、<br>
+せっかくなのでherokuもうまく使いたいなーと思ってステージング環境として使うことにした。</p></p>
 
-<p>まずは、sudoコマンドでは-uでユーザの指定ができるので、otheruserに切り替えた際の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>をみてみる。</p>
+<p>そのときにやったことをメモする。</p>
 
-<pre><code>[vagrant@testsv ~]$ sudo -E -u otheruser env | grep -i ssh
-SSH_CLIENT=192.168.33.100 60051 22
-SSH_TTY=/dev/pts/1
-SSH_AUTH_SOCK=/tmp/ssh-qhGLsXBURp/agent.9113
-SSH_CONNECTION=192.168.33.100 60051 192.168.33.100 22 
+<h1>Staging環境の設定を作る</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>ではデフォルトではdevelopment, test, productionの環境を持っている。<br>
+そこに今回、stagingという環境を追加した。<br>
+そして、herokuではデフォルトではproductionを利用するようになっているのでstagingに切り替えるだけ。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>側はstaging環境追加。</p>
+
+<pre><code>$ vim config/database.yml
+# 下記を追加した
+staging:
+  &lt;&lt;: *default
+  adapter: postgresql
+  encoding: unicode
+  database:
+  pool: 5
+  username:
+  password:
+
+$ vim config/enviroments/staging.rb
+# 基本的にはproduction.rbをコピーし、必要に応じて設定を変更
+
+$ vim config/secrets.yml
+# 必要に応じてstagingを追加 
 </code></pre>
 
-<p><br>
-rootの時と同様で予想通りな感じ。
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>_AUTH_SOCKも引き継げているし、git clone可能だと思い以下を実行すると。</p>
+<p>heroku側はステージングへの切り替え。</p>
 
-<pre><code>$ sudo -E -u otheruser git clone git@xxxxx.xxx:yyyy/zzzzzz.git /home/otheruser
-Permission denied (publickey).
-fatal: Could not read from remote repository.
-
-Please make sure you have the correct access rights
-and the repository exists. 
+<pre><code>$ heroku config --app app-name    # デフォではproductionになってる
+RAILS_ENV:                production
+$ heroku config:set RAILS_ENV=staging --app app-name
+$ heroku config --app app-name
+RAILS_ENV:                staging 
 </code></pre>
 
-<p><br>
-rootユーザの時とは異なってgit cloneは不可…</p>
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/Basic%C7%A7%BE%DA">Basic認証</a></h1>
 
-<p>でも理由はいたって簡単。<br>
-/tmp以下に保存されている認証情報は、所有者は接続したユーザで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A1%BC%A5%DF%A5%C3%A5%B7%A5%E7%A5%F3">パーミッション</a>は600なのだ。<br>
-つまり、otheruserではこの認証情報は読みこめないのである。</p>
+<p>ステージング環境なので、外部から簡単にアクセス出来ないように<a class="keyword" href="http://d.hatena.ne.jp/keyword/Basic%C7%A7%BE%DA">Basic認証</a>をかけた。<br>
+いくつかやり方があると思うが、<code>app/controllers/application_controller.rb</code>に設定を追加した。<br>
+ユーザ名とパスワードをベタ書きだと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>に上げてる場合は丸見えになってしまうので<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>でやりましょう。</p>
 
-<pre><code>[vagrant@testsv ~]$ ls -l /tmp | grep ssh
-drwx------. 2 vagrant    vagrant    23  4月  4 11:35 ssh-skQVHsUCHU 
+<pre><code class="language-ruby">http_basic_authenticate_with :name =&gt; ENV['BASIC_AUTH_USERNAME'], :password =&gt; ENV['BASIC_AUTH_PASSWORD'] if Rails.env == &quot;staging&quot;
 </code></pre>
 
-<p>重要な情報なので、アクセス権は妥当ですよね。<br>
-試しにアクセス権を変えてみるとgit cloneは可能だ。</p>
+<p>heroku側では<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>を設定してあげる。</p>
 
-<pre><code>[vagrant@testsv ~]$ chmod -R 777 /tmp/ssh-skQVHsUCHU
-[vagrant@testsv ~]$ sudo -E -u otheruser git clone git@xxxxx.xxx:yyyy/zzzzzz.git /home/otheruser
-Cloning into 'zzzzzz'...
-remote: Counting objects: 27, done.
-remote: Compressing objects: 100% (26/26), done.
-remote: Total 27 (delta 13), reused 0 (delta 0)
-Receiving objects: 100% (27/27), done.
-Resolving deltas: 100% (13/13), done.
-Checking connectivity... done. 
+<pre><code>$ heroku config:set BASIC_AUTH_USERNAME=&quot;xxxxx&quot; BASIC_AUTH_PASSWORD=&quot;xxxxx&quot; --app app-name
+$ heroku config --app app-name
+BASIC_AUTH_PASSWORD:      xxxxx
+BASIC_AUTH_USERNAME:      xxxxx 
 </code></pre>
 
-<h1>5. まとめ</h1>
+<h1>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>連携で自動デプロイ</h1>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のエージェントフォワードした際の動きと、重要な観点については抑えられた。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>エージェントフォワードの仕組みを見ていくことで、<br>
-うかつにエージェントフォワードは利用してはいけない理由も見えてきた。</p>
+<p>今更ながら<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>と連携した自動デプロイ機能があることを知った…<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>へ<code>git push origin master</code>すればheroku側にも反映される機能だ。<br>
+昔使った時には<code>git push origin master</code>と<code>git push heroku master</code>と２回コマンド打ってたのでめんどいなーと思ってた。<br>
+デプロイが楽なのでステージング環境としてはほんとに優秀だと思う。</p>
 
-<p><p>また、本題の「<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>エージェントフォワード後に、接続したユーザとは別のユーザでgit cloneしたい」だが、
-そもそもそういうことをすることはNGということらしい。<br>
-別のもっと賢い方法を考えろってことのようでした。</p>
+<p><p><a href="http://kayakuguri.github.io/blog/2015/02/10/heroku-github-sync/">[heroku]githubから自動でherokuにデプロイ - KayaMemo</a></p>
 </body></p>
 
                     </div>
@@ -1449,7 +596,7 @@ Checking connectivity... done.
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 4 of 8</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 4 of 15</span>
     
       <a href="/page/5/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>

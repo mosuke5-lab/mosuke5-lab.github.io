@@ -3,18 +3,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goldstine研究所(仮) &middot; Goldstine研究所(仮)</title>
+    <title>Goldstine研究所 &middot; Goldstine研究所</title>
 
     <meta name="description" content="mosuke5&#39;s blog">
+    <link rel="canonical" href="https://blog.mosuke.tech/">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.20" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="Goldstine研究所(仮) &middot; Goldstine研究所(仮)">
+    <meta name="twitter:title" content="Goldstine研究所 &middot; Goldstine研究所">
     <meta name="twitter:description" content="mosuke5&#39;s blog">
 
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Goldstine研究所(仮) &middot; Goldstine研究所(仮)">
+    <meta property="og:title" content="Goldstine研究所 &middot; Goldstine研究所">
     <meta property="og:description" content="mosuke5&#39;s blog">
 
     <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
@@ -25,7 +26,7 @@
     <link rel="stylesheet" href="https://blog.mosuke.tech/css/mosuke5.css">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
 
-    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所(仮)" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
     <link rel="icon" type="image/png" href="/image/favicon.png">
 </head>
 <body>
@@ -35,7 +36,7 @@
     <div class="sidebar pure-u-1 pure-u-md-1-4">
     <div class="header">
         <hgroup>
-            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所(仮)</a></h1>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
             <h2 class="brand-tagline"> mosuke5&#39;s blog </h2>
         </hgroup>
 
@@ -43,14 +44,6 @@
             <ul class="nav-list">
                 
                 
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://mosuke.tech ">About mosuke5</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://blog.mosuke.tech/index.xml"><i class="fa fa-rss"></i> rss</a>
-                </li>
             </ul>
         </nav>
     </div>
@@ -61,6 +54,437 @@
         <div>
             
             <div class="posts">
+                
+                
+                <h1 class="content-subhead">22 Feb 2015, 21:13</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2015/02/22/211316/" class="post-title">Ruby, thin(bundler利用)を使った環境でのアプリの自動起動設定</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-init" href="https://blog.mosuke.tech/categories/init">init</a><a class="post-category post-category-自動起動" href="https://blog.mosuke.tech/categories/%E8%87%AA%E5%8B%95%E8%B5%B7%E5%8B%95">自動起動</a><a class="post-category post-category-Ruby" href="https://blog.mosuke.tech/categories/ruby">Ruby</a><a class="post-category post-category-thin" href="https://blog.mosuke.tech/categories/thin">thin</a><a class="post-category post-category-unicorn" href="https://blog.mosuke.tech/categories/unicorn">unicorn</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>bunlderを使ったWebアプリをプロダクション環境で動かすときに、アプリの起動をどうやって実現しているだろうか。</p></p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a> Passengerを使う場合には、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>の起動がアプリの起動につながるので、
+アプリの起動はあまり気にしなかったかもしれない。</p>
+
+<p>しかし、例えばNginx × <a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>/thinの構成などの場合は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>やthinの起動もしなければいけなくなってくる。<br>
+（あるいはこのようなケースがあるかは謎だが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>やthinを単体で動かそうとしている場合など）</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>やthin（例ではthinを扱うが本質は同じ）の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%AB%C6%B0%B5%AF%C6%B0">自動起動</a>を実現する際の勘所、注意事項をまとめた。</p>
+
+<h1>0. 前提</h1>
+
+<ul>
+<li>CentOS6.5上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>でのWebアプリケーションを作っている。</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>はthinを利用している。</li>
+<li>また、gemパッケージ管理にbundlerを利用している。</li>
+</ul>
+
+<h1>1. 開発環境でよくするアプリの起動</h1>
+
+<p>開発環境では、アプリケーションのログの閲覧性なども兼ねて以下のようにアプリを起動していた。</p>
+
+<pre><code>$ bundle exec rackup
+$ bundle exec thin start 
+</code></pre>
+
+<p>でも、これではいつまでたってもプロダクション環境での利用はできません。</p>
+
+<h1>2. 上記方法ではプロダクション環境で利用できない理由</h1>
+
+<p>当然のことながら、プロダクション環境ではいちいち手動でコマンドを実行しアプリケーションを立ち上げるわけにはいかない。<br>
+例えば、なんらかの理由でサーバが再起動してしまった場合には、<br>
+このままではアプリケーションが自動的に立ち上がらないため、サービスの停止につながってしまう。</p>
+
+<p>ではどうするのか？<br>
+以下の状態であることがプロダクション環境では理想なのではないだろうか？</p>
+
+<ul>
+<li>オリジナルアプリケーションもserviceコマンドで起動・停止ができる
+
+<ul>
+<li>他のサービスと同様の操作方法が可能なのでわかりやすい</li>
+</ul>
+</li>
+<li>サーバ立ち上げ時にサービスが自動で起動される</li>
+</ul>
+
+<h1>3. 起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作ろう</h1>
+
+<p>上記の状態にもっていくためには、起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作らなければならない。</p>
+
+<p>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作る…！？<br>
+「作ったことないし、すぐには作れないよ〜」って思うかもしれないが、<br>
+サンプルはたくさんあるし、よく見てみるとそれほど難しくはない。</p>
+
+<p>thinを使ったサンプルを探そうと思うと数は少ないが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>も同じ仕組なので、
+"<a class="keyword" href="http://d.hatena.ne.jp/keyword/unicorn">unicorn</a> init script"なんて検索をかけてもいろいろでてくるのでおすすめ。</p>
+
+<p>参考ししたもの<br>
+<a href="https://gist.github.com/sbeam/3454488">https://gist.github.com/sbeam/3454488</a></p>
+
+<p>上を参考にしながら、こんな起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作ってみた。（未完成版）<br>
+これを<code>/etc/init.d</code>以下へ配置する。</p>
+
+<pre><code class="language-sh">#!/bin/bash
+
+### BEGIN CHKCONFIG INFO
+# chkconfig: 2345 55 25
+# description: sample-app
+### END CHKCONFIG INFO
+
+SCRIPT_NAME=/etc/init.d/sample-app
+CONFIG_PATH=/path/to/config
+BUNDLE_CMD=/usr/local/bin/bundle
+
+bundle_exec_thin ()
+{
+    for CONFIG_FILE in &quot;$CONFIG_PATH/*.yml&quot;; do
+        SITE_DIR=`awk '/^chdir:/ { print $2; }' $CONFIG_FILE`
+        cd $SITE_DIR
+        $BUNDLE_CMD exec thin $1 -C $CONFIG_FILE
+    done
+}
+
+
+case &quot;$1&quot; in
+  start)
+        bundle_exec_thin start
+        ;;
+  stop)
+        bundle_exec_thin stop
+        ;;
+  restart)
+        bundle_exec_thin restart
+        ;;
+  *)
+        echo &quot;Usage: $SCRIPT_NAME {start|stop|restart}&quot; &gt;&amp;2
+        exit 3
+        ;;
+esac
+
+:
+ 
+</code></pre>
+
+<p>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>も完成したし、実際にserviceコマンドで実行してみる。</p>
+
+<pre><code>$ sudo service sample-app start
+/usr/bin/env: ruby: No such file or directory 
+</code></pre>
+
+<p>んん。。。起動せず、撃沈…</p>
+
+<h3>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作る上での注意</h3>
+
+<p>起動しなかった原因に移る前に、起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作る上での注意点を１つ。<br>
+chkconfigで認識させるためには冒頭のCHKCONFIG INFO部分(<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%E1%A5%F3%A5%C8%A5%A2%A5%A6%A5%C8">コメントアウト</a>部分)も重要になってくる。<br>
+CHKCONFIG INFO部分を書かないままchkconfigでaddしようとすると以下のように怒られます。</p>
+
+<pre><code>$ sudo chkconfig --add sample-app
+service sample-app does not support chkconfig 
+</code></pre>
+
+<h1>4. serviceコマンド実行時のPATHのはなし</h1>
+
+<p>なぜ、serviceコマンドでthinを起動できなかったのか。<br>
+調べていくと意外なことがわかった。<br>
+serviceコマンドを実行すると中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>のPATHが上書きされてしまう。</p>
+
+<p>【参照】<br>
+<a href="http://heartbeats.jp/hbblog/2013/06/service-start-stop.html">デーモンの起動・終了にはserviceコマンドを利用しよう - インフラエンジニアway - Powered by HEARTBEATS</a></p>
+
+<p>試しに、起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>内にPATHの出力を仕込んで確かめてみる。<br>
+起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>に<code>echo $PATH</code>を仕込んだ。</p>
+
+<pre><code>$ sudo service sample-app start
+/sbin:/usr/sbin:/bin:/usr/bin 
+</code></pre>
+
+<p>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>内でbundleや<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>がインストールされているディレクトリに<br>
+PATHを通すことで、解決することにした。<br>
+（もっと美しい方法があれば教えて下さい。。。）</p>
+
+<h1>5. 起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>修正(完成版)</h1>
+
+<p>上記の通り起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を修正したものが以下。</p>
+
+<pre><code class="language-sh">#!/bin/bash
+
+### BEGIN CHKCONFIG INFO
+# chkconfig: 2345 55 25
+# description: sample-app
+### END CHKCONFIG INFO
+
+# 以下を追加
+export PATH=/usr/local/bin:$PATH
+
+SCRIPT_NAME=/etc/init.d/sample-app
+CONFIG_PATH=/path/to/config
+BUNDLE_CMD=/usr/local/bin/bundle
+
+bundle_exec_thin ()
+{
+    for CONFIG_FILE in &quot;$CONFIG_PATH/*.yml&quot;; do
+        SITE_DIR=`awk '/^chdir:/ { print $2; }' $CONFIG_FILE`
+        cd $SITE_DIR
+        $BUNDLE_CMD exec thin $1 -C $CONFIG_FILE
+    done
+}
+
+
+case &quot;$1&quot; in
+  start)
+        bundle_exec_thin start
+        ;;
+  stop)
+        bundle_exec_thin stop
+        ;;
+  restart)
+        bundle_exec_thin restart
+        ;;
+  *)
+        echo &quot;Usage: $SCRIPT_NAME {start|stop|restart}&quot; &gt;&amp;2
+        exit 3
+        ;;
+esac
+
+:
+ 
+</code></pre>
+
+<p>(PATHを通したのでbundleコマンドはフルパスでなくても大丈夫ですよ...)</p>
+
+<p>最後に起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を<code>/etc/init.d</code>以下に配置し、
+忘れずにchkconfigに登録しましょう。</p>
+
+<pre><code>$ sudo chkconfig --add sample-app 
+</code></pre>
+
+<h1>【おまけ】sudo だと<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>やgem、bundleが使えない？</h1>
+
+<p>rootユーザでは<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>やgem, bundleが使えるけど、sudoで実行すると使えない…<br>
+という悩みの人も多いのではないだろうか。</p>
+
+<pre><code>$ sudo gem install xxxxx
+sudo: gem: command not found 
+</code></pre>
+
+<p><p>sudoでの実行はrootユーザで実行することなのになぜ実行できないか。<br>
+これはsudoを使うときに/usr/local/binが許可されていないからだ。<br>
+visudoでsecure_pathの設定を見直すとよい。<br>
+<a href="http://www.xmisao.com/2013/10/11/sudoers-secure_path.html">sudoersのsecure_pathについて &ndash; ぺけみさお</a></p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">17 Feb 2015, 22:05</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2015/02/17/220526/" class="post-title">勘違いしやすいFTPとSFTPの転送モードの話</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-SFTP" href="https://blog.mosuke.tech/categories/sftp">SFTP</a><a class="post-category post-category-FTP" href="https://blog.mosuke.tech/categories/ftp">FTP</a><a class="post-category post-category-転送モード" href="https://blog.mosuke.tech/categories/%E8%BB%A2%E9%80%81%E3%83%A2%E3%83%BC%E3%83%89">転送モード</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>やSFTPでの転送モードの話。</p></p>
+
+<p>ついこの前、<a class="keyword" href="http://d.hatena.ne.jp/keyword/WinSCP">WinSCP</a>を利用している人が転送モードを選んでいて、<br>
+「SFTPには転送モードはないと思っていたのに、転送モードを選んでいる！？」<br>
+と疑問に思ったのでその辺りまとめた。</p>
+
+<h1>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>のバイナリーモードと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モード</h1>
+
+<p>入社しはじめの頃、それまでSFTPしかほとんど使ったことなかったので、<br>
+先輩に「<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>ではバイナリーモードを使って…」と言われて、意味が理解できなかったときがあったのを思い出す。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>にはファイル転送モードが２つあって、ちゃんと理解していないと思わぬところで痛い目にあう。</p>
+
+<ul>
+<li>バイナリーモード：ファイルの改行コードを変換せず転送する。</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モード：OS側で異なる改行コードを自動的に修正して転送する。</li>
+</ul>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>では標準では<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モードのため、なにも考えずにファイルを送るとファイルが壊れてしまったりする。<br>
+昔にミスしたのは<a class="keyword" href="http://d.hatena.ne.jp/keyword/Windows">Windows</a>から<a class="keyword" href="http://d.hatena.ne.jp/keyword/Linux">Linux</a>へtar.gzファイルを<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モードで送って、解凍したらファイルが壊れていたが、<br>
+それに気付かず壊れたファイルをサーバへ設置してしまったとか。</p>
+
+<h1>SFTPには転送モードはあるのか？</h1>
+
+<p>SFTPを普段から使ってる人は転送モードなんて気にしたことあまりないと思う。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>では気にしなければいけない転送モード、SFTPでは気にしなくていいのだろうか？</p>
+
+<p>結論から言うと、SFTPには転送モードはないので、気にする必要はない。<br>
+SFTPでは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>でいうバイナリーモードでファイル転送をするようだ。</p>
+
+<p>sftpコマンドのマニュアルにも特に転送モードについては記述がないのがわかる。<br>
+<a href="http://www.unixuser.org/~euske/doc/openssh/jman/sftp.html">http://www.unixuser.org/~euske/doc/openssh/jman/sftp.html</a></p>
+
+<h1>SFTPでも転送モードを選択できる場合がある！？</h1>
+
+<p>ここで、SFTPにも転送モードはあるぞ！？と疑問を思った人もいるかもしれない。<br>
+確かに<a class="keyword" href="http://d.hatena.ne.jp/keyword/WinSCP">WinSCP</a>などファイル転送ソフトを使っていると転送モードを選ぶことができる場合もある。</p>
+
+<p>しかし、勘違いしてはいけないのが、<br>
+転送モードを選ぶことができるのはSFTPの機能ではなくて<b>ファイル転送ソフトの機能</b>であるということだ。</p>
+
+<h1>まとめ</h1>
+
+<p><p>ファイル転送でよく使われる<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>やSFTP。<br>
+それぞれに違いはあるし、それを利用するソフトウェアによっても違いがある。<br>
+何が何を行っているか把握し、思わぬミスを減らしましょう。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">11 Feb 2015, 17:21</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2015/02/11/172123/" class="post-title">SSHポートフォワード、https接続をするときに間違えやすいこと</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-ポートフォワード" href="https://blog.mosuke.tech/categories/%E3%83%9D%E3%83%BC%E3%83%88%E3%83%95%E3%82%A9%E3%83%AF%E3%83%BC%E3%83%89">ポートフォワード</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>ローカルフォワードの話。<br>
+前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。<br>
+<a href="https://blog.mosuke.tech/entry/2014/12/31/170545">SSHでローカルポートフォワードを実際に試す - Goldstine研究所</a></p></p>
+
+<h1>1. やりたいこと</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>でしか接続を許可していないサーバへ、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>ローカルフォワーディングを使って接続しようした。<br>
+（直接疎通性がないためにポートフォワーディングする必要があった。）</p>
+
+<h1>2. 行ったこと</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>でしか接続ができないので、ローカル端末のポート5000を接続したいサーバのポート443に飛ばせばおっけーと思って、<br>
+下記のように<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>接続とブラウザから接続を行った。</p>
+
+<pre><code>ssh -L5000:web-host:443 user@ssh-host 
+</code></pre>
+
+<p>※web-host: 今回<a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>で接続したサーバ<br>
+※<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>-host: <a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>接続先サーバ</p>
+
+<p>これでローカルフォワーディングの設定は終わったので、ブラウザから以下に接続するだけで終わりだと思っていた。</p>
+
+<pre><code>http://localhost:5000 
+</code></pre>
+
+<p>が、接続不可…なぜでしょう？</p>
+
+<h1>3. 何が間違いだったか</h1>
+
+<p>正しくは以下で接続をしなければいけない。http<b><span style="color: #ff0000">s</span></b>が必要。</p>
+
+<pre><code>https://localhost:5000 
+</code></pre>
+
+<p>よーく考えればアタリマエのこと。<br>
+URLのはじめの&lt;http(s)&gt;の部分は<b><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB">プロトコル</a></b>で最後の&lt;:5000&gt;の部分は<b>ポート番号</b>。<br>
+<u><b><a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>は443のポートを一般的に使うが、ポート443が<a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>というわけではない。</b></u></p>
+
+<p><p>あたりまえのことだし知っていることなんだけど、見落としがちかもしれない。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">07 Feb 2015, 14:42</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2015/02/07/144208/" class="post-title">リモートのサーバでdockerを起動させるときの端末割り当て</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-docker" href="https://blog.mosuke.tech/categories/docker">docker</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>自分がハマったのでメモ。<br>
+リモートのサーバでdocker runを実行し(/bin/<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>)、ローカル側でシェルを操作したかった。</p></p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>でリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。</p>
+
+<pre><code>ssh user@host 'docker run -t -i image_name /bin/bash' 
+</code></pre>
+
+<p>そうすると</p>
+
+<pre><code>[root@0c6742f02bd9 ~]#
+
+[root@0c6742f02bd9 ~]# ^[[A^[[A^[[C 
+</code></pre>
+
+<p>エンターを押すと2行されるし、矢印キーはキーコードがでてしまう。</p>
+
+<p>これを解消するのには以下のようにすればいい。</p>
+
+<pre><code>ssh -t user@host 'docker run -t -i image_name /bin/bash' 
+</code></pre>
+
+<p><p>-tとはなんなのか、なぜこのような<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a>が起きたのか、これからしっかり調べる。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
                 
                 
                 <h1 class="content-subhead">02 Feb 2015, 20:10</h1>
@@ -89,10 +513,11 @@
 
 <p>ぼくがよくやる例では以下とか。</p>
 
-<pre class="code lang-yaml" data-lang="yaml" data-unlink> - name: check httpd installed
+<pre><code class="language-yaml">- name: check httpd installed
   command: which httpd
   ignore_errors: true
- </pre>
+ 
+</code></pre>
 
 <p>なんですが...<br>
 こうやってしまうと、仮に既にインストールされていて、正常なときでも"<b><span style="color: #f9ce1d">changed</span></b>"と表示されてしまう。<br>
@@ -100,11 +525,12 @@
 
 <p>これを解決するのに<b>chaged_when</b>を使うといい。</p>
 
-<pre class="code lang-yaml" data-lang="yaml" data-unlink> - name: check httpd installed
+<pre><code class="language-yaml">- name: check httpd installed
   command: which httpd
   ignore_errors: true
   changed_when: false
- </pre>
+ 
+</code></pre>
 
 <p>こうするとコマンドが成功した際には"<b><span style="color: #00cc00">ok</span></b>"が表示される。</p>
 
@@ -112,603 +538,6 @@
 誰がみても結果がわかりやすいですね！</p>
 
 <p><p>秘伝のタレ回避！</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">24 Jan 2015, 21:32</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/01/24/213255/" class="post-title">dockerで特定ユーザでログインした状態のシェル環境を提供する</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-docker" href="https://blog.mosuke.tech/categories/docker">docker</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、<br>
-特定のユーザでログインした状態のコンテナを作りたいという場面に遭遇した。</p></p>
-
-<h1>&lt;やりたいこと&gt;</h1>
-
-<ul>
-<li>特定のユーザでログインした状態のシェルを提供すること</li>
-<li>その際、ユーザの.<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>_profile（あるいあは.bashrc）を読み込んだ状態であること
-
-<ul>
-<li>.<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>_profileに記載したPATHやaliasを使いたい</li>
-<li>ユーザのログインシェルを利用したい（カスタマイズされたシェルとか）</li>
-</ul>
-</li>
-</ul>
-
-<p>docker runに-uオプションがあるし、これで余裕！と思った。</p>
-
-<pre class="code" data-lang="" data-unlink> [host] $ sudo docker run -u=user_name -i -t image_name /bin/bash </pre>
-
-<p>しかし…以下を確認してみると…</p>
-
-<pre class="code" data-lang="" data-unlink> [docker] $ pwd
-[docker] $ echo $PATH
-[docker] $ alias
- </pre>
-
-<p>ディレクトリは "/" だし、PATHも通ってない。<br>
-どうやら.<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>_profileなどは読んでいないようだ。普通にログインした状態とは違う。</p>
-
-<p>dockerで-uでユーザを指定し場合、指定したuserでコマンドを実行するが、<br>
-サーバにユーザでログインしてからコマンドを実行するわけではないらしい。</p>
-
-<p>ディレクトリはどうやら-wオプションで解決できるようだが…</p>
-
-<pre class="code" data-lang="" data-unlink> [host] $ sudo docker run -u=user_name -w /home/user_name -i -t image_name /bin/bash </pre>
-
-<pre class="code" data-lang="" data-unlink> [docker] $ pwd
-/home/user_name </pre>
-
-<p>ディレクトリはおっけーだが、<br .>
-当然ながら依然として.<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>_profileはダメ。</p>
-
-<p>そこでふと思いついた。-uも-wもいらない。<br>
-<b>あの手</b>があるではないか…！！</p>
-
-<pre class="code" data-lang="" data-unlink> [host] $ sudo docker run -i -t image_name su - username </pre>
-
-<p><p>suでスイッチユーザすれば.<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>_profileもホームディレクトリも全部解決だ！！</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">02 Jan 2015, 01:36</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/01/02/013658/" class="post-title">スーパーサーバってなに？ xinetdでサービスを常駐起動せずに利用する</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-サーバ" href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90">サーバ</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-xinetd" href="https://blog.mosuke.tech/categories/xinetd">xinetd</a><a class="post-category post-category-スーパーサーバ" href="https://blog.mosuke.tech/categories/%E3%82%B9%E3%83%BC%E3%83%91%E3%83%BC%E3%82%B5%E3%83%BC%E3%83%90">スーパーサーバ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。<br>
-そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させることが可能らしい。</p></p>
-
-<p>ということで、そのスーパーサーバとやらを実際に触ってみた。</p>
-
-<p>スーパーサーバというとinetdとxinetdがあるらしいが、<br>
-xinetdはinetdの拡張版で、アクセス制御などの機能を搭載しているとのこと。</p>
-
-<p>今回はxinetdを設定してみる。</p>
-
-<h1>1. 事前準備</h1>
-
-<p>【環境】<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で構築した<a class="keyword" href="http://d.hatena.ne.jp/keyword/CentOS">CentOS</a> 6.5<br>
-(仮想環境の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>は192.168.33.10)</p>
-
-<p>まずはスーパーサーバで管理するサービスを考えなければならない。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>とかhttpはどう考えてもスーパーサーバの管理するようなものではないだろうし…<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>や<a class="keyword" href="http://d.hatena.ne.jp/keyword/telnet">telnet</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/POP3">POP3</a>なんかのサービスに利用されることが多いそう？（このへんよくわかない）</p>
-
-<p>今回は<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>をスーパーサーバの管理対象とした。<br>
-※本来は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">複数</a>のサービスを管理対象とするからこそ意味がある。</p>
-
-<p>まずはxinetdとvsftpをインストール</p>
-
-<pre class="code" data-lang="" data-unlink> $ sudo yum install xinetd vsftpd </pre>
-
-<p><br>
-xinetdどうこうの前に、<a class="keyword" href="http://d.hatena.ne.jp/keyword/ftp">ftp</a>接続がきちんとできるか確認するのでサービスを起動。</p>
-
-<pre class="code" data-lang="" data-unlink> $ sudo service vsftpd start </pre>
-
-<p><br>
-ローカルPCから接続できることを確認する。</p>
-
-<pre class="code" data-lang="" data-unlink> $ ftp 192.168.33.10
-Connected to 192.168.33.10.
-220 (vsFTPd 2.2.2)
-Name (192.168.33.10:username): </pre>
-
-<h1>2. xinetdの設定</h1>
-
-<p>xinetdの基本設定は/etc/xinetd.confにかかれており、<br>
-xinetdで管理する各サービスの設定は/etc/xinetd.d/配下に書く方式。</p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/ftp">ftp</a>の設定を以下の通りにした。<br>
-"service"のあとに書くサービス名称は/etc/servicesに定義されているものを記載する。<br>
-vsftpとか書いても動かないので注意。</p>
-
-<pre class="code lang-config" data-lang="config" data-unlink> $ sudo vim /etc/xinetd.d/ftp
-service ftp
-{
-        disable         = no
-        socket_type     = stream
-        wait            = no
-        user            = root
-        server          = /usr/sbin/vsftpd
-        log_on_failure  += USERID
-}
- </pre>
-
-<p>設定項目については以下参照。<br>
-<a href="https://www.express.nec.co.jp/linux/distributions/knowledge/network/xinetd.html">xinetd の設定</a></p>
-
-<p>これでxinetdを起動</p>
-
-<pre class="code" data-lang="" data-unlink> $ sudo service xinetd start </pre>
-
-<h3>(補足) /etc/servicesってなにもの？</h3>
-
-<p>/etc/servicesがなにか気になったので一応調べると。</p>
-
-<blockquote><p>サービス名とそこで使われるポート番号、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB">プロトコル</a>(<a class="keyword" href="http://d.hatena.ne.jp/keyword/tcp">tcp</a>/<a class="keyword" href="http://d.hatena.ne.jp/keyword/udp">udp</a>)との 対応関係を記述したファイルが /etc/services です。
-このファイルは 単なるサービス名のデータベースで、それ自体では何の働きもありませ んが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/netstat">netstat</a> コマンドや次の inetd などで参照されます。
-(<a href="http://www.wakhok.ac.jp/~kanayama/summer/02/site/node43.html">http://www.wakhok.ac.jp/~kanayama/summer/02/site/node43.html</a>)</p></blockquote>
-
-<h1>3. xinetdを使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>で接続してみる</h1>
-
-<p>xinetdが<b>"起動している"</b>ことと、vsftpdが<b>"起動していない"</b>ことを確認しておく。</p>
-
-<pre class="code" data-lang="" data-unlink> $ sudo service xinetd status
-xinetd (pid  3521) is running...
-
-$ sudo service vsftpd status
-vsftpd is stopped </pre>
-
-<p><br>
-ローカルPCから<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>接続をしてみる。</p>
-
-<pre class="code" data-lang="" data-unlink> $ ftp 192.168.33.10
-Connected to 192.168.33.10.
-421 Service not available, remote server has closed connection. </pre>
-
-<p>あれ、接続が切られた…</p>
-
-<p>syslogを確認してみると。</p>
-
-<pre class="code" data-lang="" data-unlink> $ sudo tail /var/log/message
-Jan  1 15:07:25 server xinetd[3335]: START: ftp pid=3337 from=::ffff:192.168.33.1
-Jan  1 15:07:28 server xinetd[3335]: EXIT: ftp status=1 pid=3337 duration=3(sec) </pre>
-
-<p>接続できているようだがその後すぐに切断されているようにみえる。
-vsftpd側の設定を疑ってみた。</p>
-
-<h1>4. vsftpdの設定</h1>
-
-<p>vsftpd側で以下の設定をいじる必要があった。</p>
-
-<pre class="code lang-config" data-lang="config" data-unlink> $ sudo vim /etc/vsftpd/vsftpd.conf
-listen=NO
- </pre>
-
-<p>vsftpdのlistenの設定は以下のとおり。</p>
-
-<blockquote><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a> コントロールポート (21) への接続要求を vsftpd 自身で見張るか。
-YES の状態を「<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%BF%A5%F3%A5%C9%A5%A2%A5%ED%A1%BC%A5%F3">スタンドアローン</a>モード」と呼ぶ。
-inetd や後述の <a class="keyword" href="http://d.hatena.ne.jp/keyword/tcpserver">tcpserver</a> を経由する場合は NO にする。
-(<a href="http://www.asahi-net.or.jp/~aa4t-nngk/ftpd.html">http://www.asahi-net.or.jp/~aa4t-nngk/ftpd.html</a>)</p></blockquote>
-
-<h1>5. <a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>接続の再チャレンジ</h1>
-
-<p>ローカルPCから再度<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>接続を試みる。</p>
-
-<pre class="code" data-lang="" data-unlink> $ ftp 192.168.33.10
-Connected to 192.168.33.10.
-220 (vsFTPd 2.2.2)
-Name (192.168.33.10:username): </pre>
-
-<p>つながった！<br>
-<span style="font-size: 150%"><b>vsftpdサービスを停止しているのに<a class="keyword" href="http://d.hatena.ne.jp/keyword/ftp">ftp</a>接続ができる！</b></span></p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/ftp">ftp</a>接続前と接続中、接続後でプロセスを確認してみる。</p>
-
-<pre class="code" data-lang="" data-unlink> &gt; 接続前
-$ ps -ef | grep ftp
-vagrant   3552  2742  0 16:17 pts/0    00:00:00 grep ftp
-
-&gt; 接続中
-&gt; 接続中のみvsftpdのプロセスが立ち上がっている。
-$ ps -ef | grep ftp
-nobody    3555  3521  0 16:18 ?        00:00:00 vsftpd
-vagrant   3557  3555  0 16:18 ?        00:00:00 vsftpd
-vagrant   3559  2742  0 16:18 pts/0    00:00:00 grep ftp
-
-&gt; 接続終了後
-$ ps -ef | grep ftp
-vagrant   3552  2742  0 16:17 pts/0    00:00:00 grep ftp </pre>
-
-<p><br>
-プロセスツリーを見てみると、xinetdプロセスがvsftpdを起動していることがわかる。</p>
-
-<pre class="code" data-lang="" data-unlink> &gt; 接続前
-$ pstree -p
-init(1)-+-VBoxService(1003)-+-{VBoxService}(1004)
-        |
-        | (略)
-        |
-        `-xinetd(3521)
-
-&gt; 接続中
-$ pstree -p
-init(1)-+-VBoxService(1003)-+-{VBoxService}(1004)
-        |
-        | (略)
-        |
-        `-xinetd(3521)---vsftpd(3562)---vsftpd(3563) </pre>
-
-<p><p><br>
-サービスを起動しておかなくてもxinetd経由で起動できるんですね。<br>
-これはこれで使い道あるかもしれぬ。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">01 Jan 2015, 16:18</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/01/01/161826/" class="post-title">2014年を思い返して…</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>2015年になってしまいました。<br>
-2014年に技術分野で印象に残ってること３つを思い返してみる。<br></p></p>
-
-<h1>1. インフラ会</h1>
-
-<p>@mogulla3と軽いノリで始めたインフラ会。<br>
-普段触らない、あるいは触ったとしてもすでに構築された環境で触ることの多いインフラ技術について<br>
-土日を使って自らの手で構築してみるといった会。<br>
-10月くらいから初めて以下を実際にやってみた。</p>
-
-<ul>
-<li>仮想化　　　　　　：Docker, <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>
-</li>
-<li>リバースプロキシ　：Nginx</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%C9%A5%D0%A5%E9%A5%F3%A5%B5%A1%BC">ロードバランサー</a>　：HAProxy</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF%A5%EA%A5%F3%A5%B0">クラスタリング</a>　　：Pacemaker+corosync(heartbeat)</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>　　　　　　　：<a class="keyword" href="http://d.hatena.ne.jp/keyword/SoftEther">SoftEther</a>
-</li>
-<li>構成管理<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>　　：Ansible</li>
-<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%AB%BA%EEPC">自作PC</a></li>
-</ul>
-
-<p>やったことについては全てではないがブログにまとめている。</p>
-
-<ul>
-<li><a href="https://blog.mosuke.tech/entry/2014/10/09/230555">【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築 - Goldstine研究所</a></li>
-<li><a href="https://blog.mosuke.tech/entry/2014/11/09/171436">【VPS1台でインフラ勉強】HAProxyでロードバランサーを構築 - Goldstine研究所</a></li>
-<li><a href="https://blog.mosuke.tech/entry/2014/12/07/212156">【VPS1台でインフラ勉強】SoftEtherを使ってVPN構築 - Goldstine研究所</a></li>
-<li><a href="https://blog.mosuke.tech/entry/2014/12/29/154251">【年末遊び】秋葉原で自作PCパーツ集めて作った - Goldstine研究所</a></li>
-</ul>
-
-<p>このインフラ会では３つを目標にしてたけど、これが仕事でも本当に役立った。<br>
-会もそうだが、目標にしていたマインドは今後もぜひ続けていきたい。</p>
-
-<ol>
-<li>"なんとなく知っている"をなくす</li>
-<li>考える引き出しをふやす</li>
-<li>自らの手で実践する</li>
-</ol>
-
-<h4>&lt;大変参考になった書籍&gt;</h4>
-
-<p></p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4774135666/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/51uK4ACymiL._SL160_.jpg" class="hatena-asin-detail-image" alt="[24時間365日] サーバ/インフラを支える技術 ?スケーラビリティ、ハイパフォーマンス、省力運用 (WEB+DB PRESS plusシリーズ)" title="[24時間365日] サーバ/インフラを支える技術 ?スケーラビリティ、ハイパフォーマンス、省力運用 (WEB+DB PRESS plusシリーズ)"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/4774135666/hatena-blog-22/">[24時間365日] サーバ/インフラを支える技術 ?スケーラビリティ、ハイパフォーマンス、省力運用 (WEB+DB PRESS plusシリーズ)</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">作者:</span> 安井真伸,横川和哉,ひろせまさあき,<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B0%CB%C6%A3%C4%BE%CC%E9">伊藤直也</a>,田中慎司,勝見祐己</li>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%B5%BB%BD%D1%C9%BE%CF%C0%BC%D2">技術評論社</a>
-</li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2008/08/07</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> 単行本（ソフトカバー）</li>
-<li>
-<span class="hatena-asin-detail-label">購入</span>: 133人 <span class="hatena-asin-detail-label">クリック</span>: 2,270回</li>
-<li><a href="http://d.hatena.ne.jp/asin/4774135666/hatena-blog-22" target="_blank">この商品を含むブログ (289件) を見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
-
-<h1>2. システム導入工事（工事監督マン）</h1>
-
-<p>仕事では主に社内SEなのだが、社内SEの仕事をしていると新規設備の導入工事なんかもまれにある。（IaaSとかつかってないので）<br>
-新規システムの導入で、データセンターへのサー<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%E9%A5%C3%A5%AF">バラック</a>の立架工事など、インフラ機器の導入にいくつも立ち会った。<br>
-もちろんだが、私自身は工事をするわけではなく、あくまで立ち会い・監督の立場。<br>
-システム・ソフトウェア系の世界からは少し離れてるがインフラマンとしてはいい経験だった。</p>
-
-<p><span style="font-size: 80%">こんな仕事のおかげさまで、関西や北陸・四国など全国いろいろと行く機会があって、名物もかなり食べた笑<br>
-あとで、特に美味しかった名物料理を紹介するｗ</span></p>
-
-<p>工事で一番大事なのはなんといっても<b>「安全」</b>。<br>
-安全第一である。</p>
-
-<p>データセンターには無数のサーバやケーブルがある。もちろん自分が担当でないシステムの設備がたくさんある。<br>
-工事の際に過って、他の設備・機器・ケーブルを壊してしてしまった、切ってしまったなんていったらシャレにならない…<br>
-機器ならまだよいが、人的被害を出してしまったら…</p>
-
-<p>そのためにも以下をきちんとしておくことが最重要。</p>
-
-<ol>
-<li>事前の現地調査
-
-<ul>
-<li>工事場所はどこか？</li>
-<li>対象機器はどれか？場所はどこか？(ケーブルなどの接続先)</li>
-<li>十分な場所はあるか？</li>
-<li>段差などの危険ポイントはどこか？</li>
-<li>荷物はどうやって運ぶか？</li>
-</ul>
-</li>
-<li>工事内容の手順書・確認項目
-
-<ul>
-<li>上でよく確認したポイントが踏まえてあるか？</li>
-<li>実施する内容は明確か？</li>
-<li>監督側としてなにをどう確認すればいいか明確か？</li>
-</ul>
-</li>
-<li>現地の人とのネゴり
-
-<ul>
-<li>あとはいろいろと聞けるようにデータセンター管理者と仲良くしておきましょう笑</li>
-</ul>
-</li>
-</ol>
-
-<p>ラックの立架といっても、電気もひかなければいけないので、電気工事もある。<br>
-あまりにも電気的知識がなさすぎて電気の入門の本も買ってしまった…
-</p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4274035441/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/51NQ79XKHNL._SL160_.jpg" class="hatena-asin-detail-image" alt="電気がわかる本 (なるほどナットク!)" title="電気がわかる本 (なるほどナットク!)"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/4274035441/hatena-blog-22/">電気がわかる本 (なるほどナットク!)</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">作者:</span> 松原洋平</li>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AA%A1%BC%A5%E0%BC%D2">オーム社</a>
-</li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2001/03</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> 単行本</li>
-<li><a href="http://d.hatena.ne.jp/asin/4274035441/hatena-blog-22" target="_blank">この商品を含むブログを見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
-
-<h1>3. <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D6%A5%E9%A5%C3%A5%AF%A5%DC%A5%C3%A5%AF%A5%B9">ブラックボックス</a>をなくした開発組織を作る</h1>
-
-<p>好きなようにやりたいようにシステムや<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を勝手につくって<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D6%A5%E9%A5%C3%A5%AF%A5%DC%A5%C3%A5%AF%A5%B9">ブラックボックス</a>ができる…<br>
-そしてそんな<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D6%A5%E9%A5%C3%A5%AF%A5%DC%A5%C3%A5%AF%A5%B9">ブラックボックス</a>が運用される…</p>
-
-<p>こんな状況はきっとどこにいってもあるものだと思う。<br>
-でも、なんとかこの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D6%A5%E9%A5%C3%A5%AF%A5%DC%A5%C3%A5%AF%A5%B9">ブラックボックス</a>と化する状況をなくそうと以下の様な取り組みを行ってきた。<br></p>
-
-<p><b>(1) 使用する技術のある程度の統一化</b><br>
-業務の特性上、ひとつのシステムを作るというよりは、業務系システムを数十とあるのだけど、<br>
-個人の好き勝手に作ると言語も乱立し保守不可・改修難となるので、ある程度技術を統一化していくことに取り組んだ。<br>
-そうすることで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D6%A5%E9%A5%C3%A5%AF%A5%DC%A5%C3%A5%AF%A5%B9">ブラックボックス</a>の排除はもちろん、チームとしての技術の習得スピードも上がっていった。</p>
-
-<p><b>(2) Gitlabを使った開発フローの確立</b><br>
-恥ずかしながら、すべてのシステムできちんとバージョン管理ができている状況ではなかった。<br>
-Gitlabを使った開発フローをルール化し、文化的に浸透させる取り組みを行っていった。<br>
-Merge Request(Pull Request)のおかげで好き放題に作られた<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>が減った気がする。</p>
-
-<p><b>(3) Ansibleでインフラも明確化</b><br>
-上２つで、アプリケーションレベルでの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D6%A5%E9%A5%C3%A5%AF%A5%DC%A5%C3%A5%AF%A5%B9">ブラックボックス</a>はある程度解消できてきたが、<br>
-インフラレベルでは依然として<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D6%A5%E9%A5%C3%A5%AF%A5%DC%A5%C3%A5%AF%A5%B9">ブラックボックス</a>のままだった。<br>
-こちらについてはAnsibleの導入と文化的に浸透を行っていった。</p>
-
-<h4>&lt;大変参考になった書籍&gt;</h4>
-
-<p></p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4774164283/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/51ZhxAcsdkL._SL160_.jpg" class="hatena-asin-detail-image" alt="チーム開発実践入門 ~共同作業を円滑に行うツール・メソッド (WEB+DB PRESS plus)" title="チーム開発実践入門 ~共同作業を円滑に行うツール・メソッド (WEB+DB PRESS plus)"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/4774164283/hatena-blog-22/">チーム開発実践入門 ~共同作業を円滑に行うツール・メソッド (WEB+DB PRESS plus)</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">作者:</span> 池田尚史,藤倉和明,井上史彰</li>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%B5%BB%BD%D1%C9%BE%CF%C0%BC%D2">技術評論社</a>
-</li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2014/04/16</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> 単行本（ソフトカバー）</li>
-<li><a href="http://d.hatena.ne.jp/asin/4774164283/hatena-blog-22" target="_blank">この商品を含むブログ (8件) を見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
-
-<h1>4. まとめ</h1>
-
-<p>今年だけに限ったことではないけど、<br>
-ネットワーク系、インフラを支える<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DF%A5%C9%A5%EB%A5%A6%A5%A7%A5%A2">ミドルウェア</a>系、システムの開発系、システム導入工事系と<br>
-本当に多岐にわたる分野に携わり、システムを全体的に俯瞰して見れるようになってきたなーという実感がでてきた。<br>
-2014年は特にテクノロジーという側面で強くそれを感じた年だったと思う。</p>
-
-<p>これからどういう分野で生きていくか、それはとりあえずは流れに身を任せてドリフトするとしよう。<br>
-<a href="http://www.atmarkit.co.jp/ait/articles/0905/19/news148.html">エンジニアも知っておきたいキャリア理論入門（11）：金井壽宏教授が提唱する「節目」のキャリア論 (1/2) - ＠IT</a></p>
-
-<h1>5. 【おまけ】各地のうまかったもの</h1>
-
-<p>大阪 お好み焼き<br>
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Fosaka%2FA2701%2FA270101%2F27000297%2F" title="きじ 本店 (梅田/お好み焼き)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://tabelog.com/osaka/A2701/A270101/27000297/">きじ 本店 (梅田/お好み焼き)</a></iframe></p>
-
-<p>大阪 おでん<br>
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Fosaka%2FA2701%2FA270101%2F27002111%2F" title="たこ梅 北店 (梅田/おでん)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://tabelog.com/osaka/A2701/A270101/27002111/">たこ梅 北店 (梅田/おでん)</a></iframe></p>
-
-<p>金沢 海鮮丼<br>
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Fishikawa%2FA1701%2FA170101%2F17000181%2F" title="ひら井 (北鉄金沢/魚介料理・海鮮料理)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://tabelog.com/ishikawa/A1701/A170101/17000181/">ひら井 (北鉄金沢/魚介料理・海鮮料理)</a></iframe></p>
-
-<p>香川 うどん<br>
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Fkagawa%2FA3702%2FA370202%2F37001385%2F" title="将八うどん 丸亀店 (丸亀/うどん)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://tabelog.com/kagawa/A3702/A370202/37001385/">将八うどん 丸亀店 (丸亀/うどん)</a></iframe></p>
-
-<p>広島 あなご<br>
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Fhiroshima%2FA3402%2FA340202%2F34000065%2F" title="うえの (宮島口/丼もの（その他）)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://tabelog.com/hiroshima/A3402/A340202/34000065/">うえの (宮島口/丼もの（その他）)</a></iframe></p>
-
-<p><p>広島 お好み焼き<br>
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Fhiroshima%2FA3401%2FA340102%2F34001107%2F" title="お好み焼　きゃべつ 駅前ひろば店 (広島/お好み焼き)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://tabelog.com/hiroshima/A3401/A340102/34001107/">お好み焼　きゃべつ 駅前ひろば店 (広島/お好み焼き)</a></iframe></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">31 Dec 2014, 17:05</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/12/31/170545/" class="post-title">SSHでローカルポートフォワードを実際に試す</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a><a class="post-category post-category-ポートフォワード" href="https://blog.mosuke.tech/categories/%E3%83%9D%E3%83%BC%E3%83%88%E3%83%95%E3%82%A9%E3%83%AF%E3%83%BC%E3%83%89">ポートフォワード</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>・・・<br>
-いろんなことができる&rdquo;らしい&rdquo;ということは知っていたし、<br>
-例えばポートフォワーディングなんていうこともできるのも知っている。</p></p>
-
-<p>でもそれがどんなものなのか自分の手で試したことはないし、<br>
-なんとなくただのサーバログイン<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>として利用していた。</p>
-
-<p>サーバインフラ技術に興味を持つようになっていろんなことを勉強していると、<br>
-ポートフォワーディングは必須な技術であることも感じ、<br>
-年末の持て余す時間を使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のローカルポートフォワードを試してみたのでメモする。</p>
-
-<h1>環境とやりたいこと</h1>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141231/20141231162958.png" alt="f:id:mosuke5:20141231162958p:plain" title="f:id:mosuke5:20141231162958p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>ローカルPCからexample.jpは以下で接続できる状態。</p>
-
-<pre class="code" data-lang="" data-unlink> [local pc] $ ssh username@example.jp </pre>
-
-<p>またWebサーバのポート番号は80で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>のホストサーバからはWebサーバへ接続できる。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/CUI">CUI</a>なのでわかりづらいが<a class="keyword" href="http://d.hatena.ne.jp/keyword/curl">curl</a>を打つと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Hello%20World">Hello World</a>が返ってきている。</p>
-
-<pre class="code" data-lang="" data-unlink> [example.jp] $ curl 192.168.33.10
-&lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello World! Virtual Web Server&lt;/h1&gt;
-&lt;/body&gt;&lt;/html&gt; </pre>
-
-<h1>ローカルポートフォワードの実行</h1>
-
-<p>ローカルPCから以下を実行する。<br>
-以下のコマンドは、<br>
-<b>ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす</b><br>
-といったもの。</p>
-
-<pre class="code" data-lang="" data-unlink> [local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp </pre>
-
-<p>この状態でブラウザから以下にアクセスすると…<br>
-<a href="http://localhost:8888">http://localhost:8888</a></p>
-
-<p>なんと、ローカルホストにつないだはずが、example.jp上の仮想Webサーバのhtmlがうつっているではないか…</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141231/20141231163932.png" alt="f:id:mosuke5:20141231163932p:plain" title="f:id:mosuke5:20141231163932p:plain" class="hatena-fotolife" itemprop="image" style="border:solid 1px #ddd;"></span></p>
-
-<h1>セキュリティはどうなの？</h1>
-
-<p>ローカルの端末からhttpで仮想のWebサーバに接続しているけど、セキュリティはだいじょうぶなのだろうか？<br>
-http通信だから暗号化はされていないのだろうか？<br>
-なんて疑問もあるが、それは問題ない。</p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>でローカルPCから<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%E2%A1%BC%A5%C8%A5%DB%A5%B9%A5%C8">リモートホスト</a>(example.jp)までトンネルをはり、<br>
-そのなかをhttpで通信しているから全く問題なしといえる。</p>
-
-<p>ローカルポートフォワードを利用する場合は、おそらく表には出したくないけど、<br>
-ローカルから接続したいなどの要件の時に使うと思うけど、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>できちんと暗号化しているので安心。</p>
-
-<h1>最後に</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>でできることはこの他にもたくさんある。<br>
-ポートフォワードだけみても他にも「リモートポートフォワード」や「ダイナミックポートフォワード」などがある。<br>
-リモートポートなどはいまぱっと試せる環境がなかったのでおいおい実践してみる…</p>
-
-<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>をただのログイン<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>だけに留めるのは今年で終わりにしよう…</p>
 </body></p>
 
                     </div>
@@ -724,7 +553,7 @@ http通信だから暗号化はされていないのだろうか？<br>
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 9 of 14</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 9 of 15</span>
     
       <a href="/page/10/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>
@@ -750,7 +579,9 @@ http通信だから暗号化はされていないのだろうか？<br>
         </script>
 		    <gcse:search></gcse:search>
     </div>
-    <a href="/archive/">Arvhive</a>
+    <a class="pure-button" href="https://mosuke.tech "><i class="fa fa-user"></i> mosuke5</a>
+    <a class="pure-button" href="/archive/"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml"><i class="fa fa-rss"></i> rss</a>
 </div>
 <div class="footer">
     <div class="pure-menu pure-menu-horizontal pure-menu-open">
@@ -772,7 +603,7 @@ http通信だから暗号化はされていないのだろうか？<br>
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-ga('create', '', 'auto');
+ga('create', 'UA-99596316-1', 'auto');
 ga('send', 'pageview');
 
 </script>

@@ -56,11 +56,11 @@
             <div class="posts">
                 
                 
-                <h1 class="content-subhead">07 Dec 2014, 21:21</h1>
+                <h1 class="content-subhead">28 Dec 2015, 15:00</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2014/12/07/212156/" class="post-title">【VPS1台でインフラ勉強】SoftEtherを使ってVPN構築</a>
+                        <a href="https://blog.mosuke.tech/entry/2015/12/28/150042/" class="post-title">2015年振り返り</a>
 
                         <p class="post-meta">
                             
@@ -69,270 +69,115 @@
                             
                                 under 
                                 
-                                <a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-VPN" href="https://blog.mosuke.tech/categories/vpn">VPN</a><a class="post-category post-category-SoftEther" href="https://blog.mosuke.tech/categories/softether">SoftEther</a><a class="post-category post-category-ネットワーク" href="https://blog.mosuke.tech/categories/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF">ネットワーク</a>
+                                <a class="post-category post-category-vim::factory" href="https://blog.mosuke.tech/categories/vimfactory">vim::factory</a><a class="post-category post-category-vimfactory" href="https://blog.mosuke.tech/categories/vimfactory">vimfactory</a>
                             
                         </p>
                     </header>
 
                     <div class="post-description">
-                        
+                        <p><body>
+<p>去年に続き、2015年で技術分野でなにがあったか簡単に振り返りました。<br>
+<a href="https://blog.mosuke.tech/entry/2015/01/01/161826">2014年を思い返して… - Goldstine研究所</a></p></p>
 
-<p><body>
-<p>VPS1台でインフラ勉強シリーズで<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>構築を行ったのでそのメモ。</p></p>
+<h1>1. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの開発と公開</h1>
 
-<p><div class="section">
-    <h2>1. 実施したこと</h2>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>のホストサーバを<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>サーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。</p></p>
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20151227/20151227172616.png" alt="f:id:mosuke5:20151227172616p:plain:w300" title="f:id:mosuke5:20151227172616p:plain:w300" class="hatena-fotolife" style="width:300px" itemprop="image"></span></p>
 
-<p><div class="section">
-    <h3></h3>
-    <p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207200544.png" alt="f:id:mosuke5:20141207200544p:plain" title="f:id:mosuke5:20141207200544p:plain" class="hatena-fotolife" itemprop="image"></span><br>
-</p></p>
+<p>2014年の秋から@mogulla3と定期的にインフラ関連技術の勉強会をやってきていて、<br>
+はじめはインプットの勉強会だけを主にやってきていたのですが、<br>
+サービスを作る中でインフラ関連技術を駆使し勉強したいと思うようなっていました。<br>
+そこで、今年は「<a class="keyword" href="http://d.hatena.ne.jp/keyword/vim">vim</a>の設定をブラウザ上で即体感できるサービス <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factory」の開発をしました。</p>
 
-<p></div>
-</div>
-<div class="section">
-    <h2>2. 環境</h2>
-    <p>・<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>ソフトウェア：<a href="https://ja.softether.org/">SoftEther VPN プロジェクト - SoftEther VPN プロジェクト</a><br>
-・メモリ：１GB<br>
-・CPU：仮想２コア<br>
-・HDD：100GB<br>
-・OS：CentOS7<br>
-・サーバ仮想化：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>(Utuntu13)</p></p>
+<p><a href="/entry/2015/07/19/135844/">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った - Goldstine研究所</a></p>
 
-<p></div>
-<div class="section">
-    <h2>3. <a class="keyword" href="http://d.hatena.ne.jp/keyword/SoftEther">SoftEther</a>のインストール</h2>
-    <p>インストール手順は公式ドキュメント通りなので簡単にコマンドのみ記述しておく。<br>
-<a href="https://ja.softether.org/4-docs/1-manual/7/7.3">7.3 Linux へのインストールと初期設定 - SoftEther VPN プロジェクト</a></p>
-<p>【ダウンロードしたもの】<br>
-ここから環境に応じて対象のソフトウェアを選ぶ<br>
-<a href="http://www.softether-download.com/ja.aspx?product=softether">SoftEther ダウンロード センター</a></p>
-<p>・<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DD%A1%BC%A5%CD%A5%F3%A5%C8">コンポーネント</a>：<a class="keyword" href="http://d.hatena.ne.jp/keyword/SoftEther">SoftEther</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a> Server<br>
-・プラットフォーム：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Linux">Linux</a><br>
-・CPU：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Intel">Intel</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/x86">x86</a> / <a class="keyword" href="http://d.hatena.ne.jp/keyword/AMD64">AMD64</a>(64bit)</p></p>
+<h4>良かった点</h4>
 
-<pre><code>## ダウンロード
-$ wget ttp://jp.softether-download.com/files/softether/v4.08-9449-rtm-2014.06.08-tree/Linux/SoftEther%20VPN%20Server/64bit%20-%20Intel%20x64%20or%20AMD64/softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz
+<ul>
+<li>新しい技術などを組み合わせながら学習しがいのあるサービスを作れたこと</li>
+<li>サービスの実現技術を公開しそれなりの反響を得られたこと</li>
+</ul>
 
-## 解凍
-$ tar zxvf softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz
+<h4>悪かった点</h4>
 
-## 実行可能ファイル作成
-$ cd vpnserver/
-$ sudo make
+<ul>
+<li>内部的な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>の変更ばかりに時間を取られサービスそのものの改良ができなかったこと</li>
+</ul>
 
-## /usr/localへ配置
-$ sudo mv vpnserver /usr/local
+<h1>2. インフラ関連の構築や運用、仕組みづくり</h1>
 
-## パーミッション変更
-### 基本的には600。実行ファイルのみ700
-$ cd /usr/local/vpnserver
-$ sudo chown root:root ./*
-$ sudo chmod 600 ./*
-$ sudo chmod 700 ./vpncmd
-$ sudo chmod 700 ./vpnserver
+<p>主に仕事の話になりますが、今年はインフラ関連の構築や運用に多く携わった気がします。<br>
+（結構、雑な感じに書き残します。）</p>
 
-## 動作チェック
-$ sudo ./vpncmd
-1. VPN Server または VPN Bridge の管理
-2. VPN Client の管理
-3. VPN Tools コマンドの使用 (証明書作成や通信速度測定)
+<h3>(1) メールサーバの構築と運用</h3>
 
-1 - 3 を選択: 3
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Postfix">Postfix</a>を使ったメールサーバの構築と運用に携わりました。</p>
 
-VPN Tools&gt;
-##helpとうつと利用可能なコマンドが出る
-VPN Tools&gt; help
-下記の 6 個のコマンドが使用できます:
- About         - バージョン情報の表示
- Check         - SoftEther VPN の動作が可能かどうかチェックする
- MakeCert      - 新しい X.509 証明書と秘密鍵の作成 (1024 bit)
- MakeCert2048  - 新しい X.509 証明書と秘密鍵の作成 (2048 bit)
- TrafficClient - 通信スループット測定ツールクライアントの実行
- TrafficServer - 通信スループット測定ツールサーバーの実行
-VPN Tools&gt; 
-VPN Tools&gt; Check
-(略)
-すべてのチェックに合格しました。
-VPN Tools&gt; 
-VPN Tools&gt; exit
+<ul>
+<li>そもそもメールサーバってなんだっけってところからはじまったのを思い出します。</li>
+<li>とにかく運用を楽にしたかったので、その部分に多くの工夫をしました。</li>
+<li>Ansibleを使って設定の変更などのリリース作業も簡単することや</li>
+<li>Zabbixのログ監視もいい感じに機能して、不正なメール送信とかもすぐ検知できるようにしました。</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/KVM">KVM</a>の仮想環境上なので、環境の作りなおしも容易にしました。</li>
+<li>冗長性のために２つのリージョンに分散させたりもしました。</li>
+<li>目新しいことはないですが、わりと運用が楽な感じに作れたのでほんとによかったなと振り返って思います。</li>
+</ul>
 
-##起動スクリプトの作成
-$ sudo vim /etc/init.d/vpnserver
-#!/bin/sh
-# chkconfig: 2345 99 01
-# description: SoftEther VPN Server
-DAEMON=/usr/local/vpnserver/vpnserver
-LOCK=/var/lock/subsys/vpnserver
-test -x $DAEMON || exit 0
-case &quot;$1&quot; in
-start)
-$DAEMON start
-touch $LOCK
-;;
-stop)
-$DAEMON stop
-rm $LOCK
-;;
-restart)
-$DAEMON stop
-sleep 3
-$DAEMON start
-;;
-*)
-echo &quot;Usage: $0 {start|stop|restart}&quot;
-exit 1
-esac
-exit 0
+<h3>(2) インターネットから社内NWへの入口としてのリバプロサーバ構築</h3>
 
-##サービス登録
-$ sudo chkconfig --add vpnserver
-$ sudo chkconfig --list vpnserver
-vpnserver       0:off   1:off   2:on    3:on    4:on    5:on    6:off
+<p>インターネットから社内NWにあるシステムを利用できるようにするために、<br>
+リバースプロキシサーバを構築しました。（運用はこれから）<br>
+いわゆる<a class="keyword" href="http://d.hatena.ne.jp/keyword/DMZ">DMZ</a>構成におけるリバプロです。</p>
 
-##起動
-$ sudo /etc/init.d/vpnserver start  
-</code></pre>
+<ul>
+<li>技術的なところで言うと、corosync+pacemakerを使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF%A5%EA%A5%F3%A5%B0">クラスタリング</a>を組みました。</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF%A5%EA%A5%F3%A5%B0">クラスタリング</a>は思ったより奥が深く、どのような<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>を組むかかなり苦労しました。</li>
+<li>障害時に相手側サーバの電源を落とす、いわゆるフェンシングなどをどう適切に使うかなど。</li>
+<li>運用が始まってからそのあたりの実用性が確認できそうです。</li>
+<li>ちなみにNginxでリバースプロキシたてました。</li>
+</ul>
 
-<p></div>
-<div class="section">
-    <h2>4. 設定</h2></p>
+<h3>(3) 仮想環境構築とか</h3>
 
-<p><div class="section">
-    <h4>(1)管理者パスワードの設定</h4>
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</p>
+<p>仮想環境というと、今まで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>などの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>として、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>などのIaaSとして使うばかりでした。<br>
+今年は、<a class="keyword" href="http://d.hatena.ne.jp/keyword/KVM">KVM</a>を利用してプロダクションの仮想基盤を作るなどやりました。<br>
+仮想化ってそもそもなんだっけ？というもう少し基礎よりの知識と向き合う機会がありました。</p>
 
-<h1 id="pre-class-code-data-lang-data-unlink-vpnserverへ接続"><pre class="code" data-lang="" data-unlink> ## vpnserverへ接続</h1>
+<p>また、主に来年の話になるがOpenStackなどを使った<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>環境を「作る・運用する」にも携わっていきそうです。<br>
+すこしづつOpenStackをかじり始めました。</p>
 
-<pre><code>## vpnserverへ接続
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; 4f3b2c72e32161441359f6d2116c410a27a8faaf
-$ sudo ./vpncmd localhost:443 /SERVER
+<h3>(4) Ansibleの活用と布教活動</h3>
 
-## 管理者パスワード設定
-VPN Server&gt; ServerPasswordSet 
-</code></pre>
+<p>Ansibleの利用は去年から始めていたことですが、<br>
+今年はより活用することと、社内での布教活動を行いました。</p>
 
-<p></div>
-<div class="section">
-    <h4>(2)仮想HUBの作成</h4>
-    <p>デフォルトで「default」という仮想がHUBがあるのでそれで構築。<br>
-自分の仮想HUBを作りたければHubCreateでつくれる。</p></p>
+<p>活用でいうと、サーバの構築はAnsibleで行ってアプリケーションのデプロイは<br>
+別の方法でやる（手動とか…）というふうになっていたので、<br>
+Ansibleを使ってアプリケーションのデプロイまですべて行うようにしてきました。</p>
 
-<pre><code>VPN Server&gt; HubCreate 
-</code></pre>
+<p>また、こういった取り組みを社内（部内）で広めて他のチームにも活用してもらおうと、<br>
+布教活動してしたりしてきました。</p>
 
-<p>※HELPコマンドがだいぶ使えるので使おう。日本語で書かれているのでわかりやすいです。</p>
+<h1>まとめ。来年の抱負的な</h1>
 
-<pre><code>VPN Server&gt;HELP
-下記の 205 個のコマンドが使用できます:
- About                      - バージョン情報の表示
- AcAdd                      - 接続元 IP 制限リストにルールを追加 (IPv4)
- AcAdd6                     - 接続元 IP 制限リストにルールを追加 (IPv6)
- AcDel                      - 接続元 IP 制限リスト内のルールの削除
- AcList                     - 接続元 IP 制限リストのルール一覧の取得
-(...以下略) 
-</code></pre>
+<ul>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryを自分が使いたいと思うようなサービスにする</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryをベースにより自分たちが学習できる環境を作る</li>
+<li>引き続き、インフラ系エンジニア？っぽい感じで邁進する
 
-<p></div>
-<div class="section">
-    <h4>(3) <a class="keyword" href="http://d.hatena.ne.jp/keyword/IPsec">IPsec</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a> サーバー機能の有効化</h4>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>のトンネリングをするにあたって事前共有鍵が必要なので作成する必要がある。</p></p>
+<ul>
+<li>OpenStackの運用とかやりたい</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>などに踊らされない基礎力中心で学習したい</li>
+</ul>
+</li>
+<li>ISUCONにでます（あれば…）</li>
+</ul>
 
-<pre><code>VPN Server&gt;IPsecEnable
-    IPsecEnable コマンド - IPsec VPN サーバー機能の有効化 / 無効化
-    L2TP over IPsec サーバー機能を有効 (yes / no): yes
-    Raw L2TP サーバー機能を有効 (yes / no): yes
-    EtherIP / L2TPv3 over IPsec サーバー機能を有効 (yes / no): yes
-    IPsec 事前共有鍵の文字列 (9 文字以下を推奨): *******
-    VPN 接続時に仮想 HUB 名が省略された場合のデフォルト仮想 HUB 名: Default 
-</code></pre>
-
-<p></div>
-<div class="section">
-    <h4>(4) グループとユーザの作成</h4>
-    <p>ユーザを作成するにはグループの作成が必要なので先にグループを作る。<br>
-また、ユーザを作ったでではパスワードが設定されないので忘れずにパスワード設定。</p></p>
-
-<pre><code>VPN Server&gt;Hub Default
-VPN Server/DEFAULT&gt;GroupCreate
-    GroupCreate コマンド - グループの作成
-    グループ名: mygroup
-    グループの本名: mygroup
-    グループの説明: mygroup
-
-VPN Server/DEFAULT&gt;UserCreate
-    UserCreate コマンド - ユーザーの作成
-    ユーザー名: myuser
-    参加するグループ名: mygroup
-    ユーザーの本名: myuser
-    ユーザーの説明: myuser
-    コマンドは正常に終了しました。
-
-## ユーザを作っただけではパスワードが設定されないので
-VPN Server/DEFAULT&gt; UserPasswordSet 
-</code></pre>
-
-<p></div>
-<div class="section">
-    <h4>(5) ローカルブリッジの設定</h4>
-    <p>次にローカルブリッジの設定をする。<br>
-ローカルブリッジは<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>の仮想ネットワークと、LAN の実ネットワーク（ここでは<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>ホストサーバと仮想Webサーバ間のローカルネットワーク）をつなげる設定です。<br>
-ローカルブリッジを行うLANカードを指定する必要があるが、ここでは仮想の「vboxnet0」を使用します。</p></p>
-
-<pre><code>VPN Server/DEFAULT&gt;BridgeCreate
-    BridgeCreate コマンド - ローカルブリッジ接続の作成
-    ブリッジする仮想 HUB 名: Default
-    ブリッジ先のデバイス名: vboxnet0 
-</code></pre>
-
-<p></div>
-<div class="section">
-    <h4>(6) <a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>の設定</h4>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>クライアント側に割り当てる<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>のレンジを決めてあげます。<br>
-今回は最小限構成で実現するため、ローカルの<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>は同一セグメントとしました。<br>
-192.168.33.0/24を利用セグメントとした。<br>
-また、サーバ側に割り当てているIPとバッティングしないように192.168.33.20以降を<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>のIPレンジとした。</p></p>
-
-<pre><code>##まずは有効化。これをやらないと「PPPサーバーとの接続が確立ができません」ってなってハマります。
-VPN Server/example&gt; SecureNatEnable
-
-VPN Server/DEFAULT&gt;DhcpSet
-    DhcpSet コマンド - SecureNAT 機能の仮想 DHCP サーバー機能の設定の変更
-    配布するアドレス帯の開始点: 192.168.33.20
-    配布するアドレス帯の終了点: 192.168.33.50
-    サブネットマスク: 255.255.255.0
-    リース期限 (秒): 7200
-    デフォルトゲートウェイ (未設定可):
-    DNS サーバー 1 (未設定可):
-    DNS サーバー 2 (未設定可):
-    ドメイン名:
-    ログの保存 (yes / no): yes 
-</code></pre>
-
-<p></div>
-</div>
-<div class="section">
-    <h2>5. <a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>接続試験</h2>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/iPhone">iPhone</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>の設定から以下のように設定をする。<br>
-アカウントの部分は「ユーザ名@仮想Hub名」にすること。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207212531.jpg" alt="f:id:mosuke5:20141207212531j:plain" title="f:id:mosuke5:20141207212531j:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<br>
-<p>接続すると、ローカルのIPが割り当てられていることを確認。<br>
-途中で切れているが192.168.33.21が割り当てられました。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207212546.jpg" alt="f:id:mosuke5:20141207212546j:plain" title="f:id:mosuke5:20141207212546j:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>につないだ状態でブラウザから192.168.33.10にアクセスすると”It works!!!”。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207212556.jpg" alt="f:id:mosuke5:20141207212556j:plain" title="f:id:mosuke5:20141207212556j:plain" class="hatena-fotolife" itemprop="image"></span><br>
-</p></p>
-
-<p></div>
-<div class="section">
-    <h2>6 最後に</h2>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>の構築そのものはなんとかできるが、やはり奥は深い。<br>
-挙動がまだ不安定な部分もあるので、きちんと仕組みを理解していくことと、<br>
-今回は<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>クライアント側とアクセス先サーバを同一セグメントとしたので、L3の設定などをして違うセグメントにもアクセスできるようにしていきたい。</p></p>
-
-<p></div>
+<p><p>では良いお年を。</p>
 </body></p>
 
                     </div>
@@ -340,11 +185,11 @@ VPN Server/DEFAULT&gt;DhcpSet
                 
                 
                 
-                <h1 class="content-subhead">28 Nov 2014, 00:17</h1>
+                <h1 class="content-subhead">17 Dec 2015, 19:25</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2014/11/28/001748/" class="post-title">Ansible, sudoパスワード要求を忘れただけでめんどくなる</a>
+                        <a href="https://blog.mosuke.tech/entry/2015/12/17/192554/" class="post-title">インフラのデプロイとテストを同時実行できるようにしてHappyになった</a>
 
                         <p class="post-meta">
                             
@@ -353,255 +198,131 @@ VPN Server/DEFAULT&gt;DhcpSet
                             
                                 under 
                                 
-                                <a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-サーバ" href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90">サーバ</a>
+                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-serverspec" href="https://blog.mosuke.tech/categories/serverspec">serverspec</a><a class="post-category post-category-raketask" href="https://blog.mosuke.tech/categories/raketask">raketask</a><a class="post-category post-category-インフラテスト" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E3%83%86%E3%82%B9%E3%83%88">インフラテスト</a>
                             
                         </p>
                     </header>
 
                     <div class="post-description">
                         <p><body>
-<p>Ansibleを<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>上でずっと使ってて、Playbookも完成したし本番サーバへ&hellip;<br>
-と思ったところである初歩的な罠にハマった。</p>
-<p>本番環境へPalybook実行！！</p></p>
+<h1>はじめに</h1></p>
 
-<pre><code>$ ansible-playbook playbook.yml -i hosts 
+<p>私が開発しているシステムでは、Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。
+そして、serverspecを使って、インフラテストも行っています。<br>
+しかし、その運用にいくつか課題点がありました。</p>
+
+<p>その課題点についてと、課題点へ対策したことについて書きます。</p>
+
+<h1>課題だったこと</h1>
+
+<h2>(課題1) デプロイとテストをそれぞれ実行していた</h2>
+
+<p>Ansibleでのデプロイとserverspecのテストはそれぞれ別のコマンドで実行していました。</p>
+
+<pre><code>$ ansible-playbook site.yml -i 
+$ bundle exec rake serverspec 
 </code></pre>
 
-<p><p>あれ、GATHERING FACTSで10分以上も待たされた&hellip;<br>
-しかも、エラー出た&hellip;</p></p>
+<p>2つ実行することが面倒であり、面倒であるがゆえにserverspecの実行を怠ったりしていました。<br>
+これではテストの効果があまり発揮できませんね。</p>
 
-<pre><code>GATHERING FACTS
-failed to parse [ sudo via ansible, key= ..... ] 
+<h2>(課題2) sudoパスワードをうまく管理できなかった</h2>
+
+<p>上のような課題1について、真っ先に以下の様にコマンドを続けることを思いつきました。</p>
+
+<pre><code>$ ansible -playbook site.yml -i ; bundle exec rake serverspec 
 </code></pre>
 
-<p><p>sudoできていない&hellip;？</p>
-<p>playbook内のsudo: yesを外して実行。</p>
-<p>GATHERING FACTSは通過。<br>
-しかし、当たり前だがsudo で実行すべき部分で失敗&hellip;</p>
-<p>とても単純なことに気づいた&hellip;<br>
-・<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>環境ではsudoのパスワードを要求されない<br>
-・本番環境はsudoのパスワードを要求されること<br>
-・sudoのパスワードを入力するようにしていなかったこと</p>
-<p>というわけで-Kをつけて実行</p></p>
+<p>ですが、これだとansible実行終了後にserverspecを実行する際にsudoパスワードが再度聞かれるため、<br>
+コマンドを打ったまま「放置」ができませんでした。<br>
+<span style="font-size: 80%">※もちろん、sudoパスワードを要求しないようにユーザ設定をすればできますが、多くの場合ではセキュリティ上難しかったりすると思います。<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>接続は鍵認証、sudoには必ずパスワードを要求するようにしています。</span></p>
 
-<pre><code>$ ansible-playbook playbook.yml -i hosts -K 
+<p>Ansibleもserverspecにもコマンド実行時にsudoパスワードを記述する方法があります。<br>
+Ansibleでは、ansible.cfgにsudo_passwordを記述、あるいはコマンド実行時に--extra-argsでsudoパスワードを指定できます。<br>
+serverspecでも<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>でSUDO_PASSWORDが指定できます。</p>
+
+<p>例 ）</p>
+
+<pre><code>ansible -playbook site.yml -i --extra-args='ansible_sudo_pass=xxxxxxxx'
+bundle exec rake serverspec SUDO_PASSWORD=xxxxxxxx 
 </code></pre>
 
-<p><p>うまくいった&hellip;</p>
-<p>完全なる私のミスなんだが、ただ-Kオプションを忘れるだけで、一回の実行に10分ほども待たされるのは…。<br>
-しかもGATHERING FACTSで止まっているときはCtl+Cで中断も聞かなかった。</p>
-<p>要注意ですね。。。</p>
-<br>
-<p>ちなみに、こんな方法で解決もできる。<br>
-sudoのパスワードを聞かれなくして対応。</p></p>
+<p>ですが、おわかりの通り、<b>コマンドの履歴にもパスワードが残ります</b>。<br>
+なのであまり良い方法ではないと思っています。</p>
 
-<pre><code># visudo
-user_name ALL=(ALL) NOPASSWD: ALL 
+<h2>(課題3) タスクの実行方法がバラバラ</h2>
+
+<p>デプロイはansibleコマンドで実行、テストはrakeで実行、他のタスクは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%A7%A5%EB%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">シェルスクリプト</a>。。。<br>
+といったように、タスクによって実行方法が異なってしまう状況になっていました。<br>
+運用的にとても不便でしたので、１つに統一したいと思っていました。</p>
+
+<h1>いい感じに同時に実行してくれるRakeタスクを作った</h1>
+
+<p>上で述べたような課題点をクリアするように、下記の要件を満たすように工夫をしました。</p>
+
+<ul>
+<li>デプロイ、テストが同じ形式で実行できる</li>
+<li>sudoパスワードをベタ書きすることなく実行できる</li>
+<li>sudoパスワードの入力を一回だけにする</li>
+</ul>
+
+<p>結論は、すべてRakeタスクで実行できるようにしました。<br>
+タスク一覧を見ると以下の様な感じになりました。（※実行結果は例であり実際の内容とは少し異なる。）</p>
+
+<pre><code>$ bundle exec rake -T
+rake deploy:development    # Deploy to development server
+rake deploy:production     # Deploy to production server
+rake serverspec            # Run serverspec to all hosts
+rake serverspec:app        # Run serverspec to app server
+rake serverspec:db        # Run serverspec to db server 
 </code></pre>
 
-<p></body></p>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Rakefile">Rakefile</a>の実装例（一部省略）</p>
 
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">22 Nov 2014, 19:06</h1>
-                <section class="post">
-                    <header class="post-header">
+<pre><code class="language-ruby">desc &quot;Deploy and Test&quot;
+namespace :deploy do
+  require &quot;io/console&quot;
+  require &quot;open3&quot;
 
-                        <a href="https://blog.mosuke.tech/entry/2014/11/22/190648/" class="post-title">GithubクローンのGitlabの導入とその際のちょっとした注意点</a>
+  STDOUT.sync = true
+  desc &quot;Deploy to development server&quot;
+  task :development do
+    # sudoパスワードははじめに１回だけ聞くようにします。
+    sudo_password = ask_sudo_password
 
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                
-                            
-                        </p>
-                    </header>
+    # デプロイとテストを同時に実行します。
+    deploy_and_test('development', sudo_password)
+  end
 
-                    <div class="post-description">
-                        <p><body>
-<p>もろもろな理由のために<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>が利用できないことも多くあると思う。<br>
-というわけで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>クローンのGitlabを試しに立ててみたが、簡単すぎでした…</p>
-<p><a href="https://about.gitlab.com/">GitLab | Open source software to collaborate on code</a></p>
-<p>環境<br>
-さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a> 1Gプラン<br>
-OS：CentOS7</p>
-<p>インストール<br>
-基本的にはドキュメントに書いてある以下のとおりで終わり。</p></p>
+  # デプロイとテストの同時実行関数
+  def deploy_and_test(env, sudo_password)
+    deploy_cmd = &quot;ansible-playbook -i #{env} site.yml --extra-vars 'ansible_sudo_pass=#{sudo_password}'&quot;
+    test_cmd = &quot;bundle exec rake serverspec ENVIRONMENT=#{env} SUDO_PASSWORD=#{sudo_password}&quot;
+    Open3.pipeline(&quot;#{deploy_cmd}; #{test_cmd}&quot;)
+  end
 
-<pre><code>$ curl -O https://downloads-packages.s3.amazonaws.com/centos-7.0.1406/gitlab-7.5.1_omnibus.5.2.0.ci-1.el7.x86_64.rpm
-$ sudo yum install openssh-server
-$ sudo systemctl enable sshd
-$ sudo systemctl start sshd
-$ sudo yum install postfix
-$ sudo systemctl enable postfix
-$ sudo systemctl start postfix
-$ sudo rpm -i gitlab-7.5.1_omnibus.5.2.0.ci-1.el7.x86_64.rpm
-
-$ sudo gitlab-ctl reconfigure
-$ sudo firewall-cmd --permanent --add-service=http # open up the firewall for HTTP and SSH requests
-$ sudo systemctl reload firewalld 
+  # sudoパスワードを要求関数
+  def ask_sudo_password
+    print &quot;SUDO Password: &quot;
+    sudo_password = STDIN.noecho &amp;:gets
+  end
+end
 </code></pre>
 
-<p>しかし１つ気をつけないといけないことがある。<br>
-gitlabでは裏でNginxが起動しhttpのレスポンスに応答する。<br>
-すでに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>等が動いている場合には停止、あるいはポート番号の変更などの工夫が必要。</p>
-<p>ちなみに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>を停止し、Gitlabを起動した状態で80番ポートのプロセスをみると。<br>
-nginxが動いていることがわかります。</p>
-```
-$ sudo lsof -i:80
-COMMAND   PID       USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
-nginx   25937       root    6u  IPv4  84715      0t0  TCP *:http (LISTEN)
-nginx   25942 gitlab-www    6u  IPv4  84715      0t0  TCP *:http (LISTEN)
-nginx   25943 gitlab-www    6u  IPv4  84715      0t0  TCP *:http (LISTEN) 
-```
-<p>特定のポートで何が起動しているかみるのに<b>lsof</b>コマンドはとても便利。</p>
-<p>あともう一つとまどったのが、GItlabを起動させたものの、はじめログイン方法がわからなかった。<br>
-が、よーくページのしたの方よくみると書いてありました。（単なる見落とし）</p>
+<h1>まとめ</h1>
 
-<pre><code>&lt;blockquote&gt;
-    &lt;p&gt;Browse to the hostname and login &lt;br&gt;
-</code></pre>
+<p>タスクによってその実行方法が異なることは運用上とても不便です。<br>
+統一した実行方法にすることで、</p>
 
-<p>Username: root <br>
-Password: 5iveL!fe</p></p>
+<ul>
+<li>テストの実行し忘れがなくなり</li>
+<li>ドキュメントも残しやすくなり</li>
+<li>チームメンバーへの運用方法の伝授も楽になり</li>
+</ul>
 
-<pre><code>&lt;/blockquote&gt;
-</code></pre>
+<p>ました。（今回に限る話ではないけれど）</p>
 
-<p></body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">20 Nov 2014, 23:03</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/11/20/230334/" class="post-title">後からGitレポジトリを共有設定に。sharedオプションの仕組みについて</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-git" href="https://blog.mosuke.tech/categories/git">git</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>Git<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>を作って、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD">複数人</a>で開発をしていた。<br>
-しかし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>の中に作成されるファイルやディレクトリが個人のグループになってしまい、<br>
-Push, PullするときにPermission <a class="keyword" href="http://d.hatena.ne.jp/keyword/error">error</a>で怒られまくる。</p>
-<p>ユーザには共通のグループを作っていたのに…なんでだっけ…</p>
-<p>気づけば<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>を作るとき以下のようにしていた。</p></p>
-
-<pre><code>$ git init --bare 
-</code></pre>
-
-<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD">複数人</a>で共有するときには以下のようにするべきであった。</p></p>
-
-<pre><code>$ git init --bare --shared 
-</code></pre>
-
-<p><p>では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。<br>
-調べると「<b>setgid</b>」というキーワードに辿り着いた。<br>
-setgidの権限を付けておくと、そのディレクトリに作成されたファイルの所有グループは、そのディレクトリの所有グループになる。</p>
-<p>以下のようにchmodでsetgidを付けることができる。</p></p>
-
-<pre><code>$ chmod g+s dir_name 
-</code></pre>
-
-<p><p>setgidがつくとあまり馴染みのない権限がつく。<br>
-「drwxrw<span style="color: #ff40ff"><b>s</b></span>r-x」</p></p>
-
-<pre><code>$ ls -l 
-drwxrwsr-x  4 user  group  136 11 16 22:49 test_dir 
-</code></pre>
-
-<p><p>そして、すでに共有設定なしで作ってしまった<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>では以下のように対応可能。<br>
-（新しく<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>つくるのはめんどいので…）</p></p>
-
-<pre><code>##Gigレポジトリ内のディレクトリに
-$ chmod -R g+s ./branches
-$ chmod -R g+s ./hooks
-$ chmod -R g+s ./info
-$ chmod -R g+s ./objects
-$ chmod -R g+s ./refs
-$ vim .git/config
-  ##[core内に]以下を付け加えておいた
-  [core]
-       repositoryformatversion = 0 
-</code></pre>
-
-<p></body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">18 Nov 2014, 22:55</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/11/18/225542/" class="post-title">Ansible、コマンドでワイルドカードを使うときの注意</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>AnsibleのPlaybookを書いていると、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EF%A5%A4%A5%EB%A5%C9%A5%AB%A1%BC%A5%C9">ワイルドカード</a>を含んだコマンドを実行したい時がある。<br>
-そんなときあるところでハマった。</p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>をソースインストールして、パスを/usr/sbinにリンクを貼ろうとして以下を実行した。</p></p>
-
-<pre><code class="language-yaml">- command: ln -s /usr/local/httpd/bin/* /usr/sbin
-</code></pre>
-
-<p>/usr/sbin内に「*」というリンクが貼られてしまった。</p>
-
-<pre><code>* -&gt; /usr/local/httpd/bin 
-</code></pre>
-
-<p><p>どうやらcommandモジュールは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EF%A5%A4%A5%EB%A5%C9%A5%AB%A1%BC%A5%C9">ワイルドカード</a>に対応していないよう。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EF%A5%A4%A5%EB%A5%C9%A5%AB%A1%BC%A5%C9">ワイルドカード</a>を使いたいときはshellモジュールを利用すると良い。</p></p>
-
-<pre><code class="language-yaml">- shell: ln -s /usr/local/httpd/bin/* /usr/sbin
-</code></pre>
-
-<p><p>また、*というリンクを消すときは要注意（笑）</p></p>
-
-<pre><code>$ rm ./* 
-</code></pre>
-
-<p><p>とやってしまうとあたりまえだがやばいので</p></p>
-
-<pre><code>$ rm ./¥* 
-</code></pre>
-
-<p><p>こうですね…</p>
+<p><p>また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rakefile">Rakefile</a>はかなりやっつけで作ってしまったので、何をタスクにするか・その命名・実装方法などの改善は年末の課題ですかね。</p>
 </body></p>
 
                     </div>
@@ -609,11 +330,11 @@ $ vim .git/config
                 
                 
                 
-                <h1 class="content-subhead">16 Nov 2014, 15:32</h1>
+                <h1 class="content-subhead">01 Dec 2015, 18:13</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2014/11/16/153223/" class="post-title">Ansible、ソースインストールする際のPalybookの書き方</a>
+                        <a href="https://blog.mosuke.tech/entry/2015/12/01/181304/" class="post-title">Ansible、実行速度高速化の実験。ControlMasterとPipeliningについて</a>
 
                         <p class="post-meta">
                             
@@ -622,98 +343,178 @@ $ vim .git/config
                             
                                 under 
                                 
-                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a>
+                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a><a class="post-category post-category-高速化" href="https://blog.mosuke.tech/categories/%E9%AB%98%E9%80%9F%E5%8C%96">高速化</a><a class="post-category post-category-ControlMaster" href="https://blog.mosuke.tech/categories/controlmaster">ControlMaster</a><a class="post-category post-category-pipelining" href="https://blog.mosuke.tech/categories/pipelining">pipelining</a>
                             
                         </p>
                     </header>
 
                     <div class="post-description">
                         <p><body>
-<p>最近、Ansibleを使い始めたのだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/yum">yum</a>やapt-getでインストールできるものはいいけど、<br>
-どうしてもソースインストールが必要な場合がある。</p>
-<p>ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。</p>
-<p>まず、あたりまえだが、ソースインストールを行うには以下のフローを踏まなければいけな。<br>
-1. ソースファイルの取得(tarで固められていると仮定)<br>
-2. tarファイルの解凍<br>
-3. 解答してできたディレクトリへ移動<br>
-4. configure<br>
-5. make<br>
-6. make install</p>
-<p>また、Ansibleでは何回もPlaybookを実行していくため、<br>
-<b>すでにインストールされている場合は、インストールをスキップする</b>必要がある。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/yum">yum</a>やapt-getで管理されていれば上記を心配することはないのだが、やはりソースインストールだとこの壁がある。<br>
-※パッケージ化しろよ！というツッコミは禁止</p>
-<p>今回は例として、ubuntu13に<a class="keyword" href="http://d.hatena.ne.jp/keyword/emacs">emacs</a>をソースインストールするのを例としてみた。</p></p>
+<h1>1. はじめに</h1></p>
 
-<p><div class="section">
-    <h3>環境</h3>
-    <p>【Ansible実行側】<br>
-さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>の1G<br>
-OS: <a class="keyword" href="http://d.hatena.ne.jp/keyword/Centos">Centos</a> 7<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>:192.168.33.1</p>
-<p>【設定対象側】<br>
-上記さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>上にたてた<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>の仮想サーバ<br>
-OS: <a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a> 13.10<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>:192.168.33.100</p></p>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの開発や、仕事などでAnsibleを使うことが多いのだが、<br>
+その実行速度があまりでないことに不満をもっていて、どうしたら早くできるか考えていました。<br>
+調べると、ControlMasterを利用して<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のコネクションを再利用するとか、pipelineの機能を利用するとかでてくる。</p>
 
-<p></div>
-<div class="section">
-    <h3>Playbook</h3>
-    <p>以下playbookの例。</p></p>
+<p>が、それによってどのくらいの効果が得られるのかよくわからないし、仕組みもよくわかっていなかったので、仕組みの理解と実行速度の実験をした。</p>
 
-<pre><code class="language-yaml">---
-- hosts: 192.168.33.100
-  user: vagrant
-  sudo: yes
+<p>もう少し余談をすると、<br>
+ControlMasterを有効にすれば早くなることは前から知っていたが、<br>
+最近<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>をEl Capitanに変えてから「なんか最近Ansibleはやいな〜」とか思っていて、<br>
+「OpenSSHのバージョンもあがったし、まさか。。。」と思って今にいきついている。</p>
 
-  vars:
-    src_dir: /usr/local/src
-    emacs_ver: emacs-23.4
+<h2>ControlMasterについて</h2>
 
-  tasks:
-   ## emacsのソースファイルを取得済みか確認
-   - name: check exist emacs source file
-     command: ls -l {{src_dir}}/{{emacs_ver}}.tar.gz
-     ignore_errors: True
-     register: result1
+<blockquote><p>OpenSSH は、1 つの接続で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">複数</a>のセッションを共有する(束ねる)「コントロール マスター」と呼ばれる機能を持っています。コントロールマスターを使用すると、 <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%E2%A1%BC%A5%C8%A5%DB%A5%B9%A5%C8">リモートホスト</a>に接続する最初のセッションは制御用のセッション(マスターセッショ ンと呼ばれます)として利用され、制御用のソケットを作成します。セッションを 共有する <a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a> クライアントは、この制御用のソケットを通じて<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%E2%A1%BC%A5%C8%A5%DB%A5%B9%A5%C8">リモートホスト</a>と 接続し通信を行います。<br>
+出典：「<a href="http://www.amazon.co.jp/OpenSSH-%E5%AE%9F%E8%B7%B5-Software-Design-plus/dp/4774168076">OpenSSH実践入門</a>」</p></blockquote>
 
-   ## emacsのソースファイル取得。ただし、すでに取得済みならスキップ
-   - name: get emacs source file
-     command: chdir={{src_dir}} wget http://mirror.jre655.com/GNU/emacs/{{emacs_ver}}.tar.gz
-     when: result1|failed
+<p>上記のように、１つの接続で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">複数</a>のセッションを共有するため、<br>
+Ansibleのようにタスク実行ごとに<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>接続するような場合には大きな効果を得ることができる。</p>
 
-   ## emacsのソースインストールを解凍
-   - name: get emacs source file
-     command: chdir={{src_dir}} tar xvf {{emacs_ver}}.tar.gz
-     when: result1|failed
+<h2>Pipeliningについて</h2>
 
-   ## emacsがインストールされているか確認
-   #  確認基準はemacsコマンドのpathが通っているかで判断した
-   - name: check emacs install
-     command: which emacs
-     ignore_errors: True
-     register: result2
+<p>Pipelining機能の説明の前に、軽くAnsibleの実行までの流れを説明する。<br>
+Ansibleは対象サーバに<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>ログインしたあと実行するタスクのモジュールをファイルとして転送しそれを実行する。<br>
+Pipelining機能をなしの状態だと、このファイル転送とファイルの削除を１タスクごとに行う。</p>
 
-   ## emacsのインストール。ただしすでにemacsがインストールされいたらスキップ
-   - name: expand emacs src
-     command: chdir={{src_dir}} tar xvf {{emacs_ver}}.tar.gz
-     when: result2|failed
+<p>ansibleを<code>-vvvv</code>オプションをつけて実行するとわかるが、<br>
+４行目でファイルの<code>PUT</code>（転送）を、５行目の最後の方に<code>rm -rf</code>でディレクトリ・ファイルの削除を行っている。</p>
 
-   - name: comfigure emacs
-     command: chdir={{src_dir}}/{{emacs_ver}} ./configure
-     when: result2|failed
-
-   - name: make emacs
-     command: chdir={{src_dir}}/{{emacs_ver}} make
-     when: result2|failed
-
-   - name: install emacs
-     command: chdir={{src_dir}}/{{emacs_ver}} make install
-     when: result2|failed
- 
+<pre><code>&lt;192.168.33.100&gt; ESTABLISH CONNECTION FOR USER: deploy
+&lt;192.168.33.100&gt; REMOTE_MODULE command ls -l /root
+&lt;192.168.33.100&gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c 'mkdir -p $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321 &amp;&amp; chmod a+rx $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321 &amp;&amp; echo $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321'
+&lt;192.168.33.100&gt; PUT /var/folders/7_/d_dwdlcx1m95mn_846x30xb40000gn/T/tmpc8amAw TO /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/command
+&lt;192.168.33.100&gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c 'sudo -k &amp;&amp; sudo -E -S -p &quot;[sudo via ansible, key=koibtlgpbiprbaihcqxiqgcnnreofxuo] password: &quot; -u root /bin/sh -c '&quot;'&quot;'echo BECOME-SUCCESS-koibtlgpbiprbaihcqxiqgcnnreofxuo; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/command; rm -rf /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/ &gt;/dev/null 2&gt;&amp;1'&quot;'&quot;'' 
 </code></pre>
 
-<p></div>
+<p>Pipiliningの機能を有効にすると、タスク実行ごとのモジュールファイルの転送と削除をしなくなる。<br>
+そのため、実効速度があがるのです。</p>
+
+<p>下記はPipeliningを有効にした際の出力。<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>でタスクを実行しているだけなのがわかる。</p>
+
+<pre><code>&lt;192.168.33.100&gt; ESTABLISH CONNECTION FOR USER: deploy
+&lt;192.168.33.100&gt; REMOTE_MODULE command ls -l /root
+&lt;192.168.33.100&gt; EXEC ssh -C -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=deploy -o ConnectTimeout=10 192.168.33.100 /bin/sh -c 'sudo -k &amp;&amp; sudo -E -S -p &quot;[sudo via ansible, key=kjtoopnjepksibiitumqfycsoldadiws] password: &quot; -u root /bin/sh -c '&quot;'&quot;'echo BECOME-SUCCESS-kjtoopnjepksibiitumqfycsoldadiws; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python'&quot;'&quot;'' 
+</code></pre>
+
+<p><a href="http://docs.ansible.com/ansible/intro_configuration.html#pipelining">Configuration file — Ansible Documentation</a></p>
+
+<h1>2. 実験方法</h1>
+
+<p>下記の３パターンでどれだけ実行速度に差があるか確認してみた。</p>
+
+<ul>
+<li>① ControlMaster: <b>無効</b> ＆ pipeline: <b>無効</b>
+</li>
+<li>② ControlMaster: <b><span style="color: #ff0000">有効</span></b> ＆ pipeline: <b>無効</b>
+</li>
+<li>③ ControlMaster: <b><span style="color: #ff0000">有効</span></b> ＆ pipeline: <b><span style="color: #ff0000">有効</span></b>
+</li>
+</ul>
+
+<h2>実行環境</h2>
+
+<ul>
+<li>クライアント
+
+<ul>
+<li>ハードウェア：<a class="keyword" href="http://d.hatena.ne.jp/keyword/MacBook%20Air">MacBook Air</a> (13-inch, Mid 2012)</li>
+<li>プロセッサ：1.8 GHz <a class="keyword" href="http://d.hatena.ne.jp/keyword/Intel">Intel</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/Core%20i5">Core i5</a>
+</li>
+<li>メモリ：4 GB 1600 MHz DDR3</li>
+<li>OS：El Capitan</li>
+<li>OpenSSH：OpenSSH_6.9p1, LibreSSL 2.1.7</li>
+</ul>
+</li>
+<li>サーバ
+
+<ul>
+<li>ハードウェア：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>による仮想環境。メモリ１GB。</li>
+<li>OS： <a class="keyword" href="http://d.hatena.ne.jp/keyword/CentOS">CentOS</a> 7.0</li>
+<li>ネットワーク：プライベートの<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>をふっています</li>
+</ul>
+</li>
+</ul>
+
+<h2>実行タスク</h2>
+
+<p>ネットワーク環境やタスクの実行時間に左右されないように、<br>
+<code>ls -l /</code>を実行するタスクを300個用意した。</p>
+
+<h2>設定</h2>
+
+<p>ansible.cfgを下記のように書いてためした。</p>
+
+<p>① ControlMaster: <b>無効</b> ＆ pipeline: <b>無効</b></p>
+
+<pre><code>[defaults]
+transport = ssh
+
+[ssh_connection]
+pipeline = false
+ssh_args = -o ControlMaster=no 
+</code></pre>
+
+<p>② ControlMaster: <b><span style="color: #ff0000">有効</span></b> ＆ pipeline: <b>無効</b></p>
+
+<pre><code>[defaults]
+transport = ssh
+
+[ssh_connection]
+pipeline = false
+ssh_args = -o ControlMaster=auto -o ControlPersist=300s 
+</code></pre>
+
+<p>③ ControlMaster: <b><span style="color: #ff0000">有効</span></b> ＆ pipeline: <b><span style="color: #ff0000">有効</span></b></p>
+
+<pre><code>[defaults]
+transport = ssh
+
+[ssh_connection]
+pipeline = true
+ssh_args = -o ControlMaster=auto -o ControlPersist=300s 
+</code></pre>
+
+<h2>実行コマンド</h2>
+
+<p>実行時間を図るために、下記のようにコマンドを実行した。</p>
+
+<pre><code>$ date; ansible-playbook site.yml ; date
+※ansible-playbookコマンドは環境に合わせてオプションとかつけてください。 
+</code></pre>
+
+<h1>3. 結果</h1>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:center;"> ControlMaster </th>
+<th style="text-align:center;"> Pipelining </th>
+<th style="text-align:center;"> 実行時間 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;"> ✕       </td>
+<td style="text-align:center;">        ✕ </td>
+<td style="text-align:center;">     6分38秒    </td>
+</tr>
+<tr>
+<td style="text-align:center;"> ◯       </td>
+<td style="text-align:center;">        ✕</td>
+<td style="text-align:center;">     1分31秒   </td>
+</tr>
+<tr>
+<td style="text-align:center;"> ◯       </td>
+<td style="text-align:center;">        ◯</td>
+<td style="text-align:center;">     <span style="color: #ff0000"><b>52秒</b></span>   </td>
+</tr>
+</tbody>
+</table>
+
+<p><p>結果は明らかでした。<br>
+実際の環境ではタスクの実行時間などがあるため、この数字のように6倍はやくなるとかそういうことではないが、<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%E2%A1%BC%A5%C8%A5%DB%A5%B9%A5%C8">リモートホスト</a>への接続回数が多くなればなるほど大きな差が生まれそうです。</p>
 </body></p>
 
                     </div>
@@ -721,11 +522,11 @@ OS: <a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a> 13
                 
                 
                 
-                <h1 class="content-subhead">09 Nov 2014, 17:27</h1>
+                <h1 class="content-subhead">02 Nov 2015, 16:17</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2014/11/09/172745/" class="post-title">【VPS1台でインフラ勉強】多段SSH設定（おまけ）</a>
+                        <a href="https://blog.mosuke.tech/entry/2015/11/02/161744/" class="post-title">インフラテスト(serverspec)はじめました</a>
 
                         <p class="post-meta">
                             
@@ -734,486 +535,317 @@ OS: <a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a> 13
                             
                                 under 
                                 
-                                <a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-サーバ" href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90">サーバ</a><a class="post-category post-category-VPS" href="https://blog.mosuke.tech/categories/vps">VPS</a><a class="post-category post-category-Vagrant" href="https://blog.mosuke.tech/categories/vagrant">Vagrant</a><a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a>
+                                <a class="post-category post-category-serverspec" href="https://blog.mosuke.tech/categories/serverspec">serverspec</a><a class="post-category post-category-インフラテスト" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E3%83%86%E3%82%B9%E3%83%88">インフラテスト</a><a class="post-category post-category-vim::factory" href="https://blog.mosuke.tech/categories/vimfactory">vim::factory</a><a class="post-category post-category-vimfactory" href="https://blog.mosuke.tech/categories/vimfactory">vimfactory</a><a class="post-category post-category-インフラCI" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9ci">インフラCI</a>
                             
                         </p>
                     </header>
 
                     <div class="post-description">
                         <p><body>
-<p>VPS1台でインフラ勉強の会で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>のホストサーバ上に仮想でさらにいつくかのサーバを立てたが、<br>
-仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更に<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>をしなければならない。<br>
-これが面倒だったので多段<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>の設定をして、一発で<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>接続できるようにした。</p>
-<p>以下の図で言うと、web10, web11(192.168.33.<sup>10</sup>&frasl;<sub>11</sub>)に一発で<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>できるようにする。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141109/20141109170337.png" alt="f:id:mosuke5:20141109170337p:plain" title="f:id:mosuke5:20141109170337p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p>クライアントPC側に以下の設定をした。</p></p>
+<p>※執筆後、業務でもserverspecを利用し始めたのもあり、業務レベルでの実践例も追記している。</p></p>
 
-<pre><code>$ vim ~/.ssh/config
-host gateway
-    HostName xxxxx.xxx
-    User username
+<p>運営中の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryでserverspecを使ったインフラテストを導入したので、
+導入理由や工夫している点、悩んでいる点について記述します。</p>
 
-Host web10
-    HostName 192.168.33.10
-    User vagrant
-    ProxyCommand ssh -W %h:%p gateway
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryについてはこっちみてね。
+<a href="/entry/2015/07/19/135844/">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った - Goldstine研究所</a>
 
-Host web11
-    HostName 192.168.33.11
-    User vagrant
-    ProxyCommand ssh -W %h:%p gateway
+<h1>1. serverspecってなによ</h1>
 
-##これで以下で接続可能
-$ ssh web10
-$ ssh  web11 
-</code></pre>
+<p>詳しくは公式サイトや書籍などを参考にして欲しいですが、<br>
+「サーバの状態をコードで自動的にテスト・確認するためのツール」です。</p>
 
-<p><p>簡単でした。</p>
-</body></p>
+<p><a href="http://serverspec.org">Serverspec - Home</a></p>
 
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">09 Nov 2014, 17:14</h1>
-                <section class="post">
-                    <header class="post-header">
+<p>例えば、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>でWebサーバを組んでいるサーバがあったとして、下記の要件で動いているとします。</p>
 
-                        <a href="https://blog.mosuke.tech/entry/2014/11/09/171436/" class="post-title">【VPS1台でインフラ勉強】HAProxyでロードバランサーを構築</a>
+<ul>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/apache">apache</a>がインス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%EB">トール</a>されていること</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/apache">apache</a>が起動していること、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%AB%C6%B0%B5%AF%C6%B0">自動起動</a>する設定であること</li>
+<li>ポート80があいていること</li>
+</ul>
 
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-HAProxy" href="https://blog.mosuke.tech/categories/haproxy">HAProxy</a><a class="post-category post-category-VPS" href="https://blog.mosuke.tech/categories/vps">VPS</a><a class="post-category post-category-vagrant" href="https://blog.mosuke.tech/categories/vagrant">vagrant</a><a class="post-category post-category-ロードバランサ" href="https://blog.mosuke.tech/categories/%E3%83%AD%E3%83%BC%E3%83%89%E3%83%90%E3%83%A9%E3%83%B3%E3%82%B5">ロードバランサ</a>
-                            
-                        </p>
-                    </header>
+<p>この要件をサーバが満たしているかコードでテストします。<br>
+上記の例だとこんなコードを書きます。</p>
 
-                    <div class="post-description">
-                        <p><body>
-<p>前回の<a href="https://blog.mosuke.tech/entry/2014/10/09/230555">【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築</a>に続き、同様の環境を用いて、ロードバランサ構築を行った。<br>
-ロードバランサの構築にはHAProxyを利用した。</p></p>
-
-<p><div class="section">
-    <h3>1. 環境</h3>
-    <p>前回同様で、さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>の1GBのプラン1台のみ。<br>
-・メモリ：１GB<br>
-・CPU：仮想２コア<br>
-・HDD：100GB<br>
-・OS：CentOS7<br>
-・サーバ仮想化：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>(Utuntu13)<br>
-・ロードバランサ：<a href="http://www.haproxy.org/">HAProxy - The Reliable, High Performance TCP/HTTP Load Balancer</a><br>
-</p></p>
-
-<p></div>
-<div class="section">
-    <h3>2. 構成図</h3>
-    <p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141109/20141109170337.png" alt="f:id:mosuke5:20141109170337p:plain" title="f:id:mosuke5:20141109170337p:plain" class="hatena-fotolife" itemprop="image"></span><br>
-</p></p>
-
-<p></div>
-<div class="section">
-    <h3>3. ロードバランサの構築</h3>
-    <p>■ホストサーバ側の設定</p></p>
-
-<pre><code>#HAProxyインストール
-$ sudo yum install haproxy
-
-#設定はすごく簡単で以下のファイルのみ。実際に
-$ sudo vim /etc/haproxy/haproxy.cfg
-
-#---------------------------------------------------------------------
-# Example configuration for a possible web application.  See the
-# full configuration options online.
-#
-#   http://haproxy.1wt.eu/download/1.4/doc/configuration.txt
-#
-#---------------------------------------------------------------------
-
-#---------------------------------------------------------------------
-# Global settings
-#---------------------------------------------------------------------
-global
-
-    log         127.0.0.1 local6 debug
-
-    chroot      /var/lib/haproxy
-    pidfile     /var/run/haproxy.pid
-    maxconn     4000
-    user        haproxy
-    group       haproxy
-    daemon
-
-    # turn on stats unix socket
-    stats socket /var/lib/haproxy/stats
-
-#---------------------------------------------------------------------
-# common defaults that all the 'listen' and 'backend' sections will
-# use if not designated in their block
-#---------------------------------------------------------------------
-defaults
-
-    ##ロードバランサの動作モード。tcpにするとL4ロードバランサになる。httpにするとL7ロードバランサ。
-    mode                    http
-    log                     global
-    option              log-health-checks
-    option                  httplog
-    option                  dontlognull
-    
-    ##ヘルスチェック用のhtmlファイルをWebサーバ側に設置している。設置については後述。
-    option httpchk GET /health_check.html HTTP/1.0\r\nUser-agent:\ Proxy-Check
-
-    option http-server-close
-    option forwardfor       except 127.0.0.0/8
-    option                  redispatch
-    retries                 3
-    timeout http-request    10s
-    timeout queue           1m
-    timeout connect         10s
-    timeout client          1m
-    timeout server          1m
-    timeout http-keep-alive 10s
-    timeout check           10s
-    maxconn                 3000
-
-#---------------------------------------------------------------------
-# main frontend which proxys to the backends
-#---------------------------------------------------------------------
-frontend  main *:80
-    default_backend             hoge
-
-#---------------------------------------------------------------------
-# round robin balancing between the various backends
-#---------------------------------------------------------------------
-backend hoge
-    balance     roundrobin
-    server      web10 192.168.33.10:80 check inter 3000 fall 2 rise 2
-    server      web11 192.168.33.11:80 check inter 3000 fall 2 rise 2 
-</code></pre>
-
-<p><p>L4, L7のロードバランサについては以下参照。<br>
-<a href="http://www.atmarkit.co.jp/ait/articles/0302/05/news001.html">ロードバランサの本質（1）：パケットフローから負荷分散の基本を理解する - ＠IT</a></p>
-<p>ロードバランサ側でhttpのリクエストを返していないことを意味づけるために<a class="keyword" href="http://d.hatena.ne.jp/keyword/apache">apache</a>, nginxを停止しておく。<br>
-（特に意味は無いが念押し確認のため）</p></p>
-
-<pre><code>$ sudo systemctl stop nginx
-$ sudo systemctl stop httpd 
-</code></pre>
-
-<p><p>HAProxyのログをsyslogに残すように設定する。<br>
-ただしメインのmessageではなく、独自のファイルに書くために以下の設定。</p></p>
-
-<pre><code>##ログの格納場所作成
-$ sudo mkdir /var/log/haproxy
-
-##syslogの設定変更
-$ vim /etc/rsyslog.d/haproxy.conf
-   $ModLoad imudp
-   $UDPServerRun 514
-   $template Haproxy,&quot;%msg%\n&quot;
-   local6.* -/var/log/haproxy/haproxy.log;Haproxy
-
-$ vim /etc/sysconfig/rsyslog
-以下を追加
-SYSLOGD_OPTIONS=&quot;-r&quot;
-
-## haproxyの起動
-$ sudo systemctl start haproxy 
-</code></pre>
-
-<p><p><br>
-■Webサーバの設定<br>
-仮想でのWebサーバ構築は省くが、Apache2をインストールしただけである。<br>
-仮想でのサーバ構築は前回を参照。<br>
-<a href="https://blog.mosuke.tech/entry/2014/10/09/230555">【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築</a><br>
-</p></p>
-
-<pre><code>## /var/www/html配下にヘルスチェック用のhtml設置
-$ sudo touch health_check.html 
-</code></pre>
-
-<p></div>
-<div class="section">
-    <h3>4. 動作試験</h3>
-    <p>ブラウザよりホストサーバへアクセス。<br>
-きちんとロードバランスされていることを確認。</p>
-<p>HAProxy側のログは以下のとおり。</p></p>
-
-<pre><code>$ sudo tail -f /var/log/haproxy/haproxy.conf
-
-##起動した時。L7のhealt checkが走っている
-Proxy main started.
-Proxy hoge started.
-Health check for server hoge/web10 succeeded, reason: Layer7 check passed, code: 200, info: &quot;OK&quot;, check duration: 33ms, status: 2/2 UP.
-Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &quot;OK&quot;, check duration: 12ms, status: 2/2 UP.
-
-##webサーバ側でapacheを停止
-Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &quot;Not Found&quot;, check duration: 13ms, status: 1/2 UP.
-Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &quot;Not Found&quot;, check duration: 8ms, status: 0/2 DOWN.
-
-##webサーバ側でhealth_check.htmlを削除した時も同様に
-Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &quot;Not Found&quot;, check duration: 13ms, status: 1/2 UP.
-Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &quot;Not Found&quot;, check duration: 8ms, status: 0/2 DOWN.
-
-##webサーバ側でhealth_check.htmlを復活させた時
-Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &quot;OK&quot;, check duration: 8ms, status: 1/2 DOWN.
-Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &quot;OK&quot;, check duration: 6ms, status: 2/2 UP.
-Server hoge/web11 is UP. 2 active and 0 backup servers online. 0 sessions requeued, 0 total in queue. 
-</code></pre>
-
-<p><p>Webサーバ側の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>ログを見てみると。</p></p>
-
-<pre><code>$ sudo tail -f /var/log/apache2/access.log
-
-##ロードバランサからのヘルスチェックが来ていることがわかる。
-192.168.33.1 - - [09/Nov/2014:08:07:43 +0000] &quot;GET /health_check.html HTTP/1.0&quot; 200 276 &quot;-&quot; &quot;Proxy-Check&quot;
-192.168.33.1 - - [09/Nov/2014:08:07:46 +0000] &quot;GET /health_check.html HTTP/1.0&quot; 200 276 &quot;-&quot; &quot;Proxy-Check&quot;
-192.168.33.1 - - [09/Nov/2014:08:07:49 +0000] &quot;GET /health_check.html HTTP/1.0&quot; 200 276 &quot;-&quot; &quot;Proxy-Check&quot;
-192.168.33.1 - - [09/Nov/2014:08:07:52 +0000] &quot;GET /health_check.html HTTP/1.0&quot; 200 276 &quot;-&quot; &quot;Proxy-Check&quot;
-
-##Webからのアクセスが来た場合
-##SorceのIPはロードバランサにIPになっているが、UserAgentなど書き込まれていることを確認。
-192.168.33.1 - - [09/Nov/2014:08:10:06 +0000] &quot;GET / HTTP/1.1&quot; 200 488 &quot;-&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10) AppleWebKit/600.1.25 (KHTML, like Gecko) Version/8.0 Safari/600.1.25&quot; 
-</code></pre>
-
-<p></div>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">19 Oct 2014, 17:08</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/10/19/170854/" class="post-title">自宅サーバ公開時などのDDNS、固定IPについて整理</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-ネットワーク" href="https://blog.mosuke.tech/categories/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF">ネットワーク</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%AB%C2%F0%A5%B5%A1%BC%A5%D0">自宅サーバ</a>を公開するときに使う<a class="keyword" href="http://d.hatena.ne.jp/keyword/DDNS">DDNS</a>や固定IP。<br>
-それが必要な理由について図解的にまとめ。それだけ。</p>
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141019/20141019170702.png" alt="f:id:mosuke5:20141019170702p:plain" title="f:id:mosuke5:20141019170702p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">09 Oct 2014, 23:05</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/10/09/230555/" class="post-title">【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-CentOS7" href="https://blog.mosuke.tech/categories/centos7">CentOS7</a><a class="post-category post-category-Nginx" href="https://blog.mosuke.tech/categories/nginx">Nginx</a><a class="post-category post-category-Vagrant" href="https://blog.mosuke.tech/categories/vagrant">Vagrant</a><a class="post-category post-category-リバースプロキシ" href="https://blog.mosuke.tech/categories/%E3%83%AA%E3%83%90%E3%83%BC%E3%82%B9%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7">リバースプロキシ</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-VPS" href="https://blog.mosuke.tech/categories/vps">VPS</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>ロードバランシングとか<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF%A5%EA%A5%F3%A5%B0">クラスタリング</a>とかリバースプロキシとか、<br>
-業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりない。</p>
-<p>自分で構築してみたいなーと思いつつもあたりまえだけど、サーバやネットワーク機器をそう簡単に調達もできない。<br>
-お金も当然ない。</p>
-<p>というわけで、さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>で仮想化つかってロードバランシングとか<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF%A5%EA%A5%F3%A5%B0">クラスタリング</a>とかリバースプロキシとか勉強しましょうという「サーバインフラ会」を友人と始めた。<br>
-その第１回目のメモ。</p>
-<p>第1回 サーバ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">複数</a>台構成、Nginxでリバースプロキシ構築<br>
-第2回 <a href="https://blog.mosuke.tech/entry/2014/11/09/171436">HAProxyでロードバランサ構築</a></p>
-<p></p>
-<div style="border: solid 1px #dddddd;"></div></p>
-
-<p><div class="section">
-    <h2>1. 使用した環境</h2>
-    <p>まず今回利用した環境は以下のとおり。<br>
-さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>の1GBのプラン。<br>
-・メモリ：１GB<br>
-・CPU：仮想２コア<br>
-・HDD：100GB<br>
-・OS：CentOS7<br>
-・仮想化：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a><br>
-　→dockerなどもはじめ検討していたが、コンテナ型仮想化だとサーバ感がでないので、よりサーバとして意識できる<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>を採用</p>
-<p>【参考】<br>
-<a href="http://vps.sakura.ad.jp/specification.html">料金・サービス仕様 | VPS（仮想専用サーバ）は「さくらのVPS」</a><br>
-</p></p>
-
-<p></div>
-<div class="section">
-    <h2>2. 完成イメージ・物理イメージ</h2>
-    <p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140930/20140930210924.png" alt="f:id:mosuke5:20140930210924p:plain" title="f:id:mosuke5:20140930210924p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p></p>
-<div style="border: solid 1px #dddddd;"></div>
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140930/20140930210914.png" alt="f:id:mosuke5:20140930210914p:plain" title="f:id:mosuke5:20140930210914p:plain" class="hatena-fotolife" itemprop="image"></span><br>
-</p></p>
-
-<p></div>
-<div class="section">
-    <h2>3. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>でWebサーバ２台分を構築する</h2>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>の詳細な利用方法は公式ドキュメントをみてもらうとするが、セットアップまでのひととおりの流れと注意点のみ記載する。<br>
-<a href="https://docs.vagrantup.com/v2/">Vagrant Documentation</a></p>
-<p>今回はWebサーバ２台を仮想で実現するので、それぞれweb1, web2とする。<br>
-それぞれのディレクトリを作成。</p></p>
-
-<pre><code>## web1, web2のディレクトリ作成
-$ pwd
-/home/vagrant
-$ mkdir web1
-$ mkdir web2
-
-## 仮想化で利用するOSイメージをダウンロード
-$ vagrant box add ubuntu1310 ¥
-http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-13.10_chef-provisionerless.box
-
-## web1サーバ構築
-$ cd web1
-$ vagrant init ubuntu1310
-
-## ほぼほぼデフォルトの設定だが以下２つだけは設定を行った。
-$ vim Vagrantfile
-# (1)プライベートアドレスの割り当て。
-config.vm.network &quot;private_network&quot;, ip: &quot;192.168.33.10&quot;
-
-# (2)1GBしかメモリがないのでこの設定をしないと２つ仮想化するとだいぶ大変なことになりました。
-config.vm.provider &quot;virtualbox&quot; do |vb|
-     vb.customize [&quot;modifyvm&quot;, :id, &quot;--memory&quot;, &quot;128&quot;]
+<pre><code class="language-ruby">describe package('httpd') do
+  it { should be_installed }
 end
 
-$ vagrant ssh
+describe service('httpd') do
+  it { should be_enabled   }
+  it { should be_running   }
+end
+
+describe port(80) do
+  it { should be_listening }
+end
  
 </code></pre>
 
-<p>同様にweb2においても同じことを行った。</p>
-<p>また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>では一般的に対象のディレクトリで<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>を利用してサーバに入るが、<br>
-今回はプライベートアドレスも振ってあるし、物理サーバとしてイメージしているので以下のようにしてサーバにはいるようにした。</p>
-```
-$ ssh vagrant@192.168.33.10  # web1への接続
-$ ssh vagrant@192.168.33.11  # web2への接続 
-```
-<p>ホストサーバ側の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BF%A1%BC%A5%D5%A5%A7%A5%A4%A5%B9">インターフェイス</a>情報をみると。</p>
-```
-# cent7なので以下コマンドだがifconfig -aのこと
-$ ip a 
-(中略)
-5: vboxnet0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UNKNOWN qlen 1000
-    link/ether 0a:00:27:00:00:00 brd ff:ff:ff:ff:ff:ff
-    inet 192.168.33.1/24 brd 192.168.33.255 scope global vboxnet0
-       valid_lft forever preferred_lft forever
-    inet 192.168.56.101/24 brd 192.168.56.255 scope global dynamic vboxnet0
-       valid_lft 839sec preferred_lft 839sec
-    inet6 fe80::800:27ff:fe00:0/64 scope link
-       valid_lft forever preferred_lft forever 
-```
-<p>vboxnet0という仮想の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BF%A1%BC%A5%D5%A5%A7%A5%A4%A5%B9">インターフェイス</a>が作成され、<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>も192.168.33.1が振られていることを確認。</p>
-<p>ルーティングテーブルも確認しておくと</p>
-```
-$ netstat -rn
-Kernel IP routing table
-Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
-0.0.0.0         153.120.2.1     0.0.0.0         UG        0 0          0 eth0
-153.120.2.0     0.0.0.0         255.255.254.0   U         0 0          0 eth0
-192.168.33.0    0.0.0.0         255.255.255.0   U         0 0          0 vboxnet0 
-```
-<p>192.168.33.0/24行はvboxnet0から出るように設定されている。</p>
-<p>上の物理イメージに詳細書き込むと以下。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141006/20141006000246.png" alt="f:id:mosuke5:20141006000246p:plain" title="f:id:mosuke5:20141006000246p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p></p>
-<div style="border: solid 1px #dddddd;"></div>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>のみインスールする必要があるので、<br>
-web1, web2で以下を実施。（プロビジョニングしたほうが後々楽です。）</p>
-```
-$ sudo apt-get apache2
+<h1>各種テストの立ち位置</h1>
 
-##どちらがweb1でどちらがweb2か区別するために以下ファイルは変えておきます。
-$ sudo vim /var/www/index.html
-#Web1とかWeb2とかわかりやすい文言を入れておきます。
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20170416/20170416114252.jpg" alt="f:id:mosuke5:20170416114252j:plain:w600" title="f:id:mosuke5:20170416114252j:plain:w600" class="hatena-fotolife" style="width:600px" itemprop="image"></span></p>
 
-##Apache起動
-$ sudo service apache2 start
+<ul>
+<li>serverspecは、サーバの状態（正しく設定されたか）を確認するためのテストツールです</li>
+<li>サーバの振る舞いのテストは別のツールを使うことをおすすめします</li>
+<li>また、監視も一種のテストと言えます</li>
+<li>一般的には監視はその実行頻度の高さから、振る舞いを監視することが多い</li>
+<li>監視ツールで、Configファイルが正しいかは見ない</li>
+</ul>
 
-##Apache起動確認
-$ curl localhost
-　上記で変更したindex.htmlの内容が表示されること  
-```
-<p>これでWebサーバの準備は完了。</p>
+<h1>2. なんで導入したの？</h1>
 
-<p></div>
-<div class="section">
-    <h2>4, Nginxでリバースプロキシサーバを構築する</h2>
-    <p>Nginx初めて触ったがとてもシンプル。<br>
-今回はNginxをリバースプロキシとして利用したので、proxy.confを作成するだけ。</p></p>
+<p>serverspecを導入したのには大きく2つの理由があります。</p>
 
-<pre><code>##インスール
-$ sudo yum install nginx
+<h2>(その１) インフラの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C6%A5%B9%A5%C8%B6%EE%C6%B0%B3%AB%C8%AF">テスト駆動開発</a>を支えるため</h2>
 
-## /etc/nginx以下に設定ファイルなどあること確認
-$ ls /etc/nginx
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryは趣味で開発・運用しているサービスで、まだ作りたての発展途上のサービスです。<br>
+（作って公開してからは日が経っている気もしますが、週1の開発なので…）<br>
+そのため、今後もインフラコードをガンガン修正していくことを想定しています。<br>
+ですので、その開発、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%D5%A5%A1%A5%AF%A5%BF%A5%EA%A5%F3%A5%B0">リファクタリング</a>を支えるべく、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C6%A5%B9%A5%C8%B6%EE%C6%B0%B3%AB%C8%AF">テスト駆動開発</a>で行えるようにするためです。</p>
 
-## プロキシ構築のための設定ファイル作成
-$ cd /etc/nginx/conf.d
-$ sudo vim proxy.conf
-server {
+<h2>(その２) インフラテストの必要性を深く理解するため</h2>
 
-    # /web1にアクセスが来た時
-    location /web1 {
+<p>「インフラテストの必要性を深く理解するため」です。<br>
+必要性があるから導入したんじゃにないの？と思われるかもしれませんが、<br>
+ぼくはまだインフラテストの本当の必要性を理解できていないと思っています。</p>
 
-	proxy_http_version 1.1;
+<p>実は、はじめこんな風に思っていましたし、今でも少し思う部分もある。</p>
 
-	#受け渡す際のヘッダ情報を指定
-	proxy_set_header Host $host:$server_port;
-	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded_Proto http;
+<ul>
+<li>ansibleやchefで実行結果がOKならそれでテストも兼ねているのでは？</li>
+<li>実際にどんな項目をテストすればいいか、考えてみた時にピンと来ない…</li>
+</ul>
 
-        # 飛ばす先のURL(Web1サーバ)
-        proxy_pass http://192.168.33.10/;
-    }
+<p>実際に試してみないと、その本質が見えてこないと思っているので、<br>
+導入してみて自分の肌で感じようと思っています。</p>
 
-    # /web2にアクセスが来た時
-    location /web2 {
+<p>個人的なお話なのでみなさんには関係のない話ではありますが、<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの開発は企業でもなければ営利目的でもありません。<br>
+「週末にインフラ技術のインプット勉強をしていたが、それだけでは飽きてきて、<br>
+サービスを開発・運用していくなかでインフラ技術を磨いていきたい」
+というものだったので、こういった実験も大歓迎だったのです。</p>
 
-	proxy_http_version 1.1;
+<h1>3. 工夫している点</h1>
 
-	#受け渡す際のヘッダ情報を指定
-	proxy_set_header Host $host:$server_port;
-	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded_Proto http;
+<h1>チーム内でインフラテストコードの「指針」を決める</h1>
 
-        # 飛ばす先のURL(Web2サーバ)
-	proxy_pass http://192.168.33.11/;
-    }
-}
+<p>Ansibleなど構成管理ツールがあるなかで、本当にインフラテストっているの？とはじめは誰もが思うはずです。<br>
+「なんとなく」、「流行っているから」という理由で導入をすると、<br>
+きっと<b>チーム内でインフラテストを書く意味や目的が異なって</b>きてしまいます。<br>
+また、serverspecはいろんな使い方ができてしまうので、なおさら人によって考え方が異なってしまいます。</p>
 
-## あとは起動させるのみ
-$ sudo systemctl enable nginx
-$ sudo systemctl start nginx 
+<p>ですので、チーム内でインフラテストコードの「指針」を決めて共有しています。<br>
+こうすることで、「なぜインフラテストコードを書くのか」の目的意識を統一しています。</p>
+
+<p>この指針には、下記の本をかなり参考にしました。（serverspec作者の本です）
+</p>
+<div class="hatena-asin-detail">
+<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4873117097/hatena-blog-22/"><img src="https://images-fe.ssl-images-amazon.com/images/I/51P6qVOPALL._SL160_.jpg" class="hatena-asin-detail-image" alt="Serverspec" title="Serverspec"></a><div class="hatena-asin-detail-info">
+<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/4873117097/hatena-blog-22/">Serverspec</a></p>
+<ul>
+<li>
+<span class="hatena-asin-detail-label">作者:</span> 宮下剛輔</li>
+<li>
+<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AA%A5%E9%A5%A4%A5%EA%A1%BC%A5%B8%A5%E3%A5%D1%A5%F3">オライリージャパン</a>
+</li>
+<li>
+<span class="hatena-asin-detail-label">発売日:</span> 2015/01/17</li>
+<li>
+<span class="hatena-asin-detail-label">メディア:</span> 単行本（ソフトカバー）</li>
+<li><a href="http://d.hatena.ne.jp/asin/4873117097/hatena-blog-22" target="_blank">この商品を含むブログ (6件) を見る</a></li>
+</ul>
+</div>
+<div class="hatena-asin-detail-foot"></div>
+</div>
+
+<h1>テストをサーバの役割毎にまとめる</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%A3%A5%EC%A5%AF%A5%C8">ディレクト</a>リの主な構成は下記のようになっています。<br>
+（実際にはもっとファイルやホストが多いですがイメージです。）</p>
+
+<pre><code>├ Rakefile
+├ spec/
+│ └ spec_helper.rb
+│ ├ base/
+│ │   ├ user_spec.rb
+│ │   └ selinux_spec.rb
+│ ├ proxy/
+│ │   └ nginx_spec.rb
+│ └ app/
+│     └ vimfactory-app_spec.rb
+└ sshconfig 
 </code></pre>
 
-<p></div>
-</body></p>
+<p>nginxなどを搭載するプロキシサーバと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>があり、それぞれにロールを割り振ります。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rakefile">Rakefile</a>内に書いてます。もし記述が増えるようだと別ファイルに切り出すと思います。</p>
+
+<pre><code class="language-ruby">hosts = [
+  {
+    :name   =&gt; &quot;proxy.vimfactory&quot;,
+    :roles  =&gt; %w( base proxy )
+  },
+  {
+    :name   =&gt; &quot;app.vimfactory&quot;,
+    :roles  =&gt; %w( base app )
+  }
+]
+ 
+</code></pre>
+
+<p>このようにすることで、役割の違うサーバでも共有するテスト項目はコードの重複なくテストできます。<br>
+また拡張性もそこそこいい感じなんじゃないかと思っています。</p>
+
+<h1>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>の設定ファイルを任意で指定する</h1>
+
+<p>serverspecを使っていると<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>のクライアント側の設定ファイルを利用することがでてきます。<br>
+<code>serverspec-init</code>コマンドで生成されるspec_helper.rbでは<code>~/.ssh/config</code>をデフォルトで読むようになっています。</p>
+
+<p>ですが個人的には<code>~/.ssh/config</code>にプロジェクトの設定を書くのがあまり好きではないし、効果的でないことがあると考えています。<br>
+<code>~/.ssh/config</code>は個人のPCなどの設定によって各々違うものです。<br>
+そこにプロジェクト固有の設定を書くと、設定が衝突したり、管理が難しくなります。</p>
+
+<p>ですので、プロジェクトで使う<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>のクライアントの設定ファイルもgit管理しておいて、<br>
+それを使うようにすることが望ましいと思っています。</p>
+
+<p>そこで、spec_helper.rbの<code>Net::SSH::Config</code>部分を修正し、<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>の設定ファイルを任意で指定できるようにしています。</p>
+
+<pre><code class="language-ruby">config  = ENV['SSH_CONFIG']
+options = Net::SSH::Config.for(host, [config])
+ 
+</code></pre>
+
+<p>実行時に指定します。</p>
+
+<pre><code>bundle exec rake serverspec SSH_CONFIG=sshconfig 
+</code></pre>
+
+<h1>デプロイ作業での活用</h1>
+
+<p>serverspecは主に、インフラの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C6%A5%B9%A5%C8%B6%EE%C6%B0%B3%AB%C8%AF">テスト駆動開発</a>のために導入したのですが、
+本番環境でのデプロイ作業（インフラ設定の変更）にも大活躍しています。</p>
+
+<p>デプロイ作業時に、下記ステップで行うことで、デプロイ作業の安心感を得るとともに、<br>
+作業後の確認作業を軽減できたのはとても素晴らしいことでした。</p>
+
+<ol>
+<li>serverspec実行：テスト落ちる</li>
+<li>Ansible実行：デプロイ</li>
+<li>serverspec：テスト通る</li>
+</ol>
+
+<h1>4. 悩んでいること。これからについて</h1>
+
+<p>serverspecのCIの方法に悩んでいます。</p>
+
+<ul>
+<li>どうやってCIをやるのが効率的か？</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::FactoryはAnsibleでアプリケーションのデプロイまで行っているのだけど、</li>
+<li>インフラテストとアプリのテスト同時にやってほうがよくないだろうか？</li>
+<li>でも、アプリのテストをするごとにAnsibleで環境構築すると時間がかかってしまう。</li>
+<li>上記を解決するためにCI用にDockerイメージを作るという案もあるけど、そこまでするべきか？？</li>
+</ul>
+
+<p>これからは、どうCIをしていくか。<br>
+インフラテストとアプリのテストをどう結びつけていくか。<br>
+このあたりが課題と考えています。</p>
+
+<h1>(追記)インフラCI失敗した</h1>
+
+<p>よくある構成例ではあるが、下記のようにGitlabCI+ DigitalOceanを使ってインフラCIの検討を行った。<br>
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20170416/20170416125051.jpg" alt="f:id:mosuke5:20170416125051j:plain:w600" title="f:id:mosuke5:20170416125051j:plain:w600" class="hatena-fotolife" style="width:600px" itemprop="image"></span></p>
+
+<p>しかし、結果的には運用にのるところまでいかなかった。理由はこんな感じ。<br>
+正直、趣味でやってる範囲にしては、ここを突破するモチベーションがなかった。</p>
+
+<ul>
+<li>実行に膨大な時間がかかる</li>
+<li>それゆえにたまに<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8">タイムアウト</a>で死ぬ</li>
+<li>DigitalOcean<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>の停止に失敗した場合が面倒（笑）</li>
+</ul>
+
+<p></body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">25 Sep 2015, 23:27</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2015/09/25/232751/" class="post-title">Ansibleを踏み台サーバ越しに実行する</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>タイトルの通りで、なにも特別なことはない内容。<br>
+そして、9月も終わりなのに今月はひとつも記事を書いていなかった。</p></p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/KVM">KVM</a>を使って仮想のゲストサーバを立てたが、<br>
+ゲストサーバはホストサーバと通信する用の（外に出る場合にはNAT通信で）<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>しか持っていない状況で、<br>
+Ansibleの実行対象としたかったのが背景。</p>
+
+<p>ホストサーバにAnsibleをいれるわけにもいかず、ホストサーバを踏み台にして、<br>
+Ansibleを打ちたかったというもの。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150925/20150925232414.png" alt="f:id:mosuke5:20150925232414p:plain" title="f:id:mosuke5:20150925232414p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<h1>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>の設定ファイルを作る</h1>
+
+<p>"Ansibleで" と書いたが要は<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>です。<br>
+まずは<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>で踏み台サーバを経由してAnsible実行対象サーバへ接続できるように準備しました。<br>
+これはいわゆる「多段<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>」というやつで、以前にもブログに書いたので復習です。</p>
+
+<p><a href="https://blog.mosuke.tech/entry/2014/11/09/172745">【VPS1台でインフラ勉強】多段SSH設定（おまけ） - Goldstine研究所</a></p>
+
+<p>一般的には<code>~/.ssh/config</code>にこういった設定は書いたりもしますが、<br>
+Ansible実行の場合、<b><u>端末に依存したくなかった</u></b>ので、<br>
+Ansible<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>に別途ファイルを作ることにした。</p>
+
+<pre><code>## sshconfigという名前のファイルにした
+Host ansible-target
+    HostName 192.168.33.10
+    User xxxxx
+    ProxyCommand ssh -W %h:%p yyyyy@hostserver 
+</code></pre>
+
+<p>上記のファイルを使って多段<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>できることを確認します。</p>
+
+<pre><code>$ ssh -F sshconfig ansible-target 
+</code></pre>
+
+<h1>Ansible実行時に<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>設定ファイルを利用する</h1>
+
+<p>ここまで来たらとても簡単で、<br>
+ansible.cfgに下記を追記し、ansible実行時に上記のsshconfigを読み込まれるようにしました。</p>
+
+<p>ansible.cfg</p>
+
+<pre><code>[ssh_connection]
+ssh_args = -F sshconfig 
+</code></pre>
+
+<p></body></p>
 
                     </div>
                 </section>
@@ -1228,7 +860,7 @@ $ sudo systemctl start nginx
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 6 of 8</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 6 of 15</span>
     
       <a href="/page/7/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>

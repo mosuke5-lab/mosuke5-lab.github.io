@@ -56,11 +56,11 @@
             <div class="posts">
                 
                 
-                <h1 class="content-subhead">20 Sep 2014, 18:03</h1>
+                <h1 class="content-subhead">22 Aug 2015, 22:30</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2014/09/20/180326/" class="post-title">CentOS7, iptables設定でハマった</a>
+                        <a href="https://blog.mosuke.tech/entry/2015/08/22/223025/" class="post-title">(個人的) YAPC::Asia 2015ふりかえり</a>
 
                         <p class="post-meta">
                             
@@ -69,129 +69,122 @@
                             
                                 under 
                                 
-                                <a class="post-category post-category-CentOS7" href="https://blog.mosuke.tech/categories/centos7">CentOS7</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-iptables" href="https://blog.mosuke.tech/categories/iptables">iptables</a><a class="post-category post-category-ファイアウォール" href="https://blog.mosuke.tech/categories/%E3%83%95%E3%82%A1%E3%82%A4%E3%82%A2%E3%82%A6%E3%82%A9%E3%83%BC%E3%83%AB">ファイアウォール</a>
+                                <a class="post-category post-category-YAPC" href="https://blog.mosuke.tech/categories/yapc">YAPC</a>
                             
                         </p>
                     </header>
 
                     <div class="post-description">
                         <p><body>
-<p>最近<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>のOSをcentos7にしたのだが、なかなか手付かずで<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>の設定も放置していた…<br>
-（<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>の最低限の設定はしていたが、ほんとうに良くない…）</p>
-<p>久しぶりに手が空いたので設定するかーと思いきや<br>
-まず/etc/sysconfig/<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>がないし&hellip;</p>
-<p>Cent7からのsystemctlで<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>のサービスを確認してもでてこないし…</p></p>
+<p>「ブログを書くまでが<a class="keyword" href="http://d.hatena.ne.jp/keyword/YAPC">YAPC</a>」</p></p>
 
-<pre><code># systemctl status iptables
-iptables.service
-   Loaded: not-found (Reason: No such file or directory)
-   Active: inactive (dead)
-</code></pre>
+<p>というわけで、8/21, 22と<a class="keyword" href="http://d.hatena.ne.jp/keyword/YAPC">YAPC</a>に参加したので、そこでの学んだこと、気になったことなどを振り返ります。<br>
+しかし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/YAPC">YAPC</a>で聞いた公演内容を淡々とまとめるなどはしません。<br>
+単なる内容のまとめであれば、公開されているスライドなどをみるのが一番だと思いますので。</p>
 
-<p>というわけで、調べてみると、まず<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>.serviceをインスールしないといけないとのこと。<br>
-そして、centos7からはfirewalldがデフォルトでオンになっているからオフにしないといけない。<br>
-（いけないわけではないけど両方使う意味が無いので。）</p>
-<br>
-<p>まずは<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>-serviceをインスールし、firewalldをオフ、<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>をオンとした。</p>
+<p>以下３点を中心に振り返ってみます。</p>
 
-<pre><code># yum install iptables-services
-# systemctl status firewalld
-   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled)
-   Active: active (running) since Sat 2014-09-20 17:47:11 JST; 4s ago
- Main PID: 11162 (firewalld)
-   CGroup: /system.slice/firewalld.service
-           └─11162 /usr/bin/python -Es /usr/sbin/firewalld --nofork --nopid
+<ul>
+<li>インフラ関連セッションについて</li>
+<li>発表を聞いてよかった、今の自分に一番必要だったことについて</li>
+<li>興味を持ったことについて（CONBU）</li>
+</ul>
 
-#
-# systemctl stop firewalld
-#
-# systemctl status firewalld
-   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled)
-   Active: inactive (dead)
+<h1>インフラ関連セッションについて</h1>
 
-#
-#systemctl disable firewalld
-#
-#systemctl enable iptables
-#systemctl start iptables
-#
-#systemctl status iptables
-   Loaded: loaded (/usr/lib/systemd/system/iptables.service; enabled)
-   Active: inactive (dead) since Sat 2014-09-20 17:47:10 JST; 2min 48s ago
-  Process: 11139 ExecStop=/usr/libexec/iptables/iptables.init stop (code=exited, status=0/SUCCESS)
-  Process: 10096 ExecStart=/usr/libexec/iptables/iptables.init start (code=exited, status=0/SUCCESS)
- Main PID: 10096 (code=exited, status=0/SUCCESS)
-....
+<p>意図的も半分くらいあるんだけど、なんとなくセッションを選んでいたら、インフラ関連のものが多くなりました。</p>
 
-# 
-</code></pre>
+<ul>
+<li><a href="http://yapcasia.org/2015/talk/show/9ec2791c-05e5-11e5-81fa-79c97d574c3a">世界展開する大規模ウェブサービスのデプロイを支える技術 - YAPC::Asia Tokyo 2015</a></li>
+<li><a href="http://yapcasia.org/2015/talk/show/b335dee0-09ad-11e5-8d7a-67dc7d574c3a">Consulと自作OSSを活用した100台規模のWebサービス運用 - YAPC::Asia Tokyo 2015</a></li>
+<li><a href="http://yapcasia.org/2015/talk/show/4f85e87a-f9ec-11e4-8262-8ab37d574c3a">3分でサービスのOSを入れ替える技術 - YAPC::Asia Tokyo 2015</a></li>
+<li><a href="http://yapcasia.org/2015/talk/show/f2816038-10ec-11e5-89bf-d7f07d574c3a">我々はどのように冗長化を失敗したのか - YAPC::Asia Tokyo 2015</a></li>
+</ul>
 
-<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>の設定はいつもどおり。<br>
-CentOS7の新しいコマンドに戸惑ったので一部メモ。</p>
+<h2>デプロイについて</h2>
+
+<p>大規模サービスでのデプロイにおいて、一台一台のホストが<code>git clone</code>して、<code>bundle install</code>やらせてーとかやると、<br>
+時間もかかるし、並列的にgit cloneした際などgitサーバが負荷的に危なくなってくる。<br>
+なので、予めライブラリとかすべてインストールされたものをターボールなどにまとめておいて、<br>
+それをプルしてくる形式のデプロイについて多くの発表がありました。</p>
+
+<p>このデプロイ方法、並列で数百MBのファイルをダウンロードしても落ちないストーレジ（ようは<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>のS3）を前提に構築されている感がありました。<br>
+（というかそう言っていた）</p>
+
+<p>相変わらず<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>はせこいなーと思っています（笑）</p>
+
+<p>うちの環境では真似するのは難しいなーと思う部分もありますが、<br>
+それ以前にシステムの規模や用途によってデプロイのあり方も多種多様になることを改めて考えさせられました。<br>
+自分の環境にあった最適なデプロイ形態を探す日々がまた始まりそうですが、良いヒントになりそうなのはまちがいなしです。</p>
+
+<h2>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%B0%C7%AF%C1%AB%B5%DC">式年遷宮</a>インフラストラクチャ</h2>
+
+<p>Kenjiさんの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%B0%C7%AF%C1%AB%B5%DC">式年遷宮</a>インフラストラクチャ。
+この考え方、ぼくも一度考えたことはありますが、ここまで実践してみた経験談がきけたのは面白かった。</p>
+
+<p>いざというときに切り替わらない、切り替えられないという問題に対して、<br>
+自動ではないが、「切替訓練」ということで、定期的に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BE%E9%C4%B9%B2%BD">冗長化</a>の系を切り替えることはしてもいいのかなーと思ったりしています。</p>
+
+<h2>consulについて</h2>
+
+<p>実は、上であげた４つのセッション全てで共通していたのが<code>consul</code>を使っていた。</p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=https%3A%2F%2Fwww.consul.io%2F" title="Consul by HashiCorp" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="https://www.consul.io/">Consul by HashiCorp</a></iframe><cite class="hatena-citation"><a href="https://www.consul.io/">www.consul.io</a></cite></p>
+
+<p>正直、consulについて、名前くらいしかしらなかったのに、ここまで利用されていたので、時代に乗り遅れている感を感じた。
+でも利用用途をみていくと、iaas環境で力を発揮するっぽいので、概要と用途だけ押さえておくか…といったところ。<br>
+今月中の課題です。</p>
+
+<h1>発表を聞いてよかった、今の自分に一番必要だったことについて</h1>
+
+<p>たくさん学びのあったなかで、なんだかんだいっても、koemuさんの発表が今の自分が一番考えていてることであり、<br>
+一番必要なことであったように感じた。</p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fyapcasia.org%2F2015%2Ftalk%2Fshow%2F53aacc02-faca-11e4-8c2e-8ab37d574c3a" title="辛いことをやめる！から始まる業務改善とInfrastructure as Code - YAPC::Asia Tokyo 2015" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://yapcasia.org/2015/talk/show/53aacc02-faca-11e4-8c2e-8ab37d574c3a">辛いことをやめる！から始まる業務改善とInfrastructure as Code - YAPC::Asia Tokyo 2015</a></iframe><cite class="hatena-citation"><a href="http://yapcasia.org/2015/talk/show/53aacc02-faca-11e4-8c2e-8ab37d574c3a">yapcasia.org</a></cite></p>
+
+<p>実はkoemuさんのブログをたまにみていて、<br>
+いちど話を聞いてみたいなーと思っていた人であったので、とてもいい機会であった。</p>
+
+<p>特に個人的に響いたのが、次の２つのこと。</p>
+
+<ul>
+<li>CTO（という言い方をしていたが、要はキーパーソン）を味方につける働き方をする</li>
+<li>ハンズオンを大事にする</li>
+</ul>
+
+<p>キーパーソンにやりたいことを伝えて公認とするのは、いまもよくやっていることでぼくも大事にしていること。<br>
+だた、ハンズオンについてはうまくできていない部分も多くあったので見直していきたいポイントでした。</p>
+
+<p>また、個人的にこの手でよくやっているのが、「スモールステップ展開」。<br>
+一度に、あれもこれも新しいことやっていく、となると、どんなにサポートを厚くしてもなかなか浸透しなかったりしてしまう。<br>
+なので、新しいことやるときはスモールステップでひとつひとつやっていき、文化浸透してから次のことをやるという風にしている。</p>
+
+<h1>興味をもったことんついて（CONBU）</h1>
+
+<p>会場のネットワークを作ってくれたのがCONBUという団体でした。
+CONBU自体はソフトウェアデザインで特集されているのを見ていたので知ってはいましたが、ネットワークの品質の良さ、<br>
+そしてリアルタイムでのネットワークの状態を<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>提供の便利さなど肌身で感じました。</p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fgihyo.jp%2Fmagazine%2FSD%2Farchive%2F2015%2F201503" title="Software Design 2015年3月号" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://gihyo.jp/magazine/SD/archive/2015/201503">Software Design 2015年3月号</a></iframe><cite class="hatena-citation"><a href="http://gihyo.jp/magazine/SD/archive/2015/201503">gihyo.jp</a></cite></p>
+
+<p>こちら、LTで<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiFi">WiFi</a> AP設置の速さを実演したもの。<br>
+でも、ほんとの現場では安全第一でやっていると思うので、その辺も一言いってくれてるとよかったかなと笑</p>
+
 <p></p>
-<h2>service, chkconfigコマンドはsystemctlコマンドへ</h2>service, chkconfigコマンドは推奨されずsystemctlコマンドへ切り替わった。<br>
-試しにchkconfigコマンドを利用すると…</p>
-
-<pre><code># chkconfig --list
-Note: This output shows SysV services only and does not include native
-      systemd services. SysV configuration data might be overridden by native
-      systemd configuration.
-
-      If you want to list systemd services use 'systemctl list-unit-files'.
-      To see services enabled on particular target use
-      'systemctl list-dependencies [target]'.
-
-iprdump        	0:off	1:off	2:on	3:on	4:on	5:on	6:off
-iprinit        	0:off	1:off	2:on	3:on	4:on	5:on	6:off
-iprupdate      	0:off	1:off	2:on	3:on	4:on	5:on	6:off
-netconsole     	0:off	1:off	2:off	3:off	4:off	5:off	6:off
-network        	0:off	1:off	2:on	3:on	4:on	5:on	6:off
-pmcd           	0:off	1:off	2:off	3:off	4:off	5:off	6:off
-pmie           	0:off	1:off	2:off	3:off	4:off	5:off	6:off
-pmlogger       	0:off	1:off	2:off	3:off	4:off	5:off	6:off
-pmmgr          	0:off	1:off	2:off	3:off	4:off	5:off	6:off
-pmproxy        	0:off	1:off	2:off	3:off	4:off	5:off	6:off
-pmwebd         	0:off	1:off	2:off	3:off	4:off	5:off	6:off
-</code></pre>
-
-<p><blockquote>
-    <p>&ldquo;If you want to list systemd services use &lsquo;systemctl list-unit-files&rsquo;.&rdquo;</p>
+<blockquote class="twitter-tweet" lang="HASH(0x86c7010)">
+<p lang="ja" dir="ltr">突然目の前に無線APが生えてきた <a href="https://twitter.com/hashtag/yapcasia?src=hash">#yapcasia</a> <a href="http://t.co/UWcSzvRv08">pic.twitter.com/UWcSzvRv08</a></p>— ぷりんたいは求職中です、 (@spacepro_be) <a href="https://twitter.com/spacepro_be/status/635004222291902464">August 22, 2015</a>
 </blockquote>
-<p>systemdのサービスを表示したければ、systemctl list-unit-filesを利用せよとのこと。<br>
-試しに打つと以下のように表示される</p></p>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-<pre><code># systemctl list-unit-files
-UNIT FILE                                   STATE
-proc-sys-fs-binfmt_misc.automount           static
-dev-hugepages.mount                         static
-dev-mqueue.mount                            static
-proc-fs-nfsd.mount                          static
-proc-sys-fs-binfmt_misc.mount               static
-sys-fs-fuse-connections.mount               static
-sys-kernel-config.mount                     static
-sys-kernel-debug.mount                      static
-tmp.mount                                   disabled
-var-lib-nfs-rpc_pipefs.mount                static
-brandbot.path                               disabled
-....
- 
-</code></pre>
+<h1>最後に</h1>
 
-<p><p>また、サービスの起動・停止・状態確認などは</p></p>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/YAPC">YAPC</a>は今年初参加でした。
+学びも多かったけど、それ以上にエンタメとしてとても楽しめました。</p>
 
-<pre><code># service &lt;service name&gt; &lt;start/stop/restart/status&gt;
-　↓
-# systemctl &lt;start/stop/restart/status&gt; &lt;service name&gt;
-</code></pre>
+<p>小さいところからでも楽しく学べる作っていきたいですね。</p>
 
-<p><p>そして、サービスの起動オプションの設定は</p></p>
-
-<pre><code># chkconfig &lt;service name&gt; &lt;on/off&gt;
-   ↓
-# systemctl &lt;enable/disable&gt; &lt;service name&gt;
-</code></pre>
-
-<p><p>まずはこんなところ。</p>
+<p><p>本当にスタッフのみなさんお疲れ様でした。</p>
 </body></p>
 
                     </div>
@@ -199,11 +192,11 @@ brandbot.path                               disabled
                 
                 
                 
-                <h1 class="content-subhead">15 Sep 2014, 13:56</h1>
+                <h1 class="content-subhead">13 Aug 2015, 00:04</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2014/09/15/135611/" class="post-title">D3.js、DBからのデータ連携方法の検討</a>
+                        <a href="https://blog.mosuke.tech/entry/2015/08/13/000440/" class="post-title">デスクトップUbuntuにVNC接続。ついでにSSHローカルポートフォワードの復習。</a>
 
                         <p class="post-meta">
                             
@@ -212,982 +205,598 @@ brandbot.path                               disabled
                             
                                 under 
                                 
-                                <a class="post-category post-category-D3.js" href="https://blog.mosuke.tech/categories/d3.js">D3.js</a><a class="post-category post-category-Sinatra" href="https://blog.mosuke.tech/categories/sinatra">Sinatra</a><a class="post-category post-category-Ruby" href="https://blog.mosuke.tech/categories/ruby">Ruby</a>
+                                <a class="post-category post-category-Ubuntu" href="https://blog.mosuke.tech/categories/ubuntu">Ubuntu</a><a class="post-category post-category-vnc" href="https://blog.mosuke.tech/categories/vnc">vnc</a><a class="post-category post-category-ポートフォワード" href="https://blog.mosuke.tech/categories/%E3%83%9D%E3%83%BC%E3%83%88%E3%83%95%E3%82%A9%E3%83%AF%E3%83%BC%E3%83%89">ポートフォワード</a><a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a>
                             
                         </p>
                     </header>
 
                     <div class="post-description">
                         <p><body>
-<p>最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。<br>
-例えば以下の状況を考える。<br>
-【やりたいこと】<br>
-「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」</p>
-<p>【DBの構造】<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AB%A5%E9%A5%E0%CC%BE">カラム名</a>：型<br>
-　date : datetime<br>
-　value : int</p>
-<p>※また、下記では<a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>上で行っているが、他の言語でも同様のことがいえる。</p></p>
+<p>完全に自分のための備忘録。内容はわりと薄め。</p></p>
 
-<p><div class="section">
-    <h3>(1) 簡単な<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>のようなものを利用する</h3>
-    <p>先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、<br>
-これが一番複雑にならずに良いと思ったということ。</p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>側で/<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>にアクセスすると<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルをダウンロードできるようにする。</p></p>
+<h1>やったこと</h1>
 
-<pre><code class="language-ruby">#Sinatra側
-get '/csv' do
-    content_type 'application/csv'
-    attachment 'download.csv'
+<p>最近、自作したPCに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>をいれて使っているのだけど、<br>
+デスクトップPCなので、部屋でしか操作することができません。</p>
 
-    #DBからデータ取得(Activerecord利用)
-    @data   = Model.all()
+<p>他の部屋からノートPCで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>を触れたらいいなーと思いその環境を整えることをしました。</p>
 
-    #出力するCSVデータの変数。csvヘッダーを先につけている。
-    @csv = &quot;date,value\n&quot;
+<p>主にやったことは以下の通りです。</p>
 
-    #DBのデータをCSVの形にして格納
-    @data.each do |d|
-        @csv += d.date.to_s + &quot;,&quot; + d.value.to_s + &quot;\n&quot;
-    end
+<ul>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>サーバ構築について</li>
+<li>ノートPC（<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>）からの<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>接続について</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>ローカルポートフォワードを使ってのセキュアな接続について</li>
+</ul>
+
+<h1>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>での<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>サーバ構築について</h1>
+
+<p>今回利用している<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>は「<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a> Desktop 14.04」です。<br>
+また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>の実現は標準でインストールされているvinoを使って行いました。</p>
+
+<p>ご存知の方も多くいるかもしれませんが、vinoでの<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>は簡易的なもので、サーバ側のユーザがログアウトしていると使えません。<br>
+ですので、会社などでの利用には耐えないと思います。<br>
+ユーザーをログアウトせずにロック状態にしていれば使えます。</p>
+
+<p>まずはデスクトップ共有の設定をします。<br>
+「デスクトップの共有」のアプリケーションを起動します。
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150809/20150809132410.png" alt="f:id:mosuke5:20150809132410p:plain" title="f:id:mosuke5:20150809132410p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p>接続毎に要求するようにすると、サーバ側で毎度許可が必要なので、オフにします。<br>
+パスワードの設定はしておきましょう。<br>
+同じLANをつかんでる人に簡単に奪われてしまいますので。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150809/20150809132421.png" alt="f:id:mosuke5:20150809132421p:plain" title="f:id:mosuke5:20150809132421p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p>ちょっと詳細な意味を把握していないのですが、<br>
+下記を実行しないと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>で接続すると「互換性のないバージョンです」的なこといわれました…すいません。</p>
+
+<pre><code>$ gsettings set org.gnome.Vino require-encryption false 
+</code></pre>
+
+<p>設定ができたら、きちんとサーバとして<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>接続を待ち受けているか確認します。</p>
+
+<pre><code>% sudo lsof -i:5900
+COMMAND     PID    USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+vino-serv 24414 mosuke5   13u  IPv6 156661      0t0  TCP *:5900 (LISTEN)
+vino-serv 24414 mosuke5   14u  IPv4 156662      0t0  TCP *:5900 (LISTEN)
+
+% ps -ef | grep vino
+mosuke5  24414 24226  0 12:30 ?        00:00:21 /usr/lib/vino/vino-server --sm-disable
+mosuke5  25456 24470  0 13:19 pts/11   00:00:00 grep vino 
+</code></pre>
+
+<h1>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>から<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>接続する</h1>
+
+<p>これをやるまで知らなかったのですが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>には標準で<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>クライアントがついています。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/vnc">vnc</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB">プロトコル</a>で対象のサーバの<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を入れれば接続できます。
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150812/20150812225515.png" alt="f:id:mosuke5:20150812225515p:plain" title="f:id:mosuke5:20150812225515p:plain" class="hatena-fotolife" itemprop="image"></span>
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150812/20150812225126.png" alt="f:id:mosuke5:20150812225126p:plain" title="f:id:mosuke5:20150812225126p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<h1>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>ローカルフォワードを使ってセキュアな通信をする</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB">プロトコル</a>は通信の内容を暗号化しません。<a class="keyword" href="http://d.hatena.ne.jp/keyword/telnet">telnet</a>と同様で、非常に危険です。<br>
+家のLAN内で利用するので、正直ここまでする必要は全くないのだが、<br>
+より応用的な使い方に備えてと、復習を兼ねて<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のローカルフォワードを利用してセキュアに<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>を使ってみます。</p>
+
+<p>復習と書いたのは以前に、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のローカルフォワードについてはまとめたからです。</p>
+<a href="/entry/2014/12/31/170545/">SSHでローカルポートフォワードを実際に試す - Goldstine研究所</a>
+
+<p>まずは、ローカルフォワードの<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>接続。<br>
+意味は「自分の端末のポート8888に来た通信は、192.168.11.5からみて<a class="keyword" href="http://d.hatena.ne.jp/keyword/localhost">localhost</a>のポート5900にとばします」です。</p>
+
+<pre><code>$ ssh -L8888:localhost:5900 mosuke5@192.168.11.5 
+</code></pre>
+
+<p>上のコマンドで<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>接続した状態でなら、<a class="keyword" href="http://d.hatena.ne.jp/keyword/localhost">localhost</a>のポート8888が利用できます。
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150812/20150812224539.png" alt="f:id:mosuke5:20150812224539p:plain" title="f:id:mosuke5:20150812224539p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p><p>これでセキュアな<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>の完成。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">31 Jul 2015, 21:15</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2015/07/31/211542/" class="post-title">Packerやる前にKickstartはじめよう</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-kickstart" href="https://blog.mosuke.tech/categories/kickstart">kickstart</a><a class="post-category post-category-virtualbox" href="https://blog.mosuke.tech/categories/virtualbox">virtualbox</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<h1>1.はじめに</h1></p>
+
+<p>開発環境はVirualboxを使った<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>を利用しているが、<br>
+本番環境は<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>だったり<a class="keyword" href="http://d.hatena.ne.jp/keyword/KVM">KVM</a>だったり違う仮想化機構で動作しているなんてことよくあると思います。<br>
+そういう環境下でどのように開発環境と本番環境の差分をなくしていますか？</p>
+
+<p>わたしの場合、基本的にAnsibleを使ってプロビジョニングをしていますが、<br>
+そのプロビジョニング前のベースが異なってしまって困ることがよくあります。<br>
+一般に公開されているVagrantBox使ったら余計な設定が入っていたとか、すでにパッケージが入っていたとか…</p>
+
+<p>そんな問題を解決しようとPackerを使おう！って考えました。<br>
+ですが、Packerも当たり前だけど魔法ではなく、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>などの自動インストールが前提なので、<br>
+Packerをやる前に<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>を学習せよ、、、ということに気づきました。</p>
+
+<p>ということで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>をはじめたよってことです。</p>
+
+<h1>2.<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ってなに</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>はOSのインストールを自動化する仕組みです。<br>
+anaconda社が提供するインストールの仕組みで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Redhat">Redhat</a>系のOSが採用しているものです。<br>
+ですので<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>だとPreseedっていう別の仕組みだそうです。（詳しくありませんっ）</p>
+
+<p>で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>でなにができるかというと...</p>
+
+<p>OSのインストールをしたことがある方ならわかるかと思いますが、<br>
+普通にDVDなどからインストールすると、</p>
+
+<ul>
+<li>言語はなににしますかー？</li>
+<li>ホスト名なににしますかー？</li>
+<li>パッケージはなにをいれますかー？</li>
+</ul>
+
+<p>とか、聞かれて選択していく必要があります。
+この作業を自動化できるのが<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>です。</p>
+
+<p>URLのようなもの。
+<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fkajuhome.com%2Fcentos6_inst.shtml" title="はじめての自宅サーバ構築 - Fedora/CentOS - CentOS6 のインストール手順" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://kajuhome.com/centos6_inst.shtml">はじめての自宅サーバ構築 - Fedora/CentOS - CentOS6 のインストール手順</a></iframe><cite class="hatena-citation"><a href="http://kajuhome.com/centos6_inst.shtml">kajuhome.com</a></cite></p>
+
+<h1>(おまけ)Ansible, Chef, Puppetとの違い？</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>にはプロビジョニング機能もついているため、<br>
+AnsibleとかChefとかPuppetとの違いは？住み分けは？と思うかもしれません。<br>
+明確に、住み分けが決まっているわけではありませんが、
+個人的にはAnsibleやChefを実行する前の最低限の設定を<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>にやらせようと思っています。<br>
+（一般的かとは思いますが…？）</p>
+
+<p>Lee ThompsonのProvisioning Toolchainを参考にKiskstarのやる範囲をまとめると。
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150731/20150731223953.jpg" alt="f:id:mosuke5:20150731223953j:plain" title="f:id:mosuke5:20150731223953j:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fen.oreilly.com%2Fvelocity-mar2010%2Fpublic%2Fschedule%2Fdetail%2F14180" title="Provisioning Toolchain: Web Performance and Operations - Velocity Online Conference - March 17, 2010 - O'Reilly Media" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://en.oreilly.com/velocity-mar2010/public/schedule/detail/14180">Provisioning Toolchain: Web Performance and Operations - Velocity Online Conference - March 17, 2010 - O'Reilly Media</a></iframe><cite class="hatena-citation"><a href="http://en.oreilly.com/velocity-mar2010/public/schedule/detail/14180">en.oreilly.com</a></cite></p>
+
+<h1>3.Hello <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>!!</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Virtualbox">Virtualbox</a>を使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>を試しました。</p>
+
+<h1>3-1.用意したもの</h1>
+
+<ul>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Virtualbox">Virtualbox</a>
+
+<ul>
+<li>自分の環境は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>で、バージョンは5.0</li>
+</ul>
+</li>
+<li>OSのisoファイル
+
+<ul>
+<li>
+<a href="http://isoredirect.centos.org/centos/7/isos/x86_64/CentOS-7-x86_64-DVD-1503-01.iso">CentOS Mirror</a> ここからダウンロードしました</li>
+</ul>
+</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイル
+
+<ul>
+<li>ネットワーク上においてhttpでアクセスできるようにしておきました</li>
+</ul>
+</li>
+</ul>
+
+<p>利用した<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイル。自分の学習のためコメントを多く残しました。</p>
+
+<pre><code># アップグレードするかインストールするか
+install
+
+# インストールタイプの設定
+# CD-ROM経由かネットワーク経由かとか
+cdrom
+
+# 言語設定
+lang ja_JP.UTF-8
+
+# キーボード設定
+keyboard jp106
+
+# ネットワーク設定
+# /etc/sysconfig/network-scripts/ifcfg-xxxx 部分
+network --onboot yes --device eth0 --bootproto dhcp --noipv6
+
+# rootのパスワード
+# xxxxxx部分はopensslコマンドで作成するといい
+# $openssl passwd -1
+rootpw --iscrypted xxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# iptablesの設定
+# プロビジョニングで設定するのでここでは無効にしておく
+firewall --disabled
+
+# 認証オプション
+authconfig --enableshadow --passalgo=sha512
+
+# SELinuxの設定
+# こちらも詳細はプロビジョニングで設定するので無効にしておく
+selinux --disabled
+
+# タイムゾーン
+timezone --utc Asia/Tokyo
+
+# ブートローダのインストール方法
+bootloader --location=mbr --driveorder=sda --append=&quot;nomodeset crashkernel=auto rhgb quiet&quot;
+
+# 設定後にリブート
+reboot
+
+# パーティション設定
+clearpart --linux --drives=sda
+autopart
+
+# インストールパッケージ選択
+%packages --nobase
+@core
+
+%end 
+</code></pre>
+
+<h3>参考になったもの</h3>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Redhat">Redhat</a>社のインストールガイドがよくまとまっていた。<br>
+特に<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイルについては下記あたりが役立ちます。</p>
+
+<ul>
+<li><a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/6/html/Installation_Guide/s1-kickstart2-options.html">32.4. キックスタートのオプション</a></li>
+<li><a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/6/html/Installation_Guide/s1-kickstart2-packageselection.html">32.5. パッケージの選択</a></li>
+</ul>
+
+<h1>3-2.<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイルの使い方</h1>
+
+<p>しかし、OSインストール前なのにどうやってファイルを使うのか…？<br>
+はじめ戸惑いました…</p>
+
+<p>実は以下の方法で利用できます。</p>
+
+<p>OSのisoファイルで起動するとこの画面がでるやろ。
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150802/20150802125544.png" alt="f:id:mosuke5:20150802125544p:plain" title="f:id:mosuke5:20150802125544p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p>そして、ここでTabをおすと、なにか入力できるが画面が出てきて。<br>
+そこに、<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイルのパスを入力してやる。
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150802/20150802125630.png" alt="f:id:mosuke5:20150802125630p:plain" title="f:id:mosuke5:20150802125630p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p>これで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>完了や。</p>
+
+<h1>4.最後に</h1>
+
+<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>入門したし、次はPackerをやりたいと思います。<br>
+が、ふと思ったのが、自分の用途だとPackerではなく<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>で十分かもなーとか思ったり思わなかったり…</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">19 Jul 2015, 13:58</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2015/07/19/135844/" class="post-title">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-vim" href="https://blog.mosuke.tech/categories/vim">vim</a><a class="post-category post-category-vim::factory" href="https://blog.mosuke.tech/categories/vimfactory">vim::factory</a><a class="post-category post-category-vimfactory" href="https://blog.mosuke.tech/categories/vimfactory">vimfactory</a><a class="post-category post-category-docker" href="https://blog.mosuke.tech/categories/docker">docker</a><a class="post-category post-category-websocket" href="https://blog.mosuke.tech/categories/websocket">websocket</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>2014年の秋から<code>@mogulla3</code>と定期的にインフラ関連技術の勉強会をやってきましたが、<br>
+インプットの勉強会だけでは飽き足らず、いつしかサービスを作る中でインフラ関連技術を駆使し勉強したいと思うように…</p></p>
+
+<p>そして、普段使っている<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を題材に、<br>
+<b><span style="font-size: 150%"><a class="keyword" href="http://d.hatena.ne.jp/keyword/vim">vim</a>の設定をブラウザ上で即体感できるサービス <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factory</span></b><br>
+を開発しました。</p>
+
+<p>本記事は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの簡単な紹介と技術的な仕組みについて記述しています。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryはこちら。<br>
+<a href="http://vimfactory.com/">http://vimfactory.com/</a></p>
+
+<h1>1. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryについて</h1>
+
+<h2>1-1. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryってなに？？</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryは、選択した<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の設定を、ブラウザ上で「即体感」できるサービスです。<br>
+数多くあり複雑な<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の設定を容易にし、お気に入りの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>探しをサポートすることを目指しています。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150719/20150719155723.png" alt="f:id:mosuke5:20150719155723p:plain" title="f:id:mosuke5:20150719155723p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<h2>1-2. なんで作ったの？</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の設定ってたくさんあってどれを選んでいいかわからなかったり、<br>
+設定したもののどう変わったかイマイチわからなかったりしませんか？</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の設定がどのように反映されるか、もっと簡単に体験したいと考えたからです。</p>
+
+<p>あと、例えば<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>で100star以上をつける人の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>をブラウザ上で体験できたらいいなと思っていて、<br>
+それを実現のための第一歩としてこのサービスを作りました。</p>
+
+<h2>1-3. このサービスの最大の特徴は？</h2>
+
+<p>このサービスの最大の特徴はなんといっても<b>「ブラウザ上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>が体感できること」</b>です。</p>
+
+<p>今までは<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の設定を試そうと思ったら、ネットで調べて自分の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>に反映させて…という作業が必要でしたが、<br>
+ブラウザ上で設定を即体感するという新しい体験を提供するために力を注いできました。<br>
+その実現方法については、後述しています。</p>
+
+<h2>1-4. 紹介動画</h2>
+
+<p>詳しくは、実際に試してもらうのが早いと思いますが、簡単な操作動画を用意してみました。<br>
+モバイルからこのサービスはちょっと使えないので、モバイルで読んでいる方は動画でお楽しみください(笑)<br>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/j20agcBcAec?feature=oembed" frameborder="0" allowfullscreen></iframe><cite class="hatena-citation"><a href="https://www.youtube.com/watch?v=j20agcBcAec&amp;feature=youtu.be">www.youtube.com</a></cite></p>
+
+<h1>2. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの技術について</h1>
+
+<p>ここから<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの技術について一部ではありますがご紹介します。</p>
+
+<h2>2-1. ブラウザ上での<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を実現した技術</h2>
+
+<p>ブラウザ上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を実現しようと思うと、ぱっと思いつくのは<a class="keyword" href="http://d.hatena.ne.jp/keyword/JavaScript">JavaScript</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>そのものを実装してしまおうというものかもしれません。<br>
+ですが、JSで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を実装することってどれくらい難しいでしょうか？<br>
+少なくともぼくにはそんなことはできませんし、できたとして質の悪いものになってしまうと思います。</p>
+
+<p>そこで思いついたのが、一般的なターミナルソフトと同様にサーバ上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/vim">vim</a>を起動し、<br>
+そのターミナル情報をブラウザ上で表示するという方法です。<br>
+この方法であれば自ら<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を実装せずとも<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を再現できます。イメージは下記のとおりです。<br>
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150718/20150718230605.png" alt="f:id:mosuke5:20150718230605p:plain" title="f:id:mosuke5:20150718230605p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p>また、サービスとして上記を行うには、接続してきたユーザごとに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を用意する必要があります。</p>
+
+<p>これらを実現するために利用したのが<b>Docker</b>と<b>WebSocket</b>です。<br>
+dockerコンテナ上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を起動し、そのターミナル情報をWebSocketでブラウザに送信するようにしました。
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150720/20150720002840.png" alt="f:id:mosuke5:20150720002840p:plain" title="f:id:mosuke5:20150720002840p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p>dockerはコンテナ型の仮想化なので起動がとてもはやく、<br>
+httpのリクエストが来てからdockerコンテナを立ち上げても十分なほどのはやさをもっています。</p>
+
+<h2>2-2. 全体構成</h2>
+
+<p>システムの全体構成は以下のような感じです。<br>
+※実際の役割は図のとおりですが、サーバはこんなに多くありません。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150719/20150719124021.png" alt="f:id:mosuke5:20150719124021p:plain" title="f:id:mosuke5:20150719124021p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<h2>2-3. 利用した技術とか<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>のまとめ</h2>
+
+<p>振り返りも兼ねて利用した技術・<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>を一覧にまとめておきます。</p>
+
+<ul>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a></li>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a></li>
+<li>thin</li>
+<li>node.js</li>
+<li>Websocket</li>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/memcached">memcached</a></li>
+<li>docker</li>
+<li>nginx</li>
+<li>centos7</li>
+<li>Ansible</li>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a></li>
+<li>gitlab</li>
+<li>mackerel</li>
+<li>slack</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/esa">esa</a>.io(ドキュメント管理)</li>
+</ul>
+
+<h1>3. まとめ</h1>
+
+<p>このサービスで一番苦労したことはやっぱりブラウザ上での<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の実現部分です。<br>
+当初、このサービスを思いついた時、実現不可能だ…とあきらめました。<br>
+というのもJS（アプリケーションサイド）で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>をどう実装しようかしか考えていなかったからです。</p>
+
+<p>ですが、ふとしたときに上記の別の方法（インフラサイド）での実現方法を思いつきました。</p>
+
+<p>このサービスを作るきっかけは、インフラ技術のインプット勉強だけでは飽きたらず、<br>
+サービスを開発・運用していくなかでインフラ技術を磨いていきたいというものでしたが、<br>
+インプットの勉強があってこそインフラサイドからの実現方法を見つけられたようにも思いました。</p>
+
+<p>今後、運用を通してさらなるパワーアップができたらいいなと思います。</p>
+
+<h1>4. 最後に</h1>
+
+<p>最後になりますが、
+完全な趣味で作ってしまったサービスで、今後どのように展開していこうか何も考えていません。<br>
+まずは、このように公開し皆様に利用して頂いて、フィードバックなど頂いてから考えようと思っています。</p>
+
+<p>サービスに関するご意見等あれば、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Twitter">Twitter</a>やメールで書いてくれると大変嬉しいです。</p>
+
+<p>お問い合せはこちら:</p>
+
+<ul>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Twitter">Twitter</a>: <a href="https://twitter.com/mosuke5">もーすけ (@mosuke5) | Twitter</a> or <a href="https://twitter.com/mogulla3">もぐらマン (@mogulla3) | Twitter</a>
+</li>
+<li>e-mail: ilab.vimfactory+info@<a class="keyword" href="http://d.hatena.ne.jp/keyword/gmail">gmail</a>.com</li>
+</ul>
+
+<p>では、みなさんも<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>ライフを楽しみましょう！</p>
+
+<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryはこちら。<br>
+<a href="http://vimfactory.com/">http://vimfactory.com/</a></p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">17 Jun 2015, 21:28</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2015/06/17/212852/" class="post-title">PostgreSQL環境でFuelPHPのDBマイグレーションを使う</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-php" href="https://blog.mosuke.tech/categories/php">php</a><a class="post-category post-category-fuelphp" href="https://blog.mosuke.tech/categories/fuelphp">fuelphp</a><a class="post-category post-category-DBマイグレーション" href="https://blog.mosuke.tech/categories/db%E3%83%9E%E3%82%A4%E3%82%B0%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3">DBマイグレーション</a><a class="post-category post-category-PostgreSQL" href="https://blog.mosuke.tech/categories/postgresql">PostgreSQL</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>今更<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>感はあるのだが、<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>利用時の<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>のmigration導入について、注意点をまとめた。<br>
+でも、結論は納得がいっていない。</p></p>
+
+<h1>0. 前提</h1>
+
+<p>下記の環境で行ったものです。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>: 5.5.7<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>: 1.7<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Postgresql">Postgresql</a>: 9.4</p>
+
+<h1>1. テーブル<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%B8%BB%FA%A5%B3%A1%BC%A5%C9">文字コード</a>の問題</h1>
+
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a></h1>
+
+<p>公式サイトのサンプルの通りはじめに<code>app/migrations/001_example.php</code>を作り、migrationを実行した。</p>
+
+<p><code>app/migrations/001_example.php</code>の作成</p>
+
+<pre><code class="language-php">&lt;?php
+namespace Fuel\Migrations;
+class Example
+{
+    function up()
+    {
+        \DBUtil::create_table('posts', array(
+            'id' =&gt; array('type' =&gt; 'int', 'constraint' =&gt; 5),
+            'title' =&gt; array('type' =&gt; 'varchar', 'constraint' =&gt; 100),
+            'body' =&gt; array('type' =&gt; 'text'),
+        ), array('id'));
+    }
     
-    #csvtest.erbというビューに出力
-    erb :csvtest, :layout =&gt; false
-end
-</code></pre>
-
-<p>csvtest.erb</p>
-```ruby
-<%= @csv %>
-```
-<p>こうすることで"<a href="http://*****/csv">http://*****/csv</a>"にアクセスすると<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルとしてダウンロードできる状態になる。<br>
-条件指定をしてデータをダウンロードできるようにしたい場合はGETでパラメータ指定できるようにすれば良いと思う。<br>
-（<a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/CSV">CSV</a>ファイルを生成するところのコードがナンセンスだと思っているので、もっといい方法があるはず…）</p>
-<p>また、今回は<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>にしているが<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>などの他の形式でも同様のことがいえる。</p>
-<p>これをD3.js側で以下のように読み込ませる。</p>
-
-<pre><code class="language-javascript">d3.csv(&quot;/csv&quot;, function(error, data) {
-    (中略)
+    function down()
+    {
+        \DBUtil::drop_table('posts');
+    }
 }
 </code></pre>
 
-<p>d3.jsの<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>を読み込ませる関数の引数にURLを指定してあげればそれで終了。</p>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>実行すると以下のエラーに襲われた。</p>
 
-<p></div>
-<div class="section">
-    <h3>(2) <a class="keyword" href="http://d.hatena.ne.jp/keyword/javascript">javascript</a>コードの中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>変数を展開させる</h3>
-    <p>d3.jsのdatasetの中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>の変数を展開させる。ビューに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Javascript">Javascript</a>を書いているので、ビューの中で変数展開するのと同じ要領。<br>
-しかし、jsコードに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>コードも交じるので複雑になりがち。</p></p>
-
-<pre><code class="language-javascript">var dataset = [
-&lt;% @data.each do |d| %&gt;
-    {date:&lt;%= d.date%&gt;, value:&lt;%= d.value %&gt;},
-&lt;% end %&gt;
-];
+<pre><code>$ php oil refine migrate
+Uncaught exception Fuel\Core\Database_Exception: SQLSTATE[42601]: Syntax error: 7 ERROR: syntax error at or near &quot;DEFAULT&quot;
+LINE 5: )DEFAULT CHARACTER SET utf8;
+^ with query: &quot;CREATE TABLE IF NOT EXISTS &quot;migration&quot; (
+&quot;type&quot; varchar(25) NOT NULL,
+&quot;name&quot; varchar(50) NOT NULL,
+&quot;migration&quot; varchar(100) DEFAULT '' NOT NULL
+)DEFAULT CHARACTER SET utf8;&quot; 
 </code></pre>
 
-<p></div>
-<div class="section">
-    <h3>(3) <a class="keyword" href="http://d.hatena.ne.jp/keyword/CSV">CSV</a>ファイルをおいておく</h3>
-    <p>こちらはリアルタイムな更新でなれけばこれはこれでありだと思う。<br>
-publicのフォルダに予め<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルを設置しておき、以下のようにd3.jsで読み込ませる。</p></p>
+<h1>理由</h1>
 
-<pre><code class="language-javascript">d3.csv(&quot;test.csv&quot;, function(error, data) {
-    (中略)
-}
+<p>しょっぱなから躓くわけだが…</p>
+
+<p>初めて<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を実行する際には<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>管理用のテーブルを作る。<br>
+そのテーブルを作る<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が下記の通り発行されている。</p>
+
+<pre><code class="language-sql">CREATE TABLE IF NOT EXISTS &quot;migration&quot; (
+&quot;type&quot; varchar(25) NOT NULL,
+&quot;name&quot; varchar(50) NOT NULL,
+&quot;migration&quot; varchar(100) DEFAULT '' NOT NULL
+)DEFAULT CHARACTER SET utf8;
 </code></pre>
 
-<p></div>
-</body></p>
+<p>理由は単純で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>のcreate tableでは次のdefault構文は利用できないから。</p>
 
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">13 Sep 2014, 21:44</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/09/13/214414/" class="post-title">2014/8/2 Arduino会を実施の報告</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>2014年8月2日(土)に大学時代の研究室の同期・後輩を巻き込んで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>勉強会を行った。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>をほとんど触ったことのないメンバーで実施したのだが、初心者でもプロダクトを作り上げられるところまでできた。<br>
-その勉強会の簡単な資料を掲載。</p>
-<p><script async class="speakerdeck-embed" data-id="04fb75c01d710132f325123486985575" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">13 Sep 2014, 11:15</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/09/13/111537/" class="post-title">【Ethernetシールド】Arduinoをネットワークへ繋げる(1)</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Arduino" href="https://blog.mosuke.tech/categories/arduino">Arduino</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ethernet">Ethernet</a>シールドを使ってネットワークへ繋げる。<br>
-とりあえずは、スモールステップでPCとの1対1の通信。</p></p>
-
-<p><div class="section">
-    <h3>PCとの1対1通信</h3>
-    <p>構成図<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140907/20140907231747.png" alt="f:id:mosuke5:20140907231747p:plain" title="f:id:mosuke5:20140907231747p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a></p></p>
-
-<pre><code class="language-c">#include &lt;SPI.h&gt;
-#include &lt;Ethernet.h&gt;
-
-byte MAC[] = {0x90,0xA2,0xDA,0x0F,0x8B,0xA2};
-byte IP[]  = {192,168,11,3};
-
-void setup()
-{
-  Ethernet.begin(MAC,IP);
-}
-
-void loop()
-{
-}
+<pre><code class="language-sql">create table xxxx ( ) default character set xxx;
 </code></pre>
 
-<p>疎通確認</p>
-<<<<<<< HEAD
-<pre class="code" data-lang="" data-unlink>
-=======
+<p>なぜ、利用できない構文の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が発行されたのか？<br>
+それは単に<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>の問題です。次期バージョンでは解決されることを祈る。</p>
 
-```
->>>>>>> 4f3b2c72e32161441359f6d2116c410a27a8faaf
-% ping 192.168.100.3
-PING 192.168.100.3 (192.168.100.3): 56 data bytes
-Request timeout for icmp_seq 0
-64 bytes from 192.168.100.3: icmp_seq=1 ttl=128 time=0.576 ms
-64 bytes from 192.168.100.3: icmp_seq=2 ttl=128 time=0.425 ms
-64 bytes from 192.168.100.3: icmp_seq=3 ttl=128 time=0.302 ms 
-```
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ping">Ping</a>確認ヨシ!!</p>
-<p>一応<a class="keyword" href="http://d.hatena.ne.jp/keyword/ARP">ARP</a>テーブルを見ておく。</p>
-<<<<<<< HEAD
-<pre class="code" data-lang="" data-unlink>
-=======
+<h1>解決方法</h1>
 
-```
->>>>>>> 4f3b2c72e32161441359f6d2116c410a27a8faaf
-% arp -a
-? (192.168.100.3) at 90:a2:da:f:8b:a2 on en4 ifscope [ethernet]
-? (192.168.100.255) at ff:ff:ff:ff:ff:ff on en4 ifscope [ethernet] 
-```
-<p>マックアドレスの取得もヨシ!!</p>
+<p>解決方法は下記の記事がわかりやすかった。
+<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fqiita.com%2Fhirobow%2Fitems%2F8c2c379b33f0040480b7" title="FuelPHP で PDOによるPostgreSQL接続の罠 - Qiita" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://qiita.com/hirobow/items/8c2c379b33f0040480b7">FuelPHP で PDOによるPostgreSQL接続の罠 - Qiita</a></iframe><cite class="hatena-citation"><a href="http://qiita.com/hirobow/items/8c2c379b33f0040480b7">qiita.com</a></cite></p>
 
-<p></div>
-<div class="section">
-    <h3>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>を使って家内LAN接続</h3>
-    <p>実運用では<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>を利用することが圧倒的に多いと思うが、こちらもとても簡単。</p>
-<p>構成図<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140913/20140913110038.png" alt="f:id:mosuke5:20140913110038p:plain" title="f:id:mosuke5:20140913110038p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a>ルータから有線LANケーブルを伸ばし<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>に結線。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>による<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>の取得はとても容易で以下のようにマックアドレスを指定するのみ。</p></p>
+<p>簡単に言うとdbのコンフィグで、charsetをnullにすると<code>DEFAULT CHARACTER SET xxx</code>部分が発行されない。</p>
 
-<pre><code>Ethernet.begin(mac) 
+<pre><code>'charset' =&gt; NULL, 
 </code></pre>
 
-<p>以下は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>公式サイトに則って実施したもの。<br>
-<a href="http://arduino.cc/en/Tutorial/DhcpAddressPrinter">Arduino - DhcpAddressPrinter</a><br>
-</p>
+<h1>2. PRIMARY KEYの問題</h1>
 
-<pre><code class="language-c">#include &lt;SPI.h&gt;
-#include &lt;Ethernet.h&gt;
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a></h1>
 
-//Mac Address Static
-byte mac[] = {0x90,0xA2,0xDA,0x0F,0x8B,0xA2};
+<p>1.の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%B8%BB%FA%A5%B3%A1%BC%A5%C9">文字コード</a>の問題は解決して、さあもう一度<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を！と思って実行するもさらなるエラーに阻まれる。</p>
 
-void setup()
-{
-  // Open serial communications and wait for port to open:
-  Serial.begin(9600);
-
-  // start the Ethernet connection:
-  if (Ethernet.begin(mac) == 0) {
-    Serial.println(&quot;Failed to configure Ethernet using DHCP&quot;);
-    // no point in carrying on, so do nothing forevermore:
-    for(;;)
-      ;
-      
-  }
-  // print your local IP address:
-  Serial.print(&quot;My IP address: &quot;);
-  for (byte thisByte = 0; thisByte &lt; 4; thisByte++) {
-    // print the value of each byte of the IP address:
-    Serial.print(Ethernet.localIP()[thisByte], DEC);
-    Serial.print(&quot;.&quot;); 
-  }
-  Serial.println();
-}
-
-void loop()
-{
-  Serial.println(&quot;abc&quot;);
-  delay(3000);
-}
+<pre><code>$ php oil refine migrate
+Uncaught exception Fuel\Core\Database_Exception: SQLSTATE[42601]: Syntax error: 7 ERROR: syntax error at or near &quot;(&quot;
+LINE 2: &quot;id&quot; int(5) NOT NULL,
+^ with query: &quot;CREATE TABLE IF NOT EXISTS &quot;users&quot; (
+&quot;id&quot; int(5) NOT NULL,
+&quot;name&quot; text NOT NULL,
+PRIMARY KEY &quot;id&quot; (&quot;id&quot;)
+);&quot; 
 </code></pre>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>に<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>が割り当てられたかどうか確認するには、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a>ルータにアクセスし、マックアドレスと<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>のヒモ付のテーブルをみればよい。</p>
+<p>理由は1のときと一緒。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>では以下の構文は使えないのだ…</p>
 
-<p></div>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">21 Jul 2014, 23:19</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/07/21/231946/" class="post-title">【これだけは抑えておきたい】Arduino入門まとめ</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Arduino" href="https://blog.mosuke.tech/categories/arduino">Arduino</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>前々から<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>自体はもっていたし、ちょろっと触ったことはあったのだが、<br>
-大学時代の研究室の仲間と<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>勉強会をやることになり、それに向けて友人と再入門したのでそのときのメモ。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>入門にこれだけは知っておきたい事項をプログラム形式にまとめた。</p>
-<p>もちろん、不足部分もたくさんあるが、これだけわかれば楽しめるようになるかも。</p>
-<p>以下が入門プログラム。</p></p>
-
-<p><ol>
-<li><a href="#program1">LEDの点灯</a></li>
-<li><a href="#program2">PCとArduino間のシリアル通信</a></li>
-<li><a href="#program3">超音波距離センサの利用</a></li>
-<li><a href="#program4">超音波距離センサとLEDの組み合わせ</a></li>
-<li><a href="#program5">Processingとの連携</a></li>
-<li><a href="#program6">電池でArduinoを動作させる</a></li>
-</ol>
-<p>【用意したもの】<br>
-基本は以下の２つ</p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/B0025Y6C5G/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/518mUs-GudL._SL160_.jpg" class="hatena-asin-detail-image" alt="Arduinoをはじめようキット" title="Arduinoをはじめようキット"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B0025Y6C5G/hatena-blog-22/">Arduinoをはじめようキット</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> スイッチサイエンス</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> エレクトロニクス</li>
-<li>
-<span class="hatena-asin-detail-label">購入</span>: 64人 <span class="hatena-asin-detail-label">クリック</span>: 1,164回</li>
-<li><a href="http://d.hatena.ne.jp/asin/B0025Y6C5G/hatena-blog-22" target="_blank">この商品を含むブログ (51件) を見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00IJ02A7O/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/51s%2BQnZbv0L._SL160_.jpg" class="hatena-asin-detail-image" alt="みんなのArduino入門：拡張キット" title="みんなのArduino入門：拡張キット"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00IJ02A7O/hatena-blog-22/">みんなのArduino入門：拡張キット</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> スイッチサイエンス</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> エレクトロニクス</li>
-<li><a href="http://d.hatena.ne.jp/asin/B00IJ02A7O/hatena-blog-22" target="_blank">この商品を含むブログを見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
-<p>【参考にした書籍】</p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/487311537X/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/51zFePM-naL._SL160_.jpg" class="hatena-asin-detail-image" alt="Arduinoをはじめよう 第2版 (Make:PROJECTS)" title="Arduinoをはじめよう 第2版 (Make:PROJECTS)"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/487311537X/hatena-blog-22/">Arduinoをはじめよう 第2版 (Make:PROJECTS)</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">作者:</span> Massimo Banzi,船田巧</li>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AA%A5%E9%A5%A4%A5%EA%A1%BC%A5%B8%A5%E3%A5%D1%A5%F3">オライリージャパン</a>
-</li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2012/03/16</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> 単行本（ソフトカバー）</li>
-<li>
-<span class="hatena-asin-detail-label">購入</span>: 9人 <span class="hatena-asin-detail-label">クリック</span>: 27回</li>
-<li><a href="http://d.hatena.ne.jp/asin/487311537X/hatena-blog-22" target="_blank">この商品を含むブログ (10件) を見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/489797948X/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/517KqAKiwvL._SL160_.jpg" class="hatena-asin-detail-image" alt="みんなのArduino入門" title="みんなのArduino入門"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/489797948X/hatena-blog-22/">みんなのArduino入門</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">作者:</span> 高本孝頼</li>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%C3%A5%AF%A5%C6%A5%EC%A5%B3%A5%E0">リックテレコム</a>
-</li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2014/02/17</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> 単行本（ソフトカバー）</li>
-<li><a href="http://d.hatena.ne.jp/asin/489797948X/hatena-blog-22" target="_blank">この商品を含むブログを見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
-<p></p>
-<h2 id="program1">1. LEDの点灯</h2>まずはじめの第一歩はLEDの点灯。<br>
-これは<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>標準搭載の「スケッチの例」を利用。<br>
-　利用したスケッチ：スケッチの例⇒01.<a class="keyword" href="http://d.hatena.ne.jp/keyword/Basic">Basic</a>⇒Blink<p>LEDのプラス側を13番に、マイナス側を<a class="keyword" href="http://d.hatena.ne.jp/keyword/GND">GND</a>に挿せば完成。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><a href="http://f.hatena.ne.jp/mosuke5/20140721211703" class="hatena-fotolife" itemprop="url"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140721/20140721211703.jpg" alt="f:id:mosuke5:20140721211703j:image:h200" title="f:id:mosuke5:20140721211703j:image:h200" class="hatena-fotolife" style="height:200px" itemprop="image"></a></span></p>
-<p></p>
-<h2>2. PCと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>間のシリアル通信</h2>センサーで取得したデータ等をPC側に渡すシリアル通信。<br>
-まずは最初なので、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>本体側で文字列を適当に出力させてそれを表示する。<p>はじめは&rdquo;<a class="keyword" href="http://d.hatena.ne.jp/keyword/hoge">hoge</a>&ldquo;だけを出力させたのだが、ひたすら<a class="keyword" href="http://d.hatena.ne.jp/keyword/hoge">hoge</a>が並ぶだけなので<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>側の処理がよく見えなかったので、<br>
-以下のサンプルのようにした。また、回路側はなにもいじっていない。</p></p>
-
-<pre><code class="language-c">int i = 0;
-
-void setup(){
-
-  //シリアル通信の宣言
-  Serial.begin(9600);
-
-}
-
-void loop(){
-
-  Serial.print(&quot;hoge&quot;);
-  Serial.println(i);
-  i++;
-  
-  delay(300);
-
-}
+<pre><code>PRIMARY KEY &quot;id&quot; (&quot;id&quot;) 
 </code></pre>
 
-<p>出力結果</p>
-```
-hoge1
-hoge2
-hoge3
- .... 
-```
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140721/20140721103544.png" alt="f:id:mosuke5:20140721103544p:plain" title="f:id:mosuke5:20140721103544p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p></p>
-<h2>3. 超音波距離センサの利用</h2>次のステップとしてセンサーの利用を行った。<br>
-はじめ温度センサーを利用したのだが、温度の変化は室内ではわかりづらかったので「超音波距離センサ」を利用した。<br>
-ここでは超音波距離センサを利用するが、大事なことはセンサーの種類ではなく、センサーを利用した入力である。<p>【作ったもの】<br>
-超音波距離センサにて測定した物体との距離をシリアルモニターで表示するもの。</p>
-<p>【<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>】</p>
-```c
-// 送信側のピン番号
-const int TRIGPIN = 8; 
+<h1>3. 結局</h1>
 
-// 受信側のピン番号
-const int ECHOPIN = 9;
+<p>つまるところ<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>(すくなくとも1.7までは)では、<a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を行う環境がちゃんと整っていないということ。<br>
+しかたないので、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>は生<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を書くことにしました。</p>
 
-// HIGHの時間（μ秒）
-const int CTM = 10;
+<p>PRIMARY KEYを後から別途で付与するとか考えたけど、<br>
+ほかにも罠がありそうだったので、安全な生<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を採用しました。<br>
+バージョン1.8では直っている?とのことだが、まだdevelopmentだったのでこれも見送り。</p>
 
-// 時間差（μ秒）
-int dur;
+<p>うむ。。。</p>
 
-// 距離（ｃｍ）
-float dis;
-
-void setup() {
-
-  //シリアル通信の宣言
-  Serial.begin (9600);
-  
-  pinMode(TRIGPIN, OUTPUT);
-  pinMode(ECHOPIN, INPUT); 
-
-}
-
-void loop() {
-  
-  digitalWrite(TRIGPIN, HIGH);
-  delayMicroseconds(CTM);
-  digitalWrite(TRIGPIN, LOW);
-  
-  // 超音波が物体にあたり跳ね返ってくるまでの時間を測定
-  dur = pulseIn(ECHOPIN, HIGH);
-  
-  //物体までの距離に変換
-  dis  = (float) dur*0.017;
-  
-  //シリアルモニタへ出力
-  Serial.print(dis);
-  Serial.println(" cm");
-  
-  delay(500);
-  
-}
-```
-
-<p>【回路】<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140721/20140721220559.png" alt="f:id:mosuke5:20140721220559p:plain" title="f:id:mosuke5:20140721220559p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p></p>
-<h2>4. 超音波距離センサとLEDの組み合わせ</h2>センサーを用いいた入力方法・LEDを使った出力方法について学んだので、それらを組み合わせて以下のものを作成。<p>【作ったもの】<br>
-超音波距離センサを用いて、物体がある一定以上近づいた場合には赤LED の点灯を、<br>
-物体がある一定以上離れている場合（あるいは物体がない場合）には青LEDの点灯をするもの。</p>
-<p>【<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>】</p>
-
-<pre><code class="language-c">// 送信側のピン番号
-const int TRIGPIN = 8; 
-
-// 受信側のピン番号
-const int ECHOPIN = 9;
-
-// HIGHの時間（μ秒）
-const int CTM = 10;
-
-// 青LED
-const int LED_BLUE = 12;
-
-// 赤LED
-const int LED_RED = 13;
-
-// 時間差（μ秒）
-int dur;
-
-// 距離（ｃｍ）
-float dis;
-
-void setup() {
-
-  // シリアル通信の宣言
-  Serial.begin (9600);
-  
-  // 超音波距離センサ
-  pinMode(TRIGPIN, OUTPUT);
-  pinMode(ECHOPIN, INPUT); 
-  
-  // LED
-  pinMode(LED_BLUE, OUTPUT);
-  pinMode(LED_RED, OUTPUT); 
-
-}
-
-void loop() {
-  
-  digitalWrite(TRIGPIN, HIGH);
-  delayMicroseconds(CTM);
-  digitalWrite(TRIGPIN, LOW);
-  
-  // 超音波が物体にあたり跳ね返ってくるまでの時間を測定
-  dur = pulseIn(ECHOPIN, HIGH);
-  
-  // 物体までの距離に変換
-  dis = (float) dur * 0.017;
-  
-  // シリアルモニタへ出力
-  Serial.print(dis);
-  Serial.println(&quot; cm&quot;);
-  
-  // 距離が50cm以上なら青LEDを光らせる
-  if(dis &lt; 50) {
-    digitalWrite(LED_BLUE,HIGH);
-    digitalWrite(LED_RED,LOW);
-  
-  // 50cm未満なら赤LEDを光らせる
-  }else{
-    digitalWrite(LED_BLUE,LOW);
-    digitalWrite(LED_RED,HIGH);
-    
-  }
-  
-  delay(500);
-  
-}
-</code></pre>
-
-<p><br>
-【回路】<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140721/20140721222730.png" alt="f:id:mosuke5:20140721222730p:plain" title="f:id:mosuke5:20140721222730p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p></p>
-<h2>5. Processingとの連携</h2>シリアル通信で受け取ったデータをシリアルモニターで表示するだけでなく、Processingで受け取ることもできる。<br>
-Processingで受け取ったデータをとりあえず、出力するところまで実施した。<p>【<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>側】</p>
-
-<pre><code class="language-c">// 送信側のピン番号
-const int TRIGPIN = 8; 
-
-// 受信側のピン番号
-const int ECHOPIN = 9;
-
-// HIGHの時間（μ秒）
-const int CTM = 10;
-
-// 時間差（μ秒）
-int dur;
-
-// 距離（ｃｍ）
-float dis;
-
-void setup() {
-
-  //シリアル通信の宣言
-  Serial.begin (9600);
-  
-  pinMode(TRIGPIN, OUTPUT);
-  pinMode(ECHOPIN, INPUT); 
-
-}
-
-void loop() {
-  
-  digitalWrite(TRIGPIN, HIGH);
-  delayMicroseconds(CTM);
-  digitalWrite(TRIGPIN, LOW);
-  
-  // 超音波が物体にあたり跳ね返ってくるまでの時間を測定
-  dur = pulseIn(ECHOPIN, HIGH);
-  
-  //物体までの距離に変換
-  dis  = (float) dur * 0.017;
-  
-  //シリアルモニタへ出力
-  Serial.println(dis);
-  
-  delay(500);
-  
-}
-</code></pre>
-
-<p><p>【Processing側】</p></p>
-
-<pre><code class="language-c">import processing.serial.*;
-
-int val;
-Serial myPort;
-
-void setup() {
-  String arduinoPort = Serial.list()[3]; 
-  myPort = new Serial(this, arduinoPort, 9600); 
-}
-
-void draw() {
-  println(val);
-}
-
-void serialEvent(Serial p){
-
-  val=myPort.read();
-  delay(1000);
-
-}
-</code></pre>
-
-<p><p>なんか受け取れているけど、これであっているか検討します…</p>
-<p></p>
-<h2>6. 電池で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>を動作させる</h2>通常、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>はPCから電源をとっているため、PCと切り離してしまうと動かなくなる。<br>
-しかし、PCと繋いでいないと動作できない<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>なんて必要ない…とも思う。<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>を電池で動かす方法はいたって簡単で以下の２つを用意して接続するだけ。</p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/B000FHVRLE/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/41IakcNEXoL._SL160_.jpg" class="hatena-asin-detail-image" alt="Panasonic 9V型アルカリ乾電池 1本 6LR61YXJ/1S" title="Panasonic 9V型アルカリ乾電池 1本 6LR61YXJ/1S"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B000FHVRLE/hatena-blog-22/">Panasonic 9V型アルカリ乾電池 1本 6LR61YXJ/1S</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%CA%A5%BD%A5%CB%A5%C3%A5%AF">パナソニック</a>
-</li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2006/04/10</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> エレクトロニクス</li>
-<li> <span class="hatena-asin-detail-label">クリック</span>: 2回</li>
-<li><a href="http://d.hatena.ne.jp/asin/B000FHVRLE/hatena-blog-22" target="_blank">この商品を含むブログを見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/0101625138/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/311H0nRslqL._SL160_.jpg" class="hatena-asin-detail-image" alt="DC 9V電池スナップ＋2.1mm DCプラグ  並行輸入品" title="DC 9V電池スナップ＋2.1mm DCプラグ  並行輸入品"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/0101625138/hatena-blog-22/">DC 9V電池スナップ＋2.1mm DCプラグ  並行輸入品</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> Gadgettown</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> </li>
-<li><a href="http://d.hatena.ne.jp/asin/0101625138/hatena-blog-22" target="_blank">この商品を含むブログを見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
-<p>これらを以下のように接続する。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><a href="http://f.hatena.ne.jp/mosuke5/20140721222037" class="hatena-fotolife" itemprop="url"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140721/20140721222037.jpg" alt="f:id:mosuke5:20140721222037j:image:w500" title="f:id:mosuke5:20140721222037j:image:w500" class="hatena-fotolife" style="width:500px" itemprop="image"></a></span></p>
-<br>
-<p>以上で入門まとめは終わりだが、<br>
-その他にも以下を購入しているので次はもっと高度なことを実践したい。<br>
-・<a href="http://www.switch-science.com/catalog/224/">XBee ZB / ワイヤアンテナ型 - スイッチサイエンス</a><br>
-・<a href="http://www.switch-science.com/catalog/786/">Arduino ワイヤレスプロトシールド - スイッチサイエンス</a><br>
-・<a href="http://www.switch-science.com/catalog/1031/">XBee USB アダプター(リセットスイッチ付き) - スイッチサイエンス</a><br>
-・<a href="http://www.switch-science.com/catalog/838/">Arduino イーサネットシールド R3 - スイッチサイエンス</a></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">18 May 2014, 14:28</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/05/18/142838/" class="post-title">【雑記】VPSとお別れしました…</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-サーバ" href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90">サーバ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>2012年07月18日から契約していた<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>サーバを本日解約した。<br>
-約２年間の契約していたわけだがちょっと振り返るといろいろあったなーと思う。<br>
-ぼくがまだ大学３年のとき、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B7%A5%E3%A5%EB%A5%D6%A5%C3%A5%AF%A5%DE%A1%BC%A5%AF%A5%B5%A1%BC%A5%D3%A5%B9">ソーシャルブックマークサービス</a>をリリースしたのだが、<br>
-その時はまだエンジニア初心者で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>ではなく共有サーバを利用していた。</p>
-<p>そんなプロジェクトが終わり、次のサービス(<a class="keyword" href="http://d.hatena.ne.jp/keyword/Twitter">Twitter</a>の解析ツール)の開発で初めて<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>環境を与えられたのだが、<br>
-サーバ構築など右も左もわからなかったので、自分の勉強用環境として<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>を契約。VPS環境で行ったこと&gt;<br>
-プロダクトとしては次の３つくらい作った<br>
-・<a class="keyword" href="http://d.hatena.ne.jp/keyword/Amazon">Amazon</a>の最安値段通知サービス<br>
-　自分が欲しい物について希望価格を登録しておくと、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Amazon">Amazon</a>の中古価格が希望価格を下回った時に通知してくれるサービス。<br>
-　個人的には結構好きだったのだが、運用がめんどくさくなって閉鎖。</p>
-<p>・うみなう ー<a class="keyword" href="http://d.hatena.ne.jp/keyword/Twitter">Twitter</a>上の「海なう」画像を眺めようー<br>
-　夏場になると<a class="keyword" href="http://d.hatena.ne.jp/keyword/Twitter">Twitter</a>で「海なう」と水着画像を付けて投稿する人が多い。<br>
-　海なうのキーワードで出てきた画像をただただ眺めるだけのサービス(笑)</p>
-<p>・キニナル ーきになるあの二人のツイートをー<br>
-　<a class="keyword" href="http://d.hatena.ne.jp/keyword/Twitter">Twitter</a>上で気になる二人のツイート時系列で並べて監視するサービス。<br>
-　公開はしていなかったけどちょくちょく身内でみていた。</p>
-<br>
-<p>こんなくだらないサービスを趣味で作っていた。<br>
-その他、仕事で使う新しいツールの実験導入などに利用していた。</p>
-<p>社会人になってからリモートで接続できるサーバを持っている必要がなくなってきたので解約することになったが、<br>
-いろいろと勉強になったし、思い出がおおかったなー。<br>
-またいつか契約する日があることを待ち望んで…</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">17 May 2014, 22:18</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/05/17/221824/" class="post-title">ロードバランサをロードバランスする</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-ネットワーク" href="https://blog.mosuke.tech/categories/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF">ネットワーク</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>ぼくはネットワーク構成については素人です。<br>
-大量の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%D5%A5%A3%A5%C3%A5%AF">トラフィック</a>をさばくためにロードバランサを使うがロードバランサが耐えられない量の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%D5%A5%A3%A5%C3%A5%AF">トラフィック</a>にはどうするか。<br>
-ちょっと疑問に思ったので素人なりにちょろっと考えてみた。</p>
-<p><script async class="speakerdeck-embed" data-id="234d8a90bff301316cad3a6416977627" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">06 May 2014, 19:24</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/05/06/192424/" class="post-title">ER図作成ツール-MySQL Workbench- を使ってみた</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>表題の通りER図作成ツールというものを使ってみた。<br>
-開発をやる現場では当たり前のように使われているのかもしれないけど、ぼくは使ったことなかったです。<br>
-ER図とかテーブル構造は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Excel">Excel</a>でまとめて管理していました。</p>
-<p>きっかけは、ソフトウエアデザインを読んでいてER図作成ツールなるものがでてきたので、便利そうと思ってぐぐってみた。<br>
-調べると主なフリーのER図作成ツールは以下があるっぽい。</p></p>
-
-<p><ol>
-<li>DBDesigner</li>
-<li>A5-SQLmk-2</li>
-<li>AmaterasERD</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a> Workbench</li>
-<li>ERMaster</li>
-</ol>
-<p>(参考)<a href="http://treeapps.hatenablog.com/entry/20110505/p1">http://treeapps.hatenablog.com/entry/20110505/p1</a></p>
-<p>この中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>で使えそうなのが<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a> Workbenchしかなかったのでこちらを利用。<br>
-本当は<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>以外の<a class="keyword" href="http://d.hatena.ne.jp/keyword/DBMS">DBMS</a>にも対応しているものがよかったのだけど…</p>
-<p>ざっと使ってみた感じ以下３つがよいと感じた点。</p>
-<h4>1.ER図作成が容易</h4>ER図作成ツールなのであたりまえなのだが、今まで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Excel">Excel</a>の図形など使っていて書いていたので簡単さに驚き。<br>
-属性についてもそれぞれ型やキー・制約などの設定も記述できる。<p></p>
-<h4>2.<a class="keyword" href="http://d.hatena.ne.jp/keyword/DDL">DDL</a>にすぐにエクスポート可能</h4>作成したER図については<a class="keyword" href="http://d.hatena.ne.jp/keyword/DDL">DDL</a>にすぐにエクスポートできる。<br>
-なので、ツールでER図さえきちんと書けば実際のDB、テーブル構築は一瞬で可能。<p></p>
-<h4>3.イメージ図としてエクスポート可能</h4>作成したER図を<a class="keyword" href="http://d.hatena.ne.jp/keyword/PNG">PNG</a>形式にエクスポートできるので、メンバー等との共有が容易。<br>
-また、ドキュメントとして残す際にもとても使えると思う。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Excel">Excel</a>のシート形式にエクスポートできたらなぁとも思う…<br>
-<p>実際に<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a> Workbenchを使って簡単にER図を作成してみた。<br>
-・ユーザが飲んだお酒を記録していくWebシステムです。<br>
-・利用するにはシステムへのユーザ登録が必要。<br>
-・ユーザはお酒マスターから飲んだお酒を登録する。<br>
-　→同じお酒を何度登録（飲んでも）よい<br>
-・お酒には産地（<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C5%D4%C6%BB">都道</a>府県）を記入する。<br>
-・ユーザは本システムへログイン後の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%AF%A5%BB%A5%B9%A5%ED%A5%B0">アクセスログ</a>が取得される。</p>
-<p>こんなざっくりとした感じ。</p>
-<p>作成したER図はこんな感じに出来上がります（<a class="keyword" href="http://d.hatena.ne.jp/keyword/PNG">PNG</a>）。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140506/20140506191125.png" alt="f:id:mosuke5:20140506191125p:plain" title="f:id:mosuke5:20140506191125p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/DDL">DDL</a>はこんな感じに。</p></p>
-
-<pre><code class="language-mysql">-- MySQL Script generated by MySQL Workbench
--- Tue May  6 19:16:11 2014
--- Model: New Model    Version: 1.0
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
-
--- -----------------------------------------------------
--- Schema mydb
--- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
-USE `mydb` ;
-
--- -----------------------------------------------------
--- Table `mydb`.`User`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`User` (
-  `user_id` INT NOT NULL AUTO_INCREMENT,
-  `account` VARCHAR(45) NOT NULL,
-  `password` VARCHAR(45) NOT NULL,
-  `team_id` INT NOT NULL,
-  `last_login` DATETIME NULL,
-  PRIMARY KEY (`user_id`),
-  UNIQUE INDEX `account_UNIQUE` (`account` ASC))
-ENGINE = InnoDB;
-
-(以下省略)
- 
-</code></pre>
-
-<p></body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">30 Mar 2014, 00:43</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/03/30/004337/" class="post-title">データベース、隔離性水準とはなにか</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>データベースには、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>が持つべき<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%C3%C0%AD">特性</a>であるACID<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%C3%C0%AD">特性</a>というものを備えている。<br>
-<b>ACID<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%C3%C0%AD">特性</a></b><br>
-</p>
-<table>
-<tr>
-  <td>A</td>
-  <td>Atomicity</td>
-  <td>原始性</td>
-</tr>
-<tr>
-  <td>C</td>
-  <td>Consistency</td>
-  <td>一貫性</td>
-</tr>
-<tr>
-  <td>I</td>
-  <td>Isolation</td>
-  <td>隔離性</td>
-</tr>
-<tr>
-  <td>D</td>
-  <td>Dirability</td>
-  <td>耐久性</td>
-</tr>
-</table>
-<p>ACID<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%C3%C0%AD">特性</a>については詳しく書かないが、その中に隔離性という以下の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%C3%C0%AD">特性</a>がある。<br>
-「<b>複数の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>を並行して実行しても直列に実行した時と同じ結果になる。<br>
-また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>実行中は変更前の状態として見える。</b>」</p>
-<p>しかし、複数の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>を並列で実行すると、その隔離性を満たさない現象が発生することがある。<br>
-その現象は主に３つある。</p>
-<h4>1. ダーティリード</h4>[概要]<br>
-ある<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>の処理中に、別のユーザがその<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>でまだコミットしてないデータを読み込んでしまう現象のこと。<br>
-Q. 何が問題なの？<br>
-A. 例えばその<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>が<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%EB%A5%D0%A5%C3%A5%AF">ロールバック</a>したとすると、存在しない処理のデータを読み込んでいることになってしまう。<p>[対策]<br>
-対策はシンプルで、まだコミットしていないデータは読み込めないようにするだけ。<br>
-つまり、データを更新するときは「排他ロック」をかけるようにするということ。</p>
-<p></p>
-<h4>2. ノンリピータブルリード</h4>[概要]<br>
-同一<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>内で、一度読み込んだデータを再読み込みすると値が異なる現象。<p>[対策]<br>
-データを読み込むときには「共有ロック」をかけるようにするということ。<br>
-共有ロック中は他<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>から更新はできなくなるのでノンリピータブルリードは起きない。</p>
-<p></p>
-<h4>3. ファントムリード</h4>[概要]<br>
-ある<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>が複数行ある結果を返す検索条件で問合せを2度実行する間に、<br>
-コミットされた別の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>によってその条件を満たす新しい行が挿入されたり、削除された行がでたりする現象。<p>[対策]<br>
-検索結果の範囲に対してロックをかけること。</p>
-<br>
-<p>上記現象が起こらないように<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>の分離レベルが用意されている。</p>
-<p><b><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>の分離レベルと、現象に発生の有無</b><br>
-</p>
-<table>
-<tr>
-  <th>分離レベル</th>
-  <th>ダーティリード</th>
-  <th>ノンリピータブルリード</th>
-  <th>ファントムリード</th>
-</tr>
-<tr>
-  <td>Read Uncommitted</td>
-  <td style="background-color:#fdf7f7;">あり</td>
-  <td style="background-color:#fdf7f7;">あり</td>
-  <td style="background-color:#fdf7f7;">あり</td>
-</tr>
-<tr>
-  <td>Read Committed</td>
-  <td>なし</td>
-  <td style="background-color:#fdf7f7;">あり</td>
-  <td style="background-color:#fdf7f7;">あり</td>
-</tr>
-<tr>
-  <td>Repeatable Read</td>
-  <td>なし</td>
-  <td>なし</td>
-  <td style="background-color:#fdf7f7;">あり</td>
-</tr>
-<tr>
-  <td>Serializable</td>
-  <td>なし</td>
-  <td>なし</td>
-  <td>なし</td>
-</tr>
-</table>
-<p>ここでひとつの疑問が…</p>
-<h4>Q. どの現象も起こらないSerializableに設定してしまえば…！？</h4>当然だがそう簡単にはいかない。<br>
-上の「<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>の分離レベルと、現象に発生の有無」でいえば<br>
-したにいけばいくほど、処理負担が大きく実行スピードが遅くなります。<p>つまりは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>の分離レベルと実行スピードは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%EC%A1%BC%A5%C9%A5%AA%A5%D5">トレードオフ</a>。<br>
-そのときそのときの特徴に合わせて分離レベルを選ばなければならない。</p>
-<p>ちなみに、<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/InnoDB">InnoDB</a>ではデフォルトはRepeatable Read。<br>
-まずは標準のままでよいと思います。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">09 Mar 2014, 21:25</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/03/09/212520/" class="post-title">VLAN、Trunkを使った実践的な構成のメモ</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-ネットワーク" href="https://blog.mosuke.tech/categories/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF">ネットワーク</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>VLAN、Trunkそれぞれを一部分的に切り出した説明はよくあるが、<br>
-それらが組み合わさった実践的な構成についてあまり書いてないので、例を考えて載せてみる。</p>
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140309/20140309212318.jpg" alt="f:id:mosuke5:20140309212318j:plain" title="f:id:mosuke5:20140309212318j:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p>(1) L2スイッチに２つのシステムのサーバ（それぞれが冗長構成）がある。<br>
-(2) それぞれのシステムはVLANで切られている<br>
-(3) L2-L2間、L3-L2間はTrunkを使用(Vlan100,200)<br>
-(4) L3インターフェースはサブインタフェース利用<br>
-(5) L3の冗長はHSRPを利用</p>
-<p>ほかにいろいろ思いついたら、付け加えます。</p>
+<p><p>&lt;参考&gt;
+<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fimprove-future.com%2Favailable-dbms-in-fuelphp.html" title="FuelPHP で使用可能なデータベース" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://improve-future.com/available-dbms-in-fuelphp.html">FuelPHP で使用可能なデータベース</a></iframe><cite class="hatena-citation"><a href="http://improve-future.com/available-dbms-in-fuelphp.html">improve-future.com</a></cite></p>
 </body></p>
 
                     </div>
@@ -1203,7 +812,7 @@ A. 例えばその<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 7 of 8</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 7 of 15</span>
     
       <a href="/page/8/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>

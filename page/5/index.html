@@ -56,11 +56,11 @@
             <div class="posts">
                 
                 
-                <h1 class="content-subhead">22 Feb 2015, 21:13</h1>
+                <h1 class="content-subhead">19 Mar 2016, 23:24</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2015/02/22/211316/" class="post-title">Ruby, thin(bundler利用)を使った環境でのアプリの自動起動設定</a>
+                        <a href="https://blog.mosuke.tech/entry/2016/03/19/232437/" class="post-title">Github Pagesを今更作った話と、独自ドメイン適応時の通信のこと</a>
 
                         <p class="post-meta">
                             
@@ -69,1091 +69,143 @@
                             
                                 under 
                                 
-                                <a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-init" href="https://blog.mosuke.tech/categories/init">init</a><a class="post-category post-category-自動起動" href="https://blog.mosuke.tech/categories/%E8%87%AA%E5%8B%95%E8%B5%B7%E5%8B%95">自動起動</a><a class="post-category post-category-Ruby" href="https://blog.mosuke.tech/categories/ruby">Ruby</a><a class="post-category post-category-thin" href="https://blog.mosuke.tech/categories/thin">thin</a><a class="post-category post-category-unicorn" href="https://blog.mosuke.tech/categories/unicorn">unicorn</a>
+                                <a class="post-category post-category-github" href="https://blog.mosuke.tech/categories/github">github</a><a class="post-category post-category-github pages" href="https://blog.mosuke.tech/categories/github-pages">github pages</a><a class="post-category post-category-CDN" href="https://blog.mosuke.tech/categories/cdn">CDN</a><a class="post-category post-category-カスタムドメイン" href="https://blog.mosuke.tech/categories/%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0%E3%83%89%E3%83%A1%E3%82%A4%E3%83%B3">カスタムドメイン</a><a class="post-category post-category-独自ドメイン" href="https://blog.mosuke.tech/categories/%E7%8B%AC%E8%87%AA%E3%83%89%E3%83%A1%E3%82%A4%E3%83%B3">独自ドメイン</a>
                             
                         </p>
                     </header>
 
                     <div class="post-description">
                         <p><body>
-<p>bunlderを使ったWebアプリをプロダクション環境で動かすときに、アプリの起動をどうやって実現しているだろうか。</p></p>
+<p>今更ながら<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>ページでプロフィールサイトを作った。<br>
+(もう少しデザインブラッシュアップしたい…)</p></p>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a> Passengerを使う場合には、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>の起動がアプリの起動につながるので、
-アプリの起動はあまり気にしなかったかもしれない。</p>
+<p><a href="http://mosuke.tech/">mosuke tech</a></p>
 
-<p>しかし、例えばNginx × <a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>/thinの構成などの場合は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>やthinの起動もしなければいけなくなってくる。<br>
-（あるいはこのようなケースがあるかは謎だが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>やthinを単体で動かそうとしている場合など）</p>
+<p>また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%C8%BC%AB%A5%C9%A5%E1%A5%A4%A5%F3">独自ドメイン</a>（カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>）の設定やその仕組みをおっている時に、<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%C8%BC%AB%A5%C9%A5%E1%A5%A4%A5%F3">独自ドメイン</a>適応時の通信について面白いことがわかったのでかく。</p>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>やthin（例ではthinを扱うが本質は同じ）の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%AB%C6%B0%B5%AF%C6%B0">自動起動</a>を実現する際の勘所、注意事項をまとめた。</p>
-
-<h1>0. 前提</h1>
+<h1>求めていたもの</h1>
 
 <ul>
-<li>CentOS6.5上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>でのWebアプリケーションを作っている。</li>
+<li>ブログとか作ったプロダクトをまとめたかった</li>
+<li>極力シンプルでメンテしやすいものがよかった</li>
+<li>でもレスポンシブなデザインがよかった</li>
+</ul>
+
+<h1>どのようにつくったか</h1>
+
+<p>上の条件を満たすために以下の２パターンのどっちで作ろうか迷った。</p>
+
+<ul>
+<li>Jekyllなどを使いテンプレートを使って作る</li>
 <li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>はthinを利用している。</li>
-<li>また、gemパッケージ管理にbundlerを利用している。</li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/CSS">CSS</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>のみ利用し、あとは自分で作る</li>
 </ul>
 
-<h1>1. 開発環境でよくするアプリの起動</h1>
+<p>１ページだけのシンプルなプロフィールサイトがよかったので、<br>
+Jekyllとか複雑なものは利用したくないと考えた。</p>
 
-<p>開発環境では、アプリケーションのログの閲覧性なども兼ねて以下のようにアプリを起動していた。</p>
+<p>また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/CSS">CSS</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>だが、いつもよくTwitterBootstrapを使っているので、<br>
+それ以外のものでやってみようと考えた。</p>
 
-<pre><code>$ bundle exec rackup
-$ bundle exec thin start 
-</code></pre>
+<p>その結果、行き着いたのが<a href="http://getskeleton.com/">Skeleton</a>だった。<br>
+Skeletonは<b>"A dead simple, responsive boilerplate."</b>をうたっているものでよかった。</p>
 
-<p>でも、これではいつまでたってもプロダクション環境での利用はできません。</p>
+<h1>カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>の設定</h1>
 
-<h1>2. 上記方法ではプロダクション環境で利用できない理由</h1>
+<p>デフォルトだと<code>mosuke5.github.io</code>のURLが利用できる。<br>
+しかし、この前<code>mosuke.tech</code>といういい感じの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>を安く手に入れてたので、カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>の設定を行うことにした。</p>
 
-<p>当然のことながら、プロダクション環境ではいちいち手動でコマンドを実行しアプリケーションを立ち上げるわけにはいかない。<br>
-例えば、なんらかの理由でサーバが再起動してしまった場合には、<br>
-このままではアプリケーションが自動的に立ち上がらないため、サービスの停止につながってしまう。</p>
-
-<p>ではどうするのか？<br>
-以下の状態であることがプロダクション環境では理想なのではないだろうか？</p>
-
-<ul>
-<li>オリジナルアプリケーションもserviceコマンドで起動・停止ができる
-
-<ul>
-<li>他のサービスと同様の操作方法が可能なのでわかりやすい</li>
-</ul>
-</li>
-<li>サーバ立ち上げ時にサービスが自動で起動される</li>
-</ul>
-
-<h1>3. 起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作ろう</h1>
-
-<p>上記の状態にもっていくためには、起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作らなければならない。</p>
-
-<p>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作る…！？<br>
-「作ったことないし、すぐには作れないよ〜」って思うかもしれないが、<br>
-サンプルはたくさんあるし、よく見てみるとそれほど難しくはない。</p>
-
-<p>thinを使ったサンプルを探そうと思うと数は少ないが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>も同じ仕組なので、
-"<a class="keyword" href="http://d.hatena.ne.jp/keyword/unicorn">unicorn</a> init script"なんて検索をかけてもいろいろでてくるのでおすすめ。</p>
-
-<p>参考ししたもの<br>
-<a href="https://gist.github.com/sbeam/3454488">https://gist.github.com/sbeam/3454488</a></p>
-
-<p>上を参考にしながら、こんな起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作ってみた。（未完成版）<br>
-これを<code>/etc/init.d</code>以下へ配置する。</p>
-
-<pre><code class="language-sh">#!/bin/bash
-
-### BEGIN CHKCONFIG INFO
-# chkconfig: 2345 55 25
-# description: sample-app
-### END CHKCONFIG INFO
-
-SCRIPT_NAME=/etc/init.d/sample-app
-CONFIG_PATH=/path/to/config
-BUNDLE_CMD=/usr/local/bin/bundle
-
-bundle_exec_thin ()
-{
-    for CONFIG_FILE in &quot;$CONFIG_PATH/*.yml&quot;; do
-        SITE_DIR=`awk '/^chdir:/ { print $2; }' $CONFIG_FILE`
-        cd $SITE_DIR
-        $BUNDLE_CMD exec thin $1 -C $CONFIG_FILE
-    done
-}
-
-
-case &quot;$1&quot; in
-  start)
-        bundle_exec_thin start
-        ;;
-  stop)
-        bundle_exec_thin stop
-        ;;
-  restart)
-        bundle_exec_thin restart
-        ;;
-  *)
-        echo &quot;Usage: $SCRIPT_NAME {start|stop|restart}&quot; &gt;&amp;2
-        exit 3
-        ;;
-esac
-
-:
- 
-</code></pre>
-
-<p>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>も完成したし、実際にserviceコマンドで実行してみる。</p>
-
-<pre><code>$ sudo service sample-app start
-/usr/bin/env: ruby: No such file or directory 
-</code></pre>
-
-<p>んん。。。起動せず、撃沈…</p>
-
-<h3>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作る上での注意</h3>
-
-<p>起動しなかった原因に移る前に、起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作る上での注意点を１つ。<br>
-chkconfigで認識させるためには冒頭のCHKCONFIG INFO部分(<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%E1%A5%F3%A5%C8%A5%A2%A5%A6%A5%C8">コメントアウト</a>部分)も重要になってくる。<br>
-CHKCONFIG INFO部分を書かないままchkconfigでaddしようとすると以下のように怒られます。</p>
-
-<pre><code>$ sudo chkconfig --add sample-app
-service sample-app does not support chkconfig 
-</code></pre>
-
-<h1>4. serviceコマンド実行時のPATHのはなし</h1>
-
-<p>なぜ、serviceコマンドでthinを起動できなかったのか。<br>
-調べていくと意外なことがわかった。<br>
-serviceコマンドを実行すると中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>のPATHが上書きされてしまう。</p>
-
-<p>【参照】<br>
-<a href="http://heartbeats.jp/hbblog/2013/06/service-start-stop.html">デーモンの起動・終了にはserviceコマンドを利用しよう - インフラエンジニアway - Powered by HEARTBEATS</a></p>
-
-<p>試しに、起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>内にPATHの出力を仕込んで確かめてみる。<br>
-起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>に<code>echo $PATH</code>を仕込んだ。</p>
-
-<pre><code>$ sudo service sample-app start
-/sbin:/usr/sbin:/bin:/usr/bin 
-</code></pre>
-
-<p>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>内でbundleや<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>がインストールされているディレクトリに<br>
-PATHを通すことで、解決することにした。<br>
-（もっと美しい方法があれば教えて下さい。。。）</p>
-
-<h1>5. 起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>修正(完成版)</h1>
-
-<p>上記の通り起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を修正したものが以下。</p>
-
-<pre><code class="language-sh">#!/bin/bash
-
-### BEGIN CHKCONFIG INFO
-# chkconfig: 2345 55 25
-# description: sample-app
-### END CHKCONFIG INFO
-
-# 以下を追加
-export PATH=/usr/local/bin:$PATH
-
-SCRIPT_NAME=/etc/init.d/sample-app
-CONFIG_PATH=/path/to/config
-BUNDLE_CMD=/usr/local/bin/bundle
-
-bundle_exec_thin ()
-{
-    for CONFIG_FILE in &quot;$CONFIG_PATH/*.yml&quot;; do
-        SITE_DIR=`awk '/^chdir:/ { print $2; }' $CONFIG_FILE`
-        cd $SITE_DIR
-        $BUNDLE_CMD exec thin $1 -C $CONFIG_FILE
-    done
-}
-
-
-case &quot;$1&quot; in
-  start)
-        bundle_exec_thin start
-        ;;
-  stop)
-        bundle_exec_thin stop
-        ;;
-  restart)
-        bundle_exec_thin restart
-        ;;
-  *)
-        echo &quot;Usage: $SCRIPT_NAME {start|stop|restart}&quot; &gt;&amp;2
-        exit 3
-        ;;
-esac
-
-:
- 
-</code></pre>
-
-<p>(PATHを通したのでbundleコマンドはフルパスでなくても大丈夫ですよ...)</p>
-
-<p>最後に起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を<code>/etc/init.d</code>以下に配置し、
-忘れずにchkconfigに登録しましょう。</p>
-
-<pre><code>$ sudo chkconfig --add sample-app 
-</code></pre>
-
-<h1>【おまけ】sudo だと<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>やgem、bundleが使えない？</h1>
-
-<p>rootユーザでは<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>やgem, bundleが使えるけど、sudoで実行すると使えない…<br>
-という悩みの人も多いのではないだろうか。</p>
-
-<pre><code>$ sudo gem install xxxxx
-sudo: gem: command not found 
-</code></pre>
-
-<p><p>sudoでの実行はrootユーザで実行することなのになぜ実行できないか。<br>
-これはsudoを使うときに/usr/local/binが許可されていないからだ。<br>
-visudoでsecure_pathの設定を見直すとよい。<br>
-<a href="http://www.xmisao.com/2013/10/11/sudoers-secure_path.html">sudoersのsecure_pathについて &ndash; ぺけみさお</a></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">17 Feb 2015, 22:05</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/02/17/220526/" class="post-title">勘違いしやすいFTPとSFTPの転送モードの話</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-SFTP" href="https://blog.mosuke.tech/categories/sftp">SFTP</a><a class="post-category post-category-FTP" href="https://blog.mosuke.tech/categories/ftp">FTP</a><a class="post-category post-category-転送モード" href="https://blog.mosuke.tech/categories/%E8%BB%A2%E9%80%81%E3%83%A2%E3%83%BC%E3%83%89">転送モード</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>やSFTPでの転送モードの話。</p></p>
-
-<p>ついこの前、<a class="keyword" href="http://d.hatena.ne.jp/keyword/WinSCP">WinSCP</a>を利用している人が転送モードを選んでいて、<br>
-「SFTPには転送モードはないと思っていたのに、転送モードを選んでいる！？」<br>
-と疑問に思ったのでその辺りまとめた。</p>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>のバイナリーモードと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モード</h1>
-
-<p>入社しはじめの頃、それまでSFTPしかほとんど使ったことなかったので、<br>
-先輩に「<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>ではバイナリーモードを使って…」と言われて、意味が理解できなかったときがあったのを思い出す。</p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>にはファイル転送モードが２つあって、ちゃんと理解していないと思わぬところで痛い目にあう。</p>
-
-<ul>
-<li>バイナリーモード：ファイルの改行コードを変換せず転送する。</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モード：OS側で異なる改行コードを自動的に修正して転送する。</li>
-</ul>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>では標準では<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モードのため、なにも考えずにファイルを送るとファイルが壊れてしまったりする。<br>
-昔にミスしたのは<a class="keyword" href="http://d.hatena.ne.jp/keyword/Windows">Windows</a>から<a class="keyword" href="http://d.hatena.ne.jp/keyword/Linux">Linux</a>へtar.gzファイルを<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モードで送って、解凍したらファイルが壊れていたが、<br>
-それに気付かず壊れたファイルをサーバへ設置してしまったとか。</p>
-
-<h1>SFTPには転送モードはあるのか？</h1>
-
-<p>SFTPを普段から使ってる人は転送モードなんて気にしたことあまりないと思う。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>では気にしなければいけない転送モード、SFTPでは気にしなくていいのだろうか？</p>
-
-<p>結論から言うと、SFTPには転送モードはないので、気にする必要はない。<br>
-SFTPでは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>でいうバイナリーモードでファイル転送をするようだ。</p>
-
-<p>sftpコマンドのマニュアルにも特に転送モードについては記述がないのがわかる。<br>
-<a href="http://www.unixuser.org/~euske/doc/openssh/jman/sftp.html">http://www.unixuser.org/~euske/doc/openssh/jman/sftp.html</a></p>
-
-<h1>SFTPでも転送モードを選択できる場合がある！？</h1>
-
-<p>ここで、SFTPにも転送モードはあるぞ！？と疑問を思った人もいるかもしれない。<br>
-確かに<a class="keyword" href="http://d.hatena.ne.jp/keyword/WinSCP">WinSCP</a>などファイル転送ソフトを使っていると転送モードを選ぶことができる場合もある。</p>
-
-<p>しかし、勘違いしてはいけないのが、<br>
-転送モードを選ぶことができるのはSFTPの機能ではなくて<b>ファイル転送ソフトの機能</b>であるということだ。</p>
-
-<h1>まとめ</h1>
-
-<p><p>ファイル転送でよく使われる<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>やSFTP。<br>
-それぞれに違いはあるし、それを利用するソフトウェアによっても違いがある。<br>
-何が何を行っているか把握し、思わぬミスを減らしましょう。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">11 Feb 2015, 17:21</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/02/11/172123/" class="post-title">SSHポートフォワード、https接続をするときに間違えやすいこと</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-ポートフォワード" href="https://blog.mosuke.tech/categories/%E3%83%9D%E3%83%BC%E3%83%88%E3%83%95%E3%82%A9%E3%83%AF%E3%83%BC%E3%83%89">ポートフォワード</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>ローカルフォワードの話。<br>
-前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。<br>
-<a href="https://blog.mosuke.tech/entry/2014/12/31/170545">SSHでローカルポートフォワードを実際に試す - Goldstine研究所</a></p></p>
-
-<h1>1. やりたいこと</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>でしか接続を許可していないサーバへ、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>ローカルフォワーディングを使って接続しようした。<br>
-（直接疎通性がないためにポートフォワーディングする必要があった。）</p>
-
-<h1>2. 行ったこと</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>でしか接続ができないので、ローカル端末のポート5000を接続したいサーバのポート443に飛ばせばおっけーと思って、<br>
-下記のように<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>接続とブラウザから接続を行った。</p>
-
-<pre><code>ssh -L5000:web-host:443 user@ssh-host 
-</code></pre>
-
-<p>※web-host: 今回<a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>で接続したサーバ<br>
-※<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>-host: <a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>接続先サーバ</p>
-
-<p>これでローカルフォワーディングの設定は終わったので、ブラウザから以下に接続するだけで終わりだと思っていた。</p>
-
-<pre><code>http://localhost:5000 
-</code></pre>
-
-<p>が、接続不可…なぜでしょう？</p>
-
-<h1>3. 何が間違いだったか</h1>
-
-<p>正しくは以下で接続をしなければいけない。http<b><span style="color: #ff0000">s</span></b>が必要。</p>
-
-<pre><code>https://localhost:5000 
-</code></pre>
-
-<p>よーく考えればアタリマエのこと。<br>
-URLのはじめの&lt;http(s)&gt;の部分は<b><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB">プロトコル</a></b>で最後の&lt;:5000&gt;の部分は<b>ポート番号</b>。<br>
-<u><b><a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>は443のポートを一般的に使うが、ポート443が<a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>というわけではない。</b></u></p>
-
-<p><p>あたりまえのことだし知っていることなんだけど、見落としがちかもしれない。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">07 Feb 2015, 14:42</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/02/07/144208/" class="post-title">リモートのサーバでdockerを起動させるときの端末割り当て</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-docker" href="https://blog.mosuke.tech/categories/docker">docker</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>自分がハマったのでメモ。<br>
-リモートのサーバでdocker runを実行し(/bin/<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>)、ローカル側でシェルを操作したかった。</p></p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>でリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。</p>
-
-<pre><code>ssh user@host 'docker run -t -i image_name /bin/bash' 
-</code></pre>
-
-<p>そうすると</p>
-
-<pre><code>[root@0c6742f02bd9 ~]#
-
-[root@0c6742f02bd9 ~]# ^[[A^[[A^[[C 
-</code></pre>
-
-<p>エンターを押すと2行されるし、矢印キーはキーコードがでてしまう。</p>
-
-<p>これを解消するのには以下のようにすればいい。</p>
-
-<pre><code>ssh -t user@host 'docker run -t -i image_name /bin/bash' 
-</code></pre>
-
-<p><p>-tとはなんなのか、なぜこのような<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a>が起きたのか、これからしっかり調べる。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">02 Feb 2015, 20:10</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/02/02/201008/" class="post-title">Ansible、コマンド実行結果を&amp;quot;ok&amp;quot;にする（冪等性を保つ方法）</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-サーバ" href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90">サーバ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>Ansibleで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>インストールする際とか<br>
-すでにインストールされているかのチェックなどで、<br>
-シェルコマンドを実行してその結果で判断したい時がある。</p></p>
-
-<p>ぼくがよくやる例では以下とか。</p>
-
-<pre><code class="language-yaml">- name: check httpd installed
-  command: which httpd
-  ignore_errors: true
- 
-</code></pre>
-
-<p>なんですが...<br>
-こうやってしまうと、仮に既にインストールされていて、正常なときでも"<b><span style="color: #f9ce1d">changed</span></b>"と表示されてしまう。<br>
-これでは、本当にchangedなものなのか、わからなくなってくる。</p>
-
-<p>これを解決するのに<b>chaged_when</b>を使うといい。</p>
-
-<pre><code class="language-yaml">- name: check httpd installed
-  command: which httpd
-  ignore_errors: true
-  changed_when: false
- 
-</code></pre>
-
-<p>こうするとコマンドが成功した際には"<b><span style="color: #00cc00">ok</span></b>"が表示される。</p>
-
-<p>これで、何も変化がないときにはokとskippingしかでないから、<br>
-誰がみても結果がわかりやすいですね！</p>
-
-<p><p>秘伝のタレ回避！</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">24 Jan 2015, 21:32</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/01/24/213255/" class="post-title">dockerで特定ユーザでログインした状態のシェル環境を提供する</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-docker" href="https://blog.mosuke.tech/categories/docker">docker</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、<br>
-特定のユーザでログインした状態のコンテナを作りたいという場面に遭遇した。</p></p>
-
-<h1>&lt;やりたいこと&gt;</h1>
-
-<ul>
-<li>特定のユーザでログインした状態のシェルを提供すること</li>
-<li>その際、ユーザの.<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>_profile（あるいあは.bashrc）を読み込んだ状態であること
-
-<ul>
-<li>.<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>_profileに記載したPATHやaliasを使いたい</li>
-<li>ユーザのログインシェルを利用したい（カスタマイズされたシェルとか）</li>
-</ul>
-</li>
-</ul>
-
-<p>docker runに-uオプションがあるし、これで余裕！と思った。</p>
-
-<pre><code>[host] $ sudo docker run -u=user_name -i -t image_name /bin/bash 
-</code></pre>
-
-<p>しかし…以下を確認してみると…</p>
-
-<pre><code>[docker] $ pwd
-[docker] $ echo $PATH
-[docker] $ alias
- 
-</code></pre>
-
-<p>ディレクトリは "/" だし、PATHも通ってない。<br>
-どうやら.<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>_profileなどは読んでいないようだ。普通にログインした状態とは違う。</p>
-
-<p>dockerで-uでユーザを指定し場合、指定したuserでコマンドを実行するが、<br>
-サーバにユーザでログインしてからコマンドを実行するわけではないらしい。</p>
-
-<p>ディレクトリはどうやら-wオプションで解決できるようだが…</p>
-
-<pre><code>[host] $ sudo docker run -u=user_name -w /home/user_name -i -t image_name /bin/bash 
-</code></pre>
-
-<pre><code>[docker] $ pwd
-/home/user_name 
-</code></pre>
-
-<p>ディレクトリはおっけーだが、<br .>
-当然ながら依然として.<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>_profileはダメ。</p>
-
-<p>そこでふと思いついた。-uも-wもいらない。<br>
-<b>あの手</b>があるではないか…！！</p>
-
-<pre><code>[host] $ sudo docker run -i -t image_name su - username 
-</code></pre>
-
-<p><p>suでスイッチユーザすれば.<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>_profileもホームディレクトリも全部解決だ！！</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">02 Jan 2015, 01:36</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/01/02/013658/" class="post-title">スーパーサーバってなに？ xinetdでサービスを常駐起動せずに利用する</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-サーバ" href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90">サーバ</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-xinetd" href="https://blog.mosuke.tech/categories/xinetd">xinetd</a><a class="post-category post-category-スーパーサーバ" href="https://blog.mosuke.tech/categories/%E3%82%B9%E3%83%BC%E3%83%91%E3%83%BC%E3%82%B5%E3%83%BC%E3%83%90">スーパーサーバ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。<br>
-そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させることが可能らしい。</p></p>
-
-<p>ということで、そのスーパーサーバとやらを実際に触ってみた。</p>
-
-<p>スーパーサーバというとinetdとxinetdがあるらしいが、<br>
-xinetdはinetdの拡張版で、アクセス制御などの機能を搭載しているとのこと。</p>
-
-<p>今回はxinetdを設定してみる。</p>
-
-<h1>1. 事前準備</h1>
-
-<p>【環境】<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で構築した<a class="keyword" href="http://d.hatena.ne.jp/keyword/CentOS">CentOS</a> 6.5<br>
-(仮想環境の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>は192.168.33.10)</p>
-
-<p>まずはスーパーサーバで管理するサービスを考えなければならない。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>とかhttpはどう考えてもスーパーサーバの管理するようなものではないだろうし…<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>や<a class="keyword" href="http://d.hatena.ne.jp/keyword/telnet">telnet</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/POP3">POP3</a>なんかのサービスに利用されることが多いそう？（このへんよくわかない）</p>
-
-<p>今回は<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>をスーパーサーバの管理対象とした。<br>
-※本来は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">複数</a>のサービスを管理対象とするからこそ意味がある。</p>
-
-<p>まずはxinetdとvsftpをインストール</p>
-
-<pre><code>$ sudo yum install xinetd vsftpd 
-</code></pre>
-
-<p><br>
-xinetdどうこうの前に、<a class="keyword" href="http://d.hatena.ne.jp/keyword/ftp">ftp</a>接続がきちんとできるか確認するのでサービスを起動。</p>
-
-<pre><code>$ sudo service vsftpd start 
-</code></pre>
-
-<p><br>
-ローカルPCから接続できることを確認する。</p>
-
-<pre><code>$ ftp 192.168.33.10
-Connected to 192.168.33.10.
-220 (vsFTPd 2.2.2)
-Name (192.168.33.10:username): 
-</code></pre>
-
-<h1>2. xinetdの設定</h1>
-
-<p>xinetdの基本設定は/etc/xinetd.confにかかれており、<br>
-xinetdで管理する各サービスの設定は/etc/xinetd.d/配下に書く方式。</p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/ftp">ftp</a>の設定を以下の通りにした。<br>
-"service"のあとに書くサービス名称は/etc/servicesに定義されているものを記載する。<br>
-vsftpとか書いても動かないので注意。</p>
-
-<pre><code>$ sudo vim /etc/xinetd.d/ftp
-service ftp
-{
-        disable         = no
-        socket_type     = stream
-        wait            = no
-        user            = root
-        server          = /usr/sbin/vsftpd
-        log_on_failure  += USERID
-}
- 
-</code></pre>
-
-<p>設定項目については以下参照。<br>
-<a href="https://www.express.nec.co.jp/linux/distributions/knowledge/network/xinetd.html">xinetd の設定</a></p>
-
-<p>これでxinetdを起動</p>
-
-<pre><code>$ sudo service xinetd start 
-</code></pre>
-
-<h3>(補足) /etc/servicesってなにもの？</h3>
-
-<p>/etc/servicesがなにか気になったので一応調べると。</p>
-
-<blockquote><p>サービス名とそこで使われるポート番号、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB">プロトコル</a>(<a class="keyword" href="http://d.hatena.ne.jp/keyword/tcp">tcp</a>/<a class="keyword" href="http://d.hatena.ne.jp/keyword/udp">udp</a>)との 対応関係を記述したファイルが /etc/services です。
-このファイルは 単なるサービス名のデータベースで、それ自体では何の働きもありませ んが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/netstat">netstat</a> コマンドや次の inetd などで参照されます。
-(<a href="http://www.wakhok.ac.jp/~kanayama/summer/02/site/node43.html">http://www.wakhok.ac.jp/~kanayama/summer/02/site/node43.html</a>)</p></blockquote>
-
-<h1>3. xinetdを使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>で接続してみる</h1>
-
-<p>xinetdが<b>"起動している"</b>ことと、vsftpdが<b>"起動していない"</b>ことを確認しておく。</p>
-
-<pre><code>$ sudo service xinetd status
-xinetd (pid  3521) is running...
-
-$ sudo service vsftpd status
-vsftpd is stopped 
-</code></pre>
-
-<p><br>
-ローカルPCから<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>接続をしてみる。</p>
-
-<pre><code>$ ftp 192.168.33.10
-Connected to 192.168.33.10.
-421 Service not available, remote server has closed connection. 
-</code></pre>
-
-<p>あれ、接続が切られた…</p>
-
-<p>syslogを確認してみると。</p>
-
-<pre><code>$ sudo tail /var/log/message
-Jan  1 15:07:25 server xinetd[3335]: START: ftp pid=3337 from=::ffff:192.168.33.1
-Jan  1 15:07:28 server xinetd[3335]: EXIT: ftp status=1 pid=3337 duration=3(sec) 
-</code></pre>
-
-<p>接続できているようだがその後すぐに切断されているようにみえる。
-vsftpd側の設定を疑ってみた。</p>
-
-<h1>4. vsftpdの設定</h1>
-
-<p>vsftpd側で以下の設定をいじる必要があった。</p>
-
-<pre><code>$ sudo vim /etc/vsftpd/vsftpd.conf
-listen=NO
- 
-</code></pre>
-
-<p>vsftpdのlistenの設定は以下のとおり。</p>
-
-<blockquote><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a> コントロールポート (21) への接続要求を vsftpd 自身で見張るか。
-YES の状態を「<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%BF%A5%F3%A5%C9%A5%A2%A5%ED%A1%BC%A5%F3">スタンドアローン</a>モード」と呼ぶ。
-inetd や後述の <a class="keyword" href="http://d.hatena.ne.jp/keyword/tcpserver">tcpserver</a> を経由する場合は NO にする。
-(<a href="http://www.asahi-net.or.jp/~aa4t-nngk/ftpd.html">http://www.asahi-net.or.jp/~aa4t-nngk/ftpd.html</a>)</p></blockquote>
-
-<h1>5. <a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>接続の再チャレンジ</h1>
-
-<p>ローカルPCから再度<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>接続を試みる。</p>
-
-<pre><code>$ ftp 192.168.33.10
-Connected to 192.168.33.10.
-220 (vsFTPd 2.2.2)
-Name (192.168.33.10:username): 
-</code></pre>
-
-<p>つながった！<br>
-<span style="font-size: 150%"><b>vsftpdサービスを停止しているのに<a class="keyword" href="http://d.hatena.ne.jp/keyword/ftp">ftp</a>接続ができる！</b></span></p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/ftp">ftp</a>接続前と接続中、接続後でプロセスを確認してみる。</p>
-
-<pre><code>&gt; 接続前
-$ ps -ef | grep ftp
-vagrant   3552  2742  0 16:17 pts/0    00:00:00 grep ftp
-
-&gt; 接続中
-&gt; 接続中のみvsftpdのプロセスが立ち上がっている。
-$ ps -ef | grep ftp
-nobody    3555  3521  0 16:18 ?        00:00:00 vsftpd
-vagrant   3557  3555  0 16:18 ?        00:00:00 vsftpd
-vagrant   3559  2742  0 16:18 pts/0    00:00:00 grep ftp
-
-&gt; 接続終了後
-$ ps -ef | grep ftp
-vagrant   3552  2742  0 16:17 pts/0    00:00:00 grep ftp 
-</code></pre>
-
-<p><br>
-プロセスツリーを見てみると、xinetdプロセスがvsftpdを起動していることがわかる。</p>
-
-<pre><code>&gt; 接続前
-$ pstree -p
-init(1)-+-VBoxService(1003)-+-{VBoxService}(1004)
-        |
-        | (略)
-        |
-        `-xinetd(3521)
-
-&gt; 接続中
-$ pstree -p
-init(1)-+-VBoxService(1003)-+-{VBoxService}(1004)
-        |
-        | (略)
-        |
-        `-xinetd(3521)---vsftpd(3562)---vsftpd(3563) 
-</code></pre>
-
-<p><p><br>
-サービスを起動しておかなくてもxinetd経由で起動できるんですね。<br>
-これはこれで使い道あるかもしれぬ。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">01 Jan 2015, 16:18</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/01/01/161826/" class="post-title">2014年を思い返して…</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>2015年になってしまいました。<br>
-2014年に技術分野で印象に残ってること３つを思い返してみる。<br></p></p>
-
-<h1>1. インフラ会</h1>
-
-<p>@mogulla3と軽いノリで始めたインフラ会。<br>
-普段触らない、あるいは触ったとしてもすでに構築された環境で触ることの多いインフラ技術について<br>
-土日を使って自らの手で構築してみるといった会。<br>
-10月くらいから初めて以下を実際にやってみた。</p>
-
-<ul>
-<li>仮想化　　　　　　：Docker, <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>
-</li>
-<li>リバースプロキシ　：Nginx</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%C9%A5%D0%A5%E9%A5%F3%A5%B5%A1%BC">ロードバランサー</a>　：HAProxy</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF%A5%EA%A5%F3%A5%B0">クラスタリング</a>　　：Pacemaker+corosync(heartbeat)</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>　　　　　　　：<a class="keyword" href="http://d.hatena.ne.jp/keyword/SoftEther">SoftEther</a>
-</li>
-<li>構成管理<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>　　：Ansible</li>
-<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%AB%BA%EEPC">自作PC</a></li>
-</ul>
-
-<p>やったことについては全てではないがブログにまとめている。</p>
-
-<ul>
-<li><a href="https://blog.mosuke.tech/entry/2014/10/09/230555">【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築 - Goldstine研究所</a></li>
-<li><a href="https://blog.mosuke.tech/entry/2014/11/09/171436">【VPS1台でインフラ勉強】HAProxyでロードバランサーを構築 - Goldstine研究所</a></li>
-<li><a href="https://blog.mosuke.tech/entry/2014/12/07/212156">【VPS1台でインフラ勉強】SoftEtherを使ってVPN構築 - Goldstine研究所</a></li>
-<li><a href="https://blog.mosuke.tech/entry/2014/12/29/154251">【年末遊び】秋葉原で自作PCパーツ集めて作った - Goldstine研究所</a></li>
-</ul>
-
-<p>このインフラ会では３つを目標にしてたけど、これが仕事でも本当に役立った。<br>
-会もそうだが、目標にしていたマインドは今後もぜひ続けていきたい。</p>
+<p>カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>の設定方法は以下のみだ。</p>
 
 <ol>
-<li>"なんとなく知っている"をなくす</li>
-<li>考える引き出しをふやす</li>
-<li>自らの手で実践する</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>にCNAMEファイルを作成する <code>$ echo mosuke.tech &gt; CNAME</code>
+</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>の設定：Aレコードに<code>192.30.252.153</code>と<code>192.30.252.154</code>を追加</li>
 </ol>
 
-<h4>&lt;大変参考になった書籍&gt;</h4>
+<p>(本家ドキュメント)<br>
+<a href="https://help.github.com/articles/setting-up-an-apex-domain/">Setting up an apex domain - User Documentation</a></p>
 
-<p></p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4774135666/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/51uK4ACymiL._SL160_.jpg" class="hatena-asin-detail-image" alt="[24時間365日] サーバ/インフラを支える技術 ?スケーラビリティ、ハイパフォーマンス、省力運用 (WEB+DB PRESS plusシリーズ)" title="[24時間365日] サーバ/インフラを支える技術 ?スケーラビリティ、ハイパフォーマンス、省力運用 (WEB+DB PRESS plusシリーズ)"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/4774135666/hatena-blog-22/">[24時間365日] サーバ/インフラを支える技術 ?スケーラビリティ、ハイパフォーマンス、省力運用 (WEB+DB PRESS plusシリーズ)</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">作者:</span> 安井真伸,横川和哉,ひろせまさあき,<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B0%CB%C6%A3%C4%BE%CC%E9">伊藤直也</a>,田中慎司,勝見祐己</li>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%B5%BB%BD%D1%C9%BE%CF%C0%BC%D2">技術評論社</a>
-</li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2008/08/07</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> 単行本（ソフトカバー）</li>
-<li>
-<span class="hatena-asin-detail-label">購入</span>: 133人 <span class="hatena-asin-detail-label">クリック</span>: 2,270回</li>
-<li><a href="http://d.hatena.ne.jp/asin/4774135666/hatena-blog-22" target="_blank">この商品を含むブログ (289件) を見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
+<h1>カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>設定時の通信について</h1>
 
-<h1>2. システム導入工事（工事監督マン）</h1>
+<p>カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>がどのような仕組みで実現されているのか気になって、<br>
+いろいろと調べている時にあることに気づいた。</p>
 
-<p>仕事では主に社内SEなのだが、社内SEの仕事をしていると新規設備の導入工事なんかもまれにある。（IaaSとかつかってないので）<br>
-新規システムの導入で、データセンターへのサー<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%E9%A5%C3%A5%AF">バラック</a>の立架工事など、インフラ機器の導入にいくつも立ち会った。<br>
-もちろんだが、私自身は工事をするわけではなく、あくまで立ち会い・監督の立場。<br>
-システム・ソフトウェア系の世界からは少し離れてるがインフラマンとしてはいい経験だった。</p>
+<p>Aレコードに登録した<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を逆引きで調べると、pages.<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>.comが出てくるが、<br>
+pages.<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>.comをdigすると違う結果が返ってくる。</p>
 
-<p><span style="font-size: 80%">こんな仕事のおかげさまで、関西や北陸・四国など全国いろいろと行く機会があって、名物もかなり食べた笑<br>
-あとで、特に美味しかった名物料理を紹介するｗ</span></p>
+<pre><code>$ dig -x 192.30.252.153
+;; ANSWER SECTION:
+153.252.30.192.in-addr.arpa. 3600 IN    PTR pages.github.com.
 
-<p>工事で一番大事なのはなんといっても<b>「安全」</b>。<br>
-安全第一である。</p>
-
-<p>データセンターには無数のサーバやケーブルがある。もちろん自分が担当でないシステムの設備がたくさんある。<br>
-工事の際に過って、他の設備・機器・ケーブルを壊してしてしまった、切ってしまったなんていったらシャレにならない…<br>
-機器ならまだよいが、人的被害を出してしまったら…</p>
-
-<p>そのためにも以下をきちんとしておくことが最重要。</p>
-
-<ol>
-<li>事前の現地調査
-
-<ul>
-<li>工事場所はどこか？</li>
-<li>対象機器はどれか？場所はどこか？(ケーブルなどの接続先)</li>
-<li>十分な場所はあるか？</li>
-<li>段差などの危険ポイントはどこか？</li>
-<li>荷物はどうやって運ぶか？</li>
-</ul>
-</li>
-<li>工事内容の手順書・確認項目
-
-<ul>
-<li>上でよく確認したポイントが踏まえてあるか？</li>
-<li>実施する内容は明確か？</li>
-<li>監督側としてなにをどう確認すればいいか明確か？</li>
-</ul>
-</li>
-<li>現地の人とのネゴり
-
-<ul>
-<li>あとはいろいろと聞けるようにデータセンター管理者と仲良くしておきましょう笑</li>
-</ul>
-</li>
-</ol>
-
-<p>ラックの立架といっても、電気もひかなければいけないので、電気工事もある。<br>
-あまりにも電気的知識がなさすぎて電気の入門の本も買ってしまった…
-</p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4274035441/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/51NQ79XKHNL._SL160_.jpg" class="hatena-asin-detail-image" alt="電気がわかる本 (なるほどナットク!)" title="電気がわかる本 (なるほどナットク!)"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/4274035441/hatena-blog-22/">電気がわかる本 (なるほどナットク!)</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">作者:</span> 松原洋平</li>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AA%A1%BC%A5%E0%BC%D2">オーム社</a>
-</li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2001/03</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> 単行本</li>
-<li><a href="http://d.hatena.ne.jp/asin/4274035441/hatena-blog-22" target="_blank">この商品を含むブログを見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
-
-<h1>3. <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D6%A5%E9%A5%C3%A5%AF%A5%DC%A5%C3%A5%AF%A5%B9">ブラックボックス</a>をなくした開発組織を作る</h1>
-
-<p>好きなようにやりたいようにシステムや<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を勝手につくって<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D6%A5%E9%A5%C3%A5%AF%A5%DC%A5%C3%A5%AF%A5%B9">ブラックボックス</a>ができる…<br>
-そしてそんな<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D6%A5%E9%A5%C3%A5%AF%A5%DC%A5%C3%A5%AF%A5%B9">ブラックボックス</a>が運用される…</p>
-
-<p>こんな状況はきっとどこにいってもあるものだと思う。<br>
-でも、なんとかこの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D6%A5%E9%A5%C3%A5%AF%A5%DC%A5%C3%A5%AF%A5%B9">ブラックボックス</a>と化する状況をなくそうと以下の様な取り組みを行ってきた。<br></p>
-
-<p><b>(1) 使用する技術のある程度の統一化</b><br>
-業務の特性上、ひとつのシステムを作るというよりは、業務系システムを数十とあるのだけど、<br>
-個人の好き勝手に作ると言語も乱立し保守不可・改修難となるので、ある程度技術を統一化していくことに取り組んだ。<br>
-そうすることで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D6%A5%E9%A5%C3%A5%AF%A5%DC%A5%C3%A5%AF%A5%B9">ブラックボックス</a>の排除はもちろん、チームとしての技術の習得スピードも上がっていった。</p>
-
-<p><b>(2) Gitlabを使った開発フローの確立</b><br>
-恥ずかしながら、すべてのシステムできちんとバージョン管理ができている状況ではなかった。<br>
-Gitlabを使った開発フローをルール化し、文化的に浸透させる取り組みを行っていった。<br>
-Merge Request(Pull Request)のおかげで好き放題に作られた<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>が減った気がする。</p>
-
-<p><b>(3) Ansibleでインフラも明確化</b><br>
-上２つで、アプリケーションレベルでの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D6%A5%E9%A5%C3%A5%AF%A5%DC%A5%C3%A5%AF%A5%B9">ブラックボックス</a>はある程度解消できてきたが、<br>
-インフラレベルでは依然として<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D6%A5%E9%A5%C3%A5%AF%A5%DC%A5%C3%A5%AF%A5%B9">ブラックボックス</a>のままだった。<br>
-こちらについてはAnsibleの導入と文化的に浸透を行っていった。</p>
-
-<h4>&lt;大変参考になった書籍&gt;</h4>
-
-<p></p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4774164283/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/51ZhxAcsdkL._SL160_.jpg" class="hatena-asin-detail-image" alt="チーム開発実践入門 ~共同作業を円滑に行うツール・メソッド (WEB+DB PRESS plus)" title="チーム開発実践入門 ~共同作業を円滑に行うツール・メソッド (WEB+DB PRESS plus)"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/4774164283/hatena-blog-22/">チーム開発実践入門 ~共同作業を円滑に行うツール・メソッド (WEB+DB PRESS plus)</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">作者:</span> 池田尚史,藤倉和明,井上史彰</li>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%B5%BB%BD%D1%C9%BE%CF%C0%BC%D2">技術評論社</a>
-</li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2014/04/16</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> 単行本（ソフトカバー）</li>
-<li><a href="http://d.hatena.ne.jp/asin/4774164283/hatena-blog-22" target="_blank">この商品を含むブログ (8件) を見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
-
-<h1>4. まとめ</h1>
-
-<p>今年だけに限ったことではないけど、<br>
-ネットワーク系、インフラを支える<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DF%A5%C9%A5%EB%A5%A6%A5%A7%A5%A2">ミドルウェア</a>系、システムの開発系、システム導入工事系と<br>
-本当に多岐にわたる分野に携わり、システムを全体的に俯瞰して見れるようになってきたなーという実感がでてきた。<br>
-2014年は特にテクノロジーという側面で強くそれを感じた年だったと思う。</p>
-
-<p>これからどういう分野で生きていくか、それはとりあえずは流れに身を任せてドリフトするとしよう。<br>
-<a href="http://www.atmarkit.co.jp/ait/articles/0905/19/news148.html">エンジニアも知っておきたいキャリア理論入門（11）：金井壽宏教授が提唱する「節目」のキャリア論 (1/2) - ＠IT</a></p>
-
-<h1>5. 【おまけ】各地のうまかったもの</h1>
-
-<p>大阪 お好み焼き<br>
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Fosaka%2FA2701%2FA270101%2F27000297%2F" title="きじ 本店 (梅田/お好み焼き)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://tabelog.com/osaka/A2701/A270101/27000297/">きじ 本店 (梅田/お好み焼き)</a></iframe></p>
-
-<p>大阪 おでん<br>
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Fosaka%2FA2701%2FA270101%2F27002111%2F" title="たこ梅 北店 (梅田/おでん)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://tabelog.com/osaka/A2701/A270101/27002111/">たこ梅 北店 (梅田/おでん)</a></iframe></p>
-
-<p>金沢 海鮮丼<br>
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Fishikawa%2FA1701%2FA170101%2F17000181%2F" title="ひら井 (北鉄金沢/魚介料理・海鮮料理)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://tabelog.com/ishikawa/A1701/A170101/17000181/">ひら井 (北鉄金沢/魚介料理・海鮮料理)</a></iframe></p>
-
-<p>香川 うどん<br>
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Fkagawa%2FA3702%2FA370202%2F37001385%2F" title="将八うどん 丸亀店 (丸亀/うどん)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://tabelog.com/kagawa/A3702/A370202/37001385/">将八うどん 丸亀店 (丸亀/うどん)</a></iframe></p>
-
-<p>広島 あなご<br>
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Fhiroshima%2FA3402%2FA340202%2F34000065%2F" title="うえの (宮島口/丼もの（その他）)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://tabelog.com/hiroshima/A3402/A340202/34000065/">うえの (宮島口/丼もの（その他）)</a></iframe></p>
-
-<p><p>広島 お好み焼き<br>
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Fhiroshima%2FA3401%2FA340102%2F34001107%2F" title="お好み焼　きゃべつ 駅前ひろば店 (広島/お好み焼き)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://tabelog.com/hiroshima/A3401/A340102/34001107/">お好み焼　きゃべつ 駅前ひろば店 (広島/お好み焼き)</a></iframe></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">31 Dec 2014, 17:05</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/12/31/170545/" class="post-title">SSHでローカルポートフォワードを実際に試す</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a><a class="post-category post-category-ポートフォワード" href="https://blog.mosuke.tech/categories/%E3%83%9D%E3%83%BC%E3%83%88%E3%83%95%E3%82%A9%E3%83%AF%E3%83%BC%E3%83%89">ポートフォワード</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>・・・<br>
-いろんなことができる&rdquo;らしい&rdquo;ということは知っていたし、<br>
-例えばポートフォワーディングなんていうこともできるのも知っている。</p></p>
-
-<p>でもそれがどんなものなのか自分の手で試したことはないし、<br>
-なんとなくただのサーバログイン<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>として利用していた。</p>
-
-<p>サーバインフラ技術に興味を持つようになっていろんなことを勉強していると、<br>
-ポートフォワーディングは必須な技術であることも感じ、<br>
-年末の持て余す時間を使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のローカルポートフォワードを試してみたのでメモする。</p>
-
-<h1>環境とやりたいこと</h1>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141231/20141231162958.png" alt="f:id:mosuke5:20141231162958p:plain" title="f:id:mosuke5:20141231162958p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>ローカルPCからexample.jpは以下で接続できる状態。</p>
-
-<pre><code>[local pc] $ ssh username@example.jp 
+$ dig pages.github.com
+;; ANSWER SECTION:
+pages.github.com.   900 IN  CNAME   github.map.fastly.net.
+github.map.fastly.net.  23  IN  A   103.245.222.133[f:id:mosuke5:20160319233634j:plain] 
 </code></pre>
 
-<p>またWebサーバのポート番号は80で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>のホストサーバからはWebサーバへ接続できる。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/CUI">CUI</a>なのでわかりづらいが<a class="keyword" href="http://d.hatena.ne.jp/keyword/curl">curl</a>を打つと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Hello%20World">Hello World</a>が返ってきている。</p>
+<p>後者のほうでは、fastly（CDN）の結果が返ってくる。<br>
+つまり、カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>を設定しなければ、通常はCDN経由で通信されるが、<br>
+カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>を割り当てるとCDNを利用できないのではないかということがわかった。</p>
 
-<pre><code>[example.jp] $ curl 192.168.33.10
-&lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello World! Virtual Web Server&lt;/h1&gt;
-&lt;/body&gt;&lt;/html&gt; 
+<p>実際に<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ping">Ping</a>で確かめてみる。明らかに速度差がでている。</p>
+
+<pre><code>% ping mosuke5.github.io
+PING github.map.fastly.net (103.245.222.133): 56 data bytes
+64 bytes from 103.245.222.133: icmp_seq=0 ttl=58 time=18.485 ms
+64 bytes from 103.245.222.133: icmp_seq=1 ttl=58 time=19.108 ms
+64 bytes from 103.245.222.133: icmp_seq=2 ttl=58 time=18.709 ms
+64 bytes from 103.245.222.133: icmp_seq=3 ttl=58 time=19.161 ms
+64 bytes from 103.245.222.133: icmp_seq=4 ttl=58 time=20.574 ms
+
+
+% ping mosuke.tech
+PING mosuke.tech (192.30.252.154): 56 data bytes
+64 bytes from 192.30.252.154: icmp_seq=0 ttl=52 time=203.329 ms
+64 bytes from 192.30.252.154: icmp_seq=1 ttl=52 time=205.535 ms
+64 bytes from 192.30.252.154: icmp_seq=2 ttl=52 time=203.178 ms
+64 bytes from 192.30.252.154: icmp_seq=3 ttl=52 time=201.345 ms
+64 bytes from 192.30.252.154: icmp_seq=4 ttl=52 time=205.125 ms 
 </code></pre>
 
-<h1>ローカルポートフォワードの実行</h1>
+<p>また、それぞれの<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>から場所も調べてみた。<br>
+CDN利用時がオーストラリア、そうでないとアメリカ西海岸ということがわかった。
+<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fwww.iputilities.net%2F" title="IPアドレス所在地検索 IP Geolocation Search" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://www.iputilities.net/">www.iputilities.net</a></cite></p>
 
-<p>ローカルPCから以下を実行する。<br>
-以下のコマンドは、<br>
-<b>ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす</b><br>
-といったもの。</p>
+<p>以上のことをまとめつつ、地図に表した。
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160319/20160319233634.jpg" alt="f:id:mosuke5:20160319233634j:plain" title="f:id:mosuke5:20160319233634j:plain" class="hatena-fotolife" itemprop="image"></span></p>
 
-<pre><code>[local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp 
-</code></pre>
+<p>オーストラリアとアメリカ西海岸だとそんなに直線距離は変わらない気もするけど、<br>
+CDNの力なのかルート的な問題ないのか<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ping">Ping</a>の応答速度は10倍ほどの差があった。</p>
 
-<p>この状態でブラウザから<code>http://localhost:8888</code>にアクセスすると<br>
-
-<p>なんと、ローカルホストにつないだはずが、example.jp上の仮想Webサーバのhtmlがうつっているではないか…</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141231/20141231163932.png" alt="f:id:mosuke5:20141231163932p:plain" title="f:id:mosuke5:20141231163932p:plain" class="hatena-fotolife" itemprop="image" style="border:solid 1px #ddd;"></span></p>
-
-<h1>セキュリティはどうなの？</h1>
-
-<p>ローカルの端末からhttpで仮想のWebサーバに接続しているけど、セキュリティはだいじょうぶなのだろうか？<br>
-http通信だから暗号化はされていないのだろうか？<br>
-なんて疑問もあるが、それは問題ない。</p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>でローカルPCから<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%E2%A1%BC%A5%C8%A5%DB%A5%B9%A5%C8">リモートホスト</a>(example.jp)までトンネルをはり、<br>
-そのなかをhttpで通信しているから全く問題なしといえる。</p>
-
-<p>ローカルポートフォワードを利用する場合は、おそらく表には出したくないけど、<br>
-ローカルから接続したいなどの要件の時に使うと思うけど、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>できちんと暗号化しているので安心。</p>
+<p>カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>を使うと遅くなる！？（まあ全然いいんだけど…）</p>
 
 <h1>最後に</h1>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>でできることはこの他にもたくさんある。<br>
-ポートフォワードだけみても他にも「リモートポートフォワード」や「ダイナミックポートフォワード」などがある。<br>
-リモートポートなどはいまぱっと試せる環境がなかったのでおいおい実践してみる…</p>
+<p>CDNの仕組みとかいまいち忘れてしまったので、アカマイ本を読み返したい。</p>
 
-<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>をただのログイン<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>だけに留めるのは今年で終わりにしよう…</p>
+<p><p></p>
+<div class="hatena-asin-detail">
+<a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00MIFE3BC/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/51T4L8K2yLL._SL160_.jpg" class="hatena-asin-detail-image" alt="アカマイ　知られざるインターネットの巨人&lt;アカマイ&gt; (角川ＥＰＵＢ選書)" title="アカマイ　知られざるインターネットの巨人&lt;アカマイ&gt; (角川ＥＰＵＢ選書)"></a><div class="hatena-asin-detail-info">
+<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00MIFE3BC/hatena-blog-22/">アカマイ　知られざるインターネットの巨人 (角川ＥＰＵＢ選書)</a></p>
+<ul>
+<li>
+<span class="hatena-asin-detail-label">作者:</span> 小川晃通</li>
+<li>
+<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/KADOKAWA">KADOKAWA</a> / <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%C7%A5%A3%A5%A2%A5%D5%A5%A1%A5%AF%A5%C8%A5%EA%A1%BC">メディアファクトリー</a>
+</li>
+<li>
+<span class="hatena-asin-detail-label">発売日:</span> 2014/08/11</li>
+<li>
+<span class="hatena-asin-detail-label">メディア:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kindle">Kindle</a>版</li>
+<li><a href="http://d.hatena.ne.jp/asin/B00MIFE3BC/hatena-blog-22" target="_blank">この商品を含むブログ (5件) を見る</a></li>
+</ul>
+</div>
+<div class="hatena-asin-detail-foot"></div>
+</div>
 </body></p>
 
                     </div>
@@ -1161,11 +213,11 @@ http通信だから暗号化はされていないのだろうか？<br>
                 
                 
                 
-                <h1 class="content-subhead">29 Dec 2014, 15:42</h1>
+                <h1 class="content-subhead">16 Mar 2016, 17:54</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2014/12/29/154251/" class="post-title">【年末遊び】秋葉原で自作PCパーツ集めて作った</a>
+                        <a href="https://blog.mosuke.tech/entry/2016/03/16/175431/" class="post-title">DBのViewの使いどころの検討</a>
 
                         <p class="post-meta">
                             
@@ -1174,211 +226,667 @@ http通信だから暗号化はされていないのだろうか？<br>
                             
                                 under 
                                 
-                                <a class="post-category post-category-自作PC" href="https://blog.mosuke.tech/categories/%E8%87%AA%E4%BD%9Cpc">自作PC</a><a class="post-category post-category-秋葉原" href="https://blog.mosuke.tech/categories/%E7%A7%8B%E8%91%89%E5%8E%9F">秋葉原</a>
+                                <a class="post-category post-category-データベース" href="https://blog.mosuke.tech/categories/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9">データベース</a><a class="post-category post-category-DB" href="https://blog.mosuke.tech/categories/db">DB</a><a class="post-category post-category-ビュー" href="https://blog.mosuke.tech/categories/%E3%83%93%E3%83%A5%E3%83%BC">ビュー</a>
                             
                         </p>
                     </header>
 
                     <div class="post-description">
                         <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%AB%BA%EEPC">自作PC</a>を作ったのでその材料と参考資料などを簡単にまとめる。<br>
-すべての部品は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BD%A9%CD%D5%B8%B6">秋葉原</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A5%AF%A5%E2">ツクモ</a>で揃えた。<br>
-<a href="http://shop.tsukumo.co.jp/" target="_blank">パソコン・ゲームPC・自作パソコンなら【TSUKUMO】</a>
-<p>わけがあって荷物はすべて手で運んだのだが、かなり重くなるので郵送をおすすめする。<br>
-以下買ったパーツ一式や用意した道具。<br>
-ちなみに全部で54000円程度でした。（お店で買うとセット割などがあったため）</p></p>
+<p>ある実装についてどのように実装するか悩んだ。<br>
+その悩んだ過程や実装案をメモする。似たようなケースの実装案として参考になればと思う。</p></p>
 
-<div class="section">
-    <h2>材料・パーツ一式</h2>
-    
-<div class="section">
-    <h3><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%B6%A1%BC%A5%DC%A1%BC%A5%C9">マザーボード</a></h3>
-    <p></p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00KD6RZIG/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/61rM4AVJ3yL._SL160_.jpg" class="hatena-asin-detail-image" alt="ASUSTeK Intel H97チップセット搭載マザーボード H97-PRO 【ATX】" title="ASUSTeK Intel H97チップセット搭載マザーボード H97-PRO 【ATX】"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00KD6RZIG/hatena-blog-22/">ASUSTeK Intel H97チップセット搭載マザーボード H97-PRO 【ATX】</a></p>
+<h1>状況</h1>
+
+<p>ある申請に対して、検査Aと検査Bを行い、その検査状態・検査日時を管理・閲覧するシステムがあるとする。  <br>
+申請のテーブルは下記とする。</p>
+
+<ul>
+<li>id: int</li>
+<li>name: varchar(20)  # どうでもいいので無視していい</li>
+<li>check_a: datetime  # 検査すると実施した日時がはいる</li>
+<li>check_b: datetime  # 検査すると実施した日時がはいる</li>
+</ul>
+
+<p>UIとして下記のように表示したいと考えている。</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:center;">番号</th>
+<th style="text-align:center;">状態</th>
+<th style="text-align:center;">名前</th>
+<th style="text-align:center;">検査A</th>
+<th style="text-align:center;">検査B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;">1</td>
+<td style="text-align:center;">検査完了</td>
+<td style="text-align:center;">xxxxxx</td>
+<td style="text-align:center;">2016/03/01 10:00 </td>
+<td style="text-align:center;">2016/03/01 12:00</td>
+</tr>
+<tr>
+<td style="text-align:center;">2</td>
+<td style="text-align:center;">検査未完了</td>
+<td style="text-align:center;">xxxxxx</td>
+<td style="text-align:center;"> - </td>
+<td style="text-align:center;"> - </td>
+</tr>
+<tr>
+<td style="text-align:center;">3</td>
+<td style="text-align:center;">検査途中</td>
+<td style="text-align:center;">xxxxxx</td>
+<td style="text-align:center;"> 2016/03/01 13:00 </td>
+<td style="text-align:center;"> - </td>
+</tr>
+<tr>
+<td style="text-align:center;">4</td>
+<td style="text-align:center;">検査途中</td>
+<td style="text-align:center;">xxxxxx</td>
+<td style="text-align:center;"> - </td>
+<td style="text-align:center;"> 2016/03/01 15:00 </td>
+</tr>
+</tbody>
+</table>
+
+<h4>※<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%F3%A5%C1%A5%D1%A5%BF%A1%BC%A5%F3">アンチパターン</a>だろ！？</h4>
+
+<p>そもそも<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%F3%A5%C1%A5%D1%A5%BF%A1%BC%A5%F3">アンチパターン</a>の「マルチカラム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%C8%A5%EA%A5%D3%A5%E5%A1%BC%A5%C8">アトリビュート</a>」じゃないの？と思うかもしれない。<br>
+この場合は、この設計が一番という前提でお願いしたい。</p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fwww.amazon.co.jp%2FSQL%25E3%2582%25A2%25E3%2583%25B3%25E3%2583%2581%25E3%2583%2591%25E3%2582%25BF%25E3%2583%25BC%25E3%2583%25B3-Bill-Karwin%2Fdp%2F4873115892" title="Amazon.co.jp： SQLアンチパターン: Bill Karwin, 和田 卓人, 和田 省二, 児島 修: 本" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://www.amazon.co.jp/SQL%E3%82%A2%E3%83%B3%E3%83%81%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3-Bill-Karwin/dp/4873115892">www.amazon.co.jp</a></cite></p>
+
+<h1>実装の検討</h1>
+
+<p>いくつかの実装パターンを検討した。<br>
+結果的に今回は実装案４のViewを使うのがいいのではないかと考えた。 <br>
+が、Viewにもデメリットがある。必ずしもViewがいいというものではないことは留意。</p>
+
+<h2>(実装案１) <a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>側で頑張る</h2>
+
+<p>まず、データを取り出す際に<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>で頑張ることを思いつくはずだ。<br>
+例えば以下みたいに。</p>
+
+<pre><code class="language-sql">select
+  id,
+  name,
+  case
+    when check_a is null and check_b is null  then '検査未完了'
+    when check_a is not null and check_b is not null then '検査完了 '
+    else '検査途中'
+  end as check_status
+from request
+ 
+</code></pre>
+
+<p>これが悪いとはいわない。<br>
+だが、例えば同じような表示方法で他の条件式で取得したい時があるだろう。</p>
+
+<pre><code class="language-sql">select
+  id,
+  name,
+  case
+    when check_a is null and check_b is null  then '検査未完了'
+    when check_a is not null and check_b is not null then '検査完了 '
+    else '検査途中'
+  end as check_status
+from request
+where name = 'xxxxx'
+ 
+</code></pre>
+
+<p>もし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>の中に同じ形なのに条件だけがことなる<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が出てきてしまったら、
+ヤバイと感じてくるはずだ。</p>
+
+<p>そして、<a class="keyword" href="http://d.hatena.ne.jp/keyword/ActiveRecord">ActiveRecord</a>のようなORマッパーを使っている場合、<br>
+case文などを利用し始めた時点で、生<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を書かなければいけなくなる。<br>
+これも不吉な感じがしてくる。</p>
+
+<h1>(実装案２) 受け取った側で頑張る</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が複雑になるのがいやなら、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DF%A5%F3%A5%B0%B8%C0%B8%EC">プログラミング言語</a>側で頑張ることもできる。<br>
+とりあえずデータは全部生でもらっておいて</p>
+
+<pre><code class="language-sql">select * from request;
+</code></pre>
+
+<p>HTML出力の時に頑張る。(下記は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>のERB想定で記述)</p>
+
+<pre><code class="language-ruby">&lt;% if(request.check_a.nil? and request.check_b.nil?) %&gt;
+  &lt;span&gt;検査完了&lt;/span&gt; 
+&lt;% elsif(!request.check_a.nil? and !request.check_b.nil?) %&gt;
+  &lt;span&gt;検査未実施&lt;/span&gt; 
+&lt;% else %&gt;
+  &lt;span&gt;検査途中&lt;/span&gt; 
+&lt;% end %&gt;
+</code></pre>
+
+<p>ありといえばありだが、もっと条件が複雑になると条件式の管理が大変になってきそうだ。</p>
+
+<p>出力部分をhelperなどに書いて関数化も考えた。<br>
+だが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>でERBを利用して出力する場合はいいが、<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>でも出力する場合には<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>ヘルパーは利用できない。<br>
+とても嫌な予感がした。</p>
+
+<h1>(実装案３) DBの設計の変更で頑張る</h1>
+
+<p>そもそもテーブルの設計を変えてしまう方法も検討した。<br>
+テーブルの中で検査状態を持つのだ。</p>
+
+<ul>
+<li>id: int</li>
+<li>name: varchar(20)</li>
+<li>check_a: datetime</li>
+<li>check_b: datetime</li>
+<li>check_status: int</li>
+</ul>
+
+<p>サーバサイド側で頑張らなきゃいけなくてとても実装する気になれなかったし、これってどうなの？</p>
+
+<h1>(実装案４) Viewを利用して頑張る</h1>
+
+<p>上３つで見てきたように、いろいろ考えたけどどれもイケてなかった。<br>
+そこで思いついたのがデータベースの機能の「View」だ。</p>
+
+<p>Veiwを使ってよく利用する形を事前に作っておくことでいろいろ解決することがわかった。</p>
+
+<pre><code class="language-sql">create view view_request as
+select
+  id,
+  name,
+  case
+    when check_a is null and check_b is null  then '検査未完了'
+    when check_a is not null and check_b is not null then '検査完了 '
+    else '検査途中'
+  end as check_status
+from request
+</code></pre>
+
+<p>上記で作ったViewを参照することでいくつものメリットが生まれた。</p>
+
+<ol>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/ActiveRecord">ActiveRecord</a>が利用できるようになりコードが綺麗になった</li>
+<li>重複した<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が減った</li>
+<li>実現のためのコードをほとんど書かなくて済んだ</li>
+</ol>
+
+<p>だが、もちろんView機能が万能でないことは抑えておく必要がある。<br>
+Viewのデメリットは利用する前にしっかり確認してほしい。</p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fitpro.nikkeibp.co.jp%2Farticle%2FCOLUMN%2F20071126%2F287920%2F%3Frt%3Dnocnt" title="[データベース編]ビュー、トリガーを多用してはいけない" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://itpro.nikkeibp.co.jp/article/COLUMN/20071126/287920/?rt=nocnt">itpro.nikkeibp.co.jp</a></cite></p>
+
+<p><p>もっといい実装があれば教えて下さい。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">06 Mar 2016, 14:05</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2016/03/06/140531/" class="post-title">【錦織圭も分析】ATP TennisのデータスクレイパーGem作った</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Ruby" href="https://blog.mosuke.tech/categories/ruby">Ruby</a><a class="post-category post-category-Gem" href="https://blog.mosuke.tech/categories/gem">Gem</a><a class="post-category post-category-ATP" href="https://blog.mosuke.tech/categories/atp">ATP</a><a class="post-category post-category-テニス" href="https://blog.mosuke.tech/categories/%E3%83%86%E3%83%8B%E3%82%B9">テニス</a><a class="post-category post-category-ATP Tennis" href="https://blog.mosuke.tech/categories/atp-tennis">ATP Tennis</a><a class="post-category post-category-スクレイピング" href="https://blog.mosuke.tech/categories/%E3%82%B9%E3%82%AF%E3%83%AC%E3%82%A4%E3%83%94%E3%83%B3%E3%82%B0">スクレイピング</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<h1>背景</h1></p>
+
+<p>このブログは基本的に技術ブログとしてやっているので、<br>
+テニスの話題ははじめてだが、テニスがすごく好きだ。
+特に、プロの試合の観戦はとても好きだ。</p>
+
+<p>2005年からずーっと見てて、欠かさずすべての試合結果はチェックしている。</p>
+
+<p>数年前から、テニス選手をある指標から分析したいなと思っていた。
+例えば、</p>
+
+<ul>
+<li>ランキングは高くないけど、爆発するとトップ選手に勝つ力を持っているかどうか</li>
+<li>自分より格下の選手に負けることが少ないかどうか</li>
+<li>小さい大会ではあまり勝てないけど、大舞台で勝てる選手かどうか</li>
+</ul>
+
+<p>これから伸びそうな選手かどうかなどをデータ的にみたかった。<br>
+ATPの公式サイトにもいくつか統計情報が載っているが、自分が大事と思う指標で分析したいと思っていた。</p>
+
+<p>まずは、データを取得しなければいけないので、それで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EC%A5%A4%A5%D4%A5%F3%A5%B0">スクレイピング</a>のライブラリを作るにいたった。</p>
+
+<h1>AtpScraper</h1>
+
+<p>AtpScraperは男子のプロテニスの公式サイトである、<a href="http://www.atpworldtour.com">ATPのサイト</a>から情報を<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EC%A5%A4%A5%D4%A5%F3%A5%B0">スクレイピング</a>してくれる<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>ライブラリだ。</p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=https%3A%2F%2Fgithub.com%2Fmosuke5%2Fatp_scraper" title="mosuke5/atp_scraper" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://github.com/mosuke5/atp_scraper">github.com</a></cite></p>
+
+<p>現時点では、ぼくが今欲している機能しか実装していないが、下記ができる。</p>
+
+<ul>
+<li>シングルスのランキングの取得</li>
+<li>プレイヤーの対戦レコードの取得</li>
+</ul>
+
+<p>一例だが、どんなふうに利用できるかのせる。</p>
+
+<h3>シングルスのランキング取得</h3>
+
+<p>デフォルトだとトップ100のランキングを取得する。</p>
+
+<pre><code class="language-ruby">pry(main)&gt; AtpScraper::Get.singles_ranking
+=&gt; [{:ranking=&gt;&quot;1&quot;,
+  :player_name=&gt;&quot;Novak Djokovic&quot;,
+  :player_url_name=&gt;&quot;novak-djokovic&quot;,
+  :player_id=&gt;&quot;d643&quot;,
+  :points=&gt;&quot;16580&quot;},
+ {:ranking=&gt;&quot;2&quot;,
+  :player_name=&gt;&quot;Andy Murray&quot;,
+  :player_url_name=&gt;&quot;andy-murray&quot;,
+  :player_id=&gt;&quot;mc10&quot;,
+  :points=&gt;&quot;8765&quot;},
+ {:ranking=&gt;&quot;3&quot;,
+  :player_name=&gt;&quot;Roger Federer&quot;,
+  :player_url_name=&gt;&quot;roger-federer&quot;,
+  :player_id=&gt;&quot;f324&quot;,
+  :points=&gt;&quot;8295&quot;},
+
+(略)
+</code></pre>
+
+<p>下記のようにすれば、50位から60位のランキングを取得できる。<br>
+（※引数の指定の仕方がアレなのは突っ込まないこと）</p>
+
+<pre><code class="language-ruby">pry(main)&gt; AtpScraper::Get.singles_ranking(&quot;50-60&quot;)
+=&gt; [{:ranking=&gt;&quot;50&quot;,
+  :player_name=&gt;&quot;Lukas Rosol&quot;,
+  :player_url_name=&gt;&quot;lukas-rosol&quot;,
+  :player_id=&gt;&quot;r685&quot;,
+  :points=&gt;&quot;897&quot;},
+ {:ranking=&gt;&quot;51&quot;,
+  :player_name=&gt;&quot;Federico Delbonis&quot;,
+  :player_url_name=&gt;&quot;federico-delbonis&quot;,
+  :player_id=&gt;&quot;d874&quot;,
+  :points=&gt;&quot;895&quot;},
+
+(略)
+</code></pre>
+
+<h3>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B6%D3%BF%A5%B7%BD">錦織圭</a>の対戦レコード取得</h3>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%B6%D3%BF%A5%B7%BD">錦織圭</a>の2016年の対戦レコードを見たいと思えば下記のように取得できる。<br>
+（第一引数の<code>n552</code>は選手のIDのようなもので、これは上のランキングの取得時に手に入るのでそこで確認しなければいけない）</p>
+
+<pre><code class="language-ruby">pry(main)&gt; AtpScraper::Get.player_activity(&quot;n552&quot;, 2016)
+=&gt; [{:year=&gt;&quot;2016&quot;,
+  :player_name=&gt;&quot;Kei Nishikori&quot;,
+  :player_rank=&gt;&quot;6&quot;,
+  :opponent_name=&gt;&quot;Sam Querrey&quot;,
+  :opponent_rank=&gt;&quot;43&quot;,
+  :round=&gt;&quot;Round of 16&quot;,
+  :score=&gt;&quot;46 36&quot;,
+  :win_loss=&gt;&quot;L&quot;,
+  :tournament_name=&gt;&quot;Abierto Mexicano Telcel&quot;,
+  :tournament_category=&gt;&quot;500&quot;,
+  :tournament_location=&gt;&quot;Acapulco, Mexico&quot;,
+  :tournament_start_date=&gt;&quot;2016.02.22&quot;,
+  :tournament_end_date=&gt;&quot;2016.02.27&quot;,
+  :tournament_surface=&gt;&quot;Hard&quot;,
+  :tournament_surface_inout=&gt;&quot;Outdoor&quot;},
+ {:year=&gt;&quot;2016&quot;,
+  :player_name=&gt;&quot;Kei Nishikori&quot;,
+  :player_rank=&gt;&quot;6&quot;,
+  :opponent_name=&gt;&quot;Thiemo de Bakker&quot;,
+  :opponent_rank=&gt;&quot;105&quot;,
+  :round=&gt;&quot;Round of 32&quot;,
+  :score=&gt;&quot;60 63&quot;,
+  :win_loss=&gt;&quot;W&quot;,
+  :tournament_name=&gt;&quot;Abierto Mexicano Telcel&quot;,
+  :tournament_category=&gt;&quot;500&quot;,
+  :tournament_location=&gt;&quot;Acapulco, Mexico&quot;,
+  :tournament_start_date=&gt;&quot;2016.02.22&quot;,
+  :tournament_end_date=&gt;&quot;2016.02.27&quot;,
+  :tournament_surface=&gt;&quot;Hard&quot;,
+  :tournament_surface_inout=&gt;&quot;Outdoor&quot;},
+
+(略)
+</code></pre>
+
+<p>もし、過去のすべての<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B6%D3%BF%A5%B7%BD">錦織圭</a>の対戦レコードを取得したければ下記で取得できる。</p>
+
+<pre><code class="language-ruby">pry(main)&gt; AtpScraper::Get.player_activity(&quot;n552&quot;, &quot;all&quot;)
+</code></pre>
+
+<p>対戦レコードは１対戦ごとのレコードになっている。<br>
+トーナメントごとにまとめたりはしていない。</p>
+
+<h1>これから</h1>
+
+<p>データ取得ライブラリを作ったので、これからこれを使った分析をしていこうと思っている。<br>
+分析結果が見れるサービスを作るかもしれないし作らないかもしれない。</p>
+
+<p>また、データ取得について要望があれば受け付けるし、プルリクをしてくれてもOKです。</p>
+
+<p><p><a href="https://github.com/mosuke5/atp_scraper">GitHub - mosuke5/atp_scraper: atp_scraper is a tool scraping tennis data from atpworldtour.com.</a></p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">07 Feb 2016, 21:03</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2016/02/07/210300/" class="post-title">社内マリカー大会やりました！運営の工夫どころとかまとめ</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-マリオカート" href="https://blog.mosuke.tech/categories/%E3%83%9E%E3%83%AA%E3%82%AA%E3%82%AB%E3%83%BC%E3%83%88">マリオカート</a><a class="post-category post-category-マリカー" href="https://blog.mosuke.tech/categories/%E3%83%9E%E3%83%AA%E3%82%AB%E3%83%BC">マリカー</a><a class="post-category post-category-マリカー大会" href="https://blog.mosuke.tech/categories/%E3%83%9E%E3%83%AA%E3%82%AB%E3%83%BC%E5%A4%A7%E4%BC%9A">マリカー大会</a><a class="post-category post-category-マリオカート大会" href="https://blog.mosuke.tech/categories/%E3%83%9E%E3%83%AA%E3%82%AA%E3%82%AB%E3%83%BC%E3%83%88%E5%A4%A7%E4%BC%9A">マリオカート大会</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>弊社では、年に一度、社内のコミュニケーション促進で、いろんな部署が集まって行う懇親会がある。<br>
+そこでは、恒例行事として何かしらのゲームを行っている。<br>
+そのゲームにて今年マリカー大会を行ったので、その報告と工夫した点などまとめておく。</p></p>
+
+<h1>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%EA%A5%AA%A5%AB%A1%BC%A5%C8">マリオカート</a>を選んだ理由</h1>
+
+<p>パーティとか懇親会のゲームイベントというと、<br>
+ビンゴ大会だったりクイズ大会、ジェスチャーゲームだったり行うのが一般的かと思う。<br>
+ですが、今回そういう場で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%EA%A5%AA%A5%AB%A1%BC%A5%C8">マリオカート</a>大会を選ぶに至ったのには下記のような理由があった。</p>
+
+<ol>
+<li><b>準備が楽なものがよかった！</b></li>
+<li><b>順位が決められるものが良かった（景品の都合上）</b></li>
+<li><b>楽しさに進行役の力量が影響しないものがよかった…</b></li>
+</ol>
+
+<p>まず、はじめはクイズ大会などを行おうかと検討していましたが、<br>
+そのクイズの問題を考えるのが結構たいへんであることに気づき、準備が楽なものがいいなと思った。<br>
+そして、運営的な理由だが、ゲームの結果を順位を簡単に決められる必要があった。<br>
+最後に、なんといっても自分が進行役だったので、<br>
+自分の笑いを取る力や進行技術で楽しさが左右されたらこまるなーとおもっていた。</p>
+
+<p>これらを満たすことができると思ったのが<span style="font-size: 150%"><span style="color: #0000cc"><b>「マリカー」</b></span></span>だった！</p>
+
+<h1>環境</h1>
+
+<h3>参加者</h3>
+
+<p>８つのチームから合計200人程度参加。<br>
+年齢層も結構バラバラ。若手からお偉いさんまでいる。</p>
+
+<h3>映像</h3>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>の画像は、<a class="keyword" href="http://d.hatena.ne.jp/keyword/HDMI">HDMI</a>を使ってプロジェクターで大型スクリーンに投影した。</p>
+
+<h1>ルール</h1>
+
+<p>200人全員に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%EA%A5%AA%A5%AB%A1%BC%A5%C8">マリオカート</a>に参加してもらうことは難しかったので、<br>
+各チームで６人のゲーム参加者を事前に選んで頂いて、チームを代表として参加してもらうこととした。<br>
+（マリカー大会をやることは事前には言いませんでした。）</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>では４人対戦までしかできないので、下記のような形式で対戦を進めた。</p>
+
+<ol>
+<li>8チームを4チーム×２分けて予選</li>
+<li>下位２チームが下位決定戦</li>
+<li>上位２チームが決勝戦</li>
+</ol>
+
+<p>またなるべく多くの人がゲームに参加して欲しかったので、<br>
+特別ルールとして、<span style="color: #ff0000"><b>コースを１周したらチームのほかの人に交代するというリレー形式</b></span>とした。</p>
+
+<h1>準備したもの</h1>
+
 <ul>
 <li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/Asustek">Asustek</a>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>本体(<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B2%A1%BC%A5%E0%A5%D1%A5%C3%A5%C9">ゲームパッド</a>含む)</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%EA%A5%AA%A5%AB%A1%BC%A5%C88">マリオカート8</a>のソフト</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Wii%A5%EA%A5%E2%A5%B3%A5%F3">Wiiリモコン</a> 4つ
+<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fwww.amazon.co.jp%2Fdp%2FB0046EC9ZU%2Fref%3Dpd_lpo_sbs_dp_ss_1%3Fpf_rd_p%3D187205609%26pf_rd_s%3Dlpo-top-stripe%26pf_rd_t%3D201%26pf_rd_i%3DB000KF7QU2%26pf_rd_m%3DAN1VRQENFRJN5%26pf_rd_r%3D1XCVFCEE0Y8AP4TMB5C3" title="Amazon.co.jp： Wiiリモコン プラス (シロ) (「Wiiリモコンジャケット」同梱): ゲーム" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://www.amazon.co.jp/dp/B0046EC9ZU/ref=pd_lpo_sbs_dp_ss_1?pf_rd_p=187205609&amp;pf_rd_s=lpo-top-stripe&amp;pf_rd_t=201&amp;pf_rd_i=B000KF7QU2&amp;pf_rd_m=AN1VRQENFRJN5&amp;pf_rd_r=1XCVFCEE0Y8AP4TMB5C3">www.amazon.co.jp</a></cite>
 </li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2014/05/17</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> Personal Computers</li>
-<li><a href="http://d.hatena.ne.jp/asin/B00KD6RZIG/hatena-blog-22" target="_blank">この商品を含むブログを見る</a></li>
 </ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
 
-<p></div>
-<div class="section">
-    <h3>CPU</h3>
-    <p></p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00LV8U0VE/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/51R95kYLwCL._SL160_.jpg" class="hatena-asin-detail-image" alt="Intel CPU Core-i3-4160 3.60GHz 3Mキャッシュ LGA1150 BX80646I34160 【BOX】" title="Intel CPU Core-i3-4160 3.60GHz 3Mキャッシュ LGA1150 BX80646I34160 【BOX】"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00LV8U0VE/hatena-blog-22/">Intel CPU Core-i3-4160 3.60GHz 3Mキャッシュ LGA1150 BX80646I34160 【BOX】</a></p>
+<h1>運営上の工夫</h1>
+
+<p>運営上幾つかの工夫を行ったので紹介する。</p>
+
+<h3>キャラクターについて</h3>
+
+<p>利用するキャラクターや乗り物は、予めこちらでチームごとにランダムで割り振った。<br>
+そうすることで、当日にキャラを選ぶ時間を短縮できるし、マリカーの知識の差がなくなる。<br>
+キャラクターは運ということにした。</p>
+
+<h3>コントローラについて</h3>
+
+<p>４人対戦だと画面が４つに分割される。<br>
+自分がどの画面を操作すべきかわからなくなるので、画面位置がわかるようにコントローラにシールを貼った。<br>
+この対応は必須です。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160207/20160207182051.png" alt="f:id:mosuke5:20160207182051p:plain" title="f:id:mosuke5:20160207182051p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<h3>アイテムや操作など</h3>
+
+<p>CPUなしで４人対戦で行った。
+４人対戦で普通のアイテム設定だと、「コイン」とか「バナナ」とか良いアイテムが出づらくつまらない。<br>
+アイテムの設定は「ダイナミック」にすることで、４人でも強力アイテムがでてバトルが白熱する。</p>
+
+<p>カートの操作方法（曲がり方）は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BD%BD%BB%FA%A5%AD%A1%BC">十字キー</a>ではなくハンドル操作とした。<br>
+普段ゲームに慣れている人でも、ハンドル操作だと不慣れなことも多くみんなうまい具合に下手になって白熱した。</p>
+
+<h3>初心者への対応</h3>
+
+<p>アイテムの細かい使い方などいちいち説明できないので、<br>
+初心者へは「アクセル」と「曲がること」のみ教えた。<br>
+一見、経験者と不公平のようにみえるが、今回のルールだと１週しか同じ人が回らないので、<br>
+心配するほどのことにはならなかったです。</p>
+
+<h3>トラブル時への備え</h3>
+
+<p>こういう企画ではトラブルはつきもの。
+トラブルに対しての対応を用意した。</p>
+
+<ul>
+<li>コントローラの電池切れ対策で電池は買っておきました</li>
+<li>コントローラが故障した場合は、<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B2%A1%BC%A5%E0%A5%D1%A5%C3%A5%C9">ゲームパッド</a>で代用できるようにした</li>
+<li>一応プロジェクターも２つ用意しておいた</li>
+</ul>
+
+<h3>進行役</h3>
+
+<p>進行役は２人でやったのだが、雰囲気をだすために赤と緑のマントをまといました。<br>
+こういうのもいいっすね。</p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fwww.amazon.co.jp%2F%25E3%2582%25B9%25E3%2583%25BC%25E3%2583%2591%25E3%2583%25BC%25E3%2583%259E%25E3%2583%25AA%25E3%2582%25AA-%25E3%2583%25AB%25E3%2582%25A4%25E3%2583%25BC%25E3%2582%25B8-%25E5%25B8%25BD%25E5%25AD%2590%25E3%2582%25BB%25E3%2583%2583%25E3%2583%2588-%25E3%2582%25B3%25E3%2582%25B9%25E3%2583%2581%25E3%2583%25A5%25E3%2583%25BC%25E3%2583%25A0%25E7%2594%25A8%25E5%25B0%258F%25E7%2589%25A9-%25E3%2583%2595%25E3%2583%25AA%25E3%2583%25BC%25E3%2582%25B5%25E3%2582%25A4%25E3%2582%25BA%2Fdp%2FB00AGSQ5XW%2Fref%3Dsr_1_cc_3%3Fs%3Daps%26ie%3DUTF8%26qid%3D1454838114%26sr%3D1-3-catcorr%26keywords%3D%25E3%2583%259E%25E3%2583%25AA%25E3%2582%25AA%2B%25E5%25B8%25BD%25E5%25AD%2590" title="Amazon.co.jp | スーパーマリオ&amp;ルイージ 風 帽子セット コスチューム用小物 フリーサイズ | おもちゃ 通販" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://www.amazon.co.jp/%E3%82%B9%E3%83%BC%E3%83%91%E3%83%BC%E3%83%9E%E3%83%AA%E3%82%AA-%E3%83%AB%E3%82%A4%E3%83%BC%E3%82%B8-%E5%B8%BD%E5%AD%90%E3%82%BB%E3%83%83%E3%83%88-%E3%82%B3%E3%82%B9%E3%83%81%E3%83%A5%E3%83%BC%E3%83%A0%E7%94%A8%E5%B0%8F%E7%89%A9-%E3%83%95%E3%83%AA%E3%83%BC%E3%82%B5%E3%82%A4%E3%82%BA/dp/B00AGSQ5XW/ref=sr_1_cc_3?s=aps&amp;ie=UTF8&amp;qid=1454838114&amp;sr=1-3-catcorr&amp;keywords=%E3%83%9E%E3%83%AA%E3%82%AA+%E5%B8%BD%E5%AD%90">www.amazon.co.jp</a></cite></p>
+
+<h1>実況について</h1>
+
+<p>冒頭で「楽しさに進行役の力量が影響しないものがよかった」と書いたが、<br>
+「実況」が楽しさを左右するだろうといくぶんか練習した。。。</p>
+
+<p><span style="font-size: 150%"><span style="color: #0000cc">だが、盛り上がりすぎて、うるさすぎて、<br>
+実況の声なんて通りませんでした！！！！</span></span></p>
+
+<p>実況の練習とかいらないでしょう…</p>
+
+<h1>大変だったこと</h1>
+
 <ul>
 <li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%C6%A5%EB">インテル</a>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>を会社に何度ももっていくこと
+
+<ul>
+<li>リハーサルや事前の動作試験や段取り決めのため、何度も会社に<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>持って行った。</li>
+<li>家でスプラトゥーンやりたいので、毎度持って帰っていたので更に大変でした。</li>
+</ul>
 </li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2014/07/27</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> Personal Computers</li>
-<li><a href="http://d.hatena.ne.jp/asin/B00LV8U0VE/hatena-blog-22" target="_blank">この商品を含むブログを見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div></p>
+<li>当日の酒事情
 
-<p></div>
-<div class="section">
-    <h3>メモリ</h3>
-    <a href="http://kakaku.com/item/K0000290991/">価格.com - Team TED38192M1600C11DC [DDR3 PC3-12800 4GB 2枚組] 価格比較</a><br>
-</div>
-<div class="section">
-    <h3>HDD</h3>
-    <p></p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/B009QWUF9E/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/51XtnFUCHHL._SL160_.jpg" class="hatena-asin-detail-image" alt="【Amazon.co.jp限定】WD Blue 3.5inch 7,200rpm 1.0TB 64MBキャッシュ SATA3.0 WD10EZEX/N 【フラストレーションフリーパッケージ(FFP)】" title="【Amazon.co.jp限定】WD Blue 3.5inch 7,200rpm 1.0TB 64MBキャッシュ SATA3.0 WD10EZEX/N 【フラストレーションフリーパッケージ(FFP)】"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B009QWUF9E/hatena-blog-22/">【Amazon.co.jp限定】WD Blue 3.5inch 7,200rpm 1.0TB 64MBキャッシュ SATA3.0 WD10EZEX/N 【フラストレーションフリーパッケージ(FFP)】</a></p>
 <ul>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/Western%20Digital">Western Digital</a>
+<li>ゲームのセッティングはミスできないので、懇親会で酒をあんまり飲めない</li>
+<li>けれど、盛り上げるためにある程度酒を入れないとやっていられないジレンマ…</li>
+</ul>
 </li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> Personal Computers</li>
-<li> <span class="hatena-asin-detail-label">クリック</span>: 5回</li>
-<li><a href="http://d.hatena.ne.jp/asin/B009QWUF9E/hatena-blog-22" target="_blank">この商品を含むブログを見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div></p>
+<li>声を張ること
 
-<p></div>
-<div class="section">
-    <h3>光学式ドライブ</h3>
-    <p></p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00OYQTP48/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/11PYvtXkVFL._SL160_.jpg" class="hatena-asin-detail-image" alt="ASUSTeK CyberLink Power2Go 8、E-Greenソフト付き内蔵ドライブ" title="ASUSTeK CyberLink Power2Go 8、E-Greenソフト付き内蔵ドライブ"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00OYQTP48/hatena-blog-22/">ASUSTeK CyberLink Power2Go 8、E-Greenソフト付き内蔵ドライブ</a></p>
 <ul>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/Asustek">Asustek</a>
+<li>当日会場でルール説明などをしたが、マリカー大会をやるってだけで大盛り上がりで、相当な大声が必要だった…</li>
+</ul>
 </li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2014/11/12</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> Personal Computers</li>
-<li><a href="http://d.hatena.ne.jp/asin/B00OYQTP48/hatena-blog-22" target="_blank">この商品を含むブログを見る</a></li>
 </ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div></p>
 
-<p></div>
-<div class="section">
-    <h3>電源ユニット</h3>
-    <p>グラフィックボードも積んでいないし、ゲームとかもやる予定はないので430Wで十分。<br>
-また、PCケースも大きめのものを選ぶ予定だったので大きさも気にしなくてオッケーでした。</p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00FSFA566/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/51-UWNSkHAL._SL160_.jpg" class="hatena-asin-detail-image" alt="ENERMAX エナーマックス PC電源 Revolution X't 430W ERX430AWT" title="ENERMAX エナーマックス PC電源 Revolution X't 430W ERX430AWT"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00FSFA566/hatena-blog-22/">ENERMAX エナーマックス PC電源 Revolution X&rsquo;t 430W ERX430AWT</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> ENERMAX</li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2014/08/02</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> 付属品</li>
-<li><a href="http://d.hatena.ne.jp/asin/B00FSFA566/hatena-blog-22" target="_blank">この商品を含むブログを見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div></p>
+<h1>最後に</h1>
 
-<p></div>
-<div class="section">
-    <h3>ケース</h3>
-    <p></p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00E6GZL7Q/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/51SRInEw4oL._SL160_.jpg" class="hatena-asin-detail-image" alt="SharkoonミドルタワーPCケース サイドクリアウィンドウ グリーン SHA-T28-G-V3/A" title="SharkoonミドルタワーPCケース サイドクリアウィンドウ グリーン SHA-T28-G-V3/A"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00E6GZL7Q/hatena-blog-22/">SharkoonミドルタワーPCケース サイドクリアウィンドウ グリーン SHA-T28-G-V3/A</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> Sharkoon</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> Personal Computers</li>
-<li><a href="http://d.hatena.ne.jp/asin/B00E6GZL7Q/hatena-blog-22" target="_blank">この商品を含むブログ (1件) を見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div></p>
+<ol>
+<li>初心者でも十分たのしめるのでマリカー最高でした！</li>
+<li>家ではスプラトゥーンをやりたいので、できれば<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>は自分のではなくだれかに借りましょう！</li>
+<li>喉が枯れます！</li>
+</ol>
 
-<p></div>
-<div class="section">
-    <h3>参考にした書籍</h3>
-    <p></p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4822269973/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/618HZCdKnkL._SL160_.jpg" class="hatena-asin-detail-image" alt="PC自作の鉄則! 2015 (日経BPパソコンベストムック)" title="PC自作の鉄則! 2015 (日経BPパソコンベストムック)"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/4822269973/hatena-blog-22/">PC自作の鉄則! 2015 (日経BPパソコンベストムック)</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">作者:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%FC%B7%D0WinPC">日経WinPC</a>
-</li>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%FC%B7%D0BP">日経BP</a>社</li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2014/11/17</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> 単行本</li>
-<li><a href="http://d.hatena.ne.jp/asin/4822269973/hatena-blog-22" target="_blank">この商品を含むブログを見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div></p>
+<p></body></p>
 
-<p></div>
-<div class="section">
-    <h3>利用した道具など</h3>
-    <p><b>・プラスドライバー</b><br>
-　⇒PCケースと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%B6%A1%BC%A5%DC%A1%BC%A5%C9">マザーボード</a>などを固定したりするのにドライバーは必須<br>
-<b>・インシュロック（結束バンド）</b><br>
-　⇒PCケースに何本かついてくるが、綺麗に配線しようと思うと何度かやり直したりするので用意しておいた方が無難。<br>
-<b>・ニッパー</b><br>
-　⇒インシュロックを切ったりするのに必要なので準備しておきましょう。<br>
-<b>・LANケーブル</b><br>
-　⇒今回<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a>モジュールは搭載していないので、家のネットワークにつなぐには優先が必要。<br>
-　　<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BD%A9%CD%D5%B8%B6">秋葉原</a>のジャンクショップでカテゴリ6の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%C8%A5%EC%A1%BC%A5%C8%A5%B1%A1%BC%A5%D6%A5%EB">ストレートケーブル</a>5mで200円でした。（すごいお買い得）<br>
-<b>・OSインストールディスク</b><br>
-　⇒作ったPCには<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>を入れたかったので予め、イメージをDVDに焼いておきました。</p>
-<p>以下は当然だがないと、セットアップできないので要注意。<br>
-・ディプレイ<br>
-・マウス<br>
-・キーボード</p></p>
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">25 Jan 2016, 22:21</h1>
+                <section class="post">
+                    <header class="post-header">
 
-<p></div>
-</div>
-<div class="section">
-    <h2>完成ものと苦労したこと</h2>
-    <p>作るだけならとても簡単なのだが、そのなかでも一番苦労したのはやはり「配線」。<br>
-はじめはなにも考えずに配線してたら、蓋が閉まらなくなるわ、ファンに線がぶつかるわ…でやり直した。<br>
-配線を綺麗にするには上であげた「インシュロック」を追加で買っておくといいと思います。</p>
-<p>表面<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141229/20141229154205.jpg" alt="f:id:mosuke5:20141229154205j:plain" title="f:id:mosuke5:20141229154205j:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p>裏面の配線<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141229/20141229154214.jpg" alt="f:id:mosuke5:20141229154214j:plain" title="f:id:mosuke5:20141229154214j:plain" class="hatena-fotolife" itemprop="image"></span><br>
-</p></p>
+                        <a href="https://blog.mosuke.tech/entry/2016/01/25/222150/" class="post-title">Vagrant×Ansible環境の３つのスタイルとそのメリット・デメリットについて</a>
 
-<p></div>
-<div class="section">
-    <h2>【おまけ】昼飯</h2>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%E5%A5%BF%A5%A4%A5%F3%A5%BA%A5%B2%A1%BC%A5%C8">シュタインズゲート</a>のまゆしぃおすすめのメンチカツ屋にいきました。<br>
-ご飯を大盛りにするとすごい量出てくるので注意(笑)<br>
-<a href="http://tabelog.com/tokyo/A1310/A131001/13000352/">キッチン ジロー 外神田店 （kitichen JIRO） - 秋葉原/洋食 [食べログ]</a></p></p>
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-Vagrant" href="https://blog.mosuke.tech/categories/vagrant">Vagrant</a>
+                            
+                        </p>
+                    </header>
 
-<p></div>
+                    <div class="post-description">
+                        <p><body>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>×Ansibleで開発環境を作っているみなさんは、
+どんなふうにそれを実現していますか？</p></p>
+
+<p>きっといくつかのやり方、考え方があると思います。<br>
+例えば、ご自身のPCにAnsibleをインストールして<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>の仮想環境にプロビジョニングしているとか。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で立てた仮想環境にAnsibleを入れて実行するとか。</p>
+
+<p>本ブログでは下記３つの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>×Ansibleのやり方に注目し、<br>
+そのメリット・デメリットについて自分なりにまとめます。</p> 
+<ol>
+<li><b>ホストにAnsibleをインストールして利用する</b></li>
+<li><b>ゲストにAnsibleをインストールして利用する</b></li>
+<li><b>Ansible実行用のゲストを作って利用する</b></li>
+</ol>
+
+
+<h1>1. ホストにAnsibleをインストールして利用する</h1>
+
+<h2>概要</h2>
+
+<p>1番よくあるやり方だと思う。<br>
+ご自身のPCにAnsibleを入れて<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で立ち上げたゲストにプロビジョニングを行う。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160125/20160125214934.png" alt="f:id:mosuke5:20160125214934p:plain:w300" title="f:id:mosuke5:20160125214934p:plain:w300" class="hatena-fotolife" style="width:300px" itemprop="image"></span></p>
+
+<h2>メリット</h2>
+
+<p>なんといっても直感的でシンプル。<br>
+3.との比較になるが、Ansibleを実行する環境を別途用意する必要がないのでホストのリソースにも優しい。<br>
+また、2.との比較でゲストに無駄なものが入らない点でよい。</p>
+
+<h2>デメリット</h2>
+
+<p>ただ、そもそもwimdowsユーザはホストにAnsibleをインストールすることはできない。<br>
+つまり、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD">複数人</a>での開発をしていて、人によって端末が異なる場合には向いていない。<br>
+個人の端末の設定などにも大きく依存するため、チーム開発向きでないといえる。</p>
+
+<h1>2. ゲストにAnsibleをインストールして利用する</h1>
+
+<h2>概要</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で立ち上げたゲストの中にAnsibleをインストールし、自身へプロビジョニングするやりかた。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160125/20160125215405.png" alt="f:id:mosuke5:20160125215405p:plain:w300" title="f:id:mosuke5:20160125215405p:plain:w300" class="hatena-fotolife" style="width:300px" itemprop="image"></span></p>
+
+<p>この方式はshin1x1さんもおすすめしている。</p>
+<a href="http://shin1x1.hatenablog.com/embed/ansible_local-provisioner-in-vagrant" target="_blank">Vagrant + Ansible で開発環境を作るなら ansible_local プロビジョナがいい！ - Shin x Hatena Blog</a>
+
+<h2>メリット</h2>
+
+<p>（詳しくは上のブログを読むといいと思う。）<br>
+1.のデメリットで述べた、端末への依存度をなくすことができる。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>の新機能であるansible_localも利用できるのでプロビジョニングが楽だ。<br>
+3.と比べてAnsible実行環境を用意しなくて済む。</p>
+
+<h2>デメリット</h2>
+
+<p>メリットだけみると1.の問題点を解決していて最高のようにみえる。<br>
+しかし、ゲストに<b>本来インストールされるべきものでないものがはいる</b>点は忘れてはいけない。<br>
+Ansibleを使ってプロダクション環境にデプロイするユーザにとっては大きな問題だと思う。<br>
+開発環境とプロダクション環境での差分が広がってしまう。<br>
+また、Ansibleと並行してserverspecを使ってる人も多いと思うが、<br>
+そうなると今度はゲスト側に<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>もいれるのか？など様々な疑問が湧いてくる。</p>
+
+<h1>3. Ansible実行用のゲストを作って利用する</h1>
+
+<h2>概要</h2>
+
+<p>Ansible実行用のゲストを<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で立ち上げて、開発用のゲストへプロビジョニングにする。
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160125/20160125215618.png" alt="f:id:mosuke5:20160125215618p:plain:w300" title="f:id:mosuke5:20160125215618p:plain:w300" class="hatena-fotolife" style="width:300px" itemprop="image"></span></p>
+
+<h2>メリット</h2>
+
+<p>2.のデメリットで述べた、ゲストへの不要なもののインストールを防ぐことが可能。<br>
+例えばserverspecで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>が必要な場合もAnsible実行用のゲストに入れればいい。<br>
+必要なものをインストールしたAnsible実行用のイメージファイルをチーム内で共有すれば端末依存もセットアップの手間も省ける。</p>
+
+<h2>デメリット</h2>
+
+<p>なんといっても、ゲストを二つは立ちあげる必要があること。<br>
+これは少し面倒だ。</p>
+
+<h1>まとめ</h1>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160125/20160125220823.png" alt="f:id:mosuke5:20160125220823p:plain:w500" title="f:id:mosuke5:20160125220823p:plain:w500" class="hatena-fotolife" style="width:500px" itemprop="image"></span></p>
+
+<p><p>この見解は正直<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>やAnsibleの使いみち、用途によってだいぶ変わると思う。<br>
+なので絶対な評価ではないと思うが、私のいままでの経験上はこのような評価となったので参考にしてもらえればと思う。</p>
 </body></p>
 
                     </div>
@@ -1394,7 +902,7 @@ http通信だから暗号化はされていないのだろうか？<br>
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 5 of 8</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 5 of 15</span>
     
       <a href="/page/6/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>

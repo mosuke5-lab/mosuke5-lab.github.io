@@ -56,11 +56,11 @@
             <div class="posts">
                 
                 
-                <h1 class="content-subhead">19 Mar 2016, 23:24</h1>
+                <h1 class="content-subhead">25 Dec 2016, 14:27</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2016/03/19/232437/" class="post-title">Github Pagesを今更作った話と、独自ドメイン適応時の通信のこと</a>
+                        <a href="https://blog.mosuke.tech/entry/2016/12/25/142744/" class="post-title">「嵐」 2016年振り返り</a>
 
                         <p class="post-meta">
                             
@@ -69,1290 +69,292 @@
                             
                                 under 
                                 
-                                <a class="post-category post-category-github" href="https://blog.mosuke.tech/categories/github">github</a><a class="post-category post-category-github pages" href="https://blog.mosuke.tech/categories/github-pages">github pages</a><a class="post-category post-category-CDN" href="https://blog.mosuke.tech/categories/cdn">CDN</a><a class="post-category post-category-カスタムドメイン" href="https://blog.mosuke.tech/categories/%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0%E3%83%89%E3%83%A1%E3%82%A4%E3%83%B3">カスタムドメイン</a><a class="post-category post-category-独自ドメイン" href="https://blog.mosuke.tech/categories/%E7%8B%AC%E8%87%AA%E3%83%89%E3%83%A1%E3%82%A4%E3%83%B3">独自ドメイン</a>
+                                <a class="post-category post-category-パブリッククラウド" href="https://blog.mosuke.tech/categories/%E3%83%91%E3%83%96%E3%83%AA%E3%83%83%E3%82%AF%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89">パブリッククラウド</a><a class="post-category post-category-Alibaba Cloud" href="https://blog.mosuke.tech/categories/alibaba-cloud">Alibaba Cloud</a><a class="post-category post-category-SBクラウド" href="https://blog.mosuke.tech/categories/sb%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89">SBクラウド</a><a class="post-category post-category-振り返り" href="https://blog.mosuke.tech/categories/%E6%8C%AF%E3%82%8A%E8%BF%94%E3%82%8A">振り返り</a>
                             
                         </p>
                     </header>
 
                     <div class="post-description">
                         <p><body>
-<p>今更ながら<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>ページでプロフィールサイトを作った。<br>
-(もう少しデザインブラッシュアップしたい…)</p></p>
+<p>だいぶお久しぶりのブログ。
+そして恒例の年振り返りブログ。ついに2016年も終わってしまう。</p></p>
 
-<p><a href="http://mosuke.tech/">mosuke tech</a></p>
+<p>というわけで2016年を振り返りたいと思う。<br>
+一応このサイトは技術ブログのはずなんだけど、プライベートのことが大いに混ざったポエムになってしまった。</p>
 
-<p>また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%C8%BC%AB%A5%C9%A5%E1%A5%A4%A5%F3">独自ドメイン</a>（カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>）の設定やその仕組みをおっている時に、<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%C8%BC%AB%A5%C9%A5%E1%A5%A4%A5%F3">独自ドメイン</a>適応時の通信について面白いことがわかったのでかく。</p>
+<h1>なんの変哲もないはじまり</h1>
 
-<h1>求めていたもの</h1>
+<p>2016年のはじめのほう。振り返ってもとくに振り返ることがあまりないくらい変哲もない日々だった。<br>
+嵐の前の静けさだったと今思う。</p>
 
-<ul>
-<li>ブログとか作ったプロダクトをまとめたかった</li>
-<li>極力シンプルでメンテしやすいものがよかった</li>
-<li>でもレスポンシブなデザインがよかった</li>
-</ul>
+<h1>TDD研修、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%DE%A5%CD">プロマネ</a>研修</h1>
 
-<h1>どのようにつくったか</h1>
+<p>後述するが8月までは、社内システムのエンジニアとして活動していた。<br>
+いつもどおり、内製開発のチームをどう強くするかばかり考え働いていた。</p>
 
-<p>上の条件を満たすために以下の２パターンのどっちで作ろうか迷った。</p>
+<p>そんななか、新しい開発チームの模索のために部署を代表としてTDD（<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C6%A5%B9%A5%C8%B6%EE%C6%B0%B3%AB%C8%AF">テスト駆動開発</a>）の研修や、<br>
+プロジェクトマネージャーの研修など受けさせてもらった。</p>
 
-<ul>
-<li>Jekyllなどを使いテンプレートを使って作る</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/CSS">CSS</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>のみ利用し、あとは自分で作る</li>
-</ul>
+<p>そのなかでもTDD研修はとても印象深い。<br>
+なぜなら、私が気に入っていた「<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>による<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%B6%A5%A4%A5%F3%A5%D1%A5%BF%A1%BC%A5%F3">デザインパターン</a>」の翻訳者の一人が講師だったからだ。<br>
+さらには、研修の受講生は2人しかおらず、徹底してTDDを実践できた。<br>
+こんな恵まれた外部研修があるもんかと、感心したのを思い出す。</p>
 
-<p>１ページだけのシンプルなプロフィールサイトがよかったので、<br>
-Jekyllとか複雑なものは利用したくないと考えた。</p>
-
-<p>また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/CSS">CSS</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>だが、いつもよくTwitterBootstrapを使っているので、<br>
-それ以外のものでやってみようと考えた。</p>
-
-<p>その結果、行き着いたのが<a href="http://getskeleton.com/">Skeleton</a>だった。<br>
-Skeletonは<b>"A dead simple, responsive boilerplate."</b>をうたっているものでよかった。</p>
-
-<h1>カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>の設定</h1>
-
-<p>デフォルトだと<code>mosuke5.github.io</code>のURLが利用できる。<br>
-しかし、この前<code>mosuke.tech</code>といういい感じの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>を安く手に入れてたので、カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>の設定を行うことにした。</p>
-
-<p>カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>の設定方法は以下のみだ。</p>
-
-<ol>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>にCNAMEファイルを作成する <code>$ echo mosuke.tech &gt; CNAME</code>
-</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>の設定：Aレコードに<code>192.30.252.153</code>と<code>192.30.252.154</code>を追加</li>
-</ol>
-
-<p>(本家ドキュメント)<br>
-<a href="https://help.github.com/articles/setting-up-an-apex-domain/">Setting up an apex domain - User Documentation</a></p>
-
-<h1>カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>設定時の通信について</h1>
-
-<p>カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>がどのような仕組みで実現されているのか気になって、<br>
-いろいろと調べている時にあることに気づいた。</p>
-
-<p>Aレコードに登録した<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を逆引きで調べると、pages.<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>.comが出てくるが、<br>
-pages.<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>.comをdigすると違う結果が返ってくる。</p>
-
-<pre><code>$ dig -x 192.30.252.153
-;; ANSWER SECTION:
-153.252.30.192.in-addr.arpa. 3600 IN    PTR pages.github.com.
-
-$ dig pages.github.com
-;; ANSWER SECTION:
-pages.github.com.   900 IN  CNAME   github.map.fastly.net.
-github.map.fastly.net.  23  IN  A   103.245.222.133[f:id:mosuke5:20160319233634j:plain] 
-</code></pre>
-
-<p>後者のほうでは、fastly（CDN）の結果が返ってくる。<br>
-つまり、カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>を設定しなければ、通常はCDN経由で通信されるが、<br>
-カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>を割り当てるとCDNを利用できないのではないかということがわかった。</p>
-
-<p>実際に<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ping">Ping</a>で確かめてみる。明らかに速度差がでている。</p>
-
-<pre><code>% ping mosuke5.github.io
-PING github.map.fastly.net (103.245.222.133): 56 data bytes
-64 bytes from 103.245.222.133: icmp_seq=0 ttl=58 time=18.485 ms
-64 bytes from 103.245.222.133: icmp_seq=1 ttl=58 time=19.108 ms
-64 bytes from 103.245.222.133: icmp_seq=2 ttl=58 time=18.709 ms
-64 bytes from 103.245.222.133: icmp_seq=3 ttl=58 time=19.161 ms
-64 bytes from 103.245.222.133: icmp_seq=4 ttl=58 time=20.574 ms
-
-
-% ping mosuke.tech
-PING mosuke.tech (192.30.252.154): 56 data bytes
-64 bytes from 192.30.252.154: icmp_seq=0 ttl=52 time=203.329 ms
-64 bytes from 192.30.252.154: icmp_seq=1 ttl=52 time=205.535 ms
-64 bytes from 192.30.252.154: icmp_seq=2 ttl=52 time=203.178 ms
-64 bytes from 192.30.252.154: icmp_seq=3 ttl=52 time=201.345 ms
-64 bytes from 192.30.252.154: icmp_seq=4 ttl=52 time=205.125 ms 
-</code></pre>
-
-<p>また、それぞれの<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>から場所も調べてみた。<br>
-CDN利用時がオーストラリア、そうでないとアメリカ西海岸ということがわかった。
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fwww.iputilities.net%2F" title="IPアドレス所在地検索 IP Geolocation Search" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://www.iputilities.net/">www.iputilities.net</a></cite></p>
-
-<p>以上のことをまとめつつ、地図に表した。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160319/20160319233634.jpg" alt="f:id:mosuke5:20160319233634j:plain" title="f:id:mosuke5:20160319233634j:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>オーストラリアとアメリカ西海岸だとそんなに直線距離は変わらない気もするけど、<br>
-CDNの力なのかルート的な問題ないのか<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ping">Ping</a>の応答速度は10倍ほどの差があった。</p>
-
-<p>カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>を使うと遅くなる！？（まあ全然いいんだけど…）</p>
-
-<h1>最後に</h1>
-
-<p>CDNの仕組みとかいまいち忘れてしまったので、アカマイ本を読み返したい。</p>
-
-<p><p></p>
+<p></p>
 <div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00MIFE3BC/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/51T4L8K2yLL._SL160_.jpg" class="hatena-asin-detail-image" alt="アカマイ　知られざるインターネットの巨人&lt;アカマイ&gt; (角川ＥＰＵＢ選書)" title="アカマイ　知られざるインターネットの巨人&lt;アカマイ&gt; (角川ＥＰＵＢ選書)"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00MIFE3BC/hatena-blog-22/">アカマイ　知られざるインターネットの巨人 (角川ＥＰＵＢ選書)</a></p>
+<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4894712857/hatena-blog-22/"><img src="https://images-fe.ssl-images-amazon.com/images/I/41PNvUxHtgL._SL160_.jpg" class="hatena-asin-detail-image" alt="Rubyによるデザインパターン" title="Rubyによるデザインパターン"></a><div class="hatena-asin-detail-info">
+<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/4894712857/hatena-blog-22/">Rubyによるデザインパターン</a></p>
 <ul>
 <li>
-<span class="hatena-asin-detail-label">作者:</span> 小川晃通</li>
+<span class="hatena-asin-detail-label">作者:</span> Russ Olsen,ラス・<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AA%A5%EB%A5%BB%A5%F3">オルセン</a>,小<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CE%D3%B7%F2">林健</a>一,菅野裕,吉野雅人,山岸夢人,小島努</li>
 <li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/KADOKAWA">KADOKAWA</a> / <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%C7%A5%A3%A5%A2%A5%D5%A5%A1%A5%AF%A5%C8%A5%EA%A1%BC">メディアファクトリー</a>
-</li>
+<span class="hatena-asin-detail-label">出版社/メーカー:</span> ピアソン桐原</li>
 <li>
-<span class="hatena-asin-detail-label">発売日:</span> 2014/08/11</li>
+<span class="hatena-asin-detail-label">発売日:</span> 2009/04/01</li>
 <li>
-<span class="hatena-asin-detail-label">メディア:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kindle">Kindle</a>版</li>
-<li><a href="http://d.hatena.ne.jp/asin/B00MIFE3BC/hatena-blog-22" target="_blank">この商品を含むブログ (5件) を見る</a></li>
+<span class="hatena-asin-detail-label">メディア:</span> 単行本</li>
+<li>
+<span class="hatena-asin-detail-label">購入</span>: 13人 <span class="hatena-asin-detail-label">クリック</span>: 220回</li>
+<li><a href="http://d.hatena.ne.jp/asin/4894712857/hatena-blog-22" target="_blank">この商品を含むブログ (67件) を見る</a></li>
 </ul>
 </div>
 <div class="hatena-asin-detail-foot"></div>
 </div>
-</body></p>
 
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">16 Mar 2016, 17:54</h1>
-                <section class="post">
-                    <header class="post-header">
+<h1>Gem公開、ATP-stat開発</h1>
 
-                        <a href="https://blog.mosuke.tech/entry/2016/03/16/175431/" class="post-title">DBのViewの使いどころの検討</a>
+<p>会社のとあるプロジェクトで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>使うことになり、<br>
+趣味がてらに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>を使ってATP-statというサービスを開発していた。<br>
+正直、ほんとに趣味で作ったものでクオリティは全く高くないし、最近はメンテもできていない。</p>
 
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-データベース" href="https://blog.mosuke.tech/categories/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9">データベース</a><a class="post-category post-category-DB" href="https://blog.mosuke.tech/categories/db">DB</a><a class="post-category post-category-ビュー" href="https://blog.mosuke.tech/categories/%E3%83%93%E3%83%A5%E3%83%BC">ビュー</a>
-                            
-                        </p>
-                    </header>
+<p><a href="http://atpstat.org/">AtpStat</a></p>
 
-                    <div class="post-description">
-                        <p><body>
-<p>ある実装についてどのように実装するか悩んだ。<br>
-その悩んだ過程や実装案をメモする。似たようなケースの実装案として参考になればと思う。</p></p>
-
-<h1>状況</h1>
-
-<p>ある申請に対して、検査Aと検査Bを行い、その検査状態・検査日時を管理・閲覧するシステムがあるとする。  <br>
-申請のテーブルは下記とする。</p>
-
-<ul>
-<li>id: int</li>
-<li>name: varchar(20)  # どうでもいいので無視していい</li>
-<li>check_a: datetime  # 検査すると実施した日時がはいる</li>
-<li>check_b: datetime  # 検査すると実施した日時がはいる</li>
-</ul>
-
-<p>UIとして下記のように表示したいと考えている。</p>
-
-<table>
-<thead>
-<tr>
-<th style="text-align:center;">番号</th>
-<th style="text-align:center;">状態</th>
-<th style="text-align:center;">名前</th>
-<th style="text-align:center;">検査A</th>
-<th style="text-align:center;">検査B</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center;">1</td>
-<td style="text-align:center;">検査完了</td>
-<td style="text-align:center;">xxxxxx</td>
-<td style="text-align:center;">2016/03/01 10:00 </td>
-<td style="text-align:center;">2016/03/01 12:00</td>
-</tr>
-<tr>
-<td style="text-align:center;">2</td>
-<td style="text-align:center;">検査未完了</td>
-<td style="text-align:center;">xxxxxx</td>
-<td style="text-align:center;"> - </td>
-<td style="text-align:center;"> - </td>
-</tr>
-<tr>
-<td style="text-align:center;">3</td>
-<td style="text-align:center;">検査途中</td>
-<td style="text-align:center;">xxxxxx</td>
-<td style="text-align:center;"> 2016/03/01 13:00 </td>
-<td style="text-align:center;"> - </td>
-</tr>
-<tr>
-<td style="text-align:center;">4</td>
-<td style="text-align:center;">検査途中</td>
-<td style="text-align:center;">xxxxxx</td>
-<td style="text-align:center;"> - </td>
-<td style="text-align:center;"> 2016/03/01 15:00 </td>
-</tr>
-</tbody>
-</table>
-
-<h4>※<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%F3%A5%C1%A5%D1%A5%BF%A1%BC%A5%F3">アンチパターン</a>だろ！？</h4>
-
-<p>そもそも<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%F3%A5%C1%A5%D1%A5%BF%A1%BC%A5%F3">アンチパターン</a>の「マルチカラム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%C8%A5%EA%A5%D3%A5%E5%A1%BC%A5%C8">アトリビュート</a>」じゃないの？と思うかもしれない。<br>
-この場合は、この設計が一番という前提でお願いしたい。</p>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fwww.amazon.co.jp%2FSQL%25E3%2582%25A2%25E3%2583%25B3%25E3%2583%2581%25E3%2583%2591%25E3%2582%25BF%25E3%2583%25BC%25E3%2583%25B3-Bill-Karwin%2Fdp%2F4873115892" title="Amazon.co.jp： SQLアンチパターン: Bill Karwin, 和田 卓人, 和田 省二, 児島 修: 本" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://www.amazon.co.jp/SQL%E3%82%A2%E3%83%B3%E3%83%81%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3-Bill-Karwin/dp/4873115892">www.amazon.co.jp</a></cite></p>
-
-<h1>実装の検討</h1>
-
-<p>いくつかの実装パターンを検討した。<br>
-結果的に今回は実装案４のViewを使うのがいいのではないかと考えた。 <br>
-が、Viewにもデメリットがある。必ずしもViewがいいというものではないことは留意。</p>
-
-<h2>(実装案１) <a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>側で頑張る</h2>
-
-<p>まず、データを取り出す際に<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>で頑張ることを思いつくはずだ。<br>
-例えば以下みたいに。</p>
-
-<pre><code class="language-sql">select
-  id,
-  name,
-  case
-    when check_a is null and check_b is null  then '検査未完了'
-    when check_a is not null and check_b is not null then '検査完了 '
-    else '検査途中'
-  end as check_status
-from request
- 
-</code></pre>
-
-<p>これが悪いとはいわない。<br>
-だが、例えば同じような表示方法で他の条件式で取得したい時があるだろう。</p>
-
-<pre><code class="language-sql">select
-  id,
-  name,
-  case
-    when check_a is null and check_b is null  then '検査未完了'
-    when check_a is not null and check_b is not null then '検査完了 '
-    else '検査途中'
-  end as check_status
-from request
-where name = 'xxxxx'
- 
-</code></pre>
-
-<p>もし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>の中に同じ形なのに条件だけがことなる<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が出てきてしまったら、
-ヤバイと感じてくるはずだ。</p>
-
-<p>そして、<a class="keyword" href="http://d.hatena.ne.jp/keyword/ActiveRecord">ActiveRecord</a>のようなORマッパーを使っている場合、<br>
-case文などを利用し始めた時点で、生<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を書かなければいけなくなる。<br>
-これも不吉な感じがしてくる。</p>
-
-<h1>(実装案２) 受け取った側で頑張る</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が複雑になるのがいやなら、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DF%A5%F3%A5%B0%B8%C0%B8%EC">プログラミング言語</a>側で頑張ることもできる。<br>
-とりあえずデータは全部生でもらっておいて</p>
-
-<pre><code class="language-sql">select * from request;
-</code></pre>
-
-<p>HTML出力の時に頑張る。(下記は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>のERB想定で記述)</p>
-
-<pre><code class="language-ruby">&lt;% if(request.check_a.nil? and request.check_b.nil?) %&gt;
-  &lt;span&gt;検査完了&lt;/span&gt; 
-&lt;% elsif(!request.check_a.nil? and !request.check_b.nil?) %&gt;
-  &lt;span&gt;検査未実施&lt;/span&gt; 
-&lt;% else %&gt;
-  &lt;span&gt;検査途中&lt;/span&gt; 
-&lt;% end %&gt;
-</code></pre>
-
-<p>ありといえばありだが、もっと条件が複雑になると条件式の管理が大変になってきそうだ。</p>
-
-<p>出力部分をhelperなどに書いて関数化も考えた。<br>
-だが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>でERBを利用して出力する場合はいいが、<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>でも出力する場合には<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>ヘルパーは利用できない。<br>
-とても嫌な予感がした。</p>
-
-<h1>(実装案３) DBの設計の変更で頑張る</h1>
-
-<p>そもそもテーブルの設計を変えてしまう方法も検討した。<br>
-テーブルの中で検査状態を持つのだ。</p>
-
-<ul>
-<li>id: int</li>
-<li>name: varchar(20)</li>
-<li>check_a: datetime</li>
-<li>check_b: datetime</li>
-<li>check_status: int</li>
-</ul>
-
-<p>サーバサイド側で頑張らなきゃいけなくてとても実装する気になれなかったし、これってどうなの？</p>
-
-<h1>(実装案４) Viewを利用して頑張る</h1>
-
-<p>上３つで見てきたように、いろいろ考えたけどどれもイケてなかった。<br>
-そこで思いついたのがデータベースの機能の「View」だ。</p>
-
-<p>Veiwを使ってよく利用する形を事前に作っておくことでいろいろ解決することがわかった。</p>
-
-<pre><code class="language-sql">create view view_request as
-select
-  id,
-  name,
-  case
-    when check_a is null and check_b is null  then '検査未完了'
-    when check_a is not null and check_b is not null then '検査完了 '
-    else '検査途中'
-  end as check_status
-from request
-</code></pre>
-
-<p>上記で作ったViewを参照することでいくつものメリットが生まれた。</p>
-
-<ol>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/ActiveRecord">ActiveRecord</a>が利用できるようになりコードが綺麗になった</li>
-<li>重複した<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が減った</li>
-<li>実現のためのコードをほとんど書かなくて済んだ</li>
-</ol>
-
-<p>だが、もちろんView機能が万能でないことは抑えておく必要がある。<br>
-Viewのデメリットは利用する前にしっかり確認してほしい。</p>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fitpro.nikkeibp.co.jp%2Farticle%2FCOLUMN%2F20071126%2F287920%2F%3Frt%3Dnocnt" title="[データベース編]ビュー、トリガーを多用してはいけない" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://itpro.nikkeibp.co.jp/article/COLUMN/20071126/287920/?rt=nocnt">itpro.nikkeibp.co.jp</a></cite></p>
-
-<p><p>もっといい実装があれば教えて下さい。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">06 Mar 2016, 14:05</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2016/03/06/140531/" class="post-title">【錦織圭も分析】ATP TennisのデータスクレイパーGem作った</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Ruby" href="https://blog.mosuke.tech/categories/ruby">Ruby</a><a class="post-category post-category-Gem" href="https://blog.mosuke.tech/categories/gem">Gem</a><a class="post-category post-category-ATP" href="https://blog.mosuke.tech/categories/atp">ATP</a><a class="post-category post-category-テニス" href="https://blog.mosuke.tech/categories/%E3%83%86%E3%83%8B%E3%82%B9">テニス</a><a class="post-category post-category-ATP Tennis" href="https://blog.mosuke.tech/categories/atp-tennis">ATP Tennis</a><a class="post-category post-category-スクレイピング" href="https://blog.mosuke.tech/categories/%E3%82%B9%E3%82%AF%E3%83%AC%E3%82%A4%E3%83%94%E3%83%B3%E3%82%B0">スクレイピング</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<h1>背景</h1></p>
-
-<p>このブログは基本的に技術ブログとしてやっているので、<br>
-テニスの話題ははじめてだが、テニスがすごく好きだ。
-特に、プロの試合の観戦はとても好きだ。</p>
-
-<p>2005年からずーっと見てて、欠かさずすべての試合結果はチェックしている。</p>
-
-<p>数年前から、テニス選手をある指標から分析したいなと思っていた。
-例えば、</p>
-
-<ul>
-<li>ランキングは高くないけど、爆発するとトップ選手に勝つ力を持っているかどうか</li>
-<li>自分より格下の選手に負けることが少ないかどうか</li>
-<li>小さい大会ではあまり勝てないけど、大舞台で勝てる選手かどうか</li>
-</ul>
-
-<p>これから伸びそうな選手かどうかなどをデータ的にみたかった。<br>
-ATPの公式サイトにもいくつか統計情報が載っているが、自分が大事と思う指標で分析したいと思っていた。</p>
-
-<p>まずは、データを取得しなければいけないので、それで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EC%A5%A4%A5%D4%A5%F3%A5%B0">スクレイピング</a>のライブラリを作るにいたった。</p>
-
-<h1>AtpScraper</h1>
-
-<p>AtpScraperは男子のプロテニスの公式サイトである、<a href="http://www.atpworldtour.com">ATPのサイト</a>から情報を<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EC%A5%A4%A5%D4%A5%F3%A5%B0">スクレイピング</a>してくれる<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>ライブラリだ。</p>
+<p>また、このサービスに利用する仕組みをAtpScraperというGemにして公開した。<br>
+これは、せっかく受けたTDD研修を活かして、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C6%A5%B9%A5%C8%B6%EE%C6%B0%B3%AB%C8%AF">テスト駆動開発</a>で行ったりしていた。</p>
 
 <p><iframe src="//hatenablog-parts.com/embed?url=https%3A%2F%2Fgithub.com%2Fmosuke5%2Fatp_scraper" title="mosuke5/atp_scraper" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://github.com/mosuke5/atp_scraper">github.com</a></cite></p>
 
-<p>現時点では、ぼくが今欲している機能しか実装していないが、下記ができる。</p>
+<h1>嵐</h1>
 
-<ul>
-<li>シングルスのランキングの取得</li>
-<li>プレイヤーの対戦レコードの取得</li>
-</ul>
+<p>と、まあさほどいままでと変わらない感じの日々を送っていた。<br>
+だが、6月くらいから嵐が吹き始める。<br>
+プライベートでかなりショッキングなことがあった。ショッキングであると同時に生活がだいぶ変わるようなこと。  <br>
+それだけでもショッキングではあるのだけれど、その出来事はなにかのトリガーを引いてしまったようだ。<br>
+世界線が変動したのかもしれない。</p>
 
-<p>一例だが、どんなふうに利用できるかのせる。</p>
+<h1>異動</h1>
 
-<h3>シングルスのランキング取得</h3>
+<p>まず、ショッキングな出来事からわずか1週間後に、社内転職の結果がでた。<br>
+詳しくは下記のブログを読んでほしいが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>を提供する新規事業を行う会社に行くことになったのだ。</p>
 
-<p>デフォルトだとトップ100のランキングを取得する。</p>
+<p><a href="/entry/2016/07/29/180000">社内システム開発からパブリッククラウドの会社へジョインします - Goldstine研究所</a></p>
 
-<pre><code class="language-ruby">pry(main)&gt; AtpScraper::Get.singles_ranking
-=&gt; [{:ranking=&gt;&quot;1&quot;,
-  :player_name=&gt;&quot;Novak Djokovic&quot;,
-  :player_url_name=&gt;&quot;novak-djokovic&quot;,
-  :player_id=&gt;&quot;d643&quot;,
-  :points=&gt;&quot;16580&quot;},
- {:ranking=&gt;&quot;2&quot;,
-  :player_name=&gt;&quot;Andy Murray&quot;,
-  :player_url_name=&gt;&quot;andy-murray&quot;,
-  :player_id=&gt;&quot;mc10&quot;,
-  :points=&gt;&quot;8765&quot;},
- {:ranking=&gt;&quot;3&quot;,
-  :player_name=&gt;&quot;Roger Federer&quot;,
-  :player_url_name=&gt;&quot;roger-federer&quot;,
-  :player_id=&gt;&quot;f324&quot;,
-  :points=&gt;&quot;8295&quot;},
+<h1>仕事環境の変化</h1>
 
-(略)
-</code></pre>
-
-<p>下記のようにすれば、50位から60位のランキングを取得できる。<br>
-（※引数の指定の仕方がアレなのは突っ込まないこと）</p>
-
-<pre><code class="language-ruby">pry(main)&gt; AtpScraper::Get.singles_ranking(&quot;50-60&quot;)
-=&gt; [{:ranking=&gt;&quot;50&quot;,
-  :player_name=&gt;&quot;Lukas Rosol&quot;,
-  :player_url_name=&gt;&quot;lukas-rosol&quot;,
-  :player_id=&gt;&quot;r685&quot;,
-  :points=&gt;&quot;897&quot;},
- {:ranking=&gt;&quot;51&quot;,
-  :player_name=&gt;&quot;Federico Delbonis&quot;,
-  :player_url_name=&gt;&quot;federico-delbonis&quot;,
-  :player_id=&gt;&quot;d874&quot;,
-  :points=&gt;&quot;895&quot;},
-
-(略)
-</code></pre>
-
-<h3>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B6%D3%BF%A5%B7%BD">錦織圭</a>の対戦レコード取得</h3>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%B6%D3%BF%A5%B7%BD">錦織圭</a>の2016年の対戦レコードを見たいと思えば下記のように取得できる。<br>
-（第一引数の<code>n552</code>は選手のIDのようなもので、これは上のランキングの取得時に手に入るのでそこで確認しなければいけない）</p>
-
-<pre><code class="language-ruby">pry(main)&gt; AtpScraper::Get.player_activity(&quot;n552&quot;, 2016)
-=&gt; [{:year=&gt;&quot;2016&quot;,
-  :player_name=&gt;&quot;Kei Nishikori&quot;,
-  :player_rank=&gt;&quot;6&quot;,
-  :opponent_name=&gt;&quot;Sam Querrey&quot;,
-  :opponent_rank=&gt;&quot;43&quot;,
-  :round=&gt;&quot;Round of 16&quot;,
-  :score=&gt;&quot;46 36&quot;,
-  :win_loss=&gt;&quot;L&quot;,
-  :tournament_name=&gt;&quot;Abierto Mexicano Telcel&quot;,
-  :tournament_category=&gt;&quot;500&quot;,
-  :tournament_location=&gt;&quot;Acapulco, Mexico&quot;,
-  :tournament_start_date=&gt;&quot;2016.02.22&quot;,
-  :tournament_end_date=&gt;&quot;2016.02.27&quot;,
-  :tournament_surface=&gt;&quot;Hard&quot;,
-  :tournament_surface_inout=&gt;&quot;Outdoor&quot;},
- {:year=&gt;&quot;2016&quot;,
-  :player_name=&gt;&quot;Kei Nishikori&quot;,
-  :player_rank=&gt;&quot;6&quot;,
-  :opponent_name=&gt;&quot;Thiemo de Bakker&quot;,
-  :opponent_rank=&gt;&quot;105&quot;,
-  :round=&gt;&quot;Round of 32&quot;,
-  :score=&gt;&quot;60 63&quot;,
-  :win_loss=&gt;&quot;W&quot;,
-  :tournament_name=&gt;&quot;Abierto Mexicano Telcel&quot;,
-  :tournament_category=&gt;&quot;500&quot;,
-  :tournament_location=&gt;&quot;Acapulco, Mexico&quot;,
-  :tournament_start_date=&gt;&quot;2016.02.22&quot;,
-  :tournament_end_date=&gt;&quot;2016.02.27&quot;,
-  :tournament_surface=&gt;&quot;Hard&quot;,
-  :tournament_surface_inout=&gt;&quot;Outdoor&quot;},
-
-(略)
-</code></pre>
-
-<p>もし、過去のすべての<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B6%D3%BF%A5%B7%BD">錦織圭</a>の対戦レコードを取得したければ下記で取得できる。</p>
-
-<pre><code class="language-ruby">pry(main)&gt; AtpScraper::Get.player_activity(&quot;n552&quot;, &quot;all&quot;)
-</code></pre>
-
-<p>対戦レコードは１対戦ごとのレコードになっている。<br>
-トーナメントごとにまとめたりはしていない。</p>
-
-<h1>これから</h1>
-
-<p>データ取得ライブラリを作ったので、これからこれを使った分析をしていこうと思っている。<br>
-分析結果が見れるサービスを作るかもしれないし作らないかもしれない。</p>
-
-<p>また、データ取得について要望があれば受け付けるし、プルリクをしてくれてもOKです。</p>
-
-<p><p><a href="https://github.com/mosuke5/atp_scraper">GitHub - mosuke5/atp_scraper: atp_scraper is a tool scraping tennis data from atpworldtour.com.</a></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">07 Feb 2016, 21:03</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2016/02/07/210300/" class="post-title">社内マリカー大会やりました！運営の工夫どころとかまとめ</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-マリオカート" href="https://blog.mosuke.tech/categories/%E3%83%9E%E3%83%AA%E3%82%AA%E3%82%AB%E3%83%BC%E3%83%88">マリオカート</a><a class="post-category post-category-マリカー" href="https://blog.mosuke.tech/categories/%E3%83%9E%E3%83%AA%E3%82%AB%E3%83%BC">マリカー</a><a class="post-category post-category-マリカー大会" href="https://blog.mosuke.tech/categories/%E3%83%9E%E3%83%AA%E3%82%AB%E3%83%BC%E5%A4%A7%E4%BC%9A">マリカー大会</a><a class="post-category post-category-マリオカート大会" href="https://blog.mosuke.tech/categories/%E3%83%9E%E3%83%AA%E3%82%AA%E3%82%AB%E3%83%BC%E3%83%88%E5%A4%A7%E4%BC%9A">マリオカート大会</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>弊社では、年に一度、社内のコミュニケーション促進で、いろんな部署が集まって行う懇親会がある。<br>
-そこでは、恒例行事として何かしらのゲームを行っている。<br>
-そのゲームにて今年マリカー大会を行ったので、その報告と工夫した点などまとめておく。</p></p>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%EA%A5%AA%A5%AB%A1%BC%A5%C8">マリオカート</a>を選んだ理由</h1>
-
-<p>パーティとか懇親会のゲームイベントというと、<br>
-ビンゴ大会だったりクイズ大会、ジェスチャーゲームだったり行うのが一般的かと思う。<br>
-ですが、今回そういう場で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%EA%A5%AA%A5%AB%A1%BC%A5%C8">マリオカート</a>大会を選ぶに至ったのには下記のような理由があった。</p>
-
-<ol>
-<li><b>準備が楽なものがよかった！</b></li>
-<li><b>順位が決められるものが良かった（景品の都合上）</b></li>
-<li><b>楽しさに進行役の力量が影響しないものがよかった…</b></li>
-</ol>
-
-<p>まず、はじめはクイズ大会などを行おうかと検討していましたが、<br>
-そのクイズの問題を考えるのが結構たいへんであることに気づき、準備が楽なものがいいなと思った。<br>
-そして、運営的な理由だが、ゲームの結果を順位を簡単に決められる必要があった。<br>
-最後に、なんといっても自分が進行役だったので、<br>
-自分の笑いを取る力や進行技術で楽しさが左右されたらこまるなーとおもっていた。</p>
-
-<p>これらを満たすことができると思ったのが<span style="font-size: 150%"><span style="color: #0000cc"><b>「マリカー」</b></span></span>だった！</p>
-
-<h1>環境</h1>
-
-<h3>参加者</h3>
-
-<p>８つのチームから合計200人程度参加。<br>
-年齢層も結構バラバラ。若手からお偉いさんまでいる。</p>
-
-<h3>映像</h3>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>の画像は、<a class="keyword" href="http://d.hatena.ne.jp/keyword/HDMI">HDMI</a>を使ってプロジェクターで大型スクリーンに投影した。</p>
-
-<h1>ルール</h1>
-
-<p>200人全員に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%EA%A5%AA%A5%AB%A1%BC%A5%C8">マリオカート</a>に参加してもらうことは難しかったので、<br>
-各チームで６人のゲーム参加者を事前に選んで頂いて、チームを代表として参加してもらうこととした。<br>
-（マリカー大会をやることは事前には言いませんでした。）</p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>では４人対戦までしかできないので、下記のような形式で対戦を進めた。</p>
-
-<ol>
-<li>8チームを4チーム×２分けて予選</li>
-<li>下位２チームが下位決定戦</li>
-<li>上位２チームが決勝戦</li>
-</ol>
-
-<p>またなるべく多くの人がゲームに参加して欲しかったので、<br>
-特別ルールとして、<span style="color: #ff0000"><b>コースを１周したらチームのほかの人に交代するというリレー形式</b></span>とした。</p>
-
-<h1>準備したもの</h1>
-
-<ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>本体(<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B2%A1%BC%A5%E0%A5%D1%A5%C3%A5%C9">ゲームパッド</a>含む)</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%EA%A5%AA%A5%AB%A1%BC%A5%C88">マリオカート8</a>のソフト</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Wii%A5%EA%A5%E2%A5%B3%A5%F3">Wiiリモコン</a> 4つ
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fwww.amazon.co.jp%2Fdp%2FB0046EC9ZU%2Fref%3Dpd_lpo_sbs_dp_ss_1%3Fpf_rd_p%3D187205609%26pf_rd_s%3Dlpo-top-stripe%26pf_rd_t%3D201%26pf_rd_i%3DB000KF7QU2%26pf_rd_m%3DAN1VRQENFRJN5%26pf_rd_r%3D1XCVFCEE0Y8AP4TMB5C3" title="Amazon.co.jp： Wiiリモコン プラス (シロ) (「Wiiリモコンジャケット」同梱): ゲーム" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://www.amazon.co.jp/dp/B0046EC9ZU/ref=pd_lpo_sbs_dp_ss_1?pf_rd_p=187205609&amp;pf_rd_s=lpo-top-stripe&amp;pf_rd_t=201&amp;pf_rd_i=B000KF7QU2&amp;pf_rd_m=AN1VRQENFRJN5&amp;pf_rd_r=1XCVFCEE0Y8AP4TMB5C3">www.amazon.co.jp</a></cite>
-</li>
-</ul>
-
-<h1>運営上の工夫</h1>
-
-<p>運営上幾つかの工夫を行ったので紹介する。</p>
-
-<h3>キャラクターについて</h3>
-
-<p>利用するキャラクターや乗り物は、予めこちらでチームごとにランダムで割り振った。<br>
-そうすることで、当日にキャラを選ぶ時間を短縮できるし、マリカーの知識の差がなくなる。<br>
-キャラクターは運ということにした。</p>
-
-<h3>コントローラについて</h3>
-
-<p>４人対戦だと画面が４つに分割される。<br>
-自分がどの画面を操作すべきかわからなくなるので、画面位置がわかるようにコントローラにシールを貼った。<br>
-この対応は必須です。</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160207/20160207182051.png" alt="f:id:mosuke5:20160207182051p:plain" title="f:id:mosuke5:20160207182051p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<h3>アイテムや操作など</h3>
-
-<p>CPUなしで４人対戦で行った。
-４人対戦で普通のアイテム設定だと、「コイン」とか「バナナ」とか良いアイテムが出づらくつまらない。<br>
-アイテムの設定は「ダイナミック」にすることで、４人でも強力アイテムがでてバトルが白熱する。</p>
-
-<p>カートの操作方法（曲がり方）は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BD%BD%BB%FA%A5%AD%A1%BC">十字キー</a>ではなくハンドル操作とした。<br>
-普段ゲームに慣れている人でも、ハンドル操作だと不慣れなことも多くみんなうまい具合に下手になって白熱した。</p>
-
-<h3>初心者への対応</h3>
-
-<p>アイテムの細かい使い方などいちいち説明できないので、<br>
-初心者へは「アクセル」と「曲がること」のみ教えた。<br>
-一見、経験者と不公平のようにみえるが、今回のルールだと１週しか同じ人が回らないので、<br>
-心配するほどのことにはならなかったです。</p>
-
-<h3>トラブル時への備え</h3>
-
-<p>こういう企画ではトラブルはつきもの。
-トラブルに対しての対応を用意した。</p>
-
-<ul>
-<li>コントローラの電池切れ対策で電池は買っておきました</li>
-<li>コントローラが故障した場合は、<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B2%A1%BC%A5%E0%A5%D1%A5%C3%A5%C9">ゲームパッド</a>で代用できるようにした</li>
-<li>一応プロジェクターも２つ用意しておいた</li>
-</ul>
-
-<h3>進行役</h3>
-
-<p>進行役は２人でやったのだが、雰囲気をだすために赤と緑のマントをまといました。<br>
-こういうのもいいっすね。</p>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fwww.amazon.co.jp%2F%25E3%2582%25B9%25E3%2583%25BC%25E3%2583%2591%25E3%2583%25BC%25E3%2583%259E%25E3%2583%25AA%25E3%2582%25AA-%25E3%2583%25AB%25E3%2582%25A4%25E3%2583%25BC%25E3%2582%25B8-%25E5%25B8%25BD%25E5%25AD%2590%25E3%2582%25BB%25E3%2583%2583%25E3%2583%2588-%25E3%2582%25B3%25E3%2582%25B9%25E3%2583%2581%25E3%2583%25A5%25E3%2583%25BC%25E3%2583%25A0%25E7%2594%25A8%25E5%25B0%258F%25E7%2589%25A9-%25E3%2583%2595%25E3%2583%25AA%25E3%2583%25BC%25E3%2582%25B5%25E3%2582%25A4%25E3%2582%25BA%2Fdp%2FB00AGSQ5XW%2Fref%3Dsr_1_cc_3%3Fs%3Daps%26ie%3DUTF8%26qid%3D1454838114%26sr%3D1-3-catcorr%26keywords%3D%25E3%2583%259E%25E3%2583%25AA%25E3%2582%25AA%2B%25E5%25B8%25BD%25E5%25AD%2590" title="Amazon.co.jp | スーパーマリオ&amp;ルイージ 風 帽子セット コスチューム用小物 フリーサイズ | おもちゃ 通販" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://www.amazon.co.jp/%E3%82%B9%E3%83%BC%E3%83%91%E3%83%BC%E3%83%9E%E3%83%AA%E3%82%AA-%E3%83%AB%E3%82%A4%E3%83%BC%E3%82%B8-%E5%B8%BD%E5%AD%90%E3%82%BB%E3%83%83%E3%83%88-%E3%82%B3%E3%82%B9%E3%83%81%E3%83%A5%E3%83%BC%E3%83%A0%E7%94%A8%E5%B0%8F%E7%89%A9-%E3%83%95%E3%83%AA%E3%83%BC%E3%82%B5%E3%82%A4%E3%82%BA/dp/B00AGSQ5XW/ref=sr_1_cc_3?s=aps&amp;ie=UTF8&amp;qid=1454838114&amp;sr=1-3-catcorr&amp;keywords=%E3%83%9E%E3%83%AA%E3%82%AA+%E5%B8%BD%E5%AD%90">www.amazon.co.jp</a></cite></p>
-
-<h1>実況について</h1>
-
-<p>冒頭で「楽しさに進行役の力量が影響しないものがよかった」と書いたが、<br>
-「実況」が楽しさを左右するだろうといくぶんか練習した。。。</p>
-
-<p><span style="font-size: 150%"><span style="color: #0000cc">だが、盛り上がりすぎて、うるさすぎて、<br>
-実況の声なんて通りませんでした！！！！</span></span></p>
-
-<p>実況の練習とかいらないでしょう…</p>
-
-<h1>大変だったこと</h1>
-
-<ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>を会社に何度ももっていくこと
-
-<ul>
-<li>リハーサルや事前の動作試験や段取り決めのため、何度も会社に<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>持って行った。</li>
-<li>家でスプラトゥーンやりたいので、毎度持って帰っていたので更に大変でした。</li>
-</ul>
-</li>
-<li>当日の酒事情
-
-<ul>
-<li>ゲームのセッティングはミスできないので、懇親会で酒をあんまり飲めない</li>
-<li>けれど、盛り上げるためにある程度酒を入れないとやっていられないジレンマ…</li>
-</ul>
-</li>
-<li>声を張ること
-
-<ul>
-<li>当日会場でルール説明などをしたが、マリカー大会をやるってだけで大盛り上がりで、相当な大声が必要だった…</li>
-</ul>
-</li>
-</ul>
-
-<h1>最後に</h1>
-
-<ol>
-<li>初心者でも十分たのしめるのでマリカー最高でした！</li>
-<li>家ではスプラトゥーンをやりたいので、できれば<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>は自分のではなくだれかに借りましょう！</li>
-<li>喉が枯れます！</li>
-</ol>
-
-<p></body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">25 Jan 2016, 22:21</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2016/01/25/222150/" class="post-title">Vagrant×Ansible環境の３つのスタイルとそのメリット・デメリットについて</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-Vagrant" href="https://blog.mosuke.tech/categories/vagrant">Vagrant</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>×Ansibleで開発環境を作っているみなさんは、
-どんなふうにそれを実現していますか？</p></p>
-
-<p>きっといくつかのやり方、考え方があると思います。<br>
-例えば、ご自身のPCにAnsibleをインストールして<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>の仮想環境にプロビジョニングしているとか。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で立てた仮想環境にAnsibleを入れて実行するとか。</p>
-
-<p>本ブログでは下記３つの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>×Ansibleのやり方に注目し、<br>
-そのメリット・デメリットについて自分なりにまとめます。</p> 
-<ol>
-<li><b>ホストにAnsibleをインストールして利用する</b></li>
-<li><b>ゲストにAnsibleをインストールして利用する</b></li>
-<li><b>Ansible実行用のゲストを作って利用する</b></li>
-</ol>
-
-
-<h1>1. ホストにAnsibleをインストールして利用する</h1>
-
-<h2>概要</h2>
-
-<p>1番よくあるやり方だと思う。<br>
-ご自身のPCにAnsibleを入れて<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で立ち上げたゲストにプロビジョニングを行う。</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160125/20160125214934.png" alt="f:id:mosuke5:20160125214934p:plain:w300" title="f:id:mosuke5:20160125214934p:plain:w300" class="hatena-fotolife" style="width:300px" itemprop="image"></span></p>
-
-<h2>メリット</h2>
-
-<p>なんといっても直感的でシンプル。<br>
-3.との比較になるが、Ansibleを実行する環境を別途用意する必要がないのでホストのリソースにも優しい。<br>
-また、2.との比較でゲストに無駄なものが入らない点でよい。</p>
-
-<h2>デメリット</h2>
-
-<p>ただ、そもそもwimdowsユーザはホストにAnsibleをインストールすることはできない。<br>
-つまり、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD">複数人</a>での開発をしていて、人によって端末が異なる場合には向いていない。<br>
-個人の端末の設定などにも大きく依存するため、チーム開発向きでないといえる。</p>
-
-<h1>2. ゲストにAnsibleをインストールして利用する</h1>
-
-<h2>概要</h2>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で立ち上げたゲストの中にAnsibleをインストールし、自身へプロビジョニングするやりかた。</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160125/20160125215405.png" alt="f:id:mosuke5:20160125215405p:plain:w300" title="f:id:mosuke5:20160125215405p:plain:w300" class="hatena-fotolife" style="width:300px" itemprop="image"></span></p>
-
-<p>この方式はshin1x1さんもおすすめしている。</p>
-<a href="http://shin1x1.hatenablog.com/embed/ansible_local-provisioner-in-vagrant" target="_blank">Vagrant + Ansible で開発環境を作るなら ansible_local プロビジョナがいい！ - Shin x Hatena Blog</a>
-
-<h2>メリット</h2>
-
-<p>（詳しくは上のブログを読むといいと思う。）<br>
-1.のデメリットで述べた、端末への依存度をなくすことができる。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>の新機能であるansible_localも利用できるのでプロビジョニングが楽だ。<br>
-3.と比べてAnsible実行環境を用意しなくて済む。</p>
-
-<h2>デメリット</h2>
-
-<p>メリットだけみると1.の問題点を解決していて最高のようにみえる。<br>
-しかし、ゲストに<b>本来インストールされるべきものでないものがはいる</b>点は忘れてはいけない。<br>
-Ansibleを使ってプロダクション環境にデプロイするユーザにとっては大きな問題だと思う。<br>
-開発環境とプロダクション環境での差分が広がってしまう。<br>
-また、Ansibleと並行してserverspecを使ってる人も多いと思うが、<br>
-そうなると今度はゲスト側に<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>もいれるのか？など様々な疑問が湧いてくる。</p>
-
-<h1>3. Ansible実行用のゲストを作って利用する</h1>
-
-<h2>概要</h2>
-
-<p>Ansible実行用のゲストを<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で立ち上げて、開発用のゲストへプロビジョニングにする。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160125/20160125215618.png" alt="f:id:mosuke5:20160125215618p:plain:w300" title="f:id:mosuke5:20160125215618p:plain:w300" class="hatena-fotolife" style="width:300px" itemprop="image"></span></p>
-
-<h2>メリット</h2>
-
-<p>2.のデメリットで述べた、ゲストへの不要なもののインストールを防ぐことが可能。<br>
-例えばserverspecで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>が必要な場合もAnsible実行用のゲストに入れればいい。<br>
-必要なものをインストールしたAnsible実行用のイメージファイルをチーム内で共有すれば端末依存もセットアップの手間も省ける。</p>
-
-<h2>デメリット</h2>
-
-<p>なんといっても、ゲストを二つは立ちあげる必要があること。<br>
-これは少し面倒だ。</p>
-
-<h1>まとめ</h1>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160125/20160125220823.png" alt="f:id:mosuke5:20160125220823p:plain:w500" title="f:id:mosuke5:20160125220823p:plain:w500" class="hatena-fotolife" style="width:500px" itemprop="image"></span></p>
-
-<p><p>この見解は正直<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>やAnsibleの使いみち、用途によってだいぶ変わると思う。<br>
-なので絶対な評価ではないと思うが、私のいままでの経験上はこのような評価となったので参考にしてもらえればと思う。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">28 Dec 2015, 15:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/12/28/150042/" class="post-title">2015年振り返り</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-vim::factory" href="https://blog.mosuke.tech/categories/vimfactory">vim::factory</a><a class="post-category post-category-vimfactory" href="https://blog.mosuke.tech/categories/vimfactory">vimfactory</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>去年に続き、2015年で技術分野でなにがあったか簡単に振り返りました。<br>
-<a href="https://blog.mosuke.tech/entry/2015/01/01/161826">2014年を思い返して… - Goldstine研究所</a></p></p>
-
-<h1>1. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの開発と公開</h1>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20151227/20151227172616.png" alt="f:id:mosuke5:20151227172616p:plain:w300" title="f:id:mosuke5:20151227172616p:plain:w300" class="hatena-fotolife" style="width:300px" itemprop="image"></span></p>
-
-<p>2014年の秋から@mogulla3と定期的にインフラ関連技術の勉強会をやってきていて、<br>
-はじめはインプットの勉強会だけを主にやってきていたのですが、<br>
-サービスを作る中でインフラ関連技術を駆使し勉強したいと思うようなっていました。<br>
-そこで、今年は「<a class="keyword" href="http://d.hatena.ne.jp/keyword/vim">vim</a>の設定をブラウザ上で即体感できるサービス <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factory」の開発をしました。</p>
-
-<p><a href="/entry/2015/07/19/135844/">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った - Goldstine研究所</a></p>
-
-<h4>良かった点</h4>
-
-<ul>
-<li>新しい技術などを組み合わせながら学習しがいのあるサービスを作れたこと</li>
-<li>サービスの実現技術を公開しそれなりの反響を得られたこと</li>
-</ul>
-
-<h4>悪かった点</h4>
-
-<ul>
-<li>内部的な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>の変更ばかりに時間を取られサービスそのものの改良ができなかったこと</li>
-</ul>
-
-<h1>2. インフラ関連の構築や運用、仕組みづくり</h1>
-
-<p>主に仕事の話になりますが、今年はインフラ関連の構築や運用に多く携わった気がします。<br>
-（結構、雑な感じに書き残します。）</p>
-
-<h3>(1) メールサーバの構築と運用</h3>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Postfix">Postfix</a>を使ったメールサーバの構築と運用に携わりました。</p>
-
-<ul>
-<li>そもそもメールサーバってなんだっけってところからはじまったのを思い出します。</li>
-<li>とにかく運用を楽にしたかったので、その部分に多くの工夫をしました。</li>
-<li>Ansibleを使って設定の変更などのリリース作業も簡単することや</li>
-<li>Zabbixのログ監視もいい感じに機能して、不正なメール送信とかもすぐ検知できるようにしました。</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/KVM">KVM</a>の仮想環境上なので、環境の作りなおしも容易にしました。</li>
-<li>冗長性のために２つのリージョンに分散させたりもしました。</li>
-<li>目新しいことはないですが、わりと運用が楽な感じに作れたのでほんとによかったなと振り返って思います。</li>
-</ul>
-
-<h3>(2) インターネットから社内NWへの入口としてのリバプロサーバ構築</h3>
-
-<p>インターネットから社内NWにあるシステムを利用できるようにするために、<br>
-リバースプロキシサーバを構築しました。（運用はこれから）<br>
-いわゆる<a class="keyword" href="http://d.hatena.ne.jp/keyword/DMZ">DMZ</a>構成におけるリバプロです。</p>
-
-<ul>
-<li>技術的なところで言うと、corosync+pacemakerを使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF%A5%EA%A5%F3%A5%B0">クラスタリング</a>を組みました。</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF%A5%EA%A5%F3%A5%B0">クラスタリング</a>は思ったより奥が深く、どのような<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>を組むかかなり苦労しました。</li>
-<li>障害時に相手側サーバの電源を落とす、いわゆるフェンシングなどをどう適切に使うかなど。</li>
-<li>運用が始まってからそのあたりの実用性が確認できそうです。</li>
-<li>ちなみにNginxでリバースプロキシたてました。</li>
-</ul>
-
-<h3>(3) 仮想環境構築とか</h3>
-
-<p>仮想環境というと、今まで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>などの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>として、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>などのIaaSとして使うばかりでした。<br>
-今年は、<a class="keyword" href="http://d.hatena.ne.jp/keyword/KVM">KVM</a>を利用してプロダクションの仮想基盤を作るなどやりました。<br>
-仮想化ってそもそもなんだっけ？というもう少し基礎よりの知識と向き合う機会がありました。</p>
-
-<p>また、主に来年の話になるがOpenStackなどを使った<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>環境を「作る・運用する」にも携わっていきそうです。<br>
-すこしづつOpenStackをかじり始めました。</p>
-
-<h3>(4) Ansibleの活用と布教活動</h3>
-
-<p>Ansibleの利用は去年から始めていたことですが、<br>
-今年はより活用することと、社内での布教活動を行いました。</p>
-
-<p>活用でいうと、サーバの構築はAnsibleで行ってアプリケーションのデプロイは<br>
-別の方法でやる（手動とか…）というふうになっていたので、<br>
-Ansibleを使ってアプリケーションのデプロイまですべて行うようにしてきました。</p>
-
-<p>また、こういった取り組みを社内（部内）で広めて他のチームにも活用してもらおうと、<br>
-布教活動してしたりしてきました。</p>
-
-<h1>まとめ。来年の抱負的な</h1>
-
-<ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryを自分が使いたいと思うようなサービスにする</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryをベースにより自分たちが学習できる環境を作る</li>
-<li>引き続き、インフラ系エンジニア？っぽい感じで邁進する
-
-<ul>
-<li>OpenStackの運用とかやりたい</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>などに踊らされない基礎力中心で学習したい</li>
-</ul>
-</li>
-<li>ISUCONにでます（あれば…）</li>
-</ul>
-
-<p><p>では良いお年を。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">17 Dec 2015, 19:25</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/12/17/192554/" class="post-title">インフラのデプロイとテストを同時実行できるようにしてHappyになった</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-serverspec" href="https://blog.mosuke.tech/categories/serverspec">serverspec</a><a class="post-category post-category-raketask" href="https://blog.mosuke.tech/categories/raketask">raketask</a><a class="post-category post-category-インフラテスト" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E3%83%86%E3%82%B9%E3%83%88">インフラテスト</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<h1>はじめに</h1></p>
-
-<p>私が開発しているシステムでは、Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。
-そして、serverspecを使って、インフラテストも行っています。<br>
-しかし、その運用にいくつか課題点がありました。</p>
-
-<p>その課題点についてと、課題点へ対策したことについて書きます。</p>
-
-<h1>課題だったこと</h1>
-
-<h2>(課題1) デプロイとテストをそれぞれ実行していた</h2>
-
-<p>Ansibleでのデプロイとserverspecのテストはそれぞれ別のコマンドで実行していました。</p>
-
-<pre><code>$ ansible-playbook site.yml -i 
-$ bundle exec rake serverspec 
-</code></pre>
-
-<p>2つ実行することが面倒であり、面倒であるがゆえにserverspecの実行を怠ったりしていました。<br>
-これではテストの効果があまり発揮できませんね。</p>
-
-<h2>(課題2) sudoパスワードをうまく管理できなかった</h2>
-
-<p>上のような課題1について、真っ先に以下の様にコマンドを続けることを思いつきました。</p>
-
-<pre><code>$ ansible -playbook site.yml -i ; bundle exec rake serverspec 
-</code></pre>
-
-<p>ですが、これだとansible実行終了後にserverspecを実行する際にsudoパスワードが再度聞かれるため、<br>
-コマンドを打ったまま「放置」ができませんでした。<br>
-<span style="font-size: 80%">※もちろん、sudoパスワードを要求しないようにユーザ設定をすればできますが、多くの場合ではセキュリティ上難しかったりすると思います。<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>接続は鍵認証、sudoには必ずパスワードを要求するようにしています。</span></p>
-
-<p>Ansibleもserverspecにもコマンド実行時にsudoパスワードを記述する方法があります。<br>
-Ansibleでは、ansible.cfgにsudo_passwordを記述、あるいはコマンド実行時に--extra-argsでsudoパスワードを指定できます。<br>
-serverspecでも<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>でSUDO_PASSWORDが指定できます。</p>
-
-<p>例 ）</p>
-
-<pre><code>ansible -playbook site.yml -i --extra-args='ansible_sudo_pass=xxxxxxxx'
-bundle exec rake serverspec SUDO_PASSWORD=xxxxxxxx 
-</code></pre>
-
-<p>ですが、おわかりの通り、<b>コマンドの履歴にもパスワードが残ります</b>。<br>
-なのであまり良い方法ではないと思っています。</p>
-
-<h2>(課題3) タスクの実行方法がバラバラ</h2>
-
-<p>デプロイはansibleコマンドで実行、テストはrakeで実行、他のタスクは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%A7%A5%EB%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">シェルスクリプト</a>。。。<br>
-といったように、タスクによって実行方法が異なってしまう状況になっていました。<br>
-運用的にとても不便でしたので、１つに統一したいと思っていました。</p>
-
-<h1>いい感じに同時に実行してくれるRakeタスクを作った</h1>
-
-<p>上で述べたような課題点をクリアするように、下記の要件を満たすように工夫をしました。</p>
-
-<ul>
-<li>デプロイ、テストが同じ形式で実行できる</li>
-<li>sudoパスワードをベタ書きすることなく実行できる</li>
-<li>sudoパスワードの入力を一回だけにする</li>
-</ul>
-
-<p>結論は、すべてRakeタスクで実行できるようにしました。<br>
-タスク一覧を見ると以下の様な感じになりました。（※実行結果は例であり実際の内容とは少し異なる。）</p>
-
-<pre><code>$ bundle exec rake -T
-rake deploy:development    # Deploy to development server
-rake deploy:production     # Deploy to production server
-rake serverspec            # Run serverspec to all hosts
-rake serverspec:app        # Run serverspec to app server
-rake serverspec:db        # Run serverspec to db server 
-</code></pre>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Rakefile">Rakefile</a>の実装例（一部省略）</p>
-
-<pre><code class="language-ruby">desc &quot;Deploy and Test&quot;
-namespace :deploy do
-  require &quot;io/console&quot;
-  require &quot;open3&quot;
-
-  STDOUT.sync = true
-  desc &quot;Deploy to development server&quot;
-  task :development do
-    # sudoパスワードははじめに１回だけ聞くようにします。
-    sudo_password = ask_sudo_password
-
-    # デプロイとテストを同時に実行します。
-    deploy_and_test('development', sudo_password)
-  end
-
-  # デプロイとテストの同時実行関数
-  def deploy_and_test(env, sudo_password)
-    deploy_cmd = &quot;ansible-playbook -i #{env} site.yml --extra-vars 'ansible_sudo_pass=#{sudo_password}'&quot;
-    test_cmd = &quot;bundle exec rake serverspec ENVIRONMENT=#{env} SUDO_PASSWORD=#{sudo_password}&quot;
-    Open3.pipeline(&quot;#{deploy_cmd}; #{test_cmd}&quot;)
-  end
-
-  # sudoパスワードを要求関数
-  def ask_sudo_password
-    print &quot;SUDO Password: &quot;
-    sudo_password = STDIN.noecho &amp;:gets
-  end
-end
-</code></pre>
-
-<h1>まとめ</h1>
-
-<p>タスクによってその実行方法が異なることは運用上とても不便です。<br>
-統一した実行方法にすることで、</p>
-
-<ul>
-<li>テストの実行し忘れがなくなり</li>
-<li>ドキュメントも残しやすくなり</li>
-<li>チームメンバーへの運用方法の伝授も楽になり</li>
-</ul>
-
-<p>ました。（今回に限る話ではないけれど）</p>
-
-<p><p>また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rakefile">Rakefile</a>はかなりやっつけで作ってしまったので、何をタスクにするか・その命名・実装方法などの改善は年末の課題ですかね。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">01 Dec 2015, 18:13</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/12/01/181304/" class="post-title">Ansible、実行速度高速化の実験。ControlMasterとPipeliningについて</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a><a class="post-category post-category-高速化" href="https://blog.mosuke.tech/categories/%E9%AB%98%E9%80%9F%E5%8C%96">高速化</a><a class="post-category post-category-ControlMaster" href="https://blog.mosuke.tech/categories/controlmaster">ControlMaster</a><a class="post-category post-category-pipelining" href="https://blog.mosuke.tech/categories/pipelining">pipelining</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<h1>1. はじめに</h1></p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの開発や、仕事などでAnsibleを使うことが多いのだが、<br>
-その実行速度があまりでないことに不満をもっていて、どうしたら早くできるか考えていました。<br>
-調べると、ControlMasterを利用して<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のコネクションを再利用するとか、pipelineの機能を利用するとかでてくる。</p>
-
-<p>が、それによってどのくらいの効果が得られるのかよくわからないし、仕組みもよくわかっていなかったので、仕組みの理解と実行速度の実験をした。</p>
-
-<p>もう少し余談をすると、<br>
-ControlMasterを有効にすれば早くなることは前から知っていたが、<br>
-最近<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>をEl Capitanに変えてから「なんか最近Ansibleはやいな〜」とか思っていて、<br>
-「OpenSSHのバージョンもあがったし、まさか。。。」と思って今にいきついている。</p>
-
-<h2>ControlMasterについて</h2>
-
-<blockquote><p>OpenSSH は、1 つの接続で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">複数</a>のセッションを共有する(束ねる)「コントロール マスター」と呼ばれる機能を持っています。コントロールマスターを使用すると、 <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%E2%A1%BC%A5%C8%A5%DB%A5%B9%A5%C8">リモートホスト</a>に接続する最初のセッションは制御用のセッション(マスターセッショ ンと呼ばれます)として利用され、制御用のソケットを作成します。セッションを 共有する <a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a> クライアントは、この制御用のソケットを通じて<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%E2%A1%BC%A5%C8%A5%DB%A5%B9%A5%C8">リモートホスト</a>と 接続し通信を行います。<br>
-出典：「<a href="http://www.amazon.co.jp/OpenSSH-%E5%AE%9F%E8%B7%B5-Software-Design-plus/dp/4774168076">OpenSSH実践入門</a>」</p></blockquote>
-
-<p>上記のように、１つの接続で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">複数</a>のセッションを共有するため、<br>
-Ansibleのようにタスク実行ごとに<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>接続するような場合には大きな効果を得ることができる。</p>
-
-<h2>Pipeliningについて</h2>
-
-<p>Pipelining機能の説明の前に、軽くAnsibleの実行までの流れを説明する。<br>
-Ansibleは対象サーバに<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>ログインしたあと実行するタスクのモジュールをファイルとして転送しそれを実行する。<br>
-Pipelining機能をなしの状態だと、このファイル転送とファイルの削除を１タスクごとに行う。</p>
-
-<p>ansibleを<code>-vvvv</code>オプションをつけて実行するとわかるが、<br>
-４行目でファイルの<code>PUT</code>（転送）を、５行目の最後の方に<code>rm -rf</code>でディレクトリ・ファイルの削除を行っている。</p>
-
-<pre><code>&lt;192.168.33.100&gt; ESTABLISH CONNECTION FOR USER: deploy
-&lt;192.168.33.100&gt; REMOTE_MODULE command ls -l /root
-&lt;192.168.33.100&gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c 'mkdir -p $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321 &amp;&amp; chmod a+rx $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321 &amp;&amp; echo $HOME/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321'
-&lt;192.168.33.100&gt; PUT /var/folders/7_/d_dwdlcx1m95mn_846x30xb40000gn/T/tmpc8amAw TO /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/command
-&lt;192.168.33.100&gt; EXEC ssh -C -tt -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=user -o ConnectTimeout=10 192.168.33.100 /bin/sh -c 'sudo -k &amp;&amp; sudo -E -S -p &quot;[sudo via ansible, key=koibtlgpbiprbaihcqxiqgcnnreofxuo] password: &quot; -u root /bin/sh -c '&quot;'&quot;'echo BECOME-SUCCESS-koibtlgpbiprbaihcqxiqgcnnreofxuo; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/command; rm -rf /home/user/.ansible/tmp/ansible-tmp-1448959936.93-272271942952321/ &gt;/dev/null 2&gt;&amp;1'&quot;'&quot;'' 
-</code></pre>
-
-<p>Pipiliningの機能を有効にすると、タスク実行ごとのモジュールファイルの転送と削除をしなくなる。<br>
-そのため、実効速度があがるのです。</p>
-
-<p>下記はPipeliningを有効にした際の出力。<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>でタスクを実行しているだけなのがわかる。</p>
-
-<pre><code>&lt;192.168.33.100&gt; ESTABLISH CONNECTION FOR USER: deploy
-&lt;192.168.33.100&gt; REMOTE_MODULE command ls -l /root
-&lt;192.168.33.100&gt; EXEC ssh -C -vvv -o ControlMaster=auto -o ControlPersist=300s -o ControlPath=&quot;/Users/xxxxx/.ansible/cp/ansible-ssh-%h-%p-%r&quot; -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=deploy -o ConnectTimeout=10 192.168.33.100 /bin/sh -c 'sudo -k &amp;&amp; sudo -E -S -p &quot;[sudo via ansible, key=kjtoopnjepksibiitumqfycsoldadiws] password: &quot; -u root /bin/sh -c '&quot;'&quot;'echo BECOME-SUCCESS-kjtoopnjepksibiitumqfycsoldadiws; LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 /usr/bin/python'&quot;'&quot;'' 
-</code></pre>
-
-<p><a href="http://docs.ansible.com/ansible/intro_configuration.html#pipelining">Configuration file — Ansible Documentation</a></p>
-
-<h1>2. 実験方法</h1>
-
-<p>下記の３パターンでどれだけ実行速度に差があるか確認してみた。</p>
-
-<ul>
-<li>① ControlMaster: <b>無効</b> ＆ pipeline: <b>無効</b>
-</li>
-<li>② ControlMaster: <b><span style="color: #ff0000">有効</span></b> ＆ pipeline: <b>無効</b>
-</li>
-<li>③ ControlMaster: <b><span style="color: #ff0000">有効</span></b> ＆ pipeline: <b><span style="color: #ff0000">有効</span></b>
-</li>
-</ul>
-
-<h2>実行環境</h2>
-
-<ul>
-<li>クライアント
-
-<ul>
-<li>ハードウェア：<a class="keyword" href="http://d.hatena.ne.jp/keyword/MacBook%20Air">MacBook Air</a> (13-inch, Mid 2012)</li>
-<li>プロセッサ：1.8 GHz <a class="keyword" href="http://d.hatena.ne.jp/keyword/Intel">Intel</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/Core%20i5">Core i5</a>
-</li>
-<li>メモリ：4 GB 1600 MHz DDR3</li>
-<li>OS：El Capitan</li>
-<li>OpenSSH：OpenSSH_6.9p1, LibreSSL 2.1.7</li>
-</ul>
-</li>
-<li>サーバ
-
-<ul>
-<li>ハードウェア：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>による仮想環境。メモリ１GB。</li>
-<li>OS： <a class="keyword" href="http://d.hatena.ne.jp/keyword/CentOS">CentOS</a> 7.0</li>
-<li>ネットワーク：プライベートの<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>をふっています</li>
-</ul>
-</li>
-</ul>
-
-<h2>実行タスク</h2>
-
-<p>ネットワーク環境やタスクの実行時間に左右されないように、<br>
-<code>ls -l /</code>を実行するタスクを300個用意した。</p>
-
-<h2>設定</h2>
-
-<p>ansible.cfgを下記のように書いてためした。</p>
-
-<p>① ControlMaster: <b>無効</b> ＆ pipeline: <b>無効</b></p>
-
-<pre><code>[defaults]
-transport = ssh
-
-[ssh_connection]
-pipeline = false
-ssh_args = -o ControlMaster=no 
-</code></pre>
-
-<p>② ControlMaster: <b><span style="color: #ff0000">有効</span></b> ＆ pipeline: <b>無効</b></p>
-
-<pre><code>[defaults]
-transport = ssh
-
-[ssh_connection]
-pipeline = false
-ssh_args = -o ControlMaster=auto -o ControlPersist=300s 
-</code></pre>
-
-<p>③ ControlMaster: <b><span style="color: #ff0000">有効</span></b> ＆ pipeline: <b><span style="color: #ff0000">有効</span></b></p>
-
-<pre><code>[defaults]
-transport = ssh
-
-[ssh_connection]
-pipeline = true
-ssh_args = -o ControlMaster=auto -o ControlPersist=300s 
-</code></pre>
-
-<h2>実行コマンド</h2>
-
-<p>実行時間を図るために、下記のようにコマンドを実行した。</p>
-
-<pre><code>$ date; ansible-playbook site.yml ; date
-※ansible-playbookコマンドは環境に合わせてオプションとかつけてください。 
-</code></pre>
-
-<h1>3. 結果</h1>
+<p>仕事の環境は劇的に変わった。正直何もかもが違うといっても過言ではない。<br>
+変わった項目をまとめてみた。</p>
 
 <table>
 <thead>
 <tr>
-<th style="text-align:center;"> ControlMaster </th>
-<th style="text-align:center;"> Pipelining </th>
-<th style="text-align:center;"> 実行時間 </th>
+<th style="text-align:left;">項目</th>
+<th style="text-align:left;">前の仕事</th>
+<th style="text-align:left;">今の仕事</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center;"> ✕       </td>
-<td style="text-align:center;">        ✕ </td>
-<td style="text-align:center;">     6分38秒    </td>
+<td style="text-align:left;">システム種別</td>
+<td style="text-align:left;">ネットワーク監視システム</td>
+<td style="text-align:left;"><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a></td>
 </tr>
 <tr>
-<td style="text-align:center;"> ◯       </td>
-<td style="text-align:center;">        ✕</td>
-<td style="text-align:center;">     1分31秒   </td>
+<td style="text-align:left;">職種</td>
+<td style="text-align:left;"><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%B9%A5%C6%A5%E0%A5%A8%A5%F3%A5%B8%A5%CB%A5%A2">システムエンジニア</a></td>
+<td style="text-align:left;">セールスエンジニア？</td>
 </tr>
 <tr>
-<td style="text-align:center;"> ◯       </td>
-<td style="text-align:center;">        ◯</td>
-<td style="text-align:center;">     <span style="color: #ff0000"><b>52秒</b></span>   </td>
+<td style="text-align:left;">組織規模</td>
+<td style="text-align:left;">大組織の中の１部署で100人程度</td>
+<td style="text-align:left;">会社全体で数十人</td>
+</tr>
+<tr>
+<td style="text-align:left;">チーム</td>
+<td style="text-align:left;">エンジニアのみ</td>
+<td style="text-align:left;">エンジニア、営業、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A1%BC%A5%B1%A5%C6%A5%A3%A5%F3%A5%B0">マーケティング</a>など</td>
+</tr>
+<tr>
+<td style="text-align:left;">お客様</td>
+<td style="text-align:left;">社内</td>
+<td style="text-align:left;">社外</td>
+</tr>
+<tr>
+<td style="text-align:left;">人</td>
+<td style="text-align:left;">ほぼ100%日本人</td>
+<td style="text-align:left;">半分くらい外国人</td>
+</tr>
+<tr>
+<td style="text-align:left;">英語</td>
+<td style="text-align:left;">利用しない</td>
+<td style="text-align:left;">飛び交ってる</td>
 </tr>
 </tbody>
 </table>
 
-<p><p>結果は明らかでした。<br>
-実際の環境ではタスクの実行時間などがあるため、この数字のように6倍はやくなるとかそういうことではないが、<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%E2%A1%BC%A5%C8%A5%DB%A5%B9%A5%C8">リモートホスト</a>への接続回数が多くなればなるほど大きな差が生まれそうです。</p>
+<h1>実際の仕事</h1>
+
+<h4>セールスエンジニア</h4>
+
+<p>最初に断っておくが、今の職種をセールスエンジニアというと少し語弊はあるのだが、<br>
+そういう一面があることは確かなのでそういうことにしておく。</p>
+
+<p>今までやってきた開発エンジニアとはまったく異なった難しさを感じている。<br>
+お客さんはシステムを開発運用する現場のエンジニアの方であり何かしらに課題点を感じている人たちだ。<br>
+その課題についてソリューションを提案する必要があるわけであり、実際に自分が経験したことのないレベルで語ることは難しい。<br>
+自分が売る製品に知っているのは当たり前であり、それ以上に運用現場のことについて精通していてこそ仕事になる感がある。<br>
+職種的には運用現場から離れることになるわけだが、そこに精通し続ける必要があるのはとても難しさを感じとともに、だからこその価値と感じる。</p>
+
+<p>どうやって現場感覚も失わないでいるか、課題の１つである。</p>
+
+<p>そういえばこんな記事ありましたね。<br>
+<a href="https://job-draft.jp/articles/70">はてなの中でたった1人！Mackerelを支える「セールスエンジニア」って何だ!?｜転職ドラフトReport</a></p>
+
+<h4>サービスローンチ</h4>
+
+<p>異動したときの会社のミッションはAlibaba Cloudの日本リージョンの開設だ。<br>
+とにかくそれに向けてもろもろの準備をしてきた。<br>
+まずは、リリースできたので宣伝しておきます(笑)</p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=https%3A%2F%2Fjp.aliyun.com%2F" title="クラウドプロダクト、サービス、ソリューションの統合スイート | Alibaba Cloud" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://jp.aliyun.com/">jp.aliyun.com</a></cite></p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=https%3A%2F%2Fwww.sbcloud.co.jp%2F" title="SBクラウド株式会社｜SB Cloud Corp." class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://www.sbcloud.co.jp/">www.sbcloud.co.jp</a></cite></p>
+
+<h1>Gihyoデビュー</h1>
+
+<p>日本リージョンのリリースに伴って、Gihyoにデビューしました。<br>
+あとSoftwareDesignとWed+DB Pressに掲載されてます。みんなみてね。</p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fgihyo.jp%2Fadmin%2Fserial%2F01%2Fsb_cloud%2F0001" title="いよいよ日本上陸！！ 現場のエンジニアが語る，「Alibaba Cloud」の魅力と可能性：世界有数のEC企業とソフトバンクが手を組んだクラウドサービス―いま注目される「Alibaba Cloud」の可能性" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://gihyo.jp/admin/serial/01/sb_cloud/0001">gihyo.jp</a></cite></p>
+
+<h1>英語</h1>
+
+<p>コメント省略します。がんばりゅ…</p>
+
+<h1>ISUCON6</h1>
+
+<p>念願のISUCON6に参加した。圧倒的な力不足を痛感。<br>
+力不足を実感したこと自体とてもいいことだったし、またISUCON対策で得た知見は確実にいいものとなっているのでよし。<br>
+来年も出れたらリベンジしたいです。</p>
+
+<p><a href="/entry/2016/09/19/172009/">ISUCON6予選で惨敗した. 足りなかったのは&rsquo;Courage&rsquo; - Goldstine研究所</a></p>
+
+<h1>脱<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>
+</h1>
+
+<p>長年<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>を使ってたけどやめた。
+本当は新<a class="keyword" href="http://d.hatena.ne.jp/keyword/MacBook%20Pro">MacBook Pro</a>が出たら買おうと思っていたんだけれど、<br>
+USB Tpye-Cしかないことと値段の高さに<a class="keyword" href="http://d.hatena.ne.jp/keyword/ThinkPad">ThinkPad</a>をかってしまった。<br>
+この件については別途ブログを書きたいと思う。</p>
+
+<p><a href="http://shopap.lenovo.com/jp/notebooks/thinkpad/t-series/t460s/">ThinkPad T460s - 14.0型　ハイパフォーマンス・スリム・モバイル・ノートブックTシリーズ| レノボジャパン</a></p>
+
+<p>脱<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>が目的というよりは、一度いい機会なので<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>を離れてみようという感じ。</p>
+
+<h4>今のPC状況</h4>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">種類</th>
+<th style="text-align:left;">PC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">会社</td>
+<td style="text-align:left;"><a class="keyword" href="http://d.hatena.ne.jp/keyword/MacBook%20Pro">MacBook Pro</a></td>
+</tr>
+<tr>
+<td style="text-align:left;">自宅ノート</td>
+<td style="text-align:left;">
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/ThinkPad">ThinkPad</a> T460S Windows10</td>
+</tr>
+<tr>
+<td style="text-align:left;">自宅デスクトップ</td>
+<td style="text-align:left;">
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%AB%BA%EEPC">自作PC</a> Ubuntu16.04</td>
+</tr>
+</tbody>
+</table>
+
+<h1>一人暮らし</h1>
+
+<p>一人暮らしも決めた。引っ越し自体は2月予定だが、物件は決めて申し込みした。<br>
+なんだろう、勢いでこういうことになった。</p>
+
+<h1>最後に</h1>
+
+<p>今年は気持ちの面、生活の面、仕事の面といろいろと変化が大きかった。<br>
+これで嵐は吹き終わるのだろうか。それとも続くのだろうか。<br>
+それはわからないけれど、次に来る変化も受け止め楽しむことにする。</p>
+
+<h4>去年の抱負的なこと</h4>
+
+<p>せっかくなので去年の振り返りブログに書いてあった抱負的なことを振り返ってみる。<br>
+あんまり達成度はよくないけど、それ以上にいろいろあったからいいか。</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">項目</th>
+<th style="text-align:left;">達成</th>
+<th style="text-align:left;">コメント</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryを自分が使いたいと思うようなサービスにする</td>
+<td style="text-align:left;">×</td>
+<td style="text-align:left;">検討したが、サービスの方向性を見失った</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryをベースにより自分たちが学習できる環境を作る</td>
+<td style="text-align:left;">△</td>
+<td style="text-align:left;">基盤は勉強材料としては活躍している</td>
+</tr>
+<tr>
+<td style="text-align:left;">引き続き、インフラ系エンジニア？っぽい感じで邁進する</td>
+<td style="text-align:left;">〇</td>
+<td style="text-align:left;">現場のエンジニアではないが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>インフラよりで頑張ってる</td>
+</tr>
+<tr>
+<td style="text-align:left;">ISUCONにでます（あれば…）</td>
+<td style="text-align:left;">〇</td>
+<td style="text-align:left;">結果は惨敗</td>
+</tr>
+</tbody>
+</table>
+
+<h4>来年の抱負的なこと</h4>
+
+<p>大きく2つの面で頑張りたいと思ってる。<br>
+１つは、技術面の話。<br>
+今の職種は現場の開発エンジニアでもインフラエンジニアでもない。
+しかし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>を使うのは現場エンジニアであり、その感覚を忘れてはいけないと常に思っている。
+プライベートでは今まで通り何らかの形で開発エンジニアをやっていたいと思う。</p>
+
+<p>また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>はシステムを開発・運用していく中で必要なサービスが盛り込まれている。<br>
+今まで以上に幅広い視野を持ってテクノロジーと向き合わなければいけない。<br>
+トレンドやツールの使い方とかに流されない、基礎的な部分をきちんとみていきたい。</p>
+
+<p>2つは、技術面以外の話。<br>
+我々の仕事はシステムの開発ではなく、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>のビジネスを技術面から理解し支援することが大事。<br>
+そして、サービス利用者のビジネスについても技術面から理解し支援しなければいけない。<br>
+じゃ、なにをするのかっていうと難しいんだけど、テクノロジーの範囲を超えてビジネスモデルなどに意識してみようと思う。</p>
+
+<p><p>そんじゃーね。</p>
 </body></p>
 
                     </div>
@@ -1360,11 +362,11 @@ ssh_args = -o ControlMaster=auto -o ControlPersist=300s
                 
                 
                 
-                <h1 class="content-subhead">02 Nov 2015, 16:17</h1>
+                <h1 class="content-subhead">02 Oct 2016, 21:24</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2015/11/02/161744/" class="post-title">インフラテスト(serverspec)はじめました</a>
+                        <a href="https://blog.mosuke.tech/entry/2016/10/02/212420/" class="post-title">三葉よ、サーバーレス、それもまた結び。</a>
 
                         <p class="post-meta">
                             
@@ -1373,253 +375,153 @@ ssh_args = -o ControlMaster=auto -o ControlPersist=300s
                             
                                 under 
                                 
-                                <a class="post-category post-category-serverspec" href="https://blog.mosuke.tech/categories/serverspec">serverspec</a><a class="post-category post-category-インフラテスト" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E3%83%86%E3%82%B9%E3%83%88">インフラテスト</a><a class="post-category post-category-vim::factory" href="https://blog.mosuke.tech/categories/vimfactory">vim::factory</a><a class="post-category post-category-vimfactory" href="https://blog.mosuke.tech/categories/vimfactory">vimfactory</a><a class="post-category post-category-インフラCI" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9ci">インフラCI</a>
+                                <a class="post-category post-category-serverless" href="https://blog.mosuke.tech/categories/serverless">serverless</a><a class="post-category post-category-サーバレス" href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90%E3%83%AC%E3%82%B9">サーバレス</a><a class="post-category post-category-クラウド" href="https://blog.mosuke.tech/categories/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89">クラウド</a><a class="post-category post-category-lamda" href="https://blog.mosuke.tech/categories/lamda">lamda</a><a class="post-category post-category-FaaS" href="https://blog.mosuke.tech/categories/faas">FaaS</a><a class="post-category post-category-ServerlessConf" href="https://blog.mosuke.tech/categories/serverlessconf">ServerlessConf</a>
                             
                         </p>
                     </header>
 
                     <div class="post-description">
                         <p><body>
-<p>※執筆後、業務でもserverspecを利用し始めたのもあり、業務レベルでの実践例も追記している。</p></p>
+<p>タイトルちょっとふざけました。  (が、半分本気。最後の方でわかる。)</p></p>
 
-<p>運営中の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryでserverspecを使ったインフラテストを導入したので、
-導入理由や工夫している点、悩んでいる点について記述します。</p>
+<p><a href="http://tokyo.serverlessconf.io/">ServerlessConf Tokyo</a>に参加してきた。<br>
+今年8月から<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>の事業に異動していて、<br>
+開発者の立場より<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>提供側の立場として参加してきたので、また面白かった。</p>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryについてはこっちみてね。
-<a href="/entry/2015/07/19/135844/">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った - Goldstine研究所</a>
+<p>せっかくなので、自分なりにサーバレスについてまとめる。<br>
+新しいことというよりは、自分の中での整理した感じ。</p>
 
-<h1>1. serverspecってなによ</h1>
+<h1>1. サーバレスってなんだっけ</h1>
 
-<p>詳しくは公式サイトや書籍などを参考にして欲しいですが、<br>
-「サーバの状態をコードで自動的にテスト・確認するためのツール」です。</p>
-
-<p><a href="http://serverspec.org">Serverspec - Home</a></p>
-
-<p>例えば、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>でWebサーバを組んでいるサーバがあったとして、下記の要件で動いているとします。</p>
+<p>カンファレンスの中でもサーバレスの定義についてはいろいろな意見がでていた。<br>
+Martin Fowlerのブログではサーバレスの定義として下記２つが書いてある。</p>
 
 <ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/apache">apache</a>がインス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%EB">トール</a>されていること</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/apache">apache</a>が起動していること、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%AB%C6%B0%B5%AF%C6%B0">自動起動</a>する設定であること</li>
-<li>ポート80があいていること</li>
+<li>BaaS (Backend as a Service) : ex) firebase</li>
+<li>FaaS (Function as a Service) : ex) <a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda</li>
 </ul>
 
-<p>この要件をサーバが満たしているかコードでテストします。<br>
-上記の例だとこんなコードを書きます。</p>
+<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fmartinfowler.com%2Farticles%2Fserverless.html" title="Serverless Architectures" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://martinfowler.com/articles/serverless.html">martinfowler.com</a></cite></p>
 
-<pre><code class="language-ruby">describe package('httpd') do
-  it { should be_installed }
-end
+<p>ですが、ここでは焦点を絞って話すためにもFaaSということにしておく。<br>
+主にFaaSについて話したいのと、BaaSもいれてしまうと<a class="keyword" href="http://d.hatena.ne.jp/keyword/SaaS">SaaS</a>もサーバレスとかややこしいことになるので。</p>
 
-describe service('httpd') do
-  it { should be_enabled   }
-  it { should be_running   }
-end
+<h2>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda</h2>
 
-describe port(80) do
-  it { should be_listening }
-end
- 
-</code></pre>
+<p>なんといってもサーバレスの概念を推し進めたのは<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambdaでしょう。<br>
+説明はいまさら不要だと思うが、少しだけ。</p>
 
-<h1>各種テストの立ち位置</h1>
+<blockquote><p>コードを <a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda にアップロードすると、サービスが <a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> インフラストラクチャを使用してコードの実行を代行するコンピューティングサービスです。コードをアップロードして、Lambda 関数と呼ばれる関数を作成することで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda がコードを実行するサーバーのプロビジョニングおよび管理を行います。(<a href="https://aws.amazon.com/jp/lambda/details/">https://aws.amazon.com/jp/lambda/details/</a>)</p></blockquote>
 
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20170416/20170416114252.jpg" alt="f:id:mosuke5:20170416114252j:plain:w600" title="f:id:mosuke5:20170416114252j:plain:w600" class="hatena-fotolife" style="width:600px" itemprop="image"></span></p>
+<p>課金モデルは関数呼び出した回数、および実行に利用したコンピュートのスペックによって決まる。<br>
+また特徴的なことは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>の他のサービスで発生したイベントをトリガーに実行できること。<br>
+例えば、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Amazon%20S3">Amazon S3</a>にファイルアップロードされたことをトリガーにLambdaを実行できるのだ。</p>
 
-<ul>
-<li>serverspecは、サーバの状態（正しく設定されたか）を確認するためのテストツールです</li>
-<li>サーバの振る舞いのテストは別のツールを使うことをおすすめします</li>
-<li>また、監視も一種のテストと言えます</li>
-<li>一般的には監視はその実行頻度の高さから、振る舞いを監視することが多い</li>
-<li>監視ツールで、Configファイルが正しいかは見ない</li>
-</ul>
+<h2>サーバレスの特徴</h2>
 
-<h1>2. なんで導入したの？</h1>
-
-<p>serverspecを導入したのには大きく2つの理由があります。</p>
-
-<h2>(その１) インフラの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C6%A5%B9%A5%C8%B6%EE%C6%B0%B3%AB%C8%AF">テスト駆動開発</a>を支えるため</h2>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryは趣味で開発・運用しているサービスで、まだ作りたての発展途上のサービスです。<br>
-（作って公開してからは日が経っている気もしますが、週1の開発なので…）<br>
-そのため、今後もインフラコードをガンガン修正していくことを想定しています。<br>
-ですので、その開発、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%D5%A5%A1%A5%AF%A5%BF%A5%EA%A5%F3%A5%B0">リファクタリング</a>を支えるべく、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C6%A5%B9%A5%C8%B6%EE%C6%B0%B3%AB%C8%AF">テスト駆動開発</a>で行えるようにするためです。</p>
-
-<h2>(その２) インフラテストの必要性を深く理解するため</h2>
-
-<p>「インフラテストの必要性を深く理解するため」です。<br>
-必要性があるから導入したんじゃにないの？と思われるかもしれませんが、<br>
-ぼくはまだインフラテストの本当の必要性を理解できていないと思っています。</p>
-
-<p>実は、はじめこんな風に思っていましたし、今でも少し思う部分もある。</p>
-
-<ul>
-<li>ansibleやchefで実行結果がOKならそれでテストも兼ねているのでは？</li>
-<li>実際にどんな項目をテストすればいいか、考えてみた時にピンと来ない…</li>
-</ul>
-
-<p>実際に試してみないと、その本質が見えてこないと思っているので、<br>
-導入してみて自分の肌で感じようと思っています。</p>
-
-<p>個人的なお話なのでみなさんには関係のない話ではありますが、<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの開発は企業でもなければ営利目的でもありません。<br>
-「週末にインフラ技術のインプット勉強をしていたが、それだけでは飽きてきて、<br>
-サービスを開発・運用していくなかでインフラ技術を磨いていきたい」
-というものだったので、こういった実験も大歓迎だったのです。</p>
-
-<h1>3. 工夫している点</h1>
-
-<h1>チーム内でインフラテストコードの「指針」を決める</h1>
-
-<p>Ansibleなど構成管理ツールがあるなかで、本当にインフラテストっているの？とはじめは誰もが思うはずです。<br>
-「なんとなく」、「流行っているから」という理由で導入をすると、<br>
-きっと<b>チーム内でインフラテストを書く意味や目的が異なって</b>きてしまいます。<br>
-また、serverspecはいろんな使い方ができてしまうので、なおさら人によって考え方が異なってしまいます。</p>
-
-<p>ですので、チーム内でインフラテストコードの「指針」を決めて共有しています。<br>
-こうすることで、「なぜインフラテストコードを書くのか」の目的意識を統一しています。</p>
-
-<p>この指針には、下記の本をかなり参考にしました。（serverspec作者の本です）
-</p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4873117097/hatena-blog-22/"><img src="https://images-fe.ssl-images-amazon.com/images/I/51P6qVOPALL._SL160_.jpg" class="hatena-asin-detail-image" alt="Serverspec" title="Serverspec"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/4873117097/hatena-blog-22/">Serverspec</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">作者:</span> 宮下剛輔</li>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AA%A5%E9%A5%A4%A5%EA%A1%BC%A5%B8%A5%E3%A5%D1%A5%F3">オライリージャパン</a>
-</li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2015/01/17</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> 単行本（ソフトカバー）</li>
-<li><a href="http://d.hatena.ne.jp/asin/4873117097/hatena-blog-22" target="_blank">この商品を含むブログ (6件) を見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
-
-<h1>テストをサーバの役割毎にまとめる</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%A3%A5%EC%A5%AF%A5%C8">ディレクト</a>リの主な構成は下記のようになっています。<br>
-（実際にはもっとファイルやホストが多いですがイメージです。）</p>
-
-<pre><code>├ Rakefile
-├ spec/
-│ └ spec_helper.rb
-│ ├ base/
-│ │   ├ user_spec.rb
-│ │   └ selinux_spec.rb
-│ ├ proxy/
-│ │   └ nginx_spec.rb
-│ └ app/
-│     └ vimfactory-app_spec.rb
-└ sshconfig 
-</code></pre>
-
-<p>nginxなどを搭載するプロキシサーバと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>があり、それぞれにロールを割り振ります。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rakefile">Rakefile</a>内に書いてます。もし記述が増えるようだと別ファイルに切り出すと思います。</p>
-
-<pre><code class="language-ruby">hosts = [
-  {
-    :name   =&gt; &quot;proxy.vimfactory&quot;,
-    :roles  =&gt; %w( base proxy )
-  },
-  {
-    :name   =&gt; &quot;app.vimfactory&quot;,
-    :roles  =&gt; %w( base app )
-  }
-]
- 
-</code></pre>
-
-<p>このようにすることで、役割の違うサーバでも共有するテスト項目はコードの重複なくテストできます。<br>
-また拡張性もそこそこいい感じなんじゃないかと思っています。</p>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>の設定ファイルを任意で指定する</h1>
-
-<p>serverspecを使っていると<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>のクライアント側の設定ファイルを利用することがでてきます。<br>
-<code>serverspec-init</code>コマンドで生成されるspec_helper.rbでは<code>~/.ssh/config</code>をデフォルトで読むようになっています。</p>
-
-<p>ですが個人的には<code>~/.ssh/config</code>にプロジェクトの設定を書くのがあまり好きではないし、効果的でないことがあると考えています。<br>
-<code>~/.ssh/config</code>は個人のPCなどの設定によって各々違うものです。<br>
-そこにプロジェクト固有の設定を書くと、設定が衝突したり、管理が難しくなります。</p>
-
-<p>ですので、プロジェクトで使う<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>のクライアントの設定ファイルもgit管理しておいて、<br>
-それを使うようにすることが望ましいと思っています。</p>
-
-<p>そこで、spec_helper.rbの<code>Net::SSH::Config</code>部分を修正し、<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>の設定ファイルを任意で指定できるようにしています。</p>
-
-<pre><code class="language-ruby">config  = ENV['SSH_CONFIG']
-options = Net::SSH::Config.for(host, [config])
- 
-</code></pre>
-
-<p>実行時に指定します。</p>
-
-<pre><code>bundle exec rake serverspec SSH_CONFIG=sshconfig 
-</code></pre>
-
-<h1>デプロイ作業での活用</h1>
-
-<p>serverspecは主に、インフラの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C6%A5%B9%A5%C8%B6%EE%C6%B0%B3%AB%C8%AF">テスト駆動開発</a>のために導入したのですが、
-本番環境でのデプロイ作業（インフラ設定の変更）にも大活躍しています。</p>
-
-<p>デプロイ作業時に、下記ステップで行うことで、デプロイ作業の安心感を得るとともに、<br>
-作業後の確認作業を軽減できたのはとても素晴らしいことでした。</p>
+<p>サーバレス自体そしてサーバレスで実装することの特徴しては下記がある。</p>
 
 <ol>
-<li>serverspec実行：テスト落ちる</li>
-<li>Ansible実行：デプロイ</li>
-<li>serverspec：テスト通る</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>上のイベントを契機に実行できる</li>
+<li>実行環境は、immutableで時間が立つと消える</li>
+<li>実行環境は独立していて、コードは基本的にstatelessである</li>
+<li>上記のようにimmutableでstatelessな構造につくるからこそスケールしやすい</li>
 </ol>
 
-<h1>4. 悩んでいること。これからについて</h1>
+<h1>2. どんな用途で利用しているか</h1>
 
-<p>serverspecのCIの方法に悩んでいます。</p>
+<h2>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>基盤のイベントをトリガーとして</h2>
+
+<p>個人的に一番強力だと思っている使い方。上で説明したとおりだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>上のプロダクトに対してのイベントをトリガーに処理を行うことができる。<br>
+例えばこんな場合を想定してみよう。</p>
+
+<p>ユーザが写真をアップロードするサービスで、アップロードした写真にたいして何かしらの画像解析をしてメタ情報を持ちたいとする。<br>
+ざっと従来のやりかただと２つくらいやり方が思い浮かぶ。</p>
+
+<h4>(1) アップロードするたびに<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>で画像解析をする</h4>
 
 <ul>
-<li>どうやってCIをやるのが効率的か？</li>
+<li>解析にほとんど時間がかからない場合などはこれでいいと思う</li>
+<li>時間がかかるようなだとユーザへのレスポンスが遅くなる</li>
+<li>速くしようと思うとスケールアップで対応するしかない（やばい）</li>
+</ul>
+
+<h4>(2) <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>でやる</h4>
+
+<ul>
 <li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::FactoryはAnsibleでアプリケーションのデプロイまで行っているのだけど、</li>
-<li>インフラテストとアプリのテスト同時にやってほうがよくないだろうか？</li>
-<li>でも、アプリのテストをするごとにAnsibleで環境構築すると時間がかかってしまう。</li>
-<li>上記を解決するためにCI用にDockerイメージを作るという案もあるけど、そこまでするべきか？？</li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>で画像解析はまとめてやる。一番よくあるのでは？</li>
+<li>例えば５分に一度の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>で、５分間にたまった写真にたいしてまとめて処理する</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>でまとめて処理した場合、どこかでコケたときが辛い</li>
+<li>この例ならそうでもないが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>ではたいていスケールアウトが辛い</li>
 </ul>
 
-<p>これからは、どうCIをしていくか。<br>
-インフラテストとアプリのテストをどう結びつけていくか。<br>
-このあたりが課題と考えています。</p>
+<p>このケースに対してLambdaであればどうなるか。<br>
+1000件のアップロードに対して、1000回のLambda実行によって対応できる。<br>
+これは何万件きても同じことで、スケールの面で大変優れている。<br>
+また、1件ごとに処理するため、エラーが発生した場合に原因などとても追いやすい。</p>
 
-<h1>(追記)インフラCI失敗した</h1>
+<h2>アプリの<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>として</h2>
 
-<p>よくある構成例ではあるが、下記のようにGitlabCI+ DigitalOceanを使ってインフラCIの検討を行った。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20170416/20170416125051.jpg" alt="f:id:mosuke5:20170416125051j:plain:w600" title="f:id:mosuke5:20170416125051j:plain:w600" class="hatena-fotolife" style="width:600px" itemprop="image"></span></p>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>でいうと、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/Gateway">Gateway</a>と組み合わせて、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>サーバとして利用するケース。<br>
+S3などのデータストアに直接アクセスできるように作ることもできるため、ファイルアップロードなどで使われることが多いとか。<br>
+個人的には今のところあまり魅力的には感じない使い方。</p>
 
-<p>しかし、結果的には運用にのるところまでいかなかった。理由はこんな感じ。<br>
-正直、趣味でやってる範囲にしては、ここを突破するモチベーションがなかった。</p>
+<h2>事例紹介</h2>
+
+<p>カンファレンスのなかで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%FC%B7%D0%BF%B7%CA%B9">日経新聞</a>社さんののサーバレス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>の事例が一番よかったのでぜひ目を通しほしい。</p>
+
+<p><iframe allowfullscreen="true" allowtransparency="true" frameborder="0" height="463" id="talk_frame_361815" mozallowfullscreen="true" src="//speakerdeck.com/player/b4286c46056c404cbd272e253033d0df" style="border:0; padding:0; margin:0; background:transparent;" webkitallowfullscreen="true" width="710"></iframe><cite class="hatena-citation"><a href="https://speakerdeck.com/ikait/serverless-architecture-supports-nikkeis-paper-viewer">speakerdeck.com</a></cite></p>
+
+<p>ポイントとしては下記。見事にLambdaの特徴を活かした利用をしている。</p>
 
 <ul>
-<li>実行に膨大な時間がかかる</li>
-<li>それゆえにたまに<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8">タイムアウト</a>で死ぬ</li>
-<li>DigitalOcean<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>の停止に失敗した場合が面倒（笑）</li>
+<li>新聞は基本的には朝刊と夕刊の２回で限られたときだけ処理する点
+
+<ul>
+<li>常時稼働させたくない。EC2立ち上げっぱなしにする必要がない。</li>
+</ul>
+</li>
+<li>しかし、号外や速報など臨時の場合もただあり、それにも備えられる点</li>
+<li>日によってニュースの量が異なるため、いつでもスケールできる必要がある点</li>
 </ul>
 
-<p></body></p>
+<h1>3. <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ベンダーからみたサーバレスの立ち位置</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ベンダーにとってサーバレスはどういう立ち位置なのだろうか。<br>
+ぼくは<span style="font-size: 150%">「各サービスの横串」</span>と考えています。<br>
+EC2、S3、RDSなどなどそれぞれのサービスは単体としてとてもよくできている。<br>
+しかし横の連携をしようと思うと別途様々な工夫が必要なのが現状だ。</p>
+
+<p>サーバレスはその横の連携を担うのだ。<br>
+各サービス間を紐で固く結びつけてしまう。<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ロックインを加速させる役割も持つ。</p>
+
+<p><b>「三葉よ、サーバレス、それもまた結び。」</b></p>
+
+<p>そして、IoTへの布石。<br>
+IoTの世界ではリアルタイムなセンサーの情報のやりとりでデ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4">バイ</a>スとデータセンタ間の通信遅延が許容できないことがある。<br>
+そこでいま研究が進んでいるエッジコンピューティング（フォグコンピューティングとも）などがあるが、<br>
+LambdaのようにImmutable, Statelessが前提で作られる、どこの環境でも実行可能な状態はIoTと相性がいいようにみえる。</p>
+
+<p><p>今後どうなっていくかはわからないが、<br>
+デ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4">バイ</a>スに近いエッジコンピューティング側はLambdaでさばき、そのさばいたデータを中央のデータセンターへ、<br>
+なんていうことが主流になってくるかもしれない。と思うとFaaSの存在は見逃せない気がしてくる。</p>
+</body></p>
 
                     </div>
                 </section>
                 
                 
                 
-                <h1 class="content-subhead">25 Sep 2015, 23:27</h1>
+                <h1 class="content-subhead">19 Sep 2016, 17:20</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2015/09/25/232751/" class="post-title">Ansibleを踏み台サーバ越しに実行する</a>
+                        <a href="https://blog.mosuke.tech/entry/2016/09/19/172009/" class="post-title">ISUCON6予選で惨敗した. 足りなかったのは&#39;Courage&#39;</a>
 
                         <p class="post-meta">
                             
@@ -1628,62 +530,511 @@ options = Net::SSH::Config.for(host, [config])
                             
                                 under 
                                 
-                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a>
+                                <a class="post-category post-category-ISUCON" href="https://blog.mosuke.tech/categories/isucon">ISUCON</a><a class="post-category post-category-惨敗" href="https://blog.mosuke.tech/categories/%E6%83%A8%E6%95%97">惨敗</a><a class="post-category post-category-ISUCON6" href="https://blog.mosuke.tech/categories/isucon6">ISUCON6</a>
                             
                         </p>
                     </header>
 
                     <div class="post-description">
                         <p><body>
-<p>タイトルの通りで、なにも特別なことはない内容。<br>
-そして、9月も終わりなのに今月はひとつも記事を書いていなかった。</p></p>
+<p><span style="font-size: 80%"><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apple">Apple</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/keynote">keynote</a>で話題の&rsquo;<a class="keyword" href="http://d.hatena.ne.jp/keyword/Courage">Courage</a>&lsquo;使ってみた笑</span></p></p>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/KVM">KVM</a>を使って仮想のゲストサーバを立てたが、<br>
-ゲストサーバはホストサーバと通信する用の（外に出る場合にはNAT通信で）<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>しか持っていない状況で、<br>
-Ansibleの実行対象としたかったのが背景。</p>
+<p>ISUCON6予選で惨敗した。(18000点くらい)<br>
+端的に言って、とても未熟だった。</p>
 
-<p>ホストサーバにAnsibleをいれるわけにもいかず、ホストサーバを踏み台にして、<br>
-Ansibleを打ちたかったというもの。</p>
+<p>とはいえ、とてもいい思い出になったのでまとめる。</p>
 
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150925/20150925232414.png" alt="f:id:mosuke5:20150925232414p:plain" title="f:id:mosuke5:20150925232414p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+<h1>メンバー</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%EA%A1%BC%A5%A8%A5%E0">スリーエム</a>というチーム名で、@mogulla3と@mintsu123と一緒に出場した。<br>
+ふたりともぼくよりもアプリの改善などは10倍くらい優秀なエンジニアなので、<br>
+ぼくはインフラとか総務的な立ち回りをして、２人がチューニングに集中できるようにすることを心がけていた。</p>
+
+<h1>準備</h1>
+
+<p>準備は３週間の間に土日どちらかに集まってISUCONの過去問を解いたり戦略について事前に打ち合わせしてた。</p>
+
+<ul>
+<li>プライベートレポジトリの用意(Gitlab)</li>
+<li>チャットルームの用意(Slack)</li>
+<li>ISUCON4とISUCON5の予選の過去問解き
+
+<ul>
+<li>土日集まったときには戦略や振り返りを重視</li>
+<li>実際の過去問ときは平日に各々が空いた時間などにやってた</li>
+</ul>
+</li>
+<li>基本戦略を準備
+
+<ul>
+<li>なんの技術を主に使うか</li>
+<li>だれが何を担当するか</li>
+<li>定形作業の手順化</li>
+<li>その他ナレッジなど</li>
+</ul>
+</li>
+</ul>
+
+<h3>採用した技術</h3>
+
+<ul>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a> 7.0</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>-fpm</li>
+<li>Openresty(nginx) 1.11</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a> 5.7</li>
+<li>Redis 3.2</li>
+</ul>
+
+<h1>当日</h1>
+
+<p>出だしはとても順調だった。<br>
+Azure担当だったぼくはすぐにサーバをデプロイし、OSバージョンを確認した。<br>
+予想通りの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a> 16.04であったので、準備したとおり必要な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DF%A5%C9%A5%EB%A5%A6%A5%A7%A5%A2">ミドルウェア</a>のインストールをすませた。</p>
+
+<p>ほぼ定石と言える下記（定形作業と呼んでいた）もすぐにこなすことができた。</p>
+
+<ul>
+<li>調査のための各種ログ出力化</li>
+<li>Nginxでの静的ファイルの配信、キャッシュ化</li>
+<li>Kataribeインストールと実行</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>のインデックスの付与と設定見直し</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>-fpmの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unix">Unix</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>ソケット化</li>
+<li>デプロイの仕組みの整理</li>
+<li>不要デーモンの停止</li>
+</ul>
+
+<p>この状態でもスコアは0のままであり、少し焦りを感じたが、<br>
+ここからが本番のチューニング開始である。<br>
+Kataribeの結果から、<code>GET /</code>が改善ポイントであることは明らかなのはわかっていた。</p>
+
+<pre><code>Top 20 Sort By Count
+Count    Total      Mean    Stddev     Min   P50.0   P90.0   P95.0   P99.0     Max  2xx  3xx  4xx  5xx  Request
+  326  366.105  1.123021  2.619395   0.000   0.000   6.188   7.418   9.827  10.207  326    0    0    0  GET / HTTP/1.0
+  326  366.154  1.123172  2.618228   0.000   0.001   6.190   7.418   9.778  10.207  326    0    0    0  GET / HTTP/1.1
+  240    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  240    0    0    0  GET /css/bootstrap.min.css HTTP/1.0
+  240    0.737  0.003071  0.002843   0.000   0.002   0.006   0.010   0.013   0.015  240    0    0    0  GET /css/bootstrap.min.css HTTP/1.1
+  120    0.101  0.000842  0.002078   0.000   0.000   0.002   0.003   0.015   0.015  120    0    0    0  GET /img/star.gif HTTP/1.1
+  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /js/jquery.min.js HTTP/1.0
+  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /img/star.gif HTTP/1.0
+  120    0.152  0.001267  0.001788   0.000   0.001   0.003   0.004   0.011   0.012  120    0    0    0  GET /css/bootstrap-responsive.min.css HTTP/1.1
+  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /js/bootstrap.min.js HTTP/1.0
+  120    0.148  0.001233  0.001843   0.000   0.001   0.003   0.004   0.011   0.012  120    0    0    0  GET /favicon.ico HTTP/1.1
+  120    0.157  0.001308  0.001829   0.000   0.001   0.003   0.004   0.011   0.011  120    0    0    0  GET /js/bootstrap.min.js HTTP/1.1
+  120    0.379  0.003158  0.002890   0.000   0.002   0.007   0.010   0.013   0.015  120    0    0    0  GET /js/jquery.min.js HTTP/1.1
+  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /favicon.ico HTTP/1.0
+  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /css/bootstrap-responsive.min.css HTTP/1.0
+   67  116.697  1.741746  1.159447   0.020   1.760   2.999   3.000   3.001   3.001    0   42   25    0  POST /login HTTP/1.0
+   67  116.706  1.741881  1.159099   0.020   1.760   2.999   2.999   3.001   3.001    0   42   25    0  POST /login HTTP/1.1
+   35    0.857  0.024486  0.022147   0.000   0.026   0.040   0.085   0.096   0.096   35    0    0    0  GET /stars?keyword=%E5%86%85%E7%94%B0%E4%BF%AE%E5%B9%B3 HTTP/1.1
+   35    0.977  0.027914  0.020538   0.000   0.031   0.049   0.062   0.077   0.077   35    0    0    0  GET /stars?keyword=%E3%82%A6%E3%83%BC%E3%82%BA HTTP/1.1
+   34    0.867  0.025500  0.018035   0.000   0.028   0.044   0.059   0.071   0.071   34    0    0    0  GET /stars?keyword=%E5%8C%97%E6%B6%88%E9%98%B2%E7%BD%B2 HTTP/1.1
+   32    0.731  0.022844  0.015575   0.000   0.025   0.040   0.050   0.052   0.052   32    0    0    0  GET /stars?keyword=%E8%BC%AA%E7%8A%B6%E7%94%B2%E7%8A%B6%E7%AD%8B HTTP/1.1 
+</code></pre>
+
+<p>しかし、なかなか突破口が見いだせず、できるところからやっていく方針を取った。<br>
+アプリの改善を振り返ってみると、なにもしてねーなって感じがやばい。（何してたんだっけ…(・_・;)）</p>
+
+<ul>
+<li>isudaとisutarのfpmプロセスの調整</li>
+<li>isudaとisutar間のhttpによる<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>呼び出しをなくし、DB接続とした</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>改善
+
+<ul>
+<li>htmlifyのkeyword取り出し<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>
+</li>
+<li>load_starの<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>
+</li>
+<li>など</li>
+</ul>
+</li>
+<li>keywordのlengthを予め持つように変更</li>
+<li>isudaとisutarの統合
+
+<ul>
+<li>効果の検証ができず、結局マージはできなかった</li>
+</ul>
+</li>
+</ul>
+
+<h1>反省</h1>
+
+<p><code>htmlify</code>の改善がなによりも効果がでることはわかっていた。<br>
+しかし、その改善についてのいい方法がすぐに思いつかなかったこともあり、<br>
+他のやれることを優先しすぎてしまったことが一番の反省点だ。</p>
+
+<p>時間がない、大きな変更したら怖いという思いが強くなり、<br>
+どちらかというとやれることをきちんとやればいける、というディフェンシブな思考になってしまっていた気がする。</p>
+
+<p>せっかくRedisやOpenrestyを準備していたが、<br>
+そのあたりを発揮せずにおわってしまい残念な感じではあった。<br>
+（ここは準備不足ポイントでもあった）</p>
+
+<p>根本の改善に勇気を持って切り込む"<a class="keyword" href="http://d.hatena.ne.jp/keyword/Courage">Courage</a>"を次は発揮したい。</p>
+
+<p>反省会の炙りしめ鯖うまかった。</p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Ftokyo%2FA1303%2FA130301%2F13003370%2F" title="BISTRO三十五段屋 (渋谷/居酒屋)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://tabelog.com/tokyo/A1303/A130301/13003370/">tabelog.com</a></cite></p>
+
+<h1>最後に</h1>
+
+<p>反省点は多かったものの、準備期間も含めてこの１ヶ月とても楽しかったし、<br>
+また自分の未熟さを実感できてとてもよかった。</p>
+
+<p>今まで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B6%A5%B5%BB%A5%D7%A5%ED%A5%B0%A5%E9%A5%DF%A5%F3%A5%B0">競技プログラミング</a>などもしたこともなく、<br>
+技術面で「競う」ということはほとんどしたことがなかった。</p>
+
+<p><p>この敗北で、技術をきちんと理解し追求していきたいという想いが湧いてきた。<br>
+ISUCON主催者ありがとうございました。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">29 Jul 2016, 18:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2016/07/29/180000/" class="post-title">社内システム開発からパブリッククラウドの会社へジョインします</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-異動" href="https://blog.mosuke.tech/categories/%E7%95%B0%E5%8B%95">異動</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>本日、2016年7月29日をもって、新卒から３年４ヶ月働いてきた部署が最後となり、8月1日から異動（出向）する。<br>
+社内転職制度を使って、自らの希望で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>事業の会社へジョインすることになった。<br>
+（新規事業を行う部署へ異動となり、そこから別会社へ出向という扱い）<br>
+グループ内の異動ではあるが、違う会社・事業で、職種も変わるので、今の部署でやってきたことをまとめて残しておこうと思う。</p></p>
+
+<p>私は通信会社のネットワーク運用部隊に所属している（いた）。<br>
+ネットワーク運用部隊なのだが、私の部署はネットワーク運用を自動化したり運用を楽にするための<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%B9%A5%C6%A5%E0%B3%AB%C8%AF">システム開発</a>を担うところで、下記のような仕事をしてきた。</p>
+
+<h1>1. ベンダーコントロールという仕事</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%B9%A5%C6%A5%E0%B3%AB%C8%AF">システム開発</a>にはうちでは外注物も内製物（後述）もある。<br>
+業務の都合上、システムの種類によってはSIベンダーへ発注をして作ることがあった。<br>
+ベンダーコン<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%ED%A1%BC%A5%EB">トロール</a>なんて言ったりするが、発注での<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%B9%A5%C6%A5%E0%B3%AB%C8%AF">システム開発</a>の業務では下記のようなことをしてきた。</p>
+
+<ul>
+<li>要求仕様の検討</li>
+<li>見積もり依頼と価格交渉</li>
+<li>発注、スケジュール調整</li>
+<li>社内での業務調整</li>
+<li>受入試験、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B8%A1%BC%FD">検収</a>
+</li>
+<li>運用</li>
+</ul>
+
+<p>仕事のほとんどは、社内外の人との調整（コミュニケーション）だ。<br>
+エンジニアとしては一見つまらなそうな仕事にみえるかもしれない。<br>
+しかし、この仕事から様々なコミュニケーションを学び、それはいろんな場面で役に立っている。<br>
+例えばだが、以下の様なコミュニケーションがあったりした。</p>
+
+<ul>
+<li>要求を他者にしっかり、わかりやすく伝える</li>
+<li>仕様や価格についての折衝をする</li>
+<li>システムの利用部門との業務調整をする</li>
+<li>作業の手順について精査し指摘する</li>
+<li>ミスなど良くないことが起きた際には、今後の対策はどうするか相手側に考えさせるよう導く</li>
+<li>場合によっては厳しく叱ることもする（感情的に怒るわけではない）</li>
+</ul>
+
+<p>特に価格の折衝などは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SIer">SIer</a>や購買部と激しく激突することもあり今でもとても印象に残っている。<br>
+こういった業務はビジネスマンとしてとても大事なことを学んだと思うし、内製での開発業務でもとても活きてきている。</p>
+
+<h4>外注はいいけど・・・</h4>
+
+<p>社内リソースが少なくても同時並行でいろんなシステムの開発ができるし外注はいい。<br>
+一方で外注開発について、もどかしさや非効率さなどもたくさん経験してきた。</p>
+
+<p>まず、なにをやるにもお金と時間がかかることだ。<br>
+一度納品されてしまったものについて、なんらかの改修をしたい場合、<br>
+その改修規模を問わず、見積もり→発注→開発・改修→納品のプロセスを通さなければならない。<br>
+if文を１行追加するだけだろ…って思うようなものでも数百万で数週間かかることだってあった。</p>
+
+<p>そして、プロセスの効率化が難しいことだ。<br>
+ベンダーが開発したシステムをリリースするには、発注側の会社に度々きてリリース作業を行う。<br>
+勝手に発注側のシステムをアップデートすることはありえないので、必ずリリース作業には社員が立ち会わなければいけない。<br>
+そのとき、リリース作業が自動化されていないことも多く（発注時の要求によってもちろん異なる）、<br>
+何時間もかけて数十台のサーバにデプロイしたりしなければいけなかったりするので大変だ。</p>
+
+<p>これは当たり前だがとても効率が悪いし時間の無駄だ。<br>
+だがこれを改善しようと思うとまたお金がかかるわけである。<br>
+扱っているシステムが、業務システムなのでアップデートの頻度がおおくないこともあるので、<br>
+はじめからデプロイの自動化などを要件にいれることは少ないのである。</p>
+
+<p>これらはSIの開発をディスっているわけではない。（要求も悪いのはわかる。）<br>
+これは仕方ないこととして、そのメリット・デメリットをきちんと理解した上で選択、要求をしなれけばいけないということだ。</p>
+
+<h1>2. 内製開発の仕事</h1>
+
+<p>外注開発とは別にシステムの内製での開発業務も多くおこなってきた。<br>
+社内的には外注開発から内製開発に徐々に切り替えの最中であった。<br>
+ちなみに開発言語は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>（<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>やPadrino）や<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>（<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>）なんか使っていた。</p>
+
+<p>業務システムの他にもメールサーバやリバースプロキシサーバなど基盤システムも構築してきた。<br>
+2015年の振り返りブログに雑だが少し書いていた。</p>
+<a href="/entry/2015/12/28/150042/">2015年振り返り - Goldstine研究所</a>
+
+<h4>開発組織の改善活動</h4>
+
+<p>また、開発組織を改善するための活動をおおく行ってきた。<br>
+どこの組織でもある問題だと思うが、うちもまた「属人化」「秘伝のタレ」などといった類の悩みをたくさん抱えていた。</p>
+
+<p>うちはソフトウェア企業ではないし、システムを外注で作る部署も多い。<br>
+そのため、新卒や異動してくる人などがソフトウェアエンジニア思考の人ばかりではない。というかむしろ少数派。<br>
+だからこそ、よりいっそう「属人化」「秘伝のタレ」が弊害となる。<br>
+わかりやすいところでいうと下記のようなことをやったりして開発組織の改善をしてきた。</p>
+
+<ul>
+<li>gitlabを使った<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>-flowの導入。レビュー必須化</li>
+<li>Ansibleを使ったインフラ環境のコード化、構築自動化</li>
+<li>またそういったツールの導入だけでなく講師としてワークショップの実施やサポート活動</li>
+<li>部署内の開発ルールの策定</li>
+<li>最低限身につけてほしいスキルや知識を習得できる環境や研修の準備</li>
+</ul>
+
+<p>ツールの導入や普及、組織改善活動について次の２つがとても重要だったと思う。</p>
+
+<ol>
+<li>キーパーソンを見方につける。</li>
+<li>ハンズオンを行う。サポートを手厚くする。</li>
+</ol>
+
+<p>どんなにいい試みをやっても、独断で行ってしまうと「勝手にやったことだよね？」ってやっぱり思われてしまう。<br>
+また、その試みを広めるのに苦労する。<br>
+試みに対して理解してくれる上の人、キーパーソンを見方につけて働くことがとても有効的だった。</p>
+
+<p>そして、ツール類はとくにそうだが、紹介したりするだけじゃなくて、<br>
+ハンズオン会をやったりサポートをし「軌道にのせる」ところまでやったのがとてもよかった。<br>
+サポートがないと、気が付くと昔のやりかたにもどってしまっていた、なんてこともあった。</p>
+
+<h1>3. データセンター、ネットワークの仕事</h1>
+
+<h4>データセンター系</h4>
+
+<p>サーバ環境はオンプレだった。<br>
+また、専任のサーバ・インフラ管理者がいるわけではなかったので、<br>
+データセンターへのサー<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%E9%A5%C3%A5%AF">バラック</a>の立架工事やサーバ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E9%A5%C3%A5%AD%A5%F3%A5%B0">ラッキング</a>、配線などそういったことも業務の１つだった。<br>
+データセンタ系業務とそれで身につけたことなどは下記。</p>
+
+<ul>
+<li>データセンターへのサー<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%E9%A5%C3%A5%AF">バラック</a>の立架工事やサーバ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E9%A5%C3%A5%AD%A5%F3%A5%B0">ラッキング</a>、配線をやった
+
+<ul>
+<li>ラックの立架工事や電源工事は当たり前だが外注</li>
+<li>工事の監督はさんざんやった</li>
+<li>サーバの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E9%A5%C3%A5%AD%A5%F3%A5%B0">ラッキング</a>やLANケーブルの敷設は自前でもたくさんやった</li>
+<li>LANケーブル作るのはだいぶこなれた</li>
+<li>でもやっぱりプロの配線は神</li>
+</ul>
+</li>
+<li>安全に工事するための知恵をたくさん身につけた</li>
+<li>電源工事などに備え、電気的な知識を身につけた</li>
+<li>openstack（<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%E9%A5%A4%A5%D9%A1%BC%A5%C8%A5%AF%A5%E9%A5%A6%A5%C9">プライベートクラウド</a>）の検証などもした</li>
+</ul>
+
+<h4>ネットワーク系</h4>
+
+<p>バックボーンのネットワークは範囲外ではあるが、<br>
+システム内のネットワーク設計・構築・運用は自分たちの仕事だった。</p>
+
+<p>そういう組織体系が業務的によかったかどうかはわからないけど、<br>
+現代では特に触れる機会が少ないネットワークについて理解を深められたのはとてもプラスになっている。<br>
+下記あたりは自前でやってきた。</p>
+
+<ul>
+<li>システム内のネットワークの設計</li>
+<li>L2スイッチ、L3スイッチの設定
+
+<ul>
+<li>VLANとかNAT、<a class="keyword" href="http://d.hatena.ne.jp/keyword/ACL">ACL</a>とか</li>
+</ul>
+</li>
+<li>NW機器が故障した際の交換とか設定投入</li>
+</ul>
+
+<p>ネットワークは専門ではないけれど、オンプレでやっているとネットワーク系の仕事をやることや、<br>
+他部署とネットワークの話をしなければいけないことが多い。<br>
+ネットワークの知識は仮想サーバを構築するときなどにも役に立つし、ソフトウェア開発でも何かと役に立っている。<br>
+ちょうど最近、システムが調子悪い原因が<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B8%F7%A5%D5%A5%A1%A5%A4%A5%D0">光ファイバ</a>ーの不良ということを発見できてとてもスッキリした。</p>
+
+<h1>4. その他</h1>
+
+<p>その他にあったことを雑にまとめる</p>
+
+<ul>
+<li>たくさん出張にいった
+
+<ul>
+<li>大阪、北陸、名古屋、広島、四国など</li>
+</ul>
+</li>
+<li>社内での業務改善コンテストで賞をとった</li>
+<li>新卒の面倒をみたりした</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BF%A1%BC%A5%F3">インターン</a>生も毎年きて面倒をみた</li>
+<li>採用リクルータをやって就活生とたくさん出会った</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%EA%A5%AA%A5%AB%A1%BC%A5%C8">マリオカート</a>大会企画した</li>
+<li>勤務地が変更になったりした</li>
+</ul>
+
+<h1>最後に</h1>
+
+<p>ほんとうに多岐にわたる仕事をさせてもらい、視野が広がった３年間だった。<br>
+アプリケーション開発しか知らなかった学生時代を振り返ると驚くほどの成長をしたと思う。</p>
+
+<p>部署や上司、メンバーへ、本当に感謝です（＾人＾）</p>
+
+<p>次は、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>の会社に行く。<br>
+（<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>を構築し運用するところなので、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>や<a class="keyword" href="http://d.hatena.ne.jp/keyword/GCP">GCP</a>が敵…）</p>
+
+<p>会社ではオンプレを使っていたし、また<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%E9%A5%A4%A5%D9%A1%BC%A5%C8%A5%AF%A5%E9%A5%A6%A5%C9">プライベートクラウド</a>の構築の検証にも携わった。<br>
+規模感や組織構造によるのはわかっているが、どうもシステムを維持することにばかり時間を費やし、本来やるべき<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%B9%A5%C6%A5%E0%B3%AB%C8%AF">システム開発</a>による問題解決になかなかいたらなかった感じはあった。<br>
+一方、趣味開発では<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>やHerokuなどの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>を使っていたので、本来やるべき問題解決に集中できることの価値を感じていた。<br>
+そういった経験から、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>をもっと多くの人が活用して<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%B9%A5%C6%A5%E0%B3%AB%C8%AF">システム開発</a>の本質により注力できるように、と思うようになった。</p>
+
+<p>最後に…<br>
+この３年間で社内の仕事の質がかわった瞬間を目の当たりにした。<br>
+外注も内製もやってきたと書いたが、はじめは外注が多かったが徐々に内製開発の比率が増えてきた。<br>
+それに伴って、社員が行う仕事の質や求められるスキルが変化していったのを感じた。<br>
+きっと、次の３年間もなんらかで変化が起こるはずで、振り落とされないよう頑張りたい。</p>
+
+<p><span style="font-size: 80%">※次のところ英語話さなきゃいけなくてほんとにヤ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4">バイ</a>・・・</span></p>
+
+<p>とてもながめのいいオフィスでした。<br>
+<span itemscope itemtype="http://schema.org/Photograph"><a href="http://f.hatena.ne.jp/mosuke5/20160729160810" class="hatena-fotolife" itemprop="url"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160729/20160729160810.jpg" alt="f:id:mosuke5:20160729160810j:image" title="f:id:mosuke5:20160729160810j:image" class="hatena-fotolife" itemprop="image"></a></span></p>
+
+<p><p><span itemscope itemtype="http://schema.org/Photograph"><a href="http://f.hatena.ne.jp/mosuke5/20160729160817" class="hatena-fotolife" itemprop="url"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160729/20160729160817.jpg" alt="f:id:mosuke5:20160729160817j:image" title="f:id:mosuke5:20160729160817j:image" class="hatena-fotolife" itemprop="image"></a></span></p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">26 Jul 2016, 21:59</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2016/07/26/215939/" class="post-title">【めも】httpヘッダー、x-forwarded-forとか任意のヘッダーとか</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-httpヘッダー" href="https://blog.mosuke.tech/categories/http%E3%83%98%E3%83%83%E3%83%80%E3%83%BC">httpヘッダー</a><a class="post-category post-category-Nginx" href="https://blog.mosuke.tech/categories/nginx">Nginx</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>ただのめも。</p></p>
+
+<p>もともと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>+<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>で動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになった。（理由はここではどうでもいいので書かない）<br>
+つまり、Nginx-&gt;<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>-&gt;<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>という構成になった。<br>
+よくあることだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>からみるとすべてリバースプロキシから通信がきているので、
+接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>がすべてリバースプロキシのものになる。</p>
+
+<p>HTTPヘッダーに接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を追加しアプリ側（<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>）で受け取ろうとしたときのめも。</p>
+
+<h1>リバースプロキシ側でHTTPヘッダー追加</h1>
+
+<p>まず、そもそもデフォルトのNginxの設定では接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>をHTTPヘッダーに含まれない。<br>
+ググればすぐに設定方法自体はでてくる。<br>
+ X-Forwarded-Forというヘッダー名にNginxでもっている変数$proxy_add_x_forwarded_forをつっこむ。</p>
+
+<pre><code>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+</code></pre>
+
+<p>設定は簡単なんだけど、そもそもX-Forwarded-Forなんていうヘッダーあったっけ。。。？<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Wikipedia">Wikipedia</a>でみる。</p>
+
+<blockquote><p>X-Forwarded-For (XFF) とは、HTTPヘッダフィールドの一つ。HTTPプロキシサーバまたは負荷分散装置（ロードバランサ）を経由してウェブサーバに接続するクライアントの送信元<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を特定する際の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%D5%A5%A1%A5%AF%A5%C8%A5%B9%A5%BF%A5%F3%A5%C0%A1%BC%A5%C9">デファクトスタンダード</a>である。
+（略）<a class="keyword" href="http://d.hatena.ne.jp/keyword/RFC">RFC</a>の標準的なヘッダフィールドではないが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/IETF">IETF</a>のネットワーク作業部会 (Network Working Group) は2011年10月より同種のHTTPヘッダForwardedの標準化作業を開始した[1]。</p></blockquote>
+
+<p>なるほど、<a class="keyword" href="http://d.hatena.ne.jp/keyword/RFC">RFC</a>の標準ではないけど、一般的なものなんですね。</p>
 
 <h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>の設定ファイルを作る</h1>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>でX-Forwarded-Forを受け取る</h1>
 
-<p>"Ansibleで" と書いたが要は<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>です。<br>
-まずは<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>で踏み台サーバを経由してAnsible実行対象サーバへ接続できるように準備しました。<br>
-これはいわゆる「多段<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>」というやつで、以前にもブログに書いたので復習です。</p>
+<p>というわけで、おりゃ！</p>
 
-<p><a href="https://blog.mosuke.tech/entry/2014/11/09/172745">【VPS1台でインフラ勉強】多段SSH設定（おまけ） - Goldstine研究所</a></p>
-
-<p>一般的には<code>~/.ssh/config</code>にこういった設定は書いたりもしますが、<br>
-Ansible実行の場合、<b><u>端末に依存したくなかった</u></b>ので、<br>
-Ansible<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>に別途ファイルを作ることにした。</p>
-
-<pre><code>## sshconfigという名前のファイルにした
-Host ansible-target
-    HostName 192.168.33.10
-    User xxxxx
-    ProxyCommand ssh -W %h:%p yyyyy@hostserver 
+<pre><code class="language-php">echo $_SERVER['X-Forwarded-For'];
 </code></pre>
 
-<p>上記のファイルを使って多段<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>できることを確認します。</p>
+<p>エラー...<br>
+※普段<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>使ってないのがバレますね。</p>
 
-<pre><code>$ ssh -F sshconfig ansible-target 
+<p>サーバ変数とりあえず、全部はきだす。</p>
+
+<pre><code class="language-php">&lt;?php
+var_dump($_SERVER);
+
+# array(x) { [&quot;HTTP_X_FORWARDED_FOR&quot;] =&gt; string(12) &quot;192.168.33.1&quot; ...... }
 </code></pre>
 
-<h1>Ansible実行時に<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>設定ファイルを利用する</h1>
+<p>HTTP先頭についてて、大文字になってて、ハイフンがアンスコに変わっている。<br>
+あたりまえだけどこれは<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>の仕様でいいんだよな...？</p>
 
-<p>ここまで来たらとても簡単で、<br>
-ansible.cfgに下記を追記し、ansible実行時に上記のsshconfigを読み込まれるようにしました。</p>
+<pre><code class="language-php">&lt;?php
+var_dump(getallheaders());
 
-<p>ansible.cfg</p>
-
-<pre><code>[ssh_connection]
-ssh_args = -F sshconfig 
+# array(x) { [&quot;X-Forwarded-For&quot;] =&gt; string(12) &quot;192.168.33.1&quot; ...... }
 </code></pre>
 
-<p></body></p>
+<p>サーバ変数にいれるときに、変わるんだわ。</p>
+
+<h1>念のため<a class="keyword" href="http://d.hatena.ne.jp/keyword/tcpdump">tcpdump</a>で軽く確認してみる</h1>
+
+<pre><code>$ sudo yum install tcpdump
+$ tcpdump dst port 80 -X
+
+# ながいんで適当に端折りました
+11:04:01.883209 IP 10.0.2.15.43038 &gt; 192.168.0.10.54655: Flags [.], seq 802:1603, ack 1, win 14600, length 1460
+     (略)
+     0x0000:  4500 0355 c705 0000 3706 24ca adc2 265f  1.0..X-Forwarded
+     0x0010:  c0a8 000a 0050 d57f 51ad 1e62 e596 78a4  -For:.192.168.33
+     0x0020:  8018 0137 8dbe 0000 0101 080a d1dc c19e  .1..Host:.xxxxxx 
+</code></pre>
+
+<p>いたいた。<br>
+Nginxからプロキシされるときはちゃんとヘッダー名は"X-Forwarded-For "になっていること確認。</p>
+
+<h1>任意の適当なHTTPヘッダーつけてみた</h1>
+
+<pre><code>proxy_set_header my-header 'hogefugafoobar'; 
+</code></pre>
+
+<pre><code class="language-php">var_dump($_SERVER);
+
+# array(35) { [&quot;HTTP_MY_HEADER&quot;] =&gt; string(14) &quot;hogefugafoobar&quot; ...... }
+</code></pre>
+
+<p><p>ふーん、なるほどな&hellip;</p>
+</body></p>
 
                     </div>
                 </section>
@@ -1698,7 +1049,7 @@ ssh_args = -F sshconfig
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 3 of 8</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 3 of 15</span>
     
       <a href="/page/4/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>

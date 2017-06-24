@@ -3,18 +3,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goldstine研究所(仮) &middot; Goldstine研究所(仮)</title>
+    <title>Goldstine研究所 &middot; Goldstine研究所</title>
 
     <meta name="description" content="mosuke5&#39;s blog">
+    <link rel="canonical" href="https://blog.mosuke.tech/">
 
-    <meta name="generator" content="Hugo 0.20.7" />
+    <meta name="generator" content="Hugo 0.20" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="Goldstine研究所(仮) &middot; Goldstine研究所(仮)">
+    <meta name="twitter:title" content="Goldstine研究所 &middot; Goldstine研究所">
     <meta name="twitter:description" content="mosuke5&#39;s blog">
 
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Goldstine研究所(仮) &middot; Goldstine研究所(仮)">
+    <meta property="og:title" content="Goldstine研究所 &middot; Goldstine研究所">
     <meta property="og:description" content="mosuke5&#39;s blog">
 
     <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
@@ -25,7 +26,7 @@
     <link rel="stylesheet" href="https://blog.mosuke.tech/css/mosuke5.css">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
 
-    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所(仮)" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
     <link rel="icon" type="image/png" href="/image/favicon.png">
 </head>
 <body>
@@ -35,7 +36,7 @@
     <div class="sidebar pure-u-1 pure-u-md-1-4">
     <div class="header">
         <hgroup>
-            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所(仮)</a></h1>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
             <h2 class="brand-tagline"> mosuke5&#39;s blog </h2>
         </hgroup>
 
@@ -43,14 +44,6 @@
             <ul class="nav-list">
                 
                 
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://mosuke.tech ">About mosuke5</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://blog.mosuke.tech/index.xml"><i class="fa fa-rss"></i> rss</a>
-                </li>
             </ul>
         </nav>
     </div>
@@ -61,6 +54,422 @@
         <div>
             
             <div class="posts">
+                
+                
+                <h1 class="content-subhead">20 Sep 2014, 18:03</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2014/09/20/180326/" class="post-title">CentOS7, iptables設定でハマった</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-CentOS7" href="https://blog.mosuke.tech/categories/centos7">CentOS7</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-iptables" href="https://blog.mosuke.tech/categories/iptables">iptables</a><a class="post-category post-category-ファイアウォール" href="https://blog.mosuke.tech/categories/%E3%83%95%E3%82%A1%E3%82%A4%E3%82%A2%E3%82%A6%E3%82%A9%E3%83%BC%E3%83%AB">ファイアウォール</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>最近<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>のOSをcentos7にしたのだが、なかなか手付かずで<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>の設定も放置していた…<br>
+（<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>の最低限の設定はしていたが、ほんとうに良くない…）</p>
+<p>久しぶりに手が空いたので設定するかーと思いきや<br>
+まず/etc/sysconfig/<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>がないし&hellip;</p>
+<p>Cent7からのsystemctlで<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>のサービスを確認してもでてこないし…</p></p>
+
+<pre><code># systemctl status iptables
+iptables.service
+   Loaded: not-found (Reason: No such file or directory)
+   Active: inactive (dead)
+</code></pre>
+
+<p>というわけで、調べてみると、まず<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>.serviceをインスールしないといけないとのこと。<br>
+そして、centos7からはfirewalldがデフォルトでオンになっているからオフにしないといけない。<br>
+（いけないわけではないけど両方使う意味が無いので。）</p>
+<br>
+<p>まずは<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>-serviceをインスールし、firewalldをオフ、<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>をオンとした。</p>
+
+<pre><code># yum install iptables-services
+# systemctl status firewalld
+   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled)
+   Active: active (running) since Sat 2014-09-20 17:47:11 JST; 4s ago
+ Main PID: 11162 (firewalld)
+   CGroup: /system.slice/firewalld.service
+           └─11162 /usr/bin/python -Es /usr/sbin/firewalld --nofork --nopid
+
+#
+# systemctl stop firewalld
+#
+# systemctl status firewalld
+   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled)
+   Active: inactive (dead)
+
+#
+#systemctl disable firewalld
+#
+#systemctl enable iptables
+#systemctl start iptables
+#
+#systemctl status iptables
+   Loaded: loaded (/usr/lib/systemd/system/iptables.service; enabled)
+   Active: inactive (dead) since Sat 2014-09-20 17:47:10 JST; 2min 48s ago
+  Process: 11139 ExecStop=/usr/libexec/iptables/iptables.init stop (code=exited, status=0/SUCCESS)
+  Process: 10096 ExecStart=/usr/libexec/iptables/iptables.init start (code=exited, status=0/SUCCESS)
+ Main PID: 10096 (code=exited, status=0/SUCCESS)
+....
+
+# 
+</code></pre>
+
+<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>の設定はいつもどおり。<br>
+CentOS7の新しいコマンドに戸惑ったので一部メモ。</p>
+<p></p>
+<h2>service, chkconfigコマンドはsystemctlコマンドへ</h2>service, chkconfigコマンドは推奨されずsystemctlコマンドへ切り替わった。<br>
+試しにchkconfigコマンドを利用すると…</p>
+
+<pre><code># chkconfig --list
+Note: This output shows SysV services only and does not include native
+      systemd services. SysV configuration data might be overridden by native
+      systemd configuration.
+
+      If you want to list systemd services use 'systemctl list-unit-files'.
+      To see services enabled on particular target use
+      'systemctl list-dependencies [target]'.
+
+iprdump        	0:off	1:off	2:on	3:on	4:on	5:on	6:off
+iprinit        	0:off	1:off	2:on	3:on	4:on	5:on	6:off
+iprupdate      	0:off	1:off	2:on	3:on	4:on	5:on	6:off
+netconsole     	0:off	1:off	2:off	3:off	4:off	5:off	6:off
+network        	0:off	1:off	2:on	3:on	4:on	5:on	6:off
+pmcd           	0:off	1:off	2:off	3:off	4:off	5:off	6:off
+pmie           	0:off	1:off	2:off	3:off	4:off	5:off	6:off
+pmlogger       	0:off	1:off	2:off	3:off	4:off	5:off	6:off
+pmmgr          	0:off	1:off	2:off	3:off	4:off	5:off	6:off
+pmproxy        	0:off	1:off	2:off	3:off	4:off	5:off	6:off
+pmwebd         	0:off	1:off	2:off	3:off	4:off	5:off	6:off
+</code></pre>
+
+<p><blockquote>
+    <p>&ldquo;If you want to list systemd services use &lsquo;systemctl list-unit-files&rsquo;.&rdquo;</p>
+</blockquote>
+<p>systemdのサービスを表示したければ、systemctl list-unit-filesを利用せよとのこと。<br>
+試しに打つと以下のように表示される</p></p>
+
+<pre><code># systemctl list-unit-files
+UNIT FILE                                   STATE
+proc-sys-fs-binfmt_misc.automount           static
+dev-hugepages.mount                         static
+dev-mqueue.mount                            static
+proc-fs-nfsd.mount                          static
+proc-sys-fs-binfmt_misc.mount               static
+sys-fs-fuse-connections.mount               static
+sys-kernel-config.mount                     static
+sys-kernel-debug.mount                      static
+tmp.mount                                   disabled
+var-lib-nfs-rpc_pipefs.mount                static
+brandbot.path                               disabled
+....
+ 
+</code></pre>
+
+<p><p>また、サービスの起動・停止・状態確認などは</p></p>
+
+<pre><code># service &lt;service name&gt; &lt;start/stop/restart/status&gt;
+　↓
+# systemctl &lt;start/stop/restart/status&gt; &lt;service name&gt;
+</code></pre>
+
+<p><p>そして、サービスの起動オプションの設定は</p></p>
+
+<pre><code># chkconfig &lt;service name&gt; &lt;on/off&gt;
+   ↓
+# systemctl &lt;enable/disable&gt; &lt;service name&gt;
+</code></pre>
+
+<p><p>まずはこんなところ。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">15 Sep 2014, 13:56</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2014/09/15/135611/" class="post-title">D3.js、DBからのデータ連携方法の検討</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-D3.js" href="https://blog.mosuke.tech/categories/d3.js">D3.js</a><a class="post-category post-category-Sinatra" href="https://blog.mosuke.tech/categories/sinatra">Sinatra</a><a class="post-category post-category-Ruby" href="https://blog.mosuke.tech/categories/ruby">Ruby</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。<br>
+例えば以下の状況を考える。<br>
+【やりたいこと】<br>
+「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」</p>
+<p>【DBの構造】<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AB%A5%E9%A5%E0%CC%BE">カラム名</a>：型<br>
+　date : datetime<br>
+　value : int</p>
+<p>※また、下記では<a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>上で行っているが、他の言語でも同様のことがいえる。</p></p>
+
+<p><div class="section">
+    <h3>(1) 簡単な<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>のようなものを利用する</h3>
+    <p>先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、<br>
+これが一番複雑にならずに良いと思ったということ。</p>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>側で/<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>にアクセスすると<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルをダウンロードできるようにする。</p></p>
+
+<pre><code class="language-ruby">#Sinatra側
+get '/csv' do
+    content_type 'application/csv'
+    attachment 'download.csv'
+
+    #DBからデータ取得(Activerecord利用)
+    @data   = Model.all()
+
+    #出力するCSVデータの変数。csvヘッダーを先につけている。
+    @csv = &quot;date,value\n&quot;
+
+    #DBのデータをCSVの形にして格納
+    @data.each do |d|
+        @csv += d.date.to_s + &quot;,&quot; + d.value.to_s + &quot;\n&quot;
+    end
+    
+    #csvtest.erbというビューに出力
+    erb :csvtest, :layout =&gt; false
+end
+</code></pre>
+
+<p>csvtest.erb</p>
+```ruby
+<%= @csv %>
+```
+<p>こうすることで"<a href="http://*****/csv">http://*****/csv</a>"にアクセスすると<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルとしてダウンロードできる状態になる。<br>
+条件指定をしてデータをダウンロードできるようにしたい場合はGETでパラメータ指定できるようにすれば良いと思う。<br>
+（<a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/CSV">CSV</a>ファイルを生成するところのコードがナンセンスだと思っているので、もっといい方法があるはず…）</p>
+<p>また、今回は<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>にしているが<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>などの他の形式でも同様のことがいえる。</p>
+<p>これをD3.js側で以下のように読み込ませる。</p>
+
+<pre><code class="language-javascript">d3.csv(&quot;/csv&quot;, function(error, data) {
+    (中略)
+}
+</code></pre>
+
+<p>d3.jsの<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>を読み込ませる関数の引数にURLを指定してあげればそれで終了。</p>
+
+<p></div>
+<div class="section">
+    <h3>(2) <a class="keyword" href="http://d.hatena.ne.jp/keyword/javascript">javascript</a>コードの中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>変数を展開させる</h3>
+    <p>d3.jsのdatasetの中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>の変数を展開させる。ビューに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Javascript">Javascript</a>を書いているので、ビューの中で変数展開するのと同じ要領。<br>
+しかし、jsコードに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>コードも交じるので複雑になりがち。</p></p>
+
+<pre><code class="language-javascript">var dataset = [
+&lt;% @data.each do |d| %&gt;
+    {date:&lt;%= d.date%&gt;, value:&lt;%= d.value %&gt;},
+&lt;% end %&gt;
+];
+</code></pre>
+
+<p></div>
+<div class="section">
+    <h3>(3) <a class="keyword" href="http://d.hatena.ne.jp/keyword/CSV">CSV</a>ファイルをおいておく</h3>
+    <p>こちらはリアルタイムな更新でなれけばこれはこれでありだと思う。<br>
+publicのフォルダに予め<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルを設置しておき、以下のようにd3.jsで読み込ませる。</p></p>
+
+<pre><code class="language-javascript">d3.csv(&quot;test.csv&quot;, function(error, data) {
+    (中略)
+}
+</code></pre>
+
+<p></div>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">13 Sep 2014, 21:44</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2014/09/13/214414/" class="post-title">2014/8/2 Arduino会を実施の報告</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>2014年8月2日(土)に大学時代の研究室の同期・後輩を巻き込んで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>勉強会を行った。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>をほとんど触ったことのないメンバーで実施したのだが、初心者でもプロダクトを作り上げられるところまでできた。<br>
+その勉強会の簡単な資料を掲載。</p>
+<p><script async class="speakerdeck-embed" data-id="04fb75c01d710132f325123486985575" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script></p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">13 Sep 2014, 11:15</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2014/09/13/111537/" class="post-title">【Ethernetシールド】Arduinoをネットワークへ繋げる(1)</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Arduino" href="https://blog.mosuke.tech/categories/arduino">Arduino</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ethernet">Ethernet</a>シールドを使ってネットワークへ繋げる。<br>
+とりあえずは、スモールステップでPCとの1対1の通信。</p></p>
+
+<p><div class="section">
+    <h3>PCとの1対1通信</h3>
+    <p>構成図<br>
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140907/20140907231747.png" alt="f:id:mosuke5:20140907231747p:plain" title="f:id:mosuke5:20140907231747p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a></p></p>
+
+<pre><code class="language-c">#include &lt;SPI.h&gt;
+#include &lt;Ethernet.h&gt;
+
+byte MAC[] = {0x90,0xA2,0xDA,0x0F,0x8B,0xA2};
+byte IP[]  = {192,168,11,3};
+
+void setup()
+{
+  Ethernet.begin(MAC,IP);
+}
+
+void loop()
+{
+}
+</code></pre>
+
+<p>疎通確認</p>
+<<<<<<< HEAD
+<pre class="code" data-lang="" data-unlink>
+=======
+
+```
+>>>>>>> 4f3b2c72e32161441359f6d2116c410a27a8faaf
+% ping 192.168.100.3
+PING 192.168.100.3 (192.168.100.3): 56 data bytes
+Request timeout for icmp_seq 0
+64 bytes from 192.168.100.3: icmp_seq=1 ttl=128 time=0.576 ms
+64 bytes from 192.168.100.3: icmp_seq=2 ttl=128 time=0.425 ms
+64 bytes from 192.168.100.3: icmp_seq=3 ttl=128 time=0.302 ms 
+```
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ping">Ping</a>確認ヨシ!!</p>
+<p>一応<a class="keyword" href="http://d.hatena.ne.jp/keyword/ARP">ARP</a>テーブルを見ておく。</p>
+<<<<<<< HEAD
+<pre class="code" data-lang="" data-unlink>
+=======
+
+```
+>>>>>>> 4f3b2c72e32161441359f6d2116c410a27a8faaf
+% arp -a
+? (192.168.100.3) at 90:a2:da:f:8b:a2 on en4 ifscope [ethernet]
+? (192.168.100.255) at ff:ff:ff:ff:ff:ff on en4 ifscope [ethernet] 
+```
+<p>マックアドレスの取得もヨシ!!</p>
+
+<p></div>
+<div class="section">
+    <h3>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>を使って家内LAN接続</h3>
+    <p>実運用では<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>を利用することが圧倒的に多いと思うが、こちらもとても簡単。</p>
+<p>構成図<br>
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140913/20140913110038.png" alt="f:id:mosuke5:20140913110038p:plain" title="f:id:mosuke5:20140913110038p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a>ルータから有線LANケーブルを伸ばし<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>に結線。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>による<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>の取得はとても容易で以下のようにマックアドレスを指定するのみ。</p></p>
+
+<pre><code>Ethernet.begin(mac) 
+</code></pre>
+
+<p>以下は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>公式サイトに則って実施したもの。<br>
+<a href="http://arduino.cc/en/Tutorial/DhcpAddressPrinter">Arduino - DhcpAddressPrinter</a><br>
+</p>
+
+<pre><code class="language-c">#include &lt;SPI.h&gt;
+#include &lt;Ethernet.h&gt;
+
+//Mac Address Static
+byte mac[] = {0x90,0xA2,0xDA,0x0F,0x8B,0xA2};
+
+void setup()
+{
+  // Open serial communications and wait for port to open:
+  Serial.begin(9600);
+
+  // start the Ethernet connection:
+  if (Ethernet.begin(mac) == 0) {
+    Serial.println(&quot;Failed to configure Ethernet using DHCP&quot;);
+    // no point in carrying on, so do nothing forevermore:
+    for(;;)
+      ;
+      
+  }
+  // print your local IP address:
+  Serial.print(&quot;My IP address: &quot;);
+  for (byte thisByte = 0; thisByte &lt; 4; thisByte++) {
+    // print the value of each byte of the IP address:
+    Serial.print(Ethernet.localIP()[thisByte], DEC);
+    Serial.print(&quot;.&quot;); 
+  }
+  Serial.println();
+}
+
+void loop()
+{
+  Serial.println(&quot;abc&quot;);
+  delay(3000);
+}
+</code></pre>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>に<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>が割り当てられたかどうか確認するには、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a>ルータにアクセスし、マックアドレスと<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>のヒモ付のテーブルをみればよい。</p>
+
+<p></div>
+</body></p>
+
+                    </div>
+                </section>
+                
                 
                 
                 <h1 class="content-subhead">21 Jul 2014, 23:19</h1>
@@ -459,299 +868,6 @@ void serialEvent(Serial p){
                 </section>
                 
                 
-                
-                <h1 class="content-subhead">18 May 2014, 14:28</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/05/18/142838/" class="post-title">【雑記】VPSとお別れしました…</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-サーバ" href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90">サーバ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>2012年07月18日から契約していた<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>サーバを本日解約した。<br>
-約２年間の契約していたわけだがちょっと振り返るといろいろあったなーと思う。<br>
-ぼくがまだ大学３年のとき、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B7%A5%E3%A5%EB%A5%D6%A5%C3%A5%AF%A5%DE%A1%BC%A5%AF%A5%B5%A1%BC%A5%D3%A5%B9">ソーシャルブックマークサービス</a>をリリースしたのだが、<br>
-その時はまだエンジニア初心者で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>ではなく共有サーバを利用していた。</p>
-<p>そんなプロジェクトが終わり、次のサービス(<a class="keyword" href="http://d.hatena.ne.jp/keyword/Twitter">Twitter</a>の解析ツール)の開発で初めて<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>環境を与えられたのだが、<br>
-サーバ構築など右も左もわからなかったので、自分の勉強用環境として<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>を契約。VPS環境で行ったこと&gt;<br>
-プロダクトとしては次の３つくらい作った<br>
-・<a class="keyword" href="http://d.hatena.ne.jp/keyword/Amazon">Amazon</a>の最安値段通知サービス<br>
-　自分が欲しい物について希望価格を登録しておくと、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Amazon">Amazon</a>の中古価格が希望価格を下回った時に通知してくれるサービス。<br>
-　個人的には結構好きだったのだが、運用がめんどくさくなって閉鎖。</p>
-<p>・うみなう ー<a class="keyword" href="http://d.hatena.ne.jp/keyword/Twitter">Twitter</a>上の「海なう」画像を眺めようー<br>
-　夏場になると<a class="keyword" href="http://d.hatena.ne.jp/keyword/Twitter">Twitter</a>で「海なう」と水着画像を付けて投稿する人が多い。<br>
-　海なうのキーワードで出てきた画像をただただ眺めるだけのサービス(笑)</p>
-<p>・キニナル ーきになるあの二人のツイートをー<br>
-　<a class="keyword" href="http://d.hatena.ne.jp/keyword/Twitter">Twitter</a>上で気になる二人のツイート時系列で並べて監視するサービス。<br>
-　公開はしていなかったけどちょくちょく身内でみていた。</p>
-<br>
-<p>こんなくだらないサービスを趣味で作っていた。<br>
-その他、仕事で使う新しいツールの実験導入などに利用していた。</p>
-<p>社会人になってからリモートで接続できるサーバを持っている必要がなくなってきたので解約することになったが、<br>
-いろいろと勉強になったし、思い出がおおかったなー。<br>
-またいつか契約する日があることを待ち望んで…</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">17 May 2014, 22:18</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/05/17/221824/" class="post-title">ロードバランサをロードバランスする</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-ネットワーク" href="https://blog.mosuke.tech/categories/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF">ネットワーク</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>ぼくはネットワーク構成については素人です。<br>
-大量の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%D5%A5%A3%A5%C3%A5%AF">トラフィック</a>をさばくためにロードバランサを使うがロードバランサが耐えられない量の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%D5%A5%A3%A5%C3%A5%AF">トラフィック</a>にはどうするか。<br>
-ちょっと疑問に思ったので素人なりにちょろっと考えてみた。</p>
-<p><script async class="speakerdeck-embed" data-id="234d8a90bff301316cad3a6416977627" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">06 May 2014, 19:24</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/05/06/192424/" class="post-title">ER図作成ツール-MySQL Workbench- を使ってみた</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>表題の通りER図作成ツールというものを使ってみた。<br>
-開発をやる現場では当たり前のように使われているのかもしれないけど、ぼくは使ったことなかったです。<br>
-ER図とかテーブル構造は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Excel">Excel</a>でまとめて管理していました。</p>
-<p>きっかけは、ソフトウエアデザインを読んでいてER図作成ツールなるものがでてきたので、便利そうと思ってぐぐってみた。<br>
-調べると主なフリーのER図作成ツールは以下があるっぽい。</p></p>
-
-<p><ol>
-<li>DBDesigner</li>
-<li>A5-SQLmk-2</li>
-<li>AmaterasERD</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a> Workbench</li>
-<li>ERMaster</li>
-</ol>
-<p>(参考)<a href="http://treeapps.hatenablog.com/entry/20110505/p1">http://treeapps.hatenablog.com/entry/20110505/p1</a></p>
-<p>この中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>で使えそうなのが<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a> Workbenchしかなかったのでこちらを利用。<br>
-本当は<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>以外の<a class="keyword" href="http://d.hatena.ne.jp/keyword/DBMS">DBMS</a>にも対応しているものがよかったのだけど…</p>
-<p>ざっと使ってみた感じ以下３つがよいと感じた点。</p>
-<h4>1.ER図作成が容易</h4>ER図作成ツールなのであたりまえなのだが、今まで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Excel">Excel</a>の図形など使っていて書いていたので簡単さに驚き。<br>
-属性についてもそれぞれ型やキー・制約などの設定も記述できる。<p></p>
-<h4>2.<a class="keyword" href="http://d.hatena.ne.jp/keyword/DDL">DDL</a>にすぐにエクスポート可能</h4>作成したER図については<a class="keyword" href="http://d.hatena.ne.jp/keyword/DDL">DDL</a>にすぐにエクスポートできる。<br>
-なので、ツールでER図さえきちんと書けば実際のDB、テーブル構築は一瞬で可能。<p></p>
-<h4>3.イメージ図としてエクスポート可能</h4>作成したER図を<a class="keyword" href="http://d.hatena.ne.jp/keyword/PNG">PNG</a>形式にエクスポートできるので、メンバー等との共有が容易。<br>
-また、ドキュメントとして残す際にもとても使えると思う。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Excel">Excel</a>のシート形式にエクスポートできたらなぁとも思う…<br>
-<p>実際に<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a> Workbenchを使って簡単にER図を作成してみた。<br>
-・ユーザが飲んだお酒を記録していくWebシステムです。<br>
-・利用するにはシステムへのユーザ登録が必要。<br>
-・ユーザはお酒マスターから飲んだお酒を登録する。<br>
-　→同じお酒を何度登録（飲んでも）よい<br>
-・お酒には産地（<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C5%D4%C6%BB">都道</a>府県）を記入する。<br>
-・ユーザは本システムへログイン後の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%AF%A5%BB%A5%B9%A5%ED%A5%B0">アクセスログ</a>が取得される。</p>
-<p>こんなざっくりとした感じ。</p>
-<p>作成したER図はこんな感じに出来上がります（<a class="keyword" href="http://d.hatena.ne.jp/keyword/PNG">PNG</a>）。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140506/20140506191125.png" alt="f:id:mosuke5:20140506191125p:plain" title="f:id:mosuke5:20140506191125p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/DDL">DDL</a>はこんな感じに。</p>
-<pre class="code lang-mysql" data-lang="mysql" data-unlink> &ndash; MySQL Script generated by MySQL Workbench
-&ndash; Tue May  6 19:16:11 2014
-&ndash; Model: New Model    Version: 1.0
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE=&lsquo;TRADITIONAL,ALLOW_INVALID_DATES&rsquo;;</p>
-
-<hr />
-
-<p>&ndash; Schema mydb</p>
-
-<hr />
-
-<p>CREATE SCHEMA IF NOT EXISTS <code>mydb</code> DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
-USE <code>mydb</code> ;</p>
-
-<hr />
-
-<p>&ndash; Table <code>mydb</code>.<code>User</code></p>
-
-<hr />
-
-<p>CREATE TABLE IF NOT EXISTS <code>mydb</code>.<code>User</code> (
-  <code>user_id</code> INT NOT NULL AUTO_INCREMENT,
-  <code>account</code> VARCHAR(45) NOT NULL,
-  <code>password</code> VARCHAR(45) NOT NULL,
-  <code>team_id</code> INT NOT NULL,
-  <code>last_login</code> DATETIME NULL,
-  PRIMARY KEY (<code>user_id</code>),
-  UNIQUE INDEX <code>account_UNIQUE</code> (<code>account</code> ASC))
-ENGINE = InnoDB;</p>
-
-<p>(以下省略)
- </pre>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">30 Mar 2014, 00:43</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/03/30/004337/" class="post-title">データベース、隔離性水準とはなにか</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>データベースには、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>が持つべき<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%C3%C0%AD">特性</a>であるACID<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%C3%C0%AD">特性</a>というものを備えている。<br>
-<b>ACID<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%C3%C0%AD">特性</a></b><br>
-</p>
-<table>
-<tr>
-  <td>A</td>
-  <td>Atomicity</td>
-  <td>原始性</td>
-</tr>
-<tr>
-  <td>C</td>
-  <td>Consistency</td>
-  <td>一貫性</td>
-</tr>
-<tr>
-  <td>I</td>
-  <td>Isolation</td>
-  <td>隔離性</td>
-</tr>
-<tr>
-  <td>D</td>
-  <td>Dirability</td>
-  <td>耐久性</td>
-</tr>
-</table>
-<p>ACID<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%C3%C0%AD">特性</a>については詳しく書かないが、その中に隔離性という以下の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%C3%C0%AD">特性</a>がある。<br>
-「<b>複数の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>を並行して実行しても直列に実行した時と同じ結果になる。<br>
-また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>実行中は変更前の状態として見える。</b>」</p>
-<p>しかし、複数の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>を並列で実行すると、その隔離性を満たさない現象が発生することがある。<br>
-その現象は主に３つある。</p>
-<h4>1. ダーティリード</h4>[概要]<br>
-ある<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>の処理中に、別のユーザがその<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>でまだコミットしてないデータを読み込んでしまう現象のこと。<br>
-Q. 何が問題なの？<br>
-A. 例えばその<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>が<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%EB%A5%D0%A5%C3%A5%AF">ロールバック</a>したとすると、存在しない処理のデータを読み込んでいることになってしまう。<p>[対策]<br>
-対策はシンプルで、まだコミットしていないデータは読み込めないようにするだけ。<br>
-つまり、データを更新するときは「排他ロック」をかけるようにするということ。</p>
-<p></p>
-<h4>2. ノンリピータブルリード</h4>[概要]<br>
-同一<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>内で、一度読み込んだデータを再読み込みすると値が異なる現象。<p>[対策]<br>
-データを読み込むときには「共有ロック」をかけるようにするということ。<br>
-共有ロック中は他<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>から更新はできなくなるのでノンリピータブルリードは起きない。</p>
-<p></p>
-<h4>3. ファントムリード</h4>[概要]<br>
-ある<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>が複数行ある結果を返す検索条件で問合せを2度実行する間に、<br>
-コミットされた別の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>によってその条件を満たす新しい行が挿入されたり、削除された行がでたりする現象。<p>[対策]<br>
-検索結果の範囲に対してロックをかけること。</p>
-<br>
-<p>上記現象が起こらないように<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>の分離レベルが用意されている。</p>
-<p><b><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>の分離レベルと、現象に発生の有無</b><br>
-</p>
-<table>
-<tr>
-  <th>分離レベル</th>
-  <th>ダーティリード</th>
-  <th>ノンリピータブルリード</th>
-  <th>ファントムリード</th>
-</tr>
-<tr>
-  <td>Read Uncommitted</td>
-  <td style="background-color:#fdf7f7;">あり</td>
-  <td style="background-color:#fdf7f7;">あり</td>
-  <td style="background-color:#fdf7f7;">あり</td>
-</tr>
-<tr>
-  <td>Read Committed</td>
-  <td>なし</td>
-  <td style="background-color:#fdf7f7;">あり</td>
-  <td style="background-color:#fdf7f7;">あり</td>
-</tr>
-<tr>
-  <td>Repeatable Read</td>
-  <td>なし</td>
-  <td>なし</td>
-  <td style="background-color:#fdf7f7;">あり</td>
-</tr>
-<tr>
-  <td>Serializable</td>
-  <td>なし</td>
-  <td>なし</td>
-  <td>なし</td>
-</tr>
-</table>
-<p>ここでひとつの疑問が…</p>
-<h4>Q. どの現象も起こらないSerializableに設定してしまえば…！？</h4>当然だがそう簡単にはいかない。<br>
-上の「<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>の分離レベルと、現象に発生の有無」でいえば<br>
-したにいけばいくほど、処理負担が大きく実行スピードが遅くなります。<p>つまりは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>の分離レベルと実行スピードは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%EC%A1%BC%A5%C9%A5%AA%A5%D5">トレードオフ</a>。<br>
-そのときそのときの特徴に合わせて分離レベルを選ばなければならない。</p>
-<p>ちなみに、<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/InnoDB">InnoDB</a>ではデフォルトはRepeatable Read。<br>
-まずは標準のままでよいと思います。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
             </div>
             
 <div class="pagination">
@@ -761,7 +877,7 @@ A. 例えばその<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 13 of 14</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 13 of 15</span>
     
       <a href="/page/14/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>
@@ -787,7 +903,9 @@ A. 例えばその<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%
         </script>
 		    <gcse:search></gcse:search>
     </div>
-    <a href="/archive/">Arvhive</a>
+    <a class="pure-button" href="https://mosuke.tech "><i class="fa fa-user"></i> mosuke5</a>
+    <a class="pure-button" href="/archive/"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml"><i class="fa fa-rss"></i> rss</a>
 </div>
 <div class="footer">
     <div class="pure-menu pure-menu-horizontal pure-menu-open">
@@ -809,7 +927,7 @@ A. 例えばその<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-ga('create', '', 'auto');
+ga('create', 'UA-99596316-1', 'auto');
 ga('send', 'pageview');
 
 </script>
