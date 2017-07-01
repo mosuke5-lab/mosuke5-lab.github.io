@@ -56,6 +56,142 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">04 Jan 2017, 22:35</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2017/01/04/223544/" class="post-title">クラウド上でのWordPressのスケールアウトを考える</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-WordPress" href="https://blog.mosuke.tech/categories/wordpress">WordPress</a><a class="post-category post-category-クラウド" href="https://blog.mosuke.tech/categories/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89">クラウド</a><a class="post-category post-category-AWS" href="https://blog.mosuke.tech/categories/aws">AWS</a><a class="post-category post-category-Alibaba Cloud" href="https://blog.mosuke.tech/categories/alibaba-cloud">Alibaba Cloud</a><a class="post-category post-category-分散" href="https://blog.mosuke.tech/categories/%E5%88%86%E6%95%A3">分散</a><a class="post-category post-category-スケールアウト" href="https://blog.mosuke.tech/categories/%E3%82%B9%E3%82%B1%E3%83%BC%E3%83%AB%E3%82%A2%E3%82%A6%E3%83%88">スケールアウト</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>複数台サーバでの<a class="keyword" href="http://d.hatena.ne.jp/keyword/WordPress">WordPress</a>の構築・運用について考える。<br>
+実際に、とある<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>で分散環境の<a class="keyword" href="http://d.hatena.ne.jp/keyword/WordPress">WordPress</a>を構築したのでその知見をまとめる。<br>
+なるべく特定の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>に特価しないものとして記載したい。</p></p>
+
+<h1>やりたいこと</h1>
+
+<ul>
+<li>スケールアウトできる<a class="keyword" href="http://d.hatena.ne.jp/keyword/WordPress">WordPress</a>環境を作る</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSL">SSL</a>に対応する</li>
+<li>HTTP/2に対応する</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>などの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>環境で構築する</li>
+</ul>
+
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a></h1>
+
+<p>まず先に全体の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>図から示す。<br>
+これから各項目について解説していく。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20170104185455.png"></span></p>
+
+<h1>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSL">SSL</a>・HTTP/2への対応</h1>
+
+<p>まず<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSL">SSL</a>への対応だが、通常ならばロードバランサを<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSL">SSL</a>の終端とし下記のような構成にすることが多いだろう。<br>
+この場合はロードバランサをL7のものとして稼働させる。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20170104190001.png"></span></p>
+
+<p>しかし、HTTP/2に対応しようと思うと事情は異なってくる。<br>
+（もちろん、最近では<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>のALBのようにHTTP/2に対応する製品がでてきているのは承知だが。）<br>
+現在の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>で利用できるロードバランサの多くはまだHTTP/2に対応していない。<br>
+そのため、ロードバランサをL4として稼働させ、配下のWebサーバにてHTTP/2を処理する必要がでてくる。<br>
+この場合、ロードバランサは<a class="keyword" href="http://d.hatena.ne.jp/keyword/TCP">TCP</a>でポート443を待ち受けるようにし、配下のWebサーバへポート443のままでフォワードすればいい。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20170104185953.png"></span></p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>環境ではWebサーバがスケールすることは前提にいれることがおおい。<br>
+そのため、この場合の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSL%BE%DA%CC%C0%BD%F1">SSL証明書</a>はN台に対応した製品を買う必要がある。<br>
+例えば以下のような製品など。</p>
+
+<ul>
+<li><a href="https://www.cybertrust.ne.jp/sureserver/productinfo/cloud.html">SureServer for クラウド｜Cybertrust.ne.jp</a></li>
+</ul>
+
+<h1>データベースの分離</h1>
+
+<p>分散環境での<a class="keyword" href="http://d.hatena.ne.jp/keyword/Wordpress">Wordpress</a>では共通したコンテンツを配信するため、データベースはもちろんWebサーバとは分離したほうがいい。<br>
+それぞれのWebサーバは共通のデータベースを見に行くべきだ。<br>
+データベースを自前で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BE%E9%C4%B9%B2%BD">冗長化</a>しても構わないが、それなりの運用コストがかかることは容易に想像がつくので、<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>のマネージドデータベースサービスを利用した。</p>
+
+<ul>
+<li><a href="https://aws.amazon.com/jp/rds/">Amazon RDS（クラウドでのリレーショナルデータベースサービス） | AWS</a></li>
+<li><a href="https://jp.aliyun.com/product/apsaradb-for-rds">ApsaraDB for RDS - データベースホスティング | Alibaba Cloud</a></li>
+</ul>
+
+<h1>管理画面</h1>
+
+<p>管理画面のみを分離する<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>も考えられるが、ここではそうしないこととする。<br>
+管理画面へのログインセッションの保持は、別途KVS(Redisや<a class="keyword" href="http://d.hatena.ne.jp/keyword/Memcached">Memcached</a>)に保存してもいいと思う。<br>
+ですが、WordPress4.0以降ではデフォルトでは<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>へセッションを保存するので必須の対応ではないといえる。</p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=https%3A%2F%2Fgithub.com%2FWordPress%2FWordPress%2Fblob%2Fdd6da701b286579819cd6aa518aa2d7018efd759%2Fwp-includes%2Fclass-wp-user-meta-session-tokens.php" title="WordPress/WordPress" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://github.com/WordPress/WordPress/blob/dd6da701b286579819cd6aa518aa2d7018efd759/wp-includes/class-wp-user-meta-session-tokens.php">github.com</a></cite></p>
+
+<h1>記事で使うアップロード画像などの対応</h1>
+
+<p>管理画面から記事を投稿するとする。<br>
+記事のデータはデータベースに保存されるためどのWebサーバからも記事を参照できる。<br>
+しかし、記事に含まれる画像データはどうだろうか。</p>
+
+<p>通常の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Wordpress">Wordpress</a>では管理画面サーバの<code>/wp-content/uploads</code>以下に画像を保存する。<br>
+複数台Webサーバがある状態で、たまたまアクセスしているサーバに画像を保存しても、他のサーバからは参照することができない。</p>
+
+<p>これに対するソリューションはいくつかあるだろう。<br>
+例えば、<a class="keyword" href="http://d.hatena.ne.jp/keyword/rsync">rsync</a>などを使って他のサーバと画像ファイルを同期するとか、画像用のストレージを用意し<a class="keyword" href="http://d.hatena.ne.jp/keyword/NFS">NFS</a>で参照するとか。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BE%E9%C4%B9%B2%BD">冗長化</a>の観点からもここはオブジェクトストレージのサービスを利用するのがいいだろう。</p>
+
+<p>例えば、下記のような製品だ。</p>
+
+<ul>
+<li><a href="https://aws.amazon.com/jp/s3/">Amazon S3 (スケーラブルなクラウドストレージサービス ) | AWS</a></li>
+<li><a href="https://jp.aliyun.com/product/oss">Object Storage Service (OSS) - Alibaba Cloud の拡張性に優れた安全なクラウドストレージ | Alibaba Cloud</a></li>
+</ul>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>のオブジェクトストレージと<a class="keyword" href="http://d.hatena.ne.jp/keyword/WordPress">WordPress</a>を連携する<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%E9%A5%B0%A5%A4%A5%F3">プラグイン</a>は多く出ている。</p>
+
+<ul>
+<li><a href="https://wordpress.org/plugins/nephila-clavata/">Nephila clavata — WordPress Plugins</a></li>
+</ul>
+
+<h1>デプロイへの対応</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Wordpress">Wordpress</a>のコードのデプロイ、Webサーバの設定変更などにどう対応するか。<br>
+ツールはなんでもいいが（<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%A7%A5%EB%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">シェルスクリプト</a>でもいいし、Ansible,Chefなどでも）、<br>
+デプロイツールなど用いて全台サーバにデプロイできるようにしておくといいだろう。あたりまえ。<br>
+影響の大きいデプロイをするときは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%C9%A5%D0%A5%E9%A5%F3%A5%B5%A1%BC">ロードバランサー</a>から切り離してデプロイ、テストとやるといいと思う。<br>
+あるいは、新しく構築（デプロイ）した別のWebサー<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4">バイ</a>ンスタンスを用意し、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%C9%A5%D0%A5%E9%A5%F3%A5%B5%A1%BC">ロードバランサー</a>で向き先を変更してもいい。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%C9%A5%D0%A5%E9%A5%F3%A5%B5%A1%BC">ロードバランサー</a>配下のWebサーバはプライベートネットワークに配置しておりインターネットから直接アクセスできない。<br>
+そのため、デプロイサーバを用意することでデプロイできるようにした。<br>
+あるいは、踏み台サーバを用意して、多段<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>を使ってもいいかもしれない。</p>
+
+<h1>さいごに</h1>
+
+<p><p>他にも、工夫した点などはあるが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/WordPress">WordPress</a>のスケールアウトという点に絞って簡単にまとめた。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/OSS">OSS</a>の利用は簡単だが、そのスケールや<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BE%E9%C4%B9%B2%BD">冗長化</a>は毎度悩まさせると感じる。<br>
+以前もGitlabを運用してた時に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BE%E9%C4%B9%B2%BD">冗長化</a>をどうするか考えていたのを思い出す。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">25 Dec 2016, 14:27</h1>
                 <section class="post">
                     <header class="post-header">
@@ -924,116 +1060,6 @@ if文を１行追加するだけだろ…って思うようなものでも数百
 <span itemscope itemtype="http://schema.org/Photograph"><a href="http://f.hatena.ne.jp/mosuke5/20160729160810" class="hatena-fotolife" itemprop="url"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160729/20160729160810.jpg" alt="f:id:mosuke5:20160729160810j:image" title="f:id:mosuke5:20160729160810j:image" class="hatena-fotolife" itemprop="image"></a></span></p>
 
 <p><p><span itemscope itemtype="http://schema.org/Photograph"><a href="http://f.hatena.ne.jp/mosuke5/20160729160817" class="hatena-fotolife" itemprop="url"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160729/20160729160817.jpg" alt="f:id:mosuke5:20160729160817j:image" title="f:id:mosuke5:20160729160817j:image" class="hatena-fotolife" itemprop="image"></a></span></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">26 Jul 2016, 21:59</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2016/07/26/215939/" class="post-title">【めも】httpヘッダー、x-forwarded-forとか任意のヘッダーとか</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-httpヘッダー" href="https://blog.mosuke.tech/categories/http%E3%83%98%E3%83%83%E3%83%80%E3%83%BC">httpヘッダー</a><a class="post-category post-category-Nginx" href="https://blog.mosuke.tech/categories/nginx">Nginx</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>ただのめも。</p></p>
-
-<p>もともと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>+<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>で動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになった。（理由はここではどうでもいいので書かない）<br>
-つまり、Nginx-&gt;<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>-&gt;<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>という構成になった。<br>
-よくあることだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>からみるとすべてリバースプロキシから通信がきているので、
-接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>がすべてリバースプロキシのものになる。</p>
-
-<p>HTTPヘッダーに接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を追加しアプリ側（<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>）で受け取ろうとしたときのめも。</p>
-
-<h1>リバースプロキシ側でHTTPヘッダー追加</h1>
-
-<p>まず、そもそもデフォルトのNginxの設定では接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>をHTTPヘッダーに含まれない。<br>
-ググればすぐに設定方法自体はでてくる。<br>
- X-Forwarded-Forというヘッダー名にNginxでもっている変数$proxy_add_x_forwarded_forをつっこむ。</p>
-
-<pre><code>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
-</code></pre>
-
-<p>設定は簡単なんだけど、そもそもX-Forwarded-Forなんていうヘッダーあったっけ。。。？<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Wikipedia">Wikipedia</a>でみる。</p>
-
-<blockquote><p>X-Forwarded-For (XFF) とは、HTTPヘッダフィールドの一つ。HTTPプロキシサーバまたは負荷分散装置（ロードバランサ）を経由してウェブサーバに接続するクライアントの送信元<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を特定する際の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%D5%A5%A1%A5%AF%A5%C8%A5%B9%A5%BF%A5%F3%A5%C0%A1%BC%A5%C9">デファクトスタンダード</a>である。
-（略）<a class="keyword" href="http://d.hatena.ne.jp/keyword/RFC">RFC</a>の標準的なヘッダフィールドではないが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/IETF">IETF</a>のネットワーク作業部会 (Network Working Group) は2011年10月より同種のHTTPヘッダForwardedの標準化作業を開始した[1]。</p></blockquote>
-
-<p>なるほど、<a class="keyword" href="http://d.hatena.ne.jp/keyword/RFC">RFC</a>の標準ではないけど、一般的なものなんですね。</p>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>でX-Forwarded-Forを受け取る</h1>
-
-<p>というわけで、おりゃ！</p>
-
-<pre><code class="language-php">echo $_SERVER['X-Forwarded-For'];
-</code></pre>
-
-<p>エラー...<br>
-※普段<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>使ってないのがバレますね。</p>
-
-<p>サーバ変数とりあえず、全部はきだす。</p>
-
-<pre><code class="language-php">&lt;?php
-var_dump($_SERVER);
-
-# array(x) { [&quot;HTTP_X_FORWARDED_FOR&quot;] =&gt; string(12) &quot;192.168.33.1&quot; ...... }
-</code></pre>
-
-<p>HTTP先頭についてて、大文字になってて、ハイフンがアンスコに変わっている。<br>
-あたりまえだけどこれは<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>の仕様でいいんだよな...？</p>
-
-<pre><code class="language-php">&lt;?php
-var_dump(getallheaders());
-
-# array(x) { [&quot;X-Forwarded-For&quot;] =&gt; string(12) &quot;192.168.33.1&quot; ...... }
-</code></pre>
-
-<p>サーバ変数にいれるときに、変わるんだわ。</p>
-
-<h1>念のため<a class="keyword" href="http://d.hatena.ne.jp/keyword/tcpdump">tcpdump</a>で軽く確認してみる</h1>
-
-<pre><code>$ sudo yum install tcpdump
-$ tcpdump dst port 80 -X
-
-# ながいんで適当に端折りました
-11:04:01.883209 IP 10.0.2.15.43038 &gt; 192.168.0.10.54655: Flags [.], seq 802:1603, ack 1, win 14600, length 1460
-     (略)
-     0x0000:  4500 0355 c705 0000 3706 24ca adc2 265f  1.0..X-Forwarded
-     0x0010:  c0a8 000a 0050 d57f 51ad 1e62 e596 78a4  -For:.192.168.33
-     0x0020:  8018 0137 8dbe 0000 0101 080a d1dc c19e  .1..Host:.xxxxxx 
-</code></pre>
-
-<p>いたいた。<br>
-Nginxからプロキシされるときはちゃんとヘッダー名は"X-Forwarded-For "になっていること確認。</p>
-
-<h1>任意の適当なHTTPヘッダーつけてみた</h1>
-
-<pre><code>proxy_set_header my-header 'hogefugafoobar'; 
-</code></pre>
-
-<pre><code class="language-php">var_dump($_SERVER);
-
-# array(35) { [&quot;HTTP_MY_HEADER&quot;] =&gt; string(14) &quot;hogefugafoobar&quot; ...... }
-</code></pre>
-
-<p><p>ふーん、なるほどな&hellip;</p>
 </body></p>
 
                     </div>

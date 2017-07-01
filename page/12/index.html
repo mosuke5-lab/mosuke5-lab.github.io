@@ -56,6 +56,62 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">18 Nov 2014, 22:55</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2014/11/18/225542/" class="post-title">Ansible、コマンドでワイルドカードを使うときの注意</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>AnsibleのPlaybookを書いていると、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EF%A5%A4%A5%EB%A5%C9%A5%AB%A1%BC%A5%C9">ワイルドカード</a>を含んだコマンドを実行したい時がある。<br>
+そんなときあるところでハマった。</p>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>をソースインストールして、パスを/usr/sbinにリンクを貼ろうとして以下を実行した。</p></p>
+
+<pre><code class="language-yaml">- command: ln -s /usr/local/httpd/bin/* /usr/sbin
+</code></pre>
+
+<p>/usr/sbin内に「*」というリンクが貼られてしまった。</p>
+
+<pre><code>* -&gt; /usr/local/httpd/bin 
+</code></pre>
+
+<p><p>どうやらcommandモジュールは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EF%A5%A4%A5%EB%A5%C9%A5%AB%A1%BC%A5%C9">ワイルドカード</a>に対応していないよう。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EF%A5%A4%A5%EB%A5%C9%A5%AB%A1%BC%A5%C9">ワイルドカード</a>を使いたいときはshellモジュールを利用すると良い。</p></p>
+
+<pre><code class="language-yaml">- shell: ln -s /usr/local/httpd/bin/* /usr/sbin
+</code></pre>
+
+<p><p>また、*というリンクを消すときは要注意（笑）</p></p>
+
+<pre><code>$ rm ./* 
+</code></pre>
+
+<p><p>とやってしまうとあたりまえだがやばいので</p></p>
+
+<pre><code>$ rm ./¥* 
+</code></pre>
+
+<p><p>こうですね…</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">16 Nov 2014, 15:32</h1>
                 <section class="post">
                     <header class="post-header">
@@ -459,207 +515,6 @@ Server hoge/web11 is UP. 2 active and 0 backup servers online. 0 sessions requeu
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%AB%C2%F0%A5%B5%A1%BC%A5%D0">自宅サーバ</a>を公開するときに使う<a class="keyword" href="http://d.hatena.ne.jp/keyword/DDNS">DDNS</a>や固定IP。<br>
 それが必要な理由について図解的にまとめ。それだけ。</p>
 <p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141019/20141019170702.png" alt="f:id:mosuke5:20141019170702p:plain" title="f:id:mosuke5:20141019170702p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">09 Oct 2014, 23:05</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/10/09/230555/" class="post-title">【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-CentOS7" href="https://blog.mosuke.tech/categories/centos7">CentOS7</a><a class="post-category post-category-Nginx" href="https://blog.mosuke.tech/categories/nginx">Nginx</a><a class="post-category post-category-Vagrant" href="https://blog.mosuke.tech/categories/vagrant">Vagrant</a><a class="post-category post-category-リバースプロキシ" href="https://blog.mosuke.tech/categories/%E3%83%AA%E3%83%90%E3%83%BC%E3%82%B9%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7">リバースプロキシ</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-VPS" href="https://blog.mosuke.tech/categories/vps">VPS</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>ロードバランシングとか<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF%A5%EA%A5%F3%A5%B0">クラスタリング</a>とかリバースプロキシとか、<br>
-業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりない。</p>
-<p>自分で構築してみたいなーと思いつつもあたりまえだけど、サーバやネットワーク機器をそう簡単に調達もできない。<br>
-お金も当然ない。</p>
-<p>というわけで、さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>で仮想化つかってロードバランシングとか<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF%A5%EA%A5%F3%A5%B0">クラスタリング</a>とかリバースプロキシとか勉強しましょうという「サーバインフラ会」を友人と始めた。<br>
-その第１回目のメモ。</p>
-<p>第1回 サーバ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">複数</a>台構成、Nginxでリバースプロキシ構築<br>
-第2回 <a href="https://blog.mosuke.tech/entry/2014/11/09/171436">HAProxyでロードバランサ構築</a></p>
-<p></p>
-<div style="border: solid 1px #dddddd;"></div></p>
-
-<p><div class="section">
-    <h2>1. 使用した環境</h2>
-    <p>まず今回利用した環境は以下のとおり。<br>
-さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>の1GBのプラン。<br>
-・メモリ：１GB<br>
-・CPU：仮想２コア<br>
-・HDD：100GB<br>
-・OS：CentOS7<br>
-・仮想化：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a><br>
-　→dockerなどもはじめ検討していたが、コンテナ型仮想化だとサーバ感がでないので、よりサーバとして意識できる<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>を採用</p>
-<p>【参考】<br>
-<a href="http://vps.sakura.ad.jp/specification.html">料金・サービス仕様 | VPS（仮想専用サーバ）は「さくらのVPS」</a><br>
-</p></p>
-
-<p></div>
-<div class="section">
-    <h2>2. 完成イメージ・物理イメージ</h2>
-    <p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140930/20140930210924.png" alt="f:id:mosuke5:20140930210924p:plain" title="f:id:mosuke5:20140930210924p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p></p>
-<div style="border: solid 1px #dddddd;"></div>
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140930/20140930210914.png" alt="f:id:mosuke5:20140930210914p:plain" title="f:id:mosuke5:20140930210914p:plain" class="hatena-fotolife" itemprop="image"></span><br>
-</p></p>
-
-<p></div>
-<div class="section">
-    <h2>3. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>でWebサーバ２台分を構築する</h2>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>の詳細な利用方法は公式ドキュメントをみてもらうとするが、セットアップまでのひととおりの流れと注意点のみ記載する。<br>
-<a href="https://docs.vagrantup.com/v2/">Vagrant Documentation</a></p>
-<p>今回はWebサーバ２台を仮想で実現するので、それぞれweb1, web2とする。<br>
-それぞれのディレクトリを作成。</p></p>
-
-<pre><code>## web1, web2のディレクトリ作成
-$ pwd
-/home/vagrant
-$ mkdir web1
-$ mkdir web2
-
-## 仮想化で利用するOSイメージをダウンロード
-$ vagrant box add ubuntu1310 ¥
-http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-13.10_chef-provisionerless.box
-
-## web1サーバ構築
-$ cd web1
-$ vagrant init ubuntu1310
-
-## ほぼほぼデフォルトの設定だが以下２つだけは設定を行った。
-$ vim Vagrantfile
-# (1)プライベートアドレスの割り当て。
-config.vm.network &quot;private_network&quot;, ip: &quot;192.168.33.10&quot;
-
-# (2)1GBしかメモリがないのでこの設定をしないと２つ仮想化するとだいぶ大変なことになりました。
-config.vm.provider &quot;virtualbox&quot; do |vb|
-     vb.customize [&quot;modifyvm&quot;, :id, &quot;--memory&quot;, &quot;128&quot;]
-end
-
-$ vagrant ssh
- 
-</code></pre>
-
-<p>同様にweb2においても同じことを行った。</p>
-<p>また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>では一般的に対象のディレクトリで<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>を利用してサーバに入るが、<br>
-今回はプライベートアドレスも振ってあるし、物理サーバとしてイメージしているので以下のようにしてサーバにはいるようにした。</p>
-```
-$ ssh vagrant@192.168.33.10  # web1への接続
-$ ssh vagrant@192.168.33.11  # web2への接続 
-```
-<p>ホストサーバ側の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BF%A1%BC%A5%D5%A5%A7%A5%A4%A5%B9">インターフェイス</a>情報をみると。</p>
-```
-# cent7なので以下コマンドだがifconfig -aのこと
-$ ip a 
-(中略)
-5: vboxnet0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UNKNOWN qlen 1000
-    link/ether 0a:00:27:00:00:00 brd ff:ff:ff:ff:ff:ff
-    inet 192.168.33.1/24 brd 192.168.33.255 scope global vboxnet0
-       valid_lft forever preferred_lft forever
-    inet 192.168.56.101/24 brd 192.168.56.255 scope global dynamic vboxnet0
-       valid_lft 839sec preferred_lft 839sec
-    inet6 fe80::800:27ff:fe00:0/64 scope link
-       valid_lft forever preferred_lft forever 
-```
-<p>vboxnet0という仮想の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BF%A1%BC%A5%D5%A5%A7%A5%A4%A5%B9">インターフェイス</a>が作成され、<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>も192.168.33.1が振られていることを確認。</p>
-<p>ルーティングテーブルも確認しておくと</p>
-```
-$ netstat -rn
-Kernel IP routing table
-Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
-0.0.0.0         153.120.2.1     0.0.0.0         UG        0 0          0 eth0
-153.120.2.0     0.0.0.0         255.255.254.0   U         0 0          0 eth0
-192.168.33.0    0.0.0.0         255.255.255.0   U         0 0          0 vboxnet0 
-```
-<p>192.168.33.0/24行はvboxnet0から出るように設定されている。</p>
-<p>上の物理イメージに詳細書き込むと以下。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141006/20141006000246.png" alt="f:id:mosuke5:20141006000246p:plain" title="f:id:mosuke5:20141006000246p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p></p>
-<div style="border: solid 1px #dddddd;"></div>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>のみインスールする必要があるので、<br>
-web1, web2で以下を実施。（プロビジョニングしたほうが後々楽です。）</p>
-```
-$ sudo apt-get apache2
-
-##どちらがweb1でどちらがweb2か区別するために以下ファイルは変えておきます。
-$ sudo vim /var/www/index.html
-#Web1とかWeb2とかわかりやすい文言を入れておきます。
-
-##Apache起動
-$ sudo service apache2 start
-
-##Apache起動確認
-$ curl localhost
-　上記で変更したindex.htmlの内容が表示されること  
-```
-<p>これでWebサーバの準備は完了。</p>
-
-<p></div>
-<div class="section">
-    <h2>4, Nginxでリバースプロキシサーバを構築する</h2>
-    <p>Nginx初めて触ったがとてもシンプル。<br>
-今回はNginxをリバースプロキシとして利用したので、proxy.confを作成するだけ。</p></p>
-
-<pre><code>##インスール
-$ sudo yum install nginx
-
-## /etc/nginx以下に設定ファイルなどあること確認
-$ ls /etc/nginx
-
-## プロキシ構築のための設定ファイル作成
-$ cd /etc/nginx/conf.d
-$ sudo vim proxy.conf
-server {
-
-    # /web1にアクセスが来た時
-    location /web1 {
-
-	proxy_http_version 1.1;
-
-	#受け渡す際のヘッダ情報を指定
-	proxy_set_header Host $host:$server_port;
-	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded_Proto http;
-
-        # 飛ばす先のURL(Web1サーバ)
-        proxy_pass http://192.168.33.10/;
-    }
-
-    # /web2にアクセスが来た時
-    location /web2 {
-
-	proxy_http_version 1.1;
-
-	#受け渡す際のヘッダ情報を指定
-	proxy_set_header Host $host:$server_port;
-	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded_Proto http;
-
-        # 飛ばす先のURL(Web2サーバ)
-	proxy_pass http://192.168.33.11/;
-    }
-}
-
-## あとは起動させるのみ
-$ sudo systemctl enable nginx
-$ sudo systemctl start nginx 
-</code></pre>
-
-<p></div>
 </body></p>
 
                     </div>

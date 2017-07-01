@@ -56,6 +56,116 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">26 Jul 2016, 21:59</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2016/07/26/215939/" class="post-title">【めも】httpヘッダー、x-forwarded-forとか任意のヘッダーとか</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-httpヘッダー" href="https://blog.mosuke.tech/categories/http%E3%83%98%E3%83%83%E3%83%80%E3%83%BC">httpヘッダー</a><a class="post-category post-category-Nginx" href="https://blog.mosuke.tech/categories/nginx">Nginx</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>ただのめも。</p></p>
+
+<p>もともと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>+<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>で動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになった。（理由はここではどうでもいいので書かない）<br>
+つまり、Nginx-&gt;<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>-&gt;<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>という構成になった。<br>
+よくあることだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>からみるとすべてリバースプロキシから通信がきているので、
+接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>がすべてリバースプロキシのものになる。</p>
+
+<p>HTTPヘッダーに接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を追加しアプリ側（<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>）で受け取ろうとしたときのめも。</p>
+
+<h1>リバースプロキシ側でHTTPヘッダー追加</h1>
+
+<p>まず、そもそもデフォルトのNginxの設定では接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>をHTTPヘッダーに含まれない。<br>
+ググればすぐに設定方法自体はでてくる。<br>
+ X-Forwarded-Forというヘッダー名にNginxでもっている変数$proxy_add_x_forwarded_forをつっこむ。</p>
+
+<pre><code>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+</code></pre>
+
+<p>設定は簡単なんだけど、そもそもX-Forwarded-Forなんていうヘッダーあったっけ。。。？<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Wikipedia">Wikipedia</a>でみる。</p>
+
+<blockquote><p>X-Forwarded-For (XFF) とは、HTTPヘッダフィールドの一つ。HTTPプロキシサーバまたは負荷分散装置（ロードバランサ）を経由してウェブサーバに接続するクライアントの送信元<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を特定する際の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%D5%A5%A1%A5%AF%A5%C8%A5%B9%A5%BF%A5%F3%A5%C0%A1%BC%A5%C9">デファクトスタンダード</a>である。
+（略）<a class="keyword" href="http://d.hatena.ne.jp/keyword/RFC">RFC</a>の標準的なヘッダフィールドではないが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/IETF">IETF</a>のネットワーク作業部会 (Network Working Group) は2011年10月より同種のHTTPヘッダForwardedの標準化作業を開始した[1]。</p></blockquote>
+
+<p>なるほど、<a class="keyword" href="http://d.hatena.ne.jp/keyword/RFC">RFC</a>の標準ではないけど、一般的なものなんですね。</p>
+
+<h1>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>でX-Forwarded-Forを受け取る</h1>
+
+<p>というわけで、おりゃ！</p>
+
+<pre><code class="language-php">echo $_SERVER['X-Forwarded-For'];
+</code></pre>
+
+<p>エラー...<br>
+※普段<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>使ってないのがバレますね。</p>
+
+<p>サーバ変数とりあえず、全部はきだす。</p>
+
+<pre><code class="language-php">&lt;?php
+var_dump($_SERVER);
+
+# array(x) { [&quot;HTTP_X_FORWARDED_FOR&quot;] =&gt; string(12) &quot;192.168.33.1&quot; ...... }
+</code></pre>
+
+<p>HTTP先頭についてて、大文字になってて、ハイフンがアンスコに変わっている。<br>
+あたりまえだけどこれは<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>の仕様でいいんだよな...？</p>
+
+<pre><code class="language-php">&lt;?php
+var_dump(getallheaders());
+
+# array(x) { [&quot;X-Forwarded-For&quot;] =&gt; string(12) &quot;192.168.33.1&quot; ...... }
+</code></pre>
+
+<p>サーバ変数にいれるときに、変わるんだわ。</p>
+
+<h1>念のため<a class="keyword" href="http://d.hatena.ne.jp/keyword/tcpdump">tcpdump</a>で軽く確認してみる</h1>
+
+<pre><code>$ sudo yum install tcpdump
+$ tcpdump dst port 80 -X
+
+# ながいんで適当に端折りました
+11:04:01.883209 IP 10.0.2.15.43038 &gt; 192.168.0.10.54655: Flags [.], seq 802:1603, ack 1, win 14600, length 1460
+     (略)
+     0x0000:  4500 0355 c705 0000 3706 24ca adc2 265f  1.0..X-Forwarded
+     0x0010:  c0a8 000a 0050 d57f 51ad 1e62 e596 78a4  -For:.192.168.33
+     0x0020:  8018 0137 8dbe 0000 0101 080a d1dc c19e  .1..Host:.xxxxxx 
+</code></pre>
+
+<p>いたいた。<br>
+Nginxからプロキシされるときはちゃんとヘッダー名は"X-Forwarded-For "になっていること確認。</p>
+
+<h1>任意の適当なHTTPヘッダーつけてみた</h1>
+
+<pre><code>proxy_set_header my-header 'hogefugafoobar'; 
+</code></pre>
+
+<pre><code class="language-php">var_dump($_SERVER);
+
+# array(35) { [&quot;HTTP_MY_HEADER&quot;] =&gt; string(14) &quot;hogefugafoobar&quot; ...... }
+</code></pre>
+
+<p><p>ふーん、なるほどな&hellip;</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">03 Jul 2016, 22:45</h1>
                 <section class="post">
                     <header class="post-header">
@@ -486,101 +596,6 @@ bind - split-window -v
 
 <p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AD%A1%BC%A5%D0%A5%A4%A5%F3%A5%C9">キーバインド</a>でペインのサイズ自由自在！
 <span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160415/20160415000811.gif" alt="f:id:mosuke5:20160415000811g:plain" title="f:id:mosuke5:20160415000811g:plain" class="hatena-fotolife" itemprop="image"></span></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">28 Mar 2016, 18:16</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2016/03/28/181636/" class="post-title">HerokuをRailsアプリのステージング環境として使う</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Rails" href="https://blog.mosuke.tech/categories/rails">Rails</a><a class="post-category post-category-heroku" href="https://blog.mosuke.tech/categories/heroku">heroku</a><a class="post-category post-category-ステージング" href="https://blog.mosuke.tech/categories/%E3%82%B9%E3%83%86%E3%83%BC%E3%82%B8%E3%83%B3%E3%82%B0">ステージング</a><a class="post-category post-category-staging" href="https://blog.mosuke.tech/categories/staging">staging</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>趣味で作っているアプリ(<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>)があるのだが、はじめHerokuで運用しようと検討していたが、 <br>
-データ量が多いためすぐにHobbyプランでは対応できなくなってしまった。<br>
-仕方ないので、別のアプリで持っている<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>をProduction環境とすることにしたのだが、<br>
-せっかくなのでherokuもうまく使いたいなーと思ってステージング環境として使うことにした。</p></p>
-
-<p>そのときにやったことをメモする。</p>
-
-<h1>Staging環境の設定を作る</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>ではデフォルトではdevelopment, test, productionの環境を持っている。<br>
-そこに今回、stagingという環境を追加した。<br>
-そして、herokuではデフォルトではproductionを利用するようになっているのでstagingに切り替えるだけ。</p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>側はstaging環境追加。</p>
-
-<pre><code>$ vim config/database.yml
-# 下記を追加した
-staging:
-  &lt;&lt;: *default
-  adapter: postgresql
-  encoding: unicode
-  database:
-  pool: 5
-  username:
-  password:
-
-$ vim config/enviroments/staging.rb
-# 基本的にはproduction.rbをコピーし、必要に応じて設定を変更
-
-$ vim config/secrets.yml
-# 必要に応じてstagingを追加 
-</code></pre>
-
-<p>heroku側はステージングへの切り替え。</p>
-
-<pre><code>$ heroku config --app app-name    # デフォではproductionになってる
-RAILS_ENV:                production
-$ heroku config:set RAILS_ENV=staging --app app-name
-$ heroku config --app app-name
-RAILS_ENV:                staging 
-</code></pre>
-
-<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/Basic%C7%A7%BE%DA">Basic認証</a></h1>
-
-<p>ステージング環境なので、外部から簡単にアクセス出来ないように<a class="keyword" href="http://d.hatena.ne.jp/keyword/Basic%C7%A7%BE%DA">Basic認証</a>をかけた。<br>
-いくつかやり方があると思うが、<code>app/controllers/application_controller.rb</code>に設定を追加した。<br>
-ユーザ名とパスワードをベタ書きだと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>に上げてる場合は丸見えになってしまうので<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>でやりましょう。</p>
-
-<pre><code class="language-ruby">http_basic_authenticate_with :name =&gt; ENV['BASIC_AUTH_USERNAME'], :password =&gt; ENV['BASIC_AUTH_PASSWORD'] if Rails.env == &quot;staging&quot;
-</code></pre>
-
-<p>heroku側では<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>を設定してあげる。</p>
-
-<pre><code>$ heroku config:set BASIC_AUTH_USERNAME=&quot;xxxxx&quot; BASIC_AUTH_PASSWORD=&quot;xxxxx&quot; --app app-name
-$ heroku config --app app-name
-BASIC_AUTH_PASSWORD:      xxxxx
-BASIC_AUTH_USERNAME:      xxxxx 
-</code></pre>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>連携で自動デプロイ</h1>
-
-<p>今更ながら<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>と連携した自動デプロイ機能があることを知った…<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>へ<code>git push origin master</code>すればheroku側にも反映される機能だ。<br>
-昔使った時には<code>git push origin master</code>と<code>git push heroku master</code>と２回コマンド打ってたのでめんどいなーと思ってた。<br>
-デプロイが楽なのでステージング環境としてはほんとに優秀だと思う。</p>
-
-<p><p><a href="http://kayakuguri.github.io/blog/2015/02/10/heroku-github-sync/">[heroku]githubから自動でherokuにデプロイ - KayaMemo</a></p>
 </body></p>
 
                     </div>

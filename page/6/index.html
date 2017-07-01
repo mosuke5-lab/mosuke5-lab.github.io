@@ -56,6 +56,121 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">25 Jan 2016, 22:21</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2016/01/25/222150/" class="post-title">Vagrant×Ansible環境の３つのスタイルとそのメリット・デメリットについて</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-Vagrant" href="https://blog.mosuke.tech/categories/vagrant">Vagrant</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>×Ansibleで開発環境を作っているみなさんは、
+どんなふうにそれを実現していますか？</p></p>
+
+<p>きっといくつかのやり方、考え方があると思います。<br>
+例えば、ご自身のPCにAnsibleをインストールして<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>の仮想環境にプロビジョニングしているとか。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で立てた仮想環境にAnsibleを入れて実行するとか。</p>
+
+<p>本ブログでは下記３つの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>×Ansibleのやり方に注目し、<br>
+そのメリット・デメリットについて自分なりにまとめます。</p> 
+<ol>
+<li><b>ホストにAnsibleをインストールして利用する</b></li>
+<li><b>ゲストにAnsibleをインストールして利用する</b></li>
+<li><b>Ansible実行用のゲストを作って利用する</b></li>
+</ol>
+
+
+<h1>1. ホストにAnsibleをインストールして利用する</h1>
+
+<h2>概要</h2>
+
+<p>1番よくあるやり方だと思う。<br>
+ご自身のPCにAnsibleを入れて<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で立ち上げたゲストにプロビジョニングを行う。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160125/20160125214934.png" alt="f:id:mosuke5:20160125214934p:plain:w300" title="f:id:mosuke5:20160125214934p:plain:w300" class="hatena-fotolife" style="width:300px" itemprop="image"></span></p>
+
+<h2>メリット</h2>
+
+<p>なんといっても直感的でシンプル。<br>
+3.との比較になるが、Ansibleを実行する環境を別途用意する必要がないのでホストのリソースにも優しい。<br>
+また、2.との比較でゲストに無駄なものが入らない点でよい。</p>
+
+<h2>デメリット</h2>
+
+<p>ただ、そもそもwimdowsユーザはホストにAnsibleをインストールすることはできない。<br>
+つまり、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD">複数人</a>での開発をしていて、人によって端末が異なる場合には向いていない。<br>
+個人の端末の設定などにも大きく依存するため、チーム開発向きでないといえる。</p>
+
+<h1>2. ゲストにAnsibleをインストールして利用する</h1>
+
+<h2>概要</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で立ち上げたゲストの中にAnsibleをインストールし、自身へプロビジョニングするやりかた。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160125/20160125215405.png" alt="f:id:mosuke5:20160125215405p:plain:w300" title="f:id:mosuke5:20160125215405p:plain:w300" class="hatena-fotolife" style="width:300px" itemprop="image"></span></p>
+
+<p>この方式はshin1x1さんもおすすめしている。</p>
+<a href="http://shin1x1.hatenablog.com/embed/ansible_local-provisioner-in-vagrant" target="_blank">Vagrant + Ansible で開発環境を作るなら ansible_local プロビジョナがいい！ - Shin x Hatena Blog</a>
+
+<h2>メリット</h2>
+
+<p>（詳しくは上のブログを読むといいと思う。）<br>
+1.のデメリットで述べた、端末への依存度をなくすことができる。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>の新機能であるansible_localも利用できるのでプロビジョニングが楽だ。<br>
+3.と比べてAnsible実行環境を用意しなくて済む。</p>
+
+<h2>デメリット</h2>
+
+<p>メリットだけみると1.の問題点を解決していて最高のようにみえる。<br>
+しかし、ゲストに<b>本来インストールされるべきものでないものがはいる</b>点は忘れてはいけない。<br>
+Ansibleを使ってプロダクション環境にデプロイするユーザにとっては大きな問題だと思う。<br>
+開発環境とプロダクション環境での差分が広がってしまう。<br>
+また、Ansibleと並行してserverspecを使ってる人も多いと思うが、<br>
+そうなると今度はゲスト側に<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>もいれるのか？など様々な疑問が湧いてくる。</p>
+
+<h1>3. Ansible実行用のゲストを作って利用する</h1>
+
+<h2>概要</h2>
+
+<p>Ansible実行用のゲストを<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で立ち上げて、開発用のゲストへプロビジョニングにする。
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160125/20160125215618.png" alt="f:id:mosuke5:20160125215618p:plain:w300" title="f:id:mosuke5:20160125215618p:plain:w300" class="hatena-fotolife" style="width:300px" itemprop="image"></span></p>
+
+<h2>メリット</h2>
+
+<p>2.のデメリットで述べた、ゲストへの不要なもののインストールを防ぐことが可能。<br>
+例えばserverspecで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>が必要な場合もAnsible実行用のゲストに入れればいい。<br>
+必要なものをインストールしたAnsible実行用のイメージファイルをチーム内で共有すれば端末依存もセットアップの手間も省ける。</p>
+
+<h2>デメリット</h2>
+
+<p>なんといっても、ゲストを二つは立ちあげる必要があること。<br>
+これは少し面倒だ。</p>
+
+<h1>まとめ</h1>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160125/20160125220823.png" alt="f:id:mosuke5:20160125220823p:plain:w500" title="f:id:mosuke5:20160125220823p:plain:w500" class="hatena-fotolife" style="width:500px" itemprop="image"></span></p>
+
+<p><p>この見解は正直<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>やAnsibleの使いみち、用途によってだいぶ変わると思う。<br>
+なので絶対な評価ではないと思うが、私のいままでの経験上はこのような評価となったので参考にしてもらえればと思う。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">28 Dec 2015, 15:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -769,81 +884,6 @@ options = Net::SSH::Config.for(host, [config])
 <li>それゆえにたまに<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8">タイムアウト</a>で死ぬ</li>
 <li>DigitalOcean<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>の停止に失敗した場合が面倒（笑）</li>
 </ul>
-
-<p></body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">25 Sep 2015, 23:27</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/09/25/232751/" class="post-title">Ansibleを踏み台サーバ越しに実行する</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>タイトルの通りで、なにも特別なことはない内容。<br>
-そして、9月も終わりなのに今月はひとつも記事を書いていなかった。</p></p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/KVM">KVM</a>を使って仮想のゲストサーバを立てたが、<br>
-ゲストサーバはホストサーバと通信する用の（外に出る場合にはNAT通信で）<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>しか持っていない状況で、<br>
-Ansibleの実行対象としたかったのが背景。</p>
-
-<p>ホストサーバにAnsibleをいれるわけにもいかず、ホストサーバを踏み台にして、<br>
-Ansibleを打ちたかったというもの。</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150925/20150925232414.png" alt="f:id:mosuke5:20150925232414p:plain" title="f:id:mosuke5:20150925232414p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>の設定ファイルを作る</h1>
-
-<p>"Ansibleで" と書いたが要は<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>です。<br>
-まずは<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>で踏み台サーバを経由してAnsible実行対象サーバへ接続できるように準備しました。<br>
-これはいわゆる「多段<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>」というやつで、以前にもブログに書いたので復習です。</p>
-
-<p><a href="https://blog.mosuke.tech/entry/2014/11/09/172745">【VPS1台でインフラ勉強】多段SSH設定（おまけ） - Goldstine研究所</a></p>
-
-<p>一般的には<code>~/.ssh/config</code>にこういった設定は書いたりもしますが、<br>
-Ansible実行の場合、<b><u>端末に依存したくなかった</u></b>ので、<br>
-Ansible<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>に別途ファイルを作ることにした。</p>
-
-<pre><code>## sshconfigという名前のファイルにした
-Host ansible-target
-    HostName 192.168.33.10
-    User xxxxx
-    ProxyCommand ssh -W %h:%p yyyyy@hostserver 
-</code></pre>
-
-<p>上記のファイルを使って多段<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>できることを確認します。</p>
-
-<pre><code>$ ssh -F sshconfig ansible-target 
-</code></pre>
-
-<h1>Ansible実行時に<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>設定ファイルを利用する</h1>
-
-<p>ここまで来たらとても簡単で、<br>
-ansible.cfgに下記を追記し、ansible実行時に上記のsshconfigを読み込まれるようにしました。</p>
-
-<p>ansible.cfg</p>
-
-<pre><code>[ssh_connection]
-ssh_args = -F sshconfig 
-</code></pre>
 
 <p></body></p>
 
