@@ -56,6 +56,56 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">07 Feb 2015, 14:42</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2015/02/07/144208/" class="post-title">リモートのサーバでdockerを起動させるときの端末割り当て</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-docker" href="https://blog.mosuke.tech/categories/docker">docker</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>自分がハマったのでメモ。<br>
+リモートのサーバでdocker runを実行し(/bin/<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>)、ローカル側でシェルを操作したかった。</p></p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>でリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。</p>
+
+<pre><code>ssh user@host 'docker run -t -i image_name /bin/bash' 
+</code></pre>
+
+<p>そうすると</p>
+
+<pre><code>[root@0c6742f02bd9 ~]#
+
+[root@0c6742f02bd9 ~]# ^[[A^[[A^[[C 
+</code></pre>
+
+<p>エンターを押すと2行されるし、矢印キーはキーコードがでてしまう。</p>
+
+<p>これを解消するのには以下のようにすればいい。</p>
+
+<pre><code>ssh -t user@host 'docker run -t -i image_name /bin/bash' 
+</code></pre>
+
+<p><p>-tとはなんなのか、なぜこのような<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a>が起きたのか、これからしっかり調べる。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">02 Feb 2015, 20:10</h1>
                 <section class="post">
                     <header class="post-header">
@@ -633,96 +683,6 @@ Merge Request(Pull Request)のおかげで好き放題に作られた<a class="k
 
 <p><p>広島 お好み焼き<br>
 <iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Fhiroshima%2FA3401%2FA340102%2F34001107%2F" title="お好み焼　きゃべつ 駅前ひろば店 (広島/お好み焼き)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://tabelog.com/hiroshima/A3401/A340102/34001107/">お好み焼　きゃべつ 駅前ひろば店 (広島/お好み焼き)</a></iframe></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">31 Dec 2014, 17:05</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/12/31/170545/" class="post-title">SSHでローカルポートフォワードを実際に試す</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a><a class="post-category post-category-ポートフォワード" href="https://blog.mosuke.tech/categories/%E3%83%9D%E3%83%BC%E3%83%88%E3%83%95%E3%82%A9%E3%83%AF%E3%83%BC%E3%83%89">ポートフォワード</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>・・・<br>
-いろんなことができる&rdquo;らしい&rdquo;ということは知っていたし、<br>
-例えばポートフォワーディングなんていうこともできるのも知っている。</p></p>
-
-<p>でもそれがどんなものなのか自分の手で試したことはないし、<br>
-なんとなくただのサーバログイン<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>として利用していた。</p>
-
-<p>サーバインフラ技術に興味を持つようになっていろんなことを勉強していると、<br>
-ポートフォワーディングは必須な技術であることも感じ、<br>
-年末の持て余す時間を使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のローカルポートフォワードを試してみたのでメモする。</p>
-
-<h1>環境とやりたいこと</h1>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20141231162958.png"></span></p>
-
-<p>ローカルPCからexample.jpは以下で接続できる状態。</p>
-
-<pre><code>[local pc] $ ssh username@example.jp 
-</code></pre>
-
-<p>またWebサーバのポート番号は80で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>のホストサーバからはWebサーバへ接続できる。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/CUI">CUI</a>なのでわかりづらいが<a class="keyword" href="http://d.hatena.ne.jp/keyword/curl">curl</a>を打つと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Hello%20World">Hello World</a>が返ってきている。</p>
-
-<pre><code>[example.jp] $ curl 192.168.33.10
-&lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello World! Virtual Web Server&lt;/h1&gt;
-&lt;/body&gt;&lt;/html&gt; 
-</code></pre>
-
-<h1>ローカルポートフォワードの実行</h1>
-
-<p>ローカルPCから以下を実行する。<br>
-以下のコマンドは、<br>
-<b>ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす</b><br>
-といったもの。</p>
-
-<pre><code>[local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp 
-</code></pre>
-
-<p>この状態でブラウザから<code>http://localhost:8888</code>にアクセスすると<br>
-
-<p>なんと、ローカルホストにつないだはずが、example.jp上の仮想Webサーバのhtmlがうつっているではないか…</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20141231163932.png"></span></p>
-
-<h1>セキュリティはどうなの？</h1>
-
-<p>ローカルの端末からhttpで仮想のWebサーバに接続しているけど、セキュリティはだいじょうぶなのだろうか？<br>
-http通信だから暗号化はされていないのだろうか？<br>
-なんて疑問もあるが、それは問題ない。</p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>でローカルPCから<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%E2%A1%BC%A5%C8%A5%DB%A5%B9%A5%C8">リモートホスト</a>(example.jp)までトンネルをはり、<br>
-そのなかをhttpで通信しているから全く問題なしといえる。</p>
-
-<p>ローカルポートフォワードを利用する場合は、おそらく表には出したくないけど、<br>
-ローカルから接続したいなどの要件の時に使うと思うけど、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>できちんと暗号化しているので安心。</p>
-
-<h1>最後に</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>でできることはこの他にもたくさんある。<br>
-ポートフォワードだけみても他にも「リモートポートフォワード」や「ダイナミックポートフォワード」などがある。<br>
-リモートポートなどはいまぱっと試せる環境がなかったのでおいおい実践してみる…</p>
-
-<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>をただのログイン<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>だけに留めるのは今年で終わりにしよう…</p>
 </body></p>
 
                     </div>

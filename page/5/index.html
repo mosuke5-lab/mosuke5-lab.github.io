@@ -56,6 +56,167 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">15 Apr 2016, 00:20</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2016/04/15/002004/" class="post-title">今度こそ入門するtmux</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-tmux" href="https://blog.mosuke.tech/categories/tmux">tmux</a><a class="post-category post-category-入門" href="https://blog.mosuke.tech/categories/%E5%85%A5%E9%96%80">入門</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>tmuxの入門は何度目だろうか…<br>
+SoftwareDesignの2015年7月号を見ながら、何度目かの入門をしたのでメモする。<br>
+ブログに書いたので、これで運用にのりそうだ。</p></p>
+
+<h1>tmuxってなに？</h1>
+
+<p>公式ページ(<a href="http://tmux.github.io/">http://tmux.github.io/</a>)から引用すると。</p>
+
+<blockquote><p>tmux is a terminal multiplexer. What is a terminal multiplexer? It <a class="keyword" href="http://d.hatena.ne.jp/keyword/lets">lets</a> you switch easily between several programs in one terminal, detach them (they keep running in the background) and reattach them to a different terminal. And do a lot more.<br>
+（訳）tmuxはターミナルマルチプレクサです。ターミナルマルチプレクサは複数のプログラムを容易に1つのターミナル上で切り替えられるようにします。またそれらのプログラムをバックグラウンドで動かしながらデタッチしたり、別のターミナルにアタッチすることができます。さらにいろいろなことができます。</p></blockquote>
+
+<h1>tmuxを使ってみる</h1>
+
+<h1>インストール</h1>
+
+<p>今回<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>の環境で行っています。<br>
+今日時点ではバージョン2.2まででていますが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/brew">brew</a>では2.1がインストールされました。</p>
+
+<pre><code>$ brew install tmux
+$ tmux -V
+tmux 2.1 
+</code></pre>
+
+<h1>起動</h1>
+
+<p><code>$ tmux</code>と入力すると、tmuxが起動し<code>$ exit</code>で抜けることができます。<br>
+これから説明していきますが、tmuxの機能を利用するときプレフィックスキーを入力する必要があります。<br>
+デフォルトではプレフィックスキーは<code>Ctrl-b</code>になっています。</p>
+
+<h1>ウィンドウの作成、切り替え</h1>
+
+<p>１つのtmuxの中にウィンドウ（タブ機能と考えてください）を作って切り替えたりします。<br>
+<code>Ctrl-b</code>+<code>c</code>でウィンドウを作成できます。<br>
+ウィンドウを作成するとターミナルの下部分（ステータスバー）に表示されます。<br>
+*印があるのがいまいるウィンドウです。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160414/20160414233836.png" alt="f:id:mosuke5:20160414233836p:plain" title="f:id:mosuke5:20160414233836p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<h1>ウィンドウ分割</h1>
+
+<p>ウィンドウの分割もできます。開発するときに便利ですよね！<br>
+分割された画面をペインと言います。<br>
+<code>Ctrl-b</code>+<code>%</code>で縦に分割、<code>Ctrl-b</code>+<code>"</code>で横に分割できます。<br>
+ペイン間の移動は<code>Ctrl-b</code>+<code>o</code>。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160414/20160414230041.png" alt="f:id:mosuke5:20160414230041p:plain" title="f:id:mosuke5:20160414230041p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<h1>なにが嬉しいの？</h1>
+
+<p>まてまて、タブ機能もウィンドウ分割もiTerm2で全然できるよ？<br>
+ほら！？
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160414/20160414230301.png" alt="f:id:mosuke5:20160414230301p:plain" title="f:id:mosuke5:20160414230301p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p>tmuxのいいところはデタッチとアタッチ機能やカスタマイズ性の高さだと思う。<br>
+カスタマイズ性についてはまだそんなにわかってませんが。。。</p>
+
+<h1>デタッチとアタッチ</h1>
+
+<p>tmuxはターミナルを仮想化します。その威力を発揮するのがデタッチとアタッチ機能です。<br>
+tmuxを起動した状態で<code>Ctrl-b</code>+<code>d</code>を押してみよう。<br>
+そうすると下のステータスバーも消え、元のターミナルに戻ってきたと思う。<br>
+これをデタッチといい、tmuxが終了したわけではない。</p>
+
+<p>プロセスを確認すると、tmuxがまだ存在してることがわかる。</p>
+
+<pre><code>$ ps -ef | grep tmux
+  501 16038     1   0  9:26PM ??         0:02.26 tmux
+  501 17800 13345   0 11:53PM ttys005    0:00.00 grep tmux 
+</code></pre>
+
+<p><code>tmux ls</code>で現在のtmuxのセッションの一覧がみれます。</p>
+
+<pre><code>$ tmux ls
+0: 1 windows (created Thu Apr 14 21:26:19 2016) [129x32] 
+</code></pre>
+
+<p>ではアタッチしてみよう。下記で元のtmuxに戻ってくるはずです。</p>
+
+<pre><code>$ tmux attach 
+</code></pre>
+
+<p>デタッチしている間もバックグラウンドでプログラムは動き続けています。<br>
+試しに、tmux上でvmstatなどを打ってデタッチしてアタッチすると動き続けていることがわかると思います。</p>
+
+<h1>pstree見るといい</h1>
+
+<p>tmuxの概念を理解するにはpstreeをみるといい。<br>
+tmuxを使わずにpstreeコマンドを打つと、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のプロセスの下でpstreeが動いているのがわかる。</p>
+
+<pre><code>$ pstree -p
+systemd(1)
+    ├─sshd(13589)─┬─sshd(15066)───sshd(15068)───bash(15069)───pstree(15115) 
+</code></pre>
+
+<p>一方、tmuxを起動し、tmux上でpstreeを実行すると、<a class="keyword" href="http://d.hatena.ne.jp/keyword/sshd">sshd</a>のプロセスの下にはtmuxが動いており、<br>
+pstreeコマンドはtmuxプロセスの下で動いている。</p>
+
+<pre><code>$ pstree -p
+systemd(1)
+    ├─sshd(13589)─┬─sshd(15066)───sshd(15068)───bash(15069)───tmux(15146)
+    └─tmux(15148)───bash(15149)───pstree(15168) 
+</code></pre>
+
+<p>なにがいいたいかというと、tmuxの上で動かすプロセスは<a class="keyword" href="http://d.hatena.ne.jp/keyword/sshd">sshd</a>とは別プロセスで動いているということ。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>が切れても動作し続けるとはまあそういうことです。</p>
+
+<h1>カスタマイズ</h1>
+
+<p>tmuxはカスタマイズ性に優れます（ようです）。<code>.tmux.conf</code>を修正することでカスタマイズ可能です。<br>
+今回は入門ということで、よく使いそうな基本設定だけしたが、これだけでも相当便利でした。</p>
+
+<ul>
+<li>プレフィックスキーを<code>Ctrl-t</code>とする</li>
+<li>ペインのサイズを<a class="keyword" href="http://d.hatena.ne.jp/keyword/vim">vim</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AD%A1%BC%A5%D0%A5%A4%A5%F3%A5%C9">キーバインド</a>で調整できるようにする</li>
+<li>ウィンドウの分割を<code>|</code>と<code>-</code>でできるようにする</li>
+</ul>
+
+<pre><code># プレフィックスキー
+unbind C-b
+set-option -g prefix C-t
+
+# paneのサイズ変更（Vimerにはかかせない）
+bind -r H resize-pane -L 5
+bind -r J resize-pane -D 5
+bind -r K resize-pane -U 5
+bind -r L resize-pane -R 5
+
+# window分割（わかりやすくていいね！）
+bind | split-window -h
+bind - split-window -v 
+</code></pre>
+
+<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AD%A1%BC%A5%D0%A5%A4%A5%F3%A5%C9">キーバインド</a>でペインのサイズ自由自在！
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160415/20160415000811.gif" alt="f:id:mosuke5:20160415000811g:plain" title="f:id:mosuke5:20160415000811g:plain" class="hatena-fotolife" itemprop="image"></span></p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">28 Mar 2016, 18:16</h1>
                 <section class="post">
                     <header class="post-header">
@@ -679,195 +840,6 @@ ATPの公式サイトにもいくつか統計情報が載っているが、自�
 
 <p><p><a href="https://github.com/mosuke5/atp_scraper">GitHub - mosuke5/atp_scraper: atp_scraper is a tool scraping tennis data from atpworldtour.com.</a></p>
 </body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">07 Feb 2016, 21:03</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2016/02/07/210300/" class="post-title">社内マリカー大会やりました！運営の工夫どころとかまとめ</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-マリオカート" href="https://blog.mosuke.tech/categories/%E3%83%9E%E3%83%AA%E3%82%AA%E3%82%AB%E3%83%BC%E3%83%88">マリオカート</a><a class="post-category post-category-マリカー" href="https://blog.mosuke.tech/categories/%E3%83%9E%E3%83%AA%E3%82%AB%E3%83%BC">マリカー</a><a class="post-category post-category-マリカー大会" href="https://blog.mosuke.tech/categories/%E3%83%9E%E3%83%AA%E3%82%AB%E3%83%BC%E5%A4%A7%E4%BC%9A">マリカー大会</a><a class="post-category post-category-マリオカート大会" href="https://blog.mosuke.tech/categories/%E3%83%9E%E3%83%AA%E3%82%AA%E3%82%AB%E3%83%BC%E3%83%88%E5%A4%A7%E4%BC%9A">マリオカート大会</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>弊社では、年に一度、社内のコミュニケーション促進で、いろんな部署が集まって行う懇親会がある。<br>
-そこでは、恒例行事として何かしらのゲームを行っている。<br>
-そのゲームにて今年マリカー大会を行ったので、その報告と工夫した点などまとめておく。</p></p>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%EA%A5%AA%A5%AB%A1%BC%A5%C8">マリオカート</a>を選んだ理由</h1>
-
-<p>パーティとか懇親会のゲームイベントというと、<br>
-ビンゴ大会だったりクイズ大会、ジェスチャーゲームだったり行うのが一般的かと思う。<br>
-ですが、今回そういう場で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%EA%A5%AA%A5%AB%A1%BC%A5%C8">マリオカート</a>大会を選ぶに至ったのには下記のような理由があった。</p>
-
-<ol>
-<li><b>準備が楽なものがよかった！</b></li>
-<li><b>順位が決められるものが良かった（景品の都合上）</b></li>
-<li><b>楽しさに進行役の力量が影響しないものがよかった…</b></li>
-</ol>
-
-<p>まず、はじめはクイズ大会などを行おうかと検討していましたが、<br>
-そのクイズの問題を考えるのが結構たいへんであることに気づき、準備が楽なものがいいなと思った。<br>
-そして、運営的な理由だが、ゲームの結果を順位を簡単に決められる必要があった。<br>
-最後に、なんといっても自分が進行役だったので、<br>
-自分の笑いを取る力や進行技術で楽しさが左右されたらこまるなーとおもっていた。</p>
-
-<p>これらを満たすことができると思ったのが<span style="font-size: 150%"><span style="color: #0000cc"><b>「マリカー」</b></span></span>だった！</p>
-
-<h1>環境</h1>
-
-<h3>参加者</h3>
-
-<p>８つのチームから合計200人程度参加。<br>
-年齢層も結構バラバラ。若手からお偉いさんまでいる。</p>
-
-<h3>映像</h3>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>の画像は、<a class="keyword" href="http://d.hatena.ne.jp/keyword/HDMI">HDMI</a>を使ってプロジェクターで大型スクリーンに投影した。</p>
-
-<h1>ルール</h1>
-
-<p>200人全員に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%EA%A5%AA%A5%AB%A1%BC%A5%C8">マリオカート</a>に参加してもらうことは難しかったので、<br>
-各チームで６人のゲーム参加者を事前に選んで頂いて、チームを代表として参加してもらうこととした。<br>
-（マリカー大会をやることは事前には言いませんでした。）</p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>では４人対戦までしかできないので、下記のような形式で対戦を進めた。</p>
-
-<ol>
-<li>8チームを4チーム×２分けて予選</li>
-<li>下位２チームが下位決定戦</li>
-<li>上位２チームが決勝戦</li>
-</ol>
-
-<p>またなるべく多くの人がゲームに参加して欲しかったので、<br>
-特別ルールとして、<span style="color: #ff0000"><b>コースを１周したらチームのほかの人に交代するというリレー形式</b></span>とした。</p>
-
-<h1>準備したもの</h1>
-
-<ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>本体(<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B2%A1%BC%A5%E0%A5%D1%A5%C3%A5%C9">ゲームパッド</a>含む)</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%EA%A5%AA%A5%AB%A1%BC%A5%C88">マリオカート8</a>のソフト</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Wii%A5%EA%A5%E2%A5%B3%A5%F3">Wiiリモコン</a> 4つ
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fwww.amazon.co.jp%2Fdp%2FB0046EC9ZU%2Fref%3Dpd_lpo_sbs_dp_ss_1%3Fpf_rd_p%3D187205609%26pf_rd_s%3Dlpo-top-stripe%26pf_rd_t%3D201%26pf_rd_i%3DB000KF7QU2%26pf_rd_m%3DAN1VRQENFRJN5%26pf_rd_r%3D1XCVFCEE0Y8AP4TMB5C3" title="Amazon.co.jp： Wiiリモコン プラス (シロ) (「Wiiリモコンジャケット」同梱): ゲーム" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://www.amazon.co.jp/dp/B0046EC9ZU/ref=pd_lpo_sbs_dp_ss_1?pf_rd_p=187205609&amp;pf_rd_s=lpo-top-stripe&amp;pf_rd_t=201&amp;pf_rd_i=B000KF7QU2&amp;pf_rd_m=AN1VRQENFRJN5&amp;pf_rd_r=1XCVFCEE0Y8AP4TMB5C3">www.amazon.co.jp</a></cite>
-</li>
-</ul>
-
-<h1>運営上の工夫</h1>
-
-<p>運営上幾つかの工夫を行ったので紹介する。</p>
-
-<h3>キャラクターについて</h3>
-
-<p>利用するキャラクターや乗り物は、予めこちらでチームごとにランダムで割り振った。<br>
-そうすることで、当日にキャラを選ぶ時間を短縮できるし、マリカーの知識の差がなくなる。<br>
-キャラクターは運ということにした。</p>
-
-<h3>コントローラについて</h3>
-
-<p>４人対戦だと画面が４つに分割される。<br>
-自分がどの画面を操作すべきかわからなくなるので、画面位置がわかるようにコントローラにシールを貼った。<br>
-この対応は必須です。</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160207/20160207182051.png" alt="f:id:mosuke5:20160207182051p:plain" title="f:id:mosuke5:20160207182051p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<h3>アイテムや操作など</h3>
-
-<p>CPUなしで４人対戦で行った。
-４人対戦で普通のアイテム設定だと、「コイン」とか「バナナ」とか良いアイテムが出づらくつまらない。<br>
-アイテムの設定は「ダイナミック」にすることで、４人でも強力アイテムがでてバトルが白熱する。</p>
-
-<p>カートの操作方法（曲がり方）は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BD%BD%BB%FA%A5%AD%A1%BC">十字キー</a>ではなくハンドル操作とした。<br>
-普段ゲームに慣れている人でも、ハンドル操作だと不慣れなことも多くみんなうまい具合に下手になって白熱した。</p>
-
-<h3>初心者への対応</h3>
-
-<p>アイテムの細かい使い方などいちいち説明できないので、<br>
-初心者へは「アクセル」と「曲がること」のみ教えた。<br>
-一見、経験者と不公平のようにみえるが、今回のルールだと１週しか同じ人が回らないので、<br>
-心配するほどのことにはならなかったです。</p>
-
-<h3>トラブル時への備え</h3>
-
-<p>こういう企画ではトラブルはつきもの。
-トラブルに対しての対応を用意した。</p>
-
-<ul>
-<li>コントローラの電池切れ対策で電池は買っておきました</li>
-<li>コントローラが故障した場合は、<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B2%A1%BC%A5%E0%A5%D1%A5%C3%A5%C9">ゲームパッド</a>で代用できるようにした</li>
-<li>一応プロジェクターも２つ用意しておいた</li>
-</ul>
-
-<h3>進行役</h3>
-
-<p>進行役は２人でやったのだが、雰囲気をだすために赤と緑のマントをまといました。<br>
-こういうのもいいっすね。</p>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fwww.amazon.co.jp%2F%25E3%2582%25B9%25E3%2583%25BC%25E3%2583%2591%25E3%2583%25BC%25E3%2583%259E%25E3%2583%25AA%25E3%2582%25AA-%25E3%2583%25AB%25E3%2582%25A4%25E3%2583%25BC%25E3%2582%25B8-%25E5%25B8%25BD%25E5%25AD%2590%25E3%2582%25BB%25E3%2583%2583%25E3%2583%2588-%25E3%2582%25B3%25E3%2582%25B9%25E3%2583%2581%25E3%2583%25A5%25E3%2583%25BC%25E3%2583%25A0%25E7%2594%25A8%25E5%25B0%258F%25E7%2589%25A9-%25E3%2583%2595%25E3%2583%25AA%25E3%2583%25BC%25E3%2582%25B5%25E3%2582%25A4%25E3%2582%25BA%2Fdp%2FB00AGSQ5XW%2Fref%3Dsr_1_cc_3%3Fs%3Daps%26ie%3DUTF8%26qid%3D1454838114%26sr%3D1-3-catcorr%26keywords%3D%25E3%2583%259E%25E3%2583%25AA%25E3%2582%25AA%2B%25E5%25B8%25BD%25E5%25AD%2590" title="Amazon.co.jp | スーパーマリオ&amp;ルイージ 風 帽子セット コスチューム用小物 フリーサイズ | おもちゃ 通販" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://www.amazon.co.jp/%E3%82%B9%E3%83%BC%E3%83%91%E3%83%BC%E3%83%9E%E3%83%AA%E3%82%AA-%E3%83%AB%E3%82%A4%E3%83%BC%E3%82%B8-%E5%B8%BD%E5%AD%90%E3%82%BB%E3%83%83%E3%83%88-%E3%82%B3%E3%82%B9%E3%83%81%E3%83%A5%E3%83%BC%E3%83%A0%E7%94%A8%E5%B0%8F%E7%89%A9-%E3%83%95%E3%83%AA%E3%83%BC%E3%82%B5%E3%82%A4%E3%82%BA/dp/B00AGSQ5XW/ref=sr_1_cc_3?s=aps&amp;ie=UTF8&amp;qid=1454838114&amp;sr=1-3-catcorr&amp;keywords=%E3%83%9E%E3%83%AA%E3%82%AA+%E5%B8%BD%E5%AD%90">www.amazon.co.jp</a></cite></p>
-
-<h1>実況について</h1>
-
-<p>冒頭で「楽しさに進行役の力量が影響しないものがよかった」と書いたが、<br>
-「実況」が楽しさを左右するだろうといくぶんか練習した。。。</p>
-
-<p><span style="font-size: 150%"><span style="color: #0000cc">だが、盛り上がりすぎて、うるさすぎて、<br>
-実況の声なんて通りませんでした！！！！</span></span></p>
-
-<p>実況の練習とかいらないでしょう…</p>
-
-<h1>大変だったこと</h1>
-
-<ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>を会社に何度ももっていくこと
-
-<ul>
-<li>リハーサルや事前の動作試験や段取り決めのため、何度も会社に<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>持って行った。</li>
-<li>家でスプラトゥーンやりたいので、毎度持って帰っていたので更に大変でした。</li>
-</ul>
-</li>
-<li>当日の酒事情
-
-<ul>
-<li>ゲームのセッティングはミスできないので、懇親会で酒をあんまり飲めない</li>
-<li>けれど、盛り上げるためにある程度酒を入れないとやっていられないジレンマ…</li>
-</ul>
-</li>
-<li>声を張ること
-
-<ul>
-<li>当日会場でルール説明などをしたが、マリカー大会をやるってだけで大盛り上がりで、相当な大声が必要だった…</li>
-</ul>
-</li>
-</ul>
-
-<h1>最後に</h1>
-
-<ol>
-<li>初心者でも十分たのしめるのでマリカー最高でした！</li>
-<li>家ではスプラトゥーンをやりたいので、できれば<a class="keyword" href="http://d.hatena.ne.jp/keyword/WiiU">WiiU</a>は自分のではなくだれかに借りましょう！</li>
-<li>喉が枯れます！</li>
-</ol>
-
-<p></body></p>
 
                     </div>
                 </section>

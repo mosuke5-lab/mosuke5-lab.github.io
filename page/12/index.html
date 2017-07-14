@@ -56,6 +56,77 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">20 Nov 2014, 23:03</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2014/11/20/230334/" class="post-title">後からGitレポジトリを共有設定に。sharedオプションの仕組みについて</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-git" href="https://blog.mosuke.tech/categories/git">git</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>Git<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>を作って、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD">複数人</a>で開発をしていた。<br>
+しかし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>の中に作成されるファイルやディレクトリが個人のグループになってしまい、<br>
+Push, PullするときにPermission <a class="keyword" href="http://d.hatena.ne.jp/keyword/error">error</a>で怒られまくる。</p>
+<p>ユーザには共通のグループを作っていたのに…なんでだっけ…</p>
+<p>気づけば<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>を作るとき以下のようにしていた。</p></p>
+
+<pre><code>$ git init --bare 
+</code></pre>
+
+<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD">複数人</a>で共有するときには以下のようにするべきであった。</p></p>
+
+<pre><code>$ git init --bare --shared 
+</code></pre>
+
+<p><p>では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。<br>
+調べると「<b>setgid</b>」というキーワードに辿り着いた。<br>
+setgidの権限を付けておくと、そのディレクトリに作成されたファイルの所有グループは、そのディレクトリの所有グループになる。</p>
+<p>以下のようにchmodでsetgidを付けることができる。</p></p>
+
+<pre><code>$ chmod g+s dir_name 
+</code></pre>
+
+<p><p>setgidがつくとあまり馴染みのない権限がつく。<br>
+「drwxrw<span style="color: #ff40ff"><b>s</b></span>r-x」</p></p>
+
+<pre><code>$ ls -l 
+drwxrwsr-x  4 user  group  136 11 16 22:49 test_dir 
+</code></pre>
+
+<p><p>そして、すでに共有設定なしで作ってしまった<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>では以下のように対応可能。<br>
+（新しく<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>つくるのはめんどいので…）</p></p>
+
+<pre><code>##Gigレポジトリ内のディレクトリに
+$ chmod -R g+s ./branches
+$ chmod -R g+s ./hooks
+$ chmod -R g+s ./info
+$ chmod -R g+s ./objects
+$ chmod -R g+s ./refs
+$ vim .git/config
+  ##[core内に]以下を付け加えておいた
+  [core]
+       repositoryformatversion = 0 
+</code></pre>
+
+<p></body></p>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">18 Nov 2014, 22:55</h1>
                 <section class="post">
                     <header class="post-header">
@@ -485,36 +556,6 @@ Server hoge/web11 is UP. 2 active and 0 backup servers online. 0 sessions requeu
 </code></pre>
 
 <p></div>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">19 Oct 2014, 17:08</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/10/19/170854/" class="post-title">自宅サーバ公開時などのDDNS、固定IPについて整理</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-ネットワーク" href="https://blog.mosuke.tech/categories/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF">ネットワーク</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%AB%C2%F0%A5%B5%A1%BC%A5%D0">自宅サーバ</a>を公開するときに使う<a class="keyword" href="http://d.hatena.ne.jp/keyword/DDNS">DDNS</a>や固定IP。<br>
-それが必要な理由について図解的にまとめ。それだけ。</p>
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141019/20141019170702.png" alt="f:id:mosuke5:20141019170702p:plain" title="f:id:mosuke5:20141019170702p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 </body></p>
 
                     </div>

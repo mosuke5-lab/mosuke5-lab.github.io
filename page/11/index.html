@@ -56,6 +56,96 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">31 Dec 2014, 17:05</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2014/12/31/170545/" class="post-title">SSHでローカルポートフォワードを実際に試す</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a><a class="post-category post-category-ポートフォワード" href="https://blog.mosuke.tech/categories/%E3%83%9D%E3%83%BC%E3%83%88%E3%83%95%E3%82%A9%E3%83%AF%E3%83%BC%E3%83%89">ポートフォワード</a><a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>・・・<br>
+いろんなことができる&rdquo;らしい&rdquo;ということは知っていたし、<br>
+例えばポートフォワーディングなんていうこともできるのも知っている。</p></p>
+
+<p>でもそれがどんなものなのか自分の手で試したことはないし、<br>
+なんとなくただのサーバログイン<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>として利用していた。</p>
+
+<p>サーバインフラ技術に興味を持つようになっていろんなことを勉強していると、<br>
+ポートフォワーディングは必須な技術であることも感じ、<br>
+年末の持て余す時間を使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のローカルポートフォワードを試してみたのでメモする。</p>
+
+<h1>環境とやりたいこと</h1>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20141231162958.png"></span></p>
+
+<p>ローカルPCからexample.jpは以下で接続できる状態。</p>
+
+<pre><code>[local pc] $ ssh username@example.jp 
+</code></pre>
+
+<p>またWebサーバのポート番号は80で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>のホストサーバからはWebサーバへ接続できる。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/CUI">CUI</a>なのでわかりづらいが<a class="keyword" href="http://d.hatena.ne.jp/keyword/curl">curl</a>を打つと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Hello%20World">Hello World</a>が返ってきている。</p>
+
+<pre><code>[example.jp] $ curl 192.168.33.10
+&lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello World! Virtual Web Server&lt;/h1&gt;
+&lt;/body&gt;&lt;/html&gt; 
+</code></pre>
+
+<h1>ローカルポートフォワードの実行</h1>
+
+<p>ローカルPCから以下を実行する。<br>
+以下のコマンドは、<br>
+<b>ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす</b><br>
+といったもの。</p>
+
+<pre><code>[local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp 
+</code></pre>
+
+<p>この状態でブラウザから<code>http://localhost:8888</code>にアクセスすると<br>
+
+<p>なんと、ローカルホストにつないだはずが、example.jp上の仮想Webサーバのhtmlがうつっているではないか…</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20141231163932.png"></span></p>
+
+<h1>セキュリティはどうなの？</h1>
+
+<p>ローカルの端末からhttpで仮想のWebサーバに接続しているけど、セキュリティはだいじょうぶなのだろうか？<br>
+http通信だから暗号化はされていないのだろうか？<br>
+なんて疑問もあるが、それは問題ない。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>でローカルPCから<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%E2%A1%BC%A5%C8%A5%DB%A5%B9%A5%C8">リモートホスト</a>(example.jp)までトンネルをはり、<br>
+そのなかをhttpで通信しているから全く問題なしといえる。</p>
+
+<p>ローカルポートフォワードを利用する場合は、おそらく表には出したくないけど、<br>
+ローカルから接続したいなどの要件の時に使うと思うけど、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>できちんと暗号化しているので安心。</p>
+
+<h1>最後に</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>でできることはこの他にもたくさんある。<br>
+ポートフォワードだけみても他にも「リモートポートフォワード」や「ダイナミックポートフォワード」などがある。<br>
+リモートポートなどはいまぱっと試せる環境がなかったのでおいおい実践してみる…</p>
+
+<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>をただのログイン<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>だけに留めるのは今年で終わりにしよう…</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">29 Dec 2014, 15:42</h1>
                 <section class="post">
                     <header class="post-header">
@@ -698,77 +788,6 @@ nginx   25943 gitlab-www    6u  IPv4  84715      0t0  TCP *:http (LISTEN)
 Password: 5iveL!fe</p></p>
 
 <pre><code>&lt;/blockquote&gt;
-</code></pre>
-
-<p></body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">20 Nov 2014, 23:03</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/11/20/230334/" class="post-title">後からGitレポジトリを共有設定に。sharedオプションの仕組みについて</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-git" href="https://blog.mosuke.tech/categories/git">git</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>Git<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>を作って、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD">複数人</a>で開発をしていた。<br>
-しかし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>の中に作成されるファイルやディレクトリが個人のグループになってしまい、<br>
-Push, PullするときにPermission <a class="keyword" href="http://d.hatena.ne.jp/keyword/error">error</a>で怒られまくる。</p>
-<p>ユーザには共通のグループを作っていたのに…なんでだっけ…</p>
-<p>気づけば<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>を作るとき以下のようにしていた。</p></p>
-
-<pre><code>$ git init --bare 
-</code></pre>
-
-<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD">複数人</a>で共有するときには以下のようにするべきであった。</p></p>
-
-<pre><code>$ git init --bare --shared 
-</code></pre>
-
-<p><p>では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。<br>
-調べると「<b>setgid</b>」というキーワードに辿り着いた。<br>
-setgidの権限を付けておくと、そのディレクトリに作成されたファイルの所有グループは、そのディレクトリの所有グループになる。</p>
-<p>以下のようにchmodでsetgidを付けることができる。</p></p>
-
-<pre><code>$ chmod g+s dir_name 
-</code></pre>
-
-<p><p>setgidがつくとあまり馴染みのない権限がつく。<br>
-「drwxrw<span style="color: #ff40ff"><b>s</b></span>r-x」</p></p>
-
-<pre><code>$ ls -l 
-drwxrwsr-x  4 user  group  136 11 16 22:49 test_dir 
-</code></pre>
-
-<p><p>そして、すでに共有設定なしで作ってしまった<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>では以下のように対応可能。<br>
-（新しく<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>つくるのはめんどいので…）</p></p>
-
-<pre><code>##Gigレポジトリ内のディレクトリに
-$ chmod -R g+s ./branches
-$ chmod -R g+s ./hooks
-$ chmod -R g+s ./info
-$ chmod -R g+s ./objects
-$ chmod -R g+s ./refs
-$ vim .git/config
-  ##[core内に]以下を付け加えておいた
-  [core]
-       repositoryformatversion = 0 
 </code></pre>
 
 <p></body></p>
