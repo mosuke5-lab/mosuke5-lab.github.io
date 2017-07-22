@@ -57,6 +57,251 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">20 Feb 2017, 18:42</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2017/02/20/184220/" class="post-title">参加してきた、MSPJマイグレーションコンペ2017winter</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-クラウド" href="https://blog.mosuke.tech/categories/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89">クラウド</a><a class="post-category post-category-Azure" href="https://blog.mosuke.tech/categories/azure">Azure</a><a class="post-category post-category-AWS" href="https://blog.mosuke.tech/categories/aws">AWS</a><a class="post-category post-category-MSPJ" href="https://blog.mosuke.tech/categories/mspj">MSPJ</a><a class="post-category post-category-マイグレーション" href="https://blog.mosuke.tech/categories/%E3%83%9E%E3%82%A4%E3%82%B0%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3">マイグレーション</a><a class="post-category post-category-MSP" href="https://blog.mosuke.tech/categories/msp">MSP</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>先日、2017年2月18日に「MSPJ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DA%A5%C6%A5%A3%A5%B7%A5%E7%A5%F3">コンペティション</a>2017winter」に参加してきた。<br>
+MSPJ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DA%A5%C6%A5%A3%A5%B7%A5%E7%A5%F3">コンペティション</a>2017winterとは、<br>
+日本MSP協会<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DA%A5%C6%A5%A3%A5%B7%A5%E7%A5%F3">コンペティション</a>グループが主催する、
+次代を担う若手運用技術者同士の交流・競争を通して日本のMSP事業者における運用技術の向上を目指した<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DA%A5%C6%A5%A3%A5%B7%A5%E7%A5%F3">コンペティション</a>。</p></p>
+
+<p>もう少し平たく言うと、MSP事業者の本当の業務に近い形でのコンペを通じて、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AD%A5%EB%A5%A2%A5%C3%A5%D7">スキルアップ</a>を図りましょうというものだ。<br>
+自分はMSPの人じゃないけど参加は全然できた。</p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=https%3A%2F%2Fconnpass.com%2Fevent%2F47825%2F" title="MSPJマイグレーションコンペティション2017winter (2017/02/18 09:30〜)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://connpass.com/event/47825/">connpass.com</a></cite></p>
+
+<h1>競技ルール</h1>
+
+<p>今回の競技のお題は、<br>
+<b>「<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>上で動作しているレガシーな<a class="keyword" href="http://d.hatena.ne.jp/keyword/Redmine">Redmine</a>をAzure上に移行する」</b>というものだ。</p>
+
+<p>このコンペの特徴としては、実際にMSPでの業務に則し、お客さんから曖昧な要望を受けている部分や、<br>
+お客さん側にしかない権限については、お客さんと調整する必要があること。<br>
+例えば、環境の移行する際には<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>の切り替えが必要だったのですが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>の設定権限は我々にはなくて、<br>
+Slackを利用して、<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>設定変更依頼や作業周知を出さなければいけなかった。<br>
+このあたりはとてもユニークなポイント。</p>
+
+<p>お客さんからは移行について以下のような曖昧な要望をもらっていた。</p>
+
+<pre><code>&lt;要望&gt;
+- 今の環境を新しい環境に完全移行して欲しいです。
+- 実施した内容と結果については報告が欲しいです。
+- システムを止めるときは利用者に告知が必要なので連絡が欲しいです。
+- 昔から使っている古い環境なので、バージョンアップして欲しいです。
+- できれば利用者に影響を出さないように切り替えたいです。
+- できればサーバに関する資料があるとありがたいです。
+- できれば今はまったくバックアップを取っていないのでバックアップを取れるようにしたいです
+- できれば今後は利用者が増えるのでシステムを冗長化したいです。
+- できれば新しいインフラエンジニアに引継ぎするために必要な情報がまとまっていると嬉しいです。
+
+&lt;担当者のコメント&gt;
+- 前任のインフラエンジニアが辞めちゃったのでこのシステムもう分かる人がいなくって。
+- 結構前から使っているので環境も古くなっているみたいで、OSのサポートがもうすぐ切れるって話を聞いたものですから、セキュリティとか色々心配で何とかしたいんです。
+- みんなこのシステムを結構便利に使っていてくれているようだから、システムを切り替えるときは連絡しないとなぁ。
+- そうそう、近々新しいインフラエンジニアが入社予定だから、その方に引き継げるようになっていると嬉しいですね。 
+</code></pre>
+
+<p>ちなみにチームについては、当日の参加者で適当に3人チームを作って行った。<br>
+一緒の参加者が同じチームにならないように調整された。</p>
+
+<h1>構成把握</h1>
+
+<p>開始後、まずやったことが環境・構成の把握。<br>
+ざっと下記のような感じ。ログインしてすぐに、<code>pstree</code> みて大体の構成を把握した。</p>
+
+<ul>
+<li>インフラ: <a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>(EC2)</li>
+<li>OS: CentOS5.2</li>
+<li>Webサーバ: Apache2.0 + Passenger</li>
+<li>DB: MySQL5.1</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>: 1.9</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Redmine">Redmine</a>: 2.3</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>; Route53で管理。権限はお客さんのみ</li>
+<li>サーバ構成: サーバ1台のシングル構成</li>
+</ul>
+
+<h1>移行作戦</h1>
+
+<p>細かなバージョンはおいておいて、最終的に目指す構成は下記のようにした。<br>
+これに至った考え方とかは下に書く。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20170220165739.jpg"></span></p>
+
+<h2>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BE%E9%C4%B9%B2%BD">冗長化</a>の観点</h2>
+
+<p>まず、Webサーバをロードバランサを利用して負荷分散と冗長性を確保した。<br>
+Azureでは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%C9%A5%D0%A5%E9%A5%F3%A5%B5%A1%BC">ロードバランサー</a>のフルマネージドサービスがあるので、<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%C9%A5%D0%A5%E9%A5%F3%A5%B5%A1%BC">ロードバランサー</a>自体の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BE%E9%C4%B9%B2%BD">冗長化</a>については考える必要がなかった。</p>
+
+<p><a href="https://docs.microsoft.com/ja-jp/azure/load-balancer/load-balancer-overview">Azure Load Balancer の概要 | Microsoft Docs</a></p>
+
+<p>次にデータベースだが、当初ロードバランサと同様にマネージドサービスがあればそちらで対応しようと検討していた。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a> Databaseというサービスがあるのだが、「<a class="keyword" href="http://d.hatena.ne.jp/keyword/Microsoft">Microsoft</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL%20Server">SQL Server</a> エンジン」のみの対応とのことで、<br>
+今回の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Redmine">Redmine</a>移行には適切ではなかった。</p>
+
+<p><a href="https://docs.microsoft.com/ja-jp/azure/sql-database/sql-database-technical-overview">SQL Database とは SQL Database の概要 | Microsoft Docs</a></p>
+
+<p>ということで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3">レプリケーション</a>を使ったデータベースを作ることにしたのだが、<br>
+自前で作っている余裕はとてもなかったので、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A1%BC%A5%B1%A5%C3%A5%C8%A5%D7%A5%EC%A5%A4%A5%B9">マーケットプレイス</a>から<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a> with replicationというイメージを見つけて対応することとした。</p>
+
+<p><a href="https://azuremarketplace.microsoft.com/ja-jp/marketplace/apps/bitnami.mysql-cluster?tab=Overview">Microsoft Azure Marketplace</a></p>
+
+<p>最後に、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Redmine">Redmine</a>では添付ファイルのアップロードなどをすることがある。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%C9%A5%D0%A5%E9%A5%F3%A5%B5%A1%BC">ロードバランサー</a>で負荷分散環境においては、添付ファイルを共有する必要がある。<br>
+手っ取り早く<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rsync">Rsync</a>での同期をする方向にした。</p>
+
+<h2>バージョン関連</h2>
+
+<p>移行先の各種バージョンは下記とした。</p>
+
+<ul>
+<li>OS: CentOS7.2</li>
+<li>Webサーバ: Nginx</li>
+<li>DB: MySQL5.7</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>: 2.2(アプリケーション実行はthin)</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Redmine">Redmine</a>: 2.6</li>
+</ul>
+
+<p>はじめRuby2.4で検証していたのだが、<br>
+さすがにRails3はRuby2.4では動かずRuby2.2まで下げた。</p>
+
+<h2>Webサーバ、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>関連</h2>
+
+<p>移行元の環境では、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Redmine">Redmine</a>が<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>+Passengerで動作していた。<br>
+余談になるが、Passengerはmod_<a class="keyword" href="http://d.hatena.ne.jp/keyword/rails">rails</a>なんて呼ばれることもあって、いわゆるmod_<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>, <a class="keyword" href="http://d.hatena.ne.jp/keyword/mod_perl">mod_perl</a>と同じ方式での動作方法。</p>
+
+<p>昔にPassengerインス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%EB">トール</a>でハマった記憶もあるし、特にPassengerである必要性はなかったので、<br>
+馴染みのあるNginx+Thinの構成で動かすこととした。<br>
+<span style="font-size: 80%">※Thin部分はpumaでも<a class="keyword" href="http://d.hatena.ne.jp/keyword/unicorn">unicorn</a>でもお好きなものをどうぞ。</span></p>
+
+<p>この構成はWebサーバと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>を分離する<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>。<br>
+Thin単体でも動作させることが可能。Nginxはリバースプロキシや静的ファイルの配信に特化し、<br>
+アプリケーションの実行はThin側に任せる。</p>
+
+<p>正直どちらでもかまわないのだが、Passengerを利用する場合、<br>
+アプリケーションとインフラ(<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>部分)が密な関係になってしまうのが煩わしいと個人的に思う。<br>
+まあケースバイケースでしょうが。</p>
+
+<p>※あと最近<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>触ってなさすぎて忘れた…</p>
+
+<h1>移行作業</h1>
+
+<p>作戦が決まったところで、さっそく移行作業なのだが、<br>
+いきなり完成形に持っていくことは難しいと考えいくつかのステップに分けて移行作業を進めた。</p>
+
+<h4>Step1：まずはAzure環境へ</h4>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20170220173855.jpg"></span></p>
+
+<h4>Step2：<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BE%E9%C4%B9%B2%BD">冗長化</a>とか</h4>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20170220173905.jpg"></span></p>
+
+<h4>Step3：最後の仕上げ</h4>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20170220173915.jpg"></span></p>
+
+<h2>Azureのここがよくわからなかった</h2>
+
+<p>限られた時間内で、ほぼ初めてAzureをまともに使ったわけだが、<br>
+いくつか概念の理解や操作方法がわかりづらいなと感じた。<br>
+（IsuconでもAzure触ったが、あれは本当にサーバ起動するだけなので…）</p>
+
+<h4>ネットワーク概念</h4>
+
+<p>Virtual Private Networkの概念がとてもわかりづらかった印象。<br>
+買ったリソースをどうやって、指定のネットワークにデプロイするのかなど。<br>
+慣れの問題も大きいとは思うが、当日はほんとにわからなかった。</p>
+
+<h4>サーバのイメージ作成</h4>
+
+<p>すごい初歩的なことだが、構築したサーバのイメージを作成して、複製することがとても難しかった。 <br>
+メンバーがいろいろ躓いていたので、最終的に普通にもう1台構築するという強行手段を取った。<br>
+この点は、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>に携わるものとして仕様確認しておきたい。</p>
+
+<p>仕事で使っている<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>が<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>的なため、<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>の考え方にFitするものはすぐに理解できたが、Azureはまた独特の概念が多い印象。<br>
+これだけ<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>が使われている現代に、「<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>的」であることは価値がある！？？</p>
+
+<h1>結果、懇親会とか</h1>
+
+<p>んー。結果は優勝・準優勝ではなかったんですが、<br>
+きっとテストをちゃんとしないで移行したので、きっと触るとなにか抜け漏れがあったのでしょう(笑)<br>
+また来年あれば参加したいなと思える楽しいコンテストだったことは間違いない。<br>
+ISUCONに続き悔しい結果。</p>
+
+<p>参加者の中には、MSP業界の方がもちろんたくさんいた。<br>
+懇親会でいろいろ話をしたけどざっくりこんな課題を抱えている人が多かった。</p>
+
+<h4>アプリが悪い問題</h4>
+
+<p>MSPなのでお客さんのシステムの運用を請け負います。<br>
+その業務の中には障害対応や監視設定、デプロイとか様々あるわけですが、<br>
+アプリの作りにより、監視設定できないことや自動化できないことが多数あるそうです。<br>
+お客さんのせいにしてはいけないのだけど、その点が一番しんどそうだった。</p>
+
+<h4>自動化・コード化</h4>
+
+<p>MSPの方々も本当は監視やデプロイなどの自動化するコードやツールを作ることに力を入れたいけど、<br>
+単純な手順書作業や日々の障害対応に追われてなかなかできないとか。<br>
+そもそも普段コードを書く仕事ではないので、そのメンテするチーム体制が取れないという問題も。<br>
+（それは前の仕事でもよく聞いた話だなぁ～）</p>
+
+<h4>オンプレ</h4>
+
+<p>まだまだオンプレ環境の運用も多く、<br>
+ハードウェア交換やハードウェアによる障害には悩まされているとのこと。<br>
+聞いてる話だと、あえてオンプレにしているというよりはレガシーで残っているのが多いっぽい。</p>
+
+<h4>夜勤</h4>
+
+<p>夜勤の週は、5日間夜勤をする。そういう運用らしいです。<br>
+前の仕事では身近にネットワークの運用部隊がいたので夜勤事情はよく聞いていますが、
+まったく考え方が違くてびっくり。<br>
+でも意外と、週ごとに別れている方が辛くないらしいよ？</p>
+
+<h1>最後に</h1>
+
+<p>一緒に戦ってくれたチームメンバーありがとうございました。</p>
+
+<p>去年のお題は<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>から<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>への移行だったらしいですが、今回は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>から<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>への移行。<br>
+このあたり、そういう時代のフェーズに入ってきているということなんでしょうか。<br>
+きっとそういうことでしょう。</p>
+
+<p><p>特定の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>独自の機能を使っていなければ、移行自体は簡単で、<br>
+それよりももともとの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%AC%A5%B7%A1%BC%A5%B7%A5%B9%A5%C6%A5%E0">レガシーシステム</a>をバージョンアップするほうがしんどい印象。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ロックインとどう向き合っていくか、考えなければ。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">23 Jan 2017, 23:37</h1>
                 <section class="post">
                     <header class="post-header">
@@ -917,187 +1162,6 @@ LambdaのようにImmutable, Statelessが前提で作られる、どこの環境
 <p><p>今後どうなっていくかはわからないが、<br>
 デ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4">バイ</a>スに近いエッジコンピューティング側はLambdaでさばき、そのさばいたデータを中央のデータセンターへ、<br>
 なんていうことが主流になってくるかもしれない。と思うとFaaSの存在は見逃せない気がしてくる。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">19 Sep 2016, 17:20</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2016/09/19/172009/" class="post-title">ISUCON6予選で惨敗した. 足りなかったのは&#39;Courage&#39;</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-ISUCON" href="https://blog.mosuke.tech/categories/isucon">ISUCON</a><a class="post-category post-category-惨敗" href="https://blog.mosuke.tech/categories/%E6%83%A8%E6%95%97">惨敗</a><a class="post-category post-category-ISUCON6" href="https://blog.mosuke.tech/categories/isucon6">ISUCON6</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p><span style="font-size: 80%"><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apple">Apple</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/keynote">keynote</a>で話題の&rsquo;<a class="keyword" href="http://d.hatena.ne.jp/keyword/Courage">Courage</a>&lsquo;使ってみた笑</span></p></p>
-
-<p>ISUCON6予選で惨敗した。(18000点くらい)<br>
-端的に言って、とても未熟だった。</p>
-
-<p>とはいえ、とてもいい思い出になったのでまとめる。</p>
-
-<h1>メンバー</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%EA%A1%BC%A5%A8%A5%E0">スリーエム</a>というチーム名で、@mogulla3と@mintsu123と一緒に出場した。<br>
-ふたりともぼくよりもアプリの改善などは10倍くらい優秀なエンジニアなので、<br>
-ぼくはインフラとか総務的な立ち回りをして、２人がチューニングに集中できるようにすることを心がけていた。</p>
-
-<h1>準備</h1>
-
-<p>準備は３週間の間に土日どちらかに集まってISUCONの過去問を解いたり戦略について事前に打ち合わせしてた。</p>
-
-<ul>
-<li>プライベートレポジトリの用意(Gitlab)</li>
-<li>チャットルームの用意(Slack)</li>
-<li>ISUCON4とISUCON5の予選の過去問解き
-
-<ul>
-<li>土日集まったときには戦略や振り返りを重視</li>
-<li>実際の過去問ときは平日に各々が空いた時間などにやってた</li>
-</ul>
-</li>
-<li>基本戦略を準備
-
-<ul>
-<li>なんの技術を主に使うか</li>
-<li>だれが何を担当するか</li>
-<li>定形作業の手順化</li>
-<li>その他ナレッジなど</li>
-</ul>
-</li>
-</ul>
-
-<h3>採用した技術</h3>
-
-<ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a> 7.0</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>-fpm</li>
-<li>Openresty(nginx) 1.11</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a> 5.7</li>
-<li>Redis 3.2</li>
-</ul>
-
-<h1>当日</h1>
-
-<p>出だしはとても順調だった。<br>
-Azure担当だったぼくはすぐにサーバをデプロイし、OSバージョンを確認した。<br>
-予想通りの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a> 16.04であったので、準備したとおり必要な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DF%A5%C9%A5%EB%A5%A6%A5%A7%A5%A2">ミドルウェア</a>のインストールをすませた。</p>
-
-<p>ほぼ定石と言える下記（定形作業と呼んでいた）もすぐにこなすことができた。</p>
-
-<ul>
-<li>調査のための各種ログ出力化</li>
-<li>Nginxでの静的ファイルの配信、キャッシュ化</li>
-<li>Kataribeインストールと実行</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>のインデックスの付与と設定見直し</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>-fpmの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unix">Unix</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>ソケット化</li>
-<li>デプロイの仕組みの整理</li>
-<li>不要デーモンの停止</li>
-</ul>
-
-<p>この状態でもスコアは0のままであり、少し焦りを感じたが、<br>
-ここからが本番のチューニング開始である。<br>
-Kataribeの結果から、<code>GET /</code>が改善ポイントであることは明らかなのはわかっていた。</p>
-
-<pre><code>Top 20 Sort By Count
-Count    Total      Mean    Stddev     Min   P50.0   P90.0   P95.0   P99.0     Max  2xx  3xx  4xx  5xx  Request
-  326  366.105  1.123021  2.619395   0.000   0.000   6.188   7.418   9.827  10.207  326    0    0    0  GET / HTTP/1.0
-  326  366.154  1.123172  2.618228   0.000   0.001   6.190   7.418   9.778  10.207  326    0    0    0  GET / HTTP/1.1
-  240    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  240    0    0    0  GET /css/bootstrap.min.css HTTP/1.0
-  240    0.737  0.003071  0.002843   0.000   0.002   0.006   0.010   0.013   0.015  240    0    0    0  GET /css/bootstrap.min.css HTTP/1.1
-  120    0.101  0.000842  0.002078   0.000   0.000   0.002   0.003   0.015   0.015  120    0    0    0  GET /img/star.gif HTTP/1.1
-  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /js/jquery.min.js HTTP/1.0
-  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /img/star.gif HTTP/1.0
-  120    0.152  0.001267  0.001788   0.000   0.001   0.003   0.004   0.011   0.012  120    0    0    0  GET /css/bootstrap-responsive.min.css HTTP/1.1
-  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /js/bootstrap.min.js HTTP/1.0
-  120    0.148  0.001233  0.001843   0.000   0.001   0.003   0.004   0.011   0.012  120    0    0    0  GET /favicon.ico HTTP/1.1
-  120    0.157  0.001308  0.001829   0.000   0.001   0.003   0.004   0.011   0.011  120    0    0    0  GET /js/bootstrap.min.js HTTP/1.1
-  120    0.379  0.003158  0.002890   0.000   0.002   0.007   0.010   0.013   0.015  120    0    0    0  GET /js/jquery.min.js HTTP/1.1
-  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /favicon.ico HTTP/1.0
-  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /css/bootstrap-responsive.min.css HTTP/1.0
-   67  116.697  1.741746  1.159447   0.020   1.760   2.999   3.000   3.001   3.001    0   42   25    0  POST /login HTTP/1.0
-   67  116.706  1.741881  1.159099   0.020   1.760   2.999   2.999   3.001   3.001    0   42   25    0  POST /login HTTP/1.1
-   35    0.857  0.024486  0.022147   0.000   0.026   0.040   0.085   0.096   0.096   35    0    0    0  GET /stars?keyword=%E5%86%85%E7%94%B0%E4%BF%AE%E5%B9%B3 HTTP/1.1
-   35    0.977  0.027914  0.020538   0.000   0.031   0.049   0.062   0.077   0.077   35    0    0    0  GET /stars?keyword=%E3%82%A6%E3%83%BC%E3%82%BA HTTP/1.1
-   34    0.867  0.025500  0.018035   0.000   0.028   0.044   0.059   0.071   0.071   34    0    0    0  GET /stars?keyword=%E5%8C%97%E6%B6%88%E9%98%B2%E7%BD%B2 HTTP/1.1
-   32    0.731  0.022844  0.015575   0.000   0.025   0.040   0.050   0.052   0.052   32    0    0    0  GET /stars?keyword=%E8%BC%AA%E7%8A%B6%E7%94%B2%E7%8A%B6%E7%AD%8B HTTP/1.1 
-</code></pre>
-
-<p>しかし、なかなか突破口が見いだせず、できるところからやっていく方針を取った。<br>
-アプリの改善を振り返ってみると、なにもしてねーなって感じがやばい。（何してたんだっけ…(・_・;)）</p>
-
-<ul>
-<li>isudaとisutarのfpmプロセスの調整</li>
-<li>isudaとisutar間のhttpによる<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>呼び出しをなくし、DB接続とした</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>改善
-
-<ul>
-<li>htmlifyのkeyword取り出し<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>
-</li>
-<li>load_starの<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>
-</li>
-<li>など</li>
-</ul>
-</li>
-<li>keywordのlengthを予め持つように変更</li>
-<li>isudaとisutarの統合
-
-<ul>
-<li>効果の検証ができず、結局マージはできなかった</li>
-</ul>
-</li>
-</ul>
-
-<h1>反省</h1>
-
-<p><code>htmlify</code>の改善がなによりも効果がでることはわかっていた。<br>
-しかし、その改善についてのいい方法がすぐに思いつかなかったこともあり、<br>
-他のやれることを優先しすぎてしまったことが一番の反省点だ。</p>
-
-<p>時間がない、大きな変更したら怖いという思いが強くなり、<br>
-どちらかというとやれることをきちんとやればいける、というディフェンシブな思考になってしまっていた気がする。</p>
-
-<p>せっかくRedisやOpenrestyを準備していたが、<br>
-そのあたりを発揮せずにおわってしまい残念な感じではあった。<br>
-（ここは準備不足ポイントでもあった）</p>
-
-<p>根本の改善に勇気を持って切り込む"<a class="keyword" href="http://d.hatena.ne.jp/keyword/Courage">Courage</a>"を次は発揮したい。</p>
-
-<p>反省会の炙りしめ鯖うまかった。</p>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Ftokyo%2FA1303%2FA130301%2F13003370%2F" title="BISTRO三十五段屋 (渋谷/居酒屋)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://tabelog.com/tokyo/A1303/A130301/13003370/">tabelog.com</a></cite></p>
-
-<h1>最後に</h1>
-
-<p>反省点は多かったものの、準備期間も含めてこの１ヶ月とても楽しかったし、<br>
-また自分の未熟さを実感できてとてもよかった。</p>
-
-<p>今まで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B6%A5%B5%BB%A5%D7%A5%ED%A5%B0%A5%E9%A5%DF%A5%F3%A5%B0">競技プログラミング</a>などもしたこともなく、<br>
-技術面で「競う」ということはほとんどしたことがなかった。</p>
-
-<p><p>この敗北で、技術をきちんと理解し追求していきたいという想いが湧いてきた。<br>
-ISUCON主催者ありがとうございました。</p>
 </body></p>
 
                     </div>

@@ -57,6 +57,226 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">31 May 2017, 19:25</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2017/05/31/aws_summit_network/" class="post-title">AWS Summit2017 Day2のぞいてきた。 ネットワーク設計入門メモ</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-クラウド" href="https://blog.mosuke.tech/categories/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89">クラウド</a><a class="post-category post-category-AWS" href="https://blog.mosuke.tech/categories/aws">AWS</a><a class="post-category post-category-AWS Summit" href="https://blog.mosuke.tech/categories/aws-summit">AWS Summit</a><a class="post-category post-category-ネットワーク" href="https://blog.mosuke.tech/categories/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF">ネットワーク</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h1 id="はじめに">はじめに</h1>
+
+<p>弊社はプレミアムフライデー導入企業なのだが、最終金曜日に早く帰る必要はなく、月内でどこか1日15時に帰りましょうという制度になっている。<br />
+金曜日が仕事の都合上取れなかったので、今月は5/31にプレミアムフライデー（プレミアムウェンズデー）を使った。<br />
+ちょうどAWS Summit開催中だったのでのぞきにいった。</p>
+
+<h1 id="雰囲気">雰囲気</h1>
+
+<p>想像していた雰囲気とはだいぶ異なっていたというのが第一印象。<br />
+想像以上にスーツの年齢層の高い人が多かった。それだけ、AWSもエンタープライズでも注目されるようになったということだろう。<br />
+以前に、JAWS2015に参加したことある。もちろんJAWSとAWS Summitでは参加者の層が違う。<br />
+が、あれから2年たちAWSに興味を持つ層も大きく変わってきたのを感じた。</p>
+
+<p>セッションも非IT企業への導入事例や、思ったより入門セッションも多かった。<br />
+登壇者の話しぶりも「オンプレからの移行」を意識したように感じた。</p>
+
+<h1 id="ブース">ブース</h1>
+
+<p>セッションだけではなく、AWSに関連するサービスを提供している企業がたくさんブースをだしている。<br />
+ここでのコミュニケーションが案外一番楽しい。お酒も用意されていて楽しくおしゃべりできた。</p>
+
+<p>Heroku+AWSの組み合わせで利用するケースの話を聞いて、あーなるほどねって感じだった。<br />
+HerokuはAWS上で動作しているし、インターネット経由してもそこまで遅くはならない。<br />
+そんな利点を使って組み合わせて使う事例なんかきいた。</p>
+
+<p>そのほかは、やっぱりどこもかしこもコンテナ。<br />
+コンテナをどう扱うか、どう監視するか、そんなところの話が多かった。</p>
+
+<h1 id="セッション-ネットワーク設計入門">セッション「ネットワーク設計入門」</h1>
+
+<p>セッションは１つだけ「<a href="http://www.awssummit.tokyo/summit/index.html#D2T3-5">ネットワーク設計入門</a>」を聞いた。<br />
+普段ならネットワーク設計入門のセッションは聞かないと思っているのだが、<br />
+どんなことを話すのか興味あって聞いてみた。</p>
+
+<h2 id="1-クラウド上のnwの特徴">(1)クラウド上のNWの特徴</h2>
+
+<ol>
+<li>物理設計はいらない</li>
+<li>可用性はすでにセット(VRRPなど気にしなくてよい）</li>
+<li>プロフラマブルに操作可能</li>
+</ol>
+
+<h2 id="2-nwサービス">(2)NWサービス</h2>
+
+<p>NWサービスは意外とすくない。VPCがほぼすべて。<br />
+VPCが本質であり、ここが理解できればほぼ問題ない。</p>
+
+<ol>
+<li>VPC</li>
+<li>Direct Connect</li>
+<li>Route53</li>
+</ol>
+
+<h2 id="3-前提知識">(3)前提知識</h2>
+
+<h3 id="vpc">VPC</h3>
+
+<p>物理設計はいらないんだけど、<br />
+やっぱり物理知っていることがアドバンテージになる。
+VPCはリージョンの中のみ。ゾーンはまたぐことができる。</p>
+
+<h3 id="専用線">専用線</h3>
+
+<p>当たり前だがDCの場所は公開していない。<br />
+じゃどうやって接続するか？<br />
+相互接続接続ポイントを用意しているからそこにつなぎに来てね、という考え方。</p>
+
+<h3 id="エッジロケーション">エッジロケーション</h3>
+
+<p>CDNノードやRoute53が動作しているところ。<br />
+リージョンとはまた別にある。</p>
+
+<h2 id="4-設計をはじめよう">(4)設計をはじめよう</h2>
+
+<p>AWSのどのサービスを使いたいかでNWの設計方針はかわる。<br />
+まずはVPCの中で利用するサービスとVPCの外で使うものがあるのでその区別。</p>
+
+<ul>
+<li>VPCの中で使うもの
+
+<ul>
+<li>EC2とかRDSとかRedshift、EMR</li>
+</ul></li>
+<li>VPCの外で使うもの
+
+<ul>
+<li>S3、LamdaとかDynamoDB、CloudWatch</li>
+</ul></li>
+</ul>
+
+<p>次に、外部通信の設計</p>
+
+<ul>
+<li>VPCと外部を接続する場合
+
+<ul>
+<li>専用線orインターネットVPNorパブリック(ssh/https)</li>
+</ul></li>
+<li>VPCがないけど外部から利用したい場合
+
+<ul>
+<li>httpsでまかなう場合が多い。</li>
+<li>実は、VPCがなくてもDicrectConnectは使えるよ。
+
+<ul>
+<li>DirectConnectのパブリック接続</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h2 id="5-プライベートnw設計のステップ">(5)プライベートNW設計のステップ</h2>
+
+<ol>
+<li>VPCの作成
+
+<ol>
+<li>VPCのCIDRレンジは変えられないから大きくとっておこう</li>
+<li>オンプレミスとのレンジも被らないように</li>
+<li>/16がおすすめ</li>
+</ol></li>
+<li>サブネット作成
+
+<ol>
+<li>インターネットに接続するものとしないもの。ここでサブネット分けよう</li>
+<li>AZが落ちてもいいように設計しよう。サブネットは２つずつ</li>
+<li>サブネットサイズは24がおすすめ</li>
+</ol></li>
+<li>VPCコンポーネントの作成
+
+<ol>
+<li>カスタマーGW</li>
+<li>インターネットGW</li>
+<li>VPC単位、サブネット単位、インスタンス単位で配置できるコンポーネントがあるよ</li>
+</ol></li>
+<li>インスタンスの配置
+
+<ol>
+<li>セキュリティポリシーを考えよう</li>
+<li>セキュリティグループとネットワークACLがあるよ</li>
+<li>セキュリティグループのほうが柔軟</li>
+</ol></li>
+<li>名前解決の検討</li>
+</ol>
+
+<h2 id="6-ユースケースごとのnw設計">(6)ユースケースごとのNW設計</h2>
+
+<h3 id="公開サービスの場合">公開サービスの場合</h3>
+
+<ul>
+<li>インターネットから接続でいるのはロードバランサーだけにしよう
+
+<ul>
+<li>あるいはあとはメンテナンス用の踏み台サーバだけ</li>
+</ul></li>
+<li>S3を活用するときは、VPCエンドポイントつかえばVPC内部から接続できるよ</li>
+<li>管理拠点とはVPNでつなぐことをおすすめするよ</li>
+<li>管理拠点とのルーティングはルートテーブル</li>
+<li>DNSはRoute53使うと便利だよ
+
+<ul>
+<li>ALIASレコードという独自機能</li>
+<li>DNSのフェイルオーバー機能
+
+<ul>
+<li>ソーリーページへの転送が可能</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h3 id="社内システム基盤の場合">社内システム基盤の場合</h3>
+
+<ul>
+<li>DirectConnectを使おう
+
+<ul>
+<li>パートナーがたくさんいるので連絡してみよう</li>
+</ul></li>
+<li>Route53はプライベートゾーン、オンプレからVPC内の名前解決にも使えるよ</li>
+<li>DirectConnect体験ラボあるからつかってみて
+
+<ul>
+<li><a href="https://aws.amazon.com/jp/dx_labo/">https://aws.amazon.com/jp/dx_labo/</a></li>
+</ul></li>
+</ul>
+
+<h2 id="7-vpc間のピア接続">(7)VPC間のピア接続</h2>
+
+<ul>
+<li>異なるVPC間をピア接続することもできるよ</li>
+<li>VPC間でルーティングの設定が必要</li>
+<li>マルチホップルーティングはできないので注意</li>
+<li>サブネットは重複しないように注意</li>
+</ul>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">29 May 2017, 20:06</h1>
                 <section class="post">
                     <header class="post-header">
@@ -643,251 +863,6 @@ Fluentdではサーバのシャットダウンシグナルを受け取った時�
 </ul>
 
 <p></body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">20 Feb 2017, 18:42</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2017/02/20/184220/" class="post-title">参加してきた、MSPJマイグレーションコンペ2017winter</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-クラウド" href="https://blog.mosuke.tech/categories/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89">クラウド</a><a class="post-category post-category-Azure" href="https://blog.mosuke.tech/categories/azure">Azure</a><a class="post-category post-category-AWS" href="https://blog.mosuke.tech/categories/aws">AWS</a><a class="post-category post-category-MSPJ" href="https://blog.mosuke.tech/categories/mspj">MSPJ</a><a class="post-category post-category-マイグレーション" href="https://blog.mosuke.tech/categories/%E3%83%9E%E3%82%A4%E3%82%B0%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3">マイグレーション</a><a class="post-category post-category-MSP" href="https://blog.mosuke.tech/categories/msp">MSP</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>先日、2017年2月18日に「MSPJ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DA%A5%C6%A5%A3%A5%B7%A5%E7%A5%F3">コンペティション</a>2017winter」に参加してきた。<br>
-MSPJ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DA%A5%C6%A5%A3%A5%B7%A5%E7%A5%F3">コンペティション</a>2017winterとは、<br>
-日本MSP協会<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DA%A5%C6%A5%A3%A5%B7%A5%E7%A5%F3">コンペティション</a>グループが主催する、
-次代を担う若手運用技術者同士の交流・競争を通して日本のMSP事業者における運用技術の向上を目指した<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DA%A5%C6%A5%A3%A5%B7%A5%E7%A5%F3">コンペティション</a>。</p></p>
-
-<p>もう少し平たく言うと、MSP事業者の本当の業務に近い形でのコンペを通じて、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AD%A5%EB%A5%A2%A5%C3%A5%D7">スキルアップ</a>を図りましょうというものだ。<br>
-自分はMSPの人じゃないけど参加は全然できた。</p>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=https%3A%2F%2Fconnpass.com%2Fevent%2F47825%2F" title="MSPJマイグレーションコンペティション2017winter (2017/02/18 09:30〜)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://connpass.com/event/47825/">connpass.com</a></cite></p>
-
-<h1>競技ルール</h1>
-
-<p>今回の競技のお題は、<br>
-<b>「<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>上で動作しているレガシーな<a class="keyword" href="http://d.hatena.ne.jp/keyword/Redmine">Redmine</a>をAzure上に移行する」</b>というものだ。</p>
-
-<p>このコンペの特徴としては、実際にMSPでの業務に則し、お客さんから曖昧な要望を受けている部分や、<br>
-お客さん側にしかない権限については、お客さんと調整する必要があること。<br>
-例えば、環境の移行する際には<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>の切り替えが必要だったのですが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>の設定権限は我々にはなくて、<br>
-Slackを利用して、<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>設定変更依頼や作業周知を出さなければいけなかった。<br>
-このあたりはとてもユニークなポイント。</p>
-
-<p>お客さんからは移行について以下のような曖昧な要望をもらっていた。</p>
-
-<pre><code>&lt;要望&gt;
-- 今の環境を新しい環境に完全移行して欲しいです。
-- 実施した内容と結果については報告が欲しいです。
-- システムを止めるときは利用者に告知が必要なので連絡が欲しいです。
-- 昔から使っている古い環境なので、バージョンアップして欲しいです。
-- できれば利用者に影響を出さないように切り替えたいです。
-- できればサーバに関する資料があるとありがたいです。
-- できれば今はまったくバックアップを取っていないのでバックアップを取れるようにしたいです
-- できれば今後は利用者が増えるのでシステムを冗長化したいです。
-- できれば新しいインフラエンジニアに引継ぎするために必要な情報がまとまっていると嬉しいです。
-
-&lt;担当者のコメント&gt;
-- 前任のインフラエンジニアが辞めちゃったのでこのシステムもう分かる人がいなくって。
-- 結構前から使っているので環境も古くなっているみたいで、OSのサポートがもうすぐ切れるって話を聞いたものですから、セキュリティとか色々心配で何とかしたいんです。
-- みんなこのシステムを結構便利に使っていてくれているようだから、システムを切り替えるときは連絡しないとなぁ。
-- そうそう、近々新しいインフラエンジニアが入社予定だから、その方に引き継げるようになっていると嬉しいですね。 
-</code></pre>
-
-<p>ちなみにチームについては、当日の参加者で適当に3人チームを作って行った。<br>
-一緒の参加者が同じチームにならないように調整された。</p>
-
-<h1>構成把握</h1>
-
-<p>開始後、まずやったことが環境・構成の把握。<br>
-ざっと下記のような感じ。ログインしてすぐに、<code>pstree</code> みて大体の構成を把握した。</p>
-
-<ul>
-<li>インフラ: <a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>(EC2)</li>
-<li>OS: CentOS5.2</li>
-<li>Webサーバ: Apache2.0 + Passenger</li>
-<li>DB: MySQL5.1</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>: 1.9</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Redmine">Redmine</a>: 2.3</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>; Route53で管理。権限はお客さんのみ</li>
-<li>サーバ構成: サーバ1台のシングル構成</li>
-</ul>
-
-<h1>移行作戦</h1>
-
-<p>細かなバージョンはおいておいて、最終的に目指す構成は下記のようにした。<br>
-これに至った考え方とかは下に書く。</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20170220165739.jpg"></span></p>
-
-<h2>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BE%E9%C4%B9%B2%BD">冗長化</a>の観点</h2>
-
-<p>まず、Webサーバをロードバランサを利用して負荷分散と冗長性を確保した。<br>
-Azureでは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%C9%A5%D0%A5%E9%A5%F3%A5%B5%A1%BC">ロードバランサー</a>のフルマネージドサービスがあるので、<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%C9%A5%D0%A5%E9%A5%F3%A5%B5%A1%BC">ロードバランサー</a>自体の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BE%E9%C4%B9%B2%BD">冗長化</a>については考える必要がなかった。</p>
-
-<p><a href="https://docs.microsoft.com/ja-jp/azure/load-balancer/load-balancer-overview">Azure Load Balancer の概要 | Microsoft Docs</a></p>
-
-<p>次にデータベースだが、当初ロードバランサと同様にマネージドサービスがあればそちらで対応しようと検討していた。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a> Databaseというサービスがあるのだが、「<a class="keyword" href="http://d.hatena.ne.jp/keyword/Microsoft">Microsoft</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL%20Server">SQL Server</a> エンジン」のみの対応とのことで、<br>
-今回の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Redmine">Redmine</a>移行には適切ではなかった。</p>
-
-<p><a href="https://docs.microsoft.com/ja-jp/azure/sql-database/sql-database-technical-overview">SQL Database とは SQL Database の概要 | Microsoft Docs</a></p>
-
-<p>ということで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3">レプリケーション</a>を使ったデータベースを作ることにしたのだが、<br>
-自前で作っている余裕はとてもなかったので、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A1%BC%A5%B1%A5%C3%A5%C8%A5%D7%A5%EC%A5%A4%A5%B9">マーケットプレイス</a>から<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a> with replicationというイメージを見つけて対応することとした。</p>
-
-<p><a href="https://azuremarketplace.microsoft.com/ja-jp/marketplace/apps/bitnami.mysql-cluster?tab=Overview">Microsoft Azure Marketplace</a></p>
-
-<p>最後に、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Redmine">Redmine</a>では添付ファイルのアップロードなどをすることがある。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%C9%A5%D0%A5%E9%A5%F3%A5%B5%A1%BC">ロードバランサー</a>で負荷分散環境においては、添付ファイルを共有する必要がある。<br>
-手っ取り早く<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rsync">Rsync</a>での同期をする方向にした。</p>
-
-<h2>バージョン関連</h2>
-
-<p>移行先の各種バージョンは下記とした。</p>
-
-<ul>
-<li>OS: CentOS7.2</li>
-<li>Webサーバ: Nginx</li>
-<li>DB: MySQL5.7</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>: 2.2(アプリケーション実行はthin)</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Redmine">Redmine</a>: 2.6</li>
-</ul>
-
-<p>はじめRuby2.4で検証していたのだが、<br>
-さすがにRails3はRuby2.4では動かずRuby2.2まで下げた。</p>
-
-<h2>Webサーバ、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>関連</h2>
-
-<p>移行元の環境では、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Redmine">Redmine</a>が<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>+Passengerで動作していた。<br>
-余談になるが、Passengerはmod_<a class="keyword" href="http://d.hatena.ne.jp/keyword/rails">rails</a>なんて呼ばれることもあって、いわゆるmod_<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>, <a class="keyword" href="http://d.hatena.ne.jp/keyword/mod_perl">mod_perl</a>と同じ方式での動作方法。</p>
-
-<p>昔にPassengerインス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%EB">トール</a>でハマった記憶もあるし、特にPassengerである必要性はなかったので、<br>
-馴染みのあるNginx+Thinの構成で動かすこととした。<br>
-<span style="font-size: 80%">※Thin部分はpumaでも<a class="keyword" href="http://d.hatena.ne.jp/keyword/unicorn">unicorn</a>でもお好きなものをどうぞ。</span></p>
-
-<p>この構成はWebサーバと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>を分離する<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>。<br>
-Thin単体でも動作させることが可能。Nginxはリバースプロキシや静的ファイルの配信に特化し、<br>
-アプリケーションの実行はThin側に任せる。</p>
-
-<p>正直どちらでもかまわないのだが、Passengerを利用する場合、<br>
-アプリケーションとインフラ(<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>部分)が密な関係になってしまうのが煩わしいと個人的に思う。<br>
-まあケースバイケースでしょうが。</p>
-
-<p>※あと最近<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>触ってなさすぎて忘れた…</p>
-
-<h1>移行作業</h1>
-
-<p>作戦が決まったところで、さっそく移行作業なのだが、<br>
-いきなり完成形に持っていくことは難しいと考えいくつかのステップに分けて移行作業を進めた。</p>
-
-<h4>Step1：まずはAzure環境へ</h4>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20170220173855.jpg"></span></p>
-
-<h4>Step2：<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BE%E9%C4%B9%B2%BD">冗長化</a>とか</h4>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20170220173905.jpg"></span></p>
-
-<h4>Step3：最後の仕上げ</h4>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20170220173915.jpg"></span></p>
-
-<h2>Azureのここがよくわからなかった</h2>
-
-<p>限られた時間内で、ほぼ初めてAzureをまともに使ったわけだが、<br>
-いくつか概念の理解や操作方法がわかりづらいなと感じた。<br>
-（IsuconでもAzure触ったが、あれは本当にサーバ起動するだけなので…）</p>
-
-<h4>ネットワーク概念</h4>
-
-<p>Virtual Private Networkの概念がとてもわかりづらかった印象。<br>
-買ったリソースをどうやって、指定のネットワークにデプロイするのかなど。<br>
-慣れの問題も大きいとは思うが、当日はほんとにわからなかった。</p>
-
-<h4>サーバのイメージ作成</h4>
-
-<p>すごい初歩的なことだが、構築したサーバのイメージを作成して、複製することがとても難しかった。 <br>
-メンバーがいろいろ躓いていたので、最終的に普通にもう1台構築するという強行手段を取った。<br>
-この点は、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>に携わるものとして仕様確認しておきたい。</p>
-
-<p>仕事で使っている<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>が<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>的なため、<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>の考え方にFitするものはすぐに理解できたが、Azureはまた独特の概念が多い印象。<br>
-これだけ<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>が使われている現代に、「<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>的」であることは価値がある！？？</p>
-
-<h1>結果、懇親会とか</h1>
-
-<p>んー。結果は優勝・準優勝ではなかったんですが、<br>
-きっとテストをちゃんとしないで移行したので、きっと触るとなにか抜け漏れがあったのでしょう(笑)<br>
-また来年あれば参加したいなと思える楽しいコンテストだったことは間違いない。<br>
-ISUCONに続き悔しい結果。</p>
-
-<p>参加者の中には、MSP業界の方がもちろんたくさんいた。<br>
-懇親会でいろいろ話をしたけどざっくりこんな課題を抱えている人が多かった。</p>
-
-<h4>アプリが悪い問題</h4>
-
-<p>MSPなのでお客さんのシステムの運用を請け負います。<br>
-その業務の中には障害対応や監視設定、デプロイとか様々あるわけですが、<br>
-アプリの作りにより、監視設定できないことや自動化できないことが多数あるそうです。<br>
-お客さんのせいにしてはいけないのだけど、その点が一番しんどそうだった。</p>
-
-<h4>自動化・コード化</h4>
-
-<p>MSPの方々も本当は監視やデプロイなどの自動化するコードやツールを作ることに力を入れたいけど、<br>
-単純な手順書作業や日々の障害対応に追われてなかなかできないとか。<br>
-そもそも普段コードを書く仕事ではないので、そのメンテするチーム体制が取れないという問題も。<br>
-（それは前の仕事でもよく聞いた話だなぁ～）</p>
-
-<h4>オンプレ</h4>
-
-<p>まだまだオンプレ環境の運用も多く、<br>
-ハードウェア交換やハードウェアによる障害には悩まされているとのこと。<br>
-聞いてる話だと、あえてオンプレにしているというよりはレガシーで残っているのが多いっぽい。</p>
-
-<h4>夜勤</h4>
-
-<p>夜勤の週は、5日間夜勤をする。そういう運用らしいです。<br>
-前の仕事では身近にネットワークの運用部隊がいたので夜勤事情はよく聞いていますが、
-まったく考え方が違くてびっくり。<br>
-でも意外と、週ごとに別れている方が辛くないらしいよ？</p>
-
-<h1>最後に</h1>
-
-<p>一緒に戦ってくれたチームメンバーありがとうございました。</p>
-
-<p>去年のお題は<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>から<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>への移行だったらしいですが、今回は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>から<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>への移行。<br>
-このあたり、そういう時代のフェーズに入ってきているということなんでしょうか。<br>
-きっとそういうことでしょう。</p>
-
-<p><p>特定の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>独自の機能を使っていなければ、移行自体は簡単で、<br>
-それよりももともとの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%AC%A5%B7%A1%BC%A5%B7%A5%B9%A5%C6%A5%E0">レガシーシステム</a>をバージョンアップするほうがしんどい印象。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ロックインとどう向き合っていくか、考えなければ。</p>
-</body></p>
 
                     </div>
                 </section>

@@ -57,6 +57,200 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">31 Jul 2015, 21:15</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2015/07/31/211542/" class="post-title">Packerやる前にKickstartはじめよう</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-kickstart" href="https://blog.mosuke.tech/categories/kickstart">kickstart</a><a class="post-category post-category-virtualbox" href="https://blog.mosuke.tech/categories/virtualbox">virtualbox</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<h1>1.はじめに</h1></p>
+
+<p>開発環境はVirualboxを使った<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>を利用しているが、<br>
+本番環境は<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>だったり<a class="keyword" href="http://d.hatena.ne.jp/keyword/KVM">KVM</a>だったり違う仮想化機構で動作しているなんてことよくあると思います。<br>
+そういう環境下でどのように開発環境と本番環境の差分をなくしていますか？</p>
+
+<p>わたしの場合、基本的にAnsibleを使ってプロビジョニングをしていますが、<br>
+そのプロビジョニング前のベースが異なってしまって困ることがよくあります。<br>
+一般に公開されているVagrantBox使ったら余計な設定が入っていたとか、すでにパッケージが入っていたとか…</p>
+
+<p>そんな問題を解決しようとPackerを使おう！って考えました。<br>
+ですが、Packerも当たり前だけど魔法ではなく、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>などの自動インストールが前提なので、<br>
+Packerをやる前に<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>を学習せよ、、、ということに気づきました。</p>
+
+<p>ということで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>をはじめたよってことです。</p>
+
+<h1>2.<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ってなに</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>はOSのインストールを自動化する仕組みです。<br>
+anaconda社が提供するインストールの仕組みで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Redhat">Redhat</a>系のOSが採用しているものです。<br>
+ですので<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>だとPreseedっていう別の仕組みだそうです。（詳しくありませんっ）</p>
+
+<p>で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>でなにができるかというと...</p>
+
+<p>OSのインストールをしたことがある方ならわかるかと思いますが、<br>
+普通にDVDなどからインストールすると、</p>
+
+<ul>
+<li>言語はなににしますかー？</li>
+<li>ホスト名なににしますかー？</li>
+<li>パッケージはなにをいれますかー？</li>
+</ul>
+
+<p>とか、聞かれて選択していく必要があります。
+この作業を自動化できるのが<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>です。</p>
+
+<p>URLのようなもの。
+<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fkajuhome.com%2Fcentos6_inst.shtml" title="はじめての自宅サーバ構築 - Fedora/CentOS - CentOS6 のインストール手順" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://kajuhome.com/centos6_inst.shtml">はじめての自宅サーバ構築 - Fedora/CentOS - CentOS6 のインストール手順</a></iframe><cite class="hatena-citation"><a href="http://kajuhome.com/centos6_inst.shtml">kajuhome.com</a></cite></p>
+
+<h1>(おまけ)Ansible, Chef, Puppetとの違い？</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>にはプロビジョニング機能もついているため、<br>
+AnsibleとかChefとかPuppetとの違いは？住み分けは？と思うかもしれません。<br>
+明確に、住み分けが決まっているわけではありませんが、
+個人的にはAnsibleやChefを実行する前の最低限の設定を<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>にやらせようと思っています。<br>
+（一般的かとは思いますが…？）</p>
+
+<p>Lee ThompsonのProvisioning Toolchainを参考にKiskstarのやる範囲をまとめると。
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150731/20150731223953.jpg" alt="f:id:mosuke5:20150731223953j:plain" title="f:id:mosuke5:20150731223953j:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fen.oreilly.com%2Fvelocity-mar2010%2Fpublic%2Fschedule%2Fdetail%2F14180" title="Provisioning Toolchain: Web Performance and Operations - Velocity Online Conference - March 17, 2010 - O'Reilly Media" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://en.oreilly.com/velocity-mar2010/public/schedule/detail/14180">Provisioning Toolchain: Web Performance and Operations - Velocity Online Conference - March 17, 2010 - O'Reilly Media</a></iframe><cite class="hatena-citation"><a href="http://en.oreilly.com/velocity-mar2010/public/schedule/detail/14180">en.oreilly.com</a></cite></p>
+
+<h1>3.Hello <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>!!</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Virtualbox">Virtualbox</a>を使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>を試しました。</p>
+
+<h1>3-1.用意したもの</h1>
+
+<ul>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Virtualbox">Virtualbox</a>
+
+<ul>
+<li>自分の環境は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>で、バージョンは5.0</li>
+</ul>
+</li>
+<li>OSのisoファイル
+
+<ul>
+<li>
+<a href="http://isoredirect.centos.org/centos/7/isos/x86_64/CentOS-7-x86_64-DVD-1503-01.iso">CentOS Mirror</a> ここからダウンロードしました</li>
+</ul>
+</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイル
+
+<ul>
+<li>ネットワーク上においてhttpでアクセスできるようにしておきました</li>
+</ul>
+</li>
+</ul>
+
+<p>利用した<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイル。自分の学習のためコメントを多く残しました。</p>
+
+<pre><code># アップグレードするかインストールするか
+install
+
+# インストールタイプの設定
+# CD-ROM経由かネットワーク経由かとか
+cdrom
+
+# 言語設定
+lang ja_JP.UTF-8
+
+# キーボード設定
+keyboard jp106
+
+# ネットワーク設定
+# /etc/sysconfig/network-scripts/ifcfg-xxxx 部分
+network --onboot yes --device eth0 --bootproto dhcp --noipv6
+
+# rootのパスワード
+# xxxxxx部分はopensslコマンドで作成するといい
+# $openssl passwd -1
+rootpw --iscrypted xxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# iptablesの設定
+# プロビジョニングで設定するのでここでは無効にしておく
+firewall --disabled
+
+# 認証オプション
+authconfig --enableshadow --passalgo=sha512
+
+# SELinuxの設定
+# こちらも詳細はプロビジョニングで設定するので無効にしておく
+selinux --disabled
+
+# タイムゾーン
+timezone --utc Asia/Tokyo
+
+# ブートローダのインストール方法
+bootloader --location=mbr --driveorder=sda --append=&quot;nomodeset crashkernel=auto rhgb quiet&quot;
+
+# 設定後にリブート
+reboot
+
+# パーティション設定
+clearpart --linux --drives=sda
+autopart
+
+# インストールパッケージ選択
+%packages --nobase
+@core
+
+%end 
+</code></pre>
+
+<h3>参考になったもの</h3>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Redhat">Redhat</a>社のインストールガイドがよくまとまっていた。<br>
+特に<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイルについては下記あたりが役立ちます。</p>
+
+<ul>
+<li><a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/6/html/Installation_Guide/s1-kickstart2-options.html">32.4. キックスタートのオプション</a></li>
+<li><a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/6/html/Installation_Guide/s1-kickstart2-packageselection.html">32.5. パッケージの選択</a></li>
+</ul>
+
+<h1>3-2.<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイルの使い方</h1>
+
+<p>しかし、OSインストール前なのにどうやってファイルを使うのか…？<br>
+はじめ戸惑いました…</p>
+
+<p>実は以下の方法で利用できます。</p>
+
+<p>OSのisoファイルで起動するとこの画面がでるやろ。
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150802/20150802125544.png" alt="f:id:mosuke5:20150802125544p:plain" title="f:id:mosuke5:20150802125544p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p>そして、ここでTabをおすと、なにか入力できるが画面が出てきて。<br>
+そこに、<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイルのパスを入力してやる。
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150802/20150802125630.png" alt="f:id:mosuke5:20150802125630p:plain" title="f:id:mosuke5:20150802125630p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p>これで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>完了や。</p>
+
+<h1>4.最後に</h1>
+
+<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>入門したし、次はPackerをやりたいと思います。<br>
+が、ふと思ったのが、自分の用途だとPackerではなく<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>で十分かもなーとか思ったり思わなかったり…</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">19 Jul 2015, 13:58</h1>
                 <section class="post">
                     <header class="post-header">
@@ -553,137 +747,6 @@ LAN内の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">�
 <p><p>とても単純な話だが、<br>
 いろんなケースの家庭内インターネットの設定をすることで、<br>
 いろいろと気づくこともあった。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">08 May 2015, 17:47</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/05/08/174732/" class="post-title">sinatra-assetpackをproduction環境で使う時にはまったー</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-ruby" href="https://blog.mosuke.tech/categories/ruby">ruby</a><a class="post-category post-category-sinatra" href="https://blog.mosuke.tech/categories/sinatra">sinatra</a><a class="post-category post-category-sinatra-assetpack" href="https://blog.mosuke.tech/categories/sinatra-assetpack">sinatra-assetpack</a><a class="post-category post-category-jsminify" href="https://blog.mosuke.tech/categories/jsminify">jsminify</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>アプリケーションで、JSファイルを圧縮する<a class="keyword" href="http://d.hatena.ne.jp/keyword/sinatra">sinatra</a>-assetpackを利用していて、<br>
-production環境で動作させようとしたら動かなくなってしまった問題について調査した。</p></p>
-
-<h1>起こったこと</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>を使ってアプリケーションを作っていて、development環境で完成したので、
-prorudction環境で動作させようとしたら、jsのエラーが出るようになってしまい、正常に動かなくなった。</p>
-
-<p>アクセスすると、以下のエラーがでる。要は<a class="keyword" href="http://d.hatena.ne.jp/keyword/jquery">jquery</a>がないとのこと。</p>
-
-<pre><code>Uncaught ReferenceError: $ is not defined 
-</code></pre>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/jQuery">jQuery</a>はもちろん読み込ませてるし、なんでproduction環境でだけ？？？</p>
-
-<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a></h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/sinatra">sinatra</a>のメインアプリケーションであるapp.rbには以下のように、<a class="keyword" href="http://d.hatena.ne.jp/keyword/sinatra">sinatra</a>-assetpackを利用してjsを読み込んでいる。</p>
-
-<pre><code class="language-ruby">assets do
-  serve '/js', from: 'public/js'
-  serve '/bower_components', from: 'bower_components'
-
-  js :app, '/js/app.js', [
-    '/js/index.js',
-  ]
-
-  js :libs, '/js/libs.js', [
-    '/bower_components/jquery/dist/jquery.js',
-    '/bower_components/bootstrap/dist/js/bootstrap.js',
-  ]
-
-  js_compression :jsmin
-end
-</code></pre>
-
-<p>layout.erbにはもちろん、libs.jsが先に来るように記述している。</p>
-
-<pre><code class="language-ruby">&lt;%= js :libs %&gt;
-&lt;%= js :app %&gt;
-</code></pre>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/sinatra">sinatra</a>-assetpackの挙動</h1>
-
-<p>productionでのみ発生する<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a>なので、改めて<a class="keyword" href="http://d.hatena.ne.jp/keyword/sinatra">sinatra</a>-assetpackのproduction環境時の挙動を確認した。<br>
-production環境では、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">複数</a>のjsファイルを1つのファイルにまとめ、圧縮を行う。</p>
-
-<h4>development環境</h4>
-
-<p>３つのjsファイルがあったら以下のように３つ別々に読み込まれる。</p>
-
-<pre><code class="language-html">&lt;script type='text/javascript' src='/js/vendor/jquery.283479.js'&gt;&lt;/script&gt;
-&lt;script type='text/javascript' src='/js/vendor/underscore.589491.js'&gt;&lt;/script&gt;
-&lt;script type='text/javascript' src='/js/app/main.589491.js'&gt;&lt;/script&gt;
-</code></pre>
-
-<h4>production環境</h4>
-
-<p>３つあったjsファイルは1つにまとめられ、また圧縮される。</p>
-
-<pre><code class="language-html">&lt;script type='text/javascript' src='/js/app.589491.js'&gt;&lt;/script&gt;
-</code></pre>
-
-<p>詳細はこちら<br>
-<a href="https://github.com/rstacruz/sinatra-assetpack#results">rstacruz/sinatra-assetpack · GitHub</a></p>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a>の理由</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Chrome">Chrome</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%D0%A5%C3%A5%B0">デバッグ</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>のNetworkでファイルのダウンロード状況を確認してみると意外なことがわかった。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150508/20150508171833.png" alt="f:id:mosuke5:20150508171833p:plain" title="f:id:mosuke5:20150508171833p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>画像が小さくて見づらいかもしれないが、
-5行目と6行目のapp.jsとlibs.jsで先にlibs.jsを読み込んでいるのに、おそらく圧縮とダウンロードに時間がかかり、<br>
-app.jsのほうが先にダウンロードが終わっている。</p>
-
-<p>libs.jsには<a class="keyword" href="http://d.hatena.ne.jp/keyword/jQuery">jQuery</a>などが含まれていて、app.js内で<a class="keyword" href="http://d.hatena.ne.jp/keyword/jQuery">jQuery</a>を利用する。<br>
-よって、先にapp.jsが読み込まれてしまったことで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/jQuery">jQuery</a>がねーぞ！と怒られてしまったのである。</p>
-
-<h1>対策と考慮</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/sinatra">sinatra</a>-assetpackなどを利用して、jsを圧縮する際には、
-ファイルを1つにまとめたり圧縮したりする時間がかかることを十分に考慮しなければいけない。</p>
-
-<p>あまり賢い手段をは言えないが、libs.jsとapp.jsひとつにまとめることで今回の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a>は避けられる。
-app.rb</p>
-
-<pre><code class="language-ruby">assets do
-  serve '/js', from: 'public/js'
-  serve '/bower_components', from: 'bower_components'
-
-  js :app, '/js/app.js', [
-    '/bower_components/jquery/dist/jquery.js',
-    '/bower_components/bootstrap/dist/js/bootstrap.js',
-    '/js/index.js',
-  ]
-
-  js_compression :jsmin
-end
-</code></pre>
-
-<p><p>また、事前に圧縮しておいて、ダウンロードだけする状態にしてもいいかもしれない。<br>
-<a href="https://github.com/rstacruz/sinatra-assetpack#precompile">rstacruz/sinatra-assetpack · GitHub</a></p>
 </body></p>
 
                     </div>

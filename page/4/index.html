@@ -57,6 +57,187 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">19 Sep 2016, 17:20</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2016/09/19/172009/" class="post-title">ISUCON6予選で惨敗した. 足りなかったのは&#39;Courage&#39;</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-ISUCON" href="https://blog.mosuke.tech/categories/isucon">ISUCON</a><a class="post-category post-category-惨敗" href="https://blog.mosuke.tech/categories/%E6%83%A8%E6%95%97">惨敗</a><a class="post-category post-category-ISUCON6" href="https://blog.mosuke.tech/categories/isucon6">ISUCON6</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p><span style="font-size: 80%"><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apple">Apple</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/keynote">keynote</a>で話題の&rsquo;<a class="keyword" href="http://d.hatena.ne.jp/keyword/Courage">Courage</a>&lsquo;使ってみた笑</span></p></p>
+
+<p>ISUCON6予選で惨敗した。(18000点くらい)<br>
+端的に言って、とても未熟だった。</p>
+
+<p>とはいえ、とてもいい思い出になったのでまとめる。</p>
+
+<h1>メンバー</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%EA%A1%BC%A5%A8%A5%E0">スリーエム</a>というチーム名で、@mogulla3と@mintsu123と一緒に出場した。<br>
+ふたりともぼくよりもアプリの改善などは10倍くらい優秀なエンジニアなので、<br>
+ぼくはインフラとか総務的な立ち回りをして、２人がチューニングに集中できるようにすることを心がけていた。</p>
+
+<h1>準備</h1>
+
+<p>準備は３週間の間に土日どちらかに集まってISUCONの過去問を解いたり戦略について事前に打ち合わせしてた。</p>
+
+<ul>
+<li>プライベートレポジトリの用意(Gitlab)</li>
+<li>チャットルームの用意(Slack)</li>
+<li>ISUCON4とISUCON5の予選の過去問解き
+
+<ul>
+<li>土日集まったときには戦略や振り返りを重視</li>
+<li>実際の過去問ときは平日に各々が空いた時間などにやってた</li>
+</ul>
+</li>
+<li>基本戦略を準備
+
+<ul>
+<li>なんの技術を主に使うか</li>
+<li>だれが何を担当するか</li>
+<li>定形作業の手順化</li>
+<li>その他ナレッジなど</li>
+</ul>
+</li>
+</ul>
+
+<h3>採用した技術</h3>
+
+<ul>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a> 7.0</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>-fpm</li>
+<li>Openresty(nginx) 1.11</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a> 5.7</li>
+<li>Redis 3.2</li>
+</ul>
+
+<h1>当日</h1>
+
+<p>出だしはとても順調だった。<br>
+Azure担当だったぼくはすぐにサーバをデプロイし、OSバージョンを確認した。<br>
+予想通りの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a> 16.04であったので、準備したとおり必要な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DF%A5%C9%A5%EB%A5%A6%A5%A7%A5%A2">ミドルウェア</a>のインストールをすませた。</p>
+
+<p>ほぼ定石と言える下記（定形作業と呼んでいた）もすぐにこなすことができた。</p>
+
+<ul>
+<li>調査のための各種ログ出力化</li>
+<li>Nginxでの静的ファイルの配信、キャッシュ化</li>
+<li>Kataribeインストールと実行</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>のインデックスの付与と設定見直し</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>-fpmの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unix">Unix</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>ソケット化</li>
+<li>デプロイの仕組みの整理</li>
+<li>不要デーモンの停止</li>
+</ul>
+
+<p>この状態でもスコアは0のままであり、少し焦りを感じたが、<br>
+ここからが本番のチューニング開始である。<br>
+Kataribeの結果から、<code>GET /</code>が改善ポイントであることは明らかなのはわかっていた。</p>
+
+<pre><code>Top 20 Sort By Count
+Count    Total      Mean    Stddev     Min   P50.0   P90.0   P95.0   P99.0     Max  2xx  3xx  4xx  5xx  Request
+  326  366.105  1.123021  2.619395   0.000   0.000   6.188   7.418   9.827  10.207  326    0    0    0  GET / HTTP/1.0
+  326  366.154  1.123172  2.618228   0.000   0.001   6.190   7.418   9.778  10.207  326    0    0    0  GET / HTTP/1.1
+  240    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  240    0    0    0  GET /css/bootstrap.min.css HTTP/1.0
+  240    0.737  0.003071  0.002843   0.000   0.002   0.006   0.010   0.013   0.015  240    0    0    0  GET /css/bootstrap.min.css HTTP/1.1
+  120    0.101  0.000842  0.002078   0.000   0.000   0.002   0.003   0.015   0.015  120    0    0    0  GET /img/star.gif HTTP/1.1
+  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /js/jquery.min.js HTTP/1.0
+  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /img/star.gif HTTP/1.0
+  120    0.152  0.001267  0.001788   0.000   0.001   0.003   0.004   0.011   0.012  120    0    0    0  GET /css/bootstrap-responsive.min.css HTTP/1.1
+  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /js/bootstrap.min.js HTTP/1.0
+  120    0.148  0.001233  0.001843   0.000   0.001   0.003   0.004   0.011   0.012  120    0    0    0  GET /favicon.ico HTTP/1.1
+  120    0.157  0.001308  0.001829   0.000   0.001   0.003   0.004   0.011   0.011  120    0    0    0  GET /js/bootstrap.min.js HTTP/1.1
+  120    0.379  0.003158  0.002890   0.000   0.002   0.007   0.010   0.013   0.015  120    0    0    0  GET /js/jquery.min.js HTTP/1.1
+  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /favicon.ico HTTP/1.0
+  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /css/bootstrap-responsive.min.css HTTP/1.0
+   67  116.697  1.741746  1.159447   0.020   1.760   2.999   3.000   3.001   3.001    0   42   25    0  POST /login HTTP/1.0
+   67  116.706  1.741881  1.159099   0.020   1.760   2.999   2.999   3.001   3.001    0   42   25    0  POST /login HTTP/1.1
+   35    0.857  0.024486  0.022147   0.000   0.026   0.040   0.085   0.096   0.096   35    0    0    0  GET /stars?keyword=%E5%86%85%E7%94%B0%E4%BF%AE%E5%B9%B3 HTTP/1.1
+   35    0.977  0.027914  0.020538   0.000   0.031   0.049   0.062   0.077   0.077   35    0    0    0  GET /stars?keyword=%E3%82%A6%E3%83%BC%E3%82%BA HTTP/1.1
+   34    0.867  0.025500  0.018035   0.000   0.028   0.044   0.059   0.071   0.071   34    0    0    0  GET /stars?keyword=%E5%8C%97%E6%B6%88%E9%98%B2%E7%BD%B2 HTTP/1.1
+   32    0.731  0.022844  0.015575   0.000   0.025   0.040   0.050   0.052   0.052   32    0    0    0  GET /stars?keyword=%E8%BC%AA%E7%8A%B6%E7%94%B2%E7%8A%B6%E7%AD%8B HTTP/1.1 
+</code></pre>
+
+<p>しかし、なかなか突破口が見いだせず、できるところからやっていく方針を取った。<br>
+アプリの改善を振り返ってみると、なにもしてねーなって感じがやばい。（何してたんだっけ…(・_・;)）</p>
+
+<ul>
+<li>isudaとisutarのfpmプロセスの調整</li>
+<li>isudaとisutar間のhttpによる<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>呼び出しをなくし、DB接続とした</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>改善
+
+<ul>
+<li>htmlifyのkeyword取り出し<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>
+</li>
+<li>load_starの<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>
+</li>
+<li>など</li>
+</ul>
+</li>
+<li>keywordのlengthを予め持つように変更</li>
+<li>isudaとisutarの統合
+
+<ul>
+<li>効果の検証ができず、結局マージはできなかった</li>
+</ul>
+</li>
+</ul>
+
+<h1>反省</h1>
+
+<p><code>htmlify</code>の改善がなによりも効果がでることはわかっていた。<br>
+しかし、その改善についてのいい方法がすぐに思いつかなかったこともあり、<br>
+他のやれることを優先しすぎてしまったことが一番の反省点だ。</p>
+
+<p>時間がない、大きな変更したら怖いという思いが強くなり、<br>
+どちらかというとやれることをきちんとやればいける、というディフェンシブな思考になってしまっていた気がする。</p>
+
+<p>せっかくRedisやOpenrestyを準備していたが、<br>
+そのあたりを発揮せずにおわってしまい残念な感じではあった。<br>
+（ここは準備不足ポイントでもあった）</p>
+
+<p>根本の改善に勇気を持って切り込む"<a class="keyword" href="http://d.hatena.ne.jp/keyword/Courage">Courage</a>"を次は発揮したい。</p>
+
+<p>反省会の炙りしめ鯖うまかった。</p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Ftokyo%2FA1303%2FA130301%2F13003370%2F" title="BISTRO三十五段屋 (渋谷/居酒屋)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://tabelog.com/tokyo/A1303/A130301/13003370/">tabelog.com</a></cite></p>
+
+<h1>最後に</h1>
+
+<p>反省点は多かったものの、準備期間も含めてこの１ヶ月とても楽しかったし、<br>
+また自分の未熟さを実感できてとてもよかった。</p>
+
+<p>今まで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B6%A5%B5%BB%A5%D7%A5%ED%A5%B0%A5%E9%A5%DF%A5%F3%A5%B0">競技プログラミング</a>などもしたこともなく、<br>
+技術面で「競う」ということはほとんどしたことがなかった。</p>
+
+<p><p>この敗北で、技術をきちんと理解し追求していきたいという想いが湧いてきた。<br>
+ISUCON主催者ありがとうございました。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">29 Jul 2016, 18:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -490,186 +671,6 @@ Nginxからプロキシされるときはちゃんとヘッダー名は"X-Forwar
 
 <p><p>※画面が映らなくなってガチマッチ何度負けたことか・・・</p>
 </body></p>
-
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">04 Jun 2016, 18:01</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2016/06/04/180122/" class="post-title">Nginxの仕組みについて入門</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Nginx" href="https://blog.mosuke.tech/categories/nginx">Nginx</a><a class="post-category post-category-webサーバ" href="https://blog.mosuke.tech/categories/web%E3%82%B5%E3%83%BC%E3%83%90">webサーバ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>普段Nginxを使ってはいるものの、その仕組やなぜNignxを使うべきなのかというところがあまりわかっていなかったので、
-改めてNginxを入門しその仕組などについて調べてみた。<br>
-勉強不足もあって、間違ってることもあるかもしれないがその際は教えて下さい。</p></p>
-
-<h1>1. C10K問題</h1>
-
-<p>まず、Nginxを理解する上でC10K問題について知る必要がある。<br>
-C10K問題とは下記の問題のことだ。</p>
-
-<blockquote><p>ハードウェアの性能上は問題がなくても、クライアント数があまりにも多くなるとサーバがパンクする問題のこと。
-C は「Client（クライアント）」の頭文字、10K は「1 万台」を意味する。「クライアント 1 万台問題」ともいわれる。<br>
-（<a href="http://d.hatena.ne.jp/keyword/C10K%20%CC%E4%C2%EA">C10K 問題とは - はてなキーワード</a> より引用）</p></blockquote>
-
-<h1>2. 従来のWebサーバの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>
-</h1>
-
-<h1>prefork</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>のデフォルトの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>などで採用されている。<br>
-特徴としては、１リクエストに対して１プロセスが処理する。<br>
-すなわち同時接続が 1000であれば 1000個のプロセスが必要となる。</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604171531.png" alt="f:id:mosuke5:20160604171531p:plain" title="f:id:mosuke5:20160604171531p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<h1>worker</h1>
-
-<p>リクエストはスレッドが処理する。<br>
-スレッドは１プロセスのなかで複数立ち上げることができる。<br>
-プロセス数は少なくて済むが、同時接続が1000であれば1000個のスレッドが必要となる。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>で指定可能な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>の１つ。</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604171542.png" alt="f:id:mosuke5:20160604171542p:plain" title="f:id:mosuke5:20160604171542p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>いずれにしても、1000の同時接続があれば、1000のプロセスやスレッドが必要ということだ。<br>
-プロセス/スレッド数が多くなってくると「<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%AD%A5%B9%A5%C8%A5%B9%A5%A4%A5%C3%A5%C1">コンテキストスイッチ</a>」が多く発生し、処理が遅くなってしまう。</p>
-
-<h3>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%AD%A5%B9%A5%C8%A5%B9%A5%A4%A5%C3%A5%C1">コンテキストスイッチ</a>とは</h3>
-
-<blockquote><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%AD%A5%B9%A5%C8%A5%B9%A5%A4%A5%C3%A5%C1">コンテキストスイッチ</a>とは、コンピュータの処理装置（CPU）が現在実行している処理の流れ（プロセス、スレッド）を一時停止し、別のものに切り替えて実行を再開すること。<br>
-（<a href="http://e-words.jp/w/%E3%82%B3%E3%83%B3%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81.html">コンテキストスイッチとは｜コンテキストスイッチング｜context switch - 意味/定義 ： IT用語辞典</a> より引用）</p></blockquote>
-
-<h1>3. Nginxの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>
-</h1>
-
-<p>Nginxが<a class="keyword" href="http://d.hatena.ne.jp/keyword/C10K%20%CC%E4%C2%EA">C10K 問題</a>を解決するために開発されたともいわれている。<br>
-上記のような課題を解決するような<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>を採用している。</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604171559.png" alt="f:id:mosuke5:20160604171559p:plain" title="f:id:mosuke5:20160604171559p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>ワーカプロセスがリクエストを処理する。<br>
-前述のpreforkやworkerと決定的に違うところは、１つのワーカプロセスが複数のリクエストを処理するということだ。</p>
-
-<p>また、マスタープロセスはワーカプロセスの立ち上げや、制御、管理などが主な仕事。<br>
-Nginxを終了あるいは再起動、設定ファイルを再読み込みして変更を反映するなど。</p>
-
-<p>下記のような仕組みがNginxの高速化（C10K問題対応）を可能としている。</p>
-
-<h1>シングルスレッド</h1>
-
-<p>接続ごとにプロセスやスレッドを立ち上げていては、C10K問題に対応できない。<br>
-そこで、Nginxは１つのスレッドで処理を行うようにしている。<br>
-それにより、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%AD%A5%B9%A5%C8%A5%B9%A5%A4%A5%C3%A5%C1">コンテキストスイッチ</a>と呼ばれるCPUの切り替え処理が発生しない。<br>
-正確に言うと、完全に１スレッドで処理するわけではなく図にあるようにワーカプロセス自体はマルチプロセス化できる。</p>
-
-<h1>イベント駆動</h1>
-
-<p>通常のプログラムは上から書かれた順に実行されますよね。<br>
-イベ ント駆動で動作するプログラムは何かしらのイベントが発生するまで待機し、発生したイベントの種類に応じて実行される。<br>
-ブラウザ上の<a class="keyword" href="http://d.hatena.ne.jp/keyword/JavaScript">JavaScript</a>の動きをイメージするとわかりやすいと思う。</p>
-
-<h1>非同期処理</h1>
-
-<p>一般的なwebサーバでは同期処理を行う。
-つまり、複数のリクエストがあったときに順番に処理していく。<br>
-そのため、１つのリクエストが遅いとそれに引きづられてあとのリクエストも遅くなる。<br>
-非同期処理では、リクエストがきたら他のリクエストの状況に関わらず処理を行う。</p>
-
-<h4>同期処理</h4>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604173212.png" alt="f:id:mosuke5:20160604173212p:plain" title="f:id:mosuke5:20160604173212p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<h4>非同期処理</h4>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604173226.png" alt="f:id:mosuke5:20160604173226p:plain" title="f:id:mosuke5:20160604173226p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<h1>向いていること / 向いていないこと</h1>
-
-<p>Nginxではイベント駆動で非同期的なIO処理によって、リクエストを完全に処理することを待たずに次から次へと処理を受け付けていきます。<br>
-そのため、１処理に時間のかかるものをNginx自身で行おうとするとキューがどんどん溜まってしまいます。<br>
-そのため、一般にアプリケーションの実行やデータベース処理などは向いていません。<br>
-一方で、軽量な静的データの配信やリバースプロキシなどに向いています。</p>
-
-<p>Nginxは、静的データの配信や、プロキシなどに特化させ、アプリケーションの実行などは別途<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>等で行わせることで有効活用できます。</p>
-
-<h2>向いていること</h2>
-
-<ul>
-<li>軽量データの大量配信</li>
-<li>ディスクI/Oの発生しないキャッシュ</li>
-<li>リバースプロキシ</li>
-<li>ロードバランサ</li>
-</ul>
-
-<h2>向いていないこと</h2>
-
-<ul>
-<li>アプリケーション実行</li>
-<li>データベース処理</li>
-<li>動画などの重たいデータの配信</li>
-</ul>
-
-<h1>4. 最後に</h1>
-
-<p>NginxやWebサーバについてより理解を深めるためには、<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/UNIX">UNIX</a>のプロセスやネットワーク<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>についての知識が足りないと感じた。。。</p>
-
-<p>というわけでこれを買ってみたが、978ページもあってとりあえず挫折＼(^o^)／</p>
-
-<p></p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4894712059/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/213B9PVJD1L._SL160_.jpg" class="hatena-asin-detail-image" alt="UNIXネットワークプログラミング〈Vol.1〉ネットワークAPI:ソケットとXTI" title="UNIXネットワークプログラミング〈Vol.1〉ネットワークAPI:ソケットとXTI"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/4894712059/hatena-blog-22/">UNIXネットワークプログラミング〈Vol.1〉ネットワークAPI:ソケットとXTI</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">作者:</span> W.リチャードスティーヴンス,W.Richard Stevens,篠田陽一</li>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> ピアソンエデュケーション</li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 1999/07</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> 単行本</li>
-<li>
-<span class="hatena-asin-detail-label">購入</span>: 8人 <span class="hatena-asin-detail-label">クリック</span>: 151回</li>
-<li><a href="http://d.hatena.ne.jp/asin/4894712059/hatena-blog-22" target="_blank">この商品を含むブログ (37件) を見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
-
-<p>まずはこれからはじめようと思う。。。</p>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftatsu-zine.com%2Fbooks%2Fnaruhounix" title="なるほどUnixプロセス ― Rubyで学ぶUnixの基礎" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://tatsu-zine.com/books/naruhounix">tatsu-zine.com</a></cite></p>
-
-<h1>参考文献</h1>
-
-<ul>
-<li><a href="http://gihyo.jp/magazine/SD/archive/2014/201407">SoftwareDesign 2015年7月号</a></li>
-<li><a href="http://www.amazon.co.jp/nginx%E5%AE%9F%E8%B7%B5%E5%85%A5%E9%96%80-WEB-DB-PRESS-plus-%E4%B9%85%E4%BF%9D/dp/4774178667">Nginx実践入門</a></li>
-<li><a href="http://www.amazon.co.jp/24%E6%99%82%E9%96%93365%E6%97%A5-%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E3%82%92%E6%94%AF%E3%81%88%E3%82%8B%E6%8A%80%E8%A1%93-%E2%80%BE%E3%82%B9%E3%82%B1%E3%83%BC%E3%83%A9%E3%83%93%E3%83%AA%E3%83%86%E3%82%A3%E3%80%81%E3%83%8F%E3%82%A4%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E3%80%81%E7%9C%81%E5%8A%9B%E9%81%8B%E7%94%A8-PRESS-plus%E3%82%B7%E3%83%AA%E3%83%BC%E3%82%BA/dp/4774135666/ref=sr_1_1?s=books&amp;ie=UTF8&amp;qid=1465030268&amp;sr=1-1&amp;keywords=%E3%82%B5%E3%83%BC%E3%83%90%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E3%82%92%E6%94%AF%E3%81%88%E3%82%8B">[サーバインフラを支える技術](https://gihyo.jp/magazine/wdpress/plus/978-4-7741-3566-3)</a></li>
-<li><a href="http://blog.yuuk.io/entry/2015-webserver-architecture">2015年Webサーバアーキテクチャ序論 - ゆううきブログ</a></li>
-</ul>
-
-<p></body></p>
 
                     </div>
                 </section>
