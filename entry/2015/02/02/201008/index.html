@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ansible、コマンド実行結果を&amp;quot;ok&amp;quot;にする（冪等性を保つ方法） &middot; Goldstine研究所</title>
+    <title>Ansible、コマンド実行結果をokにする（冪等性を保つ方法） &middot; Goldstine研究所</title>
 
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
     <meta name="description" content=" Ansibleでソースコードインストールする際とか すでにインストールされているかのチェックなどで、 シェルコマンドを実行してその結果で判断したい時がある。  ぼくがよくやる例では以下とか。  - name: check httpd in">
@@ -12,11 +12,11 @@
     <meta name="generator" content="Hugo 0.20" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="Ansible、コマンド実行結果を&amp;quot;ok&amp;quot;にする（冪等性を保つ方法） &middot; Goldstine研究所">
+    <meta name="twitter:title" content="Ansible、コマンド実行結果をokにする（冪等性を保つ方法） &middot; Goldstine研究所">
     <meta name="twitter:description" content=" Ansibleでソースコードインストールする際とか すでにインストールされているかのチェックなどで、 シェルコマンドを実行してその結果で判断したい時がある。  ぼくがよくやる例では以下とか。  - name: check httpd in">
 
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Ansible、コマンド実行結果を&amp;quot;ok&amp;quot;にする（冪等性を保つ方法） &middot; Goldstine研究所">
+    <meta property="og:title" content="Ansible、コマンド実行結果をokにする（冪等性を保つ方法） &middot; Goldstine研究所">
     <meta property="og:description" content=" Ansibleでソースコードインストールする際とか すでにインストールされているかのチェックなどで、 シェルコマンドを実行してその結果で判断したい時がある。  ぼくがよくやる例では以下とか。  - name: check httpd in">
 
     <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
@@ -59,7 +59,7 @@
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2015/02/02/201008/" class="post-title">Ansible、コマンド実行結果を&amp;quot;ok&amp;quot;にする（冪等性を保つ方法）</a>
+                        <a href="https://blog.mosuke.tech/entry/2015/02/02/201008/" class="post-title">Ansible、コマンド実行結果をokにする（冪等性を保つ方法）</a>
 
                         <p class="post-meta">
                             
@@ -83,7 +83,6 @@
 <pre><code class="language-yaml">- name: check httpd installed
   command: which httpd
   ignore_errors: true
- 
 </code></pre>
 
 <p>なんですが...<br>
@@ -96,7 +95,6 @@
   command: which httpd
   ignore_errors: true
   changed_when: false
- 
 </code></pre>
 
 <p>こうするとコマンドが成功した際には"<b><span style="color: #00cc00">ok</span></b>"が表示される。</p>

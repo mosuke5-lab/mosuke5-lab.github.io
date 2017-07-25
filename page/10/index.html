@@ -177,7 +177,7 @@ URLのはじめの&lt;http(s)&gt;の部分は<b><a class="keyword" href="http://
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2015/02/02/201008/" class="post-title">Ansible、コマンド実行結果を&amp;quot;ok&amp;quot;にする（冪等性を保つ方法）</a>
+                        <a href="https://blog.mosuke.tech/entry/2015/02/02/201008/" class="post-title">Ansible、コマンド実行結果をokにする（冪等性を保つ方法）</a>
 
                         <p class="post-meta">
                             
@@ -202,7 +202,6 @@ URLのはじめの&lt;http(s)&gt;の部分は<b><a class="keyword" href="http://
 <pre><code class="language-yaml">- name: check httpd installed
   command: which httpd
   ignore_errors: true
- 
 </code></pre>
 
 <p>なんですが...<br>
@@ -215,7 +214,6 @@ URLのはじめの&lt;http(s)&gt;の部分は<b><a class="keyword" href="http://
   command: which httpd
   ignore_errors: true
   changed_when: false
- 
 </code></pre>
 
 <p>こうするとコマンドが成功した際には"<b><span style="color: #00cc00">ok</span></b>"が表示される。</p>
