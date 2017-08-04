@@ -57,6 +57,112 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">15 Sep 2014, 13:56</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2014/09/15/135611/" class="post-title">D3.js、DBからのデータ連携方法の検討</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-D3.js" href="https://blog.mosuke.tech/categories/d3.js">D3.js</a><a class="post-category post-category-Sinatra" href="https://blog.mosuke.tech/categories/sinatra">Sinatra</a><a class="post-category post-category-Ruby" href="https://blog.mosuke.tech/categories/ruby">Ruby</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。<br>
+例えば以下の状況を考える。<br>
+【やりたいこと】<br>
+「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」</p>
+<p>【DBの構造】<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AB%A5%E9%A5%E0%CC%BE">カラム名</a>：型<br>
+　date : datetime<br>
+　value : int</p>
+<p>※また、下記では<a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>上で行っているが、他の言語でも同様のことがいえる。</p></p>
+
+<p><div class="section">
+    <h3>(1) 簡単な<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>のようなものを利用する</h3>
+    <p>先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、<br>
+これが一番複雑にならずに良いと思ったということ。</p>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>側で/<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>にアクセスすると<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルをダウンロードできるようにする。</p></p>
+
+<pre><code class="language-ruby">#Sinatra側
+get '/csv' do
+    content_type 'application/csv'
+    attachment 'download.csv'
+
+    #DBからデータ取得(Activerecord利用)
+    @data   = Model.all()
+
+    #出力するCSVデータの変数。csvヘッダーを先につけている。
+    @csv = &quot;date,value\n&quot;
+
+    #DBのデータをCSVの形にして格納
+    @data.each do |d|
+        @csv += d.date.to_s + &quot;,&quot; + d.value.to_s + &quot;\n&quot;
+    end
+    
+    #csvtest.erbというビューに出力
+    erb :csvtest, :layout =&gt; false
+end
+</code></pre>
+
+<p>csvtest.erb</p>
+```ruby
+<%= @csv %>
+```
+<p>こうすることで"<a href="http://*****/csv">http://*****/csv</a>"にアクセスすると<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルとしてダウンロードできる状態になる。<br>
+条件指定をしてデータをダウンロードできるようにしたい場合はGETでパラメータ指定できるようにすれば良いと思う。<br>
+（<a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/CSV">CSV</a>ファイルを生成するところのコードがナンセンスだと思っているので、もっといい方法があるはず…）</p>
+<p>また、今回は<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>にしているが<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>などの他の形式でも同様のことがいえる。</p>
+<p>これをD3.js側で以下のように読み込ませる。</p>
+
+<pre><code class="language-javascript">d3.csv(&quot;/csv&quot;, function(error, data) {
+    (中略)
+}
+</code></pre>
+
+<p>d3.jsの<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>を読み込ませる関数の引数にURLを指定してあげればそれで終了。</p>
+
+<p></div>
+<div class="section">
+    <h3>(2) <a class="keyword" href="http://d.hatena.ne.jp/keyword/javascript">javascript</a>コードの中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>変数を展開させる</h3>
+    <p>d3.jsのdatasetの中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>の変数を展開させる。ビューに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Javascript">Javascript</a>を書いているので、ビューの中で変数展開するのと同じ要領。<br>
+しかし、jsコードに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>コードも交じるので複雑になりがち。</p></p>
+
+<pre><code class="language-javascript">var dataset = [
+&lt;% @data.each do |d| %&gt;
+    {date:&lt;%= d.date%&gt;, value:&lt;%= d.value %&gt;},
+&lt;% end %&gt;
+];
+</code></pre>
+
+<p></div>
+<div class="section">
+    <h3>(3) <a class="keyword" href="http://d.hatena.ne.jp/keyword/CSV">CSV</a>ファイルをおいておく</h3>
+    <p>こちらはリアルタイムな更新でなれけばこれはこれでありだと思う。<br>
+publicのフォルダに予め<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルを設置しておき、以下のようにd3.jsで読み込ませる。</p></p>
+
+<pre><code class="language-javascript">d3.csv(&quot;test.csv&quot;, function(error, data) {
+    (中略)
+}
+</code></pre>
+
+<p></div>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">13 Sep 2014, 21:44</h1>
                 <section class="post">
                     <header class="post-header">
@@ -669,37 +775,6 @@ void serialEvent(Serial p){
                 </section>
                 
                 
-                
-                <h1 class="content-subhead">17 May 2014, 22:18</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/05/17/221824/" class="post-title">ロードバランサをロードバランスする</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-ネットワーク" href="https://blog.mosuke.tech/categories/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF">ネットワーク</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>ぼくはネットワーク構成については素人です。<br>
-大量の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%D5%A5%A3%A5%C3%A5%AF">トラフィック</a>をさばくためにロードバランサを使うがロードバランサが耐えられない量の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%D5%A5%A3%A5%C3%A5%AF">トラフィック</a>にはどうするか。<br>
-ちょっと疑問に思ったので素人なりにちょろっと考えてみた。</p>
-<p><script async class="speakerdeck-embed" data-id="234d8a90bff301316cad3a6416977627" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script></p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
             </div>
             
 <div class="pagination">
@@ -709,7 +784,7 @@ void serialEvent(Serial p){
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 14 of 15</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 14 of 16</span>
     
       <a href="/page/15/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>
@@ -723,15 +798,15 @@ void serialEvent(Serial p){
 <div class="latest-posts">
     <h5>Latest Posts</h5>
     
-        <li><a href="https://blog.mosuke.tech/entry/2017/07/16/architecting_for_the_cloud/">【更新中】Architecting for the Cloud -AWS Best Pravtices-を解読する</a></li>
+        <li><a href="https://blog.mosuke.tech/entry/2017/08/04/aws_certificate_practice_exam/">英語でAWSソリューションアーキテクト認定の模擬試験を受けてみた</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2017/07/16/architecting_for_the_cloud/">【更新中】Architecting for the Cloud -AWS Best Practices-を解読する</a></li>
     
         <li><a href="https://blog.mosuke.tech/entry/2017/07/14/master_cloud_malticloud/">Terraform×Rancherでマルチクラウドを一歩すすめる、を話してきた</a></li>
     
         <li><a href="https://blog.mosuke.tech/entry/2017/07/01/yapc_fukuoka/">YAPC::Fukuoka前夜祭でLTしてきた。「Rancherでマルチクラウドをやってみる」</a></li>
     
         <li><a href="https://blog.mosuke.tech/entry/2017/06/12/hugo_optimize_image/">Hugo、PageSpeed対策で自動で画像を圧縮する</a></li>
-    
-        <li><a href="https://blog.mosuke.tech/entry/2017/06/04/hugo_deployment_with_wercker/">Werckerを使ってHugo&#43;Github PagesのCI/CD環境を整備する</a></li>
     
 </div>
 <div class="search">

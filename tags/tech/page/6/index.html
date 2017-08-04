@@ -56,6 +56,41 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">02 Jan 2015, 01:36</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2015/01/02/013658/" class="post-title">スーパーサーバってなに？ xinetdでサービスを常駐起動せずに利用する</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-サーバ" href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90">サーバ</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-xinetd" href="https://blog.mosuke.tech/categories/xinetd">xinetd</a><a class="post-category post-category-スーパーサーバ" href="https://blog.mosuke.tech/categories/%E3%82%B9%E3%83%BC%E3%83%91%E3%83%BC%E3%82%B5%E3%83%BC%E3%83%90">スーパーサーバ</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。
+そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させることが可能らしい。
+ということで、そのスーパーサーバとやらを実際に触ってみた。
+スーパーサーバというとinetdとxinetdがあるらしいが、
+xinetdはinetdの拡張版で、アクセス制御などの機能を搭載しているとのこと。
+今回はxinetdを設定してみる。
+1. 事前準備 【環境】
+Vagrantで構築したCentOS 6.5
+(仮想環境のIPアドレスは192.168.33.10)
+まずは...
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2015/01/02/013658/">全文を読む</a>
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">01 Jan 2015, 16:18</h1>
                 <section class="post">
                     <header class="post-header">
@@ -359,38 +394,6 @@ Apacheをソースインストールして、パスを/usr/sbinにリンクを�
                     </div>
                 </section>
                 
-                <h1 class="content-subhead">09 Nov 2014, 17:27</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/11/09/172745/" class="post-title">【VPS1台でインフラ勉強】多段SSH設定（おまけ）</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-サーバ" href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90">サーバ</a><a class="post-category post-category-VPS" href="https://blog.mosuke.tech/categories/vps">VPS</a><a class="post-category post-category-Vagrant" href="https://blog.mosuke.tech/categories/vagrant">Vagrant</a><a class="post-category post-category-SSH" href="https://blog.mosuke.tech/categories/ssh">SSH</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        VPS1台でインフラ勉強の会で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てたが、
-仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければならない。
-これが面倒だったので多段SSHの設定をして、一発でSSH接続できるようにした。
-以下の図で言うと、web10, web11(192.168.33.10&amp;frasl;11)に一発でSSHできるようにする。
-
-クライアントPC側に以下の設定をした。
-$ vim ~/.ssh/config host gateway HostName xxxxx.xxx User username Host web10 Hos...
-                    </div>
-                    <div class="read-more-link">
-                        <a href="https://blog.mosuke.tech/entry/2014/11/09/172745/">全文を読む</a>
-                    </div>
-                </section>
-                
             </div>
             
 <div class="pagination">
@@ -414,15 +417,15 @@ $ vim ~/.ssh/config host gateway HostName xxxxx.xxx User username Host web10 Hos
 <div class="latest-posts">
     <h5>Latest Posts</h5>
     
-        <li><a href="https://blog.mosuke.tech/entry/2017/07/16/architecting_for_the_cloud/">【更新中】Architecting for the Cloud -AWS Best Pravtices-を解読する</a></li>
+        <li><a href="https://blog.mosuke.tech/entry/2017/08/04/aws_certificate_practice_exam/">英語でAWSソリューションアーキテクト認定の模擬試験を受けてみた</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2017/07/16/architecting_for_the_cloud/">【更新中】Architecting for the Cloud -AWS Best Practices-を解読する</a></li>
     
         <li><a href="https://blog.mosuke.tech/entry/2017/07/14/master_cloud_malticloud/">Terraform×Rancherでマルチクラウドを一歩すすめる、を話してきた</a></li>
     
         <li><a href="https://blog.mosuke.tech/entry/2017/07/01/yapc_fukuoka/">YAPC::Fukuoka前夜祭でLTしてきた。「Rancherでマルチクラウドをやってみる」</a></li>
     
         <li><a href="https://blog.mosuke.tech/entry/2017/06/12/hugo_optimize_image/">Hugo、PageSpeed対策で自動で画像を圧縮する</a></li>
-    
-        <li><a href="https://blog.mosuke.tech/entry/2017/06/04/hugo_deployment_with_wercker/">Werckerを使ってHugo&#43;Github PagesのCI/CD環境を整備する</a></li>
     
 </div>
 <div class="search">

@@ -57,6 +57,81 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">17 Feb 2015, 22:05</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2015/02/17/220526/" class="post-title">勘違いしやすいFTPとSFTPの転送モードの話</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-SFTP" href="https://blog.mosuke.tech/categories/sftp">SFTP</a><a class="post-category post-category-FTP" href="https://blog.mosuke.tech/categories/ftp">FTP</a><a class="post-category post-category-転送モード" href="https://blog.mosuke.tech/categories/%E8%BB%A2%E9%80%81%E3%83%A2%E3%83%BC%E3%83%89">転送モード</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>やSFTPでの転送モードの話。</p></p>
+
+<p>ついこの前、<a class="keyword" href="http://d.hatena.ne.jp/keyword/WinSCP">WinSCP</a>を利用している人が転送モードを選んでいて、<br>
+「SFTPには転送モードはないと思っていたのに、転送モードを選んでいる！？」<br>
+と疑問に思ったのでその辺りまとめた。</p>
+
+<h1>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>のバイナリーモードと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モード</h1>
+
+<p>入社しはじめの頃、それまでSFTPしかほとんど使ったことなかったので、<br>
+先輩に「<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>ではバイナリーモードを使って…」と言われて、意味が理解できなかったときがあったのを思い出す。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>にはファイル転送モードが２つあって、ちゃんと理解していないと思わぬところで痛い目にあう。</p>
+
+<ul>
+<li>バイナリーモード：ファイルの改行コードを変換せず転送する。</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モード：OS側で異なる改行コードを自動的に修正して転送する。</li>
+</ul>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>では標準では<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モードのため、なにも考えずにファイルを送るとファイルが壊れてしまったりする。<br>
+昔にミスしたのは<a class="keyword" href="http://d.hatena.ne.jp/keyword/Windows">Windows</a>から<a class="keyword" href="http://d.hatena.ne.jp/keyword/Linux">Linux</a>へtar.gzファイルを<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モードで送って、解凍したらファイルが壊れていたが、<br>
+それに気付かず壊れたファイルをサーバへ設置してしまったとか。</p>
+
+<h1>SFTPには転送モードはあるのか？</h1>
+
+<p>SFTPを普段から使ってる人は転送モードなんて気にしたことあまりないと思う。<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>では気にしなければいけない転送モード、SFTPでは気にしなくていいのだろうか？</p>
+
+<p>結論から言うと、SFTPには転送モードはないので、気にする必要はない。<br>
+SFTPでは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>でいうバイナリーモードでファイル転送をするようだ。</p>
+
+<p>sftpコマンドのマニュアルにも特に転送モードについては記述がないのがわかる。<br>
+<a href="http://www.unixuser.org/~euske/doc/openssh/jman/sftp.html">http://www.unixuser.org/~euske/doc/openssh/jman/sftp.html</a></p>
+
+<h1>SFTPでも転送モードを選択できる場合がある！？</h1>
+
+<p>ここで、SFTPにも転送モードはあるぞ！？と疑問を思った人もいるかもしれない。<br>
+確かに<a class="keyword" href="http://d.hatena.ne.jp/keyword/WinSCP">WinSCP</a>などファイル転送ソフトを使っていると転送モードを選ぶことができる場合もある。</p>
+
+<p>しかし、勘違いしてはいけないのが、<br>
+転送モードを選ぶことができるのはSFTPの機能ではなくて<b>ファイル転送ソフトの機能</b>であるということだ。</p>
+
+<h1>まとめ</h1>
+
+<p><p>ファイル転送でよく使われる<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>やSFTP。<br>
+それぞれに違いはあるし、それを利用するソフトウェアによっても違いがある。<br>
+何が何を行っているか把握し、思わぬミスを減らしましょう。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">11 Feb 2015, 17:21</h1>
                 <section class="post">
                     <header class="post-header">
@@ -309,215 +384,6 @@ URLのはじめの&lt;http(s)&gt;の部分は<b><a class="keyword" href="http://
                 </section>
                 
                 
-                
-                <h1 class="content-subhead">02 Jan 2015, 01:36</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/01/02/013658/" class="post-title">スーパーサーバってなに？ xinetdでサービスを常駐起動せずに利用する</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-サーバ" href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90">サーバ</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a><a class="post-category post-category-xinetd" href="https://blog.mosuke.tech/categories/xinetd">xinetd</a><a class="post-category post-category-スーパーサーバ" href="https://blog.mosuke.tech/categories/%E3%82%B9%E3%83%BC%E3%83%91%E3%83%BC%E3%82%B5%E3%83%BC%E3%83%90">スーパーサーバ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。<br>
-そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させることが可能らしい。</p></p>
-
-<p>ということで、そのスーパーサーバとやらを実際に触ってみた。</p>
-
-<p>スーパーサーバというとinetdとxinetdがあるらしいが、<br>
-xinetdはinetdの拡張版で、アクセス制御などの機能を搭載しているとのこと。</p>
-
-<p>今回はxinetdを設定してみる。</p>
-
-<h1>1. 事前準備</h1>
-
-<p>【環境】<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で構築した<a class="keyword" href="http://d.hatena.ne.jp/keyword/CentOS">CentOS</a> 6.5<br>
-(仮想環境の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>は192.168.33.10)</p>
-
-<p>まずはスーパーサーバで管理するサービスを考えなければならない。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>とかhttpはどう考えてもスーパーサーバの管理するようなものではないだろうし…<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>や<a class="keyword" href="http://d.hatena.ne.jp/keyword/telnet">telnet</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/POP3">POP3</a>なんかのサービスに利用されることが多いそう？（このへんよくわかない）</p>
-
-<p>今回は<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>をスーパーサーバの管理対象とした。<br>
-※本来は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">複数</a>のサービスを管理対象とするからこそ意味がある。</p>
-
-<p>まずはxinetdとvsftpをインストール</p>
-
-<pre><code>$ sudo yum install xinetd vsftpd 
-</code></pre>
-
-<p><br>
-xinetdどうこうの前に、<a class="keyword" href="http://d.hatena.ne.jp/keyword/ftp">ftp</a>接続がきちんとできるか確認するのでサービスを起動。</p>
-
-<pre><code>$ sudo service vsftpd start 
-</code></pre>
-
-<p><br>
-ローカルPCから接続できることを確認する。</p>
-
-<pre><code>$ ftp 192.168.33.10
-Connected to 192.168.33.10.
-220 (vsFTPd 2.2.2)
-Name (192.168.33.10:username): 
-</code></pre>
-
-<h1>2. xinetdの設定</h1>
-
-<p>xinetdの基本設定は/etc/xinetd.confにかかれており、<br>
-xinetdで管理する各サービスの設定は/etc/xinetd.d/配下に書く方式。</p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/ftp">ftp</a>の設定を以下の通りにした。<br>
-"service"のあとに書くサービス名称は/etc/servicesに定義されているものを記載する。<br>
-vsftpとか書いても動かないので注意。</p>
-
-<pre><code>$ sudo vim /etc/xinetd.d/ftp
-service ftp
-{
-        disable         = no
-        socket_type     = stream
-        wait            = no
-        user            = root
-        server          = /usr/sbin/vsftpd
-        log_on_failure  += USERID
-}
- 
-</code></pre>
-
-<p>設定項目については以下参照。<br>
-<a href="https://www.express.nec.co.jp/linux/distributions/knowledge/network/xinetd.html">xinetd の設定</a></p>
-
-<p>これでxinetdを起動</p>
-
-<pre><code>$ sudo service xinetd start 
-</code></pre>
-
-<h3>(補足) /etc/servicesってなにもの？</h3>
-
-<p>/etc/servicesがなにか気になったので一応調べると。</p>
-
-<blockquote><p>サービス名とそこで使われるポート番号、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB">プロトコル</a>(<a class="keyword" href="http://d.hatena.ne.jp/keyword/tcp">tcp</a>/<a class="keyword" href="http://d.hatena.ne.jp/keyword/udp">udp</a>)との 対応関係を記述したファイルが /etc/services です。
-このファイルは 単なるサービス名のデータベースで、それ自体では何の働きもありませ んが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/netstat">netstat</a> コマンドや次の inetd などで参照されます。
-(<a href="http://www.wakhok.ac.jp/~kanayama/summer/02/site/node43.html">http://www.wakhok.ac.jp/~kanayama/summer/02/site/node43.html</a>)</p></blockquote>
-
-<h1>3. xinetdを使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>で接続してみる</h1>
-
-<p>xinetdが<b>"起動している"</b>ことと、vsftpdが<b>"起動していない"</b>ことを確認しておく。</p>
-
-<pre><code>$ sudo service xinetd status
-xinetd (pid  3521) is running...
-
-$ sudo service vsftpd status
-vsftpd is stopped 
-</code></pre>
-
-<p><br>
-ローカルPCから<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>接続をしてみる。</p>
-
-<pre><code>$ ftp 192.168.33.10
-Connected to 192.168.33.10.
-421 Service not available, remote server has closed connection. 
-</code></pre>
-
-<p>あれ、接続が切られた…</p>
-
-<p>syslogを確認してみると。</p>
-
-<pre><code>$ sudo tail /var/log/message
-Jan  1 15:07:25 server xinetd[3335]: START: ftp pid=3337 from=::ffff:192.168.33.1
-Jan  1 15:07:28 server xinetd[3335]: EXIT: ftp status=1 pid=3337 duration=3(sec) 
-</code></pre>
-
-<p>接続できているようだがその後すぐに切断されているようにみえる。
-vsftpd側の設定を疑ってみた。</p>
-
-<h1>4. vsftpdの設定</h1>
-
-<p>vsftpd側で以下の設定をいじる必要があった。</p>
-
-<pre><code>$ sudo vim /etc/vsftpd/vsftpd.conf
-listen=NO
- 
-</code></pre>
-
-<p>vsftpdのlistenの設定は以下のとおり。</p>
-
-<blockquote><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a> コントロールポート (21) への接続要求を vsftpd 自身で見張るか。
-YES の状態を「<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%BF%A5%F3%A5%C9%A5%A2%A5%ED%A1%BC%A5%F3">スタンドアローン</a>モード」と呼ぶ。
-inetd や後述の <a class="keyword" href="http://d.hatena.ne.jp/keyword/tcpserver">tcpserver</a> を経由する場合は NO にする。
-(<a href="http://www.asahi-net.or.jp/~aa4t-nngk/ftpd.html">http://www.asahi-net.or.jp/~aa4t-nngk/ftpd.html</a>)</p></blockquote>
-
-<h1>5. <a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>接続の再チャレンジ</h1>
-
-<p>ローカルPCから再度<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>接続を試みる。</p>
-
-<pre><code>$ ftp 192.168.33.10
-Connected to 192.168.33.10.
-220 (vsFTPd 2.2.2)
-Name (192.168.33.10:username): 
-</code></pre>
-
-<p>つながった！<br>
-<span style="font-size: 150%"><b>vsftpdサービスを停止しているのに<a class="keyword" href="http://d.hatena.ne.jp/keyword/ftp">ftp</a>接続ができる！</b></span></p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/ftp">ftp</a>接続前と接続中、接続後でプロセスを確認してみる。</p>
-
-<pre><code>&gt; 接続前
-$ ps -ef | grep ftp
-vagrant   3552  2742  0 16:17 pts/0    00:00:00 grep ftp
-
-&gt; 接続中
-&gt; 接続中のみvsftpdのプロセスが立ち上がっている。
-$ ps -ef | grep ftp
-nobody    3555  3521  0 16:18 ?        00:00:00 vsftpd
-vagrant   3557  3555  0 16:18 ?        00:00:00 vsftpd
-vagrant   3559  2742  0 16:18 pts/0    00:00:00 grep ftp
-
-&gt; 接続終了後
-$ ps -ef | grep ftp
-vagrant   3552  2742  0 16:17 pts/0    00:00:00 grep ftp 
-</code></pre>
-
-<p><br>
-プロセスツリーを見てみると、xinetdプロセスがvsftpdを起動していることがわかる。</p>
-
-<pre><code>&gt; 接続前
-$ pstree -p
-init(1)-+-VBoxService(1003)-+-{VBoxService}(1004)
-        |
-        | (略)
-        |
-        `-xinetd(3521)
-
-&gt; 接続中
-$ pstree -p
-init(1)-+-VBoxService(1003)-+-{VBoxService}(1004)
-        |
-        | (略)
-        |
-        `-xinetd(3521)---vsftpd(3562)---vsftpd(3563) 
-</code></pre>
-
-<p><p><br>
-サービスを起動しておかなくてもxinetd経由で起動できるんですね。<br>
-これはこれで使い道あるかもしれぬ。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
             </div>
             
 <div class="pagination">
@@ -527,7 +393,7 @@ init(1)-+-VBoxService(1003)-+-{VBoxService}(1004)
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 10 of 15</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 10 of 16</span>
     
       <a href="/page/11/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>
@@ -541,15 +407,15 @@ init(1)-+-VBoxService(1003)-+-{VBoxService}(1004)
 <div class="latest-posts">
     <h5>Latest Posts</h5>
     
-        <li><a href="https://blog.mosuke.tech/entry/2017/07/16/architecting_for_the_cloud/">【更新中】Architecting for the Cloud -AWS Best Pravtices-を解読する</a></li>
+        <li><a href="https://blog.mosuke.tech/entry/2017/08/04/aws_certificate_practice_exam/">英語でAWSソリューションアーキテクト認定の模擬試験を受けてみた</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2017/07/16/architecting_for_the_cloud/">【更新中】Architecting for the Cloud -AWS Best Practices-を解読する</a></li>
     
         <li><a href="https://blog.mosuke.tech/entry/2017/07/14/master_cloud_malticloud/">Terraform×Rancherでマルチクラウドを一歩すすめる、を話してきた</a></li>
     
         <li><a href="https://blog.mosuke.tech/entry/2017/07/01/yapc_fukuoka/">YAPC::Fukuoka前夜祭でLTしてきた。「Rancherでマルチクラウドをやってみる」</a></li>
     
         <li><a href="https://blog.mosuke.tech/entry/2017/06/12/hugo_optimize_image/">Hugo、PageSpeed対策で自動で画像を圧縮する</a></li>
-    
-        <li><a href="https://blog.mosuke.tech/entry/2017/06/04/hugo_deployment_with_wercker/">Werckerを使ってHugo&#43;Github PagesのCI/CD環境を整備する</a></li>
     
 </div>
 <div class="search">

@@ -57,6 +57,161 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">02 Oct 2016, 21:24</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2016/10/02/212420/" class="post-title">三葉よ、サーバーレス、それもまた結び。</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-serverless" href="https://blog.mosuke.tech/categories/serverless">serverless</a><a class="post-category post-category-サーバレス" href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90%E3%83%AC%E3%82%B9">サーバレス</a><a class="post-category post-category-クラウド" href="https://blog.mosuke.tech/categories/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89">クラウド</a><a class="post-category post-category-lamda" href="https://blog.mosuke.tech/categories/lamda">lamda</a><a class="post-category post-category-FaaS" href="https://blog.mosuke.tech/categories/faas">FaaS</a><a class="post-category post-category-ServerlessConf" href="https://blog.mosuke.tech/categories/serverlessconf">ServerlessConf</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>タイトルちょっとふざけました。  (が、半分本気。最後の方でわかる。)</p></p>
+
+<p><a href="http://tokyo.serverlessconf.io/">ServerlessConf Tokyo</a>に参加してきた。<br>
+今年8月から<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>の事業に異動していて、<br>
+開発者の立場より<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>提供側の立場として参加してきたので、また面白かった。</p>
+
+<p>せっかくなので、自分なりにサーバレスについてまとめる。<br>
+新しいことというよりは、自分の中での整理した感じ。</p>
+
+<h1>1. サーバレスってなんだっけ</h1>
+
+<p>カンファレンスの中でもサーバレスの定義についてはいろいろな意見がでていた。<br>
+Martin Fowlerのブログではサーバレスの定義として下記２つが書いてある。</p>
+
+<ul>
+<li>BaaS (Backend as a Service) : ex) firebase</li>
+<li>FaaS (Function as a Service) : ex) <a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda</li>
+</ul>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fmartinfowler.com%2Farticles%2Fserverless.html" title="Serverless Architectures" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://martinfowler.com/articles/serverless.html">martinfowler.com</a></cite></p>
+
+<p>ですが、ここでは焦点を絞って話すためにもFaaSということにしておく。<br>
+主にFaaSについて話したいのと、BaaSもいれてしまうと<a class="keyword" href="http://d.hatena.ne.jp/keyword/SaaS">SaaS</a>もサーバレスとかややこしいことになるので。</p>
+
+<h2>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda</h2>
+
+<p>なんといってもサーバレスの概念を推し進めたのは<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambdaでしょう。<br>
+説明はいまさら不要だと思うが、少しだけ。</p>
+
+<blockquote><p>コードを <a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda にアップロードすると、サービスが <a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> インフラストラクチャを使用してコードの実行を代行するコンピューティングサービスです。コードをアップロードして、Lambda 関数と呼ばれる関数を作成することで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda がコードを実行するサーバーのプロビジョニングおよび管理を行います。(<a href="https://aws.amazon.com/jp/lambda/details/">https://aws.amazon.com/jp/lambda/details/</a>)</p></blockquote>
+
+<p>課金モデルは関数呼び出した回数、および実行に利用したコンピュートのスペックによって決まる。<br>
+また特徴的なことは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>の他のサービスで発生したイベントをトリガーに実行できること。<br>
+例えば、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Amazon%20S3">Amazon S3</a>にファイルアップロードされたことをトリガーにLambdaを実行できるのだ。</p>
+
+<h2>サーバレスの特徴</h2>
+
+<p>サーバレス自体そしてサーバレスで実装することの特徴しては下記がある。</p>
+
+<ol>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>上のイベントを契機に実行できる</li>
+<li>実行環境は、immutableで時間が立つと消える</li>
+<li>実行環境は独立していて、コードは基本的にstatelessである</li>
+<li>上記のようにimmutableでstatelessな構造につくるからこそスケールしやすい</li>
+</ol>
+
+<h1>2. どんな用途で利用しているか</h1>
+
+<h2>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>基盤のイベントをトリガーとして</h2>
+
+<p>個人的に一番強力だと思っている使い方。上で説明したとおりだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>上のプロダクトに対してのイベントをトリガーに処理を行うことができる。<br>
+例えばこんな場合を想定してみよう。</p>
+
+<p>ユーザが写真をアップロードするサービスで、アップロードした写真にたいして何かしらの画像解析をしてメタ情報を持ちたいとする。<br>
+ざっと従来のやりかただと２つくらいやり方が思い浮かぶ。</p>
+
+<h4>(1) アップロードするたびに<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>で画像解析をする</h4>
+
+<ul>
+<li>解析にほとんど時間がかからない場合などはこれでいいと思う</li>
+<li>時間がかかるようなだとユーザへのレスポンスが遅くなる</li>
+<li>速くしようと思うとスケールアップで対応するしかない（やばい）</li>
+</ul>
+
+<h4>(2) <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>でやる</h4>
+
+<ul>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>で画像解析はまとめてやる。一番よくあるのでは？</li>
+<li>例えば５分に一度の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>で、５分間にたまった写真にたいしてまとめて処理する</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>でまとめて処理した場合、どこかでコケたときが辛い</li>
+<li>この例ならそうでもないが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>ではたいていスケールアウトが辛い</li>
+</ul>
+
+<p>このケースに対してLambdaであればどうなるか。<br>
+1000件のアップロードに対して、1000回のLambda実行によって対応できる。<br>
+これは何万件きても同じことで、スケールの面で大変優れている。<br>
+また、1件ごとに処理するため、エラーが発生した場合に原因などとても追いやすい。</p>
+
+<h2>アプリの<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>として</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>でいうと、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/Gateway">Gateway</a>と組み合わせて、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>サーバとして利用するケース。<br>
+S3などのデータストアに直接アクセスできるように作ることもできるため、ファイルアップロードなどで使われることが多いとか。<br>
+個人的には今のところあまり魅力的には感じない使い方。</p>
+
+<h2>事例紹介</h2>
+
+<p>カンファレンスのなかで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%FC%B7%D0%BF%B7%CA%B9">日経新聞</a>社さんののサーバレス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>の事例が一番よかったのでぜひ目を通しほしい。</p>
+
+<p><iframe allowfullscreen="true" allowtransparency="true" frameborder="0" height="463" id="talk_frame_361815" mozallowfullscreen="true" src="//speakerdeck.com/player/b4286c46056c404cbd272e253033d0df" style="border:0; padding:0; margin:0; background:transparent;" webkitallowfullscreen="true" width="710"></iframe><cite class="hatena-citation"><a href="https://speakerdeck.com/ikait/serverless-architecture-supports-nikkeis-paper-viewer">speakerdeck.com</a></cite></p>
+
+<p>ポイントとしては下記。見事にLambdaの特徴を活かした利用をしている。</p>
+
+<ul>
+<li>新聞は基本的には朝刊と夕刊の２回で限られたときだけ処理する点
+
+<ul>
+<li>常時稼働させたくない。EC2立ち上げっぱなしにする必要がない。</li>
+</ul>
+</li>
+<li>しかし、号外や速報など臨時の場合もただあり、それにも備えられる点</li>
+<li>日によってニュースの量が異なるため、いつでもスケールできる必要がある点</li>
+</ul>
+
+<h1>3. <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ベンダーからみたサーバレスの立ち位置</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ベンダーにとってサーバレスはどういう立ち位置なのだろうか。<br>
+ぼくは<span style="font-size: 150%">「各サービスの横串」</span>と考えています。<br>
+EC2、S3、RDSなどなどそれぞれのサービスは単体としてとてもよくできている。<br>
+しかし横の連携をしようと思うと別途様々な工夫が必要なのが現状だ。</p>
+
+<p>サーバレスはその横の連携を担うのだ。<br>
+各サービス間を紐で固く結びつけてしまう。<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ロックインを加速させる役割も持つ。</p>
+
+<p><b>「三葉よ、サーバレス、それもまた結び。」</b></p>
+
+<p>そして、IoTへの布石。<br>
+IoTの世界ではリアルタイムなセンサーの情報のやりとりでデ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4">バイ</a>スとデータセンタ間の通信遅延が許容できないことがある。<br>
+そこでいま研究が進んでいるエッジコンピューティング（フォグコンピューティングとも）などがあるが、<br>
+LambdaのようにImmutable, Statelessが前提で作られる、どこの環境でも実行可能な状態はIoTと相性がいいようにみえる。</p>
+
+<p><p>今後どうなっていくかはわからないが、<br>
+デ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4">バイ</a>スに近いエッジコンピューティング側はLambdaでさばき、そのさばいたデータを中央のデータセンターへ、<br>
+なんていうことが主流になってくるかもしれない。と思うとFaaSの存在は見逃せない気がしてくる。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">19 Sep 2016, 17:20</h1>
                 <section class="post">
                     <header class="post-header">
@@ -612,70 +767,6 @@ Nginxからプロキシされるときはちゃんとヘッダー名は"X-Forwar
                 </section>
                 
                 
-                
-                <h1 class="content-subhead">25 Jun 2016, 11:30</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2016/06/25/113009/" class="post-title">IkaLog環境整えた。画面が突然映らなくなる事象とかについて</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-スプラトゥーン" href="https://blog.mosuke.tech/categories/%E3%82%B9%E3%83%97%E3%83%A9%E3%83%88%E3%82%A5%E3%83%BC%E3%83%B3">スプラトゥーン</a><a class="post-category post-category-ikalog" href="https://blog.mosuke.tech/categories/ikalog">ikalog</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>昔まで、人の家で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%D7%A5%E9%A5%C8%A5%A5%A1%BC%A5%F3">スプラトゥーン</a>をやったりたまに借りたりして楽しんでいたが、<br>
-ついにというか今更というか自宅用に買ってしまった。<br>
-ついでにという感じで、お金を注ぎ込んで、IkaLogを楽しめる環境も作った。</p></p>
-
-<p>IkaLogあるととても楽しい。</p>
-
-<p>IkaLog環境はほぼ下記ブログを参考にしたので、詳しいことはかかないが、<br>
-全体図やハマったポイントなどを中心にまとめておく。</p>
-
-<p><a href="http://uriku.hatenablog.com/entry/2015/12/05/134411" target="_blank">雑記：Mac + IkaLog + stat.inkで戦績管理 - 新人SEの学習記録</a></p>
-
-<h1>完成後写真</h1>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160625/20160625112118.png" alt="f:id:mosuke5:20160625112118p:plain" title="f:id:mosuke5:20160625112118p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<h1>図にしてわかりやすくすると</h1>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160625/20160625112128.png" alt="f:id:mosuke5:20160625112128p:plain" title="f:id:mosuke5:20160625112128p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<h1>突然画面が映らなくなることが起きた！！</h1>
-
-<p>ゲームを楽しんでいた時突然、ディスプレーに画面が映らなくなることが度々あった。<br>
-ケーブルを抜き差ししても直らない。<br>
-ただ時間が経つと映るようになる・・・</p>
-
-<p>原因が最初わからなかったのだが、<br>
-どうやら<a class="keyword" href="http://d.hatena.ne.jp/keyword/HDMI">HDMI</a>スプリッターの電源供給が追いつかなくなった時になっていた。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/HDMI">HDMI</a>スプリッターは<a class="keyword" href="http://d.hatena.ne.jp/keyword/HDMI">HDMI</a>からある程度給電することができるので、はじめはそのまま利用していた。<br>
-だが、IkaLogを回し始めるとどうやら給電が追いつかなくなるようであった。</p>
-
-<p>説明書にも下記のように書いてあって、「あっ」って感じだった</p>
-
-<blockquote><p>入力機器側の電力不足により正常に表示できない場合に使用します。</p></blockquote>
-
-<p>USB経由で別途電源供給をするようになってから事象が発生しなくなった！</p>
-
-<p><p>※画面が映らなくなってガチマッチ何度負けたことか・・・</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
             </div>
             
 <div class="pagination">
@@ -685,7 +776,7 @@ Nginxからプロキシされるときはちゃんとヘッダー名は"X-Forwar
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 4 of 15</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 4 of 16</span>
     
       <a href="/page/5/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>
@@ -699,15 +790,15 @@ Nginxからプロキシされるときはちゃんとヘッダー名は"X-Forwar
 <div class="latest-posts">
     <h5>Latest Posts</h5>
     
-        <li><a href="https://blog.mosuke.tech/entry/2017/07/16/architecting_for_the_cloud/">【更新中】Architecting for the Cloud -AWS Best Pravtices-を解読する</a></li>
+        <li><a href="https://blog.mosuke.tech/entry/2017/08/04/aws_certificate_practice_exam/">英語でAWSソリューションアーキテクト認定の模擬試験を受けてみた</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2017/07/16/architecting_for_the_cloud/">【更新中】Architecting for the Cloud -AWS Best Practices-を解読する</a></li>
     
         <li><a href="https://blog.mosuke.tech/entry/2017/07/14/master_cloud_malticloud/">Terraform×Rancherでマルチクラウドを一歩すすめる、を話してきた</a></li>
     
         <li><a href="https://blog.mosuke.tech/entry/2017/07/01/yapc_fukuoka/">YAPC::Fukuoka前夜祭でLTしてきた。「Rancherでマルチクラウドをやってみる」</a></li>
     
         <li><a href="https://blog.mosuke.tech/entry/2017/06/12/hugo_optimize_image/">Hugo、PageSpeed対策で自動で画像を圧縮する</a></li>
-    
-        <li><a href="https://blog.mosuke.tech/entry/2017/06/04/hugo_deployment_with_wercker/">Werckerを使ってHugo&#43;Github PagesのCI/CD環境を整備する</a></li>
     
 </div>
 <div class="search">

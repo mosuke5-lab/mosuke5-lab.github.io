@@ -57,6 +57,220 @@
             <div class="posts">
                 
                 
+                <h1 class="content-subhead">16 Mar 2016, 17:54</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2016/03/16/175431/" class="post-title">DBのViewの使いどころの検討</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-データベース" href="https://blog.mosuke.tech/categories/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9">データベース</a><a class="post-category post-category-DB" href="https://blog.mosuke.tech/categories/db">DB</a><a class="post-category post-category-ビュー" href="https://blog.mosuke.tech/categories/%E3%83%93%E3%83%A5%E3%83%BC">ビュー</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>ある実装についてどのように実装するか悩んだ。<br>
+その悩んだ過程や実装案をメモする。似たようなケースの実装案として参考になればと思う。</p></p>
+
+<h1>状況</h1>
+
+<p>ある申請に対して、検査Aと検査Bを行い、その検査状態・検査日時を管理・閲覧するシステムがあるとする。  <br>
+申請のテーブルは下記とする。</p>
+
+<ul>
+<li>id: int</li>
+<li>name: varchar(20)  # どうでもいいので無視していい</li>
+<li>check_a: datetime  # 検査すると実施した日時がはいる</li>
+<li>check_b: datetime  # 検査すると実施した日時がはいる</li>
+</ul>
+
+<p>UIとして下記のように表示したいと考えている。</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:center;">番号</th>
+<th style="text-align:center;">状態</th>
+<th style="text-align:center;">名前</th>
+<th style="text-align:center;">検査A</th>
+<th style="text-align:center;">検査B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;">1</td>
+<td style="text-align:center;">検査完了</td>
+<td style="text-align:center;">xxxxxx</td>
+<td style="text-align:center;">2016/03/01 10:00 </td>
+<td style="text-align:center;">2016/03/01 12:00</td>
+</tr>
+<tr>
+<td style="text-align:center;">2</td>
+<td style="text-align:center;">検査未完了</td>
+<td style="text-align:center;">xxxxxx</td>
+<td style="text-align:center;"> - </td>
+<td style="text-align:center;"> - </td>
+</tr>
+<tr>
+<td style="text-align:center;">3</td>
+<td style="text-align:center;">検査途中</td>
+<td style="text-align:center;">xxxxxx</td>
+<td style="text-align:center;"> 2016/03/01 13:00 </td>
+<td style="text-align:center;"> - </td>
+</tr>
+<tr>
+<td style="text-align:center;">4</td>
+<td style="text-align:center;">検査途中</td>
+<td style="text-align:center;">xxxxxx</td>
+<td style="text-align:center;"> - </td>
+<td style="text-align:center;"> 2016/03/01 15:00 </td>
+</tr>
+</tbody>
+</table>
+
+<h4>※<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%F3%A5%C1%A5%D1%A5%BF%A1%BC%A5%F3">アンチパターン</a>だろ！？</h4>
+
+<p>そもそも<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%F3%A5%C1%A5%D1%A5%BF%A1%BC%A5%F3">アンチパターン</a>の「マルチカラム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%C8%A5%EA%A5%D3%A5%E5%A1%BC%A5%C8">アトリビュート</a>」じゃないの？と思うかもしれない。<br>
+この場合は、この設計が一番という前提でお願いしたい。</p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fwww.amazon.co.jp%2FSQL%25E3%2582%25A2%25E3%2583%25B3%25E3%2583%2581%25E3%2583%2591%25E3%2582%25BF%25E3%2583%25BC%25E3%2583%25B3-Bill-Karwin%2Fdp%2F4873115892" title="Amazon.co.jp： SQLアンチパターン: Bill Karwin, 和田 卓人, 和田 省二, 児島 修: 本" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://www.amazon.co.jp/SQL%E3%82%A2%E3%83%B3%E3%83%81%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3-Bill-Karwin/dp/4873115892">www.amazon.co.jp</a></cite></p>
+
+<h1>実装の検討</h1>
+
+<p>いくつかの実装パターンを検討した。<br>
+結果的に今回は実装案４のViewを使うのがいいのではないかと考えた。 <br>
+が、Viewにもデメリットがある。必ずしもViewがいいというものではないことは留意。</p>
+
+<h2>(実装案１) <a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>側で頑張る</h2>
+
+<p>まず、データを取り出す際に<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>で頑張ることを思いつくはずだ。<br>
+例えば以下みたいに。</p>
+
+<pre><code class="language-sql">select
+  id,
+  name,
+  case
+    when check_a is null and check_b is null  then '検査未完了'
+    when check_a is not null and check_b is not null then '検査完了 '
+    else '検査途中'
+  end as check_status
+from request
+ 
+</code></pre>
+
+<p>これが悪いとはいわない。<br>
+だが、例えば同じような表示方法で他の条件式で取得したい時があるだろう。</p>
+
+<pre><code class="language-sql">select
+  id,
+  name,
+  case
+    when check_a is null and check_b is null  then '検査未完了'
+    when check_a is not null and check_b is not null then '検査完了 '
+    else '検査途中'
+  end as check_status
+from request
+where name = 'xxxxx'
+ 
+</code></pre>
+
+<p>もし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>の中に同じ形なのに条件だけがことなる<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が出てきてしまったら、
+ヤバイと感じてくるはずだ。</p>
+
+<p>そして、<a class="keyword" href="http://d.hatena.ne.jp/keyword/ActiveRecord">ActiveRecord</a>のようなORマッパーを使っている場合、<br>
+case文などを利用し始めた時点で、生<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を書かなければいけなくなる。<br>
+これも不吉な感じがしてくる。</p>
+
+<h1>(実装案２) 受け取った側で頑張る</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が複雑になるのがいやなら、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DF%A5%F3%A5%B0%B8%C0%B8%EC">プログラミング言語</a>側で頑張ることもできる。<br>
+とりあえずデータは全部生でもらっておいて</p>
+
+<pre><code class="language-sql">select * from request;
+</code></pre>
+
+<p>HTML出力の時に頑張る。(下記は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>のERB想定で記述)</p>
+
+<pre><code class="language-ruby">&lt;% if(request.check_a.nil? and request.check_b.nil?) %&gt;
+  &lt;span&gt;検査完了&lt;/span&gt; 
+&lt;% elsif(!request.check_a.nil? and !request.check_b.nil?) %&gt;
+  &lt;span&gt;検査未実施&lt;/span&gt; 
+&lt;% else %&gt;
+  &lt;span&gt;検査途中&lt;/span&gt; 
+&lt;% end %&gt;
+</code></pre>
+
+<p>ありといえばありだが、もっと条件が複雑になると条件式の管理が大変になってきそうだ。</p>
+
+<p>出力部分をhelperなどに書いて関数化も考えた。<br>
+だが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>でERBを利用して出力する場合はいいが、<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>でも出力する場合には<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>ヘルパーは利用できない。<br>
+とても嫌な予感がした。</p>
+
+<h1>(実装案３) DBの設計の変更で頑張る</h1>
+
+<p>そもそもテーブルの設計を変えてしまう方法も検討した。<br>
+テーブルの中で検査状態を持つのだ。</p>
+
+<ul>
+<li>id: int</li>
+<li>name: varchar(20)</li>
+<li>check_a: datetime</li>
+<li>check_b: datetime</li>
+<li>check_status: int</li>
+</ul>
+
+<p>サーバサイド側で頑張らなきゃいけなくてとても実装する気になれなかったし、これってどうなの？</p>
+
+<h1>(実装案４) Viewを利用して頑張る</h1>
+
+<p>上３つで見てきたように、いろいろ考えたけどどれもイケてなかった。<br>
+そこで思いついたのがデータベースの機能の「View」だ。</p>
+
+<p>Veiwを使ってよく利用する形を事前に作っておくことでいろいろ解決することがわかった。</p>
+
+<pre><code class="language-sql">create view view_request as
+select
+  id,
+  name,
+  case
+    when check_a is null and check_b is null  then '検査未完了'
+    when check_a is not null and check_b is not null then '検査完了 '
+    else '検査途中'
+  end as check_status
+from request
+</code></pre>
+
+<p>上記で作ったViewを参照することでいくつものメリットが生まれた。</p>
+
+<ol>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/ActiveRecord">ActiveRecord</a>が利用できるようになりコードが綺麗になった</li>
+<li>重複した<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が減った</li>
+<li>実現のためのコードをほとんど書かなくて済んだ</li>
+</ol>
+
+<p>だが、もちろんView機能が万能でないことは抑えておく必要がある。<br>
+Viewのデメリットは利用する前にしっかり確認してほしい。</p>
+
+<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fitpro.nikkeibp.co.jp%2Farticle%2FCOLUMN%2F20071126%2F287920%2F%3Frt%3Dnocnt" title="[データベース編]ビュー、トリガーを多用してはいけない" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://itpro.nikkeibp.co.jp/article/COLUMN/20071126/287920/?rt=nocnt">itpro.nikkeibp.co.jp</a></cite></p>
+
+<p><p>もっといい実装があれば教えて下さい。</p>
+</body></p>
+
+                    </div>
+                </section>
+                
+                
+                
                 <h1 class="content-subhead">06 Mar 2016, 14:05</h1>
                 <section class="post">
                     <header class="post-header">
@@ -652,151 +866,6 @@ Ansibleを使ってアプリケーションのデプロイまですべて行う�
                 </section>
                 
                 
-                
-                <h1 class="content-subhead">17 Dec 2015, 19:25</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2015/12/17/192554/" class="post-title">インフラのデプロイとテストを同時実行できるようにしてHappyになった</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-serverspec" href="https://blog.mosuke.tech/categories/serverspec">serverspec</a><a class="post-category post-category-raketask" href="https://blog.mosuke.tech/categories/raketask">raketask</a><a class="post-category post-category-インフラテスト" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E3%83%86%E3%82%B9%E3%83%88">インフラテスト</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<h1>はじめに</h1></p>
-
-<p>私が開発しているシステムでは、Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。
-そして、serverspecを使って、インフラテストも行っています。<br>
-しかし、その運用にいくつか課題点がありました。</p>
-
-<p>その課題点についてと、課題点へ対策したことについて書きます。</p>
-
-<h1>課題だったこと</h1>
-
-<h2>(課題1) デプロイとテストをそれぞれ実行していた</h2>
-
-<p>Ansibleでのデプロイとserverspecのテストはそれぞれ別のコマンドで実行していました。</p>
-
-<pre><code>$ ansible-playbook site.yml -i 
-$ bundle exec rake serverspec 
-</code></pre>
-
-<p>2つ実行することが面倒であり、面倒であるがゆえにserverspecの実行を怠ったりしていました。<br>
-これではテストの効果があまり発揮できませんね。</p>
-
-<h2>(課題2) sudoパスワードをうまく管理できなかった</h2>
-
-<p>上のような課題1について、真っ先に以下の様にコマンドを続けることを思いつきました。</p>
-
-<pre><code>$ ansible -playbook site.yml -i ; bundle exec rake serverspec 
-</code></pre>
-
-<p>ですが、これだとansible実行終了後にserverspecを実行する際にsudoパスワードが再度聞かれるため、<br>
-コマンドを打ったまま「放置」ができませんでした。<br>
-<span style="font-size: 80%">※もちろん、sudoパスワードを要求しないようにユーザ設定をすればできますが、多くの場合ではセキュリティ上難しかったりすると思います。<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>接続は鍵認証、sudoには必ずパスワードを要求するようにしています。</span></p>
-
-<p>Ansibleもserverspecにもコマンド実行時にsudoパスワードを記述する方法があります。<br>
-Ansibleでは、ansible.cfgにsudo_passwordを記述、あるいはコマンド実行時に--extra-argsでsudoパスワードを指定できます。<br>
-serverspecでも<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>でSUDO_PASSWORDが指定できます。</p>
-
-<p>例 ）</p>
-
-<pre><code>ansible -playbook site.yml -i --extra-args='ansible_sudo_pass=xxxxxxxx'
-bundle exec rake serverspec SUDO_PASSWORD=xxxxxxxx 
-</code></pre>
-
-<p>ですが、おわかりの通り、<b>コマンドの履歴にもパスワードが残ります</b>。<br>
-なのであまり良い方法ではないと思っています。</p>
-
-<h2>(課題3) タスクの実行方法がバラバラ</h2>
-
-<p>デプロイはansibleコマンドで実行、テストはrakeで実行、他のタスクは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%A7%A5%EB%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">シェルスクリプト</a>。。。<br>
-といったように、タスクによって実行方法が異なってしまう状況になっていました。<br>
-運用的にとても不便でしたので、１つに統一したいと思っていました。</p>
-
-<h1>いい感じに同時に実行してくれるRakeタスクを作った</h1>
-
-<p>上で述べたような課題点をクリアするように、下記の要件を満たすように工夫をしました。</p>
-
-<ul>
-<li>デプロイ、テストが同じ形式で実行できる</li>
-<li>sudoパスワードをベタ書きすることなく実行できる</li>
-<li>sudoパスワードの入力を一回だけにする</li>
-</ul>
-
-<p>結論は、すべてRakeタスクで実行できるようにしました。<br>
-タスク一覧を見ると以下の様な感じになりました。（※実行結果は例であり実際の内容とは少し異なる。）</p>
-
-<pre><code>$ bundle exec rake -T
-rake deploy:development    # Deploy to development server
-rake deploy:production     # Deploy to production server
-rake serverspec            # Run serverspec to all hosts
-rake serverspec:app        # Run serverspec to app server
-rake serverspec:db        # Run serverspec to db server 
-</code></pre>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Rakefile">Rakefile</a>の実装例（一部省略）</p>
-
-<pre><code class="language-ruby">desc &quot;Deploy and Test&quot;
-namespace :deploy do
-  require &quot;io/console&quot;
-  require &quot;open3&quot;
-
-  STDOUT.sync = true
-  desc &quot;Deploy to development server&quot;
-  task :development do
-    # sudoパスワードははじめに１回だけ聞くようにします。
-    sudo_password = ask_sudo_password
-
-    # デプロイとテストを同時に実行します。
-    deploy_and_test('development', sudo_password)
-  end
-
-  # デプロイとテストの同時実行関数
-  def deploy_and_test(env, sudo_password)
-    deploy_cmd = &quot;ansible-playbook -i #{env} site.yml --extra-vars 'ansible_sudo_pass=#{sudo_password}'&quot;
-    test_cmd = &quot;bundle exec rake serverspec ENVIRONMENT=#{env} SUDO_PASSWORD=#{sudo_password}&quot;
-    Open3.pipeline(&quot;#{deploy_cmd}; #{test_cmd}&quot;)
-  end
-
-  # sudoパスワードを要求関数
-  def ask_sudo_password
-    print &quot;SUDO Password: &quot;
-    sudo_password = STDIN.noecho &amp;:gets
-  end
-end
-</code></pre>
-
-<h1>まとめ</h1>
-
-<p>タスクによってその実行方法が異なることは運用上とても不便です。<br>
-統一した実行方法にすることで、</p>
-
-<ul>
-<li>テストの実行し忘れがなくなり</li>
-<li>ドキュメントも残しやすくなり</li>
-<li>チームメンバーへの運用方法の伝授も楽になり</li>
-</ul>
-
-<p>ました。（今回に限る話ではないけれど）</p>
-
-<p><p>また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rakefile">Rakefile</a>はかなりやっつけで作ってしまったので、何をタスクにするか・その命名・実装方法などの改善は年末の課題ですかね。</p>
-</body></p>
-
-                    </div>
-                </section>
-                
-                
             </div>
             
 <div class="pagination">
@@ -806,7 +875,7 @@ end
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 6 of 15</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 6 of 16</span>
     
       <a href="/page/7/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>
@@ -820,15 +889,15 @@ end
 <div class="latest-posts">
     <h5>Latest Posts</h5>
     
-        <li><a href="https://blog.mosuke.tech/entry/2017/07/16/architecting_for_the_cloud/">【更新中】Architecting for the Cloud -AWS Best Pravtices-を解読する</a></li>
+        <li><a href="https://blog.mosuke.tech/entry/2017/08/04/aws_certificate_practice_exam/">英語でAWSソリューションアーキテクト認定の模擬試験を受けてみた</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2017/07/16/architecting_for_the_cloud/">【更新中】Architecting for the Cloud -AWS Best Practices-を解読する</a></li>
     
         <li><a href="https://blog.mosuke.tech/entry/2017/07/14/master_cloud_malticloud/">Terraform×Rancherでマルチクラウドを一歩すすめる、を話してきた</a></li>
     
         <li><a href="https://blog.mosuke.tech/entry/2017/07/01/yapc_fukuoka/">YAPC::Fukuoka前夜祭でLTしてきた。「Rancherでマルチクラウドをやってみる」</a></li>
     
         <li><a href="https://blog.mosuke.tech/entry/2017/06/12/hugo_optimize_image/">Hugo、PageSpeed対策で自動で画像を圧縮する</a></li>
-    
-        <li><a href="https://blog.mosuke.tech/entry/2017/06/04/hugo_deployment_with_wercker/">Werckerを使ってHugo&#43;Github PagesのCI/CD環境を整備する</a></li>
     
 </div>
 <div class="search">
