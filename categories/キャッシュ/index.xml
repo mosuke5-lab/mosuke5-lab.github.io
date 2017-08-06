@@ -17,20 +17,15 @@
       <pubDate>Mon, 29 May 2017 20:06:31 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2017/05/29/how_to_use_cloudflare_api/</guid>
-      <description>はじめに 最近ブログをはてなブログからHugoへ移行した。
-HugoのフロントにCloudFlareを利用している。
-ブログ移行についてはこちらを参照。
-「はてなブログからHugoに移行。その際に行ったあれこれ。」
-コンテンツをアップロードした場合などにCloudFlareのキャッシュを削除したく、
-APIを利用して効率よく作業できる環境を整えた。
-使い方 CloudFlareのAPIドキュメントはかなり充実している。
-キャッシュの全削除については下記に記載がある。
-https://api.cloudflare.com/#zone-purge-all-files
-利用方法をみると、DELETE /zones/:identifier/purge_cacheとあるが、
-:identifierがなんのことかはじめわからずはじめ苦戦した。
-identifierの確認 identifierは下記APIで確認できる。
-このAPIで返ってくるはじめのidがidenitiferだ。
-curl -X GET &amp;quot;https://api.cloudflare.com/client/v4/zones \ ?name=&amp;lt;your site&amp;gt; \ &amp;amp;status=active \ &amp;amp;page=1 \ &amp;amp;per_page=20 \ &amp;amp;order=status \ &amp;amp;direction=desc \ &amp;amp;match=all&amp;quot; \ -H &amp;quot;X-Auth-Email: &amp;lt;your email&amp;gt;&amp;quot; \ -H &amp;quot;X-Auth-Key: &amp;lt;your api key&amp;gt;&amp;quot; \ -H &amp;quot;Content-Type: application/json&amp;quot;  { &amp;quot;result&amp;quot;: [ { &amp;quot;id&amp;quot;: &amp;quot;xxxxxxxxxxxxxxxxxxxxxxx&amp;quot;, &amp;quot;name&amp;quot;: &amp;quot;mosuke.tech&amp;quot;, &amp;quot;status&amp;quot;: &amp;quot;active&amp;quot;, &amp;quot;paused&amp;quot;: false, &amp;quot;type&amp;quot;: &amp;quot;full&amp;quot;, &amp;quot;development_mode&amp;quot;: 0, &amp;quot;name_servers&amp;quot;: [ &amp;quot;rudy.</description>
+      <description>&lt;p&gt;最近ブログをはてなブログからHugoへ移行した。&lt;br /&gt;
+HugoのフロントにCloudFlareを利用している。&lt;br /&gt;
+ブログ移行についてはこちらを参照。&lt;br /&gt;
+「&lt;a href=&#34;https://blog.mosuke.tech/entry/2017/05/28/blog_migration/&#34;&gt;はてなブログからHugoに移行。その際に行ったあれこれ。&lt;/a&gt;」&lt;/p&gt;
+
+&lt;p&gt;コンテンツをアップロードした場合などにCloudFlareのキャッシュを削除したく、&lt;br /&gt;
+APIを利用して効率よく作業できる環境を整えた。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
     </item>
     
   </channel>

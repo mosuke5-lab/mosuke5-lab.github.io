@@ -76,137 +76,13 @@
                     </header>
 
                     <div class="post-description">
-                        
-
-<p>以前、はてなブログからHugoを使ったサイトに移行したことを書いた。<br />
+                        <p>以前、はてなブログからHugoを使ったサイトに移行したことを書いた。<br />
 こちら参照：<a href="https://blog.mosuke.tech/entry/2017/05/28/blog_migration/">はてなブログからHugoに移行。その際に行ったあれこれ。</a></p>
 
 <p>今回、Hugoで記事を更新してからデプロイまでの流れをWerckerを使って自動化したので紹介する。</p>
 
-<h1 id="概要">概要</h1>
-
-<p>今までは下記のフローでデプロイを行っていた。<br />
-一部シェルスクリプトにして自動化していたが、hugoファイルを管理するレポジトリとGithub Pages用の<br />
-２つのレポジトリへのコミットが必要で手間がかかっていた。</p>
-
-<ol>
-<li>hugoファイル側で記事更新、デザイン変更</li>
-<li>更新のコミット、プッシュ</li>
-<li><code>hugo</code>コマンドでビルド</li>
-<li><code>/public</code>以下のファイルをgithub pages用のレポジトリへコピー</li>
-<li>github pages用レポジトリーへ移動してコミット、プッシュ</li>
-<li>CloudFlareのキャッシュ削除</li>
-</ol>
-
-<p>このフローをWerckerを利用して下記のように変更した。</p>
-
-<ol>
-<li>hugoファイル側で記事更新、デザイン変更</li>
-<li>更新のコミット、プッシュ</li>
-<li>Werckerでビルド</li>
-<li>Werckerでビルド結果をGithub pages用レポジトリへプッシュ</li>
-<li>WerckerでCloudFlareのキャッシュ削除やSlack通知</li>
-</ol>
-
-<p>Werckerを使っていわゆるCI/CDのフローを組むことで、<br />
-hugo側のファイル・レポジトリ管理をするだけでよくなった。</p>
-
-<h1 id="werckerの設定">werckerの設定</h1>
-
-<h2 id="wercker-yml">wercker.yml</h2>
-
-<p>まず、<code>wercker.yml</code>から記述する。<br />
-Werckerを利用するには自分のレポジトリに<code>wercker.yml</code>を配置する必要があり、<br />
-このファイルに記述のとおりに自動化処理を行わせる。<br />
-本記事ではWerckerの細かい話は割愛するが、以下が<code>wercker.yml</code>だ。</p>
-
-<pre><code class="language-yml">box: debian
-build:
-  steps:
-    - install-packages:
-        packages: git
-    - script:
-        name: download theme
-        code: |
-            $(git clone https://github.com/dplesca/purehugo ./themes/purehugo)
-    - arjen/hugo-build:
-        version: &quot;0.20&quot;
-        theme: purehugo
-        flags: --buildDrafts=false
-  after-steps:
-    - slack-notifier:
-      channel: $SLACK_CHANNEL
-      url: $SLACK_URL
-      username: wercker_bot
-
-deploy:
-  steps:
-    - install-packages:
-        packages: git ssh-client curl
-    - leipert/git-push:
-        gh_oauth: $GIT_TOKEN
-        repo: mosuke5-lab/mosuke5-lab.github.io
-        branch: master
-        basedir: public
-        gh_pages_domain: blog.mosuke.tech
-  after-steps:
-    - script:
-      name: delete cloudflare cache
-      code: |
-        sh ./scripts/delete_cache_all.sh ${CF_ZONE_ID} ${CF_EMAIL} ${CF_KEY}
-    - slack-notifier:
-      channel: $SLACK_CHANNEL
-      url: $SLACK_URL
-      username: wercker_bot
-</code></pre>
-
-<h2 id="ビルド時のhugoバージョンはきちんと書く">ビルド時のhugoバージョンはきちんと書く</h2>
-
-<p><code>wercker.yml</code>を書く際に注意する点の１つがhugoバージョンの明記だ。<br />
-以下部分の<code>version</code>は、自分のローカルの環境のHugoバージョンときちんと合わせるとよい。<br />
-公式ドキュメントを参考にしてこの環境を作ったが、はじめドキュメントのままコピペで行っていたので、一部ビルド結果が本番環境だけ異なることがあり、はまった。<br />
-<a href="https://gohugo.io/tutorials/automated-deployments/#using-hugo-build">Automated deployments with Wercker</a></p>
-
-<pre><code>    - arjen/hugo-build:
-        version: &quot;0.20&quot;
-        theme: purehugo
-        flags: --buildDrafts=false
-</code></pre>
-
-<h2 id="デプロイは-leipert-git-push-を使った">デプロイは&rsquo;leipert/git-push&rsquo;を使った</h2>
-
-<p>公式ドキュメントでは<code>lukevivier/gh-pages</code>の利用を紹介している。<br />
-しかし、現状Github pagesは<code>master</code>ブランチのコードをビルドするようにできている。<br />
-このツールではどうしても<code>gh-page</code>ブランチにデプロイするため、用途と合わなかった。
-（自分がなにか間違っているだけな気もするが。。。）</p>
-
-<p>あと、<code>lukevivier/gh-pages</code>ではデプロイのコミットログが残らない。<br />
-その点でも<a href="https://github.com/leipert/step-git-push">leipert/git-push</a>はかなりおすすめ。</p>
-
-<h2 id="cloudflareのキャッシュ削除">CloudFlareのキャッシュ削除</h2>
-
-<p>Github Pagesの前段にCloudFlareを利用している。<br />
-CloudFlareのキャッシュ削除は、以前に作ったシェルスクリプトをそのまま実行する形をとった。<br />
-参考：<a href="https://blog.mosuke.tech/entry/2017/05/29/how_to_use_cloudflare_api/">CloudFlare APIを使ってキャッシュを削除する</a></p>
-
-<h2 id="werckerの設定-1">werckerの設定</h2>
-
-<p><code>wercker.yml</code>を配置しただけでは適切にCI/CDプロセスを実行することは実はできない。<br />
-wercker側でワークフローを定義する必要がある。<br />
-今回は、<code>build</code>と<code>deploy</code>の2つに分けてワークフローを定義した。</p>
-
-<ol>
-<li>build: デプロイする静的ファイルの生成</li>
-<li>deploy: 生成したファイルの本番環境へのデプロイ
-
-<ol>
-<li>masterブランチに変更があった時だけ実行</li>
-<li>deploy後の後処理も実行</li>
-</ol></li>
-</ol>
-
-<p><img src="/image/wercker_hugo-blog.mosuke.tech_workflow.png" alt="wercker_hugo-blog.mosuke.tech_workflow" /></p>
-
+<p></p>
+                        <a href="https://blog.mosuke.tech/entry/2017/06/04/hugo_deployment_with_wercker/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -231,202 +107,12 @@ wercker側でワークフローを定義する必要がある。<br />
                     </header>
 
                     <div class="post-description">
-                        
-
-<h1 id="はじめに">はじめに</h1>
-
-<p>弊社はプレミアムフライデー導入企業なのだが、最終金曜日に早く帰る必要はなく、月内でどこか1日15時に帰りましょうという制度になっている。<br />
+                        <p>弊社はプレミアムフライデー導入企業なのだが、最終金曜日に早く帰る必要はなく、月内でどこか1日15時に帰りましょうという制度になっている。<br />
 金曜日が仕事の都合上取れなかったので、今月は5/31にプレミアムフライデー（プレミアムウェンズデー）を使った。<br />
 ちょうどAWS Summit開催中だったのでのぞきにいった。</p>
 
-<h1 id="雰囲気">雰囲気</h1>
-
-<p>想像していた雰囲気とはだいぶ異なっていたというのが第一印象。<br />
-想像以上にスーツの年齢層の高い人が多かった。それだけ、AWSもエンタープライズでも注目されるようになったということだろう。<br />
-以前に、JAWS2015に参加したことある。もちろんJAWSとAWS Summitでは参加者の層が違う。<br />
-が、あれから2年たちAWSに興味を持つ層も大きく変わってきたのを感じた。</p>
-
-<p>セッションも非IT企業への導入事例や、思ったより入門セッションも多かった。<br />
-登壇者の話しぶりも「オンプレからの移行」を意識したように感じた。</p>
-
-<h1 id="ブース">ブース</h1>
-
-<p>セッションだけではなく、AWSに関連するサービスを提供している企業がたくさんブースをだしている。<br />
-ここでのコミュニケーションが案外一番楽しい。お酒も用意されていて楽しくおしゃべりできた。</p>
-
-<p>Heroku+AWSの組み合わせで利用するケースの話を聞いて、あーなるほどねって感じだった。<br />
-HerokuはAWS上で動作しているし、インターネット経由してもそこまで遅くはならない。<br />
-そんな利点を使って組み合わせて使う事例なんかきいた。</p>
-
-<p>そのほかは、やっぱりどこもかしこもコンテナ。<br />
-コンテナをどう扱うか、どう監視するか、そんなところの話が多かった。</p>
-
-<h1 id="セッション-ネットワーク設計入門">セッション「ネットワーク設計入門」</h1>
-
-<p>セッションは１つだけ「<a href="http://www.awssummit.tokyo/summit/index.html#D2T3-5">ネットワーク設計入門</a>」を聞いた。<br />
-普段ならネットワーク設計入門のセッションは聞かないと思っているのだが、<br />
-どんなことを話すのか興味あって聞いてみた。</p>
-
-<h2 id="1-クラウド上のnwの特徴">(1)クラウド上のNWの特徴</h2>
-
-<ol>
-<li>物理設計はいらない</li>
-<li>可用性はすでにセット(VRRPなど気にしなくてよい）</li>
-<li>プロフラマブルに操作可能</li>
-</ol>
-
-<h2 id="2-nwサービス">(2)NWサービス</h2>
-
-<p>NWサービスは意外とすくない。VPCがほぼすべて。<br />
-VPCが本質であり、ここが理解できればほぼ問題ない。</p>
-
-<ol>
-<li>VPC</li>
-<li>Direct Connect</li>
-<li>Route53</li>
-</ol>
-
-<h2 id="3-前提知識">(3)前提知識</h2>
-
-<h3 id="vpc">VPC</h3>
-
-<p>物理設計はいらないんだけど、<br />
-やっぱり物理知っていることがアドバンテージになる。
-VPCはリージョンの中のみ。ゾーンはまたぐことができる。</p>
-
-<h3 id="専用線">専用線</h3>
-
-<p>当たり前だがDCの場所は公開していない。<br />
-じゃどうやって接続するか？<br />
-相互接続接続ポイントを用意しているからそこにつなぎに来てね、という考え方。</p>
-
-<h3 id="エッジロケーション">エッジロケーション</h3>
-
-<p>CDNノードやRoute53が動作しているところ。<br />
-リージョンとはまた別にある。</p>
-
-<h2 id="4-設計をはじめよう">(4)設計をはじめよう</h2>
-
-<p>AWSのどのサービスを使いたいかでNWの設計方針はかわる。<br />
-まずはVPCの中で利用するサービスとVPCの外で使うものがあるのでその区別。</p>
-
-<ul>
-<li>VPCの中で使うもの
-
-<ul>
-<li>EC2とかRDSとかRedshift、EMR</li>
-</ul></li>
-<li>VPCの外で使うもの
-
-<ul>
-<li>S3、LamdaとかDynamoDB、CloudWatch</li>
-</ul></li>
-</ul>
-
-<p>次に、外部通信の設計</p>
-
-<ul>
-<li>VPCと外部を接続する場合
-
-<ul>
-<li>専用線orインターネットVPNorパブリック(ssh/https)</li>
-</ul></li>
-<li>VPCがないけど外部から利用したい場合
-
-<ul>
-<li>httpsでまかなう場合が多い。</li>
-<li>実は、VPCがなくてもDicrectConnectは使えるよ。
-
-<ul>
-<li>DirectConnectのパブリック接続</li>
-</ul></li>
-</ul></li>
-</ul>
-
-<h2 id="5-プライベートnw設計のステップ">(5)プライベートNW設計のステップ</h2>
-
-<ol>
-<li>VPCの作成
-
-<ol>
-<li>VPCのCIDRレンジは変えられないから大きくとっておこう</li>
-<li>オンプレミスとのレンジも被らないように</li>
-<li>/16がおすすめ</li>
-</ol></li>
-<li>サブネット作成
-
-<ol>
-<li>インターネットに接続するものとしないもの。ここでサブネット分けよう</li>
-<li>AZが落ちてもいいように設計しよう。サブネットは２つずつ</li>
-<li>サブネットサイズは24がおすすめ</li>
-</ol></li>
-<li>VPCコンポーネントの作成
-
-<ol>
-<li>カスタマーGW</li>
-<li>インターネットGW</li>
-<li>VPC単位、サブネット単位、インスタンス単位で配置できるコンポーネントがあるよ</li>
-</ol></li>
-<li>インスタンスの配置
-
-<ol>
-<li>セキュリティポリシーを考えよう</li>
-<li>セキュリティグループとネットワークACLがあるよ</li>
-<li>セキュリティグループのほうが柔軟</li>
-</ol></li>
-<li>名前解決の検討</li>
-</ol>
-
-<h2 id="6-ユースケースごとのnw設計">(6)ユースケースごとのNW設計</h2>
-
-<h3 id="公開サービスの場合">公開サービスの場合</h3>
-
-<ul>
-<li>インターネットから接続でいるのはロードバランサーだけにしよう
-
-<ul>
-<li>あるいはあとはメンテナンス用の踏み台サーバだけ</li>
-</ul></li>
-<li>S3を活用するときは、VPCエンドポイントつかえばVPC内部から接続できるよ</li>
-<li>管理拠点とはVPNでつなぐことをおすすめするよ</li>
-<li>管理拠点とのルーティングはルートテーブル</li>
-<li>DNSはRoute53使うと便利だよ
-
-<ul>
-<li>ALIASレコードという独自機能</li>
-<li>DNSのフェイルオーバー機能
-
-<ul>
-<li>ソーリーページへの転送が可能</li>
-</ul></li>
-</ul></li>
-</ul>
-
-<h3 id="社内システム基盤の場合">社内システム基盤の場合</h3>
-
-<ul>
-<li>DirectConnectを使おう
-
-<ul>
-<li>パートナーがたくさんいるので連絡してみよう</li>
-</ul></li>
-<li>Route53はプライベートゾーン、オンプレからVPC内の名前解決にも使えるよ</li>
-<li>DirectConnect体験ラボあるからつかってみて
-
-<ul>
-<li><a href="https://aws.amazon.com/jp/dx_labo/">https://aws.amazon.com/jp/dx_labo/</a></li>
-</ul></li>
-</ul>
-
-<h2 id="7-vpc間のピア接続">(7)VPC間のピア接続</h2>
-
-<ul>
-<li>異なるVPC間をピア接続することもできるよ</li>
-<li>VPC間でルーティングの設定が必要</li>
-<li>マルチホップルーティングはできないので注意</li>
-<li>サブネットは重複しないように注意</li>
-</ul>
-
+<p></p>
+                        <a href="https://blog.mosuke.tech/entry/2017/05/31/aws_summit_network/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -451,11 +137,7 @@ VPCはリージョンの中のみ。ゾーンはまたぐことができる。</
                     </header>
 
                     <div class="post-description">
-                        
-
-<h1 id="はじめに">はじめに</h1>
-
-<p>最近ブログをはてなブログからHugoへ移行した。<br />
+                        <p>最近ブログをはてなブログからHugoへ移行した。<br />
 HugoのフロントにCloudFlareを利用している。<br />
 ブログ移行についてはこちらを参照。<br />
 「<a href="https://blog.mosuke.tech/entry/2017/05/28/blog_migration/">はてなブログからHugoに移行。その際に行ったあれこれ。</a>」</p>
@@ -463,72 +145,8 @@ HugoのフロントにCloudFlareを利用している。<br />
 <p>コンテンツをアップロードした場合などにCloudFlareのキャッシュを削除したく、<br />
 APIを利用して効率よく作業できる環境を整えた。</p>
 
-<h1 id="使い方">使い方</h1>
-
-<p>CloudFlareのAPIドキュメントはかなり充実している。<br />
-キャッシュの全削除については下記に記載がある。<br />
-<a href="https://api.cloudflare.com/#zone-purge-all-files">https://api.cloudflare.com/#zone-purge-all-files</a></p>
-
-<p>利用方法をみると、<code>DELETE /zones/:identifier/purge_cache</code>とあるが、<br />
-<code>:identifier</code>がなんのことかはじめわからずはじめ苦戦した。</p>
-
-<h2 id="identifierの確認">identifierの確認</h2>
-
-<p><code>identifier</code>は下記APIで確認できる。<br />
-このAPIで返ってくるはじめの<code>id</code>が<code>idenitifer</code>だ。</p>
-
-<pre><code>curl -X GET &quot;https://api.cloudflare.com/client/v4/zones \
-    ?name=&lt;your site&gt; \
-    &amp;status=active \
-    &amp;page=1 \
-    &amp;per_page=20 \
-    &amp;order=status \
-    &amp;direction=desc \
-    &amp;match=all&quot; \
-    -H &quot;X-Auth-Email: &lt;your email&gt;&quot; \
-    -H &quot;X-Auth-Key: &lt;your api key&gt;&quot; \
-    -H &quot;Content-Type: application/json&quot; 
-</code></pre>
-
-<pre><code>{
-  &quot;result&quot;: [
-    {
-      &quot;id&quot;: &quot;xxxxxxxxxxxxxxxxxxxxxxx&quot;,
-      &quot;name&quot;: &quot;mosuke.tech&quot;,
-      &quot;status&quot;: &quot;active&quot;,
-      &quot;paused&quot;: false,
-      &quot;type&quot;: &quot;full&quot;,
-      &quot;development_mode&quot;: 0,
-      &quot;name_servers&quot;: [
-        &quot;rudy.ns.cloudflare.com&quot;,
-        &quot;sofia.ns.cloudflare.com&quot;
-      ],
-      ...
-      (中略)
-      ...
-    }
-  ]
-}
-</code></pre>
-
-<h2 id="キャッシュの削除">キャッシュの削除</h2>
-
-<p>うえで手に入れた<code>identifier</code>を使って、ドキュメント通り<code>purge_cache</code>を実行するだけだ。<br />
-このAPIをデプロイの過程に組み込み効率よく運用できている。</p>
-
-<pre><code>curl -X DELETE &quot;https://api.cloudflare.com/client/v4/zones/&lt;identifier&gt;/purge_cache&quot; \
-     -H &quot;X-Auth-Email: &lt;your email&gt;&quot; \
-     -H &quot;X-Auth-Key: &lt;your api key&gt;&quot; \
-     -H &quot;Content-Type: application/json&quot; \
-     --data '{&quot;purge_everything&quot;:true}'
-</code></pre>
-
-<h2 id="さいごに">さいごに</h2>
-
-<p>最近のサービスではめずらしくないが、APIに対応しているのはやはりいい。<br />
-毎度全キャッシュを消してしまっているのはどうかとは思うがそこは今後の改善点だ。<br />
-本件とは関係ないがCloudFlareはterraformにも対応しているし、かなり運用には便利そう。</p>
-
+<p></p>
+                        <a href="https://blog.mosuke.tech/entry/2017/05/29/how_to_use_cloudflare_api/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -553,203 +171,13 @@ APIを利用して効率よく作業できる環境を整えた。</p>
                     </header>
 
                     <div class="post-description">
-                        
-
-<h1 id="1-はじめに">1.はじめに</h1>
-
-<p>2017年5月27日に2014年2月から約3年3ヶ月程度使ってきたはてなブログからHugoを使ったブログへ移行をした。<br />
+                        <p>2017年5月27日に2014年2月から約3年3ヶ月程度使ってきたはてなブログからHugoを使ったブログへ移行をした。<br />
 長らく使いやすいブログを提供してきたはてなさんにはとても感謝している。<br />
 はてなブログはとても魅力なブログプラットフォームであると感じているし、いまでもそう思うのだけれどいくつかの判断をした結果Hugoへの移行を決めた。<br />
 本記事では、移行を決めた理由や移行する際に行ったこと、Hugoの実行環境などを紹介する。</p>
 
-<h1 id="2-hugoに移行した理由">2.Hugoに移行した理由</h1>
-
-<p>Hugoに移行した理由というか、はてなブログから別のところに移行しようとした理由になるのだが、<br />
-端的に言うと以下のとおりだ。</p>
-
-<ul>
-<li>常時SSL化したかった</li>
-<li>HTTP/2に対応したかった</li>
-<li>独自ドメイン(mosuke.tech)を利用したかった</li>
-</ul>
-
-<p>Hugo以外にももちろん他のツールやサイトも検討を行った。</p>
-
-<ul>
-<li>はてなブログPro</li>
-<li>jekyll</li>
-<li>medium</li>
-</ul>
-
-<p>まず、はてなブログProだが、もっとも手間がかからず独自ドメイン利用もできてよかったのだが、<br />
-SSL化とHTTP/2化はやはり難しかったので外部を検討した。</p>
-
-<p>次にGithub製のJelyllだが、Github Pagesとの相性もよくはじめに検討はじめたものだった。<br />
-Ruby製ということもあり、自分に馴染みのあるツールで最有力候補だった。<br />
-しかし、後発のHugoの完成度の高さ、コンパイルの速さ、気に入ったテンプレートがあった、という理由でHugoに劣った。</p>
-
-<p>最後にmediumだが、自前で構築することなくやりたいことのすべてを実現していた。<br />
-正直一番いいのではないかとも思う（笑）<br />
-最終的には、よりカスタマイズ度の高いHugoを選んだ。特にこれといった理由はない。<br />
-ちょうどGo言語をやってみたいモチベーションがあったので、これをきっかけに勉強がはかどればいいなぁくらいの気持ちはあった。</p>
-
-<h1 id="3-移行に際して行ったこと">3.移行に際して行ったこと</h1>
-
-<h2 id="3-1-hugoでのサイト構築-アーキテクチャ">3-1.Hugoでのサイト構築、アーキテクチャ</h2>
-
-<p>Github上でHugoを管理し、コンパイルしてできたPublicファイルを、Github Pages対応の別のレポジトリで管理。<br />
-独自ドメイン利用、SSL対応、HTTP/2対応するためにフロントにCloudFlareを利用した。<br />
-後述するが、CloudFlareはとても便利なツールだが、キャッシュの扱いは気をつけてなければいけない。<br />
-図にすると以下のとおりだ。</p>
-
-<p><img src="/image/hugo-architecture.png" alt="hugo-architecture" /></p>
-
-<h2 id="3-2-記事の移行">3-2.記事の移行</h2>
-
-<p>はてなブログはそのままのこし、新規に書くブログからHugoへ移行することも検討したが、<br />
-せっかくなのではてなブログ時代に書いた記事もすべて移行することを決めた。</p>
-
-<p>はてなブログからデータのエクスポートができる。<br />
-<img src="/image/hatena-blog-entry-export.png" alt="hatena-blog-entry-export" /></p>
-
-<p>エクスポートしたファイルを簡単なスクリプトを作ってHugoファイルへの変換を行った。（<a href="https://github.com/mosuke5/hatena-blog-parser">Github mosuke5/hatena-blog-parser</a>）<br />
-正直このツールは汎用的なものではない。このスクリプトだけではうまく行かない部分も多数ある。<br />
-いくぶんかsedなど使って（たまに手動編集・・・）して整えた。。</p>
-
-<h3 id="はてなブログのエクスポートファイルのフォーマット">はてなブログのエクスポートファイルのフォーマット</h3>
-
-<pre><code>--------
-AUTHOR: mosuke5
-TITLE: 万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する
-BASENAME: 2017/03/18/182252
-STATUS: Publish
-ALLOW COMMENTS: 1
-CONVERT BREAKS: 0
-DATE: 03/18/2017 18:22:52
-CATEGORY: オブジェクトストレージ
-CATEGORY: ObjectStorage
-CATEGORY: クラウド
-CATEGORY: S3
-IMAGE: https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20170318/20170318164020.jpg
------
-BODY:
-&lt;h2&gt;1.はじめに&lt;/h2&gt;
-
-&lt;p&gt;&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/Amazon%20S3&quot;&gt;Amazon S3&lt;/a&gt;をはじめとして、オブジェクトストレージが身近になってきています。&lt;br/&gt;
-各&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9&quot;&gt;クラウド&lt;/a&gt;ベンダーはオブジェクトストレージサービスを提供しています。&lt;/p&gt;
-</code></pre>
-
-<h3 id="変換後のhugoファイルフォーマット">変換後のHugoファイルフォーマット</h3>
-
-<pre><code>+++
-Categories = [&quot;オブジェクトストレージ&quot;, &quot;ObjectStorage&quot;, &quot;クラウド&quot;, &quot;S3&quot;]
-Description = &quot; 1.はじめに  Amazon S3をはじめとして、オブジェクトストレージが身近になってきています。 各クラウドベンダーはオブジェクトストレージサービスを提供しています。   Amazon S3  Azure Blob Storage  G&quot;
-Tags = [&quot;オブジェクトストレージ&quot;, &quot;ObjectStorage&quot;, &quot;クラウド&quot;, &quot;S3&quot;]
-date = &quot;2017-03-18T18:22:00+9:00&quot;
-title = &quot;万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する&quot;
-author = &quot;mosuke5&quot;
-archive = [&quot;2017&quot;]
-+++
-
-&lt;h2&gt;1.はじめに&lt;/h2&gt;
-
-&lt;p&gt;&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/Amazon%20S3&quot;&gt;Amazon S3&lt;/a&gt;をはじめとして、オブジェクトストレージが身近になってきています。&lt;br/&gt;
-各&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9&quot;&gt;クラウド&lt;/a&gt;ベンダーはオブジェクトストレージサービスを提供しています。&lt;/p&gt;
-</code></pre>
-
-<h2 id="3-3-リダイレクト関連">3-3.リダイレクト関連</h2>
-
-<h3 id="1-リダイレクト処理">(1)リダイレクト処理</h3>
-
-<p>はてなブログのデザイン設定から「ヘッダー」→「タイトル下」に、ブログ移転をお知らせする文言とリダイレクト処理を書いた。<br />
-これですべてのページのタイトル下に「ブログ移転しました。5秒後にリダイレクトします。（リンク先URL）」が表示し、5秒後にリダイレクトするようにした。</p>
-
-<pre><code class="language-javascript">&lt;p style=&quot;max-width: 1024px; margin: 0 auto;&quot;&gt;&lt;span style=&quot;font-size: 150%; color: white;&quot;&gt;ブログ移転しました。5秒後にリダイレクトします。&lt;/span&gt;&lt;br /&gt;
-&lt;script type=&quot;text/javascript&quot; language=&quot;javascript&quot;&gt;
-    // 新urlの作成
-    var domain = &quot;https://blog.mosuke.tech&quot;;
-    var path = location.pathname;
-    if(path !== '/'){
-    	var url = domain + path; 
-    }else{
-    	var url = domain;
-    }
-
-     // リンクhtmlの書き出し
-    document.write(&quot;&lt;a href=\&quot;&quot; + url + &quot;\&quot;&gt;&quot; + url + &quot;&lt;/a&gt;&lt;/p&gt;&quot;);
-
-    var doc = document;
-    var link = doc.getElementsByTagName(&quot;link&quot;)[0];
-    link.href = url;
-
-    // リダイレクト
-    var head = doc.getElementsByTagName(&quot;head&quot;)[0];
-    var meta = doc.createElement(&quot;meta&quot;);
-    meta.setAttribute(&quot;http-equiv&quot;,&quot;refresh&quot;);
-    meta.setAttribute(&quot;content&quot;,&quot;0; URL=&quot;+url);
-    head.appendChild(meta);
-&lt;/script&gt;
-</code></pre>
-
-<h3 id="2-スマホサイトでのリダイレクト">(2)スマホサイトでのリダイレクト</h3>
-
-<p>スマホで開いた時にも同様の動作をして欲しかったのだが、私の設定ではもともと、<br />
-スマホは別デザインとなっていて、うえで設定したJSが実行されない。<br />
-スマホ用でHTML/JSを埋め込むのは有料プランでしかできず、<br />
-「詳細設定」の「レスポンシブデザイン」にチェックを入れることで、スマホで表示した場合もPCと同じ画面を出すようにして対応した。</p>
-
-<pre><code>[x] レスポンシブデザイン
-スマートフォンでもPCと同じデザイン設定でブログを表示します。レスポンシブデザインのテーマを設定しているときのみ使用してください。
-</code></pre>
-
-<h3 id="3-googleへのアドレス変更通知">(3)Googleへのアドレス変更通知</h3>
-
-<p>一般的にブログのドメイン変更を行った場合は、<br />
-変更元のサイトで301リダイレクトを行ってGoogleに恒久的にサイトが移動したことを伝える。<br />
-しかし、はてなブログを利用しているとWebサーバレベルでの変更はできず、301リダイレクトができない。<br />
-Canonicalを変更したりしたが、うまくGoogle Search Consoleに変更を読み取らせることができなかった。<br />
-（いい方法あったら教えてください…）</p>
-
-<p>なので結局、移行時の手順は以下で進めた。</p>
-
-<ol>
-<li>新サイト(blog.mosuke.tech)を公開</li>
-<li>はてなブログに<code>http-equiv=&quot;refresh&quot;</code>を追加してリダイレクト</li>
-</ol>
-
-<h2 id="3-4-cloudflareのキャッシュ削除">3-4.CloudFlareのキャッシュ削除</h2>
-
-<p>フロントにCloudFlareを利用していると書いた。<br />
-Hugoは静的ブログサイトなので、基本的にCloudFlare側で全てキャッシュする。<br />
-そのため、ブログ記事の更新やデザインの本番への反映が時間かかる。</p>
-
-<p>CloudFlareは便利なものでapiを用意している。<br />
-簡単だが、以下のようなキャッシュ全削除スクリプトを用意した。</p>
-
-<pre><code class="language-shell">#!/bin/sh
-curl -X DELETE &quot;https://api.cloudflare.com/client/v4/zones/$1/purge_cache&quot; \
-     -H &quot;X-Auth-Email: $2&quot; \
-     -H &quot;X-Auth-Key: $3&quot; \
-     -H &quot;Content-Type: application/json&quot; \
-     --data '{&quot;purge_everything&quot;:true}'
-</code></pre>
-
-<h1 id="4-今後の課題">4.今後の課題</h1>
-
-<p>まずは新しいHugoの環境でブログを書いて、課題点など洗いだしていく必要がある。<br />
-あとは、はてなブログからの移行でだいぶSEOあたり下がったと思う。<br />
-そのあたりの挽回をどうするかはこれからの検討課題。<br />
-あとは、デプロイからCloudFlareのキャッシュ削除の流れはぜひ自動化していきたい。</p>
-
-<h1 id="追記">追記</h1>
-
-<p>その後の取り組みを追記しておきます。</p>
-
-<ul>
-<li><a href="https://blog.mosuke.tech/entry/2017/06/04/hugo_deployment_with_wercker/">Werckerを使ってHugo+Github PagesのCI/CD環境を整備する</a></li>
-<li><a href="https://blog.mosuke.tech/entry/2017/06/12/hugo_optimize_image/">Hugo、PageSpeed対策で自動で画像を圧縮する</a></li>
-</ul>
-
+<p></p>
+                        <a href="https://blog.mosuke.tech/entry/2017/05/28/blog_migration/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -778,9 +206,8 @@ curl -X DELETE &quot;https://api.cloudflare.com/client/v4/zones/$1/purge_cache&q
 <p>完全備忘録。自分でもわからなくなってきたので。
 公開すればきっと更新もする。</p></p>
 
-<p><p><iframe src="//hatenablog-parts.com/embed?url=https%3A%2F%2Fdocs.google.com%2Fpresentation%2Fd%2F1MJ8c7QkdYl5BIp9eS3Li2viq-V-CgdpnJKWylYa_dW0%2Fedit%3Fusp%3Dsharing" title="ドメインとサーバ関連図" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://docs.google.com/presentation/d/1MJ8c7QkdYl5BIp9eS3Li2viq-V-CgdpnJKWylYa_dW0/edit?usp=sharing">docs.google.com</a></cite></p>
-</body></p>
-
+<p><iframe src="//hatenablog-parts.com/embed?url=https%3A%2F%2Fdocs.google.com%2Fpresentation%2Fd%2F1MJ8c7QkdYl5BIp9eS3Li2viq-V-CgdpnJKWylYa_dW0%2Fedit%3Fusp%3Dsharing" title="ドメインとサーバ関連図" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://docs.google.com/presentation/d/1MJ8c7QkdYl5BIp9eS3Li2viq-V-CgdpnJKWylYa_dW0/edit?usp=sharing">docs.google.com</a></cite></p>
+                        <a href="https://blog.mosuke.tech/entry/2017/04/23/154957/">続きを読む</a>
                     </div>
                 </section>
                 

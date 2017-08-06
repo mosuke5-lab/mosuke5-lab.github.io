@@ -76,48 +76,28 @@
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p>Ansibleを<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>上でずっと使ってて、Playbookも完成したし本番サーバへ&hellip;<br>
-と思ったところである初歩的な罠にハマった。</p>
-<p>本番環境へPalybook実行！！</p></p>
-
-<pre><code>$ ansible-playbook playbook.yml -i hosts 
-</code></pre>
-
-<p><p>あれ、GATHERING FACTSで10分以上も待たされた&hellip;<br>
-しかも、エラー出た&hellip;</p></p>
-
-<pre><code>GATHERING FACTS
-failed to parse [ sudo via ansible, key= ..... ] 
-</code></pre>
-
-<p><p>sudoできていない&hellip;？</p>
-<p>playbook内のsudo: yesを外して実行。</p>
-<p>GATHERING FACTSは通過。<br>
-しかし、当たり前だがsudo で実行すべき部分で失敗&hellip;</p>
-<p>とても単純なことに気づいた&hellip;<br>
-・<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>環境ではsudoのパスワードを要求されない<br>
-・本番環境はsudoのパスワードを要求されること<br>
-・sudoのパスワードを入力するようにしていなかったこと</p>
-<p>というわけで-Kをつけて実行</p></p>
-
-<pre><code>$ ansible-playbook playbook.yml -i hosts -K 
-</code></pre>
-
-<p><p>うまくいった&hellip;</p>
-<p>完全なる私のミスなんだが、ただ-Kオプションを忘れるだけで、一回の実行に10分ほども待たされるのは…。<br>
-しかもGATHERING FACTSで止まっているときはCtl+Cで中断も聞かなかった。</p>
-<p>要注意ですね。。。</p>
-<br>
-<p>ちなみに、こんな方法で解決もできる。<br>
-sudoのパスワードを聞かれなくして対応。</p></p>
-
-<pre><code># visudo
-user_name ALL=(ALL) NOPASSWD: ALL 
-</code></pre>
-
-<p></body></p>
-
+                        AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&hellip;
+と思ったところである初歩的な罠にハマった。
+本番環境へPalybook実行！！
+$ ansible-playbook playbook.yml -i hosts  あれ、GATHERING FACTSで10分以上も待たされた&hellip;
+しかも、エラー出た&hellip;
+GATHERING FACTS failed to parse [ sudo via ansible, key= ..... ]  sudoできていない&hellip;？
+playbook内のsudo: yesを外して実行。
+GATHERING FACTSは通過。
+しかし、当たり前だがsudo で実行すべき部分で失敗&hellip;
+とても単純なことに気づいた&hellip;
+・Vagrant環境ではsudoのパスワードを要求されない
+・本番環境はsudoのパスワードを要求されること
+・sudoのパスワードを入力するようにしていなかったこと
+というわけで-Kをつけて実行
+$ ansible-playbook playbook.yml -i hosts -K  うまくいった&hellip;
+完全なる私のミスなんだが、ただ-Kオプションを忘れるだけで、一回の実行に10分ほども待たされるのは…。
+しかもGATHERING FACTSで止まっているときはCtl+Cで中断も聞かなかった。
+要注意ですね。。。
+ちなみに、こんな方法で解決もできる。
+sudoのパスワードを聞かれなくして対応。
+# visudo user_name ALL=(ALL) NOPASSWD: ALL
+                        <a href="https://blog.mosuke.tech/entry/2014/11/28/001748/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -142,58 +122,16 @@ user_name ALL=(ALL) NOPASSWD: ALL
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p>もろもろな理由のために<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>が利用できないことも多くあると思う。<br>
-というわけで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>クローンのGitlabを試しに立ててみたが、簡単すぎでした…</p>
-<p><a href="https://about.gitlab.com/">GitLab | Open source software to collaborate on code</a></p>
-<p>環境<br>
-さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a> 1Gプラン<br>
-OS：CentOS7</p>
-<p>インストール<br>
-基本的にはドキュメントに書いてある以下のとおりで終わり。</p></p>
-
-<pre><code>$ curl -O https://downloads-packages.s3.amazonaws.com/centos-7.0.1406/gitlab-7.5.1_omnibus.5.2.0.ci-1.el7.x86_64.rpm
-$ sudo yum install openssh-server
-$ sudo systemctl enable sshd
-$ sudo systemctl start sshd
-$ sudo yum install postfix
-$ sudo systemctl enable postfix
-$ sudo systemctl start postfix
-$ sudo rpm -i gitlab-7.5.1_omnibus.5.2.0.ci-1.el7.x86_64.rpm
-
-$ sudo gitlab-ctl reconfigure
-$ sudo firewall-cmd --permanent --add-service=http # open up the firewall for HTTP and SSH requests
-$ sudo systemctl reload firewalld 
-</code></pre>
-
-<p>しかし１つ気をつけないといけないことがある。<br>
-gitlabでは裏でNginxが起動しhttpのレスポンスに応答する。<br>
-すでに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>等が動いている場合には停止、あるいはポート番号の変更などの工夫が必要。</p>
-<p>ちなみに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>を停止し、Gitlabを起動した状態で80番ポートのプロセスをみると。<br>
-nginxが動いていることがわかります。</p>
-```
-$ sudo lsof -i:80
-COMMAND   PID       USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
-nginx   25937       root    6u  IPv4  84715      0t0  TCP *:http (LISTEN)
-nginx   25942 gitlab-www    6u  IPv4  84715      0t0  TCP *:http (LISTEN)
-nginx   25943 gitlab-www    6u  IPv4  84715      0t0  TCP *:http (LISTEN) 
-```
-<p>特定のポートで何が起動しているかみるのに<b>lsof</b>コマンドはとても便利。</p>
-<p>あともう一つとまどったのが、GItlabを起動させたものの、はじめログイン方法がわからなかった。<br>
-が、よーくページのしたの方よくみると書いてありました。（単なる見落とし）</p>
-
-<pre><code>&lt;blockquote&gt;
-    &lt;p&gt;Browse to the hostname and login &lt;br&gt;
-</code></pre>
-
-<p>Username: root <br>
-Password: 5iveL!fe</p></p>
-
-<pre><code>&lt;/blockquote&gt;
-</code></pre>
-
-<p></body></p>
-
+                        もろもろな理由のためにGithubが利用できないことも多くあると思う。
+というわけでGithubクローンのGitlabを試しに立ててみたが、簡単すぎでした…
+GitLab | Open source software to collaborate on code
+環境
+さくらVPS 1Gプラン
+OS：CentOS7
+インストール
+基本的にはドキュメントに書いてある以下のとおりで終わり。
+$ curl -O https://downloads-packages.s3.amazonaws.com/centos-7.0.1406/gitlab-7.5.1_omnibus.5.2.0.ci-1.el7.x86_64.rpm $ sudo yum install openssh-server $ sudo systemctl enable sshd $ sudo systemctl start sshd $ sudo yum install postfix $ sudo systemctl enable postfix $ sudo systemctl start postfix $ sudo rpm -i gitlab-7.5.1_omnibus.5.2.0.ci-1.el7.x86_64.rpm $ sudo gitlab-ctl reconfigure $ sudo firewall-cmd --permanent --add-service=http # open up the firewall for HTTP and SSH requests $ sudo systemctl reload firewalld  しかし１つ気をつけないといけないことがある。
+                        <a href="https://blog.mosuke.tech/entry/2014/11/22/190648/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -218,53 +156,22 @@ Password: 5iveL!fe</p></p>
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p>Git<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>を作って、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD">複数人</a>で開発をしていた。<br>
-しかし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>の中に作成されるファイルやディレクトリが個人のグループになってしまい、<br>
-Push, PullするときにPermission <a class="keyword" href="http://d.hatena.ne.jp/keyword/error">error</a>で怒られまくる。</p>
-<p>ユーザには共通のグループを作っていたのに…なんでだっけ…</p>
-<p>気づけば<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>を作るとき以下のようにしていた。</p></p>
-
-<pre><code>$ git init --bare 
-</code></pre>
-
-<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD">複数人</a>で共有するときには以下のようにするべきであった。</p></p>
-
-<pre><code>$ git init --bare --shared 
-</code></pre>
-
-<p><p>では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。<br>
-調べると「<b>setgid</b>」というキーワードに辿り着いた。<br>
-setgidの権限を付けておくと、そのディレクトリに作成されたファイルの所有グループは、そのディレクトリの所有グループになる。</p>
-<p>以下のようにchmodでsetgidを付けることができる。</p></p>
-
-<pre><code>$ chmod g+s dir_name 
-</code></pre>
-
-<p><p>setgidがつくとあまり馴染みのない権限がつく。<br>
-「drwxrw<span style="color: #ff40ff"><b>s</b></span>r-x」</p></p>
-
-<pre><code>$ ls -l 
-drwxrwsr-x  4 user  group  136 11 16 22:49 test_dir 
-</code></pre>
-
-<p><p>そして、すでに共有設定なしで作ってしまった<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>では以下のように対応可能。<br>
-（新しく<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>つくるのはめんどいので…）</p></p>
-
-<pre><code>##Gigレポジトリ内のディレクトリに
-$ chmod -R g+s ./branches
-$ chmod -R g+s ./hooks
-$ chmod -R g+s ./info
-$ chmod -R g+s ./objects
-$ chmod -R g+s ./refs
-$ vim .git/config
-  ##[core内に]以下を付け加えておいた
-  [core]
-       repositoryformatversion = 0 
-</code></pre>
-
-<p></body></p>
-
+                        Gitレポジトリを作って、複数人で開発をしていた。
+しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、
+Push, PullするときにPermission errorで怒られまくる。
+ユーザには共通のグループを作っていたのに…なんでだっけ…
+気づけばレポジトリを作るとき以下のようにしていた。
+$ git init --bare  複数人で共有するときには以下のようにするべきであった。
+$ git init --bare --shared  では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。
+調べると「setgid」というキーワードに辿り着いた。
+setgidの権限を付けておくと、そのディレクトリに作成されたファイルの所有グループは、そのディレクトリの所有グループになる。
+以下のようにchmodでsetgidを付けることができる。
+$ chmod g+s dir_name  setgidがつくとあまり馴染みのない権限がつく。
+「drwxrwsr-x」
+$ ls -l drwxrwsr-x 4 user group 136 11 16 22:49 test_dir  そして、すでに共有設定なしで作ってしまったレポジトリでは以下のように対応可能。
+（新しくレポジトリつくるのはめんどいので…）
+##Gigレポジトリ内のディレクトリに $ chmod -R g+s ./branches $ chmod -R g+s ./hooks $ chmod -R g+s ./info $ chmod -R g+s ./objects $ chmod -R g+s .
+                        <a href="https://blog.mosuke.tech/entry/2014/11/20/230334/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -289,38 +196,16 @@ $ vim .git/config
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p>AnsibleのPlaybookを書いていると、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EF%A5%A4%A5%EB%A5%C9%A5%AB%A1%BC%A5%C9">ワイルドカード</a>を含んだコマンドを実行したい時がある。<br>
-そんなときあるところでハマった。</p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>をソースインストールして、パスを/usr/sbinにリンクを貼ろうとして以下を実行した。</p></p>
-
-<pre><code class="language-yaml">- command: ln -s /usr/local/httpd/bin/* /usr/sbin
-</code></pre>
-
-<p>/usr/sbin内に「*」というリンクが貼られてしまった。</p>
-
-<pre><code>* -&gt; /usr/local/httpd/bin 
-</code></pre>
-
-<p><p>どうやらcommandモジュールは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EF%A5%A4%A5%EB%A5%C9%A5%AB%A1%BC%A5%C9">ワイルドカード</a>に対応していないよう。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EF%A5%A4%A5%EB%A5%C9%A5%AB%A1%BC%A5%C9">ワイルドカード</a>を使いたいときはshellモジュールを利用すると良い。</p></p>
-
-<pre><code class="language-yaml">- shell: ln -s /usr/local/httpd/bin/* /usr/sbin
-</code></pre>
-
-<p><p>また、*というリンクを消すときは要注意（笑）</p></p>
-
-<pre><code>$ rm ./* 
-</code></pre>
-
-<p><p>とやってしまうとあたりまえだがやばいので</p></p>
-
-<pre><code>$ rm ./¥* 
-</code></pre>
-
-<p><p>こうですね…</p>
-</body></p>
-
+                        AnsibleのPlaybookを書いていると、ワイルドカードを含んだコマンドを実行したい時がある。
+そんなときあるところでハマった。
+Apacheをソースインストールして、パスを/usr/sbinにリンクを貼ろうとして以下を実行した。
+- command: ln -s /usr/local/httpd/bin/* /usr/sbin  /usr/sbin内に「*」というリンクが貼られてしまった。
+* -&gt; /usr/local/httpd/bin  どうやらcommandモジュールはワイルドカードに対応していないよう。
+ワイルドカードを使いたいときはshellモジュールを利用すると良い。
+- shell: ln -s /usr/local/httpd/bin/* /usr/sbin  また、*というリンクを消すときは要注意（笑）
+$ rm ./*  とやってしまうとあたりまえだがやばいので
+$ rm ./¥*  こうですね…
+                        <a href="https://blog.mosuke.tech/entry/2014/11/18/225542/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -345,94 +230,32 @@ $ vim .git/config
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p>最近、Ansibleを使い始めたのだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/yum">yum</a>やapt-getでインストールできるものはいいけど、<br>
-どうしてもソースインストールが必要な場合がある。</p>
-<p>ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。</p>
-<p>まず、あたりまえだが、ソースインストールを行うには以下のフローを踏まなければいけな。<br>
-1. ソースファイルの取得(tarで固められていると仮定)<br>
-2. tarファイルの解凍<br>
-3. 解答してできたディレクトリへ移動<br>
-4. configure<br>
-5. make<br>
-6. make install</p>
-<p>また、Ansibleでは何回もPlaybookを実行していくため、<br>
-<b>すでにインストールされている場合は、インストールをスキップする</b>必要がある。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/yum">yum</a>やapt-getで管理されていれば上記を心配することはないのだが、やはりソースインストールだとこの壁がある。<br>
-※パッケージ化しろよ！というツッコミは禁止</p>
-<p>今回は例として、ubuntu13に<a class="keyword" href="http://d.hatena.ne.jp/keyword/emacs">emacs</a>をソースインストールするのを例としてみた。</p></p>
-
-<p><div class="section">
-    <h3>環境</h3>
-    <p>【Ansible実行側】<br>
-さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>の1G<br>
-OS: <a class="keyword" href="http://d.hatena.ne.jp/keyword/Centos">Centos</a> 7<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>:192.168.33.1</p>
-<p>【設定対象側】<br>
-上記さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>上にたてた<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>の仮想サーバ<br>
-OS: <a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a> 13.10<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>:192.168.33.100</p></p>
-
-<p></div>
-<div class="section">
-    <h3>Playbook</h3>
-    <p>以下playbookの例。</p></p>
-
-<pre><code class="language-yaml">---
-- hosts: 192.168.33.100
-  user: vagrant
-  sudo: yes
-
-  vars:
-    src_dir: /usr/local/src
-    emacs_ver: emacs-23.4
-
-  tasks:
-   ## emacsのソースファイルを取得済みか確認
-   - name: check exist emacs source file
-     command: ls -l {{src_dir}}/{{emacs_ver}}.tar.gz
-     ignore_errors: True
-     register: result1
-
-   ## emacsのソースファイル取得。ただし、すでに取得済みならスキップ
-   - name: get emacs source file
-     command: chdir={{src_dir}} wget http://mirror.jre655.com/GNU/emacs/{{emacs_ver}}.tar.gz
-     when: result1|failed
-
-   ## emacsのソースインストールを解凍
-   - name: get emacs source file
-     command: chdir={{src_dir}} tar xvf {{emacs_ver}}.tar.gz
-     when: result1|failed
-
-   ## emacsがインストールされているか確認
-   #  確認基準はemacsコマンドのpathが通っているかで判断した
-   - name: check emacs install
-     command: which emacs
-     ignore_errors: True
-     register: result2
-
-   ## emacsのインストール。ただしすでにemacsがインストールされいたらスキップ
-   - name: expand emacs src
-     command: chdir={{src_dir}} tar xvf {{emacs_ver}}.tar.gz
-     when: result2|failed
-
-   - name: comfigure emacs
-     command: chdir={{src_dir}}/{{emacs_ver}} ./configure
-     when: result2|failed
-
-   - name: make emacs
-     command: chdir={{src_dir}}/{{emacs_ver}} make
-     when: result2|failed
-
-   - name: install emacs
-     command: chdir={{src_dir}}/{{emacs_ver}} make install
-     when: result2|failed
- 
-</code></pre>
-
-<p></div>
-</body></p>
-
+                        最近、Ansibleを使い始めたのだが、yumやapt-getでインストールできるものはいいけど、
+どうしてもソースインストールが必要な場合がある。
+ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。
+まず、あたりまえだが、ソースインストールを行うには以下のフローを踏まなければいけな。
+1. ソースファイルの取得(tarで固められていると仮定)
+2. tarファイルの解凍
+3. 解答してできたディレクトリへ移動
+4. configure
+5. make
+6. make install
+また、Ansibleでは何回もPlaybookを実行していくため、
+すでにインストールされている場合は、インストールをスキップする必要がある。
+yumやapt-getで管理されていれば上記を心配することはないのだが、やはりソースインストールだとこの壁がある。
+※パッケージ化しろよ！というツッコミは禁止
+今回は例として、ubuntu13にemacsをソースインストールするのを例としてみた。
+環境 【Ansible実行側】
+さくらVPSの1G
+OS: Centos 7
+IPアドレス:192.168.33.1
+【設定対象側】
+上記さくらVPS上にたてたVagrantの仮想サーバ
+OS: Ubuntu 13.10
+IPアドレス:192.168.33.100
+ Playbook 以下playbookの例。
+--- - hosts: 192.168.33.100 user: vagrant sudo: yes vars: src_dir: /usr/local/src emacs_ver: emacs-23.4 tasks: ## emacsのソースファイルを取得済みか確認 - name: check exist emacs source file command: ls -l {{src_dir}}/{{emacs_ver}}.tar.gz ignore_errors: True register: result1 ## emacsのソースファイル取得。ただし、すでに取得済みならスキップ - name: get emacs source file command: chdir={{src_dir}} wget http://mirror.
+                        <a href="https://blog.mosuke.tech/entry/2014/11/16/153223/">続きを読む</a>
                     </div>
                 </section>
                 

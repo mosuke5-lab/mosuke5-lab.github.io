@@ -76,94 +76,27 @@
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p>完全に自分のための備忘録。内容はわりと薄め。</p></p>
+                        完全に自分のための備忘録。内容はわりと薄め。
+やったこと 最近、自作したPCにUbuntuをいれて使っているのだけど、
+デスクトップPCなので、部屋でしか操作することができません。
+他の部屋からノートPCでUbuntuを触れたらいいなーと思いその環境を整えることをしました。
+主にやったことは以下の通りです。
+  VNCサーバ構築について ノートPC（Mac）からのVNC接続について  SSHローカルポートフォワードを使ってのセキュアな接続について   UbuntuでのVNCサーバ構築について 今回利用しているUbuntuは「Ubuntu Desktop 14.04」です。
+また、VNCの実現は標準でインストールされているvinoを使って行いました。
+ご存知の方も多くいるかもしれませんが、vinoでのVNCは簡易的なもので、サーバ側のユーザがログアウトしていると使えません。
+ですので、会社などでの利用には耐えないと思います。
+ユーザーをログアウトせずにロック状態にしていれば使えます。
+まずはデスクトップ共有の設定をします。
+「デスクトップの共有」のアプリケーションを起動します。 
+接続毎に要求するようにすると、サーバ側で毎度許可が必要なので、オフにします。
+パスワードの設定はしておきましょう。
+同じLANをつかんでる人に簡単に奪われてしまいますので。
 
-<h1>やったこと</h1>
-
-<p>最近、自作したPCに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>をいれて使っているのだけど、<br>
-デスクトップPCなので、部屋でしか操作することができません。</p>
-
-<p>他の部屋からノートPCで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>を触れたらいいなーと思いその環境を整えることをしました。</p>
-
-<p>主にやったことは以下の通りです。</p>
-
-<ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>サーバ構築について</li>
-<li>ノートPC（<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>）からの<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>接続について</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>ローカルポートフォワードを使ってのセキュアな接続について</li>
-</ul>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>での<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>サーバ構築について</h1>
-
-<p>今回利用している<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>は「<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a> Desktop 14.04」です。<br>
-また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>の実現は標準でインストールされているvinoを使って行いました。</p>
-
-<p>ご存知の方も多くいるかもしれませんが、vinoでの<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>は簡易的なもので、サーバ側のユーザがログアウトしていると使えません。<br>
-ですので、会社などでの利用には耐えないと思います。<br>
-ユーザーをログアウトせずにロック状態にしていれば使えます。</p>
-
-<p>まずはデスクトップ共有の設定をします。<br>
-「デスクトップの共有」のアプリケーションを起動します。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150809/20150809132410.png" alt="f:id:mosuke5:20150809132410p:plain" title="f:id:mosuke5:20150809132410p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>接続毎に要求するようにすると、サーバ側で毎度許可が必要なので、オフにします。<br>
-パスワードの設定はしておきましょう。<br>
-同じLANをつかんでる人に簡単に奪われてしまいますので。</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150809/20150809132421.png" alt="f:id:mosuke5:20150809132421p:plain" title="f:id:mosuke5:20150809132421p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>ちょっと詳細な意味を把握していないのですが、<br>
-下記を実行しないと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>で接続すると「互換性のないバージョンです」的なこといわれました…すいません。</p>
-
-<pre><code>$ gsettings set org.gnome.Vino require-encryption false 
-</code></pre>
-
-<p>設定ができたら、きちんとサーバとして<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>接続を待ち受けているか確認します。</p>
-
-<pre><code>% sudo lsof -i:5900
-COMMAND     PID    USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
-vino-serv 24414 mosuke5   13u  IPv6 156661      0t0  TCP *:5900 (LISTEN)
-vino-serv 24414 mosuke5   14u  IPv4 156662      0t0  TCP *:5900 (LISTEN)
-
-% ps -ef | grep vino
-mosuke5  24414 24226  0 12:30 ?        00:00:21 /usr/lib/vino/vino-server --sm-disable
-mosuke5  25456 24470  0 13:19 pts/11   00:00:00 grep vino 
-</code></pre>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>から<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>接続する</h1>
-
-<p>これをやるまで知らなかったのですが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>には標準で<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>クライアントがついています。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/vnc">vnc</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB">プロトコル</a>で対象のサーバの<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を入れれば接続できます。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150812/20150812225515.png" alt="f:id:mosuke5:20150812225515p:plain" title="f:id:mosuke5:20150812225515p:plain" class="hatena-fotolife" itemprop="image"></span>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150812/20150812225126.png" alt="f:id:mosuke5:20150812225126p:plain" title="f:id:mosuke5:20150812225126p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>ローカルフォワードを使ってセキュアな通信をする</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB">プロトコル</a>は通信の内容を暗号化しません。<a class="keyword" href="http://d.hatena.ne.jp/keyword/telnet">telnet</a>と同様で、非常に危険です。<br>
-家のLAN内で利用するので、正直ここまでする必要は全くないのだが、<br>
-より応用的な使い方に備えてと、復習を兼ねて<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のローカルフォワードを利用してセキュアに<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>を使ってみます。</p>
-
-<p>復習と書いたのは以前に、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のローカルフォワードについてはまとめたからです。</p>
-<a href="/entry/2014/12/31/170545/">SSHでローカルポートフォワードを実際に試す - Goldstine研究所</a>
-
-<p>まずは、ローカルフォワードの<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>接続。<br>
-意味は「自分の端末のポート8888に来た通信は、192.168.11.5からみて<a class="keyword" href="http://d.hatena.ne.jp/keyword/localhost">localhost</a>のポート5900にとばします」です。</p>
-
-<pre><code>$ ssh -L8888:localhost:5900 mosuke5@192.168.11.5 
-</code></pre>
-
-<p>上のコマンドで<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>接続した状態でなら、<a class="keyword" href="http://d.hatena.ne.jp/keyword/localhost">localhost</a>のポート8888が利用できます。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150812/20150812224539.png" alt="f:id:mosuke5:20150812224539p:plain" title="f:id:mosuke5:20150812224539p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p><p>これでセキュアな<a class="keyword" href="http://d.hatena.ne.jp/keyword/VNC">VNC</a>の完成。</p>
-</body></p>
-
+ちょっと詳細な意味を把握していないのですが、
+下記を実行しないとMacで接続すると「互換性のないバージョンです」的なこといわれました…すいません。
+$ gsettings set org.gnome.Vino require-encryption false  設定ができたら、きちんとサーバとしてVNC接続を待ち受けているか確認します。
+% sudo lsof -i:5900 COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME vino-serv 24414 mosuke5 13u IPv6 156661 0t0 TCP *:5900 (LISTEN) vino-serv 24414 mosuke5 14u IPv4 156662 0t0 TCP *:5900 (LISTEN) % ps -ef | grep vino mosuke5 24414 24226 0 12:30 ?
+                        <a href="https://blog.mosuke.tech/entry/2015/08/13/000440/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -188,176 +121,34 @@ mosuke5  25456 24470  0 13:19 pts/11   00:00:00 grep vino
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<h1>1.はじめに</h1></p>
-
-<p>開発環境はVirualboxを使った<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>を利用しているが、<br>
-本番環境は<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>だったり<a class="keyword" href="http://d.hatena.ne.jp/keyword/KVM">KVM</a>だったり違う仮想化機構で動作しているなんてことよくあると思います。<br>
-そういう環境下でどのように開発環境と本番環境の差分をなくしていますか？</p>
-
-<p>わたしの場合、基本的にAnsibleを使ってプロビジョニングをしていますが、<br>
-そのプロビジョニング前のベースが異なってしまって困ることがよくあります。<br>
-一般に公開されているVagrantBox使ったら余計な設定が入っていたとか、すでにパッケージが入っていたとか…</p>
-
-<p>そんな問題を解決しようとPackerを使おう！って考えました。<br>
-ですが、Packerも当たり前だけど魔法ではなく、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>などの自動インストールが前提なので、<br>
-Packerをやる前に<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>を学習せよ、、、ということに気づきました。</p>
-
-<p>ということで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>をはじめたよってことです。</p>
-
-<h1>2.<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ってなに</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>はOSのインストールを自動化する仕組みです。<br>
-anaconda社が提供するインストールの仕組みで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Redhat">Redhat</a>系のOSが採用しているものです。<br>
-ですので<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a>だとPreseedっていう別の仕組みだそうです。（詳しくありませんっ）</p>
-
-<p>で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>でなにができるかというと...</p>
-
-<p>OSのインストールをしたことがある方ならわかるかと思いますが、<br>
-普通にDVDなどからインストールすると、</p>
-
-<ul>
-<li>言語はなににしますかー？</li>
-<li>ホスト名なににしますかー？</li>
-<li>パッケージはなにをいれますかー？</li>
-</ul>
-
-<p>とか、聞かれて選択していく必要があります。
-この作業を自動化できるのが<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>です。</p>
-
-<p>URLのようなもの。
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fkajuhome.com%2Fcentos6_inst.shtml" title="はじめての自宅サーバ構築 - Fedora/CentOS - CentOS6 のインストール手順" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://kajuhome.com/centos6_inst.shtml">はじめての自宅サーバ構築 - Fedora/CentOS - CentOS6 のインストール手順</a></iframe><cite class="hatena-citation"><a href="http://kajuhome.com/centos6_inst.shtml">kajuhome.com</a></cite></p>
-
-<h1>(おまけ)Ansible, Chef, Puppetとの違い？</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>にはプロビジョニング機能もついているため、<br>
-AnsibleとかChefとかPuppetとの違いは？住み分けは？と思うかもしれません。<br>
-明確に、住み分けが決まっているわけではありませんが、
-個人的にはAnsibleやChefを実行する前の最低限の設定を<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>にやらせようと思っています。<br>
-（一般的かとは思いますが…？）</p>
-
-<p>Lee ThompsonのProvisioning Toolchainを参考にKiskstarのやる範囲をまとめると。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150731/20150731223953.jpg" alt="f:id:mosuke5:20150731223953j:plain" title="f:id:mosuke5:20150731223953j:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fen.oreilly.com%2Fvelocity-mar2010%2Fpublic%2Fschedule%2Fdetail%2F14180" title="Provisioning Toolchain: Web Performance and Operations - Velocity Online Conference - March 17, 2010 - O'Reilly Media" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://en.oreilly.com/velocity-mar2010/public/schedule/detail/14180">Provisioning Toolchain: Web Performance and Operations - Velocity Online Conference - March 17, 2010 - O'Reilly Media</a></iframe><cite class="hatena-citation"><a href="http://en.oreilly.com/velocity-mar2010/public/schedule/detail/14180">en.oreilly.com</a></cite></p>
-
-<h1>3.Hello <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>!!</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Virtualbox">Virtualbox</a>を使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>を試しました。</p>
-
-<h1>3-1.用意したもの</h1>
-
-<ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Virtualbox">Virtualbox</a>
-
-<ul>
-<li>自分の環境は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>で、バージョンは5.0</li>
-</ul>
-</li>
-<li>OSのisoファイル
-
-<ul>
-<li>
-<a href="http://isoredirect.centos.org/centos/7/isos/x86_64/CentOS-7-x86_64-DVD-1503-01.iso">CentOS Mirror</a> ここからダウンロードしました</li>
-</ul>
-</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイル
-
-<ul>
-<li>ネットワーク上においてhttpでアクセスできるようにしておきました</li>
-</ul>
-</li>
-</ul>
-
-<p>利用した<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイル。自分の学習のためコメントを多く残しました。</p>
-
-<pre><code># アップグレードするかインストールするか
-install
-
-# インストールタイプの設定
-# CD-ROM経由かネットワーク経由かとか
-cdrom
-
-# 言語設定
-lang ja_JP.UTF-8
-
-# キーボード設定
-keyboard jp106
-
-# ネットワーク設定
-# /etc/sysconfig/network-scripts/ifcfg-xxxx 部分
-network --onboot yes --device eth0 --bootproto dhcp --noipv6
-
-# rootのパスワード
-# xxxxxx部分はopensslコマンドで作成するといい
-# $openssl passwd -1
-rootpw --iscrypted xxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-# iptablesの設定
-# プロビジョニングで設定するのでここでは無効にしておく
-firewall --disabled
-
-# 認証オプション
-authconfig --enableshadow --passalgo=sha512
-
-# SELinuxの設定
-# こちらも詳細はプロビジョニングで設定するので無効にしておく
-selinux --disabled
-
-# タイムゾーン
-timezone --utc Asia/Tokyo
-
-# ブートローダのインストール方法
-bootloader --location=mbr --driveorder=sda --append=&quot;nomodeset crashkernel=auto rhgb quiet&quot;
-
-# 設定後にリブート
-reboot
-
-# パーティション設定
-clearpart --linux --drives=sda
-autopart
-
-# インストールパッケージ選択
-%packages --nobase
-@core
-
-%end 
-</code></pre>
-
-<h3>参考になったもの</h3>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Redhat">Redhat</a>社のインストールガイドがよくまとまっていた。<br>
-特に<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイルについては下記あたりが役立ちます。</p>
-
-<ul>
-<li><a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/6/html/Installation_Guide/s1-kickstart2-options.html">32.4. キックスタートのオプション</a></li>
-<li><a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/6/html/Installation_Guide/s1-kickstart2-packageselection.html">32.5. パッケージの選択</a></li>
-</ul>
-
-<h1>3-2.<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイルの使い方</h1>
-
-<p>しかし、OSインストール前なのにどうやってファイルを使うのか…？<br>
-はじめ戸惑いました…</p>
-
-<p>実は以下の方法で利用できます。</p>
-
-<p>OSのisoファイルで起動するとこの画面がでるやろ。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150802/20150802125544.png" alt="f:id:mosuke5:20150802125544p:plain" title="f:id:mosuke5:20150802125544p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>そして、ここでTabをおすと、なにか入力できるが画面が出てきて。<br>
-そこに、<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイルのパスを入力してやる。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150802/20150802125630.png" alt="f:id:mosuke5:20150802125630p:plain" title="f:id:mosuke5:20150802125630p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>これで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>完了や。</p>
-
-<h1>4.最後に</h1>
-
-<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>入門したし、次はPackerをやりたいと思います。<br>
-が、ふと思ったのが、自分の用途だとPackerではなく<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>で十分かもなーとか思ったり思わなかったり…</p>
-</body></p>
-
+                        1.はじめに
+開発環境はVirualboxを使ったVagrantを利用しているが、
+本番環境はAWSだったりKVMだったり違う仮想化機構で動作しているなんてことよくあると思います。
+そういう環境下でどのように開発環境と本番環境の差分をなくしていますか？
+わたしの場合、基本的にAnsibleを使ってプロビジョニングをしていますが、
+そのプロビジョニング前のベースが異なってしまって困ることがよくあります。
+一般に公開されているVagrantBox使ったら余計な設定が入っていたとか、すでにパッケージが入っていたとか…
+そんな問題を解決しようとPackerを使おう！って考えました。
+ですが、Packerも当たり前だけど魔法ではなく、Kickstartなどの自動インストールが前提なので、
+Packerをやる前にKickstartを学習せよ、、、ということに気づきました。
+ということでKickstartをはじめたよってことです。
+2.kickstartってなに kickstartはOSのインストールを自動化する仕組みです。
+anaconda社が提供するインストールの仕組みでRedhat系のOSが採用しているものです。
+ですのでUbuntuだとPreseedっていう別の仕組みだそうです。（詳しくありませんっ）
+で、Kickstartでなにができるかというと...
+OSのインストールをしたことがある方ならわかるかと思いますが、
+普通にDVDなどからインストールすると、
+ 言語はなににしますかー？ ホスト名なににしますかー？ パッケージはなにをいれますかー？  とか、聞かれて選択していく必要があります。 この作業を自動化できるのがkickstartです。
+URLのようなもの。 はじめての自宅サーバ構築 - Fedora/CentOS - CentOS6 のインストール手順kajuhome.com
+(おまけ)Ansible, Chef, Puppetとの違い？ kickstartにはプロビジョニング機能もついているため、
+AnsibleとかChefとかPuppetとの違いは？住み分けは？と思うかもしれません。
+明確に、住み分けが決まっているわけではありませんが、 個人的にはAnsibleやChefを実行する前の最低限の設定をkickstartにやらせようと思っています。
+（一般的かとは思いますが…？）
+Lee ThompsonのProvisioning Toolchainを参考にKiskstarのやる範囲をまとめると。 
+Provisioning Toolchain: Web Performance and Operations - Velocity Online Conference - March 17, 2010 - O'Reilly Mediaen.oreilly.com
+3.Hello Kickstart!! Virtualboxを使ってKickstartを試しました。
+3-1.用意したもの   Virtualbox  自分の環境はMacで、バージョンは5.
+                        <a href="https://blog.mosuke.tech/entry/2015/07/31/211542/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -382,143 +173,48 @@ autopart
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p>2014年の秋から<code>@mogulla3</code>と定期的にインフラ関連技術の勉強会をやってきましたが、<br>
-インプットの勉強会だけでは飽き足らず、いつしかサービスを作る中でインフラ関連技術を駆使し勉強したいと思うように…</p></p>
+                        2014年の秋から@mogulla3と定期的にインフラ関連技術の勉強会をやってきましたが、
+インプットの勉強会だけでは飽き足らず、いつしかサービスを作る中でインフラ関連技術を駆使し勉強したいと思うように…
+そして、普段使っているVimを題材に、
+vimの設定をブラウザ上で即体感できるサービス Vim::Factory
+を開発しました。
+本記事はVim::Factoryの簡単な紹介と技術的な仕組みについて記述しています。
+Vim::Factoryはこちら。
+http://vimfactory.com/
+1. Vim::Factoryについて 1-1. Vim::Factoryってなに？？ Vim::Factoryは、選択したVimの設定を、ブラウザ上で「即体感」できるサービスです。
+数多くあり複雑なVimの設定を容易にし、お気に入りのVim探しをサポートすることを目指しています。
 
-<p>そして、普段使っている<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を題材に、<br>
-<b><span style="font-size: 150%"><a class="keyword" href="http://d.hatena.ne.jp/keyword/vim">vim</a>の設定をブラウザ上で即体感できるサービス <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factory</span></b><br>
-を開発しました。</p>
+1-2. なんで作ったの？ Vimの設定ってたくさんあってどれを選んでいいかわからなかったり、
+設定したもののどう変わったかイマイチわからなかったりしませんか？
+Vimの設定がどのように反映されるか、もっと簡単に体験したいと考えたからです。
+あと、例えばGithubで100star以上をつける人のVimをブラウザ上で体験できたらいいなと思っていて、
+それを実現のための第一歩としてこのサービスを作りました。
+1-3. このサービスの最大の特徴は？ このサービスの最大の特徴はなんといっても「ブラウザ上でVimが体感できること」です。
+今まではVimの設定を試そうと思ったら、ネットで調べて自分のVimに反映させて…という作業が必要でしたが、
+ブラウザ上で設定を即体感するという新しい体験を提供するために力を注いできました。
+その実現方法については、後述しています。
+1-4. 紹介動画 詳しくは、実際に試してもらうのが早いと思いますが、簡単な操作動画を用意してみました。
+モバイルからこのサービスはちょっと使えないので、モバイルで読んでいる方は動画でお楽しみください(笑)
+www.youtube.com
+2. Vim::Factoryの技術について ここからVim::Factoryの技術について一部ではありますがご紹介します。
+2-1. ブラウザ上でのVimを実現した技術 ブラウザ上でVimを実現しようと思うと、ぱっと思いつくのはJavaScriptでVimそのものを実装してしまおうというものかもしれません。
+ですが、JSでVimを実装することってどれくらい難しいでしょうか？
+少なくともぼくにはそんなことはできませんし、できたとして質の悪いものになってしまうと思います。
+そこで思いついたのが、一般的なターミナルソフトと同様にサーバ上でvimを起動し、
+そのターミナル情報をブラウザ上で表示するという方法です。
+この方法であれば自らVimを実装せずともVimを再現できます。イメージは下記のとおりです。
 
-<p>本記事は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの簡単な紹介と技術的な仕組みについて記述しています。</p>
+また、サービスとして上記を行うには、接続してきたユーザごとにVimを用意する必要があります。
+これらを実現するために利用したのがDockerとWebSocketです。
+dockerコンテナ上でVimを起動し、そのターミナル情報をWebSocketでブラウザに送信するようにしました。 
+dockerはコンテナ型の仮想化なので起動がとてもはやく、
+httpのリクエストが来てからdockerコンテナを立ち上げても十分なほどのはやさをもっています。
+2-2. 全体構成 システムの全体構成は以下のような感じです。
+※実際の役割は図のとおりですが、サーバはこんなに多くありません。
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryはこちら。<br>
-<a href="http://vimfactory.com/">http://vimfactory.com/</a></p>
-
-<h1>1. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryについて</h1>
-
-<h2>1-1. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryってなに？？</h2>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryは、選択した<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の設定を、ブラウザ上で「即体感」できるサービスです。<br>
-数多くあり複雑な<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の設定を容易にし、お気に入りの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>探しをサポートすることを目指しています。</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150719/20150719155723.png" alt="f:id:mosuke5:20150719155723p:plain" title="f:id:mosuke5:20150719155723p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<h2>1-2. なんで作ったの？</h2>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の設定ってたくさんあってどれを選んでいいかわからなかったり、<br>
-設定したもののどう変わったかイマイチわからなかったりしませんか？</p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の設定がどのように反映されるか、もっと簡単に体験したいと考えたからです。</p>
-
-<p>あと、例えば<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>で100star以上をつける人の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>をブラウザ上で体験できたらいいなと思っていて、<br>
-それを実現のための第一歩としてこのサービスを作りました。</p>
-
-<h2>1-3. このサービスの最大の特徴は？</h2>
-
-<p>このサービスの最大の特徴はなんといっても<b>「ブラウザ上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>が体感できること」</b>です。</p>
-
-<p>今までは<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の設定を試そうと思ったら、ネットで調べて自分の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>に反映させて…という作業が必要でしたが、<br>
-ブラウザ上で設定を即体感するという新しい体験を提供するために力を注いできました。<br>
-その実現方法については、後述しています。</p>
-
-<h2>1-4. 紹介動画</h2>
-
-<p>詳しくは、実際に試してもらうのが早いと思いますが、簡単な操作動画を用意してみました。<br>
-モバイルからこのサービスはちょっと使えないので、モバイルで読んでいる方は動画でお楽しみください(笑)<br>
-<iframe width="480" height="270" src="https://www.youtube.com/embed/j20agcBcAec?feature=oembed" frameborder="0" allowfullscreen></iframe><cite class="hatena-citation"><a href="https://www.youtube.com/watch?v=j20agcBcAec&amp;feature=youtu.be">www.youtube.com</a></cite></p>
-
-<h1>2. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの技術について</h1>
-
-<p>ここから<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの技術について一部ではありますがご紹介します。</p>
-
-<h2>2-1. ブラウザ上での<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を実現した技術</h2>
-
-<p>ブラウザ上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を実現しようと思うと、ぱっと思いつくのは<a class="keyword" href="http://d.hatena.ne.jp/keyword/JavaScript">JavaScript</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>そのものを実装してしまおうというものかもしれません。<br>
-ですが、JSで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を実装することってどれくらい難しいでしょうか？<br>
-少なくともぼくにはそんなことはできませんし、できたとして質の悪いものになってしまうと思います。</p>
-
-<p>そこで思いついたのが、一般的なターミナルソフトと同様にサーバ上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/vim">vim</a>を起動し、<br>
-そのターミナル情報をブラウザ上で表示するという方法です。<br>
-この方法であれば自ら<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を実装せずとも<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を再現できます。イメージは下記のとおりです。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150718/20150718230605.png" alt="f:id:mosuke5:20150718230605p:plain" title="f:id:mosuke5:20150718230605p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>また、サービスとして上記を行うには、接続してきたユーザごとに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を用意する必要があります。</p>
-
-<p>これらを実現するために利用したのが<b>Docker</b>と<b>WebSocket</b>です。<br>
-dockerコンテナ上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>を起動し、そのターミナル情報をWebSocketでブラウザに送信するようにしました。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150720/20150720002840.png" alt="f:id:mosuke5:20150720002840p:plain" title="f:id:mosuke5:20150720002840p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<p>dockerはコンテナ型の仮想化なので起動がとてもはやく、<br>
-httpのリクエストが来てからdockerコンテナを立ち上げても十分なほどのはやさをもっています。</p>
-
-<h2>2-2. 全体構成</h2>
-
-<p>システムの全体構成は以下のような感じです。<br>
-※実際の役割は図のとおりですが、サーバはこんなに多くありません。</p>
-
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150719/20150719124021.png" alt="f:id:mosuke5:20150719124021p:plain" title="f:id:mosuke5:20150719124021p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
-<h2>2-3. 利用した技術とか<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>のまとめ</h2>
-
-<p>振り返りも兼ねて利用した技術・<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>を一覧にまとめておきます。</p>
-
-<ul>
-<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a></li>
-<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a></li>
-<li>thin</li>
-<li>node.js</li>
-<li>Websocket</li>
-<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/memcached">memcached</a></li>
-<li>docker</li>
-<li>nginx</li>
-<li>centos7</li>
-<li>Ansible</li>
-<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a></li>
-<li>gitlab</li>
-<li>mackerel</li>
-<li>slack</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/esa">esa</a>.io(ドキュメント管理)</li>
-</ul>
-
-<h1>3. まとめ</h1>
-
-<p>このサービスで一番苦労したことはやっぱりブラウザ上での<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の実現部分です。<br>
-当初、このサービスを思いついた時、実現不可能だ…とあきらめました。<br>
-というのもJS（アプリケーションサイド）で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>をどう実装しようかしか考えていなかったからです。</p>
-
-<p>ですが、ふとしたときに上記の別の方法（インフラサイド）での実現方法を思いつきました。</p>
-
-<p>このサービスを作るきっかけは、インフラ技術のインプット勉強だけでは飽きたらず、<br>
-サービスを開発・運用していくなかでインフラ技術を磨いていきたいというものでしたが、<br>
-インプットの勉強があってこそインフラサイドからの実現方法を見つけられたようにも思いました。</p>
-
-<p>今後、運用を通してさらなるパワーアップができたらいいなと思います。</p>
-
-<h1>4. 最後に</h1>
-
-<p>最後になりますが、
-完全な趣味で作ってしまったサービスで、今後どのように展開していこうか何も考えていません。<br>
-まずは、このように公開し皆様に利用して頂いて、フィードバックなど頂いてから考えようと思っています。</p>
-
-<p>サービスに関するご意見等あれば、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Twitter">Twitter</a>やメールで書いてくれると大変嬉しいです。</p>
-
-<p>お問い合せはこちら:</p>
-
-<ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Twitter">Twitter</a>: <a href="https://twitter.com/mosuke5">もーすけ (@mosuke5) | Twitter</a> or <a href="https://twitter.com/mogulla3">もぐらマン (@mogulla3) | Twitter</a>
-</li>
-<li>e-mail: ilab.vimfactory+info@<a class="keyword" href="http://d.hatena.ne.jp/keyword/gmail">gmail</a>.com</li>
-</ul>
-
-<p>では、みなさんも<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>ライフを楽しみましょう！</p>
-
-<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryはこちら。<br>
-<a href="http://vimfactory.com/">http://vimfactory.com/</a></p>
-</body></p>
-
+2-3. 利用した技術とかツールのまとめ 振り返りも兼ねて利用した技術・ツールを一覧にまとめておきます。
+ Ruby Sinatra thin node.js Websocket memcached docker nginx centos7 Ansible Vagrant gitlab mackerel slack  esa.
+                        <a href="https://blog.mosuke.tech/entry/2015/07/19/135844/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -543,127 +239,18 @@ httpのリクエストが来てからdockerコンテナを立ち上げても十�
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p>今更<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>感はあるのだが、<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>利用時の<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>のmigration導入について、注意点をまとめた。<br>
-でも、結論は納得がいっていない。</p></p>
-
-<h1>0. 前提</h1>
-
-<p>下記の環境で行ったものです。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>: 5.5.7<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>: 1.7<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Postgresql">Postgresql</a>: 9.4</p>
-
-<h1>1. テーブル<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%B8%BB%FA%A5%B3%A1%BC%A5%C9">文字コード</a>の問題</h1>
-
-<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a></h1>
-
-<p>公式サイトのサンプルの通りはじめに<code>app/migrations/001_example.php</code>を作り、migrationを実行した。</p>
-
-<p><code>app/migrations/001_example.php</code>の作成</p>
-
-<pre><code class="language-php">&lt;?php
-namespace Fuel\Migrations;
-class Example
-{
-    function up()
-    {
-        \DBUtil::create_table('posts', array(
-            'id' =&gt; array('type' =&gt; 'int', 'constraint' =&gt; 5),
-            'title' =&gt; array('type' =&gt; 'varchar', 'constraint' =&gt; 100),
-            'body' =&gt; array('type' =&gt; 'text'),
-        ), array('id'));
-    }
-    
-    function down()
-    {
-        \DBUtil::drop_table('posts');
-    }
-}
-</code></pre>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>実行すると以下のエラーに襲われた。</p>
-
-<pre><code>$ php oil refine migrate
-Uncaught exception Fuel\Core\Database_Exception: SQLSTATE[42601]: Syntax error: 7 ERROR: syntax error at or near &quot;DEFAULT&quot;
-LINE 5: )DEFAULT CHARACTER SET utf8;
-^ with query: &quot;CREATE TABLE IF NOT EXISTS &quot;migration&quot; (
-&quot;type&quot; varchar(25) NOT NULL,
-&quot;name&quot; varchar(50) NOT NULL,
-&quot;migration&quot; varchar(100) DEFAULT '' NOT NULL
-)DEFAULT CHARACTER SET utf8;&quot; 
-</code></pre>
-
-<h1>理由</h1>
-
-<p>しょっぱなから躓くわけだが…</p>
-
-<p>初めて<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を実行する際には<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>管理用のテーブルを作る。<br>
-そのテーブルを作る<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が下記の通り発行されている。</p>
-
-<pre><code class="language-sql">CREATE TABLE IF NOT EXISTS &quot;migration&quot; (
-&quot;type&quot; varchar(25) NOT NULL,
-&quot;name&quot; varchar(50) NOT NULL,
-&quot;migration&quot; varchar(100) DEFAULT '' NOT NULL
-)DEFAULT CHARACTER SET utf8;
-</code></pre>
-
-<p>理由は単純で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>のcreate tableでは次のdefault構文は利用できないから。</p>
-
-<pre><code class="language-sql">create table xxxx ( ) default character set xxx;
-</code></pre>
-
-<p>なぜ、利用できない構文の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が発行されたのか？<br>
-それは単に<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>の問題です。次期バージョンでは解決されることを祈る。</p>
-
-<h1>解決方法</h1>
-
-<p>解決方法は下記の記事がわかりやすかった。
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fqiita.com%2Fhirobow%2Fitems%2F8c2c379b33f0040480b7" title="FuelPHP で PDOによるPostgreSQL接続の罠 - Qiita" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://qiita.com/hirobow/items/8c2c379b33f0040480b7">FuelPHP で PDOによるPostgreSQL接続の罠 - Qiita</a></iframe><cite class="hatena-citation"><a href="http://qiita.com/hirobow/items/8c2c379b33f0040480b7">qiita.com</a></cite></p>
-
-<p>簡単に言うとdbのコンフィグで、charsetをnullにすると<code>DEFAULT CHARACTER SET xxx</code>部分が発行されない。</p>
-
-<pre><code>'charset' =&gt; NULL, 
-</code></pre>
-
-<h1>2. PRIMARY KEYの問題</h1>
-
-<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a></h1>
-
-<p>1.の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%B8%BB%FA%A5%B3%A1%BC%A5%C9">文字コード</a>の問題は解決して、さあもう一度<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を！と思って実行するもさらなるエラーに阻まれる。</p>
-
-<pre><code>$ php oil refine migrate
-Uncaught exception Fuel\Core\Database_Exception: SQLSTATE[42601]: Syntax error: 7 ERROR: syntax error at or near &quot;(&quot;
-LINE 2: &quot;id&quot; int(5) NOT NULL,
-^ with query: &quot;CREATE TABLE IF NOT EXISTS &quot;users&quot; (
-&quot;id&quot; int(5) NOT NULL,
-&quot;name&quot; text NOT NULL,
-PRIMARY KEY &quot;id&quot; (&quot;id&quot;)
-);&quot; 
-</code></pre>
-
-<p>理由は1のときと一緒。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>では以下の構文は使えないのだ…</p>
-
-<pre><code>PRIMARY KEY &quot;id&quot; (&quot;id&quot;) 
-</code></pre>
-
-<h1>3. 結局</h1>
-
-<p>つまるところ<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>(すくなくとも1.7までは)では、<a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を行う環境がちゃんと整っていないということ。<br>
-しかたないので、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>は生<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を書くことにしました。</p>
-
-<p>PRIMARY KEYを後から別途で付与するとか考えたけど、<br>
-ほかにも罠がありそうだったので、安全な生<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を採用しました。<br>
-バージョン1.8では直っている?とのことだが、まだdevelopmentだったのでこれも見送り。</p>
-
-<p>うむ。。。</p>
-
-<p><p>&lt;参考&gt;
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fimprove-future.com%2Favailable-dbms-in-fuelphp.html" title="FuelPHP で使用可能なデータベース" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://improve-future.com/available-dbms-in-fuelphp.html">FuelPHP で使用可能なデータベース</a></iframe><cite class="hatena-citation"><a href="http://improve-future.com/available-dbms-in-fuelphp.html">improve-future.com</a></cite></p>
-</body></p>
-
+                        今更FuelPHP感はあるのだが、
+postgresql利用時のFuelPHPのmigration導入について、注意点をまとめた。
+でも、結論は納得がいっていない。
+0. 前提 下記の環境で行ったものです。
+PHP: 5.5.7
+FuelPHP: 1.7
+Postgresql: 9.4
+1. テーブル文字コードの問題 事象 公式サイトのサンプルの通りはじめにapp/migrations/001_example.phpを作り、migrationを実行した。
+app/migrations/001_example.phpの作成
+&lt;?php namespace Fuel\Migrations; class Example { function up() { \DBUtil::create_table('posts', array( 'id' =&gt; array('type' =&gt; 'int', 'constraint' =&gt; 5), 'title' =&gt; array('type' =&gt; 'varchar', 'constraint' =&gt; 100), 'body' =&gt; array('type' =&gt; 'text'), ), array('id')); } function down() { \DBUtil::drop_table('posts'); } }  マイグレーション実行すると以下のエラーに襲われた。
+$ php oil refine migrate Uncaught exception Fuel\Core\Database_Exception: SQLSTATE[42601]: Syntax error: 7 ERROR: syntax error at or near &quot;DEFAULT&quot; LINE 5: )DEFAULT CHARACTER SET utf8; ^ with query: &quot;CREATE TABLE IF NOT EXISTS &quot;migration&quot; ( &quot;type&quot; varchar(25) NOT NULL, &quot;name&quot; varchar(50) NOT NULL, &quot;migration&quot; varchar(100) DEFAULT '' NOT NULL )DEFAULT CHARACTER SET utf8;&quot;  理由 しょっぱなから躓くわけだが…
+                        <a href="https://blog.mosuke.tech/entry/2015/06/17/212852/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -688,120 +275,16 @@ PRIMARY KEY &quot;id&quot; (&quot;id&quot;)
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<h1>1. はじめに</h1></p>
-
-<p>ぼくはフロントエンドは本業ではありません。<br>
-jsはあまり好きではありません。<br>
-そして<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>通信後にhtmlをアウトプットする際にjsの変数の中にhtmlを書いていく<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>がもっと好きではありません。(後述)<br>
-それをJSテンプレートエンジンを使ってシンプルにしてみたって話です。
-（JsRenderの使い方を書いたものではありません。）</p>
-
-<h1>2. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>が嫌いだった理由</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>はユーザ体感的にはいいのだけれど、<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>の結果受け取った<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>などのデータを使ってhtmlを出力とかやると<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>が煩雑になるので嫌いだった。</p>
-
-<p>例として<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>で/xxxxxにリクエストを投げて、その結果(<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>データ)を使ってhtmlを出力するものを考えると。</p>
-
-<pre><code class="language-javascript">/* jsonデータは下記が返ってくるとする
-[
-    {
-        id: '1',
-        name: 'らーめん',
-        text: 'らーめんはやっぱり濃厚鶏そばです。'
-    },
-    {
-        id: '2',
-        name: 'うどん',
-        text: 'うどんはやっぱり釜揚げうどんです。'
-    }
-]
-*/
-$.ajax({
-  type: &quot;GET&quot;,
-  url: &quot;/xxxxx&quot;,
-  dataType: &quot;json&quot;,
-  success: function(data){
-    var html = '';
-    data.forEach(function (e) {
-      html += '&lt;div id=&quot;' + e.id + '&quot;&gt;';
-      html += '&lt;h1&gt;' + e.name + '&lt;/h1&gt;';
-      html += '&lt;p&gt;' + e.text + '&lt;/p&gt;';
-      html += '&lt;/div&gt;';
-    });
-    $(&quot;#result&quot;).append(html);
-  },
-})
-</code></pre>
-
-<p>jsの変数の中にhtmlが含まれる。<br>
-<b>そう、jsの変数の中にhtmlが！！</b><br>
-この規模ならまだいいが、もう少しhtmlが肥大化してくると最悪である。<br>
-これがどうしても許せない。</p>
-
-<h1>3.jsのテンプレートエンジンを使ってみた</h1>
-
-<p>上の問題をなんとかできないかと思っていたところ、jsのテンプレートエンジンにいきついた。<br>
-jsのテンプレートエンジンは多数あるのだが今回はJsRenderを採用し、<a class="keyword" href="http://d.hatena.ne.jp/keyword/ajax">ajax</a>を心地よく使うことができるようになった。</p>
-
-<p><a href="http://www.jsviews.com/">JsRender/JsViews</a></p>
-
-<h3>3-1. jsテンプレートエンジンの選定について</h3>
-
-<p>以下のまとめなど参考にするといいが、多数ある。
-<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fqiita.com%2FKumamon%2Fitems%2F7db7c8f5e5ace3b40874" title="JavaScriptテンプレートエンジンまとめ - Qiita" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://qiita.com/Kumamon/items/7db7c8f5e5ace3b40874">JavaScriptテンプレートエンジンまとめ - Qiita</a></iframe><cite class="hatena-citation"><a href="http://qiita.com/Kumamon/items/7db7c8f5e5ace3b40874">qiita.com</a></cite></p>
-
-<p>用途としては下記のような感じで選んだ。</p>
-
-<ul>
-<li>クライアントサイドで利用できる
-
-<ul>
-<li>特にサーバサイドで使える必要はなかった</li>
-</ul>
-</li>
-<li>簡単に利用できること。学習コストが低そうなこと</li>
-<li>for文やif文はつかえること</li>
-<li>プレ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB">コンパイル</a>とかは必要なかった</li>
-</ul>
-
-<h3>3-2. JsRenderを使えばここまで<a class="keyword" href="http://d.hatena.ne.jp/keyword/ajax">ajax</a>がシンプルになった</h3>
-
-<p>JsRenderを利用して先ほどの<a class="keyword" href="http://d.hatena.ne.jp/keyword/ajax">ajax</a>部分を書き直すと以下のようになる。</p>
-
-<h4>js側</h4>
-
-<pre><code class="language-javascript">$.ajax({
-  type: &quot;GET&quot;,
-  url: &quot;/xxxxx&quot;,
-  dataType: &quot;json&quot;,
-  success: function(data){
-    var template = $.templates(&quot;#result-template&quot;);   // テンプレートを指定
-    var htmlOutput = template.render(data);   //テンプレート内に変数展開
-    $(&quot;#result&quot;).html(htmlOutput);   //出力
-  },
-})
-</code></pre>
-
-<h4>html側</h4>
-
-<pre><code class="language-html">&lt;div id=&quot;result&quot;&gt;&lt;/div&gt;
-&lt;script id=&quot;result-template&quot; type=&quot;text/x-jsrender&quot;&gt;
-&lt;div id=&quot;{{:id}}&quot;&gt;
-  &lt;h1&gt;{{:name}}&lt;/h1&gt;
-  &lt;p&gt;{{:text}}&lt;/p&gt;
-&lt;/div&gt;
-&lt;/script&gt;
-</code></pre>
-
-<p>何が素晴らしいって、ロジックの部分と、ビュー部分を綺麗に分離できたこと。<br>
-いや、サーバサイドなら当たり前のようにやっていたことなんだけど、<br>
-JsRenderを使えばクライアントサイドでも簡単に実装できて最高でした。</p>
-
-<p><p>以上。</p>
-</body></p>
-
+                        1. はじめに
+ぼくはフロントエンドは本業ではありません。
+jsはあまり好きではありません。
+そしてAjax通信後にhtmlをアウトプットする際にjsの変数の中にhtmlを書いていくソースコードがもっと好きではありません。(後述)
+それをJSテンプレートエンジンを使ってシンプルにしてみたって話です。 （JsRenderの使い方を書いたものではありません。）
+2. Ajaxが嫌いだった理由 Ajaxはユーザ体感的にはいいのだけれど、
+Ajaxの結果受け取ったjsonなどのデータを使ってhtmlを出力とかやるとソースコードが煩雑になるので嫌いだった。
+例としてAjaxで/xxxxxにリクエストを投げて、その結果(jsonデータ)を使ってhtmlを出力するものを考えると。
+/* jsonデータは下記が返ってくるとする [ { id: '1', name: 'らーめん', text: 'らーめんはやっぱり濃厚鶏そばです。' }, { id: '2', name: 'うどん', text: 'うどんはやっぱり釜揚げうどんです。' } ] */ $.ajax({ type: &quot;GET&quot;, url: &quot;/xxxxx&quot;, dataType: &quot;json&quot;, success: function(data){ var html = ''; data.forEach(function (e) { html += '&lt;div id=&quot;' + e.id + '&quot;&gt;'; html += '&lt;h1&gt;' + e.name + '&lt;/h1&gt;'; html += '&lt;p&gt;' + e.text + '&lt;/p&gt;'; html += '&lt;/div&gt;'; }); $(&quot;#result&quot;).
+                        <a href="https://blog.mosuke.tech/entry/2015/06/13/231917/">続きを読む</a>
                     </div>
                 </section>
                 

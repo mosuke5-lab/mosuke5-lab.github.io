@@ -76,26 +76,14 @@
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p>テーブルを内部結合するとき、いつもINNER JOINを使って書いていたが、<br>
-「FROM句のあとに複数のテーブルを書いてWHERE句で絞り込む」やり方があることを知った。</p>
-<p>INNER JOIN型</p></p>
-
-<pre><code class="language-mysql">SELECT * FROM table1 INNER JOIN table2 ON table1.id=table2.id
- 
-</code></pre>
-
-<p><p>WHERE型</p></p>
-
-<pre><code class="language-mysql">SELECT * FROM table1 table2 WHERE table1.id=table2.id
- 
-</code></pre>
-
-<p><p>結果的には同じだし、調べる限りだとどちらが良いとかメリット・デメリットとかないそう。<br>
-個人的には「何に何を結合しているのかわかりやすい」という点からINNER JOIN型をおすすめしたいところ。</p>
-<p>DB<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%DA%A5%B7%A5%E3">スペシャ</a>リストの本とか問題みてるとだいたいWHERE型なので戸惑う…</p>
-</body></p>
-
+                        テーブルを内部結合するとき、いつもINNER JOINを使って書いていたが、
+「FROM句のあとに複数のテーブルを書いてWHERE句で絞り込む」やり方があることを知った。
+INNER JOIN型
+SELECT * FROM table1 INNER JOIN table2 ON table1.id=table2.id  WHERE型
+SELECT * FROM table1 table2 WHERE table1.id=table2.id  結果的には同じだし、調べる限りだとどちらが良いとかメリット・デメリットとかないそう。
+個人的には「何に何を結合しているのかわかりやすい」という点からINNER JOIN型をおすすめしたいところ。
+DBスペシャリストの本とか問題みてるとだいたいWHERE型なので戸惑う…
+                        <a href="https://blog.mosuke.tech/entry/2014/02/28/232846/">続きを読む</a>
                     </div>
                 </section>
                 

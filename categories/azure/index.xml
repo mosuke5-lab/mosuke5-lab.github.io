@@ -17,25 +17,18 @@
       <pubDate>Mon, 20 Feb 2017 18:42:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2017/02/20/184220/</guid>
-      <description>先日、2017年2月18日に「MSPJマイグレーションコンペティション2017winter」に参加してきた。
-MSPJマイグレーションコンペティション2017winterとは、
-日本MSP協会コンペティショングループが主催する、 次代を担う若手運用技術者同士の交流・競争を通して日本のMSP事業者における運用技術の向上を目指したコンペティション。
-もう少し平たく言うと、MSP事業者の本当の業務に近い形でのコンペを通じて、スキルアップを図りましょうというものだ。
-自分はMSPの人じゃないけど参加は全然できた。
-connpass.com
-競技ルール 今回の競技のお題は、
-「AWS上で動作しているレガシーなRedmineをAzure上に移行する」というものだ。
-このコンペの特徴としては、実際にMSPでの業務に則し、お客さんから曖昧な要望を受けている部分や、
-お客さん側にしかない権限については、お客さんと調整する必要があること。
-例えば、環境の移行する際にはDNSの切り替えが必要だったのですが、DNSの設定権限は我々にはなくて、
-Slackを利用して、DNS設定変更依頼や作業周知を出さなければいけなかった。
-このあたりはとてもユニークなポイント。
-お客さんからは移行について以下のような曖昧な要望をもらっていた。
-&amp;lt;要望&amp;gt; - 今の環境を新しい環境に完全移行して欲しいです。 - 実施した内容と結果については報告が欲しいです。 - システムを止めるときは利用者に告知が必要なので連絡が欲しいです。 - 昔から使っている古い環境なので、バージョンアップして欲しいです。 - できれば利用者に影響を出さないように切り替えたいです。 - できればサーバに関する資料があるとありがたいです。 - できれば今はまったくバックアップを取っていないのでバックアップを取れるようにしたいです - できれば今後は利用者が増えるのでシステムを冗長化したいです。 - できれば新しいインフラエンジニアに引継ぎするために必要な情報がまとまっていると嬉しいです。 &amp;lt;担当者のコメント&amp;gt; - 前任のインフラエンジニアが辞めちゃったのでこのシステムもう分かる人がいなくって。 - 結構前から使っているので環境も古くなっているみたいで、OSのサポートがもうすぐ切れるって話を聞いたものですから、セキュリティとか色々心配で何とかしたいんです。 - みんなこのシステムを結構便利に使っていてくれているようだから、システムを切り替えるときは連絡しないとなぁ。 - そうそう、近々新しいインフラエンジニアが入社予定だから、その方に引き継げるようになっていると嬉しいですね。  ちなみにチームについては、当日の参加者で適当に3人チームを作って行った。
-一緒の参加者が同じチームにならないように調整された。
-構成把握 開始後、まずやったことが環境・構成の把握。
-ざっと下記のような感じ。ログインしてすぐに、pstree みて大体の構成を把握した。
- インフラ: AWS(EC2) OS: CentOS5.2 Webサーバ: Apache2.0 + Passenger DB: MySQL5.1  Ruby: 1.9  Redmine: 2.3  DNS; Route53で管理。権限はお客さんのみ サーバ構成: サーバ1台のシングル構成  移行作戦 細かなバージョンはおいておいて、最終的に目指す構成は下記のようにした。</description>
+      <description>&lt;p&gt;&lt;body&gt;
+&lt;p&gt;先日、2017年2月18日に「MSPJ&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3&#34;&gt;マイグレーション&lt;/a&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DA%A5%C6%A5%A3%A5%B7%A5%E7%A5%F3&#34;&gt;コンペティション&lt;/a&gt;2017winter」に参加してきた。&lt;br&gt;
+MSPJ&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3&#34;&gt;マイグレーション&lt;/a&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DA%A5%C6%A5%A3%A5%B7%A5%E7%A5%F3&#34;&gt;コンペティション&lt;/a&gt;2017winterとは、&lt;br&gt;
+日本MSP協会&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DA%A5%C6%A5%A3%A5%B7%A5%E7%A5%F3&#34;&gt;コンペティション&lt;/a&gt;グループが主催する、
+次代を担う若手運用技術者同士の交流・競争を通して日本のMSP事業者における運用技術の向上を目指した&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DA%A5%C6%A5%A3%A5%B7%A5%E7%A5%F3&#34;&gt;コンペティション&lt;/a&gt;。&lt;/p&gt;&lt;/p&gt;
+
+&lt;p&gt;もう少し平たく言うと、MSP事業者の本当の業務に近い形でのコンペを通じて、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%B9%A5%AD%A5%EB%A5%A2%A5%C3%A5%D7&#34;&gt;スキルアップ&lt;/a&gt;を図りましょうというものだ。&lt;br&gt;
+自分はMSPの人じゃないけど参加は全然できた。&lt;/p&gt;
+
+&lt;p&gt;&lt;iframe src=&#34;//hatenablog-parts.com/embed?url=https%3A%2F%2Fconnpass.com%2Fevent%2F47825%2F&#34; title=&#34;MSPJマイグレーションコンペティション2017winter (2017/02/18 09:30〜)&#34; class=&#34;embed-card embed-webcard&#34; scrolling=&#34;no&#34; frameborder=&#34;0&#34; style=&#34;display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;&#34;&gt;&lt;/iframe&gt;&lt;cite class=&#34;hatena-citation&#34;&gt;&lt;a href=&#34;https://connpass.com/event/47825/&#34;&gt;connpass.com&lt;/a&gt;&lt;/cite&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
     </item>
     
   </channel>

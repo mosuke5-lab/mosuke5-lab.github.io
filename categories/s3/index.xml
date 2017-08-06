@@ -17,42 +17,25 @@
       <pubDate>Sat, 18 Mar 2017 18:22:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2017/03/18/182252/</guid>
-      <description>1.はじめに
-Amazon S3をはじめとして、オブジェクトストレージが身近になってきています。
-各クラウドベンダーはオブジェクトストレージサービスを提供しています。
- Amazon S3 Azure Blob Storage Google Cloud Storage Alibaba Cloud OSS Cloud n ObjectStorage IDCF オブジェクトストレージ  ですが、オブジェクトストレージをストレージの魔法として理解されているケースも多いように感じます。
-原点に振り返ってそもそもオブジェクトストレージとはなんなのか。
-どんな特徴を持っているストレージなのか。
-気になってまとめました。
-2.オブジェクトストレージとは オブジェクトストレージとは一言で言うと、
-「オブジェクト単位（ファイル単位）で出し入れのできる、ネットワークストレージ」です。
-オブジェクトストレージでは直接にストレージ上のファイルをRead/Writeすることはできません。
-いうなれば、FTPサーバに近い存在と言えます。
-今やクラウド上のストレージの代名詞として扱われるオブジェクトストレージですが、
-実はファイルの出し入れしかできないストレージなのです！？！？
-3.特徴 では、そんな出し入れしかできないFTPサーバに似たオブジェクトストレージですが、
-その本当の特徴はどこにあるのでしょうか。
-特徴1: ディレクリ構造の排除 1つ目の特徴としては、ディレクトリ構造でファイルを管理しないことです。
-ディレクトリ構造は、もしストレージサーバのハードディスク容量がいっぱいになり、
-ファイルを別のディスクに移動する場合、そのディレクトリパスも変更しなければいけません。
-クラウドサービスのようなたくさんのユーザが利用し拡張性の求められる場面では、ディレクトリ構造は適さないのです。
-そこで、オブジェクトストレージではディレクトリ構造ではなく、階層のないフラットな関係でファイルが保存されます。
-すべてのファイルにIDが付与され、そのIDがどこに保管されているか別で管理する仕組みとなっています。
-特徴2: 分散保存 2つ目の特徴は「分散保存」です。
-オブジェクトストレージでは、ファイルを分散保存するアーキテクチャによって、
-ファイルの冗長化と大量のファイルへのアクセスさばくことを可能にしています。
-詳しくは次の「オブジェクトストレージのアーキテクチャ」の項目でご紹介します。
-特徴3: アプリケーションからの利用を意識 3つ目の特徴はアプリケーションでの利用を強く意識していることです。
-この項目は製品によって異なる部分もありますが、主な点を３つあげます。
-(1)メタ情報管理 従来のファイルシステムでのファイルへのメタ情報は、ファイルのサイズや更新日付などが一般的でした。
-オブジェクトストレージでは更にファイルの有効期限などを設定することができ、インフラ管理を容易にします。
-(2)HTTPプロトコルを使ったインターフェイス  オブジェクトストレージでは、ファイルのアップロード、ダウンロードなどすべての操作はHTTPプロトコルを利用します。
-HTTPのような汎用的なプロトコルを採用することにより、サーバからはもちろん、モバイル端末など幅広いデバイスから利用が可能です。
-(3)Web公開機能 更には、保存したオブジェクトに対してURLを割り当てて公開することもできます。
-静的なWebサイトの公開や、cssやJavaScript、画像ファイルなどを直接オブジェクトストレージへ取得しにいくこともできます。
-4.オブジェクトストレージのアーキテクチャ  オブジェクトストレージとひとまとめにいっても、製品によってその実現方法は様々で異なります。
-しかし、ここでは一例として利用されるアーキテクチャについて紹介します。
-※ここで紹介するアーキテクチャがオブジェクトストレージのすべてのアーキテクチャを表すものではありません。また、わかりやすくするためかなり簡略化して記載しています。</description>
+      <description>&lt;p&gt;&lt;body&gt;
+&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Amazon%20S3&#34;&gt;Amazon S3&lt;/a&gt;をはじめとして、オブジェクトストレージが身近になってきています。&lt;br&gt;
+各&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9&#34;&gt;クラウド&lt;/a&gt;ベンダーはオブジェクトストレージサービスを提供しています。&lt;/p&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/Welcome.html&#34; target=&#34;_blank&#34;&gt;Amazon S3&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/storage/storage-introduction&#34; target=&#34;_blank&#34;&gt;Azure Blob Storage&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://cloud.google.com/storage/&#34; target=&#34;_blank&#34;&gt;Google Cloud Storage&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://jp.aliyun.com/product/oss&#34; target=&#34;_blank&#34;&gt;Alibaba Cloud OSS&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.ntt.com/business/services/cloud/iaas/cloudn/storage.html&#34; target=&#34;_blank&#34;&gt;Cloud n ObjectStorage&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.idcf.jp/cloud/storage/&#34; target=&#34;_blank&#34;&gt;IDCF オブジェクトストレージ&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;ですが、オブジェクトストレージをストレージの魔法として理解されているケースも多いように感じます。&lt;br&gt;
+原点に振り返ってそもそもオブジェクトストレージとはなんなのか。&lt;br&gt;
+どんな特徴を持っているストレージなのか。&lt;br&gt;
+気になってまとめました。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
     </item>
     
   </channel>

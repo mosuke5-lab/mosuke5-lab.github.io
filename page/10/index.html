@@ -76,57 +76,30 @@
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>やSFTPでの転送モードの話。</p></p>
-
-<p>ついこの前、<a class="keyword" href="http://d.hatena.ne.jp/keyword/WinSCP">WinSCP</a>を利用している人が転送モードを選んでいて、<br>
-「SFTPには転送モードはないと思っていたのに、転送モードを選んでいる！？」<br>
-と疑問に思ったのでその辺りまとめた。</p>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>のバイナリーモードと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モード</h1>
-
-<p>入社しはじめの頃、それまでSFTPしかほとんど使ったことなかったので、<br>
-先輩に「<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>ではバイナリーモードを使って…」と言われて、意味が理解できなかったときがあったのを思い出す。</p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>にはファイル転送モードが２つあって、ちゃんと理解していないと思わぬところで痛い目にあう。</p>
-
-<ul>
-<li>バイナリーモード：ファイルの改行コードを変換せず転送する。</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モード：OS側で異なる改行コードを自動的に修正して転送する。</li>
-</ul>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>では標準では<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モードのため、なにも考えずにファイルを送るとファイルが壊れてしまったりする。<br>
-昔にミスしたのは<a class="keyword" href="http://d.hatena.ne.jp/keyword/Windows">Windows</a>から<a class="keyword" href="http://d.hatena.ne.jp/keyword/Linux">Linux</a>へtar.gzファイルを<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モードで送って、解凍したらファイルが壊れていたが、<br>
-それに気付かず壊れたファイルをサーバへ設置してしまったとか。</p>
-
-<h1>SFTPには転送モードはあるのか？</h1>
-
-<p>SFTPを普段から使ってる人は転送モードなんて気にしたことあまりないと思う。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>では気にしなければいけない転送モード、SFTPでは気にしなくていいのだろうか？</p>
-
-<p>結論から言うと、SFTPには転送モードはないので、気にする必要はない。<br>
-SFTPでは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>でいうバイナリーモードでファイル転送をするようだ。</p>
-
-<p>sftpコマンドのマニュアルにも特に転送モードについては記述がないのがわかる。<br>
-<a href="http://www.unixuser.org/~euske/doc/openssh/jman/sftp.html">http://www.unixuser.org/~euske/doc/openssh/jman/sftp.html</a></p>
-
-<h1>SFTPでも転送モードを選択できる場合がある！？</h1>
-
-<p>ここで、SFTPにも転送モードはあるぞ！？と疑問を思った人もいるかもしれない。<br>
-確かに<a class="keyword" href="http://d.hatena.ne.jp/keyword/WinSCP">WinSCP</a>などファイル転送ソフトを使っていると転送モードを選ぶことができる場合もある。</p>
-
-<p>しかし、勘違いしてはいけないのが、<br>
-転送モードを選ぶことができるのはSFTPの機能ではなくて<b>ファイル転送ソフトの機能</b>であるということだ。</p>
-
-<h1>まとめ</h1>
-
-<p><p>ファイル転送でよく使われる<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>やSFTP。<br>
-それぞれに違いはあるし、それを利用するソフトウェアによっても違いがある。<br>
-何が何を行っているか把握し、思わぬミスを減らしましょう。</p>
-</body></p>
-
+                        FTPやSFTPでの転送モードの話。
+ついこの前、WinSCPを利用している人が転送モードを選んでいて、
+「SFTPには転送モードはないと思っていたのに、転送モードを選んでいる！？」
+と疑問に思ったのでその辺りまとめた。
+ FTPのバイナリーモードとアスキーモード 入社しはじめの頃、それまでSFTPしかほとんど使ったことなかったので、
+先輩に「FTPではバイナリーモードを使って…」と言われて、意味が理解できなかったときがあったのを思い出す。
+FTPにはファイル転送モードが２つあって、ちゃんと理解していないと思わぬところで痛い目にあう。
+ バイナリーモード：ファイルの改行コードを変換せず転送する。  アスキーモード：OS側で異なる改行コードを自動的に修正して転送する。  FTPでは標準ではアスキーモードのため、なにも考えずにファイルを送るとファイルが壊れてしまったりする。
+昔にミスしたのはWindowsからLinuxへtar.gzファイルをアスキーモードで送って、解凍したらファイルが壊れていたが、
+それに気付かず壊れたファイルをサーバへ設置してしまったとか。
+SFTPには転送モードはあるのか？ SFTPを普段から使ってる人は転送モードなんて気にしたことあまりないと思う。
+FTPでは気にしなければいけない転送モード、SFTPでは気にしなくていいのだろうか？
+結論から言うと、SFTPには転送モードはないので、気にする必要はない。
+SFTPでは、FTPでいうバイナリーモードでファイル転送をするようだ。
+sftpコマンドのマニュアルにも特に転送モードについては記述がないのがわかる。
+http://www.unixuser.org/~euske/doc/openssh/jman/sftp.html
+SFTPでも転送モードを選択できる場合がある！？ ここで、SFTPにも転送モードはあるぞ！？と疑問を思った人もいるかもしれない。
+確かにWinSCPなどファイル転送ソフトを使っていると転送モードを選ぶことができる場合もある。
+しかし、勘違いしてはいけないのが、
+転送モードを選ぶことができるのはSFTPの機能ではなくてファイル転送ソフトの機能であるということだ。
+まとめ ファイル転送でよく使われるFTPやSFTP。
+それぞれに違いはあるし、それを利用するソフトウェアによっても違いがある。
+何が何を行っているか把握し、思わぬミスを減らしましょう。
+                        <a href="https://blog.mosuke.tech/entry/2015/02/17/220526/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -151,48 +124,23 @@ SFTPでは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>ローカルフォワードの話。<br>
-前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。<br>
-<a href="https://blog.mosuke.tech/entry/2014/12/31/170545">SSHでローカルポートフォワードを実際に試す - Goldstine研究所</a></p></p>
-
-<h1>1. やりたいこと</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>でしか接続を許可していないサーバへ、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>ローカルフォワーディングを使って接続しようした。<br>
-（直接疎通性がないためにポートフォワーディングする必要があった。）</p>
-
-<h1>2. 行ったこと</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>でしか接続ができないので、ローカル端末のポート5000を接続したいサーバのポート443に飛ばせばおっけーと思って、<br>
-下記のように<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>接続とブラウザから接続を行った。</p>
-
-<pre><code>ssh -L5000:web-host:443 user@ssh-host 
-</code></pre>
-
-<p>※web-host: 今回<a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>で接続したサーバ<br>
-※<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>-host: <a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>接続先サーバ</p>
-
-<p>これでローカルフォワーディングの設定は終わったので、ブラウザから以下に接続するだけで終わりだと思っていた。</p>
-
-<pre><code>http://localhost:5000 
-</code></pre>
-
-<p>が、接続不可…なぜでしょう？</p>
-
-<h1>3. 何が間違いだったか</h1>
-
-<p>正しくは以下で接続をしなければいけない。http<b><span style="color: #ff0000">s</span></b>が必要。</p>
-
-<pre><code>https://localhost:5000 
-</code></pre>
-
-<p>よーく考えればアタリマエのこと。<br>
-URLのはじめの&lt;http(s)&gt;の部分は<b><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB">プロトコル</a></b>で最後の&lt;:5000&gt;の部分は<b>ポート番号</b>。<br>
-<u><b><a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>は443のポートを一般的に使うが、ポート443が<a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>というわけではない。</b></u></p>
-
-<p><p>あたりまえのことだし知っていることなんだけど、見落としがちかもしれない。</p>
-</body></p>
-
+                        SSHローカルフォワードの話。
+前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。
+SSHでローカルポートフォワードを実際に試す - Goldstine研究所
+1. やりたいこと httpsでしか接続を許可していないサーバへ、SSHローカルフォワーディングを使って接続しようした。
+（直接疎通性がないためにポートフォワーディングする必要があった。）
+2. 行ったこと httpsでしか接続ができないので、ローカル端末のポート5000を接続したいサーバのポート443に飛ばせばおっけーと思って、
+下記のようにssh接続とブラウザから接続を行った。
+ssh -L5000:web-host:443 user@ssh-host  ※web-host: 今回httpsで接続したサーバ
+※ssh-host: ssh接続先サーバ
+これでローカルフォワーディングの設定は終わったので、ブラウザから以下に接続するだけで終わりだと思っていた。
+http://localhost:5000  が、接続不可…なぜでしょう？
+3. 何が間違いだったか 正しくは以下で接続をしなければいけない。httpsが必要。
+https://localhost:5000  よーく考えればアタリマエのこと。
+URLのはじめの&lt;http(s)&gt;の部分はプロトコルで最後の&lt;:5000&gt;の部分はポート番号。
+httpsは443のポートを一般的に使うが、ポート443がhttpsというわけではない。
+あたりまえのことだし知っていることなんだけど、見落としがちかもしれない。
+                        <a href="https://blog.mosuke.tech/entry/2015/02/11/172123/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -217,32 +165,14 @@ URLのはじめの&lt;http(s)&gt;の部分は<b><a class="keyword" href="http://
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p>自分がハマったのでメモ。<br>
-リモートのサーバでdocker runを実行し(/bin/<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>)、ローカル側でシェルを操作したかった。</p></p>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>でリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。</p>
-
-<pre><code>ssh user@host 'docker run -t -i image_name /bin/bash' 
-</code></pre>
-
-<p>そうすると</p>
-
-<pre><code>[root@0c6742f02bd9 ~]#
-
-[root@0c6742f02bd9 ~]# ^[[A^[[A^[[C 
-</code></pre>
-
-<p>エンターを押すと2行されるし、矢印キーはキーコードがでてしまう。</p>
-
-<p>これを解消するのには以下のようにすればいい。</p>
-
-<pre><code>ssh -t user@host 'docker run -t -i image_name /bin/bash' 
-</code></pre>
-
-<p><p>-tとはなんなのか、なぜこのような<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a>が起きたのか、これからしっかり調べる。</p>
-</body></p>
-
+                        自分がハマったのでメモ。
+リモートのサーバでdocker runを実行し(/bin/bash)、ローカル側でシェルを操作したかった。
+sshでリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。
+ssh user@host 'docker run -t -i image_name /bin/bash'  そうすると
+[root@0c6742f02bd9 ~]# [root@0c6742f02bd9 ~]# ^[[A^[[A^[[C  エンターを押すと2行されるし、矢印キーはキーコードがでてしまう。
+これを解消するのには以下のようにすればいい。
+ssh -t user@host 'docker run -t -i image_name /bin/bash'  -tとはなんなのか、なぜこのような事象が起きたのか、これからしっかり調べる。
+                        <a href="https://blog.mosuke.tech/entry/2015/02/07/144208/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -267,38 +197,19 @@ URLのはじめの&lt;http(s)&gt;の部分は<b><a class="keyword" href="http://
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p>Ansibleで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>インストールする際とか<br>
-すでにインストールされているかのチェックなどで、<br>
-シェルコマンドを実行してその結果で判断したい時がある。</p></p>
-
-<p>ぼくがよくやる例では以下とか。</p>
-
-<pre><code class="language-yaml">- name: check httpd installed
-  command: which httpd
-  ignore_errors: true
-</code></pre>
-
-<p>なんですが...<br>
-こうやってしまうと、仮に既にインストールされていて、正常なときでも"<b><span style="color: #f9ce1d">changed</span></b>"と表示されてしまう。<br>
-これでは、本当にchangedなものなのか、わからなくなってくる。</p>
-
-<p>これを解決するのに<b>chaged_when</b>を使うといい。</p>
-
-<pre><code class="language-yaml">- name: check httpd installed
-  command: which httpd
-  ignore_errors: true
-  changed_when: false
-</code></pre>
-
-<p>こうするとコマンドが成功した際には"<b><span style="color: #00cc00">ok</span></b>"が表示される。</p>
-
-<p>これで、何も変化がないときにはokとskippingしかでないから、<br>
-誰がみても結果がわかりやすいですね！</p>
-
-<p><p>秘伝のタレ回避！</p>
-</body></p>
-
+                        Ansibleでソースコードインストールする際とか
+すでにインストールされているかのチェックなどで、
+シェルコマンドを実行してその結果で判断したい時がある。
+ぼくがよくやる例では以下とか。
+- name: check httpd installed command: which httpd ignore_errors: true  なんですが...
+こうやってしまうと、仮に既にインストールされていて、正常なときでも"changed"と表示されてしまう。
+これでは、本当にchangedなものなのか、わからなくなってくる。
+これを解決するのにchaged_whenを使うといい。
+- name: check httpd installed command: which httpd ignore_errors: true changed_when: false  こうするとコマンドが成功した際には"ok"が表示される。
+これで、何も変化がないときにはokとskippingしかでないから、
+誰がみても結果がわかりやすいですね！
+秘伝のタレ回避！
+                        <a href="https://blog.mosuke.tech/entry/2015/02/02/201008/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -323,63 +234,20 @@ URLのはじめの&lt;http(s)&gt;の部分は<b><a class="keyword" href="http://
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p>dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、<br>
-特定のユーザでログインした状態のコンテナを作りたいという場面に遭遇した。</p></p>
-
-<h1>&lt;やりたいこと&gt;</h1>
-
-<ul>
-<li>特定のユーザでログインした状態のシェルを提供すること</li>
-<li>その際、ユーザの.<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>_profile（あるいあは.bashrc）を読み込んだ状態であること
-
-<ul>
-<li>.<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>_profileに記載したPATHやaliasを使いたい</li>
-<li>ユーザのログインシェルを利用したい（カスタマイズされたシェルとか）</li>
-</ul>
-</li>
-</ul>
-
-<p>docker runに-uオプションがあるし、これで余裕！と思った。</p>
-
-<pre><code>[host] $ sudo docker run -u=user_name -i -t image_name /bin/bash 
-</code></pre>
-
-<p>しかし…以下を確認してみると…</p>
-
-<pre><code>[docker] $ pwd
-[docker] $ echo $PATH
-[docker] $ alias
- 
-</code></pre>
-
-<p>ディレクトリは "/" だし、PATHも通ってない。<br>
-どうやら.<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>_profileなどは読んでいないようだ。普通にログインした状態とは違う。</p>
-
-<p>dockerで-uでユーザを指定し場合、指定したuserでコマンドを実行するが、<br>
-サーバにユーザでログインしてからコマンドを実行するわけではないらしい。</p>
-
-<p>ディレクトリはどうやら-wオプションで解決できるようだが…</p>
-
-<pre><code>[host] $ sudo docker run -u=user_name -w /home/user_name -i -t image_name /bin/bash 
-</code></pre>
-
-<pre><code>[docker] $ pwd
-/home/user_name 
-</code></pre>
-
-<p>ディレクトリはおっけーだが、<br .>
-当然ながら依然として.<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>_profileはダメ。</p>
-
-<p>そこでふと思いついた。-uも-wもいらない。<br>
-<b>あの手</b>があるではないか…！！</p>
-
-<pre><code>[host] $ sudo docker run -i -t image_name su - username 
-</code></pre>
-
-<p><p>suでスイッチユーザすれば.<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>_profileもホームディレクトリも全部解決だ！！</p>
-</body></p>
-
+                        dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、
+特定のユーザでログインした状態のコンテナを作りたいという場面に遭遇した。
+&lt;やりたいこと&gt;  特定のユーザでログインした状態のシェルを提供すること その際、ユーザの.bash_profile（あるいあは.bashrc）を読み込んだ状態であること  .bash_profileに記載したPATHやaliasを使いたい ユーザのログインシェルを利用したい（カスタマイズされたシェルとか）    docker runに-uオプションがあるし、これで余裕！と思った。
+[host] $ sudo docker run -u=user_name -i -t image_name /bin/bash  しかし…以下を確認してみると…
+[docker] $ pwd [docker] $ echo $PATH [docker] $ alias  ディレクトリは "/" だし、PATHも通ってない。
+どうやら.bash_profileなどは読んでいないようだ。普通にログインした状態とは違う。
+dockerで-uでユーザを指定し場合、指定したuserでコマンドを実行するが、
+サーバにユーザでログインしてからコマンドを実行するわけではないらしい。
+ディレクトリはどうやら-wオプションで解決できるようだが…
+[host] $ sudo docker run -u=user_name -w /home/user_name -i -t image_name /bin/bash  [docker] $ pwd /home/user_name  ディレクトリはおっけーだが、当然ながら依然として.bash_profileはダメ。
+そこでふと思いついた。-uも-wもいらない。
+あの手があるではないか…！！
+[host] $ sudo docker run -i -t image_name su - username  suでスイッチユーザすれば.
+                        <a href="https://blog.mosuke.tech/entry/2015/01/24/213255/">続きを読む</a>
                     </div>
                 </section>
                 

@@ -76,137 +76,26 @@
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p>タイトルちょっとふざけました。  (が、半分本気。最後の方でわかる。)</p></p>
-
-<p><a href="http://tokyo.serverlessconf.io/">ServerlessConf Tokyo</a>に参加してきた。<br>
-今年8月から<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>の事業に異動していて、<br>
-開発者の立場より<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>提供側の立場として参加してきたので、また面白かった。</p>
-
-<p>せっかくなので、自分なりにサーバレスについてまとめる。<br>
-新しいことというよりは、自分の中での整理した感じ。</p>
-
-<h1>1. サーバレスってなんだっけ</h1>
-
-<p>カンファレンスの中でもサーバレスの定義についてはいろいろな意見がでていた。<br>
-Martin Fowlerのブログではサーバレスの定義として下記２つが書いてある。</p>
-
-<ul>
-<li>BaaS (Backend as a Service) : ex) firebase</li>
-<li>FaaS (Function as a Service) : ex) <a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda</li>
-</ul>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fmartinfowler.com%2Farticles%2Fserverless.html" title="Serverless Architectures" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://martinfowler.com/articles/serverless.html">martinfowler.com</a></cite></p>
-
-<p>ですが、ここでは焦点を絞って話すためにもFaaSということにしておく。<br>
-主にFaaSについて話したいのと、BaaSもいれてしまうと<a class="keyword" href="http://d.hatena.ne.jp/keyword/SaaS">SaaS</a>もサーバレスとかややこしいことになるので。</p>
-
-<h2>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda</h2>
-
-<p>なんといってもサーバレスの概念を推し進めたのは<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambdaでしょう。<br>
-説明はいまさら不要だと思うが、少しだけ。</p>
-
-<blockquote><p>コードを <a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda にアップロードすると、サービスが <a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> インフラストラクチャを使用してコードの実行を代行するコンピューティングサービスです。コードをアップロードして、Lambda 関数と呼ばれる関数を作成することで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda がコードを実行するサーバーのプロビジョニングおよび管理を行います。(<a href="https://aws.amazon.com/jp/lambda/details/">https://aws.amazon.com/jp/lambda/details/</a>)</p></blockquote>
-
-<p>課金モデルは関数呼び出した回数、および実行に利用したコンピュートのスペックによって決まる。<br>
-また特徴的なことは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>の他のサービスで発生したイベントをトリガーに実行できること。<br>
-例えば、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Amazon%20S3">Amazon S3</a>にファイルアップロードされたことをトリガーにLambdaを実行できるのだ。</p>
-
-<h2>サーバレスの特徴</h2>
-
-<p>サーバレス自体そしてサーバレスで実装することの特徴しては下記がある。</p>
-
-<ol>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>上のイベントを契機に実行できる</li>
-<li>実行環境は、immutableで時間が立つと消える</li>
-<li>実行環境は独立していて、コードは基本的にstatelessである</li>
-<li>上記のようにimmutableでstatelessな構造につくるからこそスケールしやすい</li>
-</ol>
-
-<h1>2. どんな用途で利用しているか</h1>
-
-<h2>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>基盤のイベントをトリガーとして</h2>
-
-<p>個人的に一番強力だと思っている使い方。上で説明したとおりだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>上のプロダクトに対してのイベントをトリガーに処理を行うことができる。<br>
-例えばこんな場合を想定してみよう。</p>
-
-<p>ユーザが写真をアップロードするサービスで、アップロードした写真にたいして何かしらの画像解析をしてメタ情報を持ちたいとする。<br>
-ざっと従来のやりかただと２つくらいやり方が思い浮かぶ。</p>
-
-<h4>(1) アップロードするたびに<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>で画像解析をする</h4>
-
-<ul>
-<li>解析にほとんど時間がかからない場合などはこれでいいと思う</li>
-<li>時間がかかるようなだとユーザへのレスポンスが遅くなる</li>
-<li>速くしようと思うとスケールアップで対応するしかない（やばい）</li>
-</ul>
-
-<h4>(2) <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>でやる</h4>
-
-<ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>で画像解析はまとめてやる。一番よくあるのでは？</li>
-<li>例えば５分に一度の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>で、５分間にたまった写真にたいしてまとめて処理する</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>でまとめて処理した場合、どこかでコケたときが辛い</li>
-<li>この例ならそうでもないが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>ではたいていスケールアウトが辛い</li>
-</ul>
-
-<p>このケースに対してLambdaであればどうなるか。<br>
-1000件のアップロードに対して、1000回のLambda実行によって対応できる。<br>
-これは何万件きても同じことで、スケールの面で大変優れている。<br>
-また、1件ごとに処理するため、エラーが発生した場合に原因などとても追いやすい。</p>
-
-<h2>アプリの<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>として</h2>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>でいうと、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/Gateway">Gateway</a>と組み合わせて、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>サーバとして利用するケース。<br>
-S3などのデータストアに直接アクセスできるように作ることもできるため、ファイルアップロードなどで使われることが多いとか。<br>
-個人的には今のところあまり魅力的には感じない使い方。</p>
-
-<h2>事例紹介</h2>
-
-<p>カンファレンスのなかで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%FC%B7%D0%BF%B7%CA%B9">日経新聞</a>社さんののサーバレス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>の事例が一番よかったのでぜひ目を通しほしい。</p>
-
-<p><iframe allowfullscreen="true" allowtransparency="true" frameborder="0" height="463" id="talk_frame_361815" mozallowfullscreen="true" src="//speakerdeck.com/player/b4286c46056c404cbd272e253033d0df" style="border:0; padding:0; margin:0; background:transparent;" webkitallowfullscreen="true" width="710"></iframe><cite class="hatena-citation"><a href="https://speakerdeck.com/ikait/serverless-architecture-supports-nikkeis-paper-viewer">speakerdeck.com</a></cite></p>
-
-<p>ポイントとしては下記。見事にLambdaの特徴を活かした利用をしている。</p>
-
-<ul>
-<li>新聞は基本的には朝刊と夕刊の２回で限られたときだけ処理する点
-
-<ul>
-<li>常時稼働させたくない。EC2立ち上げっぱなしにする必要がない。</li>
-</ul>
-</li>
-<li>しかし、号外や速報など臨時の場合もただあり、それにも備えられる点</li>
-<li>日によってニュースの量が異なるため、いつでもスケールできる必要がある点</li>
-</ul>
-
-<h1>3. <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ベンダーからみたサーバレスの立ち位置</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ベンダーにとってサーバレスはどういう立ち位置なのだろうか。<br>
-ぼくは<span style="font-size: 150%">「各サービスの横串」</span>と考えています。<br>
-EC2、S3、RDSなどなどそれぞれのサービスは単体としてとてもよくできている。<br>
-しかし横の連携をしようと思うと別途様々な工夫が必要なのが現状だ。</p>
-
-<p>サーバレスはその横の連携を担うのだ。<br>
-各サービス間を紐で固く結びつけてしまう。<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ロックインを加速させる役割も持つ。</p>
-
-<p><b>「三葉よ、サーバレス、それもまた結び。」</b></p>
-
-<p>そして、IoTへの布石。<br>
-IoTの世界ではリアルタイムなセンサーの情報のやりとりでデ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4">バイ</a>スとデータセンタ間の通信遅延が許容できないことがある。<br>
-そこでいま研究が進んでいるエッジコンピューティング（フォグコンピューティングとも）などがあるが、<br>
-LambdaのようにImmutable, Statelessが前提で作られる、どこの環境でも実行可能な状態はIoTと相性がいいようにみえる。</p>
-
-<p><p>今後どうなっていくかはわからないが、<br>
-デ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4">バイ</a>スに近いエッジコンピューティング側はLambdaでさばき、そのさばいたデータを中央のデータセンターへ、<br>
-なんていうことが主流になってくるかもしれない。と思うとFaaSの存在は見逃せない気がしてくる。</p>
-</body></p>
-
+                        タイトルちょっとふざけました。 (が、半分本気。最後の方でわかる。)
+ServerlessConf Tokyoに参加してきた。
+今年8月からパブリッククラウドの事業に異動していて、
+開発者の立場よりクラウド提供側の立場として参加してきたので、また面白かった。
+せっかくなので、自分なりにサーバレスについてまとめる。
+新しいことというよりは、自分の中での整理した感じ。
+1. サーバレスってなんだっけ カンファレンスの中でもサーバレスの定義についてはいろいろな意見がでていた。
+Martin Fowlerのブログではサーバレスの定義として下記２つが書いてある。
+ BaaS (Backend as a Service) : ex) firebase FaaS (Function as a Service) : ex) AWS Lambda  martinfowler.com
+ですが、ここでは焦点を絞って話すためにもFaaSということにしておく。
+主にFaaSについて話したいのと、BaaSもいれてしまうとSaaSもサーバレスとかややこしいことになるので。
+ AWS Lambda なんといってもサーバレスの概念を推し進めたのはAWS Lambdaでしょう。
+説明はいまさら不要だと思うが、少しだけ。
+コードを AWS Lambda にアップロードすると、サービスが AWS インフラストラクチャを使用してコードの実行を代行するコンピューティングサービスです。コードをアップロードして、Lambda 関数と呼ばれる関数を作成することで、AWS Lambda がコードを実行するサーバーのプロビジョニングおよび管理を行います。(https://aws.amazon.com/jp/lambda/details/)
+ 課金モデルは関数呼び出した回数、および実行に利用したコンピュートのスペックによって決まる。
+また特徴的なことは、AWSの他のサービスで発生したイベントをトリガーに実行できること。
+例えば、Amazon S3にファイルアップロードされたことをトリガーにLambdaを実行できるのだ。
+サーバレスの特徴 サーバレス自体そしてサーバレスで実装することの特徴しては下記がある。
+  クラウド上のイベントを契機に実行できる 実行環境は、immutableで時間が立つと消える 実行環境は独立していて、コードは基本的にstatelessである 上記のようにimmutableでstatelessな構造につくるからこそスケールしやすい  2. どんな用途で利用しているか  クラウド基盤のイベントをトリガーとして 個人的に一番強力だと思っている使い方。上で説明したとおりだが、クラウド上のプロダクトに対してのイベントをトリガーに処理を行うことができる。
+                        <a href="https://blog.mosuke.tech/entry/2016/10/02/212420/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -231,163 +120,23 @@ LambdaのようにImmutable, Statelessが前提で作られる、どこの環境
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p><span style="font-size: 80%"><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apple">Apple</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/keynote">keynote</a>で話題の&rsquo;<a class="keyword" href="http://d.hatena.ne.jp/keyword/Courage">Courage</a>&lsquo;使ってみた笑</span></p></p>
-
-<p>ISUCON6予選で惨敗した。(18000点くらい)<br>
-端的に言って、とても未熟だった。</p>
-
-<p>とはいえ、とてもいい思い出になったのでまとめる。</p>
-
-<h1>メンバー</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%EA%A1%BC%A5%A8%A5%E0">スリーエム</a>というチーム名で、@mogulla3と@mintsu123と一緒に出場した。<br>
-ふたりともぼくよりもアプリの改善などは10倍くらい優秀なエンジニアなので、<br>
-ぼくはインフラとか総務的な立ち回りをして、２人がチューニングに集中できるようにすることを心がけていた。</p>
-
-<h1>準備</h1>
-
-<p>準備は３週間の間に土日どちらかに集まってISUCONの過去問を解いたり戦略について事前に打ち合わせしてた。</p>
-
-<ul>
-<li>プライベートレポジトリの用意(Gitlab)</li>
-<li>チャットルームの用意(Slack)</li>
-<li>ISUCON4とISUCON5の予選の過去問解き
-
-<ul>
-<li>土日集まったときには戦略や振り返りを重視</li>
-<li>実際の過去問ときは平日に各々が空いた時間などにやってた</li>
-</ul>
-</li>
-<li>基本戦略を準備
-
-<ul>
-<li>なんの技術を主に使うか</li>
-<li>だれが何を担当するか</li>
-<li>定形作業の手順化</li>
-<li>その他ナレッジなど</li>
-</ul>
-</li>
-</ul>
-
-<h3>採用した技術</h3>
-
-<ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a> 7.0</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>-fpm</li>
-<li>Openresty(nginx) 1.11</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a> 5.7</li>
-<li>Redis 3.2</li>
-</ul>
-
-<h1>当日</h1>
-
-<p>出だしはとても順調だった。<br>
-Azure担当だったぼくはすぐにサーバをデプロイし、OSバージョンを確認した。<br>
-予想通りの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a> 16.04であったので、準備したとおり必要な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DF%A5%C9%A5%EB%A5%A6%A5%A7%A5%A2">ミドルウェア</a>のインストールをすませた。</p>
-
-<p>ほぼ定石と言える下記（定形作業と呼んでいた）もすぐにこなすことができた。</p>
-
-<ul>
-<li>調査のための各種ログ出力化</li>
-<li>Nginxでの静的ファイルの配信、キャッシュ化</li>
-<li>Kataribeインストールと実行</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>のインデックスの付与と設定見直し</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>-fpmの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unix">Unix</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>ソケット化</li>
-<li>デプロイの仕組みの整理</li>
-<li>不要デーモンの停止</li>
-</ul>
-
-<p>この状態でもスコアは0のままであり、少し焦りを感じたが、<br>
-ここからが本番のチューニング開始である。<br>
-Kataribeの結果から、<code>GET /</code>が改善ポイントであることは明らかなのはわかっていた。</p>
-
-<pre><code>Top 20 Sort By Count
-Count    Total      Mean    Stddev     Min   P50.0   P90.0   P95.0   P99.0     Max  2xx  3xx  4xx  5xx  Request
-  326  366.105  1.123021  2.619395   0.000   0.000   6.188   7.418   9.827  10.207  326    0    0    0  GET / HTTP/1.0
-  326  366.154  1.123172  2.618228   0.000   0.001   6.190   7.418   9.778  10.207  326    0    0    0  GET / HTTP/1.1
-  240    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  240    0    0    0  GET /css/bootstrap.min.css HTTP/1.0
-  240    0.737  0.003071  0.002843   0.000   0.002   0.006   0.010   0.013   0.015  240    0    0    0  GET /css/bootstrap.min.css HTTP/1.1
-  120    0.101  0.000842  0.002078   0.000   0.000   0.002   0.003   0.015   0.015  120    0    0    0  GET /img/star.gif HTTP/1.1
-  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /js/jquery.min.js HTTP/1.0
-  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /img/star.gif HTTP/1.0
-  120    0.152  0.001267  0.001788   0.000   0.001   0.003   0.004   0.011   0.012  120    0    0    0  GET /css/bootstrap-responsive.min.css HTTP/1.1
-  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /js/bootstrap.min.js HTTP/1.0
-  120    0.148  0.001233  0.001843   0.000   0.001   0.003   0.004   0.011   0.012  120    0    0    0  GET /favicon.ico HTTP/1.1
-  120    0.157  0.001308  0.001829   0.000   0.001   0.003   0.004   0.011   0.011  120    0    0    0  GET /js/bootstrap.min.js HTTP/1.1
-  120    0.379  0.003158  0.002890   0.000   0.002   0.007   0.010   0.013   0.015  120    0    0    0  GET /js/jquery.min.js HTTP/1.1
-  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /favicon.ico HTTP/1.0
-  120    0.000  0.000000  0.000000   0.000   0.000   0.000   0.000   0.000   0.000  120    0    0    0  GET /css/bootstrap-responsive.min.css HTTP/1.0
-   67  116.697  1.741746  1.159447   0.020   1.760   2.999   3.000   3.001   3.001    0   42   25    0  POST /login HTTP/1.0
-   67  116.706  1.741881  1.159099   0.020   1.760   2.999   2.999   3.001   3.001    0   42   25    0  POST /login HTTP/1.1
-   35    0.857  0.024486  0.022147   0.000   0.026   0.040   0.085   0.096   0.096   35    0    0    0  GET /stars?keyword=%E5%86%85%E7%94%B0%E4%BF%AE%E5%B9%B3 HTTP/1.1
-   35    0.977  0.027914  0.020538   0.000   0.031   0.049   0.062   0.077   0.077   35    0    0    0  GET /stars?keyword=%E3%82%A6%E3%83%BC%E3%82%BA HTTP/1.1
-   34    0.867  0.025500  0.018035   0.000   0.028   0.044   0.059   0.071   0.071   34    0    0    0  GET /stars?keyword=%E5%8C%97%E6%B6%88%E9%98%B2%E7%BD%B2 HTTP/1.1
-   32    0.731  0.022844  0.015575   0.000   0.025   0.040   0.050   0.052   0.052   32    0    0    0  GET /stars?keyword=%E8%BC%AA%E7%8A%B6%E7%94%B2%E7%8A%B6%E7%AD%8B HTTP/1.1 
-</code></pre>
-
-<p>しかし、なかなか突破口が見いだせず、できるところからやっていく方針を取った。<br>
-アプリの改善を振り返ってみると、なにもしてねーなって感じがやばい。（何してたんだっけ…(・_・;)）</p>
-
-<ul>
-<li>isudaとisutarのfpmプロセスの調整</li>
-<li>isudaとisutar間のhttpによる<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>呼び出しをなくし、DB接続とした</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>改善
-
-<ul>
-<li>htmlifyのkeyword取り出し<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>
-</li>
-<li>load_starの<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>
-</li>
-<li>など</li>
-</ul>
-</li>
-<li>keywordのlengthを予め持つように変更</li>
-<li>isudaとisutarの統合
-
-<ul>
-<li>効果の検証ができず、結局マージはできなかった</li>
-</ul>
-</li>
-</ul>
-
-<h1>反省</h1>
-
-<p><code>htmlify</code>の改善がなによりも効果がでることはわかっていた。<br>
-しかし、その改善についてのいい方法がすぐに思いつかなかったこともあり、<br>
-他のやれることを優先しすぎてしまったことが一番の反省点だ。</p>
-
-<p>時間がない、大きな変更したら怖いという思いが強くなり、<br>
-どちらかというとやれることをきちんとやればいける、というディフェンシブな思考になってしまっていた気がする。</p>
-
-<p>せっかくRedisやOpenrestyを準備していたが、<br>
-そのあたりを発揮せずにおわってしまい残念な感じではあった。<br>
-（ここは準備不足ポイントでもあった）</p>
-
-<p>根本の改善に勇気を持って切り込む"<a class="keyword" href="http://d.hatena.ne.jp/keyword/Courage">Courage</a>"を次は発揮したい。</p>
-
-<p>反省会の炙りしめ鯖うまかった。</p>
-
-<p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Ftabelog.com%2Ftokyo%2FA1303%2FA130301%2F13003370%2F" title="BISTRO三十五段屋 (渋谷/居酒屋)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://tabelog.com/tokyo/A1303/A130301/13003370/">tabelog.com</a></cite></p>
-
-<h1>最後に</h1>
-
-<p>反省点は多かったものの、準備期間も含めてこの１ヶ月とても楽しかったし、<br>
-また自分の未熟さを実感できてとてもよかった。</p>
-
-<p>今まで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B6%A5%B5%BB%A5%D7%A5%ED%A5%B0%A5%E9%A5%DF%A5%F3%A5%B0">競技プログラミング</a>などもしたこともなく、<br>
-技術面で「競う」ということはほとんどしたことがなかった。</p>
-
-<p><p>この敗北で、技術をきちんと理解し追求していきたいという想いが湧いてきた。<br>
-ISUCON主催者ありがとうございました。</p>
-</body></p>
-
+                        Appleのkeynoteで話題の&rsquo;Courage&lsquo;使ってみた笑
+ISUCON6予選で惨敗した。(18000点くらい)
+端的に言って、とても未熟だった。
+とはいえ、とてもいい思い出になったのでまとめる。
+メンバー スリーエムというチーム名で、@mogulla3と@mintsu123と一緒に出場した。
+ふたりともぼくよりもアプリの改善などは10倍くらい優秀なエンジニアなので、
+ぼくはインフラとか総務的な立ち回りをして、２人がチューニングに集中できるようにすることを心がけていた。
+準備 準備は３週間の間に土日どちらかに集まってISUCONの過去問を解いたり戦略について事前に打ち合わせしてた。
+ プライベートレポジトリの用意(Gitlab) チャットルームの用意(Slack) ISUCON4とISUCON5の予選の過去問解き  土日集まったときには戦略や振り返りを重視 実際の過去問ときは平日に各々が空いた時間などにやってた   基本戦略を準備  なんの技術を主に使うか だれが何を担当するか 定形作業の手順化 その他ナレッジなど    採用した技術   PHP 7.0  php-fpm Openresty(nginx) 1.11  MySQL 5.7 Redis 3.2  当日 出だしはとても順調だった。
+Azure担当だったぼくはすぐにサーバをデプロイし、OSバージョンを確認した。
+予想通りのUbuntu 16.04であったので、準備したとおり必要なミドルウェアのインストールをすませた。
+ほぼ定石と言える下記（定形作業と呼んでいた）もすぐにこなすことができた。
+ 調査のための各種ログ出力化 Nginxでの静的ファイルの配信、キャッシュ化 Kataribeインストールと実行  MySQLのインデックスの付与と設定見直し  php-fpmのUnixドメインソケット化 デプロイの仕組みの整理 不要デーモンの停止  この状態でもスコアは0のままであり、少し焦りを感じたが、
+ここからが本番のチューニング開始である。
+Kataribeの結果から、GET /が改善ポイントであることは明らかなのはわかっていた。
+Top 20 Sort By Count Count Total Mean Stddev Min P50.
+                        <a href="https://blog.mosuke.tech/entry/2016/09/19/172009/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -412,215 +161,50 @@ ISUCON主催者ありがとうございました。</p>
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p>本日、2016年7月29日をもって、新卒から３年４ヶ月働いてきた部署が最後となり、8月1日から異動（出向）する。<br>
-社内転職制度を使って、自らの希望で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>事業の会社へジョインすることになった。<br>
-（新規事業を行う部署へ異動となり、そこから別会社へ出向という扱い）<br>
-グループ内の異動ではあるが、違う会社・事業で、職種も変わるので、今の部署でやってきたことをまとめて残しておこうと思う。</p></p>
-
-<p>私は通信会社のネットワーク運用部隊に所属している（いた）。<br>
-ネットワーク運用部隊なのだが、私の部署はネットワーク運用を自動化したり運用を楽にするための<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%B9%A5%C6%A5%E0%B3%AB%C8%AF">システム開発</a>を担うところで、下記のような仕事をしてきた。</p>
-
-<h1>1. ベンダーコントロールという仕事</h1>
-
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%B9%A5%C6%A5%E0%B3%AB%C8%AF">システム開発</a>にはうちでは外注物も内製物（後述）もある。<br>
-業務の都合上、システムの種類によってはSIベンダーへ発注をして作ることがあった。<br>
-ベンダーコン<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%ED%A1%BC%A5%EB">トロール</a>なんて言ったりするが、発注での<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%B9%A5%C6%A5%E0%B3%AB%C8%AF">システム開発</a>の業務では下記のようなことをしてきた。</p>
-
-<ul>
-<li>要求仕様の検討</li>
-<li>見積もり依頼と価格交渉</li>
-<li>発注、スケジュール調整</li>
-<li>社内での業務調整</li>
-<li>受入試験、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B8%A1%BC%FD">検収</a>
-</li>
-<li>運用</li>
-</ul>
-
-<p>仕事のほとんどは、社内外の人との調整（コミュニケーション）だ。<br>
-エンジニアとしては一見つまらなそうな仕事にみえるかもしれない。<br>
-しかし、この仕事から様々なコミュニケーションを学び、それはいろんな場面で役に立っている。<br>
-例えばだが、以下の様なコミュニケーションがあったりした。</p>
-
-<ul>
-<li>要求を他者にしっかり、わかりやすく伝える</li>
-<li>仕様や価格についての折衝をする</li>
-<li>システムの利用部門との業務調整をする</li>
-<li>作業の手順について精査し指摘する</li>
-<li>ミスなど良くないことが起きた際には、今後の対策はどうするか相手側に考えさせるよう導く</li>
-<li>場合によっては厳しく叱ることもする（感情的に怒るわけではない）</li>
-</ul>
-
-<p>特に価格の折衝などは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SIer">SIer</a>や購買部と激しく激突することもあり今でもとても印象に残っている。<br>
-こういった業務はビジネスマンとしてとても大事なことを学んだと思うし、内製での開発業務でもとても活きてきている。</p>
-
-<h4>外注はいいけど・・・</h4>
-
-<p>社内リソースが少なくても同時並行でいろんなシステムの開発ができるし外注はいい。<br>
-一方で外注開発について、もどかしさや非効率さなどもたくさん経験してきた。</p>
-
-<p>まず、なにをやるにもお金と時間がかかることだ。<br>
-一度納品されてしまったものについて、なんらかの改修をしたい場合、<br>
-その改修規模を問わず、見積もり→発注→開発・改修→納品のプロセスを通さなければならない。<br>
-if文を１行追加するだけだろ…って思うようなものでも数百万で数週間かかることだってあった。</p>
-
-<p>そして、プロセスの効率化が難しいことだ。<br>
-ベンダーが開発したシステムをリリースするには、発注側の会社に度々きてリリース作業を行う。<br>
-勝手に発注側のシステムをアップデートすることはありえないので、必ずリリース作業には社員が立ち会わなければいけない。<br>
-そのとき、リリース作業が自動化されていないことも多く（発注時の要求によってもちろん異なる）、<br>
-何時間もかけて数十台のサーバにデプロイしたりしなければいけなかったりするので大変だ。</p>
-
-<p>これは当たり前だがとても効率が悪いし時間の無駄だ。<br>
-だがこれを改善しようと思うとまたお金がかかるわけである。<br>
-扱っているシステムが、業務システムなのでアップデートの頻度がおおくないこともあるので、<br>
-はじめからデプロイの自動化などを要件にいれることは少ないのである。</p>
-
-<p>これらはSIの開発をディスっているわけではない。（要求も悪いのはわかる。）<br>
-これは仕方ないこととして、そのメリット・デメリットをきちんと理解した上で選択、要求をしなれけばいけないということだ。</p>
-
-<h1>2. 内製開発の仕事</h1>
-
-<p>外注開発とは別にシステムの内製での開発業務も多くおこなってきた。<br>
-社内的には外注開発から内製開発に徐々に切り替えの最中であった。<br>
-ちなみに開発言語は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>（<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>やPadrino）や<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>（<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>）なんか使っていた。</p>
-
-<p>業務システムの他にもメールサーバやリバースプロキシサーバなど基盤システムも構築してきた。<br>
-2015年の振り返りブログに雑だが少し書いていた。</p>
-<a href="/entry/2015/12/28/150042/">2015年振り返り - Goldstine研究所</a>
-
-<h4>開発組織の改善活動</h4>
-
-<p>また、開発組織を改善するための活動をおおく行ってきた。<br>
-どこの組織でもある問題だと思うが、うちもまた「属人化」「秘伝のタレ」などといった類の悩みをたくさん抱えていた。</p>
-
-<p>うちはソフトウェア企業ではないし、システムを外注で作る部署も多い。<br>
-そのため、新卒や異動してくる人などがソフトウェアエンジニア思考の人ばかりではない。というかむしろ少数派。<br>
-だからこそ、よりいっそう「属人化」「秘伝のタレ」が弊害となる。<br>
-わかりやすいところでいうと下記のようなことをやったりして開発組織の改善をしてきた。</p>
-
-<ul>
-<li>gitlabを使った<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>-flowの導入。レビュー必須化</li>
-<li>Ansibleを使ったインフラ環境のコード化、構築自動化</li>
-<li>またそういったツールの導入だけでなく講師としてワークショップの実施やサポート活動</li>
-<li>部署内の開発ルールの策定</li>
-<li>最低限身につけてほしいスキルや知識を習得できる環境や研修の準備</li>
-</ul>
-
-<p>ツールの導入や普及、組織改善活動について次の２つがとても重要だったと思う。</p>
-
-<ol>
-<li>キーパーソンを見方につける。</li>
-<li>ハンズオンを行う。サポートを手厚くする。</li>
-</ol>
-
-<p>どんなにいい試みをやっても、独断で行ってしまうと「勝手にやったことだよね？」ってやっぱり思われてしまう。<br>
-また、その試みを広めるのに苦労する。<br>
-試みに対して理解してくれる上の人、キーパーソンを見方につけて働くことがとても有効的だった。</p>
-
-<p>そして、ツール類はとくにそうだが、紹介したりするだけじゃなくて、<br>
-ハンズオン会をやったりサポートをし「軌道にのせる」ところまでやったのがとてもよかった。<br>
-サポートがないと、気が付くと昔のやりかたにもどってしまっていた、なんてこともあった。</p>
-
-<h1>3. データセンター、ネットワークの仕事</h1>
-
-<h4>データセンター系</h4>
-
-<p>サーバ環境はオンプレだった。<br>
-また、専任のサーバ・インフラ管理者がいるわけではなかったので、<br>
-データセンターへのサー<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%E9%A5%C3%A5%AF">バラック</a>の立架工事やサーバ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E9%A5%C3%A5%AD%A5%F3%A5%B0">ラッキング</a>、配線などそういったことも業務の１つだった。<br>
-データセンタ系業務とそれで身につけたことなどは下記。</p>
-
-<ul>
-<li>データセンターへのサー<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%E9%A5%C3%A5%AF">バラック</a>の立架工事やサーバ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E9%A5%C3%A5%AD%A5%F3%A5%B0">ラッキング</a>、配線をやった
-
-<ul>
-<li>ラックの立架工事や電源工事は当たり前だが外注</li>
-<li>工事の監督はさんざんやった</li>
-<li>サーバの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E9%A5%C3%A5%AD%A5%F3%A5%B0">ラッキング</a>やLANケーブルの敷設は自前でもたくさんやった</li>
-<li>LANケーブル作るのはだいぶこなれた</li>
-<li>でもやっぱりプロの配線は神</li>
-</ul>
-</li>
-<li>安全に工事するための知恵をたくさん身につけた</li>
-<li>電源工事などに備え、電気的な知識を身につけた</li>
-<li>openstack（<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%E9%A5%A4%A5%D9%A1%BC%A5%C8%A5%AF%A5%E9%A5%A6%A5%C9">プライベートクラウド</a>）の検証などもした</li>
-</ul>
-
-<h4>ネットワーク系</h4>
-
-<p>バックボーンのネットワークは範囲外ではあるが、<br>
-システム内のネットワーク設計・構築・運用は自分たちの仕事だった。</p>
-
-<p>そういう組織体系が業務的によかったかどうかはわからないけど、<br>
-現代では特に触れる機会が少ないネットワークについて理解を深められたのはとてもプラスになっている。<br>
-下記あたりは自前でやってきた。</p>
-
-<ul>
-<li>システム内のネットワークの設計</li>
-<li>L2スイッチ、L3スイッチの設定
-
-<ul>
-<li>VLANとかNAT、<a class="keyword" href="http://d.hatena.ne.jp/keyword/ACL">ACL</a>とか</li>
-</ul>
-</li>
-<li>NW機器が故障した際の交換とか設定投入</li>
-</ul>
-
-<p>ネットワークは専門ではないけれど、オンプレでやっているとネットワーク系の仕事をやることや、<br>
-他部署とネットワークの話をしなければいけないことが多い。<br>
-ネットワークの知識は仮想サーバを構築するときなどにも役に立つし、ソフトウェア開発でも何かと役に立っている。<br>
-ちょうど最近、システムが調子悪い原因が<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B8%F7%A5%D5%A5%A1%A5%A4%A5%D0">光ファイバ</a>ーの不良ということを発見できてとてもスッキリした。</p>
-
-<h1>4. その他</h1>
-
-<p>その他にあったことを雑にまとめる</p>
-
-<ul>
-<li>たくさん出張にいった
-
-<ul>
-<li>大阪、北陸、名古屋、広島、四国など</li>
-</ul>
-</li>
-<li>社内での業務改善コンテストで賞をとった</li>
-<li>新卒の面倒をみたりした</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BF%A1%BC%A5%F3">インターン</a>生も毎年きて面倒をみた</li>
-<li>採用リクルータをやって就活生とたくさん出会った</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%EA%A5%AA%A5%AB%A1%BC%A5%C8">マリオカート</a>大会企画した</li>
-<li>勤務地が変更になったりした</li>
-</ul>
-
-<h1>最後に</h1>
-
-<p>ほんとうに多岐にわたる仕事をさせてもらい、視野が広がった３年間だった。<br>
-アプリケーション開発しか知らなかった学生時代を振り返ると驚くほどの成長をしたと思う。</p>
-
-<p>部署や上司、メンバーへ、本当に感謝です（＾人＾）</p>
-
-<p>次は、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>の会社に行く。<br>
-（<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>を構築し運用するところなので、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>や<a class="keyword" href="http://d.hatena.ne.jp/keyword/GCP">GCP</a>が敵…）</p>
-
-<p>会社ではオンプレを使っていたし、また<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%E9%A5%A4%A5%D9%A1%BC%A5%C8%A5%AF%A5%E9%A5%A6%A5%C9">プライベートクラウド</a>の構築の検証にも携わった。<br>
-規模感や組織構造によるのはわかっているが、どうもシステムを維持することにばかり時間を費やし、本来やるべき<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%B9%A5%C6%A5%E0%B3%AB%C8%AF">システム開発</a>による問題解決になかなかいたらなかった感じはあった。<br>
-一方、趣味開発では<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>やHerokuなどの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>を使っていたので、本来やるべき問題解決に集中できることの価値を感じていた。<br>
-そういった経験から、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>をもっと多くの人が活用して<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%B9%A5%C6%A5%E0%B3%AB%C8%AF">システム開発</a>の本質により注力できるように、と思うようになった。</p>
-
-<p>最後に…<br>
-この３年間で社内の仕事の質がかわった瞬間を目の当たりにした。<br>
-外注も内製もやってきたと書いたが、はじめは外注が多かったが徐々に内製開発の比率が増えてきた。<br>
-それに伴って、社員が行う仕事の質や求められるスキルが変化していったのを感じた。<br>
-きっと、次の３年間もなんらかで変化が起こるはずで、振り落とされないよう頑張りたい。</p>
-
-<p><span style="font-size: 80%">※次のところ英語話さなきゃいけなくてほんとにヤ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4">バイ</a>・・・</span></p>
-
-<p>とてもながめのいいオフィスでした。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><a href="http://f.hatena.ne.jp/mosuke5/20160729160810" class="hatena-fotolife" itemprop="url"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160729/20160729160810.jpg" alt="f:id:mosuke5:20160729160810j:image" title="f:id:mosuke5:20160729160810j:image" class="hatena-fotolife" itemprop="image"></a></span></p>
-
-<p><p><span itemscope itemtype="http://schema.org/Photograph"><a href="http://f.hatena.ne.jp/mosuke5/20160729160817" class="hatena-fotolife" itemprop="url"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160729/20160729160817.jpg" alt="f:id:mosuke5:20160729160817j:image" title="f:id:mosuke5:20160729160817j:image" class="hatena-fotolife" itemprop="image"></a></span></p>
-</body></p>
-
+                        本日、2016年7月29日をもって、新卒から３年４ヶ月働いてきた部署が最後となり、8月1日から異動（出向）する。
+社内転職制度を使って、自らの希望でパブリッククラウド事業の会社へジョインすることになった。
+（新規事業を行う部署へ異動となり、そこから別会社へ出向という扱い）
+グループ内の異動ではあるが、違う会社・事業で、職種も変わるので、今の部署でやってきたことをまとめて残しておこうと思う。
+私は通信会社のネットワーク運用部隊に所属している（いた）。
+ネットワーク運用部隊なのだが、私の部署はネットワーク運用を自動化したり運用を楽にするためのシステム開発を担うところで、下記のような仕事をしてきた。
+1. ベンダーコントロールという仕事 システム開発にはうちでは外注物も内製物（後述）もある。
+業務の都合上、システムの種類によってはSIベンダーへ発注をして作ることがあった。
+ベンダーコントロールなんて言ったりするが、発注でのシステム開発の業務では下記のようなことをしてきた。
+ 要求仕様の検討 見積もり依頼と価格交渉 発注、スケジュール調整 社内での業務調整 受入試験、検収  運用  仕事のほとんどは、社内外の人との調整（コミュニケーション）だ。
+エンジニアとしては一見つまらなそうな仕事にみえるかもしれない。
+しかし、この仕事から様々なコミュニケーションを学び、それはいろんな場面で役に立っている。
+例えばだが、以下の様なコミュニケーションがあったりした。
+ 要求を他者にしっかり、わかりやすく伝える 仕様や価格についての折衝をする システムの利用部門との業務調整をする 作業の手順について精査し指摘する ミスなど良くないことが起きた際には、今後の対策はどうするか相手側に考えさせるよう導く 場合によっては厳しく叱ることもする（感情的に怒るわけではない）  特に価格の折衝などは、SIerや購買部と激しく激突することもあり今でもとても印象に残っている。
+こういった業務はビジネスマンとしてとても大事なことを学んだと思うし、内製での開発業務でもとても活きてきている。
+外注はいいけど・・・ 社内リソースが少なくても同時並行でいろんなシステムの開発ができるし外注はいい。
+一方で外注開発について、もどかしさや非効率さなどもたくさん経験してきた。
+まず、なにをやるにもお金と時間がかかることだ。
+一度納品されてしまったものについて、なんらかの改修をしたい場合、
+その改修規模を問わず、見積もり→発注→開発・改修→納品のプロセスを通さなければならない。
+if文を１行追加するだけだろ…って思うようなものでも数百万で数週間かかることだってあった。
+そして、プロセスの効率化が難しいことだ。
+ベンダーが開発したシステムをリリースするには、発注側の会社に度々きてリリース作業を行う。
+勝手に発注側のシステムをアップデートすることはありえないので、必ずリリース作業には社員が立ち会わなければいけない。
+そのとき、リリース作業が自動化されていないことも多く（発注時の要求によってもちろん異なる）、
+何時間もかけて数十台のサーバにデプロイしたりしなければいけなかったりするので大変だ。
+これは当たり前だがとても効率が悪いし時間の無駄だ。
+だがこれを改善しようと思うとまたお金がかかるわけである。
+扱っているシステムが、業務システムなのでアップデートの頻度がおおくないこともあるので、
+はじめからデプロイの自動化などを要件にいれることは少ないのである。
+これらはSIの開発をディスっているわけではない。（要求も悪いのはわかる。）
+これは仕方ないこととして、そのメリット・デメリットをきちんと理解した上で選択、要求をしなれけばいけないということだ。
+2. 内製開発の仕事 外注開発とは別にシステムの内製での開発業務も多くおこなってきた。
+社内的には外注開発から内製開発に徐々に切り替えの最中であった。
+ちなみに開発言語はRuby（RailsやPadrino）やPHP（FuelPHP）なんか使っていた。
+業務システムの他にもメールサーバやリバースプロキシサーバなど基盤システムも構築してきた。
+2015年の振り返りブログに雑だが少し書いていた。
+2015年振り返り - Goldstine研究所 開発組織の改善活動 また、開発組織を改善するための活動をおおく行ってきた。
+どこの組織でもある問題だと思うが、うちもまた「属人化」「秘伝のタレ」などといった類の悩みをたくさん抱えていた。
+うちはソフトウェア企業ではないし、システムを外注で作る部署も多い。
+そのため、新卒や異動してくる人などがソフトウェアエンジニア思考の人ばかりではない。というかむしろ少数派。
+だからこそ、よりいっそう「属人化」「秘伝のタレ」が弊害となる。
+わかりやすいところでいうと下記のようなことをやったりして開発組織の改善をしてきた。
+                        <a href="https://blog.mosuke.tech/entry/2016/07/29/180000/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -645,92 +229,27 @@ if文を１行追加するだけだろ…って思うようなものでも数百
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p>ただのめも。</p></p>
-
-<p>もともと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>+<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>で動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになった。（理由はここではどうでもいいので書かない）<br>
-つまり、Nginx-&gt;<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>-&gt;<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>という構成になった。<br>
-よくあることだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>からみるとすべてリバースプロキシから通信がきているので、
-接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>がすべてリバースプロキシのものになる。</p>
-
-<p>HTTPヘッダーに接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を追加しアプリ側（<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>）で受け取ろうとしたときのめも。</p>
-
-<h1>リバースプロキシ側でHTTPヘッダー追加</h1>
-
-<p>まず、そもそもデフォルトのNginxの設定では接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>をHTTPヘッダーに含まれない。<br>
-ググればすぐに設定方法自体はでてくる。<br>
- X-Forwarded-Forというヘッダー名にNginxでもっている変数$proxy_add_x_forwarded_forをつっこむ。</p>
-
-<pre><code>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
-</code></pre>
-
-<p>設定は簡単なんだけど、そもそもX-Forwarded-Forなんていうヘッダーあったっけ。。。？<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Wikipedia">Wikipedia</a>でみる。</p>
-
-<blockquote><p>X-Forwarded-For (XFF) とは、HTTPヘッダフィールドの一つ。HTTPプロキシサーバまたは負荷分散装置（ロードバランサ）を経由してウェブサーバに接続するクライアントの送信元<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を特定する際の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%D5%A5%A1%A5%AF%A5%C8%A5%B9%A5%BF%A5%F3%A5%C0%A1%BC%A5%C9">デファクトスタンダード</a>である。
-（略）<a class="keyword" href="http://d.hatena.ne.jp/keyword/RFC">RFC</a>の標準的なヘッダフィールドではないが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/IETF">IETF</a>のネットワーク作業部会 (Network Working Group) は2011年10月より同種のHTTPヘッダForwardedの標準化作業を開始した[1]。</p></blockquote>
-
-<p>なるほど、<a class="keyword" href="http://d.hatena.ne.jp/keyword/RFC">RFC</a>の標準ではないけど、一般的なものなんですね。</p>
-
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>でX-Forwarded-Forを受け取る</h1>
-
-<p>というわけで、おりゃ！</p>
-
-<pre><code class="language-php">echo $_SERVER['X-Forwarded-For'];
-</code></pre>
-
-<p>エラー...<br>
-※普段<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>使ってないのがバレますね。</p>
-
-<p>サーバ変数とりあえず、全部はきだす。</p>
-
-<pre><code class="language-php">&lt;?php
-var_dump($_SERVER);
-
-# array(x) { [&quot;HTTP_X_FORWARDED_FOR&quot;] =&gt; string(12) &quot;192.168.33.1&quot; ...... }
-</code></pre>
-
-<p>HTTP先頭についてて、大文字になってて、ハイフンがアンスコに変わっている。<br>
-あたりまえだけどこれは<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>の仕様でいいんだよな...？</p>
-
-<pre><code class="language-php">&lt;?php
-var_dump(getallheaders());
-
-# array(x) { [&quot;X-Forwarded-For&quot;] =&gt; string(12) &quot;192.168.33.1&quot; ...... }
-</code></pre>
-
-<p>サーバ変数にいれるときに、変わるんだわ。</p>
-
-<h1>念のため<a class="keyword" href="http://d.hatena.ne.jp/keyword/tcpdump">tcpdump</a>で軽く確認してみる</h1>
-
-<pre><code>$ sudo yum install tcpdump
-$ tcpdump dst port 80 -X
-
-# ながいんで適当に端折りました
-11:04:01.883209 IP 10.0.2.15.43038 &gt; 192.168.0.10.54655: Flags [.], seq 802:1603, ack 1, win 14600, length 1460
-     (略)
-     0x0000:  4500 0355 c705 0000 3706 24ca adc2 265f  1.0..X-Forwarded
-     0x0010:  c0a8 000a 0050 d57f 51ad 1e62 e596 78a4  -For:.192.168.33
-     0x0020:  8018 0137 8dbe 0000 0101 080a d1dc c19e  .1..Host:.xxxxxx 
-</code></pre>
-
-<p>いたいた。<br>
-Nginxからプロキシされるときはちゃんとヘッダー名は"X-Forwarded-For "になっていること確認。</p>
-
-<h1>任意の適当なHTTPヘッダーつけてみた</h1>
-
-<pre><code>proxy_set_header my-header 'hogefugafoobar'; 
-</code></pre>
-
-<pre><code class="language-php">var_dump($_SERVER);
-
-# array(35) { [&quot;HTTP_MY_HEADER&quot;] =&gt; string(14) &quot;hogefugafoobar&quot; ...... }
-</code></pre>
-
-<p><p>ふーん、なるほどな&hellip;</p>
-</body></p>
-
+                        ただのめも。
+もともとApache+PHPで動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになった。（理由はここではどうでもいいので書かない）
+つまり、Nginx-&gt;Apache-&gt;PHPという構成になった。
+よくあることだが、Apacheからみるとすべてリバースプロキシから通信がきているので、 接続元のIPアドレスがすべてリバースプロキシのものになる。
+HTTPヘッダーに接続元のIPアドレスを追加しアプリ側（PHP）で受け取ろうとしたときのめも。
+リバースプロキシ側でHTTPヘッダー追加 まず、そもそもデフォルトのNginxの設定では接続元のIPアドレスをHTTPヘッダーに含まれない。
+ググればすぐに設定方法自体はでてくる。
+X-Forwarded-Forというヘッダー名にNginxでもっている変数$proxy_add_x_forwarded_forをつっこむ。
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  設定は簡単なんだけど、そもそもX-Forwarded-Forなんていうヘッダーあったっけ。。。？
+Wikipediaでみる。
+X-Forwarded-For (XFF) とは、HTTPヘッダフィールドの一つ。HTTPプロキシサーバまたは負荷分散装置（ロードバランサ）を経由してウェブサーバに接続するクライアントの送信元IPアドレスを特定する際のデファクトスタンダードである。 （略）RFCの標準的なヘッダフィールドではないが、IETFのネットワーク作業部会 (Network Working Group) は2011年10月より同種のHTTPヘッダForwardedの標準化作業を開始した[1]。
+ なるほど、RFCの標準ではないけど、一般的なものなんですね。
+ phpでX-Forwarded-Forを受け取る というわけで、おりゃ！
+echo $_SERVER['X-Forwarded-For'];  エラー...
+※普段PHP使ってないのがバレますね。
+サーバ変数とりあえず、全部はきだす。
+&lt;?php var_dump($_SERVER); # array(x) { [&quot;HTTP_X_FORWARDED_FOR&quot;] =&gt; string(12) &quot;192.168.33.1&quot; ...... }  HTTP先頭についてて、大文字になってて、ハイフンがアンスコに変わっている。
+あたりまえだけどこれはPHPの仕様でいいんだよな...？
+&lt;?php var_dump(getallheaders()); # array(x) { [&quot;X-Forwarded-For&quot;] =&gt; string(12) &quot;192.168.33.1&quot; ...... }  サーバ変数にいれるときに、変わるんだわ。
+念のためtcpdumpで軽く確認してみる $ sudo yum install tcpdump $ tcpdump dst port 80 -X # ながいんで適当に端折りました 11:04:01.
+                        <a href="https://blog.mosuke.tech/entry/2016/07/26/215939/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -755,14 +274,9 @@ Nginxからプロキシされるときはちゃんとヘッダー名は"X-Forwar
                     </header>
 
                     <div class="post-description">
-                        <p><body>
-<p>7月6日の会社のエンジニアイベントでLTするやつ、先にあげておく。<br>
-自分の中でのネタとしては古いけど、話すのはなんだかんだ初。</p></p>
-
-<script async class="speakerdeck-embed" data-id="edf3569025fd4894867e772d5731a20f" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
-
-<p></body></p>
-
+                        7月6日の会社のエンジニアイベントでLTするやつ、先にあげておく。
+自分の中でのネタとしては古いけど、話すのはなんだかんだ初。
+                        <a href="https://blog.mosuke.tech/entry/2016/07/03/224531/">続きを読む</a>
                     </div>
                 </section>
                 
