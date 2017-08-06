@@ -17,16 +17,7 @@
       <pubDate>Sat, 20 Sep 2014 18:03:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2014/09/20/180326/</guid>
-      <description>最近VPSのOSをcentos7にしたのだが、なかなか手付かずでiptablesの設定も放置していた…
-（sshの最低限の設定はしていたが、ほんとうに良くない…）
-久しぶりに手が空いたので設定するかーと思いきや
-まず/etc/sysconfig/iptablesがないし&amp;hellip;
-Cent7からのsystemctlでiptablesのサービスを確認してもでてこないし…
-# systemctl status iptables iptables.service Loaded: not-found (Reason: No such file or directory) Active: inactive (dead)  というわけで、調べてみると、まずiptables.serviceをインスールしないといけないとのこと。
-そして、centos7からはfirewalldがデフォルトでオンになっているからオフにしないといけない。
-（いけないわけではないけど両方使う意味が無いので。）
-まずはiptables-serviceをインスールし、firewalldをオフ、iptablesをオンとした。
-# yum install iptables-services # systemctl status firewalld Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled) Active: active (running) since Sat 2014-09-20 17:47:11 JST; 4s ago Main PID: 11162 (firewalld) CGroup: /system.slice/firewalld.service └─11162 /usr/bin/python -Es /usr/sbin/firewalld --nofork --nopid # # systemctl stop firewalld # # systemctl status firewalld Loaded: loaded (/usr/lib/systemd/system/firewalld.</description>
+      <description>最近VPSのOSをcentos7にしたのだが、なかなか手付かずでiptablesの設定も放置していた… （sshの最低限の設定はしていたが、ほ</description>
     </item>
     
   </channel>

@@ -17,17 +17,7 @@
       <pubDate>Fri, 28 Feb 2014 23:30:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2014/02/28/233025/</guid>
-      <description>前回の「【SQLテーブル結合】INNER JOIN とWHERE結合の違いについて」の続き。
-やはりFROM句の後にテーブルを複数書いてWHEREで結合させるのはナンセンスだと思う。
-例えば、内部結合に加え、外部結合もある場合を考える。
-WHERE型
-SELECT * FROM table1, table2 #←結合させたいもの LEFT OUTER JOIN ( ・ ・ &amp;lt;副問い合わせとか長いSQLが入ると想定&amp;gt; ・ ・ ) AS sub ON table1.id=sub.id AND table2.id=sub.id WHERE table1.id=table2.id #←結合条件  table1とtable2を内部結合させたいのに、
-肝心の何と何を結合させるかの部分の&amp;rdquo;WHERE table1.id=table2.id&amp;rdquo;が離れてしまい、
-SQL文全体として何をしたいかわかりずらい。
-一方、INNER JOINなら
-SELECT * FROM table1 INNER JOIN table2 ON table1.id=table2.id #←結合させたいものと結合条件が一緒 LEFT OUTER JOIN ( ・ ・ &amp;lt;副問い合わせとか長いSQLが入ると想定&amp;gt; ・ ・ ) AS sub ON table1.id=sub.id  上記のように、結合させたいテーブルと結合させる条件がくっつくため、
-全体としてなにをしたいかわかりやすい気がする。
-慣れの問題なのかもしれんが、圧倒的にINNER JOINだろ…</description>
+      <description>前回の「【SQLテーブル結合】INNER JOIN とWHERE結合の違いについて」の続き。 やはりFROM句の後にテーブルを複数書いてWHEREで結合</description>
     </item>
     
   </channel>

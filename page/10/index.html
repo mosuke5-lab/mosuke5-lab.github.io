@@ -76,29 +76,7 @@
                     </header>
 
                     <div class="post-description">
-                        FTPやSFTPでの転送モードの話。
-ついこの前、WinSCPを利用している人が転送モードを選んでいて、
-「SFTPには転送モードはないと思っていたのに、転送モードを選んでいる！？」
-と疑問に思ったのでその辺りまとめた。
- FTPのバイナリーモードとアスキーモード 入社しはじめの頃、それまでSFTPしかほとんど使ったことなかったので、
-先輩に「FTPではバイナリーモードを使って…」と言われて、意味が理解できなかったときがあったのを思い出す。
-FTPにはファイル転送モードが２つあって、ちゃんと理解していないと思わぬところで痛い目にあう。
- バイナリーモード：ファイルの改行コードを変換せず転送する。  アスキーモード：OS側で異なる改行コードを自動的に修正して転送する。  FTPでは標準ではアスキーモードのため、なにも考えずにファイルを送るとファイルが壊れてしまったりする。
-昔にミスしたのはWindowsからLinuxへtar.gzファイルをアスキーモードで送って、解凍したらファイルが壊れていたが、
-それに気付かず壊れたファイルをサーバへ設置してしまったとか。
-SFTPには転送モードはあるのか？ SFTPを普段から使ってる人は転送モードなんて気にしたことあまりないと思う。
-FTPでは気にしなければいけない転送モード、SFTPでは気にしなくていいのだろうか？
-結論から言うと、SFTPには転送モードはないので、気にする必要はない。
-SFTPでは、FTPでいうバイナリーモードでファイル転送をするようだ。
-sftpコマンドのマニュアルにも特に転送モードについては記述がないのがわかる。
-http://www.unixuser.org/~euske/doc/openssh/jman/sftp.html
-SFTPでも転送モードを選択できる場合がある！？ ここで、SFTPにも転送モードはあるぞ！？と疑問を思った人もいるかもしれない。
-確かにWinSCPなどファイル転送ソフトを使っていると転送モードを選ぶことができる場合もある。
-しかし、勘違いしてはいけないのが、
-転送モードを選ぶことができるのはSFTPの機能ではなくてファイル転送ソフトの機能であるということだ。
-まとめ ファイル転送でよく使われるFTPやSFTP。
-それぞれに違いはあるし、それを利用するソフトウェアによっても違いがある。
-何が何を行っているか把握し、思わぬミスを減らしましょう。
+                        FTPやSFTPでの転送モードの話。 ついこの前、WinSCPを利用している人が転送モードを選んでいて、 「SFTPには転送モードはないと思って
                         <a href="https://blog.mosuke.tech/entry/2015/02/17/220526/">続きを読む</a>
                     </div>
                 </section>
@@ -124,22 +102,7 @@ SFTPでも転送モードを選択できる場合がある！？ ここで、SFT
                     </header>
 
                     <div class="post-description">
-                        SSHローカルフォワードの話。
-前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。
-SSHでローカルポートフォワードを実際に試す - Goldstine研究所
-1. やりたいこと httpsでしか接続を許可していないサーバへ、SSHローカルフォワーディングを使って接続しようした。
-（直接疎通性がないためにポートフォワーディングする必要があった。）
-2. 行ったこと httpsでしか接続ができないので、ローカル端末のポート5000を接続したいサーバのポート443に飛ばせばおっけーと思って、
-下記のようにssh接続とブラウザから接続を行った。
-ssh -L5000:web-host:443 user@ssh-host  ※web-host: 今回httpsで接続したサーバ
-※ssh-host: ssh接続先サーバ
-これでローカルフォワーディングの設定は終わったので、ブラウザから以下に接続するだけで終わりだと思っていた。
-http://localhost:5000  が、接続不可…なぜでしょう？
-3. 何が間違いだったか 正しくは以下で接続をしなければいけない。httpsが必要。
-https://localhost:5000  よーく考えればアタリマエのこと。
-URLのはじめの&lt;http(s)&gt;の部分はプロトコルで最後の&lt;:5000&gt;の部分はポート番号。
-httpsは443のポートを一般的に使うが、ポート443がhttpsというわけではない。
-あたりまえのことだし知っていることなんだけど、見落としがちかもしれない。
+                        SSHローカルフォワードの話。 前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。 SSHでロ
                         <a href="https://blog.mosuke.tech/entry/2015/02/11/172123/">続きを読む</a>
                     </div>
                 </section>
@@ -165,13 +128,7 @@ httpsは443のポートを一般的に使うが、ポート443がhttpsという�
                     </header>
 
                     <div class="post-description">
-                        自分がハマったのでメモ。
-リモートのサーバでdocker runを実行し(/bin/bash)、ローカル側でシェルを操作したかった。
-sshでリモートサーバに接続し、docker runすればいいや、と思い以下を実行してみた。
-ssh user@host 'docker run -t -i image_name /bin/bash'  そうすると
-[root@0c6742f02bd9 ~]# [root@0c6742f02bd9 ~]# ^[[A^[[A^[[C  エンターを押すと2行されるし、矢印キーはキーコードがでてしまう。
-これを解消するのには以下のようにすればいい。
-ssh -t user@host 'docker run -t -i image_name /bin/bash'  -tとはなんなのか、なぜこのような事象が起きたのか、これからしっかり調べる。
+                        自分がハマったのでメモ。 リモートのサーバでdocker runを実行し(/bin/bash)、ローカル側でシェルを操作したかった。 sshでリモ
                         <a href="https://blog.mosuke.tech/entry/2015/02/07/144208/">続きを読む</a>
                     </div>
                 </section>
@@ -197,18 +154,7 @@ ssh -t user@host 'docker run -t -i image_name /bin/bash'  -tとはなんなの�
                     </header>
 
                     <div class="post-description">
-                        Ansibleでソースコードインストールする際とか
-すでにインストールされているかのチェックなどで、
-シェルコマンドを実行してその結果で判断したい時がある。
-ぼくがよくやる例では以下とか。
-- name: check httpd installed command: which httpd ignore_errors: true  なんですが...
-こうやってしまうと、仮に既にインストールされていて、正常なときでも"changed"と表示されてしまう。
-これでは、本当にchangedなものなのか、わからなくなってくる。
-これを解決するのにchaged_whenを使うといい。
-- name: check httpd installed command: which httpd ignore_errors: true changed_when: false  こうするとコマンドが成功した際には"ok"が表示される。
-これで、何も変化がないときにはokとskippingしかでないから、
-誰がみても結果がわかりやすいですね！
-秘伝のタレ回避！
+                        Ansibleでソースコードインストールする際とか すでにインストールされているかのチェックなどで、 シェルコマンドを実行してその結果で判断した
                         <a href="https://blog.mosuke.tech/entry/2015/02/02/201008/">続きを読む</a>
                     </div>
                 </section>
@@ -234,19 +180,7 @@ ssh -t user@host 'docker run -t -i image_name /bin/bash'  -tとはなんなの�
                     </header>
 
                     <div class="post-description">
-                        dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、
-特定のユーザでログインした状態のコンテナを作りたいという場面に遭遇した。
-&lt;やりたいこと&gt;  特定のユーザでログインした状態のシェルを提供すること その際、ユーザの.bash_profile（あるいあは.bashrc）を読み込んだ状態であること  .bash_profileに記載したPATHやaliasを使いたい ユーザのログインシェルを利用したい（カスタマイズされたシェルとか）    docker runに-uオプションがあるし、これで余裕！と思った。
-[host] $ sudo docker run -u=user_name -i -t image_name /bin/bash  しかし…以下を確認してみると…
-[docker] $ pwd [docker] $ echo $PATH [docker] $ alias  ディレクトリは "/" だし、PATHも通ってない。
-どうやら.bash_profileなどは読んでいないようだ。普通にログインした状態とは違う。
-dockerで-uでユーザを指定し場合、指定したuserでコマンドを実行するが、
-サーバにユーザでログインしてからコマンドを実行するわけではないらしい。
-ディレクトリはどうやら-wオプションで解決できるようだが…
-[host] $ sudo docker run -u=user_name -w /home/user_name -i -t image_name /bin/bash  [docker] $ pwd /home/user_name  ディレクトリはおっけーだが、当然ながら依然として.bash_profileはダメ。
-そこでふと思いついた。-uも-wもいらない。
-あの手があるではないか…！！
-[host] $ sudo docker run -i -t image_name su - username  suでスイッチユーザすれば.
+                        dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、 特定のユーザでログインした状態のコンテナを作りたいという場面に遭
                         <a href="https://blog.mosuke.tech/entry/2015/01/24/213255/">続きを読む</a>
                     </div>
                 </section>

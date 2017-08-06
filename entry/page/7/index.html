@@ -75,13 +75,7 @@
                     </header>
 
                     <div class="post-description">
-                        VPS1台でインフラ勉強の会で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てたが、
-仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければならない。
-これが面倒だったので多段SSHの設定をして、一発でSSH接続できるようにした。
-以下の図で言うと、web10, web11(192.168.33.10&amp;frasl;11)に一発でSSHできるようにする。
-
-クライアントPC側に以下の設定をした。
-$ vim ~/.ssh/config host gateway HostName xxxxx.xxx User username Host web10 Hos...
+                        VPS1台でインフラ勉強の会で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てたが、 仮想のサーバにアクセスするには、ホストサーバ
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/09/172745/">全文を読む</a>
@@ -108,16 +102,6 @@ $ vim ~/.ssh/config host gateway HostName xxxxx.xxx User username Host web10 Hos
 
                     <div class="post-description">
                         前回の【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築に続き、同様の環境を用いて、ロードバランサ構築を行った。
-ロードバランサの構築にはHAProxyを利用した。
-1. 環境 前回同様で、さくらVPSの1GBのプラン1台のみ。
-・メモリ：１GB
-・CPU：仮想２コア
-・HDD：100GB
-・OS：CentOS7
-・サーバ仮想化：Vagrant(Utuntu13)
-・ロードバランサ：HAProxy - The Reliable, High Performance TCP/HTTP Load Balancer
- 2. 構成図 
- 3. ロードバランサの構築 ■ホストサ...
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/09/171436/">全文を読む</a>
@@ -143,8 +127,7 @@ $ vim ~/.ssh/config host gateway HostName xxxxx.xxx User username Host web10 Hos
                     </header>
 
                     <div class="post-description">
-                        自宅サーバを公開するときに使うDDNSや固定IP。
-それが必要な理由について図解的にまとめ。それだけ。...
+                        自宅サーバを公開するときに使うDDNSや固定IP。 それが必要な理由について図解的にまとめ。それだけ。
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/10/19/170854/">全文を読む</a>
@@ -170,17 +153,7 @@ $ vim ~/.ssh/config host gateway HostName xxxxx.xxx User username Host web10 Hos
                     </header>
 
                     <div class="post-description">
-                        ロードバランシングとかクラスタリングとかリバースプロキシとか、
-業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりない。
-自分で構築してみたいなーと思いつつもあたりまえだけど、サーバやネットワーク機器をそう簡単に調達もできない。
-お金も当然ない。
-というわけで、さくらVPSで仮想化つかってロードバランシングとかクラスタリングとかリバースプロキシとか勉強しましょうという「サーバインフラ会」を友人と始めた。
-その第１回目のメモ。
-第1回 サーバ複数台構成、Nginxでリバースプロキシ構築
-第2回 HAProxyでロードバランサ構築
-
-
-1. 使用した環境 まず今回利用した...
+                        ロードバランシングとかクラスタリングとかリバースプロキシとか、 業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりな
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/10/09/230555/">全文を読む</a>
@@ -206,12 +179,7 @@ $ vim ~/.ssh/config host gateway HostName xxxxx.xxx User username Host web10 Hos
                     </header>
 
                     <div class="post-description">
-                        最近VPSのOSをcentos7にしたのだが、なかなか手付かずでiptablesの設定も放置していた…
-（sshの最低限の設定はしていたが、ほんとうに良くない…）
-久しぶりに手が空いたので設定するかーと思いきや
-まず/etc/sysconfig/iptablesがないし&amp;hellip;
-Cent7からのsystemctlでiptablesのサービスを確認してもでてこないし…
-# systemctl status iptables iptables.service Loaded: not-found (Reason: No such file or directory) Active: inac...
+                        最近VPSのOSをcentos7にしたのだが、なかなか手付かずでiptablesの設定も放置していた… （sshの最低限の設定はしていたが、ほ
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/09/20/180326/">全文を読む</a>
@@ -237,18 +205,7 @@ Cent7からのsystemctlでiptablesのサービスを確認してもでてこな�
                     </header>
 
                     <div class="post-description">
-                        最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。
-例えば以下の状況を考える。
-【やりたいこと】
-「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」
-【DBの構造】
-カラム名：型
-date : datetime
-value : int
-※また、下記ではSinatra上で行っているが、他の言語でも同様のことがいえる。
-(1) 簡単なAPIのようなものを利用する 先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、
-これが一番複雑にならずに良いと思ったということ。
-Sinatra側で/csvにアクセスするとcs...
+                        最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。 例えば以下の状況を考える。 【やりたいこと】 「DBに格
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/09/15/135611/">全文を読む</a>
@@ -274,9 +231,7 @@ Sinatra側で/csvにアクセスするとcs...
                     </header>
 
                     <div class="post-description">
-                        2014年8月2日(土)に大学時代の研究室の同期・後輩を巻き込んでArduino勉強会を行った。
-Arduinoをほとんど触ったことのないメンバーで実施したのだが、初心者でもプロダクトを作り上げられるところまでできた。
-その勉強会の簡単な資料を掲載。...
+                        2014年8月2日(土)に大学時代の研究室の同期・後輩を巻き込んでArduino勉強会を行った。 Arduinoをほとんど触ったことのないメン
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/09/13/214414/">全文を読む</a>
@@ -302,13 +257,7 @@ Arduinoをほとんど触ったことのないメンバーで実施したのだ�
                     </header>
 
                     <div class="post-description">
-                        Ethernetシールドを使ってネットワークへ繋げる。
-とりあえずは、スモールステップでPCとの1対1の通信。
-PCとの1対1通信 構成図
-
-Arduinoソースコード
-#include &amp;lt;SPI.h&amp;gt; #include &amp;lt;Ethernet.h&amp;gt; byte MAC[] = {0x90,0xA2,0xDA,0x0F,0x8B,0xA2}; byte IP[] = {192,168,11,3}; void setup() { Ethernet.begin(MAC,IP); } void loop() { }  疎通確認
-======= ```  4f3b2c72e32161...
+                        Ethernetシールドを使ってネットワークへ繋げる。 とりあえずは、スモールステップでPCとの1対1の通信。 PCとの1対1通信 構成図 Ardu
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/09/13/111537/">全文を読む</a>
@@ -334,14 +283,7 @@ Arduinoソースコード
                     </header>
 
                     <div class="post-description">
-                        前々からArduino自体はもっていたし、ちょろっと触ったことはあったのだが、
-大学時代の研究室の仲間とArduino勉強会をやることになり、それに向けて友人と再入門したのでそのときのメモ。
-Arduino入門にこれだけは知っておきたい事項をプログラム形式にまとめた。
-もちろん、不足部分もたくさんあるが、これだけわかれば楽しめるようになるかも。
-以下が入門プログラム。
- LEDの点灯 PCとArduino間のシリアル通信 超音波距離センサの利用 超音波距離センサとLEDの組み合わせ Processingとの連携 電池でArduinoを動作させる  【用意したもの】
-基本は以下の２つ
-Ardui...
+                        前々からArduino自体はもっていたし、ちょろっと触ったことはあったのだが、 大学時代の研究室の仲間とArduino勉強会をやることになり、
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/07/21/231946/">全文を読む</a>
@@ -367,14 +309,7 @@ Ardui...
                     </header>
 
                     <div class="post-description">
-                        2012年07月18日から契約していたVPSサーバを本日解約した。
-約２年間の契約していたわけだがちょっと振り返るといろいろあったなーと思う。
-ぼくがまだ大学３年のとき、ソーシャルブックマークサービスをリリースしたのだが、
-その時はまだエンジニア初心者で、VPSではなく共有サーバを利用していた。
-そんなプロジェクトが終わり、次のサービス(Twitterの解析ツール)の開発で初めてVPS環境を与えられたのだが、
-サーバ構築など右も左もわからなかったので、自分の勉強用環境としてVPSを契約。VPS環境で行ったこと&amp;gt;
-プロダクトとしては次の３つくらい作った
-・Amazonの最安値段通知サービス...
+                        2012年07月18日から契約していたVPSサーバを本日解約した。 約２年間の契約していたわけだがちょっと振り返るといろいろあったなーと思う。
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/05/18/142838/">全文を読む</a>

@@ -17,24 +17,7 @@
       <pubDate>Sun, 05 Apr 2015 21:25:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2015/04/05/212518/</guid>
-      <description>SSHのエージェントフォワードした後に、接続したユーザとは別のユーザでgit cloneしたいことがあった。
-それについて調べていく中で学習したことや検討したことについてまとめた。
-0. 前提 ローカルのPC(Mac)上で、Vagrantを使用してCentOS7の仮想サーバ(testsv)を立ち上げている。
-&amp;lt;IPアドレス&amp;gt;
-ローカルPC：192.168.33.1
-仮想サーバ：192.168.33.100
-本記事上での「git cloneする」とは、「プライベートのGitレポジトリからSSHを利用してクローンする」ということを指す。
-1. SSHのエージェントフォワードを利用したい理由 まず、そもそもなぜSSHのエージェントフォワードをする必要があったのか。
-最近では多くの方がご存知かつ利用していることだと思うが、仮想のサーバ上でgitを利用するときによく利用する。
-(もちろんそれだけの用途ではありません)
-仮想サーバを作るたびにSSHの鍵を生成して、Github等に登録するのが手間なので、
-ローカルのPCの鍵を他のサーバへ引き継ぐことでgit clone等を可能にするのだ。
-2. SSHエージェントフォワード利用時の挙動 SSHのエージェントフォワードで利用される認証情報は、接続先サーバの/tmp以下に保存されます。
-[myuser@localpc ~]$ ssh -A vagrant@192.168.33.100 Last login: Sat Apr 4 xx:xx:xx 2015 from 192.168.33.1 [vagrant@testsv ~]$ [vagrant@testsv ~]$ ls -l /tmp | grep ssh drwx------. 2 vagrant vagrant 23 4月 4 11:35 ssh-skQVHsUCHU  
-また、接続ユーザにはSSH_AUTH_SOCKという環境変数ができ、どの認証情報を利用するか記述がされます。
-実際に確認してみる。
-確認方法は、envコマンドで環境変数一覧を表示し、そのなかで&#34;ssh&#34;を含むものをgrep。
-[vagrant@testsv ~]$ env | grep -i ssh SSH_AUTH_SOCK=/tmp/ssh-skQVHsUCHU/agent.9034 SSH_CLIENT=&#39;192.168.33.1 58017 22&#39; SSH_CONNECTION=&#39;192.</description>
+      <description>SSHのエージェントフォワードした後に、接続したユーザとは別のユーザでgit cloneしたいことがあった。 それについて調べていく中で学習した</description>
     </item>
     
     <item>
@@ -43,34 +26,7 @@
       <pubDate>Thu, 09 Oct 2014 23:05:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2014/10/09/230555/</guid>
-      <description>ロードバランシングとかクラスタリングとかリバースプロキシとか、
-業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりない。
-自分で構築してみたいなーと思いつつもあたりまえだけど、サーバやネットワーク機器をそう簡単に調達もできない。
-お金も当然ない。
-というわけで、さくらVPSで仮想化つかってロードバランシングとかクラスタリングとかリバースプロキシとか勉強しましょうという「サーバインフラ会」を友人と始めた。
-その第１回目のメモ。
-第1回 サーバ複数台構成、Nginxでリバースプロキシ構築
-第2回 HAProxyでロードバランサ構築
-
-
-1. 使用した環境 まず今回利用した環境は以下のとおり。
-さくらVPSの1GBのプラン。
-・メモリ：１GB
-・CPU：仮想２コア
-・HDD：100GB
-・OS：CentOS7
-・仮想化：Vagrant
-→dockerなどもはじめ検討していたが、コンテナ型仮想化だとサーバ感がでないので、よりサーバとして意識できるVagrantを採用
-【参考】
-料金・サービス仕様 | VPS（仮想専用サーバ）は「さくらのVPS」
- 2. 完成イメージ・物理イメージ 
-
- 
- 3. VagrantでWebサーバ２台分を構築する Vagrantの詳細な利用方法は公式ドキュメントをみてもらうとするが、セットアップまでのひととおりの流れと注意点のみ記載する。
-Vagrant Documentation
-今回はWebサーバ２台を仮想で実現するので、それぞれweb1, web2とする。
-それぞれのディレクトリを作成。
-## web1, web2のディレクトリ作成 $ pwd /home/vagrant $ mkdir web1 $ mkdir web2 ## 仮想化で利用するOSイメージをダウンロード $ vagrant box add ubuntu1310 ¥ http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-13.10_chef-provisionerless.box ## web1サーバ構築 $ cd web1 $ vagrant init ubuntu1310 ## ほぼほぼデフォルトの設定だが以下２つだけは設定を行った。 $ vim Vagrantfile # (1)プライベートアドレスの割り当て。 config.</description>
+      <description>ロードバランシングとかクラスタリングとかリバースプロキシとか、 業務でも使っているし、概念とかはわかってるけど、自分で構築したことはやっぱりな</description>
     </item>
     
     <item>
@@ -79,16 +35,7 @@ Vagrant Documentation
       <pubDate>Sat, 20 Sep 2014 18:03:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2014/09/20/180326/</guid>
-      <description>最近VPSのOSをcentos7にしたのだが、なかなか手付かずでiptablesの設定も放置していた…
-（sshの最低限の設定はしていたが、ほんとうに良くない…）
-久しぶりに手が空いたので設定するかーと思いきや
-まず/etc/sysconfig/iptablesがないし&amp;hellip;
-Cent7からのsystemctlでiptablesのサービスを確認してもでてこないし…
-# systemctl status iptables iptables.service Loaded: not-found (Reason: No such file or directory) Active: inactive (dead)  というわけで、調べてみると、まずiptables.serviceをインスールしないといけないとのこと。
-そして、centos7からはfirewalldがデフォルトでオンになっているからオフにしないといけない。
-（いけないわけではないけど両方使う意味が無いので。）
-まずはiptables-serviceをインスールし、firewalldをオフ、iptablesをオンとした。
-# yum install iptables-services # systemctl status firewalld Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled) Active: active (running) since Sat 2014-09-20 17:47:11 JST; 4s ago Main PID: 11162 (firewalld) CGroup: /system.slice/firewalld.service └─11162 /usr/bin/python -Es /usr/sbin/firewalld --nofork --nopid # # systemctl stop firewalld # # systemctl status firewalld Loaded: loaded (/usr/lib/systemd/system/firewalld.</description>
+      <description>最近VPSのOSをcentos7にしたのだが、なかなか手付かずでiptablesの設定も放置していた… （sshの最低限の設定はしていたが、ほ</description>
     </item>
     
   </channel>

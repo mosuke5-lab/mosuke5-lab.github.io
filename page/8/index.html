@@ -76,26 +76,7 @@
                     </header>
 
                     <div class="post-description">
-                        完全に自分のための備忘録。内容はわりと薄め。
-やったこと 最近、自作したPCにUbuntuをいれて使っているのだけど、
-デスクトップPCなので、部屋でしか操作することができません。
-他の部屋からノートPCでUbuntuを触れたらいいなーと思いその環境を整えることをしました。
-主にやったことは以下の通りです。
-  VNCサーバ構築について ノートPC（Mac）からのVNC接続について  SSHローカルポートフォワードを使ってのセキュアな接続について   UbuntuでのVNCサーバ構築について 今回利用しているUbuntuは「Ubuntu Desktop 14.04」です。
-また、VNCの実現は標準でインストールされているvinoを使って行いました。
-ご存知の方も多くいるかもしれませんが、vinoでのVNCは簡易的なもので、サーバ側のユーザがログアウトしていると使えません。
-ですので、会社などでの利用には耐えないと思います。
-ユーザーをログアウトせずにロック状態にしていれば使えます。
-まずはデスクトップ共有の設定をします。
-「デスクトップの共有」のアプリケーションを起動します。 
-接続毎に要求するようにすると、サーバ側で毎度許可が必要なので、オフにします。
-パスワードの設定はしておきましょう。
-同じLANをつかんでる人に簡単に奪われてしまいますので。
-
-ちょっと詳細な意味を把握していないのですが、
-下記を実行しないとMacで接続すると「互換性のないバージョンです」的なこといわれました…すいません。
-$ gsettings set org.gnome.Vino require-encryption false  設定ができたら、きちんとサーバとしてVNC接続を待ち受けているか確認します。
-% sudo lsof -i:5900 COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME vino-serv 24414 mosuke5 13u IPv6 156661 0t0 TCP *:5900 (LISTEN) vino-serv 24414 mosuke5 14u IPv4 156662 0t0 TCP *:5900 (LISTEN) % ps -ef | grep vino mosuke5 24414 24226 0 12:30 ?
+                        完全に自分のための備忘録。内容はわりと薄め。 やったこと 最近、自作したPCにUbuntuをいれて使っているのだけど、 デスクトップPCなので、部
                         <a href="https://blog.mosuke.tech/entry/2015/08/13/000440/">続きを読む</a>
                     </div>
                 </section>
@@ -121,33 +102,7 @@ $ gsettings set org.gnome.Vino require-encryption false  設定ができたら�
                     </header>
 
                     <div class="post-description">
-                        1.はじめに
-開発環境はVirualboxを使ったVagrantを利用しているが、
-本番環境はAWSだったりKVMだったり違う仮想化機構で動作しているなんてことよくあると思います。
-そういう環境下でどのように開発環境と本番環境の差分をなくしていますか？
-わたしの場合、基本的にAnsibleを使ってプロビジョニングをしていますが、
-そのプロビジョニング前のベースが異なってしまって困ることがよくあります。
-一般に公開されているVagrantBox使ったら余計な設定が入っていたとか、すでにパッケージが入っていたとか…
-そんな問題を解決しようとPackerを使おう！って考えました。
-ですが、Packerも当たり前だけど魔法ではなく、Kickstartなどの自動インストールが前提なので、
-Packerをやる前にKickstartを学習せよ、、、ということに気づきました。
-ということでKickstartをはじめたよってことです。
-2.kickstartってなに kickstartはOSのインストールを自動化する仕組みです。
-anaconda社が提供するインストールの仕組みでRedhat系のOSが採用しているものです。
-ですのでUbuntuだとPreseedっていう別の仕組みだそうです。（詳しくありませんっ）
-で、Kickstartでなにができるかというと...
-OSのインストールをしたことがある方ならわかるかと思いますが、
-普通にDVDなどからインストールすると、
- 言語はなににしますかー？ ホスト名なににしますかー？ パッケージはなにをいれますかー？  とか、聞かれて選択していく必要があります。 この作業を自動化できるのがkickstartです。
-URLのようなもの。 はじめての自宅サーバ構築 - Fedora/CentOS - CentOS6 のインストール手順kajuhome.com
-(おまけ)Ansible, Chef, Puppetとの違い？ kickstartにはプロビジョニング機能もついているため、
-AnsibleとかChefとかPuppetとの違いは？住み分けは？と思うかもしれません。
-明確に、住み分けが決まっているわけではありませんが、 個人的にはAnsibleやChefを実行する前の最低限の設定をkickstartにやらせようと思っています。
-（一般的かとは思いますが…？）
-Lee ThompsonのProvisioning Toolchainを参考にKiskstarのやる範囲をまとめると。 
-Provisioning Toolchain: Web Performance and Operations - Velocity Online Conference - March 17, 2010 - O'Reilly Mediaen.oreilly.com
-3.Hello Kickstart!! Virtualboxを使ってKickstartを試しました。
-3-1.用意したもの   Virtualbox  自分の環境はMacで、バージョンは5.
+                        1.はじめに 開発環境はVirualboxを使ったVagrantを利用しているが、 本番環境はAWSだったりKVMだったり違う仮想化機構で動作し
                         <a href="https://blog.mosuke.tech/entry/2015/07/31/211542/">続きを読む</a>
                     </div>
                 </section>
@@ -173,47 +128,7 @@ Provisioning Toolchain: Web Performance and Operations - Velocity Online Confere
                     </header>
 
                     <div class="post-description">
-                        2014年の秋から@mogulla3と定期的にインフラ関連技術の勉強会をやってきましたが、
-インプットの勉強会だけでは飽き足らず、いつしかサービスを作る中でインフラ関連技術を駆使し勉強したいと思うように…
-そして、普段使っているVimを題材に、
-vimの設定をブラウザ上で即体感できるサービス Vim::Factory
-を開発しました。
-本記事はVim::Factoryの簡単な紹介と技術的な仕組みについて記述しています。
-Vim::Factoryはこちら。
-http://vimfactory.com/
-1. Vim::Factoryについて 1-1. Vim::Factoryってなに？？ Vim::Factoryは、選択したVimの設定を、ブラウザ上で「即体感」できるサービスです。
-数多くあり複雑なVimの設定を容易にし、お気に入りのVim探しをサポートすることを目指しています。
-
-1-2. なんで作ったの？ Vimの設定ってたくさんあってどれを選んでいいかわからなかったり、
-設定したもののどう変わったかイマイチわからなかったりしませんか？
-Vimの設定がどのように反映されるか、もっと簡単に体験したいと考えたからです。
-あと、例えばGithubで100star以上をつける人のVimをブラウザ上で体験できたらいいなと思っていて、
-それを実現のための第一歩としてこのサービスを作りました。
-1-3. このサービスの最大の特徴は？ このサービスの最大の特徴はなんといっても「ブラウザ上でVimが体感できること」です。
-今まではVimの設定を試そうと思ったら、ネットで調べて自分のVimに反映させて…という作業が必要でしたが、
-ブラウザ上で設定を即体感するという新しい体験を提供するために力を注いできました。
-その実現方法については、後述しています。
-1-4. 紹介動画 詳しくは、実際に試してもらうのが早いと思いますが、簡単な操作動画を用意してみました。
-モバイルからこのサービスはちょっと使えないので、モバイルで読んでいる方は動画でお楽しみください(笑)
-www.youtube.com
-2. Vim::Factoryの技術について ここからVim::Factoryの技術について一部ではありますがご紹介します。
-2-1. ブラウザ上でのVimを実現した技術 ブラウザ上でVimを実現しようと思うと、ぱっと思いつくのはJavaScriptでVimそのものを実装してしまおうというものかもしれません。
-ですが、JSでVimを実装することってどれくらい難しいでしょうか？
-少なくともぼくにはそんなことはできませんし、できたとして質の悪いものになってしまうと思います。
-そこで思いついたのが、一般的なターミナルソフトと同様にサーバ上でvimを起動し、
-そのターミナル情報をブラウザ上で表示するという方法です。
-この方法であれば自らVimを実装せずともVimを再現できます。イメージは下記のとおりです。
-
-また、サービスとして上記を行うには、接続してきたユーザごとにVimを用意する必要があります。
-これらを実現するために利用したのがDockerとWebSocketです。
-dockerコンテナ上でVimを起動し、そのターミナル情報をWebSocketでブラウザに送信するようにしました。 
-dockerはコンテナ型の仮想化なので起動がとてもはやく、
-httpのリクエストが来てからdockerコンテナを立ち上げても十分なほどのはやさをもっています。
-2-2. 全体構成 システムの全体構成は以下のような感じです。
-※実際の役割は図のとおりですが、サーバはこんなに多くありません。
-
-2-3. 利用した技術とかツールのまとめ 振り返りも兼ねて利用した技術・ツールを一覧にまとめておきます。
- Ruby Sinatra thin node.js Websocket memcached docker nginx centos7 Ansible Vagrant gitlab mackerel slack  esa.
+                        2014年の秋から@mogulla3と定期的にインフラ関連技術の勉強会をやってきましたが、 インプットの勉強会だけでは飽き足らず、いつしかサー
                         <a href="https://blog.mosuke.tech/entry/2015/07/19/135844/">続きを読む</a>
                     </div>
                 </section>
@@ -239,17 +154,7 @@ httpのリクエストが来てからdockerコンテナを立ち上げても十�
                     </header>
 
                     <div class="post-description">
-                        今更FuelPHP感はあるのだが、
-postgresql利用時のFuelPHPのmigration導入について、注意点をまとめた。
-でも、結論は納得がいっていない。
-0. 前提 下記の環境で行ったものです。
-PHP: 5.5.7
-FuelPHP: 1.7
-Postgresql: 9.4
-1. テーブル文字コードの問題 事象 公式サイトのサンプルの通りはじめにapp/migrations/001_example.phpを作り、migrationを実行した。
-app/migrations/001_example.phpの作成
-&lt;?php namespace Fuel\Migrations; class Example { function up() { \DBUtil::create_table('posts', array( 'id' =&gt; array('type' =&gt; 'int', 'constraint' =&gt; 5), 'title' =&gt; array('type' =&gt; 'varchar', 'constraint' =&gt; 100), 'body' =&gt; array('type' =&gt; 'text'), ), array('id')); } function down() { \DBUtil::drop_table('posts'); } }  マイグレーション実行すると以下のエラーに襲われた。
-$ php oil refine migrate Uncaught exception Fuel\Core\Database_Exception: SQLSTATE[42601]: Syntax error: 7 ERROR: syntax error at or near &quot;DEFAULT&quot; LINE 5: )DEFAULT CHARACTER SET utf8; ^ with query: &quot;CREATE TABLE IF NOT EXISTS &quot;migration&quot; ( &quot;type&quot; varchar(25) NOT NULL, &quot;name&quot; varchar(50) NOT NULL, &quot;migration&quot; varchar(100) DEFAULT '' NOT NULL )DEFAULT CHARACTER SET utf8;&quot;  理由 しょっぱなから躓くわけだが…
+                        今更FuelPHP感はあるのだが、 postgresql利用時のFuelPHPのmigration導入について、注意点をまとめた。 でも、結論は
                         <a href="https://blog.mosuke.tech/entry/2015/06/17/212852/">続きを読む</a>
                     </div>
                 </section>
@@ -275,15 +180,7 @@ $ php oil refine migrate Uncaught exception Fuel\Core\Database_Exception: SQLSTA
                     </header>
 
                     <div class="post-description">
-                        1. はじめに
-ぼくはフロントエンドは本業ではありません。
-jsはあまり好きではありません。
-そしてAjax通信後にhtmlをアウトプットする際にjsの変数の中にhtmlを書いていくソースコードがもっと好きではありません。(後述)
-それをJSテンプレートエンジンを使ってシンプルにしてみたって話です。 （JsRenderの使い方を書いたものではありません。）
-2. Ajaxが嫌いだった理由 Ajaxはユーザ体感的にはいいのだけれど、
-Ajaxの結果受け取ったjsonなどのデータを使ってhtmlを出力とかやるとソースコードが煩雑になるので嫌いだった。
-例としてAjaxで/xxxxxにリクエストを投げて、その結果(jsonデータ)を使ってhtmlを出力するものを考えると。
-/* jsonデータは下記が返ってくるとする [ { id: '1', name: 'らーめん', text: 'らーめんはやっぱり濃厚鶏そばです。' }, { id: '2', name: 'うどん', text: 'うどんはやっぱり釜揚げうどんです。' } ] */ $.ajax({ type: &quot;GET&quot;, url: &quot;/xxxxx&quot;, dataType: &quot;json&quot;, success: function(data){ var html = ''; data.forEach(function (e) { html += '&lt;div id=&quot;' + e.id + '&quot;&gt;'; html += '&lt;h1&gt;' + e.name + '&lt;/h1&gt;'; html += '&lt;p&gt;' + e.text + '&lt;/p&gt;'; html += '&lt;/div&gt;'; }); $(&quot;#result&quot;).
+                        1. はじめに ぼくはフロントエンドは本業ではありません。 jsはあまり好きではありません。 そしてAjax通信後にhtmlをアウトプットする際にjs
                         <a href="https://blog.mosuke.tech/entry/2015/06/13/231917/">続きを読む</a>
                     </div>
                 </section>

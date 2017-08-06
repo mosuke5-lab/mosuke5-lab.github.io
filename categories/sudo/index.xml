@@ -17,24 +17,7 @@
       <pubDate>Sun, 05 Apr 2015 21:25:00 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2015/04/05/212518/</guid>
-      <description>SSHのエージェントフォワードした後に、接続したユーザとは別のユーザでgit cloneしたいことがあった。
-それについて調べていく中で学習したことや検討したことについてまとめた。
-0. 前提 ローカルのPC(Mac)上で、Vagrantを使用してCentOS7の仮想サーバ(testsv)を立ち上げている。
-&amp;lt;IPアドレス&amp;gt;
-ローカルPC：192.168.33.1
-仮想サーバ：192.168.33.100
-本記事上での「git cloneする」とは、「プライベートのGitレポジトリからSSHを利用してクローンする」ということを指す。
-1. SSHのエージェントフォワードを利用したい理由 まず、そもそもなぜSSHのエージェントフォワードをする必要があったのか。
-最近では多くの方がご存知かつ利用していることだと思うが、仮想のサーバ上でgitを利用するときによく利用する。
-(もちろんそれだけの用途ではありません)
-仮想サーバを作るたびにSSHの鍵を生成して、Github等に登録するのが手間なので、
-ローカルのPCの鍵を他のサーバへ引き継ぐことでgit clone等を可能にするのだ。
-2. SSHエージェントフォワード利用時の挙動 SSHのエージェントフォワードで利用される認証情報は、接続先サーバの/tmp以下に保存されます。
-[myuser@localpc ~]$ ssh -A vagrant@192.168.33.100 Last login: Sat Apr 4 xx:xx:xx 2015 from 192.168.33.1 [vagrant@testsv ~]$ [vagrant@testsv ~]$ ls -l /tmp | grep ssh drwx------. 2 vagrant vagrant 23 4月 4 11:35 ssh-skQVHsUCHU  
-また、接続ユーザにはSSH_AUTH_SOCKという環境変数ができ、どの認証情報を利用するか記述がされます。
-実際に確認してみる。
-確認方法は、envコマンドで環境変数一覧を表示し、そのなかで&#34;ssh&#34;を含むものをgrep。
-[vagrant@testsv ~]$ env | grep -i ssh SSH_AUTH_SOCK=/tmp/ssh-skQVHsUCHU/agent.9034 SSH_CLIENT=&#39;192.168.33.1 58017 22&#39; SSH_CONNECTION=&#39;192.</description>
+      <description>SSHのエージェントフォワードした後に、接続したユーザとは別のユーザでgit cloneしたいことがあった。 それについて調べていく中で学習した</description>
     </item>
     
   </channel>

@@ -76,31 +76,7 @@
                     </header>
 
                     <div class="post-description">
-                        使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。
-そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ起動しておき、要求があったときだけ特定のサービスを起動させることが可能らしい。
-ということで、そのスーパーサーバとやらを実際に触ってみた。
-スーパーサーバというとinetdとxinetdがあるらしいが、
-xinetdはinetdの拡張版で、アクセス制御などの機能を搭載しているとのこと。
-今回はxinetdを設定してみる。
-1. 事前準備 【環境】
-Vagrantで構築したCentOS 6.5
-(仮想環境のIPアドレスは192.168.33.10)
-まずはスーパーサーバで管理するサービスを考えなければならない。
-SSHとかhttpはどう考えてもスーパーサーバの管理するようなものではないだろうし…
-FTPやtelnet、POP3なんかのサービスに利用されることが多いそう？（このへんよくわかない）
-今回はFTPをスーパーサーバの管理対象とした。
-※本来は複数のサービスを管理対象とするからこそ意味がある。
-まずはxinetdとvsftpをインストール
-$ sudo yum install xinetd vsftpd  
-xinetdどうこうの前に、ftp接続がきちんとできるか確認するのでサービスを起動。
-$ sudo service vsftpd start  
-ローカルPCから接続できることを確認する。
-$ ftp 192.168.33.10 Connected to 192.168.33.10. 220 (vsFTPd 2.2.2) Name (192.168.33.10:username):  2. xinetdの設定 xinetdの基本設定は/etc/xinetd.confにかかれており、
-xinetdで管理する各サービスの設定は/etc/xinetd.d/配下に書く方式。
-ftpの設定を以下の通りにした。
-"service"のあとに書くサービス名称は/etc/servicesに定義されているものを記載する。
-vsftpとか書いても動かないので注意。
-$ sudo vim /etc/xinetd.d/ftp service ftp { disable = no socket_type = stream wait = no user = root server = /usr/sbin/vsftpd log_on_failure += USERID }  設定項目については以下参照。
+                        使用頻度の低いサービスのデーモンをメモリに常駐させておくのは効率が悪い。 そこでスーパーサーバという使用頻度の低いサービスの窓口のサービスのみ
                         <a href="https://blog.mosuke.tech/entry/2015/01/02/013658/">続きを読む</a>
                     </div>
                 </section>
@@ -126,18 +102,7 @@ $ sudo vim /etc/xinetd.d/ftp service ftp { disable = no socket_type = stream wai
                     </header>
 
                     <div class="post-description">
-                        2015年になってしまいました。
-2014年に技術分野で印象に残ってること３つを思い返してみる。
-1. インフラ会 @mogulla3と軽いノリで始めたインフラ会。
-普段触らない、あるいは触ったとしてもすでに構築された環境で触ることの多いインフラ技術について
-土日を使って自らの手で構築してみるといった会。
-10月くらいから初めて以下を実際にやってみた。
- 仮想化　：Docker, Vagrant  リバースプロキシ　：Nginx  ロードバランサー　：HAProxy  クラスタリング　：Pacemaker+corosync(heartbeat)  VPN　：SoftEther  構成管理ツール　：Ansible 自作PC  やったことについては全てではないがブログにまとめている。
- 【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築 - Goldstine研究所 【VPS1台でインフラ勉強】HAProxyでロードバランサーを構築 - Goldstine研究所 【VPS1台でインフラ勉強】SoftEtherを使ってVPN構築 - Goldstine研究所 【年末遊び】秋葉原で自作PCパーツ集めて作った - Goldstine研究所  このインフラ会では３つを目標にしてたけど、これが仕事でも本当に役立った。
-会もそうだが、目標にしていたマインドは今後もぜひ続けていきたい。
- "なんとなく知っている"をなくす 考える引き出しをふやす 自らの手で実践する  &lt;大変参考になった書籍&gt; 
-[24時間365日] サーバ/インフラを支える技術 ?スケーラビリティ、ハイパフォーマンス、省力運用 (WEB+DB PRESS plusシリーズ)
-  作者: 安井真伸,横川和哉,ひろせまさあき,伊藤直也,田中慎司,勝見祐己  出版社/メーカー: 技術評論社   発売日: 2008/08/07  メディア: 単行本（ソフトカバー）  購入: 133人 クリック: 2,270回 この商品を含むブログ (289件) を見る     2.
+                        2015年になってしまいました。 2014年に技術分野で印象に残ってること３つを思い返してみる。 1. インフラ会 @mogulla3と軽いノリで始め
                         <a href="https://blog.mosuke.tech/entry/2015/01/01/161826/">続きを読む</a>
                     </div>
                 </section>
@@ -163,36 +128,7 @@ $ sudo vim /etc/xinetd.d/ftp service ftp { disable = no socket_type = stream wai
                     </header>
 
                     <div class="post-description">
-                        SSH・・・
-いろんなことができる&rdquo;らしい&rdquo;ということは知っていたし、
-例えばポートフォワーディングなんていうこともできるのも知っている。
-でもそれがどんなものなのか自分の手で試したことはないし、
-なんとなくただのサーバログインツールとして利用していた。
-サーバインフラ技術に興味を持つようになっていろんなことを勉強していると、
-ポートフォワーディングは必須な技術であることも感じ、
-年末の持て余す時間を使ってSSHのローカルポートフォワードを試してみたのでメモする。
-環境とやりたいこと 
-ローカルPCからexample.jpは以下で接続できる状態。
-[local pc] $ ssh username@example.jp  またWebサーバのポート番号は80で、VPSのホストサーバからはWebサーバへ接続できる。
-CUIなのでわかりづらいがcurlを打つとHello Worldが返ってきている。
-[example.jp] $ curl 192.168.33.10 &lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello World! Virtual Web Server&lt;/h1&gt; &lt;/body&gt;&lt;/html&gt;  ローカルポートフォワードの実行 ローカルPCから以下を実行する。
-以下のコマンドは、
-ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす
-といったもの。
-[local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp  この状態でブラウザからhttp://localhost:8888にアクセスすると
-なんと、ローカルホストにつないだはずが、example.jp上の仮想Webサーバのhtmlがうつっているではないか…
-
-セキュリティはどうなの？ ローカルの端末からhttpで仮想のWebサーバに接続しているけど、セキュリティはだいじょうぶなのだろうか？
-http通信だから暗号化はされていないのだろうか？
-なんて疑問もあるが、それは問題ない。
-SSHでローカルPCからリモートホスト(example.jp)までトンネルをはり、
-そのなかをhttpで通信しているから全く問題なしといえる。
-ローカルポートフォワードを利用する場合は、おそらく表には出したくないけど、
-ローカルから接続したいなどの要件の時に使うと思うけど、SSHできちんと暗号化しているので安心。
-最後に SSHでできることはこの他にもたくさんある。
-ポートフォワードだけみても他にも「リモートポートフォワード」や「ダイナミックポートフォワード」などがある。
-リモートポートなどはいまぱっと試せる環境がなかったのでおいおい実践してみる…
-SSHをただのログインツールだけに留めるのは今年で終わりにしよう…
+                        SSH・・・ いろんなことができる&rdquo;らしい&rdquo;ということは知っていたし、 例えばポートフォワーディングなんていうこともでき
                         <a href="https://blog.mosuke.tech/entry/2014/12/31/170545/">続きを読む</a>
                     </div>
                 </section>
@@ -218,17 +154,7 @@ SSHをただのログインツールだけに留めるのは今年で終わり�
                     </header>
 
                     <div class="post-description">
-                        自作PCを作ったのでその材料と参考資料などを簡単にまとめる。
-すべての部品は秋葉原のツクモで揃えた。
-パソコン・ゲームPC・自作パソコンなら【TSUKUMO】 わけがあって荷物はすべて手で運んだのだが、かなり重くなるので郵送をおすすめする。
-以下買ったパーツ一式や用意した道具。
-ちなみに全部で54000円程度でした。（お店で買うとセット割などがあったため）
-材料・パーツ一式 マザーボード 
-ASUSTeK Intel H97チップセット搭載マザーボード H97-PRO 【ATX】
-  出版社/メーカー: Asustek   発売日: 2014/05/17  メディア: Personal Computers この商品を含むブログを見る      CPU 
-Intel CPU Core-i3-4160 3.60GHz 3Mキャッシュ LGA1150 BX80646I34160 【BOX】
-  出版社/メーカー: インテル   発売日: 2014/07/27  メディア: Personal Computers この商品を含むブログを見る    
- メモリ 価格.com - Team TED38192M1600C11DC [DDR3 PC3-12800 4GB 2枚組] 価格比較
+                        自作PCを作ったのでその材料と参考資料などを簡単にまとめる。 すべての部品は秋葉原のツクモで揃えた。 パソコン・ゲームPC・自作パソコンなら【T
                         <a href="https://blog.mosuke.tech/entry/2014/12/29/154251/">続きを読む</a>
                     </div>
                 </section>
@@ -254,24 +180,7 @@ Intel CPU Core-i3-4160 3.60GHz 3Mキャッシュ LGA1150 BX80646I34160 【BOX】
                     </header>
 
                     <div class="post-description">
-                        VPS1台でインフラ勉強シリーズでVPN構築を行ったのでそのメモ。
-1. 実施したこと VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。
- 
-  2. 環境 ・VPNソフトウェア：SoftEther VPN プロジェクト - SoftEther VPN プロジェクト
-・メモリ：１GB
-・CPU：仮想２コア
-・HDD：100GB
-・OS：CentOS7
-・サーバ仮想化：Vagrant(Utuntu13)
- 3. SoftEtherのインストール インストール手順は公式ドキュメント通りなので簡単にコマンドのみ記述しておく。
-7.3 Linux へのインストールと初期設定 - SoftEther VPN プロジェクト
-【ダウンロードしたもの】
-ここから環境に応じて対象のソフトウェアを選ぶ
-SoftEther ダウンロード センター
-・コンポーネント：SoftEther VPN Server
-・プラットフォーム：Linux
-・CPU：Intel x86 / AMD64(64bit)
-## ダウンロード $ wget ttp://jp.softether-download.com/files/softether/v4.08-9449-rtm-2014.06.08-tree/Linux/SoftEther%20VPN%20Server/64bit%20-%20Intel%20x64%20or%20AMD64/softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz ## 解凍 $ tar zxvf softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz ## 実行可能ファイル作成 $ cd vpnserver/ $ sudo make ## /usr/localへ配置 $ sudo mv vpnserver /usr/local ## パーミッション変更 ### 基本的には600。実行ファイルのみ700 $ cd /usr/local/vpnserver $ sudo chown root:root .
+                        VPS1台でインフラ勉強シリーズでVPN構築を行ったのでそのメモ。 1. 実施したこと VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上
                         <a href="https://blog.mosuke.tech/entry/2014/12/07/212156/">続きを読む</a>
                     </div>
                 </section>
