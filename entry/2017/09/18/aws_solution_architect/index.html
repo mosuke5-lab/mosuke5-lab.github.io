@@ -3,23 +3,23 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>後からGitレポジトリを共有設定に。sharedオプションの仕組みについて | Goldstine研究所</title>
+    <title>【合格】AWSソリューションアーキテクト Associate認定試験 | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
-    <meta name="description" content=" Gitレポジトリを作って、複数人で開発をしていた。 しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、 Push, PullするときにPermission errorで怒られまくる。  ユーザには共通">
-    <link rel="canonical" href="https://blog.mosuke.tech/entry/2014/11/20/230334/">
+    <meta name="description" content="AWSソリューションアーキテクト認定試験（アソシエイト）に合格したので記録しておきます。前回、「英語でAWSソリューションアーキテクト認定の模擬試験を受けてみた」の報告の続きです。">
+    <link rel="canonical" href="https://blog.mosuke.tech/entry/2017/09/18/aws_solution_architect/">
     <meta name="generator" content="Hugo 0.25.1" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="後からGitレポジトリを共有設定に。sharedオプションの仕組みについて | Goldstine研究所">
-    <meta name="twitter:description" content=" Gitレポジトリを作って、複数人で開発をしていた。 しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、 Push, PullするときにPermission errorで怒られまくる。  ユーザには共通">
+    <meta name="twitter:title" content="【合格】AWSソリューションアーキテクト Associate認定試験 | Goldstine研究所">
+    <meta name="twitter:description" content="AWSソリューションアーキテクト認定試験（アソシエイト）に合格したので記録しておきます。前回、「英語でAWSソリューションアーキテクト認定の模擬試験を受けてみた」の報告の続きです。">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
-    <meta property="og:title" content="後からGitレポジトリを共有設定に。sharedオプションの仕組みについて &middot; Goldstine研究所">
-    <meta property="og:description" content=" Gitレポジトリを作って、複数人で開発をしていた。 しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、 Push, PullするときにPermission errorで怒られまくる。  ユーザには共通">
+    <meta property="og:title" content="【合格】AWSソリューションアーキテクト Associate認定試験 &middot; Goldstine研究所">
+    <meta property="og:description" content="AWSソリューションアーキテクト認定試験（アソシエイト）に合格したので記録しておきます。前回、「英語でAWSソリューションアーキテクト認定の模擬試験を受けてみた」の報告の続きです。">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
-    <meta property="og:url" content="https://blog.mosuke.tech/entry/2014/11/20/230334/" />
+    <meta property="og:url" content="https://blog.mosuke.tech/entry/2017/09/18/aws_solution_architect/" />
 
     <link rel="stylesheet" href="https://blog.mosuke.tech/css/all.min.css">
 
@@ -52,11 +52,11 @@
         <div>
             
             <div class="posts">
-                <h1 class="content-subhead">20 Nov 2014, 23:03</h1>
+                <h1 class="content-subhead">18 Sep 2017, 19:34</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2014/11/20/230334/" class="post-title">後からGitレポジトリを共有設定に。sharedオプションの仕組みについて</a>
+                        <a href="https://blog.mosuke.tech/entry/2017/09/18/aws_solution_architect/" class="post-title">【合格】AWSソリューションアーキテクト Associate認定試験</a>
 
                         <p class="post-meta">
                             
@@ -65,65 +65,42 @@
                             
                                 under 
                                 
-                                <a class="post-category post-category-git" href="https://blog.mosuke.tech/categories/git">git</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a>
+                                <a class="post-category post-category-AWS" href="https://blog.mosuke.tech/categories/aws">AWS</a><a class="post-category post-category-ソリューションアーキテクト" href="https://blog.mosuke.tech/categories/%E3%82%BD%E3%83%AA%E3%83%A5%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%88">ソリューションアーキテクト</a>
                             
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><body>
-<p>Git<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>を作って、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD">複数人</a>で開発をしていた。<br>
-しかし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>の中に作成されるファイルやディレクトリが個人のグループになってしまい、<br>
-Push, PullするときにPermission <a class="keyword" href="http://d.hatena.ne.jp/keyword/error">error</a>で怒られまくる。</p>
-<p>ユーザには共通のグループを作っていたのに…なんでだっけ…</p>
-<p>気づけば<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>を作るとき以下のようにしていた。</p></p>
+                        <p>AWSソリューションアーキテクト認定試験（アソシエイト）に合格したので記録しておきます。<br />
+前回、「<a href="/entry/2017/08/04/aws_certificate_practice_exam/">英語でAWSソリューションアーキテクト認定の模擬試験を受けてみた</a>」の報告の続きです。</p>
 
-<pre><code>$ git init --bare 
-</code></pre>
+<p></p>
 
-<p><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4%BF%CD">複数人</a>で共有するときには以下のようにするべきであった。</p></p>
+<p>前回ブログでも報告したので、今回はほぼ備忘録として本番試験について残します。<br />
+試験勉強とかは、他の人がブログで載せているのと対して変わりません。</p>
 
-<pre><code>$ git init --bare --shared 
-</code></pre>
+<h2 id="本番試験について">本番試験について</h2>
 
-<p><p>では、そもそもgitのsharedオプションをつけると何が裏で起こっているのか。<br>
-調べると「<b>setgid</b>」というキーワードに辿り着いた。<br>
-setgidの権限を付けておくと、そのディレクトリに作成されたファイルの所有グループは、そのディレクトリの所有グループになる。</p>
-<p>以下のようにchmodでsetgidを付けることができる。</p></p>
-
-<pre><code>$ chmod g+s dir_name 
-</code></pre>
-
-<p><p>setgidがつくとあまり馴染みのない権限がつく。<br>
-「drwxrw<span style="color: #ff40ff"><b>s</b></span>r-x」</p></p>
-
-<pre><code>$ ls -l 
-drwxrwsr-x  4 user  group  136 11 16 22:49 test_dir 
-</code></pre>
-
-<p><p>そして、すでに共有設定なしで作ってしまった<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>では以下のように対応可能。<br>
-（新しく<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>つくるのはめんどいので…）</p></p>
-
-<pre><code>##Gigレポジトリ内のディレクトリに
-$ chmod -R g+s ./branches
-$ chmod -R g+s ./hooks
-$ chmod -R g+s ./info
-$ chmod -R g+s ./objects
-$ chmod -R g+s ./refs
-$ vim .git/config
-  ##[core内に]以下を付け加えておいた
-  [core]
-       repositoryformatversion = 0 
-</code></pre>
-
-<p></body></p>
-
+<ul>
+<li>本番の試験は、各地のテストセンター（PC教室など）で行われています</li>
+<li>土日の試験の予約はかなり埋まっているので、はやめの予約をおすすめします</li>
+<li>試験を受ける端末にはカメラが付いていて、遠隔で監視されています</li>
+<li>試験中は試験官とのチャットも可能です</li>
+<li>ぼくだけかもしれないが、日本語が打てず英語でやり取りすることになりました笑</li>
+<li>試験中に腕を組んでいたら「手はデスクの上においてください」と指示をもらいました。きびしい</li>
+<li>試験を受ける前に本人確認があり、免許証などの本人確認ができるものとクレジットカードなどもう１つ証明できるものの用意が必要です</li>
+<li>免許証は端末に備え付けのスキャナにかざすと情報が試験官側に送付されました</li>
+<li>カメラ越しに試験を監視されているのは初めてで、なかなかやりづらい感じがありました</li>
+<li>模擬試験よりも本番試験のほうが難しく感じました。</li>
+<li>おそらく問題数が多くある分わからない問題も多かったからだと思います</li>
+<li>実際の点数は模擬試験よりも良かったので、心理的な問題かな</li>
+</ul>
                     </div>
                     
                     <div class="post-share">
                         <div class="post-share-links">
                             <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
                             <a href="https://twitter.com/share" class="twitter-share-button">Tweet</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2014%2f11%2f20%2f230334%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2017%2f09%2f18%2faws_solution_architect%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
                         </div>
                     </div>
                 </section>
