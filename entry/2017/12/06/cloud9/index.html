@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Cloud9でブログを書くことについて、AWS Cloud9で書いてみた | Goldstine研究所</title>
+    <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+    <meta name="description" content="AWS Cloud9でブログを書くことについて、AWS Cloud9で書いてみました。最高です。Hugoで管理しているブログをCloud9で書いてデプロイします。">
+    <link rel="canonical" href="https://blog.mosuke.tech/entry/2017/12/06/cloud9/">
+    <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2017/12/06/cloud9/" />
+    <meta name="generator" content="Hugo 0.27.1" />
+    <meta name="twitter:card" content="summary">
+    
+    <meta name="twitter:title" content="AWS Cloud9でブログを書くことについて、AWS Cloud9で書いてみた | Goldstine研究所">
+    <meta name="twitter:description" content="AWS Cloud9でブログを書くことについて、AWS Cloud9で書いてみました。最高です。Hugoで管理しているブログをCloud9で書いてデプロイします。">
+    <meta name="twitter:site" content="@mosuke5" />
+    <meta name="twitter:creator" content="@mosuke5" />
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="AWS Cloud9でブログを書くことについて、AWS Cloud9で書いてみた &middot; Goldstine研究所">
+    <meta property="og:description" content="AWS Cloud9でブログを書くことについて、AWS Cloud9で書いてみました。最高です。Hugoで管理しているブログをCloud9で書いてデプロイします。">
+    <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
+    <meta property="og:site_name" content="Goldstine研究所" />
+    <meta property="og:url" content="https://blog.mosuke.tech/entry/2017/12/06/cloud9/" />
+
+    <link rel="stylesheet" href="https://blog.mosuke.tech/css/all.min.css">
+
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="icon" type="image/png" href="/image/favicon.ico">
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
+            <h2 class="brand-tagline"> @mosuke5&#39;s Blog </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">05 Dec 2017, 14:53</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2017/12/06/cloud9/" class="post-title">AWS Cloud9でブログを書くことについて、AWS Cloud9で書いてみた</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-AWS" href="https://blog.mosuke.tech/categories/aws">AWS</a><a class="post-category post-category-Cloud9" href="https://blog.mosuke.tech/categories/cloud9">Cloud9</a><a class="post-category post-category-ブログ" href="https://blog.mosuke.tech/categories/%E3%83%96%E3%83%AD%E3%82%B0">ブログ</a><a class="post-category post-category-Hugo" href="https://blog.mosuke.tech/categories/hugo">Hugo</a>
+                            
+                        </p>
+                    </header>
+                    <div class="post-description">
+                        <p>こんにちは。mosuke5です。先日AWS re:Inventは楽しみましたか？<br />
+まだキャッチアップしきれていないのですが、前から楽しみにしていたCloud9がついにAWSとしてでたので早速さわってみました。</p>
+
+<p>せっかくなので、<br />
+このブログ記事は<strong>Cloud9でブログを書くことについて、Cloud9で書いている</strong>様子をお伝えしています。
+</p>
+
+<h2 id="aws-cloud9とは">AWS Cloud9とは</h2>
+
+<p>Cloud9はもともとAWSとは関係なくブラウザエディタとして開発が進められていました。しかし、昨年AWSに買収され、ブラウザエディタがAWSとどう融合していくかとても楽しみにしていました。それが今年のre:InventにてついにAWS Cloud9として発表されました。
+基本的な部分はもちろんいままでのCloud9と変わっていないのですが、いくつかの機能がAWSと連携するようになっていて、クラウド上での開発により最適化されたエディタとなっています。</p>
+
+<p>Cloud9ではエディタを起動するときに、EC2インスタンスを同時にたちあげます。そしてEC2サーバ上のファイルを編集していくというスタイルです。簡単に言ってしまえば、インスタンスの時間課金で利用するエディタということです。</p>
+
+<h2 id="ブログサイトをcloud9で管理する">ブログサイトをCloud9で管理する</h2>
+
+<p>冒頭にも書いたのですが、この記事をCloud9で書いていて、Cloud9でテストして、Cloud9から公開してみようとしています。
+以前にブログで紹介したことがありますが、このブログはHugoを使ったスタティックWebとして構築しています。(過去記事は<a href="https://blog.mosuke.tech/entry/2017/05/28/blog_migration/">こちら</a>)
+そのため、記事を書くのにすることといえば、</p>
+
+<ol>
+<li>blogレポジトリをダウンロード</li>
+<li>記事を執筆</li>
+<li>hugo serverを起動して確認</li>
+<li>問題なければGithubへプッシュ</li>
+<li>あとはWerckerが起動して自動デプロイ</li>
+</ol>
+
+<p>こんな流れなわけです。つまり、記事がかけて、Hugoやgitがインストールされた環境でコマンドラインが使えれば十分です。
+AWS Cloud9ではこれがすべてブラウザだけで完結してしまうのです。すばらしい。</p>
+
+<p>こちら書いている様子です。<br />
+<img src="/image/aws_cloud9_overview.png" alt="cloud9_overview" /></p>
+
+<h2 id="ターミナル">ターミナル</h2>
+
+<p>AWS Cloud9では、Cloud9が操作するファイルはEC2インスタンス上にあります。
+あります、というかEC2インスタンスを起動させその上のファイルを編集するわけです。
+ということは、ファイルの編集だけでなくターミナル操作も可能なわけです。<br />
+Gitはコマンドラインで操作したい派の自分としてはこれまた最高ですね。</p>
+
+<p><img src="/image/aws_cloud9_terminal.gif" alt="cloud9_overview" /></p>
+
+<h2 id="vimモードもあって最高">Vimモードもあって最高</h2>
+
+<p>ぼくはにわかVimmerで、Vimの操作ができることをいつも望んでいるのですが、Cloud9はちゃんとVimモードもあります。最高です。</p>
+
+<h2 id="cloud9でhugoを管理するにあたっての技術的なポイント">Cloud9でHugoを管理するにあたっての技術的なポイント</h2>
+
+<p>Cloud9でHugoを管理するにあたっていくつかの技術的なポイントで工夫が必要だったのでまとめておきます。</p>
+
+<h3 id="sshの鍵">SSHの鍵</h3>
+
+<p>Githubにあるレポジトリにアクセスしなければいけないので、SSHの鍵の問題がでてきます。<br />
+Cloud9上で動くターミナルは端末からログインしているわけではないので、SSHのエージェントフォワードは活用できません。<br />
+この点は仕方ないので、新しくSSH鍵を作成しGithubへ登録を行いました。ただ初回だけで継続して利用するならまあいいでしょう。</p>
+
+<h3 id="hugoサーバの立ち上げ">Hugoサーバの立ち上げ</h3>
+
+<p>Hugoサーバを立ち上げて、実際に書いた記事を確認する必要がありますが、こういった仮想環境上だと一つ問題があります。
+それは端末からCloud9で編集しているサーバに対してアクセスしなければいけなという点です。
+そのためにはHugoサーバを立ち上げ時にベースURLとして、サーバのグローバルIPアドレスを指定する必要がありました。</p>
+
+<pre><code>$ hugo server -D -b &lt;Global IPaddress&gt; --bind 0.0.0.0
+</code></pre>
+
+<p>Cloud9ではしばらく利用していないと、自動的にEC2インスタンスを停止し費用の節約をしてくれます。<br />
+しかし、AWSの仮想インスタンスの仕様上、一度インスタンスを停止し起動すると、IPアドレスなどが変更されてしうので、Hugoサーバを立ち上げるときのグローバルIPが毎回変わってしまいます。毎回調べて貼り付けるのはナンセンスすぎます。<br />
+というわけで、AWSにはメタデータという便利な機能があるので、以下のようにサーバを起動するようにして解決しました。</p>
+
+<pre><code>$ hugo server -D -b `curl http://169.254.169.254/latest/meta-data/public-ipv4` --bind 0.0.0.0
+</code></pre>
+
+<p>メタデータの機能を知らない方は下記を見ておきましょう。<br />
+<a href="http://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/ec2-instance-metadata.html">インスタンスメタデータとユーザーデータ</a></p>
+
+<h3 id="セキュリティグループの設定">セキュリティグループの設定</h3>
+
+<p>あたりまえですが、AWSのEC2上なのでHugoサーバで使う1313ポート（デフォルトでは）はセキュリティグループで開放しておきましょう。</p>
+
+<h2 id="自分のスタイルにあっている">自分のスタイルにあっている</h2>
+
+<p>とにかくCloud9を使い始めてこれは自分のスタイルにあっているなと感じました。<br />
+ぼくは、あまりローカルPCでの開発をするのが好きではないです。Hugoのブログぐらいならいいですが、システム開発だと環境差分を大きくしないために、極力本番に近い環境でやりたいといつも思っています。<br />
+また、Vimをよく使いますが、プラグインに依存せずなるべく素のまま使っているのもあるので、Cloud9のVimモードでまったく違和感がないのです。<br />
+最後に、gitはコマンドライン派というのも大きいです。gitはコマンドライン行いたいのでそのあたりがスムーズにできる点も大きいです。</p>
+
+<h2 id="では公開します">では公開します</h2>
+
+<p>いろいろとつらつら書きましたが、そろそろ記事も終わりにしてGithubへプッシュしたいと思います。<br />
+公開されたブログの世界でお会いしましょう。</p>
+                    </div>
+                    
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+                            <a class="twitter-share-button"
+                            href="https://twitter.com/intent/tweet">
+                          Tweet</a>
+                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2017%2f12%2f06%2fcloud9%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <hr class="footer-hr" />
+<div class="latest-posts">
+    <h5>Latest Posts</h5>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2017/12/06/cloud9/">AWS Cloud9でブログを書くことについて、AWS Cloud9で書いてみた</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2017/11/25/security_study/">SecurityStudy#2でパブリッククラウドのセキュリティについて話してきた</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2017/11/10/acp/">Alibaba Cloud Professionalの認定取ってきた！</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2017/11/03/serverlessconf_tokyo/">今年も、Serverlessconf Tokyo(2017)に参加してきた</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2017/10/06/nobolycloud/">nobolycloudのポッドキャストでAlibaba Cloudについて話してきた</a></li>
+    
+</div>
+<div class="search">
+    <h5>Search(Beta)</h5>
+    <p>この機能は、ElasticSearchを用いた全文検索エンジンです。Beta版。</p>
+    <div class="gill-search-engine">
+        <input type="text" id="search-textbox" placeholder="Search">
+        <button id="search-btn">Search</button>
+    </div>
+    <div id="search-result"></div>
+</div>
+<div class="links">
+    <h5>Links</h5>
+    <a class="pure-button" href="https://mosuke.tech"><i class="fa fa-user"></i> mosuke5</a>
+    <a class="pure-button" href="/about/"><i class="fa fa-info-circle"></i> About this site</a>
+    <a class="pure-button" href="/archive/"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml"><i class="fa fa-rss"></i> rss</a>
+</div>
+<div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>&copy; <strong>mosuke5</strong> All rights reserved.<br />Powered by <a class="hugo" href="https://gohugo.io/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="https://blog.mosuke.tech/js/all.min.js"></script>
+<script>
+        $(function() {
+            $('#search-btn').click(function(e) {
+                $('#search-result').empty();
+                search($('#search-textbox').val())
+                    .done(function(result){
+                        $.each(result.hits.hits, function(){
+                            $("#search-result").append("<li><a href=" + this._source.uri +">"+ this._source.title +"</a>("+this._score+")</li>");
+                        })
+                    }).fail(function(){
+                        $('#search-result').append("<p>error</p>");
+                    })
+            });
+        });
+        function search(query){
+            return $.ajax({
+                type: "GET",
+                url: "https://gill-search.mosuke.tech/search",
+                data: "q=" + query,
+                dataType: "json",
+                success: function(res){
+                    console.log(res);
+                }
+            })
+        }
+        </script>
+        </div>
+    </div>
+</div>
+<script>
+window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+  
+    return t;
+}(document, "script", "twitter-wjs"));
+</script>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-99596316-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
