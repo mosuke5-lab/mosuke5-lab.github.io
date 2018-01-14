@@ -3,24 +3,24 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>このブログについて | Goldstine研究所</title>
+    <title>[随時更新] ElasticSearchの基本APIのまとめ | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
-    <meta name="description" content="本ブログサイトの運営者、内容、動作環境やプライバシーポリシーなど。">
-    <link rel="canonical" href="https://blog.mosuke.tech/about/">
-    <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/about/" />
+    <meta name="description" content="ElasticSearch APIでよくつかうものをまとめました。基本的なAPIをいつもググっている方これみて活用してください。">
+    <link rel="canonical" href="https://blog.mosuke.tech/entry/2018/01/14/elasticsearch-api/">
+    <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2018/01/14/elasticsearch-api/" />
     <meta name="generator" content="Hugo 0.31.1" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="このブログについて | Goldstine研究所">
-    <meta name="twitter:description" content="本ブログサイトの運営者、内容、動作環境やプライバシーポリシーなど。">
+    <meta name="twitter:title" content="[随時更新] ElasticSearchの基本APIのまとめ | Goldstine研究所">
+    <meta name="twitter:description" content="ElasticSearch APIでよくつかうものをまとめました。基本的なAPIをいつもググっている方これみて活用してください。">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
-    <meta property="og:title" content="このブログについて &middot; Goldstine研究所">
-    <meta property="og:description" content="本ブログサイトの運営者、内容、動作環境やプライバシーポリシーなど。">
+    <meta property="og:title" content="[随時更新] ElasticSearchの基本APIのまとめ &middot; Goldstine研究所">
+    <meta property="og:description" content="ElasticSearch APIでよくつかうものをまとめました。基本的なAPIをいつもググっている方これみて活用してください。">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
-    <meta property="og:url" content="https://blog.mosuke.tech/about/" />
+    <meta property="og:url" content="https://blog.mosuke.tech/entry/2018/01/14/elasticsearch-api/" />
 
     <link rel="stylesheet" href="https://blog.mosuke.tech/css/all.min.css">
 
@@ -54,63 +54,145 @@
         <div>
             
             <div class="posts">
-                <h1 class="content-subhead">11 Aug 2017, 00:00</h1>
+                <h1 class="content-subhead">14 Jan 2018, 14:00</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/about/" class="post-title">このブログについて</a>
+                        <a href="https://blog.mosuke.tech/entry/2018/01/14/elasticsearch-api/" class="post-title">[随時更新] ElasticSearchの基本APIのまとめ</a>
 
                         <p class="post-meta">
                             
                                 By <strong class="post-author">mosuke5</strong>
                             
                             
+                                under 
+                                
+                                <a class="post-category post-category-ElasticSearch" href="https://blog.mosuke.tech/categories/elasticsearch">ElasticSearch</a><a class="post-category post-category-API" href="https://blog.mosuke.tech/categories/api">API</a>
+                            
                         </p>
                     </header>
                     <div class="post-description">
-                        
+                        <p>とにかく、ElasticSearchの基本APIを自分のためにまとめていったものです。<br />
+参考につかってください。
+</p>
 
-<h2 id="運営者">運営者</h2>
+<h2 id="全般">全般</h2>
 
-<p>もーすけ(@mosuke5)が本ブログを運営しています。
-現在クラウドプロバイダーで働くエンジニアです。<br />
-詳しくはこちらを見るといいと思います。<br />
-<a href="https://mosuke.tech">mosuke.tech</a></p>
+<h3 id="ユーザ名とパスワードをつけてapiを実行する">ユーザ名とパスワードをつけてAPIを実行する</h3>
 
-<h2 id="このブログについて">このブログについて</h2>
+<pre><code>$ curl  -u user:password -XGET localhost:9200/_cat/indices?v
+</code></pre>
 
-<p>本ブログ「Goldstine研究所」は2014年2月から運用を開始しています。
-エンジニアとして、自分の行ったことの備忘録ではじめたものですが、そのナレッジが少しでも他の人の役に立てばと思っています。また、このサイトの運営そのものが自分自身のテクノロジーの学習でもあります。後述しますが、いくつかのテクノロジーを利用していて、自身の実験プロダクトでもあります。</p>
+<h3 id="レスポンス結果を見やすくする">レスポンス結果を見やすくする</h3>
 
-<h3 id="内容について">内容について</h3>
+<p>パラメータに<code>pretty</code>をつける。</p>
 
-<p>基本的には技術ブログとして運営しています。
-たまにポエムっぽいことや、個人的なキャリアの話など書いてます。
-キャリアといっても、エンジニアとしてのキャリアのことが多いので技術ブログの範疇ですかね。</p>
+<pre><code>$ curl -XGET 'localhost:9200/xxxxx?pretty
+</code></pre>
 
-<p>技術の分野は特に絞っていないです。
-日々自分が触っているテクノロジーやツール、環境について。
-多いのは、クラウドテクノロジーやDevOps、アプリケーション開発あたりだと思います。</p>
+<h2 id="インデックス-ドキュメント関連">インデックス、ドキュメント関連</h2>
 
-<h3 id="運用環境について">運用環境について</h3>
+<h3 id="インデックスの一覧を確認する">インデックスの一覧を確認する</h3>
 
-<p>以前はブログサイトを使って運用していましたが、2017年5月にHugo+Github Pagesを使った運用に変更しました。（<a href="/entry/2017/05/28/blog_migration/">変更に関するブログ記事</a>）</p>
+<pre><code>$ curl localhost:9200/_cat/indices?v
+status index   uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+yellow open   blog    rwvaOBVcRaSLqt3NDRFZ-w   5   1          0            0       324b           324b
+</code></pre>
 
-<p>本サイトの動作環境についてはこちらで公開、随時更新しています。<br />
-<a href="https://docs.google.com/presentation/d/1MJ8c7QkdYl5BIp9eS3Li2viq-V-CgdpnJKWylYa_dW0/edit#slide=id.g24396a60f1_1_0">https://docs.google.com/presentation/d/1MJ8c7QkdYl5BIp9eS3Li2viq-V-CgdpnJKWylYa_dW0/edit#slide=id.g24396a60f1_1_0</a></p>
+<h3 id="インデックスを作成する">インデックスを作成する</h3>
 
-<h2 id="アクセス解析ツールについて">アクセス解析ツールについて</h2>
+<pre><code>$ curl -XPUT localhost:9200/blog
+</code></pre>
 
-<p>本サイトでは、Googleによるアクセス解析ツール「Googleアナリティクス」を利用しています。</p>
+<h3 id="インデックスの削除をする">インデックスの削除をする</h3>
 
-<p>このGoogleアナリティクスはトラフィックデータの収集のためにCookieを使用しています。このトラフィックデータは匿名で収集されており、個人を特定するものではありません。この機能はCookieを無効にすることで収集を拒否することが出来ますので、お使いのブラウザの設定をご確認ください。この規約に関して、詳しくは<a href="https://www.google.com/analytics/terms/jp.html">ここをクリック</a>してください。</p>
+<pre><code>$ curl -XDELETE localhost:9200/blog
+</code></pre>
 
-<h2 id="免責事項">免責事項</h2>
+<h3 id="インデックスのマッピングを確認する">インデックスのマッピングを確認する</h3>
 
-<p>本サイトに掲載されている情報は、その正確性および完全性を保証するものではありません。当ブログを利用すること、もしくは当ブログを利用できなかったことによって生じるいかなる損害についても、当ブログは一切の責任を負いかねます。</p>
+<pre><code>// インデックス全体
+$ curl -XGET localhost:9200/blog/_mapping?pretty
+true
+{
+  &quot;blog&quot; : {
+    &quot;mappings&quot; : {
+      &quot;user&quot; : {
+        &quot;properties&quot; : {
+          &quot;image_url&quot; : {
+            &quot;type&quot; : &quot;text&quot;,
+            &quot;index&quot; : false
+          },
+          &quot;last_login_at&quot; : {
+            &quot;type&quot; : &quot;date&quot;,
+            &quot;fields&quot; : {
+              &quot;keyword&quot; : {
+                &quot;type&quot; : &quot;keyword&quot;,
+                &quot;ignore_above&quot; : 256
+              }
+            },
 
-<p>また、当ブログで掲載している情報につきましては、一切の予告なく内容を変更する可能性があります。あらかじめご了承ください。</p>
 
+// 特定のタイプのみ
+$ curl -XGET localhost:9200/blog/user/_mapping?pretty
+</code></pre>
+
+<h3 id="バルクインサート">バルクインサート</h3>
+
+<pre><code>$ curl -H &quot;Content-Type: application/json&quot; -XPOST 'localhost:9200/blog/post/_bulk?pretty&amp;refresh' --data-binary @sample-data.json
+</code></pre>
+
+<h3 id="マッピング">マッピング</h3>
+
+<pre><code>$ cat user.json
+{
+  &quot;properties&quot; : {
+    &quot;last_login_at&quot; : {
+      &quot;type&quot; : &quot;date&quot;,
+      &quot;format&quot;: &quot;yyyy-MM-dd HH:mm:ss&quot;,
+      &quot;fields&quot; : {
+        &quot;keyword&quot; : {
+          &quot;type&quot; : &quot;keyword&quot;,
+          &quot;ignore_above&quot; : 256
+        }
+      }
+    },
+    &quot;user_name&quot; : {
+      &quot;type&quot; : &quot;text&quot;,
+      &quot;fields&quot; : {
+        &quot;keyword&quot; : {
+          &quot;type&quot; : &quot;keyword&quot;,
+          &quot;ignore_above&quot; : 256
+        }
+      }
+    },
+    &quot;image_url&quot; : {
+      &quot;type&quot; : &quot;text&quot;,
+      &quot;index&quot;: false
+      }
+    }
+  }
+}
+
+$ curl -XPUT 'localhost:9200/blog/_mapping/user?pretty' -d @user.json
+</code></pre>
+
+<h3 id="ドキュメントを削除する">ドキュメントを削除する</h3>
+
+<pre><code>$ curl -XDELETE localhost:9200/blog/user/123456
+($ curl -XDELETE localhost:9200/:index/:type/:id)
+</code></pre>
+
+<h2 id="検索関連">検索関連</h2>
+
+<h3 id="基本検索">基本検索</h3>
+
+<pre><code>//&quot;ElasticSearch 入門&quot;というキーワードで検索
+$ curl 'localhost:9200/blog/_search?pretty' -d '
+{
+  &quot;query&quot;: { &quot;match&quot;: { &quot;body&quot;: &quot;ElasticSearch 入門&quot; } }
+}'
+</code></pre>
                     </div>
                     
                     <div class="post-share">
@@ -119,7 +201,7 @@
                             <a class="twitter-share-button"
                             href="https://twitter.com/intent/tweet">
                           Tweet</a>
-                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fabout%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2018%2f01%2f14%2felasticsearch-api%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
                         </div>
                     </div>
                 </section>
