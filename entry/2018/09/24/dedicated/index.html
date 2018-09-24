@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWSとAlibaba Cloudの「Dedicated」インスタンスを整理する | Goldstine研究所</title>
+    <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+    <meta name="description" content="AWSとAlibaba Cloudででてくる「Dedicated」「専有」の意味を整理します。Dedicated Hostsやハードウェア専有インスタンスなどいろんな意味合いで使われるので混同しがちです。">
+    <link rel="canonical" href="https://blog.mosuke.tech/entry/2018/09/24/dedicated/">
+    <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2018/09/24/dedicated/" />
+    <meta name="generator" content="Hugo 0.40.3" />
+    <meta name="twitter:card" content="summary">
+    
+    <meta name="twitter:title" content="AWSとAlibaba Cloudの「Dedicated」インスタンスを整理する | Goldstine研究所">
+    <meta name="twitter:description" content="AWSとAlibaba Cloudででてくる「Dedicated」「専有」の意味を整理します。Dedicated Hostsやハードウェア専有インスタンスなどいろんな意味合いで使われるので混同しがちです。">
+    <meta name="twitter:site" content="@mosuke5" />
+    <meta name="twitter:creator" content="@mosuke5" />
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="AWSとAlibaba Cloudの「Dedicated」インスタンスを整理する &middot; Goldstine研究所">
+    <meta property="og:description" content="AWSとAlibaba Cloudででてくる「Dedicated」「専有」の意味を整理します。Dedicated Hostsやハードウェア専有インスタンスなどいろんな意味合いで使われるので混同しがちです。">
+    <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
+    <meta property="og:site_name" content="Goldstine研究所" />
+    <meta property="og:url" content="https://blog.mosuke.tech/entry/2018/09/24/dedicated/" />
+
+    <link rel="stylesheet" href="https://blog.mosuke.tech/css/all.min.css">
+
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="icon" type="image/png" href="/image/favicon.ico">
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
+            <h2 class="brand-tagline"> @mosuke5&#39;s Blog </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">24 Sep 2018, 16:49</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2018/09/24/dedicated/" class="post-title">AWSとAlibaba Cloudの「Dedicated」インスタンスを整理する</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-AWS" href="https://blog.mosuke.tech/categories/aws">AWS</a><a class="post-category post-category-Alibaba Cloud" href="https://blog.mosuke.tech/categories/alibaba-cloud">Alibaba Cloud</a><a class="post-category post-category-Dedicated Host" href="https://blog.mosuke.tech/categories/dedicated-host">Dedicated Host</a><a class="post-category post-category-Dedicated Instance" href="https://blog.mosuke.tech/categories/dedicated-instance">Dedicated Instance</a>
+                            
+                        </p>
+                    </header>
+                    <div class="post-description">
+                        <p>だいぶ久しぶりです。@mosuke5です。<br />
+どういうわけか、3か月くらいブログの更新ができていませんでした。<br />
+勉強や活動をサボっていたわけではないのですが。。。</p>
+
+<p>最近Alibaba CloudでもBYOLの要求に対応することのできる、Dedicated Host（通称DDH）というサービスをリリースしました。
+サービスの仕様を把握するために、いろんなクラウドサービスを調べるのですが、とにかく「Dedicated」という単語がいろんな意味合いで利用され混同しがちです。<br />
+このブログではAWSとAlibaba Cloudででてくる「Dedicated」という言葉について整理したいと思います。
+</p>
+
+<p>ややこしいので、先に出てくるサービス・機能を一覧にしておきます。<br />
+それぞれが何者かは順に説明していきます。</p>
+
+<ul>
+<li>AWS
+
+<ol>
+<li>Dedicated Hosts</li>
+<li>Dedicated Instnaces</li>
+<li>Bare Metal Instances</li>
+</ol></li>
+<li>Alibaba Cloud
+
+<ol>
+<li>Dedicated Host(DDH)</li>
+<li>Enterprise-level Instance(Dedicated resource)</li>
+<li>Bare Metal Instnace(Dedicated hardware resouce)</li>
+<li>RDS Dedicated Instnace</li>
+</ol></li>
+</ul>
+
+<h2 id="awsでいうdedicated-hostsとdedicated-instances">AWSでいうDedicated HostsとDedicated Instances</h2>
+
+<p>まず読者の多くがなじみのあるであろうAWSから整理します。<br />
+AWSではEC2の起動方法に「Dedicated Hosts」と「Dedicated Instances（ハードウェア専有インスタンス）」という２つがあります。
+この２つの比較については今更自分がまとめるほどもなく下記がわかりやすいので掲載しておきます。</p>
+
+<p>AWS | Amazon EC2 Dedicated Hosts<br />
+<a href="https://aws.amazon.com/jp/ec2/dedicated-hosts/">https://aws.amazon.com/jp/ec2/dedicated-hosts/</a></p>
+
+<p>自分の理解のためにも少し情報を加えてまとめると下記のとおりです。</p>
+
+<h3 id="aws-dedicated-hosts">AWS: Dedicated Hosts</h3>
+
+<p>Dedicated Hostsは、自分専用の物理ホストを購入するイメージです。<br />
+とはいっても物理ホストのサーバを直接いじれるわけではなく、その物理ホスト上に自分のEC2インスタンスを立ち上げることができるというものです。課金体系は、インスタンスではなくその物理ホストに対して支払います。<br />
+こちらの物理ホスト上のEC2インスタンスでは「ソケット、コア、ホスト ID の可視性」があり、いわゆるBYOLの要件を満たすためによく利用されます。</p>
+
+<h3 id="aws-dedicated-instances-ハードウェア専有インスタンス">AWS: Dedicated Instances（ハードウェア専有インスタンス）</h3>
+
+<p>Dedicated Instances(日本語名ハードウェア専有インスタンス)は、Dedicated Hostsと同様で自分専用の物理ホストに対してEC2インスタンスを起動できるものです。
+しかし、大きく異なる点があります。物理ホストに対してお金を払うわけではなく、あくまでEC2インスタンスに対してお金を払います。<br />
+ここで、疑問に思うことあるでしょう。
+この方式のインスタンスは通常のインスタンスよりも若干料金が高いのですが、物理ホストを専有しているわりにはとても安いです。
+例えば、低スペックのインスタンスを１つだけ立てた場合でも、物理ホストを専有しているのでAWSとしてとても損をしてしまいそうです。
+そのため、「リージョン専用料金」というインスタンスとは別の料金を別途払う必要がある仕組みとなっています。</p>
+
+<p>また、このインスタンスタイプでは、「ソケット、コア。ホストIDの可視性」はありません。<br />
+BYOLのためというよりは、セキュリティ要件で、他社のお客さんとホストを共有したくないときに利用するもの、と認識しておくとよさそうです。</p>
+
+<h3 id="aws-bare-metal-instances">AWS: Bare Metal Instances</h3>
+
+<p>AWSでDidicatedというと上２つが代表的ですがもう１つだけ。<br />
+仮想化層のオーバーヘッドを気にする人やVMWareを動かしたい人のためのベアメタルインスタンスタイプですね。<br />
+<a href="https://aws.amazon.com/jp/blogs/news/new-amazon-ec2-bare-metal-instances-with-direct-access-to-hardware/">https://aws.amazon.com/jp/blogs/news/new-amazon-ec2-bare-metal-instances-with-direct-access-to-hardware/</a></p>
+
+<h2 id="alibaba-cloudでの-dedicated">Alibaba Cloudでの&rdquo;Dedicated&rdquo;</h2>
+
+<p>またAlibaba Cloudで英語ドキュメントを読んでいると、いろんな場面で「Dedicated」という言葉がでてきます。
+大きく４つの場面ででてきます。</p>
+
+<h3 id="alibaba-cloud-dedicated-host">Alibaba Cloud: Dedicated Host</h3>
+
+<p>まず、AWSの「Dedicated Hosts」と同じような用途で利用できる「Dedicated Host(DDH)」というサービスを展開しています。
+仮想サーバインスタンスでの下記ではなく、物理ホストに課金をし、その上に仮想サーバを構築できるものです。</p>
+
+<p>サービスについて気になる方は下記から参照ください。
+<a href="https://jp.alibabacloud.com/product/ddh">https://jp.alibabacloud.com/product/ddh</a></p>
+
+<h3 id="alibaba-cloud-enterprise-level-instance">Alibaba Cloud: Enterprise-level Instance</h3>
+
+<p>Alibaba Cloudを調べていて一番勘違いしやすいものが、ECSインスタンスのEnterprise-level Instnaceで使われる「Dedicated Resource」ではないかなと思います。<br />
+Alibaba Cloudの仮想サーバサービスElastic Compute Service(通称 ECS)では、インスタンスのタイプファミリーが、大きく「Enterprise-level Instance」と「Entry-level Instance」の２つに分かれています。<br />
+このEnterprise-level Instanceの説明では「Dedicated Resource」と書かれています。この意味合いがよく勘違いされがちです。</p>
+
+<p>Enterpsise-levl Instanceでは、「排他的で安定したコンピューティング、ストレージ、およびネットワークリソースで設計」しているため、パフォーマンスを安定的（Stable）にできるといっています。この意味を英語「Dedicated Resource」と記載されていることがあります。<br />
+物理ホストを専有しているわけでも、ベアメタルインスタンスというわけでもなく、仮想サーバで物理ホストはほかのユーザと共有ですが、利用できるリソースが「専有（Dedicated）」ということを意味しているようです。</p>
+
+<p>「Enterprise-level Instance」と「Entry-level Instance」の違いについては以下参照しましょう。<br />
+<a href="https://jp.alibabacloud.com/help/faq-detail/44078.htm">https://jp.alibabacloud.com/help/faq-detail/44078.htm</a></p>
+
+<h3 id="alibaba-cloud-baremetal-instance">Alibaba Cloud: Baremetal Instance</h3>
+
+<p>Alibaba CloudでもECSインスタンスのタイプファミリーの１つとして、ベアメタルインスタンスを提供しています。<br />
+仮想化層のオーバーヘッドをなくしたい人や、VMWareなどのハイパーバイザーを動かしたい人向けのインスタンスです。
+こちらは、名前の通り「ベアメタル」のため、物理サーバレベルで専有されています。<br />
+そのため、英語で「Provides dedicated hardware resources and physical isolation」と書かれることがあります。</p>
+
+<p>Instance type families - Product Introduction<br />
+<a href="https://www.alibabacloud.com/help/doc-detail/25378.htm#concept_sx4_lxv_tdb__xn4-n4-mn4-e4">https://www.alibabacloud.com/help/doc-detail/25378.htm#concept_sx4_lxv_tdb__xn4-n4-mn4-e4</a></p>
+
+<h3 id="alibaba-cloud-rds-dedicated-instance">Alibaba Cloud: RDS Dedicated Instance</h3>
+
+<p>データベースのマネージドサービスであるRDSについても仮想サーバと同様にリソースが専有化されたインスタンスを提供しています。(※まだ日本のお客さんに提供できていませんが)</p>
+
+<p><a href="https://www.alibabacloud.com/help/doc-detail/49875.htm">https://www.alibabacloud.com/help/doc-detail/49875.htm</a></p>
+
+<h2 id="まとめ">まとめ</h2>
+
+<p>自分は、最近クラウド系のドキュメントを読むときに極力英語で情報を収集しています。
+そうするとたくさんの「Dedicated」という意味がでてくることがありますが、それぞれが提供するものは違うこともあります。
+「なにがDedicatedなのか？」ここに注意しながら技術キャッチアップをしていきましょう。</p>
+
+<p>最近後にもこちら記載しておきます。</p>
+
+<ul>
+<li>AWS
+
+<ol>
+<li>Dedicated Hosts</li>
+<li>Dedicated Instnaces</li>
+<li>Bare Metal Instances</li>
+</ol></li>
+<li>Alibaba Cloud
+
+<ol>
+<li>Dedicated Host(DDH)</li>
+<li>Enterprise-level Instance(Dedicated resource)</li>
+<li>Bare Metal Instnace(Dedicated hardware resouce)</li>
+<li>RDS Dedicated Instnace</li>
+</ol></li>
+</ul>
+                    </div>
+                    
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+                            <a class="twitter-share-button"
+                            href="https://twitter.com/intent/tweet">
+                          Tweet</a>
+                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2018%2f09%2f24%2fdedicated%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <hr class="footer-hr" />
+<div class="footer-posts">
+    <h5>Latest Posts</h5>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2018/09/24/dedicated/">AWSとAlibaba Cloudの「Dedicated」インスタンスを整理する</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2018/06/20/terraform_import/">Terraformのimportの使い方と注意ポイント</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2018/06/17/terraform-backend/">Terraformのbackend機能を利用してstateファイルを共有する</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2018/06/16/terraform-workspaces/">Terraform workspaceを利用する。環境ごとのリソース名の分岐など</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2018/06/08/terraform_multi_provider/">Terraformで複数リージョンをまたいだリソース制御する</a></li>
+    
+</div>
+<div class="footer-posts">
+    <h5>Featured Posts</h5>
+    <li><a href="https://blog.mosuke.tech/entry/2016/06/04/180122/">Nginxの仕組みについて入門</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2017/03/18/182252/">万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2015/07/19/135844/">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った</a></li>
+</div>
+<div class="search">
+    <h5>Search(Beta)</h5>
+    <p>この機能は、ElasticSearchを用いた全文検索エンジンです。Beta版。</p>
+    <div class="gill-search-engine">
+        <input type="text" id="search-textbox" placeholder="Search">
+    </div>
+    <div id="search-result"></div>
+</div>
+<div class="links">
+    <h5>Links</h5>
+    <a class="pure-button" href="https://mosuke.tech"><i class="fa fa-user"></i> mosuke5</a>
+    <a class="pure-button" href="/about/"><i class="fa fa-info-circle"></i> About this site</a>
+    <a class="pure-button" href="/archive/"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml"><i class="fa fa-rss"></i> rss</a>
+</div>
+<div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>&copy; 2018 <strong>mosuke5</strong> All rights reserved.<br />Powered by <a class="hugo" href="https://gohugo.io/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="https://blog.mosuke.tech/js/all.min.js"></script>
+<script>
+$(function() {
+    $('#search-textbox').keypress(function(e) {
+        if(e.which == 13){
+            $('#search-result').empty();
+            search($('#search-textbox').val())
+                .done(function(result){
+                $.each(result.hits.hits, function(){
+                    $("#search-result").append("<div class=\"search-result-list\"><div class=\"search-result-title\"><a href=" + this._source.uri +">"+ this._source.title +"</a><span class=\"search-result-score\"> ("+this._score+")</span></div><div class=\"search-result-description\">" + this._source.description + "</div></div>");
+                })
+            }).fail(function(){
+                $('#search-result').append("<p>error</p>");
+            })
+        }
+    });
+});
+function search(query){
+    return $.ajax({
+        type: "GET",
+        url: "https://gill-search.mosuke.tech/search",
+        data: "q=" + query,
+        dataType: "json",
+        success: function(res){
+            console.log(res);
+        }
+    })
+}
+</script>
+
+        </div>
+    </div>
+</div>
+<script>
+window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+  
+    return t;
+}(document, "script", "twitter-wjs"));
+</script>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-99596316-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
