@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlideShare APIをGoogleAppsScriptから利用する | Goldstine研究所</title>
+    <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+    <meta name="description" content="GoogleAppsScript(GAS)からSlideShare APIを使ってスライド情報をスプレッドシートに書き込むことをやってみました。SlideShare APIの使い方含め説明します。">
+    <link rel="canonical" href="https://blog.mosuke.tech/entry/2018/12/20/slideshare-api-by-gas/">
+    <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2018/12/20/slideshare-api-by-gas/" />
+    <meta name="generator" content="Hugo 0.49" />
+    <meta name="twitter:card" content="summary">
+    
+    <meta name="twitter:title" content="SlideShare APIをGoogleAppsScriptから利用する | Goldstine研究所">
+    <meta name="twitter:description" content="GoogleAppsScript(GAS)からSlideShare APIを使ってスライド情報をスプレッドシートに書き込むことをやってみました。SlideShare APIの使い方含め説明します。">
+    <meta name="twitter:site" content="@mosuke5" />
+    <meta name="twitter:creator" content="@mosuke5" />
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="SlideShare APIをGoogleAppsScriptから利用する &middot; Goldstine研究所">
+    <meta property="og:description" content="GoogleAppsScript(GAS)からSlideShare APIを使ってスライド情報をスプレッドシートに書き込むことをやってみました。SlideShare APIの使い方含め説明します。">
+    <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
+    <meta property="og:site_name" content="Goldstine研究所" />
+    <meta property="og:url" content="https://blog.mosuke.tech/entry/2018/12/20/slideshare-api-by-gas/" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+    <link rel="stylesheet" href="https://blog.mosuke.tech/css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="icon" type="image/png" href="/image/favicon.ico">
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
+            <h2 class="brand-tagline"> @mosuke5&#39;s Blog </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">20 Dec 2018, 21:46</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2018/12/20/slideshare-api-by-gas/" class="post-title">SlideShare APIをGoogleAppsScriptから利用する</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-SlideShare" href="https://blog.mosuke.tech/categories/slideshare">SlideShare</a><a class="post-category post-category-GoogleAppsScript" href="https://blog.mosuke.tech/categories/googleappsscript">GoogleAppsScript</a>
+                            
+                        </p>
+                    </header>
+                    <div class="post-description">
+                        
+
+<p>どうも、SlideShareの記事の管理をスプレッドシートでやりたいというちょっとした自分のニーズがあって、
+SlideShare APIってあるのか？そしてGoogleAppsScriptもほとんどやったことがない、自分でしたが試してみたのでメモっておきます。</p>
+
+<h2 id="slideshare-api">SlideShare API</h2>
+
+<p>結論から言うと<a href="https://www.slideshare.net/developers">SlideShare API</a>ありました。</p>
+
+<p>利用できるAPIは執筆時点では8個で、主にスライドを検索したり、スライドの情報を編集や削除といったところがメインです。
+スライドをアップロードするのはAPIがなさそうなので投稿や更新は自動化できなさそうでした。</p>
+
+<p>利用するには以下のバリデーションや認証が必要です。</p>
+
+<h3 id="apiバリデーション">APIバリデーション</h3>
+
+<p>まずはAPI KEYを取得するためにこちらの「<a href="https://www.slideshare.net/developers/applyforapi">Apply for API key</a>」から申請しましょう。</p>
+
+<p>API Keyを申請するとメールにて、<code>api_key</code>と<code>shared_secret</code>の2つが送られてきます。
+実際にAPIを利用するためには、以下の３つの情報をそろえる必要があります。</p>
+
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>description</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>api_key</td>
+<td>こちらはメールで送られてくる通りのapi_key</td>
+</tr>
+
+<tr>
+<td>ts</td>
+<td>タイムスタンプ。Unix timestampの秒までのもの</td>
+</tr>
+
+<tr>
+<td>hash</td>
+<td>shared_secretとtsのくっつけた文字列をSHA1ハッシュしたもの</td>
+</tr>
+</tbody>
+</table>
+
+<p>たとえば、shared_secretが&rdquo;abcdef&rdquo;でタイムスタンプが&rdquo;1545315685&rdquo;の場合、
+&ldquo;abcdef1545315685&rdquo;をsha1ハッシュすればいいということです。</p>
+
+<pre><code>$ echo -n &quot;abcdef1545315685&quot; | sha1sum
+e4d673a71b769782541920b7acfcee92a686b91c  -
+</code></pre>
+
+<h3 id="認証">認証</h3>
+
+<p>プライベートなデータを取得するような一部のAPIでは、上のバリデーションとはべつに、
+認証で<code>username</code>と<code>password</code>が必要です。</p>
+
+<h3 id="get-slideshows-by-user-apiを使ってみる">get_slideshows_by_user APIを使ってみる</h3>
+
+<p>では実際に<code>get_slideshows_by_user</code>を、まず手作業で実行していきたいと思います。
+このAPIでは公開情報のみ使うので認証は必要ありません。
+必須パラメータは<code>username_for</code>のみなので、取得したいユーザの名前だけで大丈夫です。
+今回は、<code>mosuke5</code>のスライドを取得してみます。</p>
+
+<p><code>get_slideshows_by_user</code>の必要なメッソドやパラメータ<br />
+<img src="/image/slideshare_api_by_user.png" alt="slideshare-api" /></p>
+
+<p>メソッドはGETなので、URLの後ろにパラメータを付けて下記のようにリクエストURLを完成させます。
+ブラウザからアクセスしてみて、成功していればXMLが返ってくるはずです。</p>
+
+<pre><code>https://www.slideshare.net/api/2/get_slideshows_by_user?api_key=xxxxx&amp;ts=1545315685&amp;hash=xxxxxxxxxxxx&amp;username_for=mosuke5
+</code></pre>
+
+<pre><code class="language-xml">&lt;User&gt;
+  &lt;Name&gt;mosuke5&lt;/Name&gt;
+  &lt;Count&gt;16&lt;/Count&gt;
+&lt;Slideshow&gt;
+  &lt;ID&gt;124228224&lt;/ID&gt;
+  &lt;Title&gt;Double 11を支えるApsaraDB for Redis (AliEaters #8)&lt;/Title&gt;
+  &lt;Description&gt;Alibaba Cloudで提供しているマネージドのRedisの概要や特徴とTaobao内での利用について少しだけ触れます。元ネタはAlibaba Cloudの国際チームが投稿しているブログです。&lt;/Description&gt;
+  &lt;Status&gt;2&lt;/Status&gt;
+  &lt;Username&gt;mosuke5&lt;/Username&gt;
+  &lt;URL&gt;https://www.slideshare.net/mosuke5/double-11apsaradb-for-redis-alieaters-8&lt;/URL&gt;
+  &lt;ThumbnailURL&gt;//cdn.slidesharecdn.com/ss_thumbnails/apsaradbforredis-181128061230-thumbnail.jpg?cb=1543385711&lt;/ThumbnailURL&gt;
+  ...
+</code></pre>
+
+<h2 id="gasで実行する">GASで実行する</h2>
+
+<p>もともとは、スプレッドシートでSlideShareの投稿を管理したい用途があって、
+GoogleAppsScript(GAS)で実行したいと思っていました。
+GASは初心者なのですが、これを機にすこしさわってみようかなと思い、こちらをGASで実行してみました、</p>
+
+<p>SHA1でハッシュする関数は用意されていなかったので、ググりながら下記のように自分で関数を用意する必要がありました。
+それ意外は、上で手動で実行したのをGASでほぼ再現したのみです。
+取得したXMLの結果を、スプレッドシートに書き込むという部分は特有な部分ですが慣れれば簡単そうでした。</p>
+
+<pre><code class="language-javascript">var api_key = &quot;xxxxx&quot;,
+    shared_secret = &quot;xxxxx&quot;
+
+function main() {
+  var username = &quot;mosuke5&quot;
+  var bk = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = bk.getSheetByName(&quot;SlideShare&quot;);
+  var xml = getSlideshowsByUser(api_key, shared_secret, username);
+  var document = XmlService.parse(xml);
+  var entries = document.getRootElement().getChildren('Slideshow');
+  for (var i = 0; i &lt; entries.length; i++) {
+    var slide_id = entries[i].getChild('ID').getText();
+    var slide_title = entries[i].getChild('Title').getText();
+    var slide_url = entries[i].getChild('URL').getText();
+    var slide_username = entries[i].getChild('Username').getText();
+    var slide_created_at = entries[i].getChild('Created').getText();
+    
+    var row = i + 1
+    sheet.getRange('A' + row).setValue(slide_id);
+    sheet.getRange('B' + row).setValue(slide_title);
+    sheet.getRange('C' + row).setValue(slide_url);
+    sheet.getRange('D' + row).setValue(slide_username);
+    sheet.getRange('E' + row).setValue(slide_created_at);
+  }
+}
+
+function getSlideshowsByUser(api_key, shared_secret, username_for) {
+  var date = new Date();
+  var ts = Math.floor(date.getTime()/1000).toString();
+  var hash = toSHA1(shared_secret + ts);
+  var base_url = &quot;https://www.slideshare.net/api/2/get_slideshows_by_user&quot;;
+  var request_url = base_url + '?api_key=' + api_key + '&amp;ts=' + ts + '&amp;hash=' + hash + '&amp;username_for=' + username_for;
+  return UrlFetchApp.fetch(request_url).getContentText();
+}
+
+function toSHA1(text) {
+  var rawHash = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_1, text);
+  var txtHash = &quot;&quot;;
+  
+  for (i = 0; i &lt; rawHash.length; i++) {
+	 var hashVal = rawHash[i];
+	 if (hashVal &lt; 0) {
+		hashVal += 256;
+	 }
+	 if (hashVal.toString(16).length == 1) {
+		txtHash += '0';
+	 }
+	 txtHash += hashVal.toString(16);
+  }
+  return txtHash;
+}
+</code></pre>
+
+<p><img src="/image/slideshare_api_to_spreadsheet.png" alt="slideshare-api-to-spreadsheet" /></p>
+
+<h2 id="さいごに">さいごに</h2>
+
+<p><a href="https://github.com/google/clasp">google/clasp</a>というツールもあって、ローカル環境でもGASのコードが書けるようになってきています。<br />
+まだまだ勝手がわからないのですが、業務Hackに役立ちそうのは間違いなしです。</p>
+
+                    </div>
+                    <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+                            <a class="twitter-share-button"
+                            href="https://twitter.com/intent/tweet">
+                          Tweet</a>
+                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2018%2f12%2f20%2fslideshare-api-by-gas%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <hr class="footer-hr" />
+<div class="footer-posts">
+    <h5>Latest Posts</h5>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2018/12/20/slideshare-api-by-gas/">SlideShare APIをGoogleAppsScriptから利用する</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2018/12/03/softbank-sysdev/">ソフトバンクの携帯電話部門のシステム系エンジニアは何している？</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2018/11/08/aws-sa-pro/">サンプル問題集付き！AWSソリューションアーキテクトプロフェッショナル勉強方法</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2018/10/25/sapro-sample-question/">AWS Solution Architect Professionalサンプル問題38選</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2018/10/16/object-storage-metadata/">S3(オブジェクトストレージ)のメタデータの管理方法について</a></li>
+    
+</div>
+<div class="footer-posts">
+    <h5>Featured Posts</h5>
+    <li><a href="https://blog.mosuke.tech/entry/2016/06/04/180122/">Nginxの仕組みについて入門</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2017/03/18/182252/">万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2015/07/19/135844/">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った</a></li>
+</div>
+<div class="search">
+    <h5>Search(Beta)</h5>
+    <p>この機能は、ElasticSearchを用いた全文検索エンジンです。Beta版。</p>
+    <div class="gill-search-engine">
+        <input type="text" id="search-textbox" placeholder="Search">
+    </div>
+    <div id="search-result"></div>
+</div>
+<div class="links">
+    <h5>Links</h5>
+    <a class="pure-button" href="https://mosuke.tech"><i class="fa fa-user"></i> mosuke5</a>
+    <a class="pure-button" href="/about/"><i class="fa fa-info-circle"></i> About this site</a>
+    <a class="pure-button" href="/archive/"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml"><i class="fa fa-rss"></i> rss</a>
+</div>
+<div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>&copy; 2018 <strong>mosuke5</strong> All rights reserved.<br />Powered by <a class="hugo" href="https://gohugo.io/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="https://blog.mosuke.tech/js/all.min.js"></script>
+<script>
+$(function() {
+    $('#search-textbox').keypress(function(e) {
+        if(e.which == 13){
+            $('#search-result').empty();
+            search($('#search-textbox').val())
+                .done(function(result){
+                $.each(result.hits.hits, function(){
+                    $("#search-result").append("<div class=\"search-result-list\"><div class=\"search-result-title\"><a href=" + this._source.uri +">"+ this._source.title +"</a><span class=\"search-result-score\"> ("+this._score+")</span></div><div class=\"search-result-description\">" + this._source.description + "</div></div>");
+                })
+            }).fail(function(){
+                $('#search-result').append("<p>error</p>");
+            })
+        }
+    });
+});
+function search(query){
+    return $.ajax({
+        type: "GET",
+        url: "https://gill-search.mosuke.tech/search",
+        data: "q=" + query,
+        dataType: "json",
+        success: function(res){
+            console.log(res);
+        }
+    })
+}
+</script>
+
+        </div>
+    </div>
+</div>
+<script>
+window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+  
+    return t;
+}(document, "script", "twitter-wjs"));
+</script>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-99596316-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
