@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>virtual-kubeletは何か。Alibaba Cloud上で実際に動かして検証する | Goldstine研究所</title>
+    <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+    <meta name="description" content="virtual-kubeletとはなにか、調査しました。実際にAlibaba Cloud上で動作させることも行いました。virtual-kubeletの理解を深めるのにご活用ください。">
+    <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/">
+    <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/" />
+    <meta name="generator" content="Hugo 0.49" />
+    <meta name="twitter:card" content="summary">
+    
+    <meta name="twitter:title" content="virtual-kubeletは何か。Alibaba Cloud上で実際に動かして検証する | Goldstine研究所">
+    <meta name="twitter:description" content="virtual-kubeletとはなにか、調査しました。実際にAlibaba Cloud上で動作させることも行いました。virtual-kubeletの理解を深めるのにご活用ください。">
+    <meta name="twitter:site" content="@mosuke5" />
+    <meta name="twitter:creator" content="@mosuke5" />
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="virtual-kubeletは何か。Alibaba Cloud上で実際に動かして検証する &middot; Goldstine研究所">
+    <meta property="og:description" content="virtual-kubeletとはなにか、調査しました。実際にAlibaba Cloud上で動作させることも行いました。virtual-kubeletの理解を深めるのにご活用ください。">
+    <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
+    <meta property="og:site_name" content="Goldstine研究所" />
+    <meta property="og:url" content="https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+    <link rel="stylesheet" href="https://blog.mosuke.tech/css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="icon" type="image/png" href="/image/favicon.ico">
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
+            <h2 class="brand-tagline"> @mosuke5&#39;s Blog </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">03 Feb 2019, 15:49</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/" class="post-title">virtual-kubeletは何か。Alibaba Cloud上で実際に動かして検証する</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-kubernetes" href="https://blog.mosuke.tech/categories/kubernetes">kubernetes</a><a class="post-category post-category-virtual-kubelet" href="https://blog.mosuke.tech/categories/virtual-kubelet">virtual-kubelet</a>
+                            
+                        </p>
+                    </header>
+                    <div class="post-description">
+                        <p>はい、@mosuke5です。<br />
+ここ最近、会社でも少しずつKubernetesに関するはなしなどもでてきており、自分の興味ある分野だったこともあり本腰いれて遊んでおります。
+そのなかで、Alibaba CloudもProviderを出しているという、<a href="https://github.com/virtual-kubelet/virtual-kubelet">virtual-kubelet</a>について気になったので、実際に動かして概念の整理と使いどころについて考えてみました。</p>
+
+<p>例ではAlibaba CloudのKubernetesとECIを使っていますが、基本的な考え方は同じですので、virtual-kubeletについて勉強したい人はぜひ読んでみてください。
+</p>
+
+<h2 id="各クラウドプロバイダーのサービスと分類">各クラウドプロバイダーのサービスと分類</h2>
+
+<p>まずvirtual-kubeletの話をする前に、最近のクラウドプロバイダーのコンテナ関連サービスの動向の話をします。
+コンテナ、およびkubertenesが流行り始め、クラウドプロバイダー各社が様々なタイプのサービスを提供している現状です。</p>
+
+<table>
+<thead>
+<tr>
+<th>プロバイダー</th>
+<th>非マネージド</th>
+<th>マネージド</th>
+<th>ノードレス</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Alibaba Cloud</td>
+<td>Container Service for Kubernetes</td>
+<td>Container Service for Kubernetes(Managed mode)/Swarm</td>
+<td>Elastic Container Service(ECI)</td>
+</tr>
+
+<tr>
+<td>AWS</td>
+<td>-</td>
+<td>Amazon ECS, Amazon EKS</td>
+<td>Fargate</td>
+</tr>
+
+<tr>
+<td>Azure</td>
+<td>Azure Container Service(終了予定)</td>
+<td>Azure Kubernetes Service(AKS)</td>
+<td>Azure Container Instance(ACI)</td>
+</tr>
+
+<tr>
+<td>GCP</td>
+<td>-</td>
+<td>Google Kubernetes Engine(GKE)</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+
+<ul>
+<li>非マネージド: マスターノード及びワーカーノードすべてが仮想サーバとしてデプロイされる形式のこと。</li>
+<li>マネージド: マスターノードがマネージドサービスとなっており、ユーザが管理する必要がない形式のこと。</li>
+<li>ノードレス: ユーザがクラスタを意識する必要がなく、コンテナイメージの指定で実行できる形式のこと。</li>
+</ul>
+
+<p>コンテナが普及し始め、まだオーケストレーションツールとしてのデファクトスタンダードが決まっていなかったころ、Azure Container Serviceは非マネージド型でオーケストレーションツールをユーザが選択できるものとして提供していました。一方で、AWSはAmazon ECSはAWS独自の仕様としてマネージド型でコンテナサービスを打ち出していました。
+時代はKubernetesをデファクトスタンダードになっていき、各社は単純に仮想サーバ上でSwarmやKubernetesをインストールするだけでなく、Kubernetesのマネージドサービスとして出すようになりました。
+それに伴い、AzureはAzure Container Serviceの終了を発表し、AKSへの移行をアナウンスしているのも象徴的です。</p>
+
+<p>一方、Kubernetesのマネージドサービスとはいえ、ワーカーノードは仮想マシンで実装されることが多く運用が面倒な面もたくさんあります。
+仮想マシンを管理しなくてよいタイプのコンテナサービスもFargateをはじめ各社リリースするようになりました。
+それぞれのメリットデメリットがあるため、Kubernetesの拡張としてノードレスのコンテナサービスを利用できるようにしているのが、virtual-kubeletです。</p>
+
+<p>あとは、見る限りエッジコンピューティングも生まれた背景と関連すると見受けられます。
+エッジコンピューティングでの実行アプリケーションとして、Kubernetesの拡張としてデプロイできないか、というのも大きく関係していそうです。</p>
+
+<h2 id="kubeletとは">kubeletとは</h2>
+
+<p>virtual-kubeletの話の前にもう一つ。
+virtual-kubeletのkubeletってなんなのか、みていきます。<br />
+kubeletはkubernetesを構成するコンポーネントの１つです。
+公式ドキュメントに下記のように書いてあります。</p>
+
+<blockquote>
+<p>An agent that runs on each node in the cluster. It makes sure that containers are running in a pod.</p>
+
+<p>The kubelet takes a set of PodSpecs that are provided through various mechanisms and ensures that the containers described in those PodSpecs are running and healthy. The kubelet doesn’t manage containers which were not created by Kubernetes.</p>
+</blockquote>
+
+<p>適当に和訳すると、</p>
+
+<blockquote>
+<p>クラスター内の各ノードで実行されるエージェント。ポッド内でコンテナを実行させるようにする役割を持ちます。</p>
+
+<p>kubeletは様々な方式を通して提供されるPodSpecsを持ち、それらのPodSpecsに記載されたコンテナを実行し正常な状態であるようにするものです。kubeletはKubernetes以外によって作られたコンテナの管理は行いません。</p>
+</blockquote>
+
+<p>つまり、kubeletは、Kubernetesクラスターのワーカーノード内で動作しているエージェントで、&rdquo;実際のコンテナの起動などを担うコンポーネント&rdquo;である、ということです。</p>
+
+<h2 id="virtual-kubeletとは">virtual-kubeletとは</h2>
+
+<p>それではいよいよvirtual-kubeletとは何かについて触れていきます。
+まずは、<a href="https://github.com/virtual-kubelet/virtual-kubelet">公式ドキュメント</a>から見ていきましょう。</p>
+
+<blockquote>
+<p>Virtual Kubelet is an open source Kubernetes kubelet implementation that masquerades as a kubelet for the purposes of connecting Kubernetes to other APIs. This allows the nodes to be backed by other services like ACI, AWS Fargate, Hyper.sh, IoT Edge etc. The primary scenario for VK is enabling the extension of the Kubernetes API into serverless container platforms like ACI, Fargate, and Hyper.sh, though we are open to others.</p>
+</blockquote>
+
+<p>こちらも適当に訳すと。。</p>
+
+<blockquote>
+<p>Virtual KubeletはオープンソースのKubernetes kubelet実装の１つで、他のAPIと接続することを目的にしたKubeletである。これは、ノードがACI, AWS Fargate, Hyper.sh, IoT Edgeなどのほかのサービスに支えられることを実現します。VKの主なシナリオはKubernetes APIをACI, Fargate, and Hyper.shなどのサーバレスコンテナプラットフォームへの拡張を可能にすることです。</p>
+</blockquote>
+
+<p>公式ドキュメントにある図を参考に、より具体的にvirtual-kubeletの概念を図で表してみました。
+virtual-kubeletを動作させると、仮想のWorkerノードを登録します。
+Kubernetesからvirtual-kubeletのノードにPodの配置を行うと、virtual-kubeletのプロセスは、プロセス起動時に指定した拡張リソース（右上のAliaba ECIやFargate）へPodを配置します。
+つまり、普段はKubernetesの通常のクラスターを扱いながら、特定のワークロードだけKuernetesの拡張として、ノードレスのサービス側で実行することができるということです。</p>
+
+<p><img src="/image/virtual-kubelet-overview.png" alt="virtual-kubelet-overview" /></p>
+
+<h2 id="eciとは">ECIとは</h2>
+
+<p>実際にvirtual-kubeletが拡張先として利用するノードレスのコンテナサービスとはどんなサービスなのか見てみましょう。
+ここではAlibaba Cloudの新サービスである<a href="https://www.alibabacloud.com/products/elastic-container-instance">Elastic Container Instance</a>(略称ECI)をターゲットにして説明します。</p>
+
+<p>ECIは非常にシンプルなサービスです。
+CLIから実行できるAPIリストをみても、現在６つだけです。</p>
+
+<pre><code>$ aliyun eci help
+Available Api List:
+  CreateContainerGroup
+  DeleteContainerGroup
+  DescribeContainerGroupPrice
+  DescribeContainerGroups
+  DescribeContainerLog
+  ExecContainerCommand
+</code></pre>
+
+<p>ECIは基本的にContainerGroupを作成・削除、コマンド実行、そのほかログや状態閲覧しかできません。
+ContainerGroupと呼ばれているものが、Kubernetesでいう<a href="https://www.alibabacloud.com/help/doc-detail/91315.htm">Podと似た概念</a>で、ネットワークやストレージなどのリソースを共有する複数のコンテナの集合体のことです。</p>
+
+<p>設定できる項目は主に下記の通りで、KubernetesのPodsとおおよそ同じですが、VPCやSecutiryGroupはクラウド特有の設定になります。<br />
+ECIは、実際のコンテナを実行するためのノードを持たなくても、実行イメージを指定さえすれば実行できるというのが最大の特徴です。</p>
+
+<ul>
+<li>コンテナを配置する場所: リージョンやゾーン、VPCなど</li>
+<li>グローバルIPを付与するかどうか</li>
+<li>セキュリティグループ</li>
+<li>ボリューム
+
+<ul>
+<li>NFS Volume, Config File Volume, Empty Dir Volume</li>
+</ul></li>
+<li>Container Groupの設定
+
+<ul>
+<li>DockerイメージやCPU、メモリーなどリソースの設定</li>
+</ul></li>
+</ul>
+
+<h2 id="virtual-kubeletをインストール">virtual-kubeletをインストール</h2>
+
+<p>では、実際にvirtual-kubeletを動作させてみます。
+<a href="https://github.com/virtual-kubelet/virtual-kubelet/blob/master/providers/alibabacloud/README.md">公式ドキュメント</a>に起動方法がかいてあるのですが、少し説明不十分なところがあるので補っていきます。</p>
+
+<p>まず、初心者の自分が勘違いしていたのは、このレポジトリをビルドしてできるバイナリーは、常駐プロセスになっており、手元のローカルで動かしてもいいのですが、Kubernetesクラスター上で動かすほうが合理的です。
+virtual-kubeletをKubernetes上で動かすためのサンプルのYAMLは中国語ですが<a href="https://help.aliyun.com/document_detail/97527.html">こちら</a>にありました。
+自分は最終的に以下で動かしました。</p>
+
+<pre><code class="language-yaml"># virtual-kubelet.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: alicloud-virtual-kubelet
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: alicloud-virtual-kubelet
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: alicloud-virtual-kubelet
+    namespace: default
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: alicloud-virtual-kubelet
+  namespace: default
+  labels:
+    app: alicloud-virtual-kubelet
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alicloud-virtual-kubelet
+  template:
+    metadata:
+      labels:
+        app: alicloud-virtual-kubelet
+    spec:
+      serviceAccount: alicloud-virtual-kubelet
+      containers:
+      - name: alicloud-virtual-kubelet
+        image: registry.cn-hangzhou.aliyuncs.com/ask/virtual-nodes-eci:v1.0.0.1-aliyun
+        imagePullPolicy: Always
+        args: [&quot;--provider&quot;, &quot;alibabacloud&quot;]
+        env:
+        - name: KUBELET_PORT
+          value: &quot;10250&quot;
+        - name: VKUBELET_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: VKUBELET_TAINT_KEY
+          value: &quot;alibabacloud.com/eci&quot;
+        - name: VKUBELET_TAINT_EFFECT
+          value: &quot;NoSchedule&quot;
+        - name: ECI_REGION
+          value: &quot;us-west-1&quot;
+        - name: ECI_VSWITCH
+          value: &quot;YOUR VSWITCH ID&quot;
+        - name: ECI_SECURITY_GROUP
+          value: &quot;YOUR SECURITY GROUP ID&quot;
+        - name: ECI_ACCESS_KEY
+          value: &quot;YOUR ACCESS KEY&quot;
+        - name: ECI_SECRET_KEY
+          value: &quot;YOUR SECRET KEY&quot;
+</code></pre>
+
+<p>上のマニュフェストを実行後、ノードとPodを確認すると動いていることが確認できるはずです。
+ノードでは実在はしないが仮想ノードとして&rdquo;virtual-kubelet&rdquo;というのが追加されています。
+このノードを登録し、司令塔をだすのがpodで表示される&rdquo;alicloud-virtual-kubelet-xxxxx&rdquo;になります。</p>
+
+<pre><code>$ kubectl apply -f virtual-kubelet.yaml
+$ kubectl get node
+NAME                                    STATUS    ROLES     AGE       VERSION
+ap-northeast-1.i-6we4hocj9kh3qr082fxq   Ready     &lt;none&gt;    12d       v1.11.5
+ap-northeast-1.i-6we4hocj9kh3qr082fxr   Ready     &lt;none&gt;    12d       v1.11.5
+ap-northeast-1.i-6we9xja5r3v6bx6ialw6   Ready     master    62d       v1.11.5
+ap-northeast-1.i-6wef05frowkd82mmlq01   Ready     master    62d       v1.11.5
+ap-northeast-1.i-6wef05frowkd82mmlq02   Ready     master    62d       v1.11.5
+virtual-kubelet                         Ready     agent     4d        v1.11.2
+
+$ kubectl get pods
+NAME                                        READY     STATUS           RESTARTS   AGE
+alicloud-virtual-kubelet-55d7c8b89d-khjsh   1/1       Running          0          3d
+</code></pre>
+
+<h2 id="virtual-kubeletでeciを操作する">virtual-kubeletでECIを操作する</h2>
+
+<p>それでは、次にさっそく、KubernetesからこのECIに対してPodを配置してみたいと思います。
+virtual-kubeletのノードに対してnginxを実行させる簡単なマニュフェストを用意して実行します。<br />
+nodeSelectorでvirtual-kubeletのノードを指定し、そこに配置するようにマニュフェストを書きます。</p>
+
+<pre><code class="language-yaml"># vk_pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+  - image: nginx:latest
+    imagePullPolicy: Always
+    name: nginx
+  nodeSelector:
+    kubernetes.io/role: agent
+    beta.kubernetes.io/os: linux
+    type: virtual-kubelet
+  tolerations:
+  - key: alibabacloud.com/eci
+    operator: &quot;Exists&quot;
+    effect: NoSchedule
+</code></pre>
+
+<pre><code>$ kubectl apply -f vk_pod.yaml
+$ kubectl get pods
+NAME                                        READY     STATUS           RESTARTS   AGE
+alicloud-virtual-kubelet-55d7c8b89d-khjsh   1/1       Running          0          3d
+mypod                                       1/1       Running          0          3d
+</code></pre>
+
+<p>実際にECI側のコンソールを見てみるとちゃんとコンテナが起動していました。<br />
+<img src="/image/virtual-kubelet-eci-console.png" alt="virtual-kubelet-ec-console" /></p>
+
+<h3 id="eciのネットワーク">ECIのネットワーク</h3>
+
+<p>virtual-kubeletのプロセスを起動させるときに、もしKubernetesクラスターと同じネットワークを指定すれば、KubernetesのPodとECIで動作するコンテナは同一のネットワークにすることができます。。
+これは幾分か使い勝手がいいと思います。例えばバッチ処理のようなものをECIで実行したとしても、データベースなどにアクセスしやすいですね。利用しているKubernetesクラスターと拡張先が同じネットワークだとできることがいろいろと広がると考えています。</p>
+
+<p><img src="/image/virtual-kubelet-eci.png" alt="virtual-kubelet-eci" /></p>
+
+<h2 id="さいごに">さいごに</h2>
+
+<p>長くなりましたが、virtual-kubeletの概要と実際にAlibaba Cloudで動作させてみた例でした。
+本ブログではAlibaba Cloudを例にしましたが、基本概念は他の場合でもほぼ同じでしょう。理解を深めるのに利用してもらえればと思います。</p>
+                    </div>
+                    <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+                            <a class="twitter-share-button"
+                            href="https://twitter.com/intent/tweet">
+                          Tweet</a>
+                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2019%2f02%2f03%2fvirtual-kubelet%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <hr class="footer-hr" />
+<div class="footer-posts">
+    <h5>Latest Posts</h5>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/">virtual-kubeletは何か。Alibaba Cloud上で実際に動かして検証する</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/01/04/purge-specified-cache-with-ci/">更新したファイルのCloudFlareキャッシュをCI過程で自動で削除する</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2018/12/31/reflection/">「索」2018年振り返り。</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2018/12/20/slideshare-api-by-gas/">SlideShare APIをGoogleAppsScriptから利用する</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2018/12/03/softbank-sysdev/">ソフトバンクの携帯電話部門のシステム系エンジニアは何している？</a></li>
+    
+</div>
+<div class="footer-posts">
+    <h5>Featured Posts</h5>
+    <li><a href="https://blog.mosuke.tech/entry/2016/06/04/180122/">Nginxの仕組みについて入門</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2017/03/18/182252/">万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2015/07/19/135844/">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った</a></li>
+</div>
+<div class="search">
+    <h5>Search(Beta)</h5>
+    <p>この機能は、ElasticSearchを用いた全文検索エンジンです。Beta版。</p>
+    <div class="gill-search-engine">
+        <input type="text" id="search-textbox" placeholder="Search">
+    </div>
+    <div id="search-result"></div>
+</div>
+<div class="links">
+    <h5>Links</h5>
+    <a class="pure-button" href="https://mosuke.tech"><i class="fa fa-user"></i> mosuke5</a>
+    <a class="pure-button" href="/about/"><i class="fa fa-info-circle"></i> About this site</a>
+    <a class="pure-button" href="/archive/"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml"><i class="fa fa-rss"></i> rss</a>
+</div>
+<div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>&copy; 2018 <strong>mosuke5</strong> All rights reserved.<br />Powered by <a class="hugo" href="https://gohugo.io/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="https://blog.mosuke.tech/js/all.min.js"></script>
+<script>
+$(function() {
+    $('#search-textbox').keypress(function(e) {
+        if(e.which == 13){
+            $('#search-result').empty();
+            search($('#search-textbox').val())
+                .done(function(result){
+                $.each(result.hits.hits, function(){
+                    $("#search-result").append("<div class=\"search-result-list\"><div class=\"search-result-title\"><a href=" + this._source.uri +">"+ this._source.title +"</a><span class=\"search-result-score\"> ("+this._score+")</span></div><div class=\"search-result-description\">" + this._source.description + "</div></div>");
+                })
+            }).fail(function(){
+                $('#search-result').append("<p>error</p>");
+            })
+        }
+    });
+});
+function search(query){
+    return $.ajax({
+        type: "GET",
+        url: "https://gill-search.mosuke.tech/search",
+        data: "q=" + query,
+        dataType: "json",
+        success: function(res){
+            console.log(res);
+        }
+    })
+}
+</script>
+
+        </div>
+    </div>
+</div>
+<script>
+window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+  
+    return t;
+}(document, "script", "twitter-wjs"));
+</script>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-99596316-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
