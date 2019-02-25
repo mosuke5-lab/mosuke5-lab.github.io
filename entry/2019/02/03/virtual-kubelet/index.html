@@ -3,21 +3,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>virtual-kubeletは何か。Alibaba Cloud上で実際に動かして検証する | Goldstine研究所</title>
+    <title>Virtual Kubeletは何か。Alibaba Cloud上で実際に動かして検証する | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
-    <meta name="description" content="virtual-kubeletとはなにか、調査しました。実際にAlibaba Cloud上で動作させることも行いました。virtual-kubeletの理解を深めるのにご活用ください。">
+    <meta name="description" content="Virtual Kubeletとはなにか、調査しました。実際にAlibaba Cloud上で動作させることも行いました。Virtual Kubeletの理解を深めるのにご活用ください。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/" />
     <meta name="generator" content="Hugo 0.49" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="virtual-kubeletは何か。Alibaba Cloud上で実際に動かして検証する | Goldstine研究所">
-    <meta name="twitter:description" content="virtual-kubeletとはなにか、調査しました。実際にAlibaba Cloud上で動作させることも行いました。virtual-kubeletの理解を深めるのにご活用ください。">
+    <meta name="twitter:title" content="Virtual Kubeletは何か。Alibaba Cloud上で実際に動かして検証する | Goldstine研究所">
+    <meta name="twitter:description" content="Virtual Kubeletとはなにか、調査しました。実際にAlibaba Cloud上で動作させることも行いました。Virtual Kubeletの理解を深めるのにご活用ください。">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
-    <meta property="og:title" content="virtual-kubeletは何か。Alibaba Cloud上で実際に動かして検証する &middot; Goldstine研究所">
-    <meta property="og:description" content="virtual-kubeletとはなにか、調査しました。実際にAlibaba Cloud上で動作させることも行いました。virtual-kubeletの理解を深めるのにご活用ください。">
+    <meta property="og:title" content="Virtual Kubeletは何か。Alibaba Cloud上で実際に動かして検証する &middot; Goldstine研究所">
+    <meta property="og:description" content="Virtual Kubeletとはなにか、調査しました。実際にAlibaba Cloud上で動作させることも行いました。Virtual Kubeletの理解を深めるのにご活用ください。">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
     <meta property="og:url" content="https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/" />
@@ -58,7 +58,7 @@
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/" class="post-title">virtual-kubeletは何か。Alibaba Cloud上で実際に動かして検証する</a>
+                        <a href="https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/" class="post-title">Virtual Kubeletは何か。Alibaba Cloud上で実際に動かして検証する</a>
 
                         <p class="post-meta">
                             
@@ -67,21 +67,21 @@
                             
                                 under 
                                 
-                                <a class="post-category post-category-kubernetes" href="https://blog.mosuke.tech/categories/kubernetes">kubernetes</a><a class="post-category post-category-virtual-kubelet" href="https://blog.mosuke.tech/categories/virtual-kubelet">virtual-kubelet</a>
+                                <a class="post-category post-category-kubernetes" href="https://blog.mosuke.tech/categories/kubernetes">kubernetes</a><a class="post-category post-category-Virtual Kubelet" href="https://blog.mosuke.tech/categories/virtual-kubelet">Virtual Kubelet</a>
                             
                         </p>
                     </header>
                     <div class="post-description">
                         <p>はい、@mosuke5です。<br />
 ここ最近、会社でも少しずつKubernetesに関するはなしなどもでてきており、自分の興味ある分野だったこともあり本腰いれて遊んでおります。
-そのなかで、Alibaba CloudもProviderを出しているという、<a href="https://github.com/virtual-kubelet/virtual-kubelet">virtual-kubelet</a>について気になったので、実際に動かして概念の整理と使いどころについて考えてみました。</p>
+そのなかで、Alibaba CloudもProviderを出しているという、<a href="https://github.com/virtual-kubelet/virtual-kubelet">Virtual Kubelet</a>について気になったので、実際に動かして概念の整理と使いどころについて考えてみました。</p>
 
-<p>例ではAlibaba CloudのKubernetesとECIを使っていますが、基本的な考え方は同じですので、virtual-kubeletについて勉強したい人はぜひ読んでみてください。
+<p>例ではAlibaba CloudのKubernetesとECIを使っていますが、基本的な考え方は同じですので、Virtual Kubeletについて勉強したい人はぜひ読んでみてください。
 </p>
 
 <h2 id="各クラウドプロバイダーのサービスと分類">各クラウドプロバイダーのサービスと分類</h2>
 
-<p>まずvirtual-kubeletの話をする前に、最近のクラウドプロバイダーのコンテナ関連サービスの動向の話をします。
+<p>まずVirtual Kubeletの話をする前に、最近のクラウドプロバイダーのコンテナ関連サービスの動向の話をします。
 コンテナ、およびkubertenesが流行り始め、クラウドプロバイダー各社が様々なタイプのサービスを提供している現状です。</p>
 
 <table>
@@ -137,15 +137,15 @@
 
 <p>一方、Kubernetesのマネージドサービスとはいえ、ワーカーノードは仮想マシンで実装されることが多く運用が面倒な面もたくさんあります。
 仮想マシンを管理しなくてよいタイプのコンテナサービスもFargateをはじめ各社リリースするようになりました。
-それぞれのメリットデメリットがあるため、Kubernetesの拡張としてノードレスのコンテナサービスを利用できるようにしているのが、virtual-kubeletです。</p>
+それぞれのメリットデメリットがあるため、Kubernetesの拡張としてノードレスのコンテナサービスを利用できるようにしているのが、Virtual Kubeletです。</p>
 
 <p>あとは、見る限りエッジコンピューティングも生まれた背景と関連すると見受けられます。
 エッジコンピューティングでの実行アプリケーションとして、Kubernetesの拡張としてデプロイできないか、というのも大きく関係していそうです。</p>
 
 <h2 id="kubeletとは">kubeletとは</h2>
 
-<p>virtual-kubeletの話の前にもう一つ。
-virtual-kubeletのkubeletってなんなのか、みていきます。<br />
+<p>Virtual Kubeletの話の前にもう一つ。
+Virtual Kubeletのkubeletってなんなのか、みていきます。<br />
 kubeletはkubernetesを構成するコンポーネントの１つです。
 公式ドキュメントに下記のように書いてあります。</p>
 
@@ -165,9 +165,9 @@ kubeletはkubernetesを構成するコンポーネントの１つです。
 
 <p>つまり、kubeletは、Kubernetesクラスターのワーカーノード内で動作しているエージェントで、&rdquo;実際のコンテナの起動などを担うコンポーネント&rdquo;である、ということです。</p>
 
-<h2 id="virtual-kubeletとは">virtual-kubeletとは</h2>
+<h2 id="virtual-kubeletとは">Virtual Kubeletとは</h2>
 
-<p>それではいよいよvirtual-kubeletとは何かについて触れていきます。
+<p>それではいよいよVirtual Kubeletとは何かについて触れていきます。
 まずは、<a href="https://github.com/virtual-kubelet/virtual-kubelet">公式ドキュメント</a>から見ていきましょう。</p>
 
 <blockquote>
@@ -180,16 +180,16 @@ kubeletはkubernetesを構成するコンポーネントの１つです。
 <p>Virtual KubeletはオープンソースのKubernetes kubelet実装の１つで、他のAPIと接続することを目的にしたKubeletである。これは、ノードがACI, AWS Fargate, Hyper.sh, IoT Edgeなどのほかのサービスに支えられることを実現します。VKの主なシナリオはKubernetes APIをACI, Fargate, and Hyper.shなどのサーバレスコンテナプラットフォームへの拡張を可能にすることです。</p>
 </blockquote>
 
-<p>公式ドキュメントにある図を参考に、より具体的にvirtual-kubeletの概念を図で表してみました。
-virtual-kubeletを動作させると、仮想のWorkerノードを登録します。
-Kubernetesからvirtual-kubeletのノードにPodの配置を行うと、virtual-kubeletのプロセスは、プロセス起動時に指定した拡張リソース（右上のAliaba ECIやFargate）へPodを配置します。
+<p>公式ドキュメントにある図を参考に、より具体的にVirtual Kubeletの概念を図で表してみました。
+Virtual Kubeletを動作させると、仮想のWorkerノードを登録します。
+KubernetesからVirtual KubeletのノードにPodの配置を行うと、Virtual Kubeletのプロセスは、プロセス起動時に指定した拡張リソース（右上のAliaba ECIやFargate）へPodを配置します。
 つまり、普段はKubernetesの通常のクラスターを扱いながら、特定のワークロードだけKuernetesの拡張として、ノードレスのサービス側で実行することができるということです。</p>
 
 <p><img src="/image/virtual-kubelet-overview.png" alt="virtual-kubelet-overview" /></p>
 
 <h2 id="eciとは">ECIとは</h2>
 
-<p>実際にvirtual-kubeletが拡張先として利用するノードレスのコンテナサービスとはどんなサービスなのか見てみましょう。
+<p>実際にVirtual Kubeletが拡張先として利用するノードレスのコンテナサービスとはどんなサービスなのか見てみましょう。
 ここではAlibaba Cloudの新サービスである<a href="https://www.alibabacloud.com/products/elastic-container-instance">Elastic Container Instance</a>(略称ECI)をターゲットにして説明します。</p>
 
 <p>ECIは非常にシンプルなサービスです。
@@ -227,13 +227,13 @@ ECIは、実際のコンテナを実行するためのノードを持たなく�
 </ul></li>
 </ul>
 
-<h2 id="virtual-kubeletをインストール">virtual-kubeletをインストール</h2>
+<h2 id="virtual-kubeletをインストール">Virtual Kubeletをインストール</h2>
 
-<p>では、実際にvirtual-kubeletを動作させてみます。
+<p>では、実際にVirtual Kubeletを動作させてみます。
 <a href="https://github.com/virtual-kubelet/virtual-kubelet/blob/master/providers/alibabacloud/README.md">公式ドキュメント</a>に起動方法がかいてあるのですが、少し説明不十分なところがあるので補っていきます。</p>
 
 <p>まず、初心者の自分が勘違いしていたのは、このレポジトリをビルドしてできるバイナリーは、常駐プロセスになっており、手元のローカルで動かしてもいいのですが、Kubernetesクラスター上で動かすほうが合理的です。
-virtual-kubeletをKubernetes上で動かすためのサンプルのYAMLは中国語ですが<a href="https://help.aliyun.com/document_detail/97527.html">こちら</a>にありました。
+Virtual KubeletをKubernetes上で動かすためのサンプルのYAMLは中国語ですが<a href="https://help.aliyun.com/document_detail/97527.html">こちら</a>にありました。
 自分は最終的に以下で動かしました。</p>
 
 <pre><code class="language-yaml"># virtual-kubelet.yaml
@@ -322,11 +322,11 @@ NAME                                        READY     STATUS           RESTARTS 
 alicloud-virtual-kubelet-55d7c8b89d-khjsh   1/1       Running          0          3d
 </code></pre>
 
-<h2 id="virtual-kubeletでeciを操作する">virtual-kubeletでECIを操作する</h2>
+<h2 id="virtual-kubeletでeciを操作する">Virtual KubeletでECIを操作する</h2>
 
 <p>それでは、次にさっそく、KubernetesからこのECIに対してPodを配置してみたいと思います。
-virtual-kubeletのノードに対してnginxを実行させる簡単なマニュフェストを用意して実行します。<br />
-nodeSelectorでvirtual-kubeletのノードを指定し、そこに配置するようにマニュフェストを書きます。</p>
+Virtual Kubeletのノードに対してnginxを実行させる簡単なマニュフェストを用意して実行します。<br />
+nodeSelectorでVirtual Kubeletのノードを指定し、そこに配置するようにマニュフェストを書きます。</p>
 
 <pre><code class="language-yaml"># vk_pod.yaml
 apiVersion: v1
@@ -360,14 +360,14 @@ mypod                                       1/1       Running          0        
 
 <h3 id="eciのネットワーク">ECIのネットワーク</h3>
 
-<p>virtual-kubeletのプロセスを起動させるときに、もしKubernetesクラスターと同じネットワークを指定すれば、KubernetesのPodとECIで動作するコンテナは同一のネットワークにすることができます。。
+<p>Virtual Kubeletのプロセスを起動させるときに、もしKubernetesクラスターと同じネットワークを指定すれば、KubernetesのPodとECIで動作するコンテナは同一のネットワークにすることができます。。
 これは幾分か使い勝手がいいと思います。例えばバッチ処理のようなものをECIで実行したとしても、データベースなどにアクセスしやすいですね。利用しているKubernetesクラスターと拡張先が同じネットワークだとできることがいろいろと広がると考えています。</p>
 
 <p><img src="/image/virtual-kubelet-eci.png" alt="virtual-kubelet-eci" /></p>
 
 <h2 id="さいごに">さいごに</h2>
 
-<p>長くなりましたが、virtual-kubeletの概要と実際にAlibaba Cloudで動作させてみた例でした。
+<p>長くなりましたが、Virtual Kubeletの概要と実際にAlibaba Cloudで動作させてみた例でした。
 本ブログではAlibaba Cloudを例にしましたが、基本概念は他の場合でもほぼ同じでしょう。理解を深めるのに利用してもらえればと思います。</p>
                     </div>
                     <div id="disqus_thread"></div>
@@ -405,7 +405,7 @@ mypod                                       1/1       Running          0        
 <div class="footer-posts">
     <h5>Latest Posts</h5>
     
-        <li><a href="https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/">virtual-kubeletは何か。Alibaba Cloud上で実際に動かして検証する</a></li>
+        <li><a href="https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/">Virtual Kubeletは何か。Alibaba Cloud上で実際に動かして検証する</a></li>
     
         <li><a href="https://blog.mosuke.tech/entry/2019/01/04/purge-specified-cache-with-ci/">更新したファイルのCloudFlareキャッシュをCI過程で自動で削除する</a></li>
     
