@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubernetes上のリソースをTerraformで管理するメリットとデメリット | Goldstine研究所</title>
+    <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+    <meta name="description" content="TerraformでKubernetes上のリソースを管理する方法およびそのメリット・デメリットをみてみます。こちらをふまえ、最近のOperatorの動きなどを考察してみたいと思います。">
+    <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/">
+    <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/" />
+    <meta name="generator" content="Hugo 0.49" />
+    <meta name="twitter:card" content="summary">
+    
+    <meta name="twitter:title" content="Kubernetes上のリソースをTerraformで管理するメリットとデメリット | Goldstine研究所">
+    <meta name="twitter:description" content="TerraformでKubernetes上のリソースを管理する方法およびそのメリット・デメリットをみてみます。こちらをふまえ、最近のOperatorの動きなどを考察してみたいと思います。">
+    <meta name="twitter:site" content="@mosuke5" />
+    <meta name="twitter:creator" content="@mosuke5" />
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Kubernetes上のリソースをTerraformで管理するメリットとデメリット &middot; Goldstine研究所">
+    <meta property="og:description" content="TerraformでKubernetes上のリソースを管理する方法およびそのメリット・デメリットをみてみます。こちらをふまえ、最近のOperatorの動きなどを考察してみたいと思います。">
+    <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
+    <meta property="og:site_name" content="Goldstine研究所" />
+    <meta property="og:url" content="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+    <link rel="stylesheet" href="https://blog.mosuke.tech/css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="icon" type="image/png" href="/image/favicon.ico">
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
+            <h2 class="brand-tagline"> @mosuke5&#39;s Blog </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">07 Mar 2019, 01:06</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/" class="post-title">Kubernetes上のリソースをTerraformで管理するメリットとデメリット</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Kubernetes" href="https://blog.mosuke.tech/categories/kubernetes">Kubernetes</a><a class="post-category post-category-Terraform" href="https://blog.mosuke.tech/categories/terraform">Terraform</a>
+                            
+                        </p>
+                    </header>
+                    <div class="post-description">
+                        <p>@mosuke5です。早くも3月になってしまいました。<br />
+しかし、個人的にはこの2か月は非常に動きがあった2か月でしたのでいろいろ楽しかったです。</p>
+
+<p>さて、本題ですが、、<br />
+わたしの好きなTerraformを使ってKubernetesクラスタ上のリソースを管理するのをやってみたいと思います。<br />
+そもそもKubernetesをTeraformで管理するとなると2つのレイヤーの話があります。
+今回は、後者のほうに重きを置いてお伝えします。</p>
+
+<ol>
+<li>KubernetesクラスターそのものをTerraformで管理する</li>
+<li>Kubernetesクラスター上のリソースをTerraformで管理する</li>
+</ol>
+
+<p></p>
+
+<h2 id="kubernetesクラスターそのものをterraformで操る">KubernetesクラスターそのものをTerraformで操る</h2>
+
+<p>こちらは軽く流していきますが、Terraformでクラウドのサービスを操ることができるので、もしKubernetesのサービスを提供している場合は、下記のようにクラスターそのものを構築することが容易です。
+こちらは、Alibaba CloudのContainer Serviceを起動する例としていてます。</p>
+
+<pre><code class="language-json">provider &quot;alicloud&quot; {
+  access_key = &quot;${var.access_key}&quot;
+  secret_key = &quot;${var.secret_key}&quot;
+  region     = &quot;${var.region}&quot;
+}
+
+resource &quot;alicloud_cs_kubernetes&quot; &quot;main&quot; {
+  name_prefix = &quot;my-first-k8s&quot;
+  availability_zone = &quot;${data.alicloud_zones.default.zones.0.id}&quot;
+  new_nat_gateway = true
+  master_instance_types = [&quot;ecs.n4.small&quot;]
+  worker_instance_types = [&quot;ecs.n4.small&quot;]
+  worker_numbers = [3]
+  key_name = &quot;hogekey&quot;
+  pod_cidr = &quot;192.168.1.0/24&quot;
+  service_cidr = &quot;192.168.2.0/24&quot;
+  enable_ssh = true
+  install_cloud_monitor = true
+}
+</code></pre>
+
+<h2 id="kubernetes上のリソースをterraformから操るメリットとデメリット">Kubernetes上のリソースをTerraformから操るメリットとデメリット</h2>
+
+<p>次はクラスターそのものではなくて、クラスター上のリソースをどう扱うかを見ていきます。
+そもそもKubernetesクラスタのリソースはmanifestファイルで扱うことが一般的です。
+Terraformで管理するメリット/デメリットってどんなところにあるのか考えてみたいと思います。</p>
+
+<h3 id="メリット">メリット</h3>
+
+<ul>
+<li>stateファイルを使って状態管理、差分管理ができる</li>
+<li>他の豊富なproviderと組み合わせて利用ができる</li>
+<li>削除が容易</li>
+</ul>
+
+<h3 id="デメリット">デメリット</h3>
+
+<ul>
+<li>対応リソースが少ない or 最新のリソースへの対応が遅い</li>
+<li>manifestで十分な感じもある</li>
+</ul>
+
+<h2 id="hello-world">Hello world</h2>
+
+<h3 id="認証-provider設定">認証、provider設定</h3>
+
+<p>まずは試してみます。認証ですが、いろんな方法がありますが、もしすでに<code>~/.kube/config</code>にクライアント証明の入った設定ファイルがあるのならば、特に設定することなく利用できます。
+認証に、<code>servicea ccount</code>のtokenを利用している場合などは、既定の設定をいれる必要があります。
+ここでは、<code>~/.kube/config</code>があるので以下だけのProvider設定で行きます。</p>
+
+<pre><code>provider &quot;kubernetes&quot; {}
+</code></pre>
+
+<h3 id="deploymentを作ってみる">Deploymentを作ってみる</h3>
+
+<p>例えばすごく単純に、Nginxが3つ立ち上がるdeploymentを作ることとします。
+manifestなら以下のようになりますね。</p>
+
+<pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-sample-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx-sample
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: nginx-sample
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+</code></pre>
+
+<p>こちらをTerraformで記述していくとどうなるのか。<br />
+書いてみた所感だと、ストラクチャーはもちろんmanifestファイルと同じなので書きやすいのですが、
+一部のArgumentsの名前がmanifestで書くものと異なります。
+例えば、<code>matchLabels</code>を<code>match_labels</code>としなければいけなかったりします。
+このあたりが少し面倒という印象です。</p>
+
+<pre><code class="language-json">resource &quot;kubernetes_deployment&quot; &quot;test&quot; {
+  metadata {
+    name = &quot;nginx-sample-deployment&quot;
+  }
+
+  spec {
+    selector {
+      match_labels {
+        app = &quot;nginx-sample-deployment&quot;
+      }
+    }
+    replicas = 3
+    template {
+      metadata {
+        labels {
+          app = &quot;nginx-sample-deployment&quot;
+        }
+      }
+      spec {
+        container {
+          name = &quot;nignx&quot;
+          image = &quot;nginx:latest&quot;
+          port {
+            container_port = 80
+          }
+        }
+      }
+    }
+  }
+}
+</code></pre>
+
+<p>Terraform管理のいいところは、なんといっても、この<code>terraform plan</code>によるDry-runができることですね。
+やってみます。</p>
+
+<pre><code>$ terraform plan
+Refreshing Terraform state in-memory prior to plan...
+The refreshed state will be used to calculate this plan, but will not be
+persisted to local or remote state storage.
+
+------------------------------------------------------------------------
+
+An execution plan has been generated and is shown below.
+Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  + kubernetes_deployment.test
+      id:                                                            &lt;computed&gt;
+      metadata.#:                                                    &quot;1&quot;
+      metadata.0.generation:                                         &lt;computed&gt;
+      metadata.0.name:                                               &quot;nginx-sample-deployment&quot;
+      metadata.0.namespace:                                          &quot;default&quot;
+(中略)
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+</code></pre>
+
+<p>差分を確認してapplyしてデプロイしていきます。</p>
+
+<pre><code>$ terraform apply
+(中略)
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+$ kubectl get deployment
+NAME                       DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+nginx-sample-deployment    3         3         3            3           30s
+
+$ kubectl get pods
+NAME                                        READY     STATUS    RESTARTS   AGE
+nginx-sample-deployment-6c668d7f76-2djrb    1/1       Running   0          49s
+nginx-sample-deployment-6c668d7f76-5ncww    1/1       Running   0          49s
+nginx-sample-deployment-6c668d7f76-t9lfp    1/1       Running   0          49s
+</code></pre>
+
+<p>変更があったと仮定して、Terraformの定義ファイルの中身を少し変えてみます。
+レプリカ数とコンテナ名を変更してみました。<br />
+変更の差分を確認できるのはやっぱりTerraformで管理する最大のメリットですね。</p>
+
+<pre><code>$ terraform plan
+kubernetes_deployment.test: Refreshing state... (ID: default/nginx-sample-deployment)
+
+------------------------------------------------------------------------
+
+An execution plan has been generated and is shown below.
+Resource actions are indicated with the following symbols:
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  ~ kubernetes_deployment.test
+      spec.0.replicas:                           &quot;3&quot; =&gt; &quot;5&quot;
+      spec.0.template.0.spec.0.container.0.name: &quot;nignx&quot; =&gt; &quot;nignx-hogege&quot;
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+</code></pre>
+
+<h2 id="kubernetes側からクラウドリソースを制御する動き">Kubernetes側からクラウドリソースを制御する動き</h2>
+
+<p>しかし最近はKubernetes側からクラウドリソースを制御するようにするという動きが顕著です。
+先日Redhatがオープンした<a href="https://www.operatorhub.io/">OperatorHub.io</a>ではAWSもカスタムリソースを提供していて、DynamoDBやSQSなどの一部のクラウドリソースをKubernetesから扱えるようにするモジュールを提供しています。<br />
+こちらについては、まだ試せていないので試したら別でブログに書こうと思います。</p>
+
+<p>以上にみてきたように、Terraformではstate管理ができるので、それゆえに差分管理やDry-runなどの機能が使えて便利な側面がありました。一方で、Kubernetes側からのクラウドリソースの管理の流れをみると、アプリケーション寄りの人はこちらのほうがスタンダードになってくるかなと思っている部分もあります。</p>
+
+<p>今後の動きが楽しみです。</p>
+                    </div>
+                    <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+                            <a class="twitter-share-button"
+                            href="https://twitter.com/intent/tweet">
+                          Tweet</a>
+                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2019%2f03%2f07%2fk8s-with-terraform%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <hr class="footer-hr" />
+<div class="footer-posts">
+    <h5>Latest Posts</h5>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/">Kubernetes上のリソースをTerraformで管理するメリットとデメリット</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/">Virtual Kubeletとは何か。Alibaba Cloud上で実際に動かして検証する</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/01/04/purge-specified-cache-with-ci/">更新したファイルのCloudFlareキャッシュをCI過程で自動で削除する</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2018/12/31/reflection/">「索」2018年振り返り。</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2018/12/20/slideshare-api-by-gas/">SlideShare APIをGoogleAppsScriptから利用する</a></li>
+    
+</div>
+<div class="footer-posts">
+    <h5>Featured Posts</h5>
+    <li><a href="https://blog.mosuke.tech/entry/2016/06/04/180122/">Nginxの仕組みについて入門</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2017/03/18/182252/">万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2015/07/19/135844/">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った</a></li>
+</div>
+<div class="search">
+    <h5>Search(Beta)</h5>
+    <p>この機能は、ElasticSearchを用いた全文検索エンジンです。Beta版。</p>
+    <div class="gill-search-engine">
+        <input type="text" id="search-textbox" placeholder="Search">
+    </div>
+    <div id="search-result"></div>
+</div>
+<div class="links">
+    <h5>Links</h5>
+    <a class="pure-button" href="https://mosuke.tech"><i class="fa fa-user"></i> mosuke5</a>
+    <a class="pure-button" href="/about/"><i class="fa fa-info-circle"></i> About this site</a>
+    <a class="pure-button" href="/archive/"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml"><i class="fa fa-rss"></i> rss</a>
+</div>
+<div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>&copy; 2018 <strong>mosuke5</strong> All rights reserved.<br />Powered by <a class="hugo" href="https://gohugo.io/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="https://blog.mosuke.tech/js/all.min.js"></script>
+<script>
+$(function() {
+    $('#search-textbox').keypress(function(e) {
+        if(e.which == 13){
+            $('#search-result').empty();
+            search($('#search-textbox').val())
+                .done(function(result){
+                $.each(result.hits.hits, function(){
+                    $("#search-result").append("<div class=\"search-result-list\"><div class=\"search-result-title\"><a href=" + this._source.uri +">"+ this._source.title +"</a><span class=\"search-result-score\"> ("+this._score+")</span></div><div class=\"search-result-description\">" + this._source.description + "</div></div>");
+                })
+            }).fail(function(){
+                $('#search-result').append("<p>error</p>");
+            })
+        }
+    });
+});
+function search(query){
+    return $.ajax({
+        type: "GET",
+        url: "https://gill-search.mosuke.tech/search",
+        data: "q=" + query,
+        dataType: "json",
+        success: function(res){
+            console.log(res);
+        }
+    })
+}
+</script>
+
+        </div>
+    </div>
+</div>
+<script>
+window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+  
+    return t;
+}(document, "script", "twitter-wjs"));
+</script>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-99596316-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
