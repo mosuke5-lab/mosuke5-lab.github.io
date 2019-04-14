@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fargateの動き、Amazon ECSへのデプロイフローなどを確認する | Goldstine研究所</title>
+    <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+    <meta name="description" content="はじめてAmaozn ECSを触って、Fargateの正体を突き止めたり、デプロイの方法などを確かめたりしました。Firecrackerすげーというのが一番の感想。">
+    <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/04/13/aws-ecs-deploy/">
+    <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/04/13/aws-ecs-deploy/" />
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta name="twitter:card" content="summary">
+    
+    <meta name="twitter:title" content="Fargateの動き、Amazon ECSへのデプロイフローなどを確認する | Goldstine研究所">
+    <meta name="twitter:description" content="はじめてAmaozn ECSを触って、Fargateの正体を突き止めたり、デプロイの方法などを確かめたりしました。Firecrackerすげーというのが一番の感想。">
+    <meta name="twitter:site" content="@mosuke5" />
+    <meta name="twitter:creator" content="@mosuke5" />
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Fargateの動き、Amazon ECSへのデプロイフローなどを確認する &middot; Goldstine研究所">
+    <meta property="og:description" content="はじめてAmaozn ECSを触って、Fargateの正体を突き止めたり、デプロイの方法などを確かめたりしました。Firecrackerすげーというのが一番の感想。">
+    <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
+    <meta property="og:site_name" content="Goldstine研究所" />
+    <meta property="og:url" content="https://blog.mosuke.tech/entry/2019/04/13/aws-ecs-deploy/" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+    <link rel="stylesheet" href="https://blog.mosuke.tech/css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="icon" type="image/png" href="/image/favicon.ico">
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
+            <h2 class="brand-tagline"> @mosuke5&#39;s Blog </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">14 Apr 2019, 13:40</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2019/04/13/aws-ecs-deploy/" class="post-title">Fargateの動き、Amazon ECSへのデプロイフローなどを確認する</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-AWS" href="https://blog.mosuke.tech/categories/aws">AWS</a><a class="post-category post-category-ECS" href="https://blog.mosuke.tech/categories/ecs">ECS</a><a class="post-category post-category-Fargate" href="https://blog.mosuke.tech/categories/fargate">Fargate</a><a class="post-category post-category-Firecracker" href="https://blog.mosuke.tech/categories/firecracker">Firecracker</a><a class="post-category post-category-Gitlab" href="https://blog.mosuke.tech/categories/gitlab">Gitlab</a><a class="post-category post-category-ecs-deploy" href="https://blog.mosuke.tech/categories/ecs-deploy">ecs-deploy</a>
+                            
+                        </p>
+                    </header>
+                    <div class="post-description">
+                        <p>ニート最終日の<a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br />
+先日@mogulla3と一緒にAWS ECSをはじめて触ってみて、
+AWSのコンテナ戦略やECSへのデプロイあたりまで試してみたのでやったことをまとめました。
+自分はDockerやKubernetesなどは、ちょいちょい触ってきましたがAWS特有のサービスとしてECS, Fargateあたりは実は初めて触りました。いろいろな気づきもあったのでその辺り含めてまとめられればとおもいます。</p>
+
+<h2 id="やったことの全体像">やったことの全体像</h2>
+
+<p>試してみたことの全体像は下記の通りです。<br />
+ごちゃごちゃと書いていますが、大きく右と左で分かれていて、左側のAWS上ではECS(Fargateのタスク)でNginxで静的なデータを返すWebサーバを配置。前段にALBで分散してアクセスできるようにしています。
+右側では、そのECSに対して変更をデプロイするためにGitlabを使っています。<br />
+初めてECSを触ったので、どんなもんか全体感を把握するとともに、せっかくなのでGitlabで簡易的なCI/CDっぽい環境作ってみようとしてやったものです。</p>
+
+<p><img src="/image/overview-deploy-to-ecs-with-gitlab.png" alt="overview" /></p>
+
+<h2 id="fargateへの気付き">Fargateへの気付き</h2>
+
+<p>まず、本題の部分ではないのですが、個人的に一番盛り上がっていたポイント（笑）<br />
+Fargateを触り始めてすぐにある違和感に気づきました。
+それは、Fargateが単なるコンテナじゃない、ということです。
+どういうことかというと、Fargate Taskをスケールさせた際にALB配下のターゲットがFargateのIPアドレスであり、また全てが同じ80番ポートだったということです。</p>
+
+<p><img src="/image/ecs-alb-targets.png" alt="alb-targets" /></p>
+
+<p>もしFargateを単なるコンテナとして見るならば、すべてがポート80であることは不自然です。
+なぜかというと、コンテナはホストサーバの上に複数立ち上がることが一般的です。
+ホスト上では80ポートは1つしか使えないため、もしすべてのコンテナが80ポートでアクセスできるためにはそれぞれのコンテナが別々のホストでないといけないからです。
+1コンテナに対して1VMというのは一般的には考えづらく、これはなんだ？？と思っていました。</p>
+
+<p>自分はKubernetesは触っており、kube-proxyによるコンテナの分散を見ていたから余計に沿う感じるのかもしれません。
+Kubernetesではロードバランサが直接コンテナに分散することはなく、ワーカーノードに対してロードバランサの振り先が設定されます。
+その上で、ワーカーノード上のkube-proxyが適切なコンテナへのリクエストの振り分けを行います。そのため、例えば80番ポートを利用するコンテナも、コンテナのホスト側のポートが必ずしも80である必要はない、というものです。
+下記は、<a href="https://www.slideshare.net/mosuke5/alibabacloudkubernetes">こちらのスライドの抜粋</a>。</p>
+
+<p><img src="/image/kubeproxy-why-loadbalanced.png" alt="kube-proxy" /></p>
+
+<p>実際に、この違和感はすぐにとあることを思い出して納得しました。
+それは少し前にAWSが公表していたFirecrackerというオープンソースです。こちらでは、125msでmicroVMを立ち上げることのできるソフトウェアで、こちらをFargateやLambdaに利用しているとのことでした。
+つまり、Fargateはたんなるコンテナではなく、やはりひとつのVMとして動作しているということでした。これで納得。
+詳しくはこちらの記事をみるといいでしょう。おもしろいです。</p>
+
+<p><a href="https://aws.amazon.com/jp/blogs/news/firecracker-lightweight-virtualization-for-serverless-computing/">Firecracker – サーバーレスコンピューティングのための軽量な仮想化機能 | Amazon Web Services ブログ</a></p>
+
+<p>ちなみに、料金をみるとFargateは少しお高めのようです。<br />
+最近値下がったとはいえ、例えば1vCPU, 1GB memoryのFargateコンピューティングを1ヵ月動かすと、大体4400円/月くらいかかります。高いですね。
+しかし、料金体系的にメモリを増やしてもそこまで高くならないのがポイントかもしれません。
+1vCPU, 1GB memoryのFargateコンピューティングを1ヵ月動かしても、5500-6000円/月とそこまで変わりません。
+仮に小スペックでも上のようにFirecrackerでVMとして起動するのでそういう意味で高いのかもしれませんね。（真相はしりません.）</p>
+
+<h2 id="ecsへのデプロイ">ECSへのデプロイ</h2>
+
+<p>本編よりFargateで盛り上がってしまいました。
+ECSへのデプロイは、<a href="https://github.com/silinternational/ecs-deploy">ecs-deploy</a>というオープンソースがあったのでこちらを利用しました。</p>
+
+<p>特別な事はしていないですが、アプリの変更から自動的にコンテナイメージを生成してデプロイするまでをGitlabを活用しました。
+下記のような<code>.gitlab-ci.yml</code>をアプリのレポジトリに配置して、Masterブランチへのコミットをトリガーに、Dockerイメージの生成とAWS ECSへのデプロイを行いました。Dockerイメージにはgitのコミット番号を振り、切り戻しなどしやすいようにしています。</p>
+
+<pre><code class="language-YAML">image: docker:stable
+
+services:
+  - docker:dind
+
+stages:
+  - build
+  - deploy
+
+variables:
+  CONTAINER_IMAGE: registry.gitlab.com/$CI_PROJECT_PATH
+  DOCKER_DRIVER: overlay2
+
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+  - apk add jq python3
+  - apk add bash
+  - pip3 install awscli
+  
+release-image:
+  stage: build
+  script:
+    - docker pull $CONTAINER_IMAGE:latest || true
+    - docker build --cache-from $CONTAINER_IMAGE:latest --tag $CONTAINER_IMAGE:$CI_BUILD_REF --tag $CONTAINER_IMAGE:latest .
+    - docker push $CONTAINER_IMAGE:$CI_BUILD_REF
+    - docker push $CONTAINER_IMAGE:latest
+  only: 
+    - master
+
+deploy:
+  stage: deploy
+  script:
+    - wget https://raw.githubusercontent.com/silinternational/ecs-deploy/master/ecs-deploy -O /usr/bin/ecs-deploy
+    - chmod +x /usr/bin/ecs-deploy
+    - ecs-deploy -c &lt;ECS cluster name&gt; -n &lt;ECS service name&gt; -i $CONTAINER_IMAGE:$CI_BUILD_REF
+  only: 
+    - master
+</code></pre>
+
+<h2 id="secretmanager連携">SecretManager連携</h2>
+
+<p>Fargateのタスクで利用するDockerイメージはプライベートレポジトリに格納されているものです。
+プライベートレポジトリから取得するためには認証がいるのですが、ここでしょうもないことにハマりました。
+設定自体は<a href="https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/private-auth.html">こちらのドキュメント</a>をみながらやっていたのですが、うまくいかない状況でした。<br />
+下記は出ていたエラーメッセージです。IAMのポリシーがおかしいというのは分かっていたのですが、はじめなにがおかしいかわかりませんでした。</p>
+
+<pre><code>Asm fetching secret from the service for arn:aws:secretsmanager:ap-northeast-1:xxxxxxxxxx:secret:gitlab-sample-registry-y54JnU: AccessDeniedException: User: arn:aws:sts::xxxxxxxxxx:assumed-role/ecsTaskExecutionRole/14edf050-3d47-4c90-8e13-cb4a6d0e67a1 is not authorized to perform: secretsmanager:GetSecretValue on resource: arn:aws:secretsmanager:ap-northeast-1:xxxxxxxxxx:secret:gitlab-sample-registry-y54JnU status code: 400, request id: 83b3a590-db73-43d8-a0cb-abf894994173
+</code></pre>
+
+<p>IAMのロールのポリシーの設定で下記を設定する必要があるのですが、<code>Resource</code>ででてくる<code>secret_name</code>に少し罠がありました。</p>
+
+<pre><code class="language-json">{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: 
+    {
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Action&quot;: [
+        &quot;kms:Decrypt&quot;,
+        &quot;secretsmanager:GetSecretValue&quot;
+      ],
+      &quot;Resource&quot;: [
+        &quot;arn:aws:secretsmanager:region:aws_account_id:secret:secret_name&quot;,
+        &quot;arn:aws:kms:region:aws_account_id:key:key_id&quot;     
+      ]
+    }
+  ]
+}
+</code></pre>
+
+<p>secret managerの下記の画面の「Secret Name」ではなく、ARNの末尾の値のことでした。ここは初心者には間違えやすいので注意してください。</p>
+
+<p><img src="/image/aws-secret-name-edited.png" alt="secret-name" /></p>
+
+<h2 id="まとめ">まとめ</h2>
+
+<p>以上、@mogulla3とだいたい1日でしゃべりながら一緒に触って実施したことでした。<br />
+やれたことは少ないのですが、いままでKubernetesを基準にコンテナオーケストレーションをみていて、AWS独自サービスは触った事無かったのですが、触ってみるといろいろと面白いことを発見できました。
+今後もAWSの動きは見ていきたいと思います。</p>
+
+<p>また、これからECSやFargateを触る人たちの少しでも参考になればと思っています。</p>
+                    </div>
+                    <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+                            <a class="twitter-share-button"
+                            href="https://twitter.com/intent/tweet">
+                          Tweet</a>
+                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2019%2f04%2f13%2faws-ecs-deploy%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <hr class="footer-hr" />
+<div class="footer-posts">
+    <h5>Latest Posts</h5>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/04/13/aws-ecs-deploy/">Fargateの動き、Amazon ECSへのデプロイフローなどを確認する</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/03/29/thank-you-alibaba/">Alibaba Cloudの中の人を卒業。Alibabaと僕の物語</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/03/26/terraform-integrated-with-ansible/">AnsibleのTerraform moduleを考察してみる</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/">Kubernetes上のリソースをTerraformで管理するメリットとデメリット</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/">Virtual Kubeletとは何か。Alibaba Cloud上で実際に動かして検証する</a></li>
+    
+</div>
+<div class="footer-posts">
+    <h5>Featured Posts</h5>
+    <li><a href="https://blog.mosuke.tech/entry/2016/06/04/180122/">Nginxの仕組みについて入門</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2017/03/18/182252/">万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2015/07/19/135844/">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った</a></li>
+</div>
+<div class="search">
+    <h5>Search(Beta)</h5>
+    <p>この機能は、ElasticSearchを用いた全文検索エンジンです。Beta版。</p>
+    <div class="gill-search-engine">
+        <input type="text" id="search-textbox" placeholder="Search">
+    </div>
+    <div id="search-result"></div>
+</div>
+<div class="links">
+    <h5>Links</h5>
+    <a class="pure-button" href="https://mosuke.tech"><i class="fa fa-user"></i> mosuke5</a>
+    <a class="pure-button" href="/about/"><i class="fa fa-info-circle"></i> About this site</a>
+    <a class="pure-button" href="/archive/"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml"><i class="fa fa-rss"></i> rss</a>
+</div>
+<div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>&copy; 2018 <strong>mosuke5</strong> All rights reserved.<br />Powered by <a class="hugo" href="https://gohugo.io/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="https://blog.mosuke.tech/js/all.min.js"></script>
+<script>
+$(function() {
+    $('#search-textbox').keypress(function(e) {
+        if(e.which == 13){
+            $('#search-result').empty();
+            search($('#search-textbox').val())
+                .done(function(result){
+                $.each(result.hits.hits, function(){
+                    $("#search-result").append("<div class=\"search-result-list\"><div class=\"search-result-title\"><a href=" + this._source.uri +">"+ this._source.title +"</a><span class=\"search-result-score\"> ("+this._score+")</span></div><div class=\"search-result-description\">" + this._source.description + "</div></div>");
+                })
+            }).fail(function(){
+                $('#search-result').append("<p>error</p>");
+            })
+        }
+    });
+});
+function search(query){
+    return $.ajax({
+        type: "GET",
+        url: "https://gill-search.mosuke.tech/search",
+        data: "q=" + query,
+        dataType: "json",
+        success: function(res){
+            console.log(res);
+        }
+    })
+}
+</script>
+
+        </div>
+    </div>
+</div>
+<script>
+window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+  
+    return t;
+}(document, "script", "twitter-wjs"));
+</script>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-99596316-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
