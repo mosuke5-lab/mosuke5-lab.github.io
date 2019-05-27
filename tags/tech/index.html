@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tech | Goldstine研究所</title>
+    <title>Tech | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
     <meta name="description" content="@mosuke5のブログサイト。クラウド技術やアプリ開発、インフラ系ツールなどを主に情報発信しています。">
     <link rel="canonical" href="https://blog.mosuke.tech/tags/tech/">
@@ -11,12 +11,12 @@
     <meta name="generator" content="Hugo 0.55.4" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="tech | Goldstine研究所">
+    <meta name="twitter:title" content="Tech | Goldstine研究所">
     <meta name="twitter:description" content="@mosuke5のブログサイト。クラウド技術やアプリ開発、インフラ系ツールなどを主に情報発信しています。">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
-    <meta property="og:title" content="tech &middot; Goldstine研究所">
+    <meta property="og:title" content="Tech &middot; Goldstine研究所">
     <meta property="og:description" content="@mosuke5のブログサイト。クラウド技術やアプリ開発、インフラ系ツールなどを主に情報発信しています。">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
@@ -74,7 +74,23 @@
                     </header>
 
                     <div class="post-description">
-                        お久しぶりです。@mosuke5です。 新しい会社に入って１ヶ月ほど経ちましたが生きています。 今回は、ElasticSearchを題材にします
+                        <p>お久しぶりです。@mosuke5です。<br />
+新しい会社に入って１ヶ月ほど経ちましたが生きています。
+今回は、ElasticSearchを題材にしますが外部コンポーネントを利用しているアプリケーションのテストについてです。
+すごく初歩的なところですが、いくつか考えなければいけないポイントもあったのでまとめました。</p>
+
+<h2 id="はじめに">はじめに</h2>
+
+<p>今回の題材は非常にシンプルな検索機能をもったアプリケーションです。
+構成はアプリケーションはRailsで、検索エンジンを担うのがElastiCsearchという前提です。</p>
+
+<p>アプリケーションがもつmethodは３つで以下としています。</p>
+
+<ol>
+<li>GET &lsquo;/&rsquo;  =&gt; &lsquo;Hello&rsquo;を返す</li>
+<li>GET &lsquo;/search&rsquo; =&gt; GETパラメータ&rsquo;q&rsquo;のキーワードで検索した結果をjsonで返す</li>
+<li>POST &lsquo;/update&rsquo; =&gt; 所定のjsonファイルをPOSTするとbulkでinsertされ、その結果をjsonで返す</li>
+</ol>
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2019/05/26/elasticsearch-test/">全文を読む</a>

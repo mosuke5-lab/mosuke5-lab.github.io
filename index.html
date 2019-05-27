@@ -75,7 +75,23 @@
                     </header>
 
                     <div class="post-description">
-                        お久しぶりです。@mosuke5です。 新しい会社に入って１ヶ月ほど経ちましたが生きています。 今回は、ElasticSearchを題材にします
+                        <p>お久しぶりです。@mosuke5です。<br />
+新しい会社に入って１ヶ月ほど経ちましたが生きています。
+今回は、ElasticSearchを題材にしますが外部コンポーネントを利用しているアプリケーションのテストについてです。
+すごく初歩的なところですが、いくつか考えなければいけないポイントもあったのでまとめました。</p>
+
+<h2 id="はじめに">はじめに</h2>
+
+<p>今回の題材は非常にシンプルな検索機能をもったアプリケーションです。
+構成はアプリケーションはRailsで、検索エンジンを担うのがElastiCsearchという前提です。</p>
+
+<p>アプリケーションがもつmethodは３つで以下としています。</p>
+
+<ol>
+<li>GET &lsquo;/&rsquo;  =&gt; &lsquo;Hello&rsquo;を返す</li>
+<li>GET &lsquo;/search&rsquo; =&gt; GETパラメータ&rsquo;q&rsquo;のキーワードで検索した結果をjsonで返す</li>
+<li>POST &lsquo;/update&rsquo; =&gt; 所定のjsonファイルをPOSTするとbulkでinsertされ、その結果をjsonで返す</li>
+</ol>
                         <a href="https://blog.mosuke.tech/entry/2019/05/26/elasticsearch-test/">続きを読む</a>
                     </div>
                 </section>
