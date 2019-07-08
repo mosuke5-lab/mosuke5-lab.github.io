@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CKADを取得の対策や試験当日の対応について | Goldstine研究所</title>
+    <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+    <meta name="description" content="CKAD(Certified Kubernetes Application Developer)を受験してきて無事に合格しました。合格のために準備すべきことと、試験受験に関して不安だったことなどをまとめました。">
+    <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/07/08/ckad/">
+    <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/07/08/ckad/" />
+    <meta name="generator" content="Hugo 0.55.4" />
+    <meta name="twitter:card" content="summary">
+    
+    <meta name="twitter:title" content="CKADを取得の対策や試験当日の対応について | Goldstine研究所">
+    <meta name="twitter:description" content="CKAD(Certified Kubernetes Application Developer)を受験してきて無事に合格しました。合格のために準備すべきことと、試験受験に関して不安だったことなどをまとめました。">
+    <meta name="twitter:site" content="@mosuke5" />
+    <meta name="twitter:creator" content="@mosuke5" />
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="CKADを取得の対策や試験当日の対応について &middot; Goldstine研究所">
+    <meta property="og:description" content="CKAD(Certified Kubernetes Application Developer)を受験してきて無事に合格しました。合格のために準備すべきことと、試験受験に関して不安だったことなどをまとめました。">
+    <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
+    <meta property="og:site_name" content="Goldstine研究所" />
+    <meta property="og:url" content="https://blog.mosuke.tech/entry/2019/07/08/ckad/" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+    <link rel="stylesheet" href="https://blog.mosuke.tech/css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="icon" type="image/png" href="/image/favicon.ico">
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
+            <h2 class="brand-tagline"> @mosuke5&#39;s Blog </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">08 Jul 2019, 09:12</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2019/07/08/ckad/" class="post-title">CKADを取得の対策や試験当日の対応について</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Kubernetes" href="https://blog.mosuke.tech/categories/kubernetes">Kubernetes</a><a class="post-category post-category-CKAD" href="https://blog.mosuke.tech/categories/ckad">CKAD</a><a class="post-category post-category-資格試験" href="https://blog.mosuke.tech/categories/%E8%B3%87%E6%A0%BC%E8%A9%A6%E9%A8%93">資格試験</a>
+                            
+                        </p>
+                    </header>
+                    <div class="post-description">
+                        <p><a href="https://twitter.com/mosuke5">@mosuke5</a>です。<a href="https://www.cncf.io/certification/ckad/" target="_blank">CKAD(Certified Kubernetes Application Developer)</a>を受けてきました。<br />
+すでに多くのCKA/CKADの合格レポートや体験記がでておりますが、
+それでも自分が実際に受けてみるまで不安な要素も多くあったので、
+そのあたりを払拭するべくこの記事を書きたいと思います。</p>
+
+<p>2019年7月5日にCKADを受験して無事に合格しました。<br />
+スコアは89%と案外高く(66%で合格)、驚きでもあったのですが、その体験をこれから受験する人にもシェアできればと思います。</p>
+
+<p><img src="/image/ckad-certificate.png" alt="ckad-certificate" /></p>
+
+<h2 id="モチベーション">モチベーション</h2>
+
+<p>前置き的な。適当に流してください。<br />
+今年の4月からDevOpsを中心とした技術・プロダクトやそのプロセスなどをお客さんに提供する立場になりました。
+個人的にいつもそうなのですが、自分の資格そのものはお客さんからのはじめの信頼を得るため、くらいのものでしかないと思っていますが、一方で、資格試験は「学び」の手段の１つとして有効と思います。
+仕事の中で自分のスキルも当然必要ですが、他者がよりはやく正確な学びをするためにどうしたらいいかも自分の関心事なわけです。
+この資格試験がどういうレベル感でなにをもとめているのか、それを自分で知りたいというのが一番のモチベーションでした。</p>
+
+<h2 id="準備したこと">準備したこと</h2>
+
+<p>なにを勉強すればいいかについては、すでにでているブログなどを多く参考にしました。
+その中で、下記3つが一番役に立ったものでしたので紹介します。</p>
+
+<h3 id="ckad-exercises">CKAD-exercises</h3>
+
+<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/dgkanatsios/CKAD-exercises" data-iframely-url="//cdn.iframe.ly/MAoLizS"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
+
+<p>こちらのサイトはGithubのページなのですが、CKADの資格試験の問題の中で行うであろう「操作」について効率的に学べるものです。
+ここにある問題のレベルがそのままでるわけではないのですが（一部そのレベルのものもある）、CKADでは問題を解くスピードも重要で、基本的な動作を「身体に染み込ませる」ために役立ちます。
+必要なコマンドや概念についてはexercisesをやっておけばほぼ網羅できるものだったかなと感じています。</p>
+
+<p>しかし、CKAD-exercisesでは、実際に実行する環境までは用意していないので、自分で環境は用意する必要があります。
+自分の場合は、自分で構築したKubernetesクラスターがあったのでそちらで練習しましたが、お持ちでない方も多いとお思います。
+もし今後、Kubernetesをガッツリ触っていく予定があるのであれば、自前で構築するないしはGKEやEKSなどを一時的に借りて触ってみることをおすすめします。
+自前構築は、CKAを受ける方はやることになるはずですが、それなりに大変なのも事実です。
+まずはアプリケーション寄りでCKADを取りたいというかたはパブリッククラウドのKubernetesサービスか、Katacodaなどをおすすめします。
+Katacoda自身も基本操作を学べるサイトですが、ここでは一時的にクラスタを借りれるのでその上でCKAD-exercisesに練習をすることも一部可能かなと思います。</p>
+
+<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.katacoda.com/" data-iframely-url="//cdn.iframe.ly/rhYCdmg?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
+
+<h3 id="linux-academy">Linux Academy</h3>
+
+<p>CKAD-exercisesで基本的な操作は体得できるとして、とはいえ実際にどんな問題がでるのだろうか、、と気になるのではないかと思います。
+試験の内容は公開してはいけないので、ブログ等をみてもあまり参考になるものはでてきませんでした。Linux Academyと下記のCloud Academyでは実際の問題に近い練習ができるのでやっておくといいでしょう。</p>
+
+<p>Linux AcademyとCloud Academyは実践問題だけではなく、1から学ぶコースも用意しています。基礎の部分からやっていきたいというかたはどちらかを選んでやってみてもいいと思います。<br />
+こちらの練習問題ですが、かなり本番のテストとにていますが、問題数が3つと多くないので、あくまで「こういう形式のテストね」と納得するものとして活用するといいです。</p>
+
+<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://linuxacademy.com//training/course/name/certified-kubernetes-application-developer-ckad" data-iframely-url="//cdn.iframe.ly/ANIUa8y?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
+
+<h3 id="cloud-academy">Cloud Academy</h3>
+
+<p>こちらも上のLinux Academyとほぼ同様です。基礎の部分から学ぶことができ、最後に練習問題があるという形式です。
+すべて受講したわけではないのですが、以前にAWSの資格試験を取得する際にこちらのサイトはお世話になり、それなりに内容は充実していました。</p>
+
+<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://cloudacademy.com/learning-paths/certified-kubernetes-application-developer-ckad-exam-preparation-451/" data-iframely-url="//cdn.iframe.ly/iq3FYij?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
+
+<h2 id="受験開始まで">受験開始まで</h2>
+
+<h3 id="申し込み-環境チェック">申し込み、環境チェック</h3>
+
+<p>ある程度勉強ができたら、思い切って試験の申込みをしてみましょう。
+実は、この試験では「再試験」が1度だけ可能です。仮に落ちたとしても無料でもう一度受けることができるので、
+ある程度の勉強ができたらトライしてみることも重要です。</p>
+
+<p>申込みが完了したら、ポータルページから「Check System Requirements」というのがあるので必ずチェックしておきましょう。
+他の人のブログ等でWebカメラを用意した、というのを書いている人もいますが、要件を満たしていればノートPCに備え付けのインカメラでも受験可能です。
+実際に自分は、2017年モデルのMacBook Proで受験しました。</p>
+
+<h3 id="場所の確保">場所の確保</h3>
+
+<p>申し込みにあたって、「場所の確保」という難題があります。
+この試験は、オンラインで受験することが可能ですが、試験の時間まわりにだれもいない環境を作らなければいけません。
+だれにも邪魔されない自分の部屋をもっているか、持っていない方は会議室などを抑える必要があります。ご注意ください。
+自分の場合は、会社の会議室を人があまりいない時間帯で抑えて利用しました。</p>
+
+<p>試験時間は、CKAで3時間、CKADで2時間なのですが、会議室は試験予定の前後30分程度多くとっておくといいです。
+というのも、後述しますが、実際の試験開始までの準備ややり取りで30分程時間もかかるためです。</p>
+
+<h2 id="試験について">試験について</h2>
+
+<h3 id="試験開始前の準備">試験開始前の準備</h3>
+
+<p>試験もそうなのですが、試験をきちんとうけられるのか？そこが実際に受けるまで不安な要素でした。</p>
+
+<p>マイポータルのページに行くと、残り何時間で試験が受けられます、というカウントダウンがされています。当日はそのカウントが０になるまでとりあえず待ちます。
+カウントが０になると、試験開始のボタンが出てくるのでそちらを押して、試験監とのやりとりがはじまります。</p>
+
+<p>基本的に下記おようなチェックが試験監との間で行われます。<br />
+やりとりはすべてチャットで英語で行われます。こちらから質問がない限りは、英語を書く必要はなく、相手から言われたことを淡々とこなせば大丈夫です。</p>
+
+<ul>
+<li>画面共有がきちんと相手側とされているかどうか</li>
+<li>カメラの映像が相手に届いているか</li>
+<li>身の回りの環境にだれもいないか、筆記用具など不必要なものが置かれていないか
+
+<ul>
+<li>カメラをゆっくり回して周りの状況を相手に伝えます</li>
+<li>ドリンクはOK。ただしラベルははずせと言われました。</li>
+</ul></li>
+<li>本人確認
+
+<ul>
+<li>日本人の場合はたいてい２つのIDが必要です。顔がわかる運転免許証などと、英語表記で名前が書かれたクレジットカードなどの２つ。</li>
+</ul></li>
+<li>ブラウザ以外に余計なアプリケーションが立ち上がっていないか
+
+<ul>
+<li>ブラウザのタブも余分なものは閉じる必要があります</li>
+<li>kubernetesの公式ドキュメントはみてよい。公式ドキュメント内の検索ももちろん使ってよい</li>
+</ul></li>
+</ul>
+
+<h3 id="試験問題について">試験問題について</h3>
+
+<p>試験問題については、多く語れませんが下記だけは注意しておいたほうがいいです。
+自分もヒヤッとした場面がありました。</p>
+
+<ul>
+<li>問題ごとに利用するクラスタ環境が異なります。連続して同じクラスタ環境を使うこともあるのですが、必ず問題冒頭のクラスタ切り替えは年のため毎回実施しておいたほうが安心です。</li>
+<li>かなりサクサク解いたつもりでも時間はギリギリなので、わからないものは飛ばしてもいいかもしれません。ただし、あとで戻れるように問題にフラグを立てたりはできなかったので注意です。</li>
+<li>調べ方をマスターしておきましょう。どういうことかというと、問題ごとにだいたいキーワードがあります。&rdquo;ConfigMap&rdquo;とか&rdquo;PersistentVolume&rdquo;とか。そのYAMLの書き方をすべて覚えておくのは不可能なので、どうやって自分のやりたいことが書いてあるドキュメントにたどり着けるかは練習しておいたほうがいいです。基本的には検索を使ってキーワードでたどり着けるとお思いますが、見慣れておきましょう。</li>
+</ul>
+
+<h3 id="合否について">合否について</h3>
+
+<p>合否は試験後36時間以内にメールで通知がきます。</p>
+
+<h2 id="さいごに">さいごに</h2>
+
+<p>自分がとくにきになったところを中心にCKAD受験について書きました。<br />
+他の人の体験記なども多く参考にしながら、ぜひKubernetesライフを楽しんでください。</p>
+
+<p>次はCKAを取るのかとも聞かれるのですが、個人的にはしばらくKubernetesの構築サイドよりは、それを使ったアプリケーション開発や運用に焦点をあてる予定なので、いまのところCKAの予定はありません。
+アプリケーション開発・運用の観点で今後も情報発信できればと思います。</p>
+                    </div>
+                    <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+                            <a class="twitter-share-button"
+                            href="https://twitter.com/intent/tweet">
+                          Tweet</a>
+                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2019%2f07%2f08%2fckad%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <hr class="footer-hr" />
+<div class="footer-posts">
+    <h5>Latest Posts</h5>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/07/08/ckad/">CKADを取得の対策や試験当日の対応について</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/06/30/scram/">「スクラム」（ジェフ・サザーランド）を読んだ</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/06/21/kustomize/">Kustomizeで環境ごとに異なるマニフェストを作る</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/05/26/elasticsearch-test/">[基礎] ElasticSerachなどの外部コンポーネントがあるときのテスト</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/04/29/serverless-k8s/">Serverless Kubernetes 徹底解説</a></li>
+    
+</div>
+<div class="footer-posts">
+    <h5>Featured Posts</h5>
+    <li><a href="https://blog.mosuke.tech/entry/2016/06/04/180122/">Nginxの仕組みについて入門</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2017/03/18/182252/">万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2015/07/19/135844/">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った</a></li>
+</div>
+<div class="search">
+    <h5>Search(Beta)</h5>
+    <p>この機能は、ElasticSearchを用いた全文検索エンジンです。Beta版。</p>
+    <div class="gill-search-engine">
+        <input type="text" id="search-textbox" placeholder="Search">
+    </div>
+    <div id="search-result"></div>
+</div>
+<div class="links">
+    <h5>Links</h5>
+    <a class="pure-button" href="https://mosuke.tech"><i class="fa fa-user"></i> mosuke5</a>
+    <a class="pure-button" href="/about/"><i class="fa fa-info-circle"></i> About this site</a>
+    <a class="pure-button" href="/archive/"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml"><i class="fa fa-rss"></i> rss</a>
+</div>
+<div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>&copy; 2018 <strong>mosuke5</strong> All rights reserved.<br />Powered by <a class="hugo" href="https://gohugo.io/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="https://blog.mosuke.tech/js/all.min.js"></script>
+<script>
+$(function() {
+    $('#search-textbox').keypress(function(e) {
+        if(e.which == 13){
+            $('#search-result').empty();
+            search($('#search-textbox').val())
+                .done(function(result){
+                $.each(result.hits.hits, function(){
+                    $("#search-result").append("<div class=\"search-result-list\"><div class=\"search-result-title\"><a href=" + this._source.uri +">"+ this._source.title +"</a><span class=\"search-result-score\"> ("+this._score+")</span></div><div class=\"search-result-description\">" + this._source.description + "</div></div>");
+                })
+            }).fail(function(){
+                $('#search-result').append("<p>error</p>");
+            })
+        }
+    });
+});
+function search(query){
+    return $.ajax({
+        type: "GET",
+        url: "https://gill-search.mosuke.tech/search",
+        data: "q=" + query,
+        dataType: "json",
+        success: function(res){
+            console.log(res);
+        }
+    })
+}
+</script>
+
+        </div>
+    </div>
+</div>
+<script>
+window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+  
+    return t;
+}(document, "script", "twitter-wjs"));
+</script>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-99596316-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
