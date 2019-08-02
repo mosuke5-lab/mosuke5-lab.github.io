@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>勘違いしやすいFTPとSFTPの転送モードの話 | Goldstine研究所</title>
+    <title>SFTPにもFTPのような転送モードの選択が必要なのか | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
     <meta name="description" content=" FTPやSFTPでの転送モードの話。  ついこの前、WinSCPを利用している人が転送モードを選んでいて、 「SFTPには転送モードはないと思っていたのに、転送モードを選んでいる！？」 と疑問に思ったのでその辺りまとめた。  FTPのバイ">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/02/17/220526/">
@@ -11,12 +11,12 @@
     <meta name="generator" content="Hugo 0.55.6" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="勘違いしやすいFTPとSFTPの転送モードの話 | Goldstine研究所">
+    <meta name="twitter:title" content="SFTPにもFTPのような転送モードの選択が必要なのか | Goldstine研究所">
     <meta name="twitter:description" content=" FTPやSFTPでの転送モードの話。  ついこの前、WinSCPを利用している人が転送モードを選んでいて、 「SFTPには転送モードはないと思っていたのに、転送モードを選んでいる！？」 と疑問に思ったのでその辺りまとめた。  FTPのバイ">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
-    <meta property="og:title" content="勘違いしやすいFTPとSFTPの転送モードの話 &middot; Goldstine研究所">
+    <meta property="og:title" content="SFTPにもFTPのような転送モードの選択が必要なのか &middot; Goldstine研究所">
     <meta property="og:description" content=" FTPやSFTPでの転送モードの話。  ついこの前、WinSCPを利用している人が転送モードを選んでいて、 「SFTPには転送モードはないと思っていたのに、転送モードを選んでいる！？」 と疑問に思ったのでその辺りまとめた。  FTPのバイ">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
@@ -65,7 +65,7 @@
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2015/02/17/220526/" class="post-title">勘違いしやすいFTPとSFTPの転送モードの話</a>
+                        <a href="https://blog.mosuke.tech/entry/2015/02/17/220526/" class="post-title">SFTPにもFTPのような転送モードの選択が必要なのか</a>
 
                         <p class="post-meta">
                             
@@ -82,12 +82,12 @@
                         <p><body>
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>やSFTPでの転送モードの話。</p></p>
 
-<p>ついこの前、<a class="keyword" href="http://d.hatena.ne.jp/keyword/WinSCP">WinSCP</a>を利用している人が転送モードを選んでいて、<br>
-「SFTPには転送モードはないと思っていたのに、転送モードを選んでいる！？」<br>
-と疑問に思ったのでその辺りまとめた。</p>
+<p>ついこの前、<a class="keyword" href="http://d.hatena.ne.jp/keyword/WinSCP">WinSCP</a>を利用していた隣の席の人が転送モードを選んでいて、<br>
+「SFTPには転送モードはないはずなのに、転送モードを選んでいる！？」<br>
+と疑問に思ったので確認してまとめた。</p>
 
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>のバイナリーモードと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モード</h1>
+<h2>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>のバイナリーモードと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モード</h2>
 
 <p>入社しはじめの頃、それまでSFTPしかほとんど使ったことなかったので、<br>
 先輩に「<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>ではバイナリーモードを使って…」と言われて、意味が理解できなかったときがあったのを思い出す。</p>
@@ -104,7 +104,7 @@
 昔にミスしたのは<a class="keyword" href="http://d.hatena.ne.jp/keyword/Windows">Windows</a>から<a class="keyword" href="http://d.hatena.ne.jp/keyword/Linux">Linux</a>へtar.gzファイルを<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC">アスキー</a>モードで送って、解凍したらファイルが壊れていたが、<br>
 それに気付かず壊れたファイルをサーバへ設置してしまったとか。</p>
 
-<h1>SFTPには転送モードはあるのか？</h1>
+<h2>SFTPには転送モードはあるのか？</h2>
 
 <p>SFTPを普段から使ってる人は転送モードなんて気にしたことあまりないと思う。<br>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>では気にしなければいけない転送モード、SFTPでは気にしなくていいのだろうか？</p>
@@ -115,7 +115,7 @@ SFTPでは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>
 <p>sftpコマンドのマニュアルにも特に転送モードについては記述がないのがわかる。<br>
 <a href="http://www.unixuser.org/~euske/doc/openssh/jman/sftp.html">http://www.unixuser.org/~euske/doc/openssh/jman/sftp.html</a></p>
 
-<h1>SFTPでも転送モードを選択できる場合がある！？</h1>
+<h2>SFTPでも転送モードを選択できる場合がある！？</h2>
 
 <p>ここで、SFTPにも転送モードはあるぞ！？と疑問を思った人もいるかもしれない。<br>
 確かに<a class="keyword" href="http://d.hatena.ne.jp/keyword/WinSCP">WinSCP</a>などファイル転送ソフトを使っていると転送モードを選ぶことができる場合もある。</p>
@@ -123,7 +123,7 @@ SFTPでは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>
 <p>しかし、勘違いしてはいけないのが、<br>
 転送モードを選ぶことができるのはSFTPの機能ではなくて<b>ファイル転送ソフトの機能</b>であるということだ。</p>
 
-<h1>まとめ</h1>
+<h2>まとめ</h2>
 
 <p><p>ファイル転送でよく使われる<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>やSFTP。<br>
 それぞれに違いはあるし、それを利用するソフトウェアによっても違いがある。<br>
