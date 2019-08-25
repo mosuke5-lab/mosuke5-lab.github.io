@@ -63,42 +63,11 @@
             <div class="posts">
                 
                 
-                <h1 class="content-subhead">25 Dec 2016, 14:27</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2016/12/25/142744/" class="post-title">「嵐」 2016年振り返り</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                <br />
-                                
-                                <a class="post-category post-category-パブリッククラウド" href="https://blog.mosuke.tech/categories/%E3%83%91%E3%83%96%E3%83%AA%E3%83%83%E3%82%AF%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89">パブリッククラウド</a><a class="post-category post-category-Alibaba Cloud" href="https://blog.mosuke.tech/categories/alibaba-cloud">Alibaba Cloud</a><a class="post-category post-category-SBクラウド" href="https://blog.mosuke.tech/categories/sb%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89">SBクラウド</a><a class="post-category post-category-振り返り" href="https://blog.mosuke.tech/categories/%E6%8C%AF%E3%82%8A%E8%BF%94%E3%82%8A">振り返り</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        <p><body>
-<p>だいぶお久しぶりのブログ。
-そして恒例の年振り返りブログ。ついに2016年も終わってしまう。</p></p>
-
-<p>というわけで2016年を振り返りたいと思う。<br>
-一応このサイトは技術ブログのはずなんだけど、プライベートのことが大いに混ざったポエムになってしまった。</p>
-                        <a href="https://blog.mosuke.tech/entry/2016/12/25/142744/">続きを読む</a>
-                    </div>
-                </section>
-                
-                
-                
                 <h1 class="content-subhead">02 Oct 2016, 21:24</h1>
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2016/10/02/212420/" class="post-title">三葉よ、サーバーレス、それもまた結び。</a>
+                        <a href="https://blog.mosuke.tech/entry/2016/10/02/212420/" class="post-title">サーバーレスとはなにか。クラウドロックインを加速させる一手</a>
 
                         <p class="post-meta">
                             
@@ -113,7 +82,13 @@
                     </header>
 
                     <div class="post-description">
-                        タイトルちょっとふざけました。 (が、半分本気。最後の方でわかる。) ServerlessConf Tokyoに参加してきた。 今年8月からパブリッククラウドの事業に異動して
+                        <p><body>
+<p><a href="http://tokyo.serverlessconf.io/">ServerlessConf Tokyo</a>に参加してきた。<br>
+今年8月から<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>の事業に異動していて、<br>
+開発者の立場より<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>提供側の立場として参加してきたので、また面白かった。</p></p>
+
+<p>せっかくなので、自分なりにサーバレスについてまとめる。<br>
+クラウド提供側の立場から見たサーバレスについて考えてみます。</p>
                         <a href="https://blog.mosuke.tech/entry/2016/10/02/212420/">続きを読む</a>
                     </div>
                 </section>
@@ -176,7 +151,7 @@
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2016/07/26/215939/" class="post-title">【めも】httpヘッダー、x-forwarded-forとか任意のヘッダーとか</a>
+                        <a href="https://blog.mosuke.tech/entry/2016/07/26/215939/" class="post-title">PHPでhttpヘッダー、x-forwarded-forを受け取る</a>
 
                         <p class="post-meta">
                             
@@ -191,34 +166,15 @@
                     </header>
 
                     <div class="post-description">
-                        ただのめも。 もともとApache+PHPで動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになった。（理由はここではど
+                        <p><body></p>
+
+<p>もともとApach+PHPで動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになった。理由は、もともと社内ネットワークでのみ利用するシステムだったのだが、インターネットの外からも利用することになり、インターネットからの入り口にリバースプロキシを導入したから。<br>
+つまり、Nginx-&gt;<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>-&gt;<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>という構成になった。<br>
+よくあることだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>からみるとすべてリバースプロキシから通信がきているので、
+接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>がすべてリバースプロキシのものになる。</p>
+
+<p>HTTPヘッダーに接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を追加しアプリ側（<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>）で受け取る方法をかく。</p>
                         <a href="https://blog.mosuke.tech/entry/2016/07/26/215939/">続きを読む</a>
-                    </div>
-                </section>
-                
-                
-                
-                <h1 class="content-subhead">03 Jul 2016, 22:45</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2016/07/03/224531/" class="post-title">Vim::Factory、LTではなす</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                <br />
-                                
-                                <a class="post-category post-category-vimfactory" href="https://blog.mosuke.tech/categories/vimfactory">vimfactory</a><a class="post-category post-category-vim::factory" href="https://blog.mosuke.tech/categories/vimfactory">vim::factory</a><a class="post-category post-category-docker" href="https://blog.mosuke.tech/categories/docker">docker</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        7月6日の会社のエンジニアイベントでLTするやつ、先にあげておく。 自分の中でのネタとしては古いけど、話すのはなんだかんだ初。
-                        <a href="https://blog.mosuke.tech/entry/2016/07/03/224531/">続きを読む</a>
                     </div>
                 </section>
                 
@@ -327,6 +283,58 @@
                 </section>
                 
                 
+                
+                <h1 class="content-subhead">19 Mar 2016, 23:24</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2016/03/19/232437/" class="post-title">Github Pagesと、独自ドメイン適応時の通信経路について</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                <br />
+                                
+                                <a class="post-category post-category-github" href="https://blog.mosuke.tech/categories/github">github</a><a class="post-category post-category-github pages" href="https://blog.mosuke.tech/categories/github-pages">github pages</a><a class="post-category post-category-CDN" href="https://blog.mosuke.tech/categories/cdn">CDN</a><a class="post-category post-category-カスタムドメイン" href="https://blog.mosuke.tech/categories/%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0%E3%83%89%E3%83%A1%E3%82%A4%E3%83%B3">カスタムドメイン</a><a class="post-category post-category-独自ドメイン" href="https://blog.mosuke.tech/categories/%E7%8B%AC%E8%87%AA%E3%83%89%E3%83%A1%E3%82%A4%E3%83%B3">独自ドメイン</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        執筆当時の状況で、現在は異なる状況のように見えた。そのため本記事は検証の観点としてとどめてください。 今更ながらgithubページでプロフィー
+                        <a href="https://blog.mosuke.tech/entry/2016/03/19/232437/">続きを読む</a>
+                    </div>
+                </section>
+                
+                
+                
+                <h1 class="content-subhead">16 Mar 2016, 17:54</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2016/03/16/175431/" class="post-title">実装案を使って、DBのViewの使いどころを検討する</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                <br />
+                                
+                                <a class="post-category post-category-データベース" href="https://blog.mosuke.tech/categories/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9">データベース</a><a class="post-category post-category-DB" href="https://blog.mosuke.tech/categories/db">DB</a><a class="post-category post-category-ビュー" href="https://blog.mosuke.tech/categories/%E3%83%93%E3%83%A5%E3%83%BC">ビュー</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        ある実装についてどのように実装するか悩んだ。 その悩んだ過程や実装案をメモする。似たようなケースの実装案として参考になればと思う。 状況 ある申請
+                        <a href="https://blog.mosuke.tech/entry/2016/03/16/175431/">続きを読む</a>
+                    </div>
+                </section>
+                
+                
             </div>
             
 <div class="pagination">
@@ -336,7 +344,7 @@
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 7 of 13</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 7 of 12</span>
     
       <a href="/page/8/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>

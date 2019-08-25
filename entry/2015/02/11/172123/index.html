@@ -3,21 +3,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SSHポートフォワード、https接続をするときに間違えやすいこと | Goldstine研究所</title>
+    <title>SSHポートフォワードを通してhttps接続をするときの注意点 | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
-    <meta name="description" content=" SSHローカルフォワードの話。 前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。 SSHでローカルポートフォワードを実際に試す - Goldstine研究所  1. やりたいこと  ht">
+    <meta name="description" content="サービスの管理画面へSSHのローカルポート越しにhttpsで接続したい場面があります。その際の接続方法の注意点について書きました。接続するプロトコルの確認が重要です。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/02/11/172123/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2015/02/11/172123/" />
     <meta name="generator" content="Hugo 0.55.6" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="SSHポートフォワード、https接続をするときに間違えやすいこと | Goldstine研究所">
-    <meta name="twitter:description" content=" SSHローカルフォワードの話。 前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。 SSHでローカルポートフォワードを実際に試す - Goldstine研究所  1. やりたいこと  ht">
+    <meta name="twitter:title" content="SSHポートフォワードを通してhttps接続をするときの注意点 | Goldstine研究所">
+    <meta name="twitter:description" content="サービスの管理画面へSSHのローカルポート越しにhttpsで接続したい場面があります。その際の接続方法の注意点について書きました。接続するプロトコルの確認が重要です。">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
-    <meta property="og:title" content="SSHポートフォワード、https接続をするときに間違えやすいこと &middot; Goldstine研究所">
-    <meta property="og:description" content=" SSHローカルフォワードの話。 前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。 SSHでローカルポートフォワードを実際に試す - Goldstine研究所  1. やりたいこと  ht">
+    <meta property="og:title" content="SSHポートフォワードを通してhttps接続をするときの注意点 &middot; Goldstine研究所">
+    <meta property="og:description" content="サービスの管理画面へSSHのローカルポート越しにhttpsで接続したい場面があります。その際の接続方法の注意点について書きました。接続するプロトコルの確認が重要です。">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
     <meta property="og:url" content="https://blog.mosuke.tech/entry/2015/02/11/172123/" />
@@ -65,7 +65,7 @@
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2015/02/11/172123/" class="post-title">SSHポートフォワード、https接続をするときに間違えやすいこと</a>
+                        <a href="https://blog.mosuke.tech/entry/2015/02/11/172123/" class="post-title">SSHポートフォワードを通してhttps接続をするときの注意点</a>
 
                         <p class="post-meta">
                             
@@ -80,47 +80,52 @@
                     </header>
                     <div class="post-description">
                         <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>ローカルフォワードの話。<br>
-前回は簡単に実践してみたというのを書いたのだが、今度は実際に使ってみてハマった部分があったのでメモ。<br>
-<a href="https://blog.mosuke.tech/entry/2014/12/31/170545">SSHでローカルポートフォワードを実際に試す - Goldstine研究所</a></p></p>
+<p>SSHローカルフォワードを使いこなしてますか？SSHを制するものはインフラを制するとも言われています。最近良く使っているのですが、ローカルポートフォワードでhttps接続をする際に間違えやすいポイントがあるので紹介します。</p></p>
 
-<h1>1. やりたいこと</h1>
+<p>下記は、以前に書いたSSHのローカルポートフォワードに関する記事です。まず基本的な概念や使い方を知りたい方は書きを参照してください。
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2014/12/31/170545/" data-iframely-url="//cdn.iframe.ly/wDM0LAq"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>でしか接続を許可していないサーバへ、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>ローカルフォワーディングを使って接続しようした。<br>
-（直接疎通性がないためにポートフォワーディングする必要があった。）</p>
+<h2>1. やりたいこと</h2>
 
-<h1>2. 行ったこと</h1>
+<p>httpsでサービスを提供しているサーバへ、SSHローカルポートフォワーディングを使って接続する。<br>
+該当のサーバへは、ネットワーク上、直接疎通性がないためにポートフォワーディングする必要がある。</p>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>でしか接続ができないので、ローカル端末のポート5000を接続したいサーバのポート443に飛ばせばおっけーと思って、<br>
-下記のように<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>接続とブラウザから接続を行った。</p>
+<p>具体的なユースケースだと、KubernetesやKibanaのダッシュボード(管理画面)などインターネットにそのまま公開していないが、接続にhttpsを接続に要求しており、SSH越しで接続したいなどがある。</p>
 
-<pre><code>ssh -L5000:web-host:443 user@ssh-host 
-</code></pre>
+<h2>2. 行ったこと</h2>
+<p>httpsでしか接続ができないので、ローカル端末のポート5000を接続したいサーバのポート443にフォワードすれば問題ないと思い、
+下記のようにssh接続をしたあと、ブラウザから接続を行った。</p>
 
-<p>※web-host: 今回<a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>で接続したサーバ<br>
-※<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>-host: <a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>接続先サーバ</p>
+```
+// 対象のサーバへローカルポートフォワードのため接続する
+$ ssh -L5000:web-host:443 user@ssh-host 
+```
 
-<p>これでローカルフォワーディングの設定は終わったので、ブラウザから以下に接続するだけで終わりだと思っていた。</p>
+<p>※web-host: 今回httpsで接続したサーバ<br>
+※ssh-host: ssh接続先サーバ</p>
 
-<pre><code>http://localhost:5000 
-</code></pre>
+<p>これでローカルフォワーディングの設定は終わったので、ブラウザから以下に接続すれば接続できると考えていた。しかし実際は接続することができなかった。それはなぜでしょうか？</p>
 
-<p>が、接続不可…なぜでしょう？</p>
+```
+http://localhost:5000 
+```
 
-<h1>3. 何が間違いだったか</h1>
+<h2>3. 何が間違いだったか</h2>
 
-<p>正しくは以下で接続をしなければいけない。http<b><span style="color: #ff0000">s</span></b>が必要。</p>
+<p>正しくは以下のようにhttpsプロトコルで接続をしなければいけない。http<b><span style="color: #ff0000">s</span></b>が必要ということだ。</p>
 
 <pre><code>https://localhost:5000 
 </code></pre>
 
-<p>よーく考えればアタリマエのこと。<br>
-URLのはじめの&lt;http(s)&gt;の部分は<b><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB">プロトコル</a></b>で最後の&lt;:5000&gt;の部分は<b>ポート番号</b>。<br>
+<p>よく考えればアタリマエのこと。<br>
+URLのはじめの&lt;http(s)&gt;の部分は<b>プロトコル</b>で最後の&lt;:5000&gt;の部分は<b>ポート番号</b>。<br>
 <u><b><a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>は443のポートを一般的に使うが、ポート443が<a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>というわけではない。</b></u></p>
 
-<p><p>あたりまえのことだし知っていることなんだけど、見落としがちかもしれない。</p>
-</body></p>
+<p>あたりまえのことだし知っていることなんだけど、見落としがちかもしれない。</p>
 
+<p><h2>4. まとめ</h2>
+<p>非常に単純なことではあるのですが間違えやすいポイントかと思います。ローカルポートフォワードの接続先で443ポートを指定したので感覚的にhttpsにしていると思いがちです。実際に接続するプロトコルがなにか、改めて見直してみるとこういったミスは軽減できるし、非常に重要なことです。</p>
+</body></p>
                     </div>
                     
                     
@@ -135,7 +140,7 @@ URLのはじめの&lt;http(s)&gt;の部分は<b><a class="keyword" href="http://
                     	
                         <li><a href="https://blog.mosuke.tech/entry/2015/12/01/181304/" onClick="ga('send','event','link','click','related-posts');">Ansible、実行速度高速化の実験。ControlMasterとPipeliningについて</a> (2015/12/01)</li>
                     	
-                        <li><a href="https://blog.mosuke.tech/entry/2015/09/25/232751/" onClick="ga('send','event','link','click','related-posts');">Ansibleを踏み台サーバ越しに実行する</a> (2015/09/25)</li>
+                        <li><a href="https://blog.mosuke.tech/entry/2015/09/25/232751/" onClick="ga('send','event','link','click','related-posts');">Ansibleを踏み台サーバ越しに実行する方法</a> (2015/09/25)</li>
                     	
                     </div>
                     

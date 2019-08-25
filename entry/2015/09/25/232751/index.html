@@ -3,21 +3,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ansibleを踏み台サーバ越しに実行する | Goldstine研究所</title>
+    <title>Ansibleを踏み台サーバ越しに実行する方法 | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
-    <meta name="description" content=" タイトルの通りで、なにも特別なことはない内容。 そして、9月も終わりなのに今月はひとつも記事を書いていなかった。  KVMを使って仮想のゲストサーバを立てたが、 ゲストサーバはホストサーバと通信する用の（外に出る場合にはNAT通信で）IP">
+    <meta name="description" content="踏み台サーバ越しにAnsibleを使ってプロビジョニングする方法を解説します。多段SSHを使ってネットワーク的に直接届かないサーバに対して実行していきます。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/09/25/232751/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2015/09/25/232751/" />
     <meta name="generator" content="Hugo 0.55.6" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="Ansibleを踏み台サーバ越しに実行する | Goldstine研究所">
-    <meta name="twitter:description" content=" タイトルの通りで、なにも特別なことはない内容。 そして、9月も終わりなのに今月はひとつも記事を書いていなかった。  KVMを使って仮想のゲストサーバを立てたが、 ゲストサーバはホストサーバと通信する用の（外に出る場合にはNAT通信で）IP">
+    <meta name="twitter:title" content="Ansibleを踏み台サーバ越しに実行する方法 | Goldstine研究所">
+    <meta name="twitter:description" content="踏み台サーバ越しにAnsibleを使ってプロビジョニングする方法を解説します。多段SSHを使ってネットワーク的に直接届かないサーバに対して実行していきます。">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Ansibleを踏み台サーバ越しに実行する &middot; Goldstine研究所">
-    <meta property="og:description" content=" タイトルの通りで、なにも特別なことはない内容。 そして、9月も終わりなのに今月はひとつも記事を書いていなかった。  KVMを使って仮想のゲストサーバを立てたが、 ゲストサーバはホストサーバと通信する用の（外に出る場合にはNAT通信で）IP">
+    <meta property="og:title" content="Ansibleを踏み台サーバ越しに実行する方法 &middot; Goldstine研究所">
+    <meta property="og:description" content="踏み台サーバ越しにAnsibleを使ってプロビジョニングする方法を解説します。多段SSHを使ってネットワーク的に直接届かないサーバに対して実行していきます。">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
     <meta property="og:url" content="https://blog.mosuke.tech/entry/2015/09/25/232751/" />
@@ -65,7 +65,7 @@
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2015/09/25/232751/" class="post-title">Ansibleを踏み台サーバ越しに実行する</a>
+                        <a href="https://blog.mosuke.tech/entry/2015/09/25/232751/" class="post-title">Ansibleを踏み台サーバ越しに実行する方法</a>
 
                         <p class="post-meta">
                             
@@ -80,30 +80,33 @@
                     </header>
                     <div class="post-description">
                         <p><body>
-<p>タイトルの通りで、なにも特別なことはない内容。<br>
-そして、9月も終わりなのに今月はひとつも記事を書いていなかった。</p></p>
+Ansibleを使ってどんどん構築の自動化を進めている。<br />
+すすめていくと、Ansibleを実行する端末からネットワーク的に直接届かないサーバに対してプロビジョニングしたいケースがでてくる。そこで、踏み台サーバ越しにAnsibleでプロビジョニングしていくことを試してみる。</p>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/KVM">KVM</a>を使って仮想のゲストサーバを立てたが、<br>
-ゲストサーバはホストサーバと通信する用の（外に出る場合にはNAT通信で）<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>しか持っていない状況で、<br>
+<h2>環境</h2>
+<p>KVMを使って仮想のゲストサーバを立てたが、<br>
+ゲストサーバはホストサーバと通信する用の（外に出る場合にはNAT通信）IPアドレスしか持っていない状況で、
 Ansibleの実行対象としたかったのが背景。</p>
 
-<p>ホストサーバにAnsibleをいれるわけにもいかず、ホストサーバを踏み台にして、<br>
-Ansibleを打ちたかったというもの。</p>
+<p>ホストサーバに直接Ansibleをインストールして実行するわけにもいかず、ホストサーバを踏み台にして、
+Ansibleを実行することがやりたかったこと。</p>
 
 <p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150925/20150925232414.png" alt="f:id:mosuke5:20150925232414p:plain" title="f:id:mosuke5:20150925232414p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 
-<h1>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>の設定ファイルを作る</h1>
+<h2>SSHの設定ファイルを作る</h2>
 
-<p>"Ansibleで" と書いたが要は<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>です。<br>
+<p>"Ansibleで" と書いたが要はSSHです。Ansibleのコネクションの方法はいくつかありますが、SSHを使っている。<br>
 まずは<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>で踏み台サーバを経由してAnsible実行対象サーバへ接続できるように準備しました。<br>
-これはいわゆる「多段<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>」というやつで、以前にもブログに書いたので復習です。</p>
+技術を検証するときの重要なポイントですが、その仕組みが何で実現されているかわかると、このように検証項目を分解することができてデバッグなどにも役立ちますね。
 
-<p><a href="https://blog.mosuke.tech/entry/2014/11/09/172745">【VPS1台でインフラ勉強】多段SSH設定（おまけ） - Goldstine研究所</a></p>
+これはいわゆる「多段SSH」というやつで、以前にもブログに書いた内容です。</p>
+
+<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2014/11/09/172745/" data-iframely-url="//cdn.iframe.ly/2l4v67H"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
 
 <p>一般的には<code>~/.ssh/config</code>にこういった設定は書いたりもしますが、<br>
-Ansible実行の場合、<b><u>端末に依存したくなかった</u></b>ので、<br>
-Ansible<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>に別途ファイルを作ることにした。</p>
+Ansible実行の場合、<b><u>特定の端末に依存したくなかった</u></b>ので、<br>
+ansible-playbookのレポジトリに別途ファイルを作るって管理することにしました。<br>
+なぜ特定の端末に依存したくなかったかというと、一人で利用する場合には良いのですが、複数人での運用環境の場合、ことなる環境でAnsibleのplaybookを実行しなければいけないことがあったからです。</p>
 
 <pre><code>## sshconfigという名前のファイルにした
 Host ansible-target
@@ -112,24 +115,30 @@ Host ansible-target
     ProxyCommand ssh -W %h:%p yyyyy@hostserver 
 </code></pre>
 
-<p>上記のファイルを使って多段<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>できることを確認します。</p>
+<p>上記のファイルを使って多段SSHできることを確認します。
+こちらで、問題なくターゲットのホストにSSH接続できれば問題なしです。</p>
 
-<pre><code>$ ssh -F sshconfig ansible-target 
+<pre><code>$ ssh -F sshconfig ansible-target
 </code></pre>
 
-<h1>Ansible実行時に<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>設定ファイルを利用する</h1>
+<p><h2>Ansible実行時にSSH設定ファイルを利用する</h2>
+<p>ここまで来たらとても簡単です。<br>
+Ansibleには、Ansible実行時の設定を管理する<a href="https://docs.ansible.com/ansible/latest/installation_guide/intro_configuration.html" target="_blank">ansible.cfgという設定ファイル</a>を利用することができます。非常に便利なので活用方法は覚えておくといいです。<br>
+そのansible.cfgに下記を追記し、ansible実行時に上記のsshconfigを読み込まれるようにすることで踏み台越しにAnsibleを実行することができます。</p></p>
 
-<p>ここまで来たらとても簡単で、<br>
-ansible.cfgに下記を追記し、ansible実行時に上記のsshconfigを読み込まれるようにしました。</p>
-
-<p>ansible.cfg</p>
-
-<pre><code>[ssh_connection]
+<pre><code># ansible.cfg
+[ssh_connection]
 ssh_args = -F sshconfig 
 </code></pre>
 
-<p></body></p>
+<p><h2>まとめ</h2>
+Ansibleを使った自動化をどんどん進めていくといろんな場面に遭遇します。
+その１つとしてAnsibleを実行する端末からネットワーク的に直接届かないサーバへのプロビジョニングです。</p>
 
+<p>今回は、いわゆる多段SSHを使った踏み台サーバ越しでのAnsibleの実行方法について解説しました。<br />
+Ansibleの設定自体も重要ですが、その機能が実現している方法がわかると、仕組みの理解やデバッグの手助けになるでしょう。</p>
+
+<p></body></p>
                     </div>
                     
                     
@@ -144,7 +153,7 @@ ssh_args = -F sshconfig
                     	
                         <li><a href="https://blog.mosuke.tech/entry/2016/01/25/222150/" onClick="ga('send','event','link','click','related-posts');">Vagrant×Ansible環境の３つのスタイルとそのメリット・デメリットについて</a> (2016/01/25)</li>
                     	
-                        <li><a href="https://blog.mosuke.tech/entry/2015/12/17/192554/" onClick="ga('send','event','link','click','related-posts');">インフラのデプロイとテストを同時実行できるようにしてHappyになった</a> (2015/12/17)</li>
+                        <li><a href="https://blog.mosuke.tech/entry/2015/12/17/192554/" onClick="ga('send','event','link','click','related-posts');">インフラのデプロイとテストを同時実行できるようにする</a> (2015/12/17)</li>
                     	
                     </div>
                     

@@ -80,22 +80,25 @@
                     </header>
                     <div class="post-description">
                         <p><body>
-<p>Ansibleで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>インストールする際とか<br>
-すでにインストールされているかのチェックなどで、<br>
-シェルコマンドを実行してその結果で判断したい時がある。</p></p>
+<p>最近は、Ansibleを使うことが非常に増えてきた。使って運用を回していくと、大したことではないのだが運用上少し困るようなことも多く出てきた。そのうちの一つである、アウトプットの結果の表示についてのチップスを紹介する。</p></p>
 
-<p>ぼくがよくやる例では以下とか。</p>
+<p><h2>課題</h2>
+<p>Ansibleでソースコードインストールするのを実装する際に、インストール前に事前にそのソフトウエアがインストールされているか確認することがある。
+例えば、httpdをソースコードインストールする前に、そもそもhttpdが入っているかのチェックで which httpdと実行して判断したり。</p></p>
+
+<p>Playbookであらわすと以下のようになる。</p>
 
 <pre><code class="language-yaml">- name: check httpd installed
   command: which httpd
   ignore_errors: true
 </code></pre>
 
-<p>なんですが...<br>
-こうやってしまうと、仮に既にインストールされていて、正常なときでも"<b><span style="color: #f9ce1d">changed</span></b>"と表示されてしまう。<br>
-これでは、本当にchangedなものなのか、わからなくなってくる。</p>
+<p>しかしこのまま運用に回すと困るポイントがでてきた。
+既にインストールされていて、正常なときでも&rdquo;<b><span style="color: #f9ce1d">changed</span></b>&ldquo;と表示されてしまうという問題である。<br>
+これでは、本当にchangedなものなのか、わからなくなってくる。</p></p>
 
-<p>これを解決するのに<b>chaged_when</b>を使うといい。</p>
+<p><h2>解決策</h2>
+<p>こういった問題を解決するのには<b>chaged_when</b>を使うといい。以下はPlaybookのサンプルだ。</p></p>
 
 <pre><code class="language-yaml">- name: check httpd installed
   command: which httpd
@@ -103,14 +106,11 @@
   changed_when: false
 </code></pre>
 
-<p>こうするとコマンドが成功した際には"<b><span style="color: #00cc00">ok</span></b>"が表示される。</p>
+<p>こうするとコマンドが成功した際には"<b><span style="color: #00cc00">ok</span></b>"が表示することができる。</p>
 
-<p>これで、何も変化がないときにはokとskippingしかでないから、<br>
-誰がみても結果がわかりやすいですね！</p>
-
-<p><p>秘伝のタレ回避！</p>
+<p><p>こうすることで、何も変化がない場合にはokとskippingしかでないため、<br>
+誰がみても結果がわかりやすくなります。表示されるアウトプットの結果を信じやすくなるわけです。</p>
 </body></p>
-
                     </div>
                     
                     

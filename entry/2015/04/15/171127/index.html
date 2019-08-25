@@ -3,21 +3,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ansibleで最新のMySQLをインストールする際にハマったこと。MySQL-shared-compatのこと。 | Goldstine研究所</title>
+    <title>Ansibleで最新のMySQLをインストールする。MySQL-shared-compatの役割。 | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
-    <meta name="description" content=" CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にハマったことをまとめた。 本質的にはAnsibleというよりLinux RPMパッケージのはなし。 ついでに、しょっぼいgithubを公開し">
+    <meta name="description" content=" CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にMySQL-shared-compatの役割を知らず困ったことがあったのでまとめました。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/04/15/171127/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2015/04/15/171127/" />
     <meta name="generator" content="Hugo 0.55.6" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="Ansibleで最新のMySQLをインストールする際にハマったこと。MySQL-shared-compatのこと。 | Goldstine研究所">
-    <meta name="twitter:description" content=" CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にハマったことをまとめた。 本質的にはAnsibleというよりLinux RPMパッケージのはなし。 ついでに、しょっぼいgithubを公開し">
+    <meta name="twitter:title" content="Ansibleで最新のMySQLをインストールする。MySQL-shared-compatの役割。 | Goldstine研究所">
+    <meta name="twitter:description" content=" CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にMySQL-shared-compatの役割を知らず困ったことがあったのでまとめました。">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Ansibleで最新のMySQLをインストールする際にハマったこと。MySQL-shared-compatのこと。 &middot; Goldstine研究所">
-    <meta property="og:description" content=" CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にハマったことをまとめた。 本質的にはAnsibleというよりLinux RPMパッケージのはなし。 ついでに、しょっぼいgithubを公開し">
+    <meta property="og:title" content="Ansibleで最新のMySQLをインストールする。MySQL-shared-compatの役割。 &middot; Goldstine研究所">
+    <meta property="og:description" content=" CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にMySQL-shared-compatの役割を知らず困ったことがあったのでまとめました。">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
     <meta property="og:url" content="https://blog.mosuke.tech/entry/2015/04/15/171127/" />
@@ -65,7 +65,7 @@
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2015/04/15/171127/" class="post-title">Ansibleで最新のMySQLをインストールする際にハマったこと。MySQL-shared-compatのこと。</a>
+                        <a href="https://blog.mosuke.tech/entry/2015/04/15/171127/" class="post-title">Ansibleで最新のMySQLをインストールする。MySQL-shared-compatの役割。</a>
 
                         <p class="post-meta">
                             
@@ -79,62 +79,61 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/CentOS">CentOS</a> 6.5環境でAnsibleを使って最新の<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>のセットアップをしようと思った際にハマったことをまとめた。<br>
-本質的にはAnsibleというより<a class="keyword" href="http://d.hatena.ne.jp/keyword/Linux">Linux</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/RPM">RPM</a>パッケージのはなし。<br>
-ついでに、しょっぼい<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>を公開しました。</p></p>
+                        <p>CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にハマったことをまとめた。<br />
+本質的にはAnsibleというよりLinux RPMパッケージのはなし。
+非常に簡単なサンプルコードも載せて解説します。</p>
 
-<h1>(1) 本記事を書くに至った経緯</h1>
+<h2 id="1-背景">(1) 背景</h2>
+
+<p>まずは、本記事を書くに至った経緯から少し整理していきます。</p>
 
 <ol>
-<li>Ansibleで<a class="keyword" href="http://d.hatena.ne.jp/keyword/mysql">mysql</a>を使ったサーバを構築(CentOS6.5)することになった。
+<li>Ansibleでmysqlを使ったサーバを構築(CentOS6.5)することになった
 
 <ul>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>のバージョンは5.6を採用した。</li>
-</ul>
-</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>の公式<a class="keyword" href="http://d.hatena.ne.jp/keyword/rpm">rpm</a>をダウンロードしインストールした。
+<li>MySQLのバージョンは5.6を採用</li>
+</ul></li>
+<li>MySQLの公式rpmをダウンロードしインストール
 
 <ul>
-<li>インストールしたもの：<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-client, <a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-devel, <a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-server, <a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-shared</li>
-</ul>
-</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-sharedをインストールする際にデフォルトの<a class="keyword" href="http://d.hatena.ne.jp/keyword/mysql">mysql</a>-libsと競合</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/mysql">mysql</a>-libsをアンインストールし再インストール</li>
-<li>Ansibleで<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>の操作をするには<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL-python">MySQL-python</a>が必要なのでインストール</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL-python">MySQL-python</a>をインストールするにはさっきアンインストールした<a class="keyword" href="http://d.hatena.ne.jp/keyword/mysql">mysql</a>-libsが必要…(困った)</li>
-<li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-shared-compatの存在に気づく</li>
-<li>備忘録に書いておくか…</li>
+<li>インストールしたもの
+
+<ul>
+<li>MySQL-client</li>
+<li>MySQL-devel</li>
+<li>MySQL-server</li>
+<li>MySQL-shared</li>
+</ul></li>
+</ul></li>
+<li>MySQL-sharedをインストールする際にデフォルトの<code>mysql-libs</code>と競合しインストール失敗</li>
+<li>mysql-libsをアンインストールしインストールに再挑戦</li>
+<li>AnsibleでMySQLの操作をするにはMySQL-pythonが必要なのでインストール</li>
+<li>MySQL-pythonをインストールするにはさっきアンインストールしたmysql-libsが必要…</li>
+<li>MySQL-shared-compatというパッケージの役割を知る</li>
 </ol>
 
-<h1>(2) <a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-shared-compatの存在</h1>
+<h2 id="2-mysql-shared-compatというパッケージ">(2) MySQL-shared-compatというパッケージ</h2>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/mysql">mysql</a>-libsは多くのパッケージの依存となっており、公式のMySQL5.6をインストールすることで、<br>
-他のパッケージがいれられない状況となっていた。<br>
-そんな状況を解決するために<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-shared-compatというパッケージが用意されていた。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>-shared-compatは「過去の<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>バージョン向けの共有クライアントライブラリが納められているもの」だ。</p>
+<p>上で起きたことを一言でまとめると、mysql-libsというパッケージは多くの他のパッケージの依存関係となっており、公式のMySQL5.6をインストールすることで、他のパッケージがいれられない状況となっていた。</p>
 
-<p>詳細は下記参照をおすすめ。<br>
-<a href="http://y-ken.hatenablog.com/entry/inside-of-libmysqlclient-with-mysql-shared-compat">MySQL-5.5.6から仕様が変わった「MySQL-shared-compat」の中身を徹底解剖 - Y-Ken Studio</a></p>
+<p>そんな状況を解決するためにMySQL-shared-compatというパッケージが用意されている。<br />
+MySQL-shared-compatは「過去のMySQLバージョン向けの共有クライアントライブラリが納められているもの」だ。<br />
+このパッケージをインストールすることで、mysql-libsの代わりになり、mysql-libsをインストールしなくても他のソフトウエアをインスーツできるようになる。</p>
 
-<p>ちなみに"compat"という単語がよく使われるが"compatibility"の略で「互換性」とかそういう意味。</p>
+<p>パッケージの詳細を知りたい方は下記参照をおすすめ。<br />
+<a href="http://y-ken.hatenablog.com/entry/inside-of-libmysqlclient-with-mysql-shared-compat" target="_blank">MySQL-5.5.6から仕様が変わった「MySQL-shared-compat」の中身を徹底解剖 - Y-Ken Studio</a>&lt;</p>
 
-<h1>(3) <a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>で公開しました</h1>
+<p>ちなみに豆知識だが、この業界で&rdquo;compat&rdquo;という単語がよく使われるが、これは&rdquo;compatibility&rdquo;の略で「互換性」とかそういう意味。</p>
 
-<p>内容は今のところ死ぬほど薄いのだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>をインストールするansibleを公開しました。
+<p><h2>(3) サンプルコード</h2>
+内容は非常に簡単なものだが、MySQLをインストールするansibleをGithubにあげた。playbookを書く参考になればと。<br />
 <a href="https://github.com/mosuke5/mysql-ansible">mosuke5/mysql-ansible · GitHub</a></p>
 
-<p>内容はあれだが、特徴としては、インターネット上から<a class="keyword" href="http://d.hatena.ne.jp/keyword/RPM">RPM</a>をダウンロードしてインストールする際に、<br>
+<p>特徴としては、インターネット上からRPMをダウンロードしてインストールする際に、<br>
 Ansibleでも「ダウンロード」→「インストール」の流れを踏む人が多いが、以下のようにするとシンプルになる。<br>
-varsでインストールしたい<a class="keyword" href="http://d.hatena.ne.jp/keyword/rpm">rpm</a>やその取得先を記述しておいて、task側では<a class="keyword" href="http://d.hatena.ne.jp/keyword/yum">yum</a>でnameにvarsで定義した変数を読むだけでできる。</p>
+varsでインストールしたいrpmやその取得先を記述しておいて、task側ではyumでnameにvarsで定義した変数を読むだけでできる。</p>
 
-<p>role/<a class="keyword" href="http://d.hatena.ne.jp/keyword/mysql">mysql</a>/vars/main.yml</p>
+<p><code>role/mysql/vars/main.yml</code></p>
 
 <pre><code class="language-yaml">mysql_url: http://ftp.jaist.ac.jp/pub/mysql/Downloads/MySQL-5.6
 mysql_ver: &quot;5.6.24-1&quot;
@@ -147,16 +146,19 @@ mysql_rpms:
  
 </code></pre>
 
-<p>role/<a class="keyword" href="http://d.hatena.ne.jp/keyword/mysql">mysql</a>/tasks/main.yml</p>
+<p><code>role/mysql/tasks/main.yml</code></p>
 
 <pre><code class="language-yaml">- name: Install MySQL without MySQL-shared
   yum: name={{ mysql_url}}/{{ item }}
   with_items: mysql_rpms
- 
 </code></pre>
 
-<p></body></p>
+<h2 id="4-まとめ">(4) まとめ</h2>
 
+<p>パッケージ管理のデッドロックにハマってしまい、どうしようかと悩んでいたが、
+よくしらべると解決策をきちんと用意してくれていた。
+こうやってみていくと１つ１つのパッケージがどんな役割を果たしているのか少しずつ興味もわいてきた。
+いい勉強になったハマりだったかなと思う。</p>
                     </div>
                     
                     
@@ -169,7 +171,7 @@ mysql_rpms:
                     	
                         <li><a href="https://blog.mosuke.tech/entry/2016/01/25/222150/" onClick="ga('send','event','link','click','related-posts');">Vagrant×Ansible環境の３つのスタイルとそのメリット・デメリットについて</a> (2016/01/25)</li>
                     	
-                        <li><a href="https://blog.mosuke.tech/entry/2015/12/17/192554/" onClick="ga('send','event','link','click','related-posts');">インフラのデプロイとテストを同時実行できるようにしてHappyになった</a> (2015/12/17)</li>
+                        <li><a href="https://blog.mosuke.tech/entry/2015/12/17/192554/" onClick="ga('send','event','link','click','related-posts');">インフラのデプロイとテストを同時実行できるようにする</a> (2015/12/17)</li>
                     	
                         <li><a href="https://blog.mosuke.tech/entry/2015/12/01/181304/" onClick="ga('send','event','link','click','related-posts');">Ansible、実行速度高速化の実験。ControlMasterとPipeliningについて</a> (2015/12/01)</li>
                     	

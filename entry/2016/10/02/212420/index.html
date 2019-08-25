@@ -3,21 +3,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>三葉よ、サーバーレス、それもまた結び。 | Goldstine研究所</title>
+    <title>サーバーレスとはなにか。クラウドロックインを加速させる一手 | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
-    <meta name="description" content=" タイトルちょっとふざけました。  (が、半分本気。最後の方でわかる。)  ServerlessConf Tokyoに参加してきた。 今年8月からパブリッククラウドの事業に異動していて、（異動ブログ） 開発者の立場よりクラウド提供側の立場と">
+    <meta name="description" content="serverlessconf tokyo 2016に参加してきた。サーバレスとはなにか、そしてクラウドの提供側の立場からみてサーバレスはどんな意図や戦略があるのかみていきます。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2016/10/02/212420/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2016/10/02/212420/" />
     <meta name="generator" content="Hugo 0.55.6" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="三葉よ、サーバーレス、それもまた結び。 | Goldstine研究所">
-    <meta name="twitter:description" content=" タイトルちょっとふざけました。  (が、半分本気。最後の方でわかる。)  ServerlessConf Tokyoに参加してきた。 今年8月からパブリッククラウドの事業に異動していて、（異動ブログ） 開発者の立場よりクラウド提供側の立場と">
+    <meta name="twitter:title" content="サーバーレスとはなにか。クラウドロックインを加速させる一手 | Goldstine研究所">
+    <meta name="twitter:description" content="serverlessconf tokyo 2016に参加してきた。サーバレスとはなにか、そしてクラウドの提供側の立場からみてサーバレスはどんな意図や戦略があるのかみていきます。">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
-    <meta property="og:title" content="三葉よ、サーバーレス、それもまた結び。 &middot; Goldstine研究所">
-    <meta property="og:description" content=" タイトルちょっとふざけました。  (が、半分本気。最後の方でわかる。)  ServerlessConf Tokyoに参加してきた。 今年8月からパブリッククラウドの事業に異動していて、（異動ブログ） 開発者の立場よりクラウド提供側の立場と">
+    <meta property="og:title" content="サーバーレスとはなにか。クラウドロックインを加速させる一手 &middot; Goldstine研究所">
+    <meta property="og:description" content="serverlessconf tokyo 2016に参加してきた。サーバレスとはなにか、そしてクラウドの提供側の立場からみてサーバレスはどんな意図や戦略があるのかみていきます。">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
     <meta property="og:url" content="https://blog.mosuke.tech/entry/2016/10/02/212420/" />
@@ -65,7 +65,7 @@
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2016/10/02/212420/" class="post-title">三葉よ、サーバーレス、それもまた結び。</a>
+                        <a href="https://blog.mosuke.tech/entry/2016/10/02/212420/" class="post-title">サーバーレスとはなにか。クラウドロックインを加速させる一手</a>
 
                         <p class="post-meta">
                             
@@ -80,16 +80,14 @@
                     </header>
                     <div class="post-description">
                         <p><body>
-<p>タイトルちょっとふざけました。  (が、半分本気。最後の方でわかる。)</p></p>
-
 <p><a href="http://tokyo.serverlessconf.io/">ServerlessConf Tokyo</a>に参加してきた。<br>
 今年8月から<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>の事業に異動していて、<br>
-開発者の立場より<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>提供側の立場として参加してきたので、また面白かった。</p>
+開発者の立場より<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>提供側の立場として参加してきたので、また面白かった。</p></p>
 
 <p>せっかくなので、自分なりにサーバレスについてまとめる。<br>
-新しいことというよりは、自分の中での整理した感じ。</p>
+クラウド提供側の立場から見たサーバレスについて考えてみます。</p>
 
-<h1>1. サーバレスってなんだっけ</h1>
+<h2>1. サーバレスってなんだっけ</h2>
 
 <p>カンファレンスの中でもサーバレスの定義についてはいろいろな意見がでていた。<br>
 Martin Fowlerのブログではサーバレスの定義として下記２つが書いてある。</p>
@@ -104,8 +102,8 @@ Martin Fowlerのブログではサーバレスの定義として下記２つが�
 <p>ですが、ここでは焦点を絞って話すためにもFaaSということにしておく。<br>
 主にFaaSについて話したいのと、BaaSもいれてしまうと<a class="keyword" href="http://d.hatena.ne.jp/keyword/SaaS">SaaS</a>もサーバレスとかややこしいことになるので。</p>
 
-<h2>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda</h2>
+<h3>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda</h3>
 
 <p>なんといってもサーバレスの概念を推し進めたのは<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambdaでしょう。<br>
 説明はいまさら不要だと思うが、少しだけ。</p>
@@ -116,7 +114,7 @@ Martin Fowlerのブログではサーバレスの定義として下記２つが�
 また特徴的なことは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>の他のサービスで発生したイベントをトリガーに実行できること。<br>
 例えば、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Amazon%20S3">Amazon S3</a>にファイルアップロードされたことをトリガーにLambdaを実行できるのだ。</p>
 
-<h2>サーバレスの特徴</h2>
+<h3>サーバレスの特徴</h3>
 
 <p>サーバレス自体そしてサーバレスで実装することの特徴しては下記がある。</p>
 
@@ -128,10 +126,10 @@ Martin Fowlerのブログではサーバレスの定義として下記２つが�
 <li>上記のようにimmutableでstatelessな構造につくるからこそスケールしやすい</li>
 </ol>
 
-<h1>2. どんな用途で利用しているか</h1>
+<h2>2. どんな用途で利用しているか</h2>
 
-<h2>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>基盤のイベントをトリガーとして</h2>
+<h3>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>基盤のイベントをトリガーとして</h3>
 
 <p>個人的に一番強力だと思っている使い方。上で説明したとおりだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>上のプロダクトに対してのイベントをトリガーに処理を行うことができる。<br>
 例えばこんな場合を想定してみよう。</p>
@@ -163,13 +161,13 @@ Martin Fowlerのブログではサーバレスの定義として下記２つが�
 これは何万件きても同じことで、スケールの面で大変優れている。<br>
 また、1件ごとに処理するため、エラーが発生した場合に原因などとても追いやすい。</p>
 
-<h2>アプリの<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>として</h2>
+<h3>アプリの<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>として</h3>
 
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>でいうと、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/Gateway">Gateway</a>と組み合わせて、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>サーバとして利用するケース。<br>
 S3などのデータストアに直接アクセスできるように作ることもできるため、ファイルアップロードなどで使われることが多いとか。<br>
 個人的には今のところあまり魅力的には感じない使い方。</p>
 
-<h2>事例紹介</h2>
+<h3>事例紹介</h3>
 
 <p>カンファレンスのなかで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%FC%B7%D0%BF%B7%CA%B9">日経新聞</a>社さんののサーバレス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>の事例が一番よかったのでぜひ目を通しほしい。</p>
 
@@ -188,7 +186,7 @@ S3などのデータストアに直接アクセスできるように作ること
 <li>日によってニュースの量が異なるため、いつでもスケールできる必要がある点</li>
 </ul>
 
-<h1>3. <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ベンダーからみたサーバレスの立ち位置</h1>
+<h2>3. <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ベンダーからみたサーバレスの立ち位置</h2>
 
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ベンダーにとってサーバレスはどういう立ち位置なのだろうか。<br>
 ぼくは<span style="font-size: 150%">「各サービスの横串」</span>と考えています。<br>
@@ -197,8 +195,6 @@ EC2、S3、RDSなどなどそれぞれのサービスは単体としてとても
 
 <p>サーバレスはその横の連携を担うのだ。<br>
 各サービス間を紐で固く結びつけてしまう。<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ロックインを加速させる役割も持つ。</p>
-
-<p><b>「三葉よ、サーバレス、それもまた結び。」</b></p>
 
 <p>そして、IoTへの布石。<br>
 IoTの世界ではリアルタイムなセンサーの情報のやりとりでデ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4">バイ</a>スとデータセンタ間の通信遅延が許容できないことがある。<br>
@@ -209,7 +205,6 @@ LambdaのようにImmutable, Statelessが前提で作られる、どこの環境
 デ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4">バイ</a>スに近いエッジコンピューティング側はLambdaでさばき、そのさばいたデータを中央のデータセンターへ、<br>
 なんていうことが主流になってくるかもしれない。と思うとFaaSの存在は見逃せない気がしてくる。</p>
 </body></p>
-
                     </div>
                     
                     
