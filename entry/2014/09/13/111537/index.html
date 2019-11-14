@@ -79,15 +79,28 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><body>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ethernet">Ethernet</a>シールドを使ってネットワークへ繋げる。<br>
-とりあえずは、スモールステップでPCとの1対1の通信。</p></p>
+                        <p>もーすけです。前回はArduinoの入門の記事を書きました。<br />
+今日は、Ethernetシールドを使ってネットワークへ繋げることをやってみます。
+Arduinoは標準のままでは、PCとケーブルでつないでシリアル通信しかできません。
+やはりデータの取得したあとにサーバに送ったり、サーバ上のデータを元に挙動を変えたり、ネットワーク通信は必須です。
+というわけでEthernetシールドも買ったので活用していきます。</p>
 
-<p><div class="section">
-    <h3>PCとの1対1通信</h3>
-    <p>構成図<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140907/20140907231747.png" alt="f:id:mosuke5:20140907231747p:plain" title="f:id:mosuke5:20140907231747p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a></p></p>
+<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2014/07/21/231946/" data-iframely-url="//cdn.iframe.ly/0bOcPc1"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
+
+<h2 id="pcとの1対1通信">PCとの1対1通信</h2>
+
+<p>まずは、スモールステップでPCとの1対1の通信を確認します。<br />
+ArduinoにEthernetシールドを装着して、LANケーブルでダイレクトにPCとつなぎます。
+このときのIPアドレスが何かは注意しておきましょう。</p>
+
+<h3 id="構成図">構成図</h3>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140907/20140907231747.png" alt="f:id:mosuke5:20140907231747p:plain" title="f:id:mosuke5:20140907231747p:plain" class="hatena-fotolife" itemprop="image"></span></p></p>
+
+<h3 id="arduinoソースコード">Arduinoソースコード</h3>
+
+<p>ArduinoのソースコードでIPアドレスを指定できます。
+PC側とレンジをそろえましょう。</p>
 
 <pre><code class="language-c">#include &lt;SPI.h&gt;
 #include &lt;Ethernet.h&gt;
@@ -105,7 +118,11 @@ void loop()
 }
 </code></pre>
 
-<p>疎通確認</p>
+<h3 id="疎通確認">疎通確認</h3>
+
+<p>PCからArduinoに対してPingを売ってみます。
+疎通あれば成功です。<br />
+Ping確認ヨシ!!</p>
 
 <pre><code>% ping 192.168.100.3
 PING 192.168.100.3 (192.168.100.3): 56 data bytes
@@ -115,32 +132,32 @@ Request timeout for icmp_seq 0
 64 bytes from 192.168.100.3: icmp_seq=3 ttl=128 time=0.302 ms 
 </code></pre>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ping">Ping</a>確認ヨシ!!</p>
-<p>一応<a class="keyword" href="http://d.hatena.ne.jp/keyword/ARP">ARP</a>テーブルを見ておく。</p>
+<p>Pingが通っているので問題ないのですが、せっかくなのでARPテーブルを見ておきます。<br />
+マックアドレスの取得もヨシ!!</p>
 
 <pre><code>% arp -a
 ? (192.168.100.3) at 90:a2:da:f:8b:a2 on en4 ifscope [ethernet]
 ? (192.168.100.255) at ff:ff:ff:ff:ff:ff on en4 ifscope [ethernet] 
 </code></pre>
 
-<p>マックアドレスの取得もヨシ!!</p>
+<h2 id="dhcpを使って家内lan接続">DHCPを使って家内LAN接続</h2>
 
-<p></div>
-<div class="section">
-    <h3>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>を使って家内LAN接続</h3>
-    <p>実運用では<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>を利用することが圧倒的に多いと思うが、こちらもとても簡単。</p>
-<p>構成図<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140913/20140913110038.png" alt="f:id:mosuke5:20140913110038p:plain" title="f:id:mosuke5:20140913110038p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a>ルータから有線LANケーブルを伸ばし<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>に結線。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>による<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>の取得はとても容易で以下のようにマックアドレスを指定するのみ。</p></p>
+<p>先程はスタティックでArduinoにIPアドレスをふりました。<br />
+実際の買うようの場面ではDHCPを利用したいです。</p>
+
+<h3 id="構成図-1">構成図</h3>
+
+<p><img src="/image/arduino_ethernet.png" alt="arduino-dhcp" /></p>
+
+<p>普段はあまり利用しないかもしれませんが、家庭にある無線LANルータにはたいていの場合はLANケーブルのポートがあります。
+そこから有線LANケーブルを伸ばしArduinoに結線します。無線LANルータがDHCPサーバとなります。
+DHCPによるIPアドレスの取得はとても容易で以下のようにマックアドレスを指定するのみです。</p>
 
 <pre><code>Ethernet.begin(mac) 
 </code></pre>
 
-<p>以下は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>公式サイトに則って実施したもの。<br>
-<a href="http://arduino.cc/en/Tutorial/DhcpAddressPrinter">Arduino - DhcpAddressPrinter</a><br>
-</p>
+<p>以下はArduino公式サイトに則って実施したもの。<br>
+<a href="http://arduino.cc/en/Tutorial/DhcpAddressPrinter">Arduino - DhcpAddressPrinter</a></p>
 
 <pre><code class="language-c">#include &lt;SPI.h&gt;
 #include &lt;Ethernet.h&gt;
@@ -171,25 +188,27 @@ void setup()
   Serial.println();
 }
 
-void loop()
-{
+。{
   Serial.println(&quot;abc&quot;);
   delay(3000);
 }
 </code></pre>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>に<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>が割り当てられたかどうか確認するには、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CC%B5%C0%FELAN">無線LAN</a>ルータにアクセスし、マックアドレスと<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>のヒモ付のテーブルをみればよい。</p>
+<p>ArduinoにIPアドレスが割り当てられたかどうか確認するには、無線LANルータにアクセスして確認できます。
+マックアドレスとIPアドレスのヒモ付のテーブルが大抵の場合あるのでそちらをみると確認しやすいですよ。</p>
 
-<p></div>
-</body></p>
+<h2 id="まとめ">まとめ</h2>
 
+<p>Arduinoを実用的に利用するためにEthernetシールドを使って通信できるようにしてみました。<br />
+前回やったArduinoの基礎とこのネットワークの設定ができれば、かなりおもしろいことができるようになりますね。<br />
+ものづくりに挑戦していきましょう。</p>
                     </div>
                     
                     
                     <div class="related-post">
                         <h5>関連する記事はこちら</h5>
                     	
-                        <li><a href="https://blog.mosuke.tech/entry/2014/07/21/231946/" onClick="ga('send','event','link','click','related-posts');">【これだけは抑えておきたい】Arduino入門まとめ</a> (2014/07/21)</li>
+                        <li><a href="https://blog.mosuke.tech/entry/2014/07/21/231946/" onClick="ga('send','event','link','click','related-posts');">これだけは抑えておきたい、Arduino入門時に学ぶべきこと</a> (2014/07/21)</li>
                     	
                     </div>
                     
