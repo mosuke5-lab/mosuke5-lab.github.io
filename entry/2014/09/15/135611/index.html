@@ -79,22 +79,48 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><body>
-<p>最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。<br>
-例えば以下の状況を考える。<br>
-【やりたいこと】<br>
-「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」</p>
-<p>【DBの構造】<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AB%A5%E9%A5%E0%CC%BE">カラム名</a>：型<br>
-　date : datetime<br>
-　value : int</p>
-<p>※また、下記では<a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>上で行っているが、他の言語でも同様のことがいえる。</p></p>
+                        <p>こんにちは。もーすけです。<br />
+Web上でのデータのグラフ化にどんな方法をとっていますか？いろいろ検討して<a href="https://d3js.org/">D3.js</a>が非常に良さそうだったので使ってみています。今回、データベースにあるデータを読み込ませる方法についていくつか検討してみました。</p>
 
-<p><div class="section">
-    <h3>(1) 簡単な<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>のようなものを利用する</h3>
-    <p>先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、<br>
-これが一番複雑にならずに良いと思ったということ。</p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>側で/<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>にアクセスすると<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルをダウンロードできるようにする。</p></p>
+<p>例えば以下の状況を考えます。</p>
+
+<h3 id="やりたいこと">やりたいこと</h3>
+
+<p>「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」</p>
+
+<h3 id="dbの構造">DBの構造</h3>
+
+<p>すごく単純に下記のテーブル構造とします。</p>
+
+<table>
+<thead>
+<tr>
+<th>カラム名</th>
+<th>データ型</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>date</td>
+<td>datetime</td>
+</tr>
+
+<tr>
+<td>value</td>
+<td>int</td>
+</tr>
+</tbody>
+</table>
+
+<p>※また、下記ではSinatra上で行っているが、他の言語でも同じ考え方が可能です。</p>
+
+<h3 id="1-簡単なapiのようなものを利用する-h3">(1) 簡単なAPIのようなものを利用する</h3></h3>
+
+<p>先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、
+これが一番複雑にならずに良いと思いました。</p>
+
+<p>Sinatra側で/csvにアクセスするとcsvファイルをダウンロードできるようにします。</p>
 
 <pre><code class="language-ruby">#Sinatra側
 get '/csv' do
@@ -117,29 +143,22 @@ get '/csv' do
 end
 </code></pre>
 
-<p>csvtest.erb</p>
+<p>こうすることで<code>http://*****/csv</code>にアクセスするとcsvファイルとしてダウンロードできる状態になります。
+条件指定をしてデータをダウンロードできるようにしたい場合はGETでパラメータ指定できるようにすれば良いと思います。<br />
+また、今回はcsvにしているがjsonなどの他の形式でも同様のことがいえる。もっと複雑な構造のデータを扱うのであればjsonを利用すべきです。</p>
 
-<pre><code class="language-ruby">&lt;%= @csv %&gt;
-</code></pre>
-
-<p>こうすることで"<a href="http://*****/csv">http://*****/csv</a>"にアクセスすると<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルとしてダウンロードできる状態になる。<br>
-条件指定をしてデータをダウンロードできるようにしたい場合はGETでパラメータ指定できるようにすれば良いと思う。<br>
-（<a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/CSV">CSV</a>ファイルを生成するところのコードがナンセンスだと思っているので、もっといい方法があるはず…）</p>
-<p>また、今回は<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>にしているが<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>などの他の形式でも同様のことがいえる。</p>
-<p>これをD3.js側で以下のように読み込ませる。</p>
+<p>このエンドポイントを使って、D3.js側で以下のように読み込ませる。
+d3.jsのcsvを読み込ませる関数の引数にURLを指定してあげればそれで終了。</p>
 
 <pre><code class="language-javascript">d3.csv(&quot;/csv&quot;, function(error, data) {
     (中略)
 }
 </code></pre>
 
-<p>d3.jsの<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>を読み込ませる関数の引数にURLを指定してあげればそれで終了。</p>
+<h3 id="2-javascriptコードの中でruby変数を展開させる">(2) javascriptコードの中でRuby変数を展開させる</h3>
 
-<p></div>
-<div class="section">
-    <h3>(2) <a class="keyword" href="http://d.hatena.ne.jp/keyword/javascript">javascript</a>コードの中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>変数を展開させる</h3>
-    <p>d3.jsのdatasetの中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>の変数を展開させる。ビューに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Javascript">Javascript</a>を書いているので、ビューの中で変数展開するのと同じ要領。<br>
-しかし、jsコードに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>コードも交じるので複雑になりがち。</p></p>
+<p>d3.jsのdatasetの中でRuby変数を展開させる。ビューにJavascriptを書いているので、ビューの中で変数展開するのと同じ要領。
+しかし、jsコードにRubyコードも交じるのはアンチパターンと言えよう。</p>
 
 <pre><code class="language-javascript">var dataset = [
 &lt;% @data.each do |d| %&gt;
@@ -148,20 +167,15 @@ end
 ];
 </code></pre>
 
-<p></div>
-<div class="section">
-    <h3>(3) <a class="keyword" href="http://d.hatena.ne.jp/keyword/CSV">CSV</a>ファイルをおいておく</h3>
-    <p>こちらはリアルタイムな更新でなれけばこれはこれでありだと思う。<br>
-publicのフォルダに予め<a class="keyword" href="http://d.hatena.ne.jp/keyword/csv">csv</a>ファイルを設置しておき、以下のようにd3.jsで読み込ませる。</p></p>
+<h3 id="3-csvファイルをおいておく">(3) CSVファイルをおいておく</h3>
+
+<p>こちらはリアルタイムな更新でなれけばこれはこれでありかもしれない。
+publicのフォルダに予めcsvファイルを設置しておき、以下のようにd3.jsで読み込ませる。</p>
 
 <pre><code class="language-javascript">d3.csv(&quot;test.csv&quot;, function(error, data) {
     (中略)
 }
 </code></pre>
-
-<p></div>
-</body></p>
-
                     </div>
                     
                     
