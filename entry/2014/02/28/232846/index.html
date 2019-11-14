@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>【SQL テーブル結合】INNER JOIN とWHERE結合の違いについて | Goldstine研究所</title>
+    <title>INNER JOIN とWHERE結合の違いについて理解する | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
     <meta name="description" content=" テーブルを内部結合するとき、いつもINNER JOINを使って書いていたが、 「FROM句のあとに複数のテーブルを書いてWHERE句で絞り込む」やり方があることを知った。  INNER JOIN型  SELECT * FROM table">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2014/02/28/232846/">
@@ -11,12 +11,12 @@
     <meta name="generator" content="Hugo 0.58.3" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="【SQL テーブル結合】INNER JOIN とWHERE結合の違いについて | Goldstine研究所">
+    <meta name="twitter:title" content="INNER JOIN とWHERE結合の違いについて理解する | Goldstine研究所">
     <meta name="twitter:description" content=" テーブルを内部結合するとき、いつもINNER JOINを使って書いていたが、 「FROM句のあとに複数のテーブルを書いてWHERE句で絞り込む」やり方があることを知った。  INNER JOIN型  SELECT * FROM table">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
-    <meta property="og:title" content="【SQL テーブル結合】INNER JOIN とWHERE結合の違いについて &middot; Goldstine研究所">
+    <meta property="og:title" content="INNER JOIN とWHERE結合の違いについて理解する &middot; Goldstine研究所">
     <meta property="og:description" content=" テーブルを内部結合するとき、いつもINNER JOINを使って書いていたが、 「FROM句のあとに複数のテーブルを書いてWHERE句で絞り込む」やり方があることを知った。  INNER JOIN型  SELECT * FROM table">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
@@ -65,7 +65,7 @@
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2014/02/28/232846/" class="post-title">【SQL テーブル結合】INNER JOIN とWHERE結合の違いについて</a>
+                        <a href="https://blog.mosuke.tech/entry/2014/02/28/232846/" class="post-title">INNER JOIN とWHERE結合の違いについて理解する</a>
 
                         <p class="post-meta">
                             
@@ -79,29 +79,245 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        
+                        <p>こんにちは。@mosuke5です。<br />
+近頃、<a href="https://www.jitec.ipa.go.jp/1_11seido/db.html">データベーススペシャリスト</a>の資格試験の勉強をしています。理由は、普段システムの開発・運用を行っているのですが、障害がデータベース起因のことが非常に多いです。また社内にデータベースに詳しい人も少ないので、どうしてもベンダー頼みになってしまうことも多いからです。<br />
+データベースの運用とは少しまた違うのですが、その第一歩としてデータベーススペシャリストを撮ろうと考えています。</p>
 
-<p><body>
-<p>テーブルを内部結合するとき、いつもINNER JOINを使って書いていたが、<br>
-「FROM句のあとに複数のテーブルを書いてWHERE句で絞り込む」やり方があることを知った。具体的には以下のようなやり方だ。</p>
-<p>INNER JOIN型</p></p>
+<h5 id="追記">追記</h5>
 
-<pre><code class="language-mysql">SELECT * FROM table1 INNER JOIN table2 ON table1.id=table2.id
+<p>その後無事に資格の取得できました。</p>
+
+<h2 id="テーブル結合の２つの記述方法">テーブル結合の２つの記述方法</h2>
+
+<p>RDBMSを勉強すれば、すぐにテーブル結合について学びます。２つのテーブルの情報を何かのキーを使って結合するものです。
+その結合の方法について、データベーススペシャリストの勉強をしていると見慣れない記述方法がされており戸惑ったことがこのブログを書いたきっかけです。<br />
+普段、アプリケーションの開発時にテーブルを内部結合するときには、<code>INNER JOIN</code>を使って書いていましたが、
+「FROM句のあとに複数のテーブルを書いてWHERE句で絞り込む」という記述方法もあるようです。
+具体的に何が違うのか？同じなのか？書き方はどうか？見ていきます。</p>
+
+<h3 id="前提">前提</h3>
+
+<p>以下のようなuserテーブルとorderテーブルがあると想定します。
+そして、テーブル結合によりorderの内容とuserを紐づけたいとします。</p>
+
+<h4 id="userテーブル">userテーブル</h4>
+
+<table>
+<thead>
+<tr>
+<th>user_id</th>
+<th>name</th>
+<th>age</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>1</td>
+<td>Taro Shinagawa</td>
+<td>24</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>Hiroshi Meguro</td>
+<td>35</td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>Goro Gotanda</td>
+<td>33</td>
+</tr>
+</tbody>
+</table>
+
+<h4 id="orderテーブル">orderテーブル</h4>
+
+<table>
+<thead>
+<tr>
+<th>order_id</th>
+<th>user_id</th>
+<th>product</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>りんご</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>2</td>
+<td>なし</td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>1</td>
+<td>おれんじ</td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>3</td>
+<td>ぶどう</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="inner-join型">INNER JOIN型</h3>
+
+<p>まずは、INNER JOIN型です。自分は一番見慣れた形式です。</p>
+
+<pre><code class="language-mysql">SELECT * FROM order INNER JOIN user ON order.user_id=user.user_id
 </code></pre>
 
-<p>WHERE型</p>
+<h3 id="where型">WHERE型</h3>
 
-<pre><code class="language-mysql">SELECT * FROM table1 table2 WHERE table1.id=table2.id
+<pre><code class="language-mysql">SELECT * FROM user,order WHERE order.user_id=user.user_id
 </code></pre>
 
-<p>結果的には同じだし、調べる限りだとどちらが良いとかメリット・デメリットとかないそう。個人的には「何に何を結合しているのかわかりやすい」という点からINNER JOIN型をおすすめしたいところ。</p>
-<p>DBスペシャリストの資格の勉強で、問題をみてるとだいたいWHERE型なので、普段INNER JOIN型を使っている自分は戸惑うことがある。</p>
+<p>結果は一緒です。ですが記法的にすこし考え方が異なりそうです。その考え方がわかればたいしたことはないです。
+INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをくっつけます。と解釈できますね。</p>
 
-<h2 id="その後考えてみて">その後考えてみて</h2>
+<p>一方、WHERE型は、まず<code>SELECT * FROM user,order</code>これの結果を考えるとわかりやすいです。
+テーブル名を２つ並べるとクロスでかけ合わせます。
+この中から、userのuser_idとorderのorder_idが同じものを選ぶ、と考えればWHERE型も納得ができますね。</p>
 
-<p>いろいろ考えてみたのだが、やはりFROM句の後にテーブルを複数書いてWHEREで結合させるのはナンセンスだと思う。</p>
-<p>例えば、内部結合に加え、外部結合もある場合を考える。</p>
-<p>WHERE型</p>
+<table>
+<thead>
+<tr>
+<th>user_id</th>
+<th>name</th>
+<th>age</th>
+<th>order_id</th>
+<th>user_id</th>
+<th>product</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>1</td>
+<td>Taro Shinagawa</td>
+<td>24</td>
+<td>1</td>
+<td>1</td>
+<td>りんご</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>Hiroshi Meguro</td>
+<td>35</td>
+<td>1</td>
+<td>1</td>
+<td>りんご</td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>Goro Gotanda</td>
+<td>33</td>
+<td>1</td>
+<td>1</td>
+<td>りんご</td>
+</tr>
+
+<tr>
+<td>1</td>
+<td>Taro Shinagawa</td>
+<td>24</td>
+<td>2</td>
+<td>2</td>
+<td>なし</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>Hiroshi Meguro</td>
+<td>35</td>
+<td>2</td>
+<td>2</td>
+<td>なし</td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>Goro Gotanda</td>
+<td>33</td>
+<td>2</td>
+<td>2</td>
+<td>なし</td>
+</tr>
+
+<tr>
+<td>1</td>
+<td>Taro Shinagawa</td>
+<td>24</td>
+<td>3</td>
+<td>1</td>
+<td>おれんじ</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>Hiroshi Meguro</td>
+<td>35</td>
+<td>3</td>
+<td>1</td>
+<td>おれんじ</td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>Goro Gotanda</td>
+<td>33</td>
+<td>3</td>
+<td>1</td>
+<td>おれんじ</td>
+</tr>
+
+<tr>
+<td>1</td>
+<td>Taro Shinagawa</td>
+<td>24</td>
+<td>4</td>
+<td>3</td>
+<td>ぶどう</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>Hiroshi Meguro</td>
+<td>35</td>
+<td>4</td>
+<td>3</td>
+<td>ぶどう</td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>Goro Gotanda</td>
+<td>33</td>
+<td>4</td>
+<td>3</td>
+<td>ぶどう</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="どちらがよいか">どちらがよいか</h2>
+
+<p>どちらがよいか？という見出しにしましたが、どちらがいいということは基本的にないと思います。
+しかし、頭のなかの理解のしやすさや、その他SQLの運用のことをいろいろ考えてみると、やはりFROM句の後にテーブルを複数書いてWHEREで結合させるのはナンセンスだと自分は考えています。<br />
+例えば、内部結合に加え、外部結合もある場合を考えてみます。
+<p>WHERE型</p></p>
 
 <pre><code class="language-mysql">SELECT * 
 FROM table1, table2 #←結合させたいもの
@@ -117,7 +333,7 @@ WHERE table1.id=table2.id #←結合条件
  
 </code></pre>
 
-<p><p>table1とtable2を内部結合させたいのに、肝心の何と何を結合させるかの部分の&rdquo;WHERE table1.id=table2.id&rdquo;が離れてしまい、QL文全体として何をしたいかわかりずらいからだ。</p>
+<p><p>table1とtable2を内部結合させたいのに、肝心の何と何を結合させるかの部分の&rdquo;WHERE table1.id=table2.id&rdquo;が離れてしまい、SQL文全体として何をしたいかわかりずらいきがします。</p>
 <p>一方、INNER JOINなら</p></p>
 
 <pre><code class="language-mysql">SELECT * 
@@ -134,11 +350,9 @@ ON table1.id=sub.id
  
 </code></pre>
 
-<p><p>上記のように、結合させたいテーブルと結合させる条件がくっつくため、<br>
-全体としてなにをしたいかわかりやすい気がする。</p>
-<p>慣れの問題なのかもしれんが、圧倒的にINNER JOINがわかりやすいのではないかと考えている。</p>
-</body></p>
-
+<p>上記のように、結合させたいテーブルと結合させる条件がくっつくため、全体としてなにをしたいかわかりやすいと考えます。
+慣れの問題や書き方によって改善できるのかもしれませんが、圧倒的にINNER JOINがわかりやすいのではないかと考えています。
+みなさんはどうかんがえていますか？</p>
                     </div>
                     
                     
