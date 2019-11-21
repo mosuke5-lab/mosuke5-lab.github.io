@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datadog APMとトレーシングの仕組みについて | Goldstine研究所</title>
+    <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+    <meta name="description" content="Datadog APMを体験しました。非常に強力で、いままでアプリケーションをいかに把握していなかった痛感しました。本ブログではAPMとはなにか、なぜ必要か、どんな情報が取得されているのかなど紹介します。">
+    <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/">
+    <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/" />
+    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="twitter:card" content="summary">
+    
+    <meta name="twitter:title" content="Datadog APMとトレーシングの仕組みについて | Goldstine研究所">
+    <meta name="twitter:description" content="Datadog APMを体験しました。非常に強力で、いままでアプリケーションをいかに把握していなかった痛感しました。本ブログではAPMとはなにか、なぜ必要か、どんな情報が取得されているのかなど紹介します。">
+    <meta name="twitter:site" content="@mosuke5" />
+    <meta name="twitter:creator" content="@mosuke5" />
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Datadog APMとトレーシングの仕組みについて &middot; Goldstine研究所">
+    <meta property="og:description" content="Datadog APMを体験しました。非常に強力で、いままでアプリケーションをいかに把握していなかった痛感しました。本ブログではAPMとはなにか、なぜ必要か、どんな情報が取得されているのかなど紹介します。">
+    <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
+    <meta property="og:site_name" content="Goldstine研究所" />
+    <meta property="og:url" content="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+    <link rel="stylesheet" href="https://blog.mosuke.tech/css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="icon" type="image/png" href="/image/favicon.ico">
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-2753210161325997",
+        enable_page_level_ads: true
+      });
+    </script>
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
+            <h2 class="brand-tagline"> @mosuke5&#39;s Blog </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">21 Nov 2019, 11:32</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/" class="post-title">Datadog APMとトレーシングの仕組みについて</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Datadog" href="https://blog.mosuke.tech/categories/datadog">Datadog</a><a class="post-category post-category-APM" href="https://blog.mosuke.tech/categories/apm">APM</a>
+                            
+                        </p>
+                    </header>
+                    <div class="post-description">
+                        <p>こんにちは。<a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br />
+みなさん普段の監視はどのように行っていますか？Datadog使っていますか？</p>
+
+<p>最近<a href="https://www.datadoghq.com/">Datadog</a>を触る機会が多いのですが、Datadogはobservabilityの3本柱ということで、メトリックとトレース(APM)とログ、この3つを統合した監視サービスであることを強くおしだしています。
+3つの分野のそれぞれに対応したOSSやサービスは多いですが、統合されてシームレスに連携できる点はDatadogの非常に強いポイントと感じます。
+さて、そんななかでDatadog APM (Application Perfomance Monitoring) が強力だったので紹介したいのと、その仕組みを探っていきましょう。</p>
+
+<h2 id="apmとはなにか-なぜ必要か">APMとはなにか、なぜ必要か</h2>
+
+<h3 id="従来的な監視との違い">従来的な監視との違い</h3>
+
+<p>今回に至るまで、APMは名前は聞いたことがありましたが、実際に利用したことはありませんでした。
+APMはApplication Performance Monigoringの略で、名前から想像ができる通りアプリケーションに関するモニタリングです。
+アプリケーションのモニタリングというと、通常の監視となにも変わらないように思えるのですが下記の点で異なります。</p>
+
+<ul>
+<li><strong>APM</strong>
+
+<ul>
+<li>専用のライブラリをアプリケーションに組み込んで、「実際のユーザからのリクエスト」に対するパフォーマンスやエラーを計測、監視する。</li>
+</ul></li>
+<li><strong>従来的なアプリケーションの監視</strong><small> (※1)</small>
+
+<ul>
+<li>アプリケーションのプロセスが動いているか確認する。</li>
+<li>外形監視として定期的に、アプリケーションにリクエストを発行して正常か確認する。
+
+<ul>
+<li>あくまで実際のユーザのリクエストではなく、監視のためのリクエスト。</li>
+</ul></li>
+<li>アプリケーションが出力したログからエラーが出ていないか監視する。</li>
+</ul></li>
+</ul>
+
+<p><small>※1: 「従来的なアプリケーションの監視」とは、私のAPMに出会う前のアプリケーションの監視の認識をもとに書いています。</small></p>
+
+<h3 id="なぜ必要か">なぜ必要か？</h3>
+
+<p>なぜAPMが必要なのでしょうか？<br />
+一番の理由はアプリケーションのパフォーマンスがビジネスにおいてより重要な役割を果たすようになってきたからでしょう。
+そして、アプリケーションがどんどん複雑化していて、パフォーマンスの改善やエラーの特定が難しくなってきているからです。</p>
+
+<p>このような状況にもかかわらず、APMを利用してみて感じたことなのですが、いかに今まで自らのアプリケーションの監視ができていなかったか痛感します。<br />
+それは、やはり今までは外側からしかアプリケーションを監視していなかったからです。
+アプリケーションのことはアプリケーションが一番よく知っているわけで、内側から計測していかないといけません。</p>
+
+<h3 id="どのようなものか">どのようなものか</h3>
+
+<p>具体的にどのようなメトリックを収集できるのか例をあげてみます。</p>
+
+<ul>
+<li>時間ごとのリクエスト数、エラー数</li>
+<li>アプリケーションのレイテンシー</li>
+<li>エンドポイント毎のリクエスト数、レイテンシー、エラー率</li>
+<li>各リクエストごとの処理時間、ボトルネック</li>
+</ul>
+
+<p>とくに各リクエストごとの処理時間やボトルネックが追えるのが魅力的です。<br />
+下記は、あるリクエストでエラーが発生したときのAPMの画面です。どこの処理でなんのエラーがでているか簡単に追うことができます。またそのときのホストのリソース状況も同時に確認できます。</p>
+
+<p><img src="/image/datadog-apm-error.png" alt="datadog-apm-error" /></p>
+
+<p>動画もありましたので、イメージをわいてもらうために掲載しておきます。
+<iframe width="560" height="315" src="https://www.youtube.com/embed/iScrJXR3mLI?start=52" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></p>
+
+<h3 id="datadog-apmの導入">Datadog APMの導入</h3>
+
+<p>上のような素晴らしいことができるわけですが、Datadog APMの場合、導入も非常に簡単です。<br />
+このブログではあまり手順的な話にしたくないので、こちらも1分の動画がありましたので参考にしてください。</p>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/faoR5M-BaSw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<h2 id="どうしてできるのか">どうしてできるのか</h2>
+
+<p>ドキュメントのインストールの手順の通りで言えば、ライブラリを入れて、アプリケーションの設定ファイルに数行書くだけ。
+それだけで、上のようなことができてしまうわけです。一見魔法のように見えるDatadog APMですが、どんな情報を取得しているのか気になります。</p>
+
+<h3 id="トレースの簡単な仕組み">トレースの簡単な仕組み</h3>
+
+<p>トレース、トレーシングというと、最近では「分散トレーシング」という言葉で聞くことが多いと思いますが、
+必ずしも分散システムやマイクロサービスのでなくてもトレースは実現できるし役に立ちます。
+ひとつのモノリシックなアプリケーションの中での各処理もトレーシングを使ってみていくことができます。
+（分散トレーシングに対してシングルトレーシングなんていったりするらしいです）</p>
+
+<p>まずは、トレーシングの簡単な概要について説明します。<br />
+下記のような簡単な処理を行うWebアプリケーションの1つのリクエスト例に考えてみましょう。</p>
+
+<ol>
+<li>アプリケーションがリクエストを受け付けます</li>
+<li>コントローラがリクエストを処理をします</li>
+<li>コントローラは画面を表示するのに必要なデータをDBから取り出します</li>
+<li>ビューレンダリングをします</li>
+</ol>
+
+<p>実際にどうやってトレースされていくのかというと、
+下図のように3つのIDが振られて管理されていきます。
+各処理に3つのIDをふることで親子関係を認識し、またここには書いてませんが、それぞれの処理の開始時間と終了時間がわかれば下記のような図が書けます。
+こちらは簡単な例でしたが、Datadog APMではこのようなことを実際のアプリケーションに対して行ってくれます。</p>
+
+<p><img src="/image/tracing-basic.png" alt="tracing-basic" /></p>
+
+<table>
+<thead>
+<tr>
+<th>項目名</th>
+<th>意味</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Trace ID</td>
+<td>一連のトレースを管理するID。この例でいうとすべて同じ。</td>
+</tr>
+
+<tr>
+<td>Parent ID</td>
+<td>親の処理のSpan ID。Parent IDが0のものは一番親でありはじめの処理。</td>
+</tr>
+
+<tr>
+<td>Span ID</td>
+<td>それぞれの処理のID</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="実際のトレースのログ">実際のトレースのログ</h3>
+
+<p>上で簡単な例として見ていきましたが、実際のアプリケーションでどのようになっているのでしょうか。
+デフォルトの設定だとトレースのログの出力がされませんが、設定を変更してログファイルを出力させてみると理解ができますのでやってみます。
+こちらの例は、Ruby on Railsで動いているRedmineに対してDatadog APMを導入したものです。</p>
+
+<h4 id="設定の変更">設定の変更</h4>
+
+<p>Datadogの設定において、下記のように<code>my-custom.log</code>にログを出力するようにしておきます。</p>
+
+<pre><code class="language-ruby">f = File.new(&quot;my-custom.log&quot;, &quot;w+&quot;)
+Datadog.configure do |c|
+  c.use :rails
+  c.tracer log: Logger.new(f)
+end
+</code></pre>
+
+<h4 id="トレースログ">トレースログ</h4>
+
+<p>こちらが実際に、Redmineのトップページにアクセスしたときに出力されたログのはじめの部分です。
+サンプルの例でみたものよりももっとたくさんの情報で構成されています。
+データベースからの情報取得についてみてみると、実際に発行されたSQLもデータとして扱われています。
+ゆえに、どのSQLの処理がボトルネックになっているか判断したりできるわけです。</p>
+
+<pre><code> Name: rack.request
+Span ID: 4092285044422002896
+Parent ID: 0
+Trace ID: 5153016093792861274
+Type: web
+Service: redmine_app
+Resource: WelcomeController#index
+Error: 0
+Start: 1574235569204547584
+End: 1574235569259600128
+Duration: 55052569
+Allocations: 9632
+Tags: [
+   system.pid =&gt; 12492,
+   language =&gt; ruby,
+   http.method =&gt; GET,
+   http.url =&gt; /,
+   http.base_url =&gt; http://xxxxx.ap-northeast-1.elb.amazonaws.com,
+   http.status_code =&gt; 200,
+   http.response.headers.content_type =&gt; text/html; charset=utf-8,
+   http.response.headers.x_request_id =&gt; a1c70291-36bd-41ad-bbb8-8ef1d1c6c2b0]
+Metrics: [
+   _sampling_priority_v1 =&gt; 1.0],
+
+ Name: postgres.query
+Span ID: 5781776840616204252
+Parent ID: 4092285044422002896
+Trace ID: 5153016093792861274
+Type: sql
+Service: redmine_app-postgres
+Resource: UPDATE &quot;tokens&quot; SET &quot;updated_on&quot; = '2019-11-20 07:39:29.205854' WHERE &quot;tokens&quot;.&quot;user_id&quot; = $1 AND &quot;tokens&quot;.&quot;value&quot; = $2 AND &quot;tokens&quot;.&quot;action&quot; = $3
+Error: 0
+Start: 1574235569208989952
+End: 1574235569215289088
+Duration: 6299193
+Allocations: 26
+Tags: [
+   active_record.db.vendor =&gt; postgres,
+   active_record.db.name =&gt; redmine,
+   out.host =&gt; xxxxx.ap-northeast-1.rds.amazonaws.com,
+   out.port =&gt; 5432]
+Metrics: [ ],
+</code></pre>
+
+<table>
+<thead>
+<tr>
+<th>項目名</th>
+<th>意味</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Name</td>
+<td>処理の名前</td>
+</tr>
+
+<tr>
+<td>Span ID</td>
+<td>それぞれの処理のID</td>
+</tr>
+
+<tr>
+<td>Parent ID</td>
+<td>親のSpan ID。</td>
+</tr>
+
+<tr>
+<td>Trace ID</td>
+<td>一連の処理のトレースID</td>
+</tr>
+
+<tr>
+<td>Resource</td>
+<td>実行されたアプリケーションのメソッド名やSQL</td>
+</tr>
+
+<tr>
+<td>Start</td>
+<td>開始した時間</td>
+</tr>
+
+<tr>
+<td>End</td>
+<td>終了した時間</td>
+</tr>
+
+<tr>
+<td>Duration</td>
+<td>処理にかかった時間</td>
+</tr>
+</tbody>
+</table>
+
+<h4 id="分散トレーシングの場合">分散トレーシングの場合</h4>
+
+<p>分散トレーシングまでは実施していないのですが、考え方は基本的に同じです。
+他の異なるサービスにたとえばHTTP経由でアクセスする場合には、HTTPヘッダーに<code>x-datadog-trace-id</code>や<code>x-datadog-parent-id</code>を追加することで、他のシステムの処理であっても紐づけすることができます。
+そのため、下記のService Mapと呼ばれる分散システム間でのマッピングがかけるわけです。</p>
+
+<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://docs.datadoghq.com/ja/tracing/visualization/services_map/" data-iframely-url="//cdn.iframe.ly/aaMeTjE"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
+
+<h2 id="まとめ">まとめ</h2>
+
+<p>APMの魅力や仕組みについて理解できましたでしょうか。<br />
+Datadog APMを体験すれば、アプリケーションをいかに理解していないか痛感することもあると思います。
+また、トレーシングときくと最近は分散トレーシングの文脈で聞くことが多いですが、普段身近に扱っているもっと小規模なシステムでも十分にトレーシングの考え方を応用できます。</p>
+
+<p>自分自身が動かしているアプリケーションの運用状態を本当に理解できているか、監視・計測できているか、あらためて問いかけてみましょう。</p>
+                    </div>
+                    
+                    
+                    <div class="related-post">
+                        <h5>関連する記事はこちら</h5>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2019/08/28/datadog-for-alibaba-cloud/" onClick="ga('send','event','link','click','related-posts');">DatadogのAlibaba Cloud integrationでできること</a> (2019/08/28)</li>
+                    	
+                    </div>
+                    
+                    <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+                            <a class="twitter-share-button"
+                            href="https://twitter.com/intent/tweet">
+                          Tweet</a>
+                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2019%2f11%2f21%2fdatadog-apm%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <hr class="footer-hr" />
+<div class="footer-posts">
+    <h5>Latest Posts</h5>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/" onClick="ga('send','event','link','click','latest-posts');">Datadog APMとトレーシングの仕組みについて</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/11/12/wedding/" onClick="ga('send','event','link','click','latest-posts');">結婚式を楽に円満に行う！やって本当によかった７つのこと</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/09/23/apsara-conference-trip/" onClick="ga('send','event','link','click','latest-posts');">Apsara Conference 杭州に上海経由でいくために必要なこと</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/08/28/datadog-for-alibaba-cloud/" onClick="ga('send','event','link','click','latest-posts');">DatadogのAlibaba Cloud integrationでできること</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2019/08/21/ansible-for-k8s-resources/" onClick="ga('send','event','link','click','latest-posts');">Kubernetes上のリソースをAnsibleで管理する</a></li>
+    
+</div>
+<div class="footer-posts">
+    <h5>Featured Posts</h5>
+    <li><a href="https://blog.mosuke.tech/entry/2016/06/04/180122/" onClick="ga('send','event','link','click','featured-posts');">Nginxの仕組みについて入門</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2017/03/18/182252/" onClick="ga('send','event','link','click','featured-posts');">万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2015/07/19/135844/" onClick="ga('send','event','link','click','featured-posts');">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った</a></li>
+</div>
+<div class="search">
+    <h5>Search</h5>
+    <div class="google-search" style="width:400px;">
+    <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+<div class="gcse-search"></div>
+    </div>
+</div>
+<div class="links">
+    <h5>Links</h5>
+    <a class="pure-button" href="/about/" onClick="ga('send','event','link','click','about-this-site');"><i class="fa fa-info-circle"></i> About this site</a>
+    <a class="pure-button" href="/archive/" onClick="ga('send','event','link','click','archive');"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="/categories/" onClick="ga('send','event','link','click','categories');"><i class="fa fa-tag"></i> Categories</a>
+    <a class="pure-button" href="https://docs.google.com/forms/d/e/1FAIpQLSd6N53H7zfF8EBrvyezRizU1mQx-CP3vc_jG-WvxfRmCjHTpg/viewform" onClick="ga('send','event','link','click','contact');" target="_blank"><i class="fa fa-question-circle"></i> Contact</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml" onClick="ga('send','event','link','click','rss');"><i class="fa fa-rss"></i> rss</a>
+</div>
+<div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>&copy; 2018 <strong>mosuke5</strong> All rights reserved.<br />Powered by <a class="hugo" href="https://gohugo.io/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="https://blog.mosuke.tech/js/all.min.js"></script>
+<script>
+$(function() {
+    $('#search-textbox').keypress(function(e) {
+        if(e.which == 13){
+            $('#search-result').empty();
+            search($('#search-textbox').val())
+                .done(function(result){
+                $.each(result.hits.hits, function(){
+                    $("#search-result").append("<div class=\"search-result-list\"><div class=\"search-result-title\"><a href=" + this._source.uri +">"+ this._source.title +"</a><span class=\"search-result-score\"> ("+this._score+")</span></div><div class=\"search-result-description\">" + this._source.description + "</div></div>");
+                })
+            }).fail(function(){
+                $('#search-result').append("<p>error</p>");
+            })
+        }
+    });
+});
+function search(query){
+    return $.ajax({
+        type: "GET",
+        url: "https://gill-search.mosuke.tech/search",
+        data: "q=" + query,
+        dataType: "json",
+        success: function(res){
+            console.log(res);
+        }
+    })
+}
+</script>
+
+        </div>
+    </div>
+</div>
+<script>
+window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+  
+    return t;
+}(document, "script", "twitter-wjs"));
+</script>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-99596316-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
