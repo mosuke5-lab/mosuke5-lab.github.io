@@ -3,21 +3,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SSHでローカルポートフォワードを実際に試す | Goldstine研究所</title>
+    <title>SSHを制してインフラを制する。ローカルポートフォワードを使いこなす | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
-    <meta name="description" content=" SSHは奥が深い。ローカルポートフォワードの使い方を実例を含めて解説する。">
+    <meta name="description" content=" SSHを制するものがインフラを制する。SSHのローカルポートフォワーディングの活用場面や活用方法について解説していきます。AWS上でプライベートネットワークのRDSに接続する方法などもみていきます。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2014/12/31/170545/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2014/12/31/170545/" />
     <meta name="generator" content="Hugo 0.58.3" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="SSHでローカルポートフォワードを実際に試す | Goldstine研究所">
-    <meta name="twitter:description" content=" SSHは奥が深い。ローカルポートフォワードの使い方を実例を含めて解説する。">
+    <meta name="twitter:title" content="SSHを制してインフラを制する。ローカルポートフォワードを使いこなす | Goldstine研究所">
+    <meta name="twitter:description" content=" SSHを制するものがインフラを制する。SSHのローカルポートフォワーディングの活用場面や活用方法について解説していきます。AWS上でプライベートネットワークのRDSに接続する方法などもみていきます。">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
-    <meta property="og:title" content="SSHでローカルポートフォワードを実際に試す &middot; Goldstine研究所">
-    <meta property="og:description" content=" SSHは奥が深い。ローカルポートフォワードの使い方を実例を含めて解説する。">
+    <meta property="og:title" content="SSHを制してインフラを制する。ローカルポートフォワードを使いこなす &middot; Goldstine研究所">
+    <meta property="og:description" content=" SSHを制するものがインフラを制する。SSHのローカルポートフォワーディングの活用場面や活用方法について解説していきます。AWS上でプライベートネットワークのRDSに接続する方法などもみていきます。">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
     <meta property="og:url" content="https://blog.mosuke.tech/entry/2014/12/31/170545/" />
@@ -65,7 +65,7 @@
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2014/12/31/170545/" class="post-title">SSHでローカルポートフォワードを実際に試す</a>
+                        <a href="https://blog.mosuke.tech/entry/2014/12/31/170545/" class="post-title">SSHを制してインフラを制する。ローカルポートフォワードを使いこなす</a>
 
                         <p class="post-meta">
                             
@@ -79,72 +79,134 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><body>
-<p>SSH・・・<br>
-いろんなことができる&rdquo;らしい&rdquo;ということは知っていたし、<br>
-例えばポートフォワーディングなんていうこともできるのも知っている。<br>
-SSHを制する者がインフラを制する、なんていうことも聞いたことがある。</p></p>
+                        <p>SSHを単なるサーバへのログインのツールとして使っていませんか？<br />
+SSHを制する者がインフラを制する、なんていわれることもあります。
+SSHにはポートフォワーディングをはじめとしたいろんな使い方があります。
+今日は実際にローカルポートフォワーディングを理解しみなさんに使いこなしてもらえるようになっていただこうと思います。</p>
 
-<p>でもポートフォワーディングがどんなものなのか自分の手で試したことはないし、<br>
-なんとなくただのサーバログインツールとして利用していた。</p>
+<h2 id="どういうときに必要なの">どういうときに必要なの</h2>
 
-<p>サーバインフラ技術に興味を持つようになっていろんなことを勉強していると、<br>
-ポートフォワーディングは必須な技術であることも感じ、<br>
-年末の持て余す時間を使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のローカルポートフォワードを試してみたのでメモする。</p>
+<p>どういうときにポートフォワーディングが必要なのでしょうか？<br />
+ネットワーク的に直接とどかない（ただしサーバを経由すればとどく）環境に直接的に接続したい場面がありませんか？
+まずは、いくつか活用場面をご紹介します。</p>
 
-<h2>環境とやりたいこと</h2>
+<h3 id="プライベートネットワークのamazon-rdsに接続したい">プライベートネットワークのAmazon RDSに接続したい</h3>
 
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20141231162958.png"></span></p>
+<p>クラウド上でシステムを構築しているとよく遭遇するケースです。
+RDS（データベース）をプライベートネットワークに配置しているため、インターネットから直接アクセスできません。
+踏み台サーバはあり、踏み台サーバからならデータベースに接続ができますが、GUIのソフトウェアを使いたいなど、ローカルのPCから直接接続したいことがあります。<br />
+具体的に図に表すと以下のとおりです。</p>
 
-<p>ローカルPCからexample.jpは以下で接続できる状態。</p>
+<p><img src="/image/ssh-portforward-rds.png" alt="ssh-portforward-rds" /></p>
+
+<p>直接的にRDSに接続ができませんが、SSHのポートフォワーディングを使うと、ローカルのPCからたとえばmysqlコマンドなどで接続できるようになります。
+もちろん、ネットワークの経路は、踏み台を経由しています。</p>
+
+<h3 id="インターネットに公開していないサーバ上のサービスにアクセスしたい">インターネットに公開していないサーバ上のサービスにアクセスしたい</h3>
+
+<p>次のケースは、とあるサーバ上に動かしているソフトウェアにブラウザから接続したいが、そのソフトウェアがインターネットから直接アクセスできるように指定ないケースです。
+下図ではGrafanaというツールにしていますが、なんのソフトウェアでも構わず、ElasticSearchでもいいし、ApacheのようなWebサーバでも構いません。重要なのは、対象のサーバからlocalhostとして接続できるが、外部ネットワークからは接続できない場合を想定しています。</p>
+
+<p><img src="/image/ssh-portforward-grafana.png" alt="ssh-portforward-grafana" /></p>
+
+<h2 id="環境と実現したいこと">環境と実現したいこと</h2>
+
+<p>では、上のようなことがどのように実現できるのか？<br />
+例では、インターネット上にあるさくらのVPSの上に仮想マシンでWebサーバを立ち上げた、ということにしておきます。
+実現したいことは、VPSのサーバ上に立ち上がっている仮想マシンのWebサーバに、ローカルのPCのブラウザからアクセスするというものです。</p>
+
+<p><img src="/image/20141231162958.png" alt="ssh-portforward-example" /></p>
+
+<p>ローカルPCからexample.jp(VPSのサーバ)へはSSHできる状態です。</p>
 
 <pre><code>[local pc] $ ssh username@example.jp 
+ログイン可能
 </code></pre>
 
-<p>またWebサーバのポート番号は80で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>のホストサーバからはWebサーバへ接続できる。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/CUI">CUI</a>なのでわかりづらいが<a class="keyword" href="http://d.hatena.ne.jp/keyword/curl">curl</a>を打つと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Hello%20World">Hello World</a>が返ってきている。</p>
+<p>また、仮想サーバ上のWebサーバのポート番号は80でVPSのホストサーバからはWebサーバへ接続できる状態です。<br />
+VPSのホストからcurlを使って仮想サーバの80番ポートにリクエストを投げると、Hello Worldが返ってきます。</p>
 
 <pre><code>[example.jp] $ curl 192.168.33.10
 &lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello World! Virtual Web Server&lt;/h1&gt;
 &lt;/body&gt;&lt;/html&gt; 
 </code></pre>
 
-<h2>ローカルポートフォワードの実行</h2>
+<h2 id="ローカルポートフォワードの実行">ローカルポートフォワードの実行</h2>
 
-<p>ローカルPCから以下を実行する。<br>
-以下のコマンドは、<br>
-<b>ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす</b><br>
-といったもの。</p>
+<p>しかし、この状態では、仮想マシン上のWebサーバにたいしてローカルPCから直接はアクセスできません。
+そこで、SSHのローカルポートフォワーディングの出番です。ローカルPCから以下を実行してみます。<br />
+以下のコマンドは、<br />
+<strong>ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす</strong><br />
+と解釈するとわかりやすいです。</p>
 
 <pre><code>[local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp 
 </code></pre>
 
-<p>この状態でブラウザから<code>http://localhost:8888</code>にアクセスすると<br>
+<p>上を実行すると、いつもどおりSSHでログインした状態になります。
+「セッションを切らずに」、ブラウザから<code>http://localhost:8888</code>にアクセスするとなんと、ローカルホストにつないだはずが、example.jp上の仮想Webサーバのhtmlが帰ってくるのがわかります。</p>
 
-<p>なんと、ローカルホストにつないだはずが、example.jp上の仮想Webサーバのhtmlがうつっているではないか…</p>
+<p><img src="/image/20141231163932.png" alt="ssh-portforward-access" /></p>
 
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20141231163932.png"></span></p>
+<h2 id="rdsの例の場合">RDSの例の場合</h2>
 
-<h2>セキュリティはどうなの？</h2>
+<p>上の例はあまり実用的ではないので、AWS RDSの例も考えてみましょう。<br />
+以下の条件だとするとこうできます</p>
 
-<p>ローカルの端末からhttpで仮想のWebサーバに接続しているけど、セキュリティはだいじょうぶなのだろうか？<br>
-http通信だから暗号化はされていないのだろうか？<br>
-なんて疑問もあるが、それは問題ない。</p>
+<p><img src="/image/ssh-portforward-rds-2.png" alt="ssh-portforward-rds-2" /></p>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>でローカルPCから<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%E2%A1%BC%A5%C8%A5%DB%A5%B9%A5%C8">リモートホスト</a>(example.jp)までトンネルをはり、<br>
-そのなかをhttpで通信しているから全く問題なしといえる。</p>
+<p>次のようにSSH接続していきます。こう解釈するとわかりやすいです。<br />
+<strong>ローカルPCのポート8888での接続はfumidai.example.jpからみて「xxxx.rds.amazonaws.comのポート3306」に飛ばす</strong></p>
 
-<p>ローカルポートフォワードを利用する場合は、おそらく表には出したくないけど、<br>
-ローカルから接続したいなどの要件の時に使うと思うけど、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>できちんと暗号化しているので安心。</p>
+<pre><code>[local pc] $ ssh -L8888:xxxx.rds.amazonaws.com:3306 username@fumidai.example.jp 
+</code></pre>
 
-<h2>最後に</h2>
+<p>SSHセッションは維持したまま、別ターミナルでmysql接続していきます。</p>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>でできることはこの他にもたくさんある。<br>
-ポートフォワードだけみても他にも「リモートポートフォワード」や「ダイナミックポートフォワード」などがある。<br>
-リモートポートなどはいまぱっと試せる環境がなかったのでおいおい実践してみる…</p>
+<pre><code>[local pc] $ mysql -u user -p -H 127.0.0.1:8888
+</code></pre>
 
-<p><p>SSHをただのログイン<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>だけに留めるのは今年で終わりにしよう…</p>
-</body></p>
+<h3 id="セキュリティはどうなの">セキュリティはどうなの？</h3>
+
+<p>ローカルポートフォワーディングのSSHコマンドで、ローカルPCからリモートホスト(example.jp)までトンネルをはっています。そのトンネルの中をhttp通信やmysqlの通信を流しています。そのため、セキュリティ的にも安心できます。</p>
+
+<h2 id="最後に">最後に</h2>
+
+<p>SSHのローカルポートフォワーディングが普段の業務の中で役立つ場面がでてきましたか？<br />
+SSHは他にもたくさんのことができ、ポートフォワードだけみても他にも「リモートポートフォワード」や「ダイナミックポートフォワード」などがあります。SSHに関しては、下記の書籍がおすすめです。興味持った方は書籍などを参考にしながらSSHについて理解を深めていくととてもいいと思います。</p>
+
+<iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="https://rcm-fe.amazon-adsystem.com/e/cm?ref=tf_til&t=mosuke5-22&m=amazon&o=9&p=8&l=as1&IS1=1&detail=1&asins=4774168076&linkId=a7cf83a6990173efc362f1f761664194&bc1=ffffff&lt1=_blank&fc1=333333&lc1=0066c0&bg1=ffffff&f=ifr">
+    </iframe>
+
+<h2 id="おまけ-多段ssh">おまけ、多段SSH</h2>
+
+<p>今日の構成にも近いが、以前のブログ<a href="https://blog.mosuke.tech/entry/2014/11/09/171436/">【VPS1台でインフラ勉強】HAProxyでロードバランサーを構築</a>で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てました。
+仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければなりませんでした。
+多段SSHの設定をして、一回のSSH接続で仮想サーバにアクセスすることもできます。
+以下の図で言うと、web10, web11(192.168.33.<sup>10</sup>&frasl;<sub>11</sub>)に一発でSSHできるようになるわけです。</p>
+
+<p><img src="/image/20141109170337.png" alt="ssh" /></p>
+
+<p>設定のサンプルは下記のとおりです。クライアントPC側に以下の設定をすることで完了します。</p>
+
+<pre><code>$ vim ~/.ssh/config
+host gateway
+    HostName xxxxx.xxx
+    User username
+
+Host web10
+    HostName 192.168.33.10
+    User vagrant
+    ProxyCommand ssh -W %h:%p gateway
+
+Host web11
+    HostName 192.168.33.11
+    User vagrant
+    ProxyCommand ssh -W %h:%p gateway
+
+##これで以下で接続可能
+$ ssh web10
+$ ssh web11 
+</code></pre>
                     </div>
                     
                     
@@ -155,11 +217,11 @@ http通信だから暗号化はされていないのだろうか？<br>
                     	
                         <li><a href="https://blog.mosuke.tech/entry/2015/08/13/000440/" onClick="ga('send','event','link','click','related-posts');">デスクトップUbuntuにVNC接続。ついでにSSHローカルポートフォワードの復習。</a> (2015/08/13)</li>
                     	
-                        <li><a href="https://blog.mosuke.tech/entry/2014/11/09/172745/" onClick="ga('send','event','link','click','related-posts');">【VPS1台でインフラ勉強】多段SSH設定（おまけ）</a> (2014/11/09)</li>
-                    	
                         <li><a href="https://blog.mosuke.tech/entry/2015/12/01/181304/" onClick="ga('send','event','link','click','related-posts');">Ansible、実行速度高速化の実験。ControlMasterとPipeliningについて</a> (2015/12/01)</li>
                     	
                         <li><a href="https://blog.mosuke.tech/entry/2015/09/25/232751/" onClick="ga('send','event','link','click','related-posts');">Ansibleを踏み台サーバ越しに実行する方法</a> (2015/09/25)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2015/04/05/212518/" onClick="ga('send','event','link','click','related-posts');">SSHエージェントフォワード後に他のユーザでgit cloneする(鍵を使う)ことに関する考察</a> (2015/04/05)</li>
                     	
                     </div>
                     
