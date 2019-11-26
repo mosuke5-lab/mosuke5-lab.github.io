@@ -150,58 +150,6 @@ VPS1台でインフラ勉強シリーズの第3回目でVPN構築を行ったの
                     </div>
                 </section>
                 
-                <h1 class="content-subhead">28 Nov 2014, 00:17</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/11/28/001748/" class="post-title">Ansible, sudoパスワード要求を忘れただけでめんどくなる</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                <br />
-                                
-                                <a class="post-category post-category-インフラ" href="https://blog.mosuke.tech/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9">インフラ</a><a class="post-category post-category-Ansible" href="https://blog.mosuke.tech/categories/ansible">Ansible</a><a class="post-category post-category-サーバ" href="https://blog.mosuke.tech/categories/%E3%82%B5%E3%83%BC%E3%83%90">サーバ</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        AnsibleをVagrant上でずっと使ってて、Playbookも完成したし本番サーバへ&hellip; と思ったところである初歩的な罠にハ
-                    </div>
-                    <div class="read-more-link">
-                        <a href="https://blog.mosuke.tech/entry/2014/11/28/001748/">全文を読む</a>
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">20 Nov 2014, 23:03</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2014/11/20/230334/" class="post-title">後からGitレポジトリを共有設定に。sharedオプションの仕組みについて</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                <br />
-                                
-                                <a class="post-category post-category-git" href="https://blog.mosuke.tech/categories/git">git</a><a class="post-category post-category-Linux" href="https://blog.mosuke.tech/categories/linux">Linux</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        Gitレポジトリを作って、複数人で開発をしていた。 しかし、レポジトリの中に作成されるファイルやディレクトリが個人のグループになってしまい、 Push,
-                    </div>
-                    <div class="read-more-link">
-                        <a href="https://blog.mosuke.tech/entry/2014/11/20/230334/">全文を読む</a>
-                    </div>
-                </section>
-                
                 <h1 class="content-subhead">16 Nov 2014, 15:32</h1>
                 <section class="post">
                     <header class="post-header">
@@ -221,7 +169,20 @@ VPS1台でインフラ勉強シリーズの第3回目でVPN構築を行ったの
                     </header>
 
                     <div class="post-description">
-                        最近、Ansibleを使い始めたのだが、yumやapt-getでインストールできるものはいいけど、 どうしてもソースインストールが必要な場合が
+                        <p>こんにちは。<a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br />
+最近、Ansibleを使い始めました、yumやapt-getでインストールできるものは記述も簡単でいいのですが、
+どうしてもソースインストールが必要な場合があります。ソースコードでのインストールは結構手間がかかるので、ソースインストールを行う際のPlaybookの書き方と注意点をまとめました。</p>
+
+<p>まず、ソースインストールを行うには以下のフローを行うと仮定します。</p>
+
+<ol>
+<li>ソースファイルの取得(tarで固められていると仮定)</li>
+<li>tarファイルの解凍</li>
+<li>解答してできたディレクトリへ移動</li>
+<li>configure</li>
+<li>make</li>
+<li>make install</li>
+</ol>
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/11/16/153223/">全文を読む</a>
@@ -352,6 +313,68 @@ Web上でのデータのグラフ化にどんな方法をとっていますか�
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2014/09/15/135611/">全文を読む</a>
+                    </div>
+                </section>
+                
+                <h1 class="content-subhead">13 Sep 2014, 11:15</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2014/09/13/111537/" class="post-title">ArduinoをEthernetシールドを使ってネットワークへ繋げる</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                <br />
+                                
+                                <a class="post-category post-category-Arduino" href="https://blog.mosuke.tech/categories/arduino">Arduino</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p>もーすけです。前回はArduinoの入門の記事を書きました。<br />
+今日は、Ethernetシールドを使ってネットワークへ繋げることをやってみます。
+Arduinoは標準のままでは、PCとケーブルでつないでシリアル通信しかできません。
+やはりデータの取得したあとにサーバに送ったり、サーバ上のデータを元に挙動を変えたり、ネットワーク通信は必須です。
+というわけでEthernetシールドも買ったので活用していきます。</p>
+
+<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2014/07/21/231946/" data-iframely-url="//cdn.iframe.ly/0bOcPc1"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/09/13/111537/">全文を読む</a>
+                    </div>
+                </section>
+                
+                <h1 class="content-subhead">21 Jul 2014, 23:19</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2014/07/21/231946/" class="post-title">これだけは抑えておきたい、Arduino入門時に学ぶべきこと</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                <br />
+                                
+                                <a class="post-category post-category-Arduino" href="https://blog.mosuke.tech/categories/arduino">Arduino</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p><body>
+<p>もーすけです。前々からArduino自体はもっていたし、ちょろっと触ったことはあったのだが、
+最近に大学時代の研究室の仲間とArduino勉強会をやることになり、それに向けて友人と再入門したので入門プログラムを作ってみた。<br>
+Arduino入門時にこれだけは知っておきたい事項をプログラム形式にまとめた。</p>
+<p>もちろん、不足部分もたくさんあるが、これだけわかれば楽しめるようになると思う。</p></p>
+                    </div>
+                    <div class="read-more-link">
+                        <a href="https://blog.mosuke.tech/entry/2014/07/21/231946/">全文を読む</a>
                     </div>
                 </section>
                 

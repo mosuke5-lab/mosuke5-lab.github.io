@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ansible、ソースインストールする際のPalybookの書き方 | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
-    <meta name="description" content=" 最近、Ansibleを使い始めたのだが、yumやapt-getでインストールできるものはいいけど、 どうしてもソースインストールが必要な場合がある。  ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。  まず、あた">
+    <meta name="description" content=" Ansibleで、ソースコードからソフトウェアのインストールが必要な場合があります。yumやaptを使うのに比べて記述が大変です。ソースインストールを行う際のPlaybookの書き方と注意点をまとめました。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2014/11/16/153223/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2014/11/16/153223/" />
     <meta name="generator" content="Hugo 0.58.3" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Ansible、ソースインストールする際のPalybookの書き方 | Goldstine研究所">
-    <meta name="twitter:description" content=" 最近、Ansibleを使い始めたのだが、yumやapt-getでインストールできるものはいいけど、 どうしてもソースインストールが必要な場合がある。  ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。  まず、あた">
+    <meta name="twitter:description" content=" Ansibleで、ソースコードからソフトウェアのインストールが必要な場合があります。yumやaptを使うのに比べて記述が大変です。ソースインストールを行う際のPlaybookの書き方と注意点をまとめました。">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
     <meta property="og:title" content="Ansible、ソースインストールする際のPalybookの書き方 &middot; Goldstine研究所">
-    <meta property="og:description" content=" 最近、Ansibleを使い始めたのだが、yumやapt-getでインストールできるものはいいけど、 どうしてもソースインストールが必要な場合がある。  ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。  まず、あた">
+    <meta property="og:description" content=" Ansibleで、ソースコードからソフトウェアのインストールが必要な場合があります。yumやaptを使うのに比べて記述が大変です。ソースインストールを行う際のPlaybookの書き方と注意点をまとめました。">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
     <meta property="og:url" content="https://blog.mosuke.tech/entry/2014/11/16/153223/" />
@@ -79,38 +79,50 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><body>
-<p>最近、Ansibleを使い始めたのだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/yum">yum</a>やapt-getでインストールできるものはいいけど、<br>
-どうしてもソースインストールが必要な場合がある。</p>
-<p>ソースインストールを行う際のPlaybookの書き方と注意点をまとめた。</p>
-<p>まず、あたりまえだが、ソースインストールを行うには以下のフローを踏まなければいけな。<br>
-1. ソースファイルの取得(tarで固められていると仮定)<br>
-2. tarファイルの解凍<br>
-3. 解答してできたディレクトリへ移動<br>
-4. configure<br>
-5. make<br>
-6. make install</p>
-<p>また、Ansibleでは何回もPlaybookを実行していくため、<br>
-<b>すでにインストールされている場合は、インストールをスキップする</b>必要がある。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/yum">yum</a>やapt-getで管理されていれば上記を心配することはないのだが、やはりソースインストールだとこの壁がある。<br>
-※パッケージ化しろよ！というツッコミは禁止</p>
-<p>今回は例として、ubuntu13に<a class="keyword" href="http://d.hatena.ne.jp/keyword/emacs">emacs</a>をソースインストールするのを例としてみた。</p></p>
+                        <p>こんにちは。<a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br />
+最近、Ansibleを使い始めました、yumやapt-getでインストールできるものは記述も簡単でいいのですが、
+どうしてもソースインストールが必要な場合があります。ソースコードでのインストールは結構手間がかかるので、ソースインストールを行う際のPlaybookの書き方と注意点をまとめました。</p>
 
-<p><div class="section">
-    <h3>環境</h3>
-    <p>【Ansible実行側】<br>
-さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>の1G<br>
-OS: <a class="keyword" href="http://d.hatena.ne.jp/keyword/Centos">Centos</a> 7<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>:192.168.33.1</p>
-<p>【設定対象側】<br>
-上記さくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>上にたてた<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>の仮想サーバ<br>
-OS: <a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a> 13.10<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>:192.168.33.100</p></p>
+<p>まず、ソースインストールを行うには以下のフローを行うと仮定します。</p>
 
-<p></div>
-<div class="section">
-    <h3>Playbook</h3>
-    <p>以下playbookの例。</p></p>
+<ol>
+<li>ソースファイルの取得(tarで固められていると仮定)</li>
+<li>tarファイルの解凍</li>
+<li>解答してできたディレクトリへ移動</li>
+<li>configure</li>
+<li>make</li>
+<li>make install</li>
+</ol>
+
+<p>また、Ansibleの運用では通常、何回も同じPlaybookを対象のサーバに実行していくため、
+<b>すでにインストールされている場合は、インストールをスキップする</b>必要があります。いわゆる冪等性です。
+yumやapt-getで管理されていれば上記を心配することはないのだが、やはりソースインストールだとこの壁があります。</p>
+
+<p>今回は例として、ubuntu13にemacsをソースインストールするのを例としてみた。</p>
+
+<h3 id="環境">環境</h3>
+
+<h4 id="ansible実行側">【Ansible実行側】</h4>
+
+<ul>
+<li>さくらVPSの1G</li>
+<li>OS:Centos 7</li>
+<li>IPアドレス:192.168.33.1</li>
+</ul>
+
+<h4 id="設定対象側">【設定対象側】</h4>
+
+<p>上記さくらVPS上にたてたVagrantの仮想サーバ</p>
+
+<ul>
+<li>OS: Ubuntu 13.10</li>
+<li>IPアドレス:192.168.33.100</li>
+</ul>
+
+<h3 id="playbook">Playbook</h3>
+
+<p>以下playbookの例です。重要なのは、何を判断してインストール済みとするかです。<br />
+※本記事は2014年にかかれたもので、Ansibleのバージョンが古いです。最新の書き方にそぐわない可能性があるので注意してください。</p>
 
 <pre><code class="language-yaml">---
 - hosts: 192.168.33.100
@@ -164,9 +176,12 @@ OS: <a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a> 13
  
 </code></pre>
 
-<p></div>
-</body></p>
+<h2 id="まとめ">まとめ</h2>
 
+<p>考えてほしいところは、2回目以降の実行時にエラーにならないようにどうすればいいかということです。
+なにを確認して、インストール済みと判断するのか、インストールがされていればどうすればいいのか。
+ここが一番重要なポイントです。<br />
+この例は、非常にシンプルな例であるので、実際のユースケースに合わせて上の点を判断してもらえればと思います。</p>
                     </div>
                     
                     
@@ -175,13 +190,13 @@ OS: <a class="keyword" href="http://d.hatena.ne.jp/keyword/Ubuntu">Ubuntu</a> 13
                     	
                         <li><a href="https://blog.mosuke.tech/entry/2015/02/02/201008/" onClick="ga('send','event','link','click','related-posts');">Ansible、コマンド実行結果をokにする（冪等性を保つ方法）</a> (2015/02/02)</li>
                     	
-                        <li><a href="https://blog.mosuke.tech/entry/2014/11/28/001748/" onClick="ga('send','event','link','click','related-posts');">Ansible, sudoパスワード要求を忘れただけでめんどくなる</a> (2014/11/28)</li>
-                    	
                         <li><a href="https://blog.mosuke.tech/entry/2019/08/21/ansible-for-k8s-resources/" onClick="ga('send','event','link','click','related-posts');">Kubernetes上のリソースをAnsibleで管理する</a> (2019/08/21)</li>
                     	
                         <li><a href="https://blog.mosuke.tech/entry/2019/03/26/terraform-integrated-with-ansible/" onClick="ga('send','event','link','click','related-posts');">AnsibleのTerraform moduleを考察してみる</a> (2019/03/25)</li>
                     	
                         <li><a href="https://blog.mosuke.tech/entry/2016/01/25/222150/" onClick="ga('send','event','link','click','related-posts');">Vagrant×Ansible環境の３つのスタイルとそのメリット・デメリットについて</a> (2016/01/25)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2015/12/17/192554/" onClick="ga('send','event','link','click','related-posts');">インフラのデプロイとテストを同時実行できるようにする</a> (2015/12/17)</li>
                     	
                     </div>
                     
