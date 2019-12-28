@@ -201,7 +201,7 @@ SlideShare APIってあるのか？そしてGoogleAppsScriptもほとんどや�
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2016/07/26/215939/" class="post-title">PHPでhttpヘッダー、x-forwarded-forを受け取る</a>
+                        <a href="https://blog.mosuke.tech/entry/2016/07/26/215939/" class="post-title">PHPでHTTPヘッダー、x-forwarded-forを受け取る方法</a>
 
                         <p class="post-meta">
                             
@@ -216,14 +216,13 @@ SlideShare APIってあるのか？そしてGoogleAppsScriptもほとんどや�
                     </header>
 
                     <div class="post-description">
-                        <p><body></p>
+                        <p>こんにちは@mosuke5です。<br />
+もともとApach+PHPで動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになりました。理由は、もともと社内ネットワークでのみ利用するシステムだったのですが、インターネットの外からも利用することになり、インターネットからの入り口にリバースプロキシを導入したからです。<br />
+つまり、Nginx-&gt;Apache-&gt;PHPという構成になりました。<br />
+リバースプロキシを導入した際によく問題となることだが、Apacheからみるとすべてリバースプロキシから通信がきているようにみえます。
+接続元のIPアドレスがすべてリバースプロキシのもの変わってしまいます。</p>
 
-<p>もともとApach+PHPで動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになった。理由は、もともと社内ネットワークでのみ利用するシステムだったのだが、インターネットの外からも利用することになり、インターネットからの入り口にリバースプロキシを導入したから。<br>
-つまり、Nginx-&gt;<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>-&gt;<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>という構成になった。<br>
-よくあることだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>からみるとすべてリバースプロキシから通信がきているので、
-接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>がすべてリバースプロキシのものになる。</p>
-
-<p>HTTPヘッダーに接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を追加しアプリ側（<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>）で受け取る方法をかく。</p>
+<p>そこで、HTTPヘッダーに接続元のIPアドレス追加しアプリ側（PHP）で受け取る方法とその際の注意点を書きます。</p>
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2016/07/26/215939/">全文を読む</a>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PHPでhttpヘッダー、x-forwarded-forを受け取る | Goldstine研究所</title>
+    <title>PHPでHTTPヘッダー、x-forwarded-forを受け取る方法 | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
     <meta name="description" content="Nginx-&gt;Apache-&gt;PHPの構成で、x-forwarded-forなどの任意の追加したHTTPヘッダーをPHPで受け取る方法について解説します。サーバ変数に格納した際に名前が変わります。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2016/07/26/215939/">
@@ -11,12 +11,12 @@
     <meta name="generator" content="Hugo 0.58.3" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="PHPでhttpヘッダー、x-forwarded-forを受け取る | Goldstine研究所">
+    <meta name="twitter:title" content="PHPでHTTPヘッダー、x-forwarded-forを受け取る方法 | Goldstine研究所">
     <meta name="twitter:description" content="Nginx-&gt;Apache-&gt;PHPの構成で、x-forwarded-forなどの任意の追加したHTTPヘッダーをPHPで受け取る方法について解説します。サーバ変数に格納した際に名前が変わります。">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
-    <meta property="og:title" content="PHPでhttpヘッダー、x-forwarded-forを受け取る &middot; Goldstine研究所">
+    <meta property="og:title" content="PHPでHTTPヘッダー、x-forwarded-forを受け取る方法 &middot; Goldstine研究所">
     <meta property="og:description" content="Nginx-&gt;Apache-&gt;PHPの構成で、x-forwarded-forなどの任意の追加したHTTPヘッダーをPHPで受け取る方法について解説します。サーバ変数に格納した際に名前が変わります。">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
@@ -65,7 +65,7 @@
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2016/07/26/215939/" class="post-title">PHPでhttpヘッダー、x-forwarded-forを受け取る</a>
+                        <a href="https://blog.mosuke.tech/entry/2016/07/26/215939/" class="post-title">PHPでHTTPヘッダー、x-forwarded-forを受け取る方法</a>
 
                         <p class="post-meta">
                             
@@ -79,59 +79,57 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><body></p>
+                        <p>こんにちは@mosuke5です。<br />
+もともとApach+PHPで動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになりました。理由は、もともと社内ネットワークでのみ利用するシステムだったのですが、インターネットの外からも利用することになり、インターネットからの入り口にリバースプロキシを導入したからです。<br />
+つまり、Nginx-&gt;Apache-&gt;PHPという構成になりました。<br />
+リバースプロキシを導入した際によく問題となることだが、Apacheからみるとすべてリバースプロキシから通信がきているようにみえます。
+接続元のIPアドレスがすべてリバースプロキシのもの変わってしまいます。</p>
 
-<p>もともとApach+PHPで動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになった。理由は、もともと社内ネットワークでのみ利用するシステムだったのだが、インターネットの外からも利用することになり、インターネットからの入り口にリバースプロキシを導入したから。<br>
-つまり、Nginx-&gt;<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>-&gt;<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>という構成になった。<br>
-よくあることだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>からみるとすべてリバースプロキシから通信がきているので、
-接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>がすべてリバースプロキシのものになる。</p>
+<p>そこで、HTTPヘッダーに接続元のIPアドレス追加しアプリ側（PHP）で受け取る方法とその際の注意点を書きます。</p>
 
-<p>HTTPヘッダーに接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を追加しアプリ側（<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>）で受け取る方法をかく。</p>
+<h2 id="リバースプロキシ側でhttpヘッダー追加">リバースプロキシ側でHTTPヘッダー追加</h2>
 
-<h2>リバースプロキシ側でHTTPヘッダー追加</h2>
-
-<p>まず、そもそもデフォルトのNginxの設定では接続元の<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>をHTTPヘッダーに含まれない。<br>
-ググればすぐに設定方法自体はでてくる。<br>
+<p>まず、デフォルトのNginxの設定では接続元のIPアドレスをHTTPヘッダーに含みません。そのため、本当のクライアント側のIPアドレスをHTTPヘッダーに追加します。一般的に<code>X-Forwarded-For</code>というHTTPヘッダーを利用します。<br />
  X-Forwarded-Forというヘッダー名にNginxでもっている変数$proxy_add_x_forwarded_forを追加する。</p>
 
 <pre><code>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
 </code></pre>
 
-<p>設定は簡単なんだけど、そもそもX-Forwarded-Forなんていうヘッダーはもともとあったか？と疑問に思い調べてみると。</p>
-<blockquote><p>X-Forwarded-For (XFF) とは、HTTPヘッダフィールドの一つ。HTTPプロキシサーバまたは負荷分散装置（ロードバランサ）を経由してウェブサーバに接続するクライアントの送信元<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を特定する際の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%D5%A5%A1%A5%AF%A5%C8%A5%B9%A5%BF%A5%F3%A5%C0%A1%BC%A5%C9">デファクトスタンダード</a>である。
-（略）<a class="keyword" href="http://d.hatena.ne.jp/keyword/RFC">RFC</a>の標準的なヘッダフィールドではないが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/IETF">IETF</a>のネットワーク作業部会 (Network Working Group) は2011年10月より同種のHTTPヘッダForwardedの標準化作業を開始した[1]。</p></blockquote>
+<p>リバースプロキシしかり、AWSのELBなどしかり、L7でのプロキシやロードバランサを利用した際に、よくX-Forwarded-Forというヘッダー名がでてきます。このヘッダーはなんなのか？HTTPの標準のヘッダーとして存在するのかと疑問に思い調べてみると、RFCには定義されていないが一般的に利用されているヘッダーであることがわかりました。</p>
 
-<p>なるほど、<a class="keyword" href="http://d.hatena.ne.jp/keyword/RFC">RFC</a>の標準ではないけど、一般的なものなんですね。</p>
+<blockquote>
+<p>X-Forwarded-For (XFF) とは、HTTPヘッダフィールドの一つ。HTTPプロキシサーバまたは負荷分散装置（ロードバランサ）を経由してウェブサーバに接続するクライアントの送信元IPアドレスを特定する際のデファクトスタンダードである。
+（略）RFCの標準的なヘッダフィールドではないが、IETFのネットワーク作業部会 (Network Working Group) は2011年10月より同種のHTTPヘッダForwardedの標準化作業を開始した[1]。</p>
+</blockquote>
 
-<h2>phpでX-Forwarded-Forを受け取る</h2>
+<h2 id="phpでx-forwarded-forを受け取る">PHPでX-Forwarded-Forを受け取る</h2>
 
-<p>リバースプロキシで'X-forwarded-For'という名前のHTTPヘッダーを追加したので、そのまま取得することをやってみるが、うまくいかなかった。これはPHPのサーバ変数の仕様の問題だ。</p>
+<p>リバースプロキシで&rsquo;X-forwarded-For&rsquo;という名前のHTTPヘッダーを追加したので、そのまま取得しようとするが、実はこのままだとうまくいきません。これはPHPのサーバ変数の仕様の問題です。PHPのサーバ変数に入れる際に、名前を規則に従って変更するからです。</p>
 
 <pre><code class="language-php">echo $_SERVER['X-Forwarded-For'];
+// -&gt; 存在しない
 </code></pre>
 
-<p>サーバ変数をvar_dumpを使って中身を確認してみると、
-HTTPが先頭についてて、すべて大文字になってて、ハイフンがアンスコに変わっていることが確認できた。<br>
+<p>サーバ変数をvar_dumpを使って中身を確認してみると、HTTPが先頭についてて、すべて大文字になってて、ハイフンがアンスコに変わっていることが確認できます。</p>
 
-```php
-<?php
+<pre><code class="language-php">&lt;?php
 var_dump($_SERVER);
 
-# array(x) { ["HTTP_X_FORWARDED_FOR"] => string(12) "192.168.33.1" ...... }
-```
+# array(x) { [&quot;HTTP_X_FORWARDED_FOR&quot;] =&gt; string(12) &quot;192.168.33.1&quot; ...... }
+</code></pre>
 
-ためしにgetallheadersという関数で生のヘッダーの状態を確認してみると、想定通りでした。
-つまりサーバ変数に格納するタイミングで、名前が変わるということです。
+<p>ためしにgetallheadersという関数で生のヘッダーの状態を確認してみると、想定通りでした。
+つまりサーバ変数に格納するタイミングで、名前が変わるということです。</p>
 
-```php
-<?php
+<pre><code class="language-php">&lt;?php
 var_dump(getallheaders());
 
-# array(x) { ["X-Forwarded-For"] => string(12) "192.168.33.1" ...... }
-```
+# array(x) { [&quot;X-Forwarded-For&quot;] =&gt; string(12) &quot;192.168.33.1&quot; ...... }
+</code></pre>
 
-<h2>tcpdumpで生のパケットを確認してみる</h2>
-<p>もう結果は見えているのですが、気になったのでtcpdumpで生パケットの状態を確認してみた。</p>
+<h2 id="tcpdumpで生のパケットを確認してみる">tcpdumpで生のパケットを確認してみる</h2>
+
+<p>結果は見えているのですが、気になったのでtcpdumpで生パケットの状態を確認してみます。Nginxからプロキシされるときは期待通りとヘッダー名は&rdquo;X-Forwarded-For &ldquo;になっていること確認できました。</p>
 
 <pre><code>$ sudo yum install tcpdump
 $ tcpdump dst port 80 -X
@@ -144,24 +142,25 @@ $ tcpdump dst port 80 -X
      0x0020:  8018 0137 8dbe 0000 0101 080a d1dc c19e  .1..Host:.xxxxxx 
 </code></pre>
 
-<p>いたいた。<br>
-Nginxからプロキシされるときはちゃんとヘッダー名は"X-Forwarded-For "になっていること確認。</p>
+<h2 id="任意のhttpヘッダーつけた場合">任意のHTTPヘッダーつけた場合</h2>
 
-<p><h2>任意の適当なHTTPヘッダーつけてみた</h2>
-それでは、X-Forwarded-For以外の任意のHTTPヘッダーをつけた場合も同様になるのか確認してみます。
+<p>それでは、X-Forwarded-For以外の任意のHTTPヘッダーをつけた場合も同様になるのか確認してみます。
 Nginxにて、&rsquo;my-header&rsquo;という名前でヘッダーを追加してPHP側で受け取ります。</p>
 
 <pre><code>proxy_set_header my-header 'hogefugafoobar'; 
 </code></pre>
 
-<p><p>&lsquo;my-header&rsquo;が&rsquo;HTTP_MY_HEADER&rsquo;に変わっていることが確認できた。</p></p>
+<p><code>my-header</code>が<code>HTTP_MY_HEADER</code>に変わっていることが確認できた。</p>
 
 <pre><code class="language-php">var_dump($_SERVER);
 
 # array(35) { [&quot;HTTP_MY_HEADER&quot;] =&gt; string(14) &quot;hogefugafoobar&quot; ...... }
 </code></pre>
 
-<p></body></p>
+<h2 id="さいごに">さいごに</h2>
+
+<p>PHPでHTTPヘッダーを受け取る際の注意点について見てきました。
+本ブログではNginxを用いたリバースプロキシを例にしていますが、その他にもAWS ELBなどのL7のロードバランサを用いた場合も基本的に同様ですので、原理原則をおさえておくといいでしょう。</p>
                     </div>
                     
                     
