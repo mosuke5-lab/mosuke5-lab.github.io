@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docker上でMySQLを利用する際のセットアップについて | Goldstine研究所</title>
+    <title>DockerでのMySQLのセットアップ方法とその仕組みを理解する | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
     <meta name="description" content="Dockerを使ってMySQLをセットアップする際の知見について。ユーザやデータベスの作成、テストデータのインポートなどの方法。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2018/04/21/basic-mysql-on-docker/">
@@ -11,12 +11,12 @@
     <meta name="generator" content="Hugo 0.58.3" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="Docker上でMySQLを利用する際のセットアップについて | Goldstine研究所">
+    <meta name="twitter:title" content="DockerでのMySQLのセットアップ方法とその仕組みを理解する | Goldstine研究所">
     <meta name="twitter:description" content="Dockerを使ってMySQLをセットアップする際の知見について。ユーザやデータベスの作成、テストデータのインポートなどの方法。">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Docker上でMySQLを利用する際のセットアップについて &middot; Goldstine研究所">
+    <meta property="og:title" content="DockerでのMySQLのセットアップ方法とその仕組みを理解する &middot; Goldstine研究所">
     <meta property="og:description" content="Dockerを使ってMySQLをセットアップする際の知見について。ユーザやデータベスの作成、テストデータのインポートなどの方法。">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
@@ -65,7 +65,7 @@
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2018/04/21/basic-mysql-on-docker/" class="post-title">Docker上でMySQLを利用する際のセットアップについて</a>
+                        <a href="https://blog.mosuke.tech/entry/2018/04/21/basic-mysql-on-docker/" class="post-title">DockerでのMySQLのセットアップ方法とその仕組みを理解する</a>
 
                         <p class="post-meta">
                             
@@ -79,10 +79,18 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>個人で作っているサービスをDockerベースで動かしているのだが、MySQL使いたくなってきて導入することになった。
-Docker上のMySQL利用ははじめてだったしたので、いろいろわからないところがあった。その知見をまとめる。</p>
+                        <p>こんにちは。もーすけです。<br />
+個人で作っているサービスをDockerベースで動かしているのだが、MySQL使いたくなってきて導入することになった。
+Docker上のMySQL利用ははじめてだったので、いろいろわからないところがあった。その知見をまとめる。</p>
 
-<p>アプリ部分はRuby on Railsを利用している。そのため、基本的に、アプリケーション側からDBマイグレーションの機能などを使って、テーブルの作成やテストデータのインポートは行う。コンテナ基盤側で行ってほしいのは、そもそもMySQLの起動はもちろん、データベース作成だったり、それを扱うためのユーザの設定などだ。</p>
+<h2 id="コンテナに期待すること">コンテナに期待すること</h2>
+
+<p>筆者の場合は、アプリ部分はRuby on Railsを利用している。
+そのため、基本的に、アプリケーション側からDBマイグレーションの機能などを使って、テーブルの作成やテストデータのインポートは行うことを前提にしている。
+おそらく、Ruby on Rails以外のWebアプリケーションフレームワークでも同様の利用の仕方をするはずだ。
+そうなると、コンテナとして行ってほしいのは、そもそもMySQLの起動はもちろん、データベース作成と、それを操作するためのユーザの設定などだ。</p>
+
+<h2 id="起動と基本設定">起動と基本設定</h2>
 
 <p>MySQLのDockerイメージがあるので動かすだけならば特に難しいことはなにもない。</p>
 
@@ -92,21 +100,30 @@ Docker上のMySQL利用ははじめてだったしたので、いろいろわか
 <p>しかし、MySQLの基本設定や、そもそもrootユーザのパスワードなどどうすればいいのか。<br />
 データベースやユーザはどうやって作ることができるのか。このあたりは当然ながら一番はじめに気になる部分である。</p>
 
-<p>ドキュメント読むとすぐにわかるわけだが、
-MySQLのDockerコンテナを起動するときに環境変数を設定することである程度は作成できることがわかる。
-<a href="https://hub.docker.com/_/mysql/">https://hub.docker.com/_/mysql/</a></p>
+<p>ドキュメント読むとすぐにわかるが、
+MySQLのDockerコンテナを起動するときに環境変数を設定することである程度は設定できることがわかる。（<a href="https://hub.docker.com/_/mysql/">公式ドキュメント</a>）
+下記は、よく利用するであろう基本的な設定ができる環境変数だ。</p>
 
 <ul>
-<li>MYSQL_ROOT_PASSWORD: rootユーザパスワード</li>
-<li>MYSQL_DATABASE: 作成するデータベース名</li>
-<li>MYSQL_USER: 作成するユーザ名。上で作ったデータベースに関する操作権限を持つ</li>
-<li>MYSQL_PASSWORD: 上のユーザのパスワード</li>
+<li><code>MYSQL_ROOT_PASSWORD</code>: rootユーザパスワード</li>
+<li><code>MYSQL_DATABASE</code>: 作成するデータベース名</li>
+<li><code>MYSQL_USER</code>: 作成するユーザ名。上で作ったデータベースに関する操作権限を持つ</li>
+<li><code>MYSQL_PASSWORD</code>: 上のユーザのパスワード</li>
 </ul>
 
-<p>何よりも、MySQLのDockerイメージで立ち上げのときの実行される、<code>docker-entrypoint.sh</code>の中身を見ると理解しやすい。<br />
-<a href="https://github.com/docker-library/mariadb/blob/master/docker-entrypoint.sh">https://github.com/docker-library/mariadb/blob/master/docker-entrypoint.sh</a></p>
+<p>例えば、rootパスワードを設定したい場合は以下のようにすればよい。</p>
 
-<p>次のように、環境変数が設定されている場合に、それにそってデータベースの作成やユーザ設定を行ってくれる。</p>
+<pre><code>$ docker run --name mysql -e MYSQL_ROOT_PASSWORD=mysecret -d -p 3306:3306 mysql
+</code></pre>
+
+<h2 id="dockerfileをのぞく">Dockerfileをのぞく</h2>
+
+<p>Dockerfileの中身を見ていくと、より仕組みが理解できる。
+MySQLのDockerイメージで立ち上げのときの実行される、<code>docker-entrypoint.sh</code>の中身をみるよいい。</p>
+
+<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/docker-library/mariadb/blob/master/docker-entrypoint.sh" data-iframely-url="//cdn.iframe.ly/nNIVaxs"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
+
+<p>次のように、環境変数が設定されている場合に、それにそってデータベースの作成やユーザ設定を行ってくれることがわかる。</p>
 
 <pre><code class="language-shell">if [ &quot;$MYSQL_DATABASE&quot; ]; then
 	echo &quot;CREATE DATABASE IF NOT EXISTS \`$MYSQL_DATABASE\` ;&quot; | &quot;${mysql[@]}&quot;
@@ -125,11 +142,14 @@ fi
 fi
 </code></pre>
 
+<h2 id="さらなる応用">さらなる応用</h2>
+
 <p>しかし、環境変数で設定できる項目には限りがある。<br />
 それ以上のことを行いたい場合には別の方法で行う必要がある。
 鍵をにぎるのが同じく<code>docker-entrypoint.sh</code>の中に記述のある、<code>/docker-entrypoint-initdb.d/</code>だ。
 このディレクトリにある、シェルスクリプトやsqlファイルが実行されるようになっている。
-もし、セットアップで独自の処理を実行したい場合には、コンテナ起動時にこのディレクトリにファイルを置けばいい。一番簡単なのはボリュームをマウントすることだと思う。</p>
+もし、セットアップで独自の処理を実行したい場合には、コンテナ起動時にこのディレクトリにファイルを置けばいい。一番簡単なのはボリュームをマウントすることだ。
+例えば、テーブルの作成やテストデータのインポートなど任意の処理を実行させることができる。</p>
 
 <pre><code class="language-shell">for f in /docker-entrypoint-initdb.d/*; do
 	case &quot;$f&quot; in
@@ -150,6 +170,12 @@ done
     ....
 done
 </code></pre>
+
+<h2 id="さいごに">さいごに</h2>
+
+<p>Dockerを使ったMySQLの実行方法と設定についてみてきた。<br />
+このようにDockerfileを少しのぞいてみるだけでより多くのことがわかる。
+勇気をもってDockerfileをのぞくと視野が広がること間違いなしだ。</p>
                     </div>
                     
                     
