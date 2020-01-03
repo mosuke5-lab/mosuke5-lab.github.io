@@ -3,21 +3,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>インフラのデプロイとテストを同時実行できるようにする | Goldstine研究所</title>
+    <title>AnsibleとServerspecの実行をRakeタスクにまとめる | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
-    <meta name="description" content=" はじめに  私が開発しているシステムでは、Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。そして、serverspecを使って、インフラテストも行っています。 しかし、その運用にいくつか課題点">
+    <meta name="description" content="Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。そして、serverspecを使って、インフラテストも行っていますが。その運用にいくつか課題点ありました。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/12/17/192554/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2015/12/17/192554/" />
     <meta name="generator" content="Hugo 0.58.3" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="インフラのデプロイとテストを同時実行できるようにする | Goldstine研究所">
-    <meta name="twitter:description" content=" はじめに  私が開発しているシステムでは、Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。そして、serverspecを使って、インフラテストも行っています。 しかし、その運用にいくつか課題点">
+    <meta name="twitter:title" content="AnsibleとServerspecの実行をRakeタスクにまとめる | Goldstine研究所">
+    <meta name="twitter:description" content="Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。そして、serverspecを使って、インフラテストも行っていますが。その運用にいくつか課題点ありました。">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
-    <meta property="og:title" content="インフラのデプロイとテストを同時実行できるようにする &middot; Goldstine研究所">
-    <meta property="og:description" content=" はじめに  私が開発しているシステムでは、Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。そして、serverspecを使って、インフラテストも行っています。 しかし、その運用にいくつか課題点">
+    <meta property="og:title" content="AnsibleとServerspecの実行をRakeタスクにまとめる &middot; Goldstine研究所">
+    <meta property="og:description" content="Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。そして、serverspecを使って、インフラテストも行っていますが。その運用にいくつか課題点ありました。">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
     <meta property="og:url" content="https://blog.mosuke.tech/entry/2015/12/17/192554/" />
@@ -65,7 +65,7 @@
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2015/12/17/192554/" class="post-title">インフラのデプロイとテストを同時実行できるようにする</a>
+                        <a href="https://blog.mosuke.tech/entry/2015/12/17/192554/" class="post-title">AnsibleとServerspecの実行をRakeタスクにまとめる</a>
 
                         <p class="post-meta">
                             
@@ -79,59 +79,56 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><body>
-<h1>はじめに</h1></p>
-
-<p>私が開発しているシステムでは、Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。
-そして、serverspecを使って、インフラテストも行っています。<br>
-しかし、その運用にいくつか課題点がありました。</p>
+                        <p>こんにちは<a href="https://twitter.com/mosuke5">もーすけ</a>です。<br />
+私が趣味で開発しているシステムでは、Ansibleを使って、サーバ構築からアプリケーションのデプロイまで実行できるように管理しています。
+そして、serverspecを使って、そのサーバに対するインフラテストも行っています。しかし、その運用にいくつか課題点がありました。</p>
 
 <p>その課題点についてと、課題点へ対策したことについて書きます。</p>
 
-<h1>課題だったこと</h1>
+<h2 id="課題だったこと">課題だったこと</h2>
 
-<h2>(課題1) デプロイとテストをそれぞれ実行していた</h2>
+<h3 id="課題1-デプロイとテストをそれぞれ実行していた">(課題1) デプロイとテストをそれぞれ実行していた</h3>
 
 <p>Ansibleでのデプロイとserverspecのテストはそれぞれ別のコマンドで実行していました。</p>
 
-<pre><code>$ ansible-playbook site.yml -i 
+<pre><code>$ ansible-playbook site.yml -i hosts
 $ bundle exec rake serverspec 
 </code></pre>
 
-<p>2つ実行することが面倒であり、面倒であるがゆえにserverspecの実行を怠ったりしていました。<br>
-これではテストの効果があまり発揮できませんね。</p>
+<p>2つ実行することが面倒であり、面倒であるがゆえにserverspecの実行を怠ったりしていました。
+これではテストの効果があまり発揮できませんね。
+CIで自動実行すればいいのでは？というのがありますが、本番環境への適応はそれでいいのですが、
+このシステムは開発環境はローカルPCのVagrant上に構築しており、手元でのプロビジョニングには、手動でのAnsible実行を必要としている状況でした。</p>
 
-<h2>(課題2) sudoパスワードをうまく管理できなかった</h2>
+<h3 id="課題2-sudoパスワードをうまく管理できなかった">(課題2) sudoパスワードをうまく管理できなかった</h3>
 
 <p>上のような課題1について、真っ先に以下の様にコマンドを続けることを思いつきました。</p>
 
-<pre><code>$ ansible -playbook site.yml -i ; bundle exec rake serverspec 
+<pre><code>$ ansible -playbook site.yml -i hosts; bundle exec rake serverspec 
 </code></pre>
 
-<p>ですが、これだとansible実行終了後にserverspecを実行する際にsudoパスワードが再度聞かれるため、<br>
-コマンドを打ったまま「放置」ができませんでした。<br>
-<span style="font-size: 80%">※もちろん、sudoパスワードを要求しないようにユーザ設定をすればできますが、多くの場合ではセキュリティ上難しかったりすると思います。<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>接続は鍵認証、sudoには必ずパスワードを要求するようにしています。</span></p>
+<p>しかし、この方法ではansible実行終了後にserverspecを実行する際にsudoパスワードが再度聞かれるため、
+コマンドを打ったまま「放置」ができませんでした。<br />
+<span style="font-size: 80%">※もちろん、sudoパスワードを要求しないようにユーザ設定をすればできますが、多くの場合ではセキュリティ上難しかったりすると思います。ssh接続は鍵認証、sudoには必ずパスワードを要求するようにしています。</span></p>
 
-<p>Ansibleもserverspecにもコマンド実行時にsudoパスワードを記述する方法があります。<br>
-Ansibleでは、ansible.cfgにsudo_passwordを記述、あるいはコマンド実行時に--extra-argsでsudoパスワードを指定できます。<br>
-serverspecでも<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>でSUDO_PASSWORDが指定できます。</p>
-
-<p>例 ）</p>
+<p>また、Ansibleもserverspecにもコマンド実行時にsudoパスワードを記述する方法があります。<br />
+Ansibleでは、<code>ansible.cfg</code>に<code>sudo_password</code>を記述、あるいはコマンド実行時に<code>--extra-args</code>でsudoパスワードを指定できます。
+serverspecでも環境変数で<code>SUDO_PASSWORD</code>が指定できます。</p>
 
 <pre><code>ansible -playbook site.yml -i --extra-args='ansible_sudo_pass=xxxxxxxx'
 bundle exec rake serverspec SUDO_PASSWORD=xxxxxxxx 
 </code></pre>
 
-<p>ですが、おわかりの通り、<b>コマンドの履歴にもパスワードが残ります</b>。<br>
-なのであまり良い方法ではないと思っています。</p>
+<p>ですが、おわかりの通り、<b>コマンドの履歴にもパスワードが残ります</b>。
+あまり良い方法ではないと思っています。</p>
 
-<h2>(課題3) タスクの実行方法がバラバラ</h2>
+<h3 id="課題3-タスクの実行方法がバラバラ">(課題3) タスクの実行方法がバラバラ</h3>
 
-<p>デプロイはansibleコマンドで実行、テストはrakeで実行、他のタスクは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%A7%A5%EB%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">シェルスクリプト</a>。。。<br>
-といったように、タスクによって実行方法が異なってしまう状況になっていました。<br>
+<p>デプロイはansibleコマンドで実行、テストはrakeで実行、他のタスクはシェルスクリプト。
+といったように、タスクによって実行方法が異なってしまう状況になっていました。
 運用的にとても不便でしたので、１つに統一したいと思っていました。</p>
 
-<h1>いい感じに同時に実行してくれるRakeタスクを作った</h1>
+<h2 id="アプリケーションの運用に必要なことはrakeタスクで実行する">アプリケーションの運用に必要なことはRakeタスクで実行する</h2>
 
 <p>上で述べたような課題点をクリアするように、下記の要件を満たすように工夫をしました。</p>
 
@@ -141,7 +138,7 @@ bundle exec rake serverspec SUDO_PASSWORD=xxxxxxxx
 <li>sudoパスワードの入力を一回だけにする</li>
 </ul>
 
-<p>結論は、すべてRakeタスクで実行できるようにしました。<br>
+<p>結論は、すべてRakeタスクで実行できるようにしました。
 タスク一覧を見ると以下の様な感じになりました。（※実行結果は例であり実際の内容とは少し異なる。）</p>
 
 <pre><code>$ bundle exec rake -T
@@ -152,7 +149,7 @@ rake serverspec:app        # Run serverspec to app server
 rake serverspec:db        # Run serverspec to db server 
 </code></pre>
 
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Rakefile">Rakefile</a>の実装例（一部省略）</p>
+<p>Rakefileの実装例（一部省略）</p>
 
 <pre><code class="language-ruby">desc &quot;Deploy and Test&quot;
 namespace :deploy do
@@ -184,22 +181,19 @@ namespace :deploy do
 end
 </code></pre>
 
-<h1>まとめ</h1>
+<h2 id="まとめ">まとめ</h2>
 
-<p>タスクによってその実行方法が異なることは運用上とても不便です。<br>
-統一した実行方法にすることで、</p>
+<p>タスクによってその実行方法が異なることは運用上とても不便です。
+とくに慣れている言語でタスクが整理されていることによって以下のような恩恵を受けれるようになります。</p>
 
 <ul>
-<li>テストの実行し忘れがなくなり</li>
-<li>ドキュメントも残しやすくなり</li>
-<li>チームメンバーへの運用方法の伝授も楽になり</li>
+<li>テストの実行し忘れがなくなる</li>
+<li>ドキュメントも残しやすくなる</li>
+<li>慣れている言語で整理されることによりメンテしやすくなる。</li>
+<li>チームメンバーへの運用方法の伝授も楽になる</li>
 </ul>
 
-<p>ました。（今回に限る話ではないけれど）</p>
-
-<p><p>また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rakefile">Rakefile</a>はかなりやっつけで作ってしまったので、何をタスクにするか・その命名・実装方法などの改善は年末の課題ですかね。</p>
-</body></p>
-
+<p>保守性を考えて、慣れている言語やアプリケーションのスタックに合わせてタスクを統一することを選択肢の一つに入れるといいかもしれません。</p>
                     </div>
                     
                     
