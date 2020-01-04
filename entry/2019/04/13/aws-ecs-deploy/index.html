@@ -3,22 +3,22 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fargateの動き、Amazon ECSへのデプロイフローなどを確認する | Goldstine研究所</title>
+    <title>Amazon ECSを使った際のFargateの仕組みとそのデプロイフローを学ぶ | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
     <meta name="propeller" content="78ffb64bf8546f1b32b8a4e4400f4c06">
-    <meta name="description" content="はじめてAmaozn ECSを触って、Fargateの正体を突き止めたり、デプロイの方法などを確かめたりしました。Firecrackerすげーというのが一番の感想。">
+    <meta name="description" content="Amaozn ECSを利用した際のFargateの仕組みやそのデプロイフローを解説します。Fargateが単なるコンテナではなくVMである点など興味深いことが見えてきました。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/04/13/aws-ecs-deploy/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/04/13/aws-ecs-deploy/" />
     <meta name="generator" content="Hugo 0.58.3" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="Fargateの動き、Amazon ECSへのデプロイフローなどを確認する | Goldstine研究所">
-    <meta name="twitter:description" content="はじめてAmaozn ECSを触って、Fargateの正体を突き止めたり、デプロイの方法などを確かめたりしました。Firecrackerすげーというのが一番の感想。">
+    <meta name="twitter:title" content="Amazon ECSを使った際のFargateの仕組みとそのデプロイフローを学ぶ | Goldstine研究所">
+    <meta name="twitter:description" content="Amaozn ECSを利用した際のFargateの仕組みやそのデプロイフローを解説します。Fargateが単なるコンテナではなくVMである点など興味深いことが見えてきました。">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Fargateの動き、Amazon ECSへのデプロイフローなどを確認する &middot; Goldstine研究所">
-    <meta property="og:description" content="はじめてAmaozn ECSを触って、Fargateの正体を突き止めたり、デプロイの方法などを確かめたりしました。Firecrackerすげーというのが一番の感想。">
+    <meta property="og:title" content="Amazon ECSを使った際のFargateの仕組みとそのデプロイフローを学ぶ &middot; Goldstine研究所">
+    <meta property="og:description" content="Amaozn ECSを利用した際のFargateの仕組みやそのデプロイフローを解説します。Fargateが単なるコンテナではなくVMである点など興味深いことが見えてきました。">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
     <meta property="og:url" content="https://blog.mosuke.tech/entry/2019/04/13/aws-ecs-deploy/" />
@@ -66,7 +66,7 @@
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2019/04/13/aws-ecs-deploy/" class="post-title">Fargateの動き、Amazon ECSへのデプロイフローなどを確認する</a>
+                        <a href="https://blog.mosuke.tech/entry/2019/04/13/aws-ecs-deploy/" class="post-title">Amazon ECSを使った際のFargateの仕組みとそのデプロイフローを学ぶ</a>
 
                         <p class="post-meta">
                             
@@ -81,25 +81,26 @@
                     </header>
                     <div class="post-description">
                         <p>ニート最終日の<a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br />
-先日@mogulla3と一緒にAWS ECSをはじめて触ってみて、
-AWSのコンテナ戦略やECSへのデプロイあたりまで試してみたのでやったことをまとめました。
-自分はDockerやKubernetesなどは、ちょいちょい触ってきましたがAWS特有のサービスとしてECS, Fargateあたりは実は初めて触りました。いろいろな気づきもあったのでその辺り含めてまとめられればとおもいます。</p>
+今日は、Amazon ECSからみる、AWSのコンテナ戦略やECSへのデプロイフローなどについて解説します。
+自分はDockerやKubernetesなどを触ってきましたが、AWS特有のコンテナサービスであるECS, Fargateを調査していくとAWSの戦略などいろんな発見がありました。</p>
 
-<h2 id="やったことの全体像">やったことの全体像</h2>
+<h2 id="全体像">全体像</h2>
 
-<p>試してみたことの全体像は下記の通りです。<br />
-ごちゃごちゃと書いていますが、大きく右と左で分かれていて、左側のAWS上ではECS(Fargateのタスク)でNginxで静的なデータを返すWebサーバを配置。前段にALBで分散してアクセスできるようにしています。
-右側では、そのECSに対して変更をデプロイするためにGitlabを使っています。<br />
-初めてECSを触ったので、どんなもんか全体感を把握するとともに、せっかくなのでGitlabで簡易的なCI/CDっぽい環境作ってみようとしてやったものです。</p>
+<p>Amazon ECSで実現することの全体像は下記の通りです。<br />
+大きく右と左で分かれていて、左側のAWS上ではECS(Fargateのタスク)でNginxで静的なデータを返すWebサーバを配置。前段にALBで分散してアクセスできるようにしています。
+右側では、Gitlabを用いて、そのECSに対して変更をデプロイを行います。</p>
 
 <p><img src="/image/overview-deploy-to-ecs-with-gitlab.png" alt="overview" /></p>
 
-<h2 id="fargateへの気付き">Fargateへの気付き</h2>
+<h2 id="fargateの動き">Fargateの動き</h2>
 
-<p>まず、本題の部分ではないのですが、個人的に一番盛り上がっていたポイント（笑）<br />
-Fargateを触り始めてすぐにある違和感に気づきました。
-それは、Fargateが単なるコンテナじゃない、ということです。
-どういうことかというと、Fargate Taskをスケールさせた際にALB配下のターゲットがFargateのIPアドレスであり、また全てが同じ80番ポートだったということです。</p>
+<p>まず、Fargateについてです。個人的に一番盛り上がっていたポイントです！！<br />
+Amazon ECSではタスクを実行する環境をEC2かFargateか選ぶことができます。
+今回はサーバレスで起動できるFargateを採用したのですが、触り始めてすぐにある違和感に気づきました。
+それは、<strong>Fargateが単なるコンテナではない</strong>、ということです。
+どういうことかというと、Fargate Taskをスケールさせた際にALB配下のターゲットがFargateのIPアドレスであり、また全てが同じ80番ポートだったということです。
+以下のスクリーンショットは3台にFargateをスケールさせたときのALBのターゲットです。<br />
+みなさんは、これをみて違和感に気づきましたでしょうか？</p>
 
 <p><img src="/image/ecs-alb-targets.png" alt="alb-targets" /></p>
 
@@ -108,21 +109,21 @@ Fargateを触り始めてすぐにある違和感に気づきました。
 ホスト上では80ポートは1つしか使えないため、もしすべてのコンテナが80ポートでアクセスできるためにはそれぞれのコンテナが別々のホストでないといけないからです。
 1コンテナに対して1VMというのは一般的には考えづらく、これはなんだ？？と思っていました。</p>
 
-<p>自分はKubernetesは触っており、kube-proxyによるコンテナの分散を見ていたから余計に沿う感じるのかもしれません。
+<p>自分はKubernetesは触っており、kube-proxyによるコンテナの分散を見ていたから余計にそのように感じるのかもしれません。
 Kubernetesではロードバランサが直接コンテナに分散することはなく、ワーカーノードに対してロードバランサの振り先が設定されます。
 その上で、ワーカーノード上のkube-proxyが適切なコンテナへのリクエストの振り分けを行います。そのため、例えば80番ポートを利用するコンテナも、コンテナのホスト側のポートが必ずしも80である必要はない、というものです。
 下記は、<a href="https://www.slideshare.net/mosuke5/alibabacloudkubernetes">こちらのスライドの抜粋</a>。</p>
 
 <p><img src="/image/kubeproxy-why-loadbalanced.png" alt="kube-proxy" /></p>
 
-<p>実際に、この違和感はすぐにとあることを思い出して納得しました。
+<p>実際に、この違和感はすぐにとあることを思い出して納得しました。<br />
 それは少し前にAWSが公表していたFirecrackerというオープンソースです。こちらでは、125msでmicroVMを立ち上げることのできるソフトウェアで、こちらをFargateやLambdaに利用しているとのことでした。
-つまり、Fargateはたんなるコンテナではなく、やはりひとつのVMとして動作しているということでした。これで納得。
-詳しくはこちらの記事をみるといいでしょう。おもしろいです。</p>
+つまり、<strong>Fargateはたんなるコンテナではなく、やはりひとつのVMとして動作しているということ</strong>です。
+詳しくはこちらの記事をみるといいでしょう。</p>
 
 <p><a href="https://aws.amazon.com/jp/blogs/news/firecracker-lightweight-virtualization-for-serverless-computing/">Firecracker – サーバーレスコンピューティングのための軽量な仮想化機能 | Amazon Web Services ブログ</a></p>
 
-<p>ちなみに、料金をみるとFargateは少しお高めのようです。<br />
+<p>ちなみに、料金をみるとFargateは少しお高めに設定されています。<br />
 最近値下がったとはいえ、例えば1vCPU, 1GB memoryのFargateコンピューティングを1ヵ月動かすと、大体4400円/月くらいかかります。高いですね。
 しかし、料金体系的にメモリを増やしてもそこまで高くならないのがポイントかもしれません。
 1vCPU, 4GB memoryのFargateコンピューティングを1ヵ月動かしても、5500-6000円/月とそこまで変わりません。
@@ -130,13 +131,13 @@ Kubernetesではロードバランサが直接コンテナに分散すること�
 
 <h2 id="ecsへのデプロイ">ECSへのデプロイ</h2>
 
-<p>本編よりFargateで盛り上がってしまいました。
-ECSへのデプロイは、<a href="https://github.com/silinternational/ecs-deploy">ecs-deploy</a>というオープンソースがあったのでこちらを利用しました。</p>
+<p>さて、ECSを利用したときのFargateの動きが理解できたところで、実際にECSへのデプロイを行っていきます。
+ECSへのデプロイは、<a href="https://github.com/silinternational/ecs-deploy">ecs-deploy</a>というオープンソースを利用しました。</p>
 
 <p>@mogulla3がツールの解説をしているのでこちらを参考にするといいと思います。<br />
 <a href="https://sandragon.hatenablog.com/entry/2019/04/14/211209">ecs-deployを使ったAmazon ECSへのデプロイの裏側</a></p>
 
-<p>特別な事はしていないですが、アプリの変更から自動的にコンテナイメージを生成してデプロイするまでをGitlabを活用しました。
+<p>アプリの変更から自動的にコンテナイメージを生成してデプロイするまでをGitlabを活用しました。
 下記のような<code>.gitlab-ci.yml</code>をアプリのレポジトリに配置して、Masterブランチへのコミットをトリガーに、Dockerイメージの生成とAWS ECSへのデプロイを行いました。Dockerイメージにはgitのコミット番号を振り、切り戻しなどしやすいようにしています。</p>
 
 <pre><code class="language-YAML">image: docker:stable
@@ -214,11 +215,8 @@ deploy:
 
 <h2 id="まとめ">まとめ</h2>
 
-<p>以上、@mogulla3とだいたい1日でしゃべりながら一緒に触って実施したことでした。<br />
-やれたことは少ないのですが、いままでKubernetesを基準にコンテナオーケストレーションをみていて、AWS独自サービスは触った事無かったのですが、触ってみるといろいろと面白いことを発見できました。
-今後もAWSの動きは見ていきたいと思います。</p>
-
-<p>また、これからECSやFargateを触る人たちの少しでも参考になればと思っています。</p>
+<p>Amazon ECSでタスクの実行にFargateを利用する際に知っておくべき、Fargeteの仕組みやECSへのデプロイ方法を見てきました。Fargateの仕組みについては、一見クラウド利用者からすると無関係な知識のように見えますが、コンテナのセキュリティやクラウドを真に理解して使っていくためには必要な知識と言えます。<br />
+今後ECSを使っていく人のすこしでも参考になればと思います。</p>
                     </div>
                     
                     
