@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alibaba CloudでのPrivate DNS(PrivateZone)を確認する | Goldstine研究所</title>
+    <title>Alibaba CloudでのPrivate DNS(PrivateZone)の仕様と用途の解説 | Goldstine研究所</title>
     <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
     <meta name="propeller" content="78ffb64bf8546f1b32b8a4e4400f4c06">
     <meta name="description" content="Alibaba CloudのPrivateZoneというVPC内での名前解決の機能について確認してみました。CENとの組み合わせで日中間での名前解決ができるようになることは非常にいい進化と感じています。">
@@ -12,12 +12,12 @@
     <meta name="generator" content="Hugo 0.58.3" />
     <meta name="twitter:card" content="summary">
     
-    <meta name="twitter:title" content="Alibaba CloudでのPrivate DNS(PrivateZone)を確認する | Goldstine研究所">
+    <meta name="twitter:title" content="Alibaba CloudでのPrivate DNS(PrivateZone)の仕様と用途の解説 | Goldstine研究所">
     <meta name="twitter:description" content="Alibaba CloudのPrivateZoneというVPC内での名前解決の機能について確認してみました。CENとの組み合わせで日中間での名前解決ができるようになることは非常にいい進化と感じています。">
     <meta name="twitter:site" content="@mosuke5" />
     <meta name="twitter:creator" content="@mosuke5" />
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Alibaba CloudでのPrivate DNS(PrivateZone)を確認する &middot; Goldstine研究所">
+    <meta property="og:title" content="Alibaba CloudでのPrivate DNS(PrivateZone)の仕様と用途の解説 &middot; Goldstine研究所">
     <meta property="og:description" content="Alibaba CloudのPrivateZoneというVPC内での名前解決の機能について確認してみました。CENとの組み合わせで日中間での名前解決ができるようになることは非常にいい進化と感じています。">
     <meta property="og:image" content="https://blog.mosuke.tech/image/ogp_image.jpg" />
     <meta property="og:site_name" content="Goldstine研究所" />
@@ -66,7 +66,7 @@
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="https://blog.mosuke.tech/entry/2019/07/19/alibaba-private-zone/" class="post-title">Alibaba CloudでのPrivate DNS(PrivateZone)を確認する</a>
+                        <a href="https://blog.mosuke.tech/entry/2019/07/19/alibaba-private-zone/" class="post-title">Alibaba CloudでのPrivate DNS(PrivateZone)の仕様と用途の解説</a>
 
                         <p class="post-meta">
                             
@@ -81,8 +81,7 @@
                     </header>
                     <div class="post-description">
                         <p>お疲れ様です。mosuke5です。<br />
-仕事でAWS上でのVPC内の名前解決について調査していて、
-そういえば最近Alibaba Cloudにも<a href="https://www.alibabacloud.com/products/private-zone" target="_bkank">PrivateZone</a>という機能がついたなと思ったので、軽く確認しました。</p>
+Alibaba Cloudのプライベートの名前解決機能である、<a href="https://www.alibabacloud.com/products/private-zone" target="_bkank">PrivateZone</a>の仕様とその用途について解説していきます。</p>
 
 <h2 id="privatezoneとは">PrivateZoneとは</h2>
 
@@ -91,7 +90,7 @@
 PrivateZoneは、VPC内部だけで使えるDNSです。
 この機能により、VPC内部でのシステム間の連携やサーバ管理などが楽になります。</p>
 
-<h2 id="使ってみる">使ってみる</h2>
+<h2 id="名前解決のパターン検証">名前解決のパターン検証</h2>
 
 <p>使い方は簡単なので、本ブログでは使い方の説明はしません。
 確認したことをベースに書き残していきます。</p>
