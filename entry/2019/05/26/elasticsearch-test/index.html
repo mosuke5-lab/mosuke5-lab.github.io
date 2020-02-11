@@ -9,7 +9,7 @@
     <meta name="description" content="ElasticSearchなどの外部コンポーネントが存在するときのRailsアプリでのテストで考慮ポイントを記載。Gitlab-CIでCIを回すことにも触れていく。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/05/26/elasticsearch-test/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/05/26/elasticsearch-test/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="[基礎] ElasticSerachなどの外部コンポーネントがあるときのテスト | Goldstine研究所">
@@ -80,143 +80,121 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>お久しぶりです。@mosuke5です。<br />
+                        <p>お久しぶりです。@mosuke5です。<br>
 新しい会社に入って１ヶ月ほど経ちましたが生きています。
 今回は、ElasticSearchを題材にしますが外部コンポーネントを利用しているアプリケーションのテストについてです。
 すごく初歩的なところですが、いくつか考えなければいけないポイントもあったのでまとめました。</p>
-
 <h2 id="はじめに">はじめに</h2>
-
 <p>今回の題材は非常にシンプルな検索機能をもったアプリケーションです。
 構成はアプリケーションはRailsで、検索エンジンを担うのがElastiCsearchという前提です。</p>
-
 <p>アプリケーションがもつmethodは３つで以下としています。</p>
-
 <ol>
-<li>GET &lsquo;/&rsquo;  =&gt; &lsquo;Hello&rsquo;を返す</li>
-<li>GET &lsquo;/search&rsquo; =&gt; GETパラメータ&rsquo;q&rsquo;のキーワードで検索した結果をjsonで返す</li>
+<li>GET &lsquo;/&rsquo;  =&gt; &lsquo;Hello'を返す</li>
+<li>GET &lsquo;/search&rsquo; =&gt; GETパラメータ&rsquo;q'のキーワードで検索した結果をjsonで返す</li>
 <li>POST &lsquo;/update&rsquo; =&gt; 所定のjsonファイルをPOSTするとbulkでinsertされ、その結果をjsonで返す</li>
 </ol>
-
 <h2 id="elasticsearchを使うテスト">ElasticSearchを使うテスト</h2>
-
 <p>これらのメソッドに対してテストを書こうと考えたときに、そもそもElasticSearch自体の扱いをどうするかでまず最初の考慮ポイントがありました。
 以下３つくらいの考え方がありそうです。答えはなく、システムの要件によって変わると思います。</p>
-
 <ol>
 <li>事前に手動でElasticSearchを立ち上げておく</li>
 <li>テストコードの中でプログラム的にElasticSearchを立ち上げる</li>
 <li>モックする</li>
 </ol>
-
-<p>まずは1.についてですが、一番シンプルな方法でしょう。<br />
+<p>まずは1.についてですが、一番シンプルな方法でしょう。<br>
 開発しているときにもElasticSearchが必要であることを考えるとローカル環境ではすでに立ち上がっていることが前提で進めていくのも良いと思います。
 その場合、CI環境でどうするんだ！？と思う方もいると思うがそれは次の章で解決策はあるのでそこで紹介する。</p>
-
-<p>実際にメリットとして、ElasticSearchを立ち上げる手間もないのでテストが早いなどのメリットもあっていいです。<br />
+<p>実際にメリットとして、ElasticSearchを立ち上げる手間もないのでテストが早いなどのメリットもあっていいです。<br>
 一方で、データの扱いだけ注意が必要である。テストではテストの実行環境を統一することが重要であるため、テストの度にテストデータを入れたり、データを追加したり削除したりすることがある。
 たとえばindexを分けるなどして対応するなどして、開発用のデータとの分離を考えましょう。</p>
-
 <p>次に2.のプログラム的に起動する方法ですが、<a href="https://github.com/elastic/elasticsearch-ruby/tree/master/elasticsearch-extensions">ElasticSearchのrubyのSDK</a>ではTest::Clusterという機能を提供していて、テスト用のクラスターをプログラム的に起動することが可能です。
 テスト実行前に起動して、終了時に停止するということが可能です。</p>
-
 <p>一般的にテストフレームワークではテストケースごとにその前後で任意の処理を実行する機能と、テスト全体の前後で任意の処理を実行する処理を備えています。
-そちらを使ってテストの前後で起動・停止するといいと思います。<br />
+そちらを使ってテストの前後で起動・停止するといいと思います。<br>
 しかし、テストケースごとの前後で実行してしまうとテストの実行時間が長くなるので注意が必要です。とくにElasticSearchは起動に時間がかかるのでテストケースごとに行うのは無理がありそうです。</p>
-
 <p>最後に3.のモックです。外部システムとの連携を伴うシステムのテストではモックなどを利用するケースも多いと思います。ElasticSearchをモックしてしまうこともできます。しかし、モックはあくまでモックであり、実際の処理を実行するのとは異なります。
 可能な限りモックせず、きちんとテストできるものはする、とするほうがベターかなと思います。実際、ElasticSearchくらいであれば、起動にいくつかの制限がありますがDockerなどを使って比較的容易に起動させることが可能です。</p>
-
 <p>以下はサンプルのコードです。minitestを利用しています。
 いくつかコメントをいれてみました。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">EsControllerTest</span> <span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">ActionDispatch</span><span style="color:#f92672">::</span><span style="color:#66d9ef">IntegrationTest</span>
+  <span style="color:#75715e">## 今回は自分は利用しませんでしたが、setup/teardownでelasticsearchの起動を設定することも可能です。</span>
+  <span style="color:#75715e">#def setup</span>
+  <span style="color:#75715e">#  Elasticsearch::Extensions::Test::Cluster.start \</span>
+  <span style="color:#75715e">#    cluster_name:    &#34;my-testing-cluster&#34;,</span>
+  <span style="color:#75715e">#    command:         &#34;/path/to/elasticsearch&#34;,</span>
+  <span style="color:#75715e">#    port:            9350,</span>
+  <span style="color:#75715e">#    number_of_nodes: 1</span>
+  <span style="color:#75715e">#end</span>
 
-<pre><code class="language-ruby">class EsControllerTest &lt; ActionDispatch::IntegrationTest
-  ## 今回は自分は利用しませんでしたが、setup/teardownでelasticsearchの起動を設定することも可能です。
-  #def setup
-  #  Elasticsearch::Extensions::Test::Cluster.start \
-  #    cluster_name:    &quot;my-testing-cluster&quot;,
-  #    command:         &quot;/path/to/elasticsearch&quot;,
-  #    port:            9350,
-  #    number_of_nodes: 1
-  #end
+  <span style="color:#75715e">#def teardown</span>
+  <span style="color:#75715e">#  Elasticsearch::Extensions::Test::Cluster.stop \</span>
+  <span style="color:#75715e">#    port:            9350,</span>
+  <span style="color:#75715e">#end</span>
 
-  #def teardown
-  #  Elasticsearch::Extensions::Test::Cluster.stop \
-  #    port:            9350,
-  #end
-
-  # テストのHello world的なもの。
-  test &quot;should return index&quot; do
-    get &quot;/&quot;
-    assert_equal &quot;Hello&quot;, @response.body
-  end
+  <span style="color:#75715e"># テストのHello world的なもの。</span>
+  test <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">should return index</span><span style="color:#e6db74">&#34;</span> <span style="color:#66d9ef">do</span>
+    get <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">/</span><span style="color:#e6db74">&#34;</span>
+    assert_equal <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Hello</span><span style="color:#e6db74">&#34;</span>, @response<span style="color:#f92672">.</span>body
+  <span style="color:#66d9ef">end</span>
   
-  # テストデータのpostをしてエラーなくレスポンししたかどうか
-  test &quot;should upload blog data&quot; do
+  <span style="color:#75715e"># テストデータのpostをしてエラーなくレスポンししたかどうか</span>
+  test <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">should upload blog data</span><span style="color:#e6db74">&#34;</span> <span style="color:#66d9ef">do</span>
     post_entry_data
-    assert_response :success
-  end
+    assert_response <span style="color:#e6db74">:success</span>
+  <span style="color:#66d9ef">end</span>
   
-  # テストデータがきちんとインポートされているかの確認
-  # テストの実行方法にもよりますが、テストケースは順番に実行されるとは限りません。
-  # そのため、&quot;順番に依存しないよう&quot;にここで事前にまたテストデータのインポートを行います。
-  test &quot;should get search results&quot; do
+  <span style="color:#75715e"># テストデータがきちんとインポートされているかの確認</span>
+  <span style="color:#75715e"># テストの実行方法にもよりますが、テストケースは順番に実行されるとは限りません。</span>
+  <span style="color:#75715e"># そのため、&#34;順番に依存しないよう&#34;にここで事前にまたテストデータのインポートを行います。</span>
+  test <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">should get search results</span><span style="color:#e6db74">&#34;</span> <span style="color:#66d9ef">do</span>
     post_entry_data
-    get '/search', params: { q: 'keyword' }
-    assert_response :success
-    assert_not_empty @response.body
-  end
+    get <span style="color:#e6db74">&#39;/search&#39;</span>, <span style="color:#e6db74">params</span>: { <span style="color:#e6db74">q</span>: <span style="color:#e6db74">&#39;keyword&#39;</span> }
+    assert_response <span style="color:#e6db74">:success</span>
+    assert_not_empty @response<span style="color:#f92672">.</span>body
+  <span style="color:#66d9ef">end</span>
   
-  # テストデータをpostする関数
-  def post_entry_data
-    entries = fixture_file_upload(Rails.root.join('test/fixtures/files/entries.json'))
-    post '/update', params: { file: entries }
-  end
-end
-</code></pre>
-
-<h2 id="ci環境でのelasticsearchの扱い">CI環境でのElasticSearchの扱い</h2>
-
+  <span style="color:#75715e"># テストデータをpostする関数</span>
+  <span style="color:#66d9ef">def</span> <span style="color:#a6e22e"></span><span style="color:#f92672"></span><span style="color:#a6e22e">post_entry_data</span>
+    entries <span style="color:#f92672">=</span> fixture_file_upload(<span style="color:#66d9ef">Rails</span><span style="color:#f92672">.</span>root<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#39;test/fixtures/files/entries.json&#39;</span>))
+    post <span style="color:#e6db74">&#39;/update&#39;</span>, <span style="color:#e6db74">params</span>: { <span style="color:#e6db74">file</span>: entries }
+  <span style="color:#66d9ef">end</span>
+<span style="color:#66d9ef">end</span>
+</code></pre></div><h2 id="ci環境でのelasticsearchの扱い">CI環境でのElasticSearchの扱い</h2>
 <p>テストコードがかけて、ローカルでテストが通るようになったら、CI環境で実行するようにしたいですよね。
 今回はgitlab-ciを使って行ってみます。
 CI環境でもElasticSearchをどう扱うか、考えるポイントがあります。</p>
-
 <ol>
 <li>CIの実行環境の上にElasticSearchを起動させる</li>
 <li>テストの実行環境とは別環境で起動させる</li>
 </ol>
-
 <p>今回の例では2の方式を取りました。
 gitlab-ciやcircleCIなどのよくあるCIサービスでは実行環境はDockerベースで動いていることが多いです。その環境の中で1.の方式でElasticSearchを起動させるのは、何かと面倒がおおいというのが実際でした。
 例えば、ElasticSearchの実行バイナリをダウンロードしたり、rootだと起動できないので調整したり、はたまたメモリが足りなかったり。。</p>
-
 <p>gitlab-ciのservicesという機能を使うことで簡単にElasticSearch環境を起動させることが可能でしたので2.の方法をとりました。</p>
-
 <p>下記が<code>.gitlab-ci.yml</code>のサンプルコードなのですが、servicesというのが関連する他のサービス（例えばMySQLだったり、Redis、ElasticSearchなど）を実行環境とは別に起動することのできる機能です。
 servicesについてもdockerイメージを指定することで特定のサービスを簡単に起動できます。ElasticSearchも公式でDockerイメージを出しているので簡単に起動ができます。
 また、<code>alias</code>を設定すると、その名前でサービスにアクセスできます。
 <code>alias</code>に<code>elasticsearch</code>と指定し、Rails側のElasticSearchのホストを指定する環境変数に同じように<code>elasticsearch</code>と指定することで簡単に接続が可能です。</p>
-
-<pre><code class="language-yml"># .gitlab-ci.yml
-stages:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#75715e"># .gitlab-ci.yml</span>
+<span style="color:#66d9ef">stages</span>:
   - test
 
-test:
-  stage: test
-  image: ruby:2.5.5
-  services:
-    - name: docker.elastic.co/elasticsearch/elasticsearch:6.7.2
-      alias: elasticsearch
-  before_script:
-    - apt-get update &amp;&amp; apt-get upgrade -y
+<span style="color:#66d9ef">test</span>:
+  <span style="color:#66d9ef">stage</span>: test
+  <span style="color:#66d9ef">image</span>: ruby:<span style="color:#ae81ff">2.5</span><span style="color:#ae81ff">.5</span>
+  <span style="color:#66d9ef">services</span>:
+    - <span style="color:#66d9ef">name</span>: docker.elastic.co/elasticsearch/elasticsearch:<span style="color:#ae81ff">6.7</span><span style="color:#ae81ff">.2</span>
+      <span style="color:#66d9ef">alias</span>: elasticsearch
+  <span style="color:#66d9ef">before_script</span>:
+    - apt-get update <span style="color:#75715e">&amp;&amp;</span> apt-get upgrade -y
     - apt-get install -y some componets
-  script:
+  <span style="color:#66d9ef">script</span>:
     - bundle install
     - bundle exec rake test
-  variables:
-    ELASTICSEARCH_HOST: &quot;elasticsearch&quot;
-    ELASTICSEARCH_PORT: 9200
-</code></pre>
+  <span style="color:#66d9ef">variables</span>:
+    <span style="color:#66d9ef">ELASTICSEARCH_HOST</span>: <span style="color:#e6db74">&#34;elasticsearch&#34;</span>
+    <span style="color:#66d9ef">ELASTICSEARCH_PORT</span>: <span style="color:#ae81ff">9200</span>
+</code></pre></div>
                     </div>
                     
                     

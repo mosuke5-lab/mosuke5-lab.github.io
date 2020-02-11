@@ -9,7 +9,7 @@
     <meta name="description" content="Kubernetesのマニフェストファイルを自動生成できるツールであるKustomizeを紹介します。使おうと思った動機や使う上での注意点など書きました。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/06/21/kustomize/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/06/21/kustomize/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Kustomizeで環境ごとに異なるマニフェストを作る | Goldstine研究所">
@@ -82,65 +82,42 @@
                     <div class="post-description">
                         <p>ブログの更新頻度が落ちていますが、サボっているわけではないです。。
 はい。mosuke5です。</p>
-
 <p>やはりKubernetesマニフェストのテンプレートエンジンは必要だ、と気づいてしまったので、マニフェストを生成できるツールを探していました。
 そこで、Kustomizeを試しみたのでアウトプットとして残しておきます。使ってみた上でハマったポイントや注意すべき点なども含めて書きたいと思います。</p>
-
 <h2 id="モチベーション">モチベーション</h2>
-
 <p>kubernetes初心者として、マニフェストもかけてきたし、<code>kubectl apply -f xxxx</code>ですぐにデプロイできるし、最高だなって思ってました。
 しかし、いざ、開発環境と本番環境の2つのNamespaceで利用したくなったり、運用のことを考えるといろいろと不都合が発生してきました。</p>
-
 <ol>
 <li>開発環境と本番環境でパラメータが変えたいことがある</li>
 <li>本番環境だけ入れたいリソースがある（例えばLoadBalancerは本番だけほしいなど）</li>
 <li>イメージをLatestで使いたくない。タグ指定したいが、都度手動で変更したくない</li>
 <li>configMapやsecretの変更したときのアプリ側の再起動どうしよう、など</li>
 </ol>
-
 <p>こうなってきたときに、「あっ。やっぱりマニフェストのテンプレートエンジンが必要だ。。」と強く感じました。
 マニフェストの生成にはいくつか方法があるようなのですが、kubernetes v1.14からkubectlに統合された<a href="https://github.com/kubernetes-sigs/kustomize">Kustomize</a>が便利そうだったので、そちらでまずは使い勝手を試してみようと思い立ったわけです。</p>
-
 <h2 id="kustomizeとは">Kustomizeとは</h2>
-
 <p>名前から少し推察できるかもしれませんが、CustomizeのCをKubernetesのKにもじったのが、Kustomizeであり、configuration(manifest) managementのツールです。(<a href="https://github.com/kubernetes-sigs/kustomize">公式Github</a>)</p>
-
 <p>基本的な構成としては<code>kustomization.yml</code> + <code>resources(manifest files)</code>になります。
 <code>kustomization.yml</code>にはどのマニフェストファイルを対象にするか、そしてそれらに対してどのような変更や修正、変数を割り当てるかを記述するかたちです。最終的なアウトプットとしては、変更・修正が施されたマニフェストファイルの中身がアウトプットされます。
 公式ドキュメントにも書いてありますがマニフェストに対するsedみたいな一面があります。</p>
-
 <h2 id="ドキュメント">ドキュメント</h2>
-
-<p>Kustomizeを実際に触っていく上でハマったポイントもあったのでご紹介します。<br />
+<p>Kustomizeを実際に触っていく上でハマったポイントもあったのでご紹介します。<br>
 Kustomizeはkubernetes v1.14からkubectlに組み込まれることになりました。実際に、<code>kubectl -h</code>でヘルプを見てみてもわかります。</p>
-
 <pre><code>Advanced Commands:
   kustomize      Build a kustomization target from a directory or a remote url.
-</code></pre>
-
-<p>kubectlに統合されているのはバージョンが最新のものではありません。また、Kustomizeも進化が早いので機能差分がでてくることもめずらくありません。</p>
-
+</code></pre><p>kubectlに統合されているのはバージョンが最新のものではありません。また、Kustomizeも進化が早いので機能差分がでてくることもめずらくありません。</p>
 <p>自分も使っていく中で何度か下記のようなエラーメッセージに出くわしました。下記の例だと、<code>envs</code>というフィールドがありませんというエラーです。公式ドキュメントを見て記述していたのですが、kubectlに見込まれているバージョンではそのフィールドがなかったということです。</p>
-
 <pre><code>$ kubectl kustomize .
 Error: couldn't make target for ../../base: json: unknown field &quot;envs&quot;
-</code></pre>
-
-<p>そのため、ドキュメントをみる場合は使っている方法に合わせて使い分けるといいです。</p>
-
+</code></pre><p>そのため、ドキュメントをみる場合は使っている方法に合わせて使い分けるといいです。</p>
 <ul>
 <li><a href="https://kubectl.docs.kubernetes.io/pages/reference/kustomize.html">kubectlに組み込まれたKustomizeを使う場合</a></li>
 <li><a href="https://github.com/kubernetes-sigs/kustomize/tree/master/docs">Kustomize本家を利用する場合</a></li>
 </ul>
-
 <h2 id="とにもかくにも使ってみる">とにもかくにも使ってみる</h2>
-
 <h3 id="hello-world">Hello World</h3>
-
 <p>Kustomizeはサンプルもいくつか用意してくれているので始めるのは簡単です。Hello World的には<a href="https://github.com/kubernetes-sigs/kustomize/tree/master/examples/helloWorld">こちら</a>が良いと思います。</p>
-
 <p><code>kustomization.yml</code>が下記の通り書いてありますが、resourcesに記載の３ファイルを対象に共通のlabelを付与するという意味になります。</p>
-
 <pre><code>commonLabels:
   app: hello
 
@@ -148,33 +125,22 @@ resources:
 - deployment.yaml
 - service.yaml
 - configMap.yaml
-</code></pre>
-
-<h3 id="configmapgenerator">configMapGenerator</h3>
-
+</code></pre><h3 id="configmapgenerator">configMapGenerator</h3>
 <p>上のHello Worldの例ではマニフェストに<code>configMap.yaml</code>が含まれていましたが、configMapを生成するには、もうひとつ<code>configMapGenerator</code>という機能を使うこともできます。(<a href="https://github.com/kubernetes-sigs/kustomize/blob/master/docs/fields.md#configmapgenerator">公式ドキュメント</a>)</p>
-
 <p>こちらの機能を使うと、configMapを作成時に名前にハッシュ値が付きます。そして、configMapに変更があった場合に、そのハッシュ値も変更され別のconfigMapとして保存されます。また、そのconfigMapを参照しているDeploymentなどのconfigMapの名前も変更してくれます。
 それによって、configMapを変更時にアプリ側のPodsの再作成もされます。運用面を考えると非常に便利な機能です。</p>
-
-<p>以下に自分のいいたいことが全て書かれていたので、詳細についてはこちら参照してみてください。<br />
+<p>以下に自分のいいたいことが全て書かれていたので、詳細についてはこちら参照してみてください。<br>
 <a href="https://qiita.com/Sho2010@github/items/548582996d5ebfc63b1d">kustomizeでconfigMapを取り扱うときの注意</a></p>
-
 <h3 id="overlay">overlay</h3>
-
-<p>自分がKustomizeを触ろうとした主なモチベーションの部分である、環境ごとにパラメータを変えたい、一部のリソースを変えたいというニーズにはoverlayという機能で対応することができます。<br />
+<p>自分がKustomizeを触ろうとした主なモチベーションの部分である、環境ごとにパラメータを変えたい、一部のリソースを変えたいというニーズにはoverlayという機能で対応することができます。<br>
 overlayは名前の通り「覆う」的な意味なので、Baseのマニュフェストを用意して、環境ごとにパッチ当てするマニフェストを用意する、という形になります。</p>
-
 <p>今回こんなサンプルを作りました。(<a href="https://github.com/mosuke5/kustomize-examples/tree/master/overlay-example">コードはこちら</a>)</p>
-
 <ul>
 <li>Nginxをデプロイする</li>
 <li>開発環境用はnamespaceをdevelopmentに、本番環境用はnamespaceをproductionにする</li>
 <li>本番環境用のNginxのServiceはType=LoadBalancerにする</li>
 </ul>
-
 <p>ファイル構造はこのような形です。</p>
-
 <pre><code>.
 ├── base
 │   ├── kustomization.yml
@@ -186,116 +152,103 @@ overlayは名前の通り「覆う」的な意味なので、Baseのマニュフ
     └── production
         ├── change-nginx-service-to-loadbalancer.yml
         └── kustomization.yml
-</code></pre>
-
-<p>baseには共通のマニフェストです。出力すると下記のとおりです。
+</code></pre><p>baseには共通のマニフェストです。出力すると下記のとおりです。
 見ておいてほしいのは<code>nginx-servce</code>のTypeです。baseマニフェストでは<code>ClusterIP</code>を指定しています。</p>
-
-<pre><code class="language-yaml">$ kubectl kustomize base
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx-service
-spec:
-  ports:
-  - name: http-port
-    port: 80
-    protocol: TCP
-    targetPort: 80
-  selector:
-    app: nginx
-  type: ClusterIP    # baseではClusterIPを指定
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">$ kubectl kustomize base
+<span style="color:#66d9ef">apiVersion</span>: v1
+<span style="color:#66d9ef">kind</span>: Service
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: nginx-service
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">ports</span>:
+  - <span style="color:#66d9ef">name</span>: http-port
+    <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">80</span>
+    <span style="color:#66d9ef">protocol</span>: TCP
+    <span style="color:#66d9ef">targetPort</span>: <span style="color:#ae81ff">80</span>
+  <span style="color:#66d9ef">selector</span>:
+    <span style="color:#66d9ef">app</span>: nginx
+  <span style="color:#66d9ef">type</span>: ClusterIP    <span style="color:#75715e"># baseではClusterIPを指定</span>
 ---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - image: nginx:1.17.0
-        name: nginx
-        ports:
-        - containerPort: 80
-</code></pre>
-
-<p>しかし、本番環境ではNamespaceを指定して、Typeを<code>LoadBalancer</code>で公開したかったとします。
+<span style="color:#66d9ef">apiVersion</span>: apps/v1
+<span style="color:#66d9ef">kind</span>: Deployment
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: nginx-deployment
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">replicas</span>: <span style="color:#ae81ff">1</span>
+  <span style="color:#66d9ef">selector</span>:
+    <span style="color:#66d9ef">matchLabels</span>:
+      <span style="color:#66d9ef">app</span>: nginx
+  <span style="color:#66d9ef">template</span>:
+    <span style="color:#66d9ef">metadata</span>:
+      <span style="color:#66d9ef">labels</span>:
+        <span style="color:#66d9ef">app</span>: nginx
+    <span style="color:#66d9ef">spec</span>:
+      <span style="color:#66d9ef">containers</span>:
+      - <span style="color:#66d9ef">image</span>: nginx:<span style="color:#ae81ff">1.17</span><span style="color:#ae81ff">.0</span>
+        <span style="color:#66d9ef">name</span>: nginx
+        <span style="color:#66d9ef">ports</span>:
+        - <span style="color:#66d9ef">containerPort</span>: <span style="color:#ae81ff">80</span>
+</code></pre></div><p>しかし、本番環境ではNamespaceを指定して、Typeを<code>LoadBalancer</code>で公開したかったとします。
 以下は本番環境用にパッチ当てするためのkustomization.ymlなのですが、baseのマニフェストを指定し、namespaceとパッチを当てるマニフェストを指定しました。</p>
-
-<pre><code class="language-yaml">$ cat overlays/production/kustomization.yml
-bases:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">$ cat overlays/production/kustomization.yml
+<span style="color:#66d9ef">bases</span>:
 - ../../base
-namespace: &quot;production&quot;
-patchesStrategicMerge:
-- change-nginx-service-to-loadbalancer.yml   # serviceのtypeを変えるパッチを当てる
+<span style="color:#66d9ef">namespace</span>: <span style="color:#e6db74">&#34;production&#34;</span>
+<span style="color:#66d9ef">patchesStrategicMerge</span>:
+- change-nginx-service-to-loadbalancer.yml   <span style="color:#75715e"># serviceのtypeを変えるパッチを当てる</span>
 
 $ cat overlays/production/change-nginx-service-to-loadbalancer.yml
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx-service
-spec:
-  type: LoadBalancer   # typeをLoadBalancerへ
-  ports:
-    - name: &quot;http-port&quot;
-      protocol: &quot;TCP&quot;
-      port: 80
-      targetPort: 80
-</code></pre>
-
-<p>このようにして、本番環境用のパッチを当てて出力すると、typeがLoadBalancerに変わっていることがわかります。これで、1つのマニフェストを使って環境ごとにパラメータや一部のリソースを変更してデプロイできそうです。</p>
-
-<pre><code class="language-yaml">$ kubectl kustomize overlays/production
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx-service
-  namespace: production
-spec:
-  ports:
-  - name: http-port
-    port: 80
-    protocol: TCP
-    targetPort: 80
-  selector:
-    app: nginx
-  type: LoadBalancer   # typleがLoadBalancerに変更されている
+<span style="color:#66d9ef">apiVersion</span>: v1
+<span style="color:#66d9ef">kind</span>: Service
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: nginx-service
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">type</span>: LoadBalancer   <span style="color:#75715e"># typeをLoadBalancerへ</span>
+  <span style="color:#66d9ef">ports</span>:
+    - <span style="color:#66d9ef">name</span>: <span style="color:#e6db74">&#34;http-port&#34;</span>
+      <span style="color:#66d9ef">protocol</span>: <span style="color:#e6db74">&#34;TCP&#34;</span>
+      <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">80</span>
+      <span style="color:#66d9ef">targetPort</span>: <span style="color:#ae81ff">80</span>
+</code></pre></div><p>このようにして、本番環境用のパッチを当てて出力すると、typeがLoadBalancerに変わっていることがわかります。これで、1つのマニフェストを使って環境ごとにパラメータや一部のリソースを変更してデプロイできそうです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">$ kubectl kustomize overlays/production
+<span style="color:#66d9ef">apiVersion</span>: v1
+<span style="color:#66d9ef">kind</span>: Service
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: nginx-service
+  <span style="color:#66d9ef">namespace</span>: production
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">ports</span>:
+  - <span style="color:#66d9ef">name</span>: http-port
+    <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">80</span>
+    <span style="color:#66d9ef">protocol</span>: TCP
+    <span style="color:#66d9ef">targetPort</span>: <span style="color:#ae81ff">80</span>
+  <span style="color:#66d9ef">selector</span>:
+    <span style="color:#66d9ef">app</span>: nginx
+  <span style="color:#66d9ef">type</span>: LoadBalancer   <span style="color:#75715e"># typleがLoadBalancerに変更されている</span>
 ---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-  namespace: production
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - image: nginx:1.17.0
-        name: nginx
-        ports:
-        - containerPort: 80
-</code></pre>
-
-<h2 id="まとめ">まとめ</h2>
-
+<span style="color:#66d9ef">apiVersion</span>: apps/v1
+<span style="color:#66d9ef">kind</span>: Deployment
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: nginx-deployment
+  <span style="color:#66d9ef">namespace</span>: production
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">replicas</span>: <span style="color:#ae81ff">1</span>
+  <span style="color:#66d9ef">selector</span>:
+    <span style="color:#66d9ef">matchLabels</span>:
+      <span style="color:#66d9ef">app</span>: nginx
+  <span style="color:#66d9ef">template</span>:
+    <span style="color:#66d9ef">metadata</span>:
+      <span style="color:#66d9ef">labels</span>:
+        <span style="color:#66d9ef">app</span>: nginx
+    <span style="color:#66d9ef">spec</span>:
+      <span style="color:#66d9ef">containers</span>:
+      - <span style="color:#66d9ef">image</span>: nginx:<span style="color:#ae81ff">1.17</span><span style="color:#ae81ff">.0</span>
+        <span style="color:#66d9ef">name</span>: nginx
+        <span style="color:#66d9ef">ports</span>:
+        - <span style="color:#66d9ef">containerPort</span>: <span style="color:#ae81ff">80</span>
+</code></pre></div><h2 id="まとめ">まとめ</h2>
 <p>Kubernetesの初歩の勉強をしているうちはあまり必要性を感じないのですが、それなりに「運用」をみすえると、マニフェストを自動で生成する必要性がでてきます。
 その１つの方法としてKustomizeというツールを触りました。kubectlにも統合されているので比較的簡単にはじめることができますし、自分がやりたいと思っていたことは問題なく実現できることがわかりました。</p>
-
 <p>今後使っていくなかで、また知見がたまればおしらせします。</p>
                     </div>
                     

@@ -9,7 +9,7 @@
     <meta name="description" content="ElasticSearch APIでよくつかうものをまとめました。基本的なAPIをいつもググっている方これみて活用してください。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2018/01/14/elasticsearch-api/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2018/01/14/elasticsearch-api/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="[随時更新] ElasticSearchの基本APIのまとめ | Goldstine研究所">
@@ -80,26 +80,17 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>こんにちは。もーすけです。<br />
-ElasticSearchを使っているのですがいつもAPI操作を忘れてしまうので、基本的な操作をまとめました。<br />
+                        <p>こんにちは。もーすけです。<br>
+ElasticSearchを使っているのですがいつもAPI操作を忘れてしまうので、基本的な操作をまとめました。<br>
 参考につかってください。</p>
-
-<p>そもそものElasticSearchやKibanaのインストールなどについては下記をご覧ください。
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2017/08/13/elasticsearch_basic/" data-iframely-url="//cdn.iframe.ly/e14fjI9"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
-
+<p>そもそものElasticSearchやKibanaのインストールなどについては下記をご覧ください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2017/08/13/elasticsearch_basic/" data-iframely-url="//cdn.iframe.ly/e14fjI9"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
 <h2 id="全般">全般</h2>
-
 <h3 id="ユーザ名とパスワードをつけてapiを実行する">ユーザ名とパスワードをつけてAPIを実行する</h3>
-
 <p>curlでのベーシック認証です。デフォルトでは、ユーザ名<code>elastic</code>、パスワード<code>password</code>とついていて使うことが多い。</p>
-
 <pre><code>$ curl  -u elastic:password -XGET 'localhost:9200/_cat/indices?v'
-</code></pre>
-
-<h3 id="レスポンス結果を見やすくする">レスポンス結果を見やすくする</h3>
-
+</code></pre><h3 id="レスポンス結果を見やすくする">レスポンス結果を見やすくする</h3>
 <p>GETパラメータに<code>pretty</code>をつける。以下で違いを見てみる。</p>
-
 <pre><code>$ curl -XPUT 'localhost:9200/blog'
 {&quot;acknowledged&quot;:true,&quot;shards_acknowledged&quot;:true,&quot;index&quot;:&quot;blog&quot;
 
@@ -109,21 +100,13 @@ $ curl -XPUT 'localhost:9200/blog?pretty'
   &quot;shards_acknowledged&quot; : true,
   &quot;index&quot; : &quot;blog&quot;
 }
-</code></pre>
-
-<h2 id="インデックス-ドキュメント関連">インデックス、ドキュメント関連</h2>
-
+</code></pre><h2 id="インデックスドキュメント関連">インデックス、ドキュメント関連</h2>
 <h3 id="インデックスの一覧を確認する">インデックスの一覧を確認する</h3>
-
 <p>作成したインデックスを確認する。<code>index</code>は複数形になると<code>indices</code>になるので注意。</p>
-
 <pre><code>$ curl 'localhost:9200/_cat/indices?v'
 status index   uuid                   pri rep docs.count docs.deleted store.size pri.store.size
 yellow open   blog    rwvaOBVcRaSLqt3NDRFZ-w   5   1          0            0       324b           324b
-</code></pre>
-
-<p>ちなみに<code>_cat</code>で出力できるものはこちらで確認できる。</p>
-
+</code></pre><p>ちなみに<code>_cat</code>で出力できるものはこちらで確認できる。</p>
 <pre><code>$ curl -X GET 'localhost:9200/_cat'
 =^.^=
 /_cat/allocation
@@ -153,26 +136,14 @@ yellow open   blog    rwvaOBVcRaSLqt3NDRFZ-w   5   1          0            0    
 /_cat/repositories
 /_cat/snapshots/{repository}
 /_cat/templates
-</code></pre>
-
-<h3 id="インデックスを作成する">インデックスを作成する</h3>
-
+</code></pre><h3 id="インデックスを作成する">インデックスを作成する</h3>
 <p><code>blog</code>という名前のインデックスを作成。Methodが<code>PUT</code>であることに注意。</p>
-
 <pre><code>$ curl -XPUT 'localhost:9200/blog'
-</code></pre>
-
-<h3 id="インデックスの削除をする">インデックスの削除をする</h3>
-
+</code></pre><h3 id="インデックスの削除をする">インデックスの削除をする</h3>
 <p><code>blog</code>という名前のインデックスを削除する。</p>
-
 <pre><code>$ curl -XDELETE localhost:9200/blog
-</code></pre>
-
-<h3 id="インデックスのマッピングを確認する">インデックスのマッピングを確認する</h3>
-
+</code></pre><h3 id="インデックスのマッピングを確認する">インデックスのマッピングを確認する</h3>
 <p>インデックスのマッピングを確認する。</p>
-
 <pre><code>// インデックス全体
 $ curl -XGET localhost:9200/blog/_mapping?pretty
 true
@@ -194,16 +165,10 @@ true
               }
             },
 (略)
-</code></pre>
-
-<pre><code>// 特定のタイプのみ
+</code></pre><pre><code>// 特定のタイプのみ
 $ curl -XGET localhost:9200/blog/user/_mapping?pretty
-</code></pre>
-
-<h3 id="バルクインサート">バルクインサート</h3>
-
+</code></pre><h3 id="バルクインサート">バルクインサート</h3>
 <p>データをバルクインサートする。バルクインサートするデータのサンプルフォーマットはこちら。</p>
-
 <pre><code>$ cat sample-data.json
 { &quot;index&quot; : {} }
 {&quot;date&quot; : &quot;2017-08-13 10:00:00&quot;,&quot;title&quot; : &quot;ElasticSearch入門&quot;,&quot;body&quot; : &quot;ブログ記事の全文検索などをやりたくて、ElasticSearchはどんなもんじゃろか？と触ってみたのでメモ。ElasticSearchの入門についてはたくさんの記事がすでにでているので、ほぼ自分の理解のために残します。&quot;, &quot;tag&quot;: [&quot;ElasticSearch&quot;, &quot;入門&quot;]}
@@ -218,12 +183,8 @@ $ curl -XGET localhost:9200/blog/user/_mapping?pretty
 
 // バルクインサート
 $ curl -H &quot;Content-Type: application/json&quot; -XPOST 'localhost:9200/blog/post/_bulk?pretty&amp;refresh' --data-binary @sample-data.json
-</code></pre>
-
-<h3 id="マッピング">マッピング</h3>
-
+</code></pre><h3 id="マッピング">マッピング</h3>
 <p>マッピングを定義ファイルから設定する。</p>
-
 <pre><code>$ cat user.json
 {
   &quot;properties&quot; : {
@@ -255,18 +216,11 @@ $ curl -H &quot;Content-Type: application/json&quot; -XPOST 'localhost:9200/blog
 }
 
 $ curl -XPUT 'localhost:9200/blog/_mapping/user?pretty' -d @user.json
-</code></pre>
-
-<h3 id="ドキュメントを削除する">ドキュメントを削除する</h3>
-
+</code></pre><h3 id="ドキュメントを削除する">ドキュメントを削除する</h3>
 <pre><code>$ curl -XDELETE localhost:9200/blog/user/123456
 ($ curl -XDELETE localhost:9200/:index/:type/:id)
-</code></pre>
-
-<h2 id="検索関連">検索関連</h2>
-
+</code></pre><h2 id="検索関連">検索関連</h2>
 <h3 id="基本検索">基本検索</h3>
-
 <pre><code>//&quot;ElasticSearch 入門&quot;というキーワードで検索
 $ curl 'localhost:9200/blog/_search?pretty' -d '
 {

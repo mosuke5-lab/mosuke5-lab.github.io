@@ -9,7 +9,7 @@
     <meta name="description" content=" 趣味で作っているアプリ(Rails)があるのだが、はじめHerokuで運用しようと検討していたが、  データ量が多いためすぐにHobbyプランでは対応できなくなってしまった。 仕方ないので、別のアプリで持っているVPSをProductio">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2016/03/28/181636/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2016/03/28/181636/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="HerokuをRailsアプリのステージング環境として使う | Goldstine研究所">
@@ -80,22 +80,17 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><body>
+                        <body>
 <p>趣味で作っているアプリ(<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>)があるのだが、はじめHerokuで運用しようと検討していたが、 <br>
 データ量が多いためすぐにHobbyプランでは対応できなくなってしまった。<br>
 仕方ないので、別のアプリで持っている<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>をProduction環境とすることにしたのだが、<br>
-せっかくなのでherokuもうまく使いたいなーと思ってステージング環境として使うことにした。</p></p>
-
+せっかくなのでherokuもうまく使いたいなーと思ってステージング環境として使うことにした。</p>
 <p>そのときにやったことをメモする。</p>
-
 <h1>Staging環境の設定を作る</h1>
-
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>ではデフォルトではdevelopment, test, productionの環境を持っている。<br>
 そこに今回、stagingという環境を追加した。<br>
 そして、herokuではデフォルトではproductionを利用するようになっているのでstagingに切り替えるだけ。</p>
-
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>側はstaging環境追加。</p>
-
 <pre><code>$ vim config/database.yml
 # 下記を追加した
 staging:
@@ -112,44 +107,30 @@ $ vim config/enviroments/staging.rb
 
 $ vim config/secrets.yml
 # 必要に応じてstagingを追加 
-</code></pre>
-
-<p>heroku側はステージングへの切り替え。</p>
-
+</code></pre><p>heroku側はステージングへの切り替え。</p>
 <pre><code>$ heroku config --app app-name    # デフォではproductionになってる
 RAILS_ENV:                production
 $ heroku config:set RAILS_ENV=staging --app app-name
 $ heroku config --app app-name
 RAILS_ENV:                staging 
-</code></pre>
-
-<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/Basic%C7%A7%BE%DA">Basic認証</a></h1>
-
+</code></pre><h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/Basic%C7%A7%BE%DA">Basic認証</a></h1>
 <p>ステージング環境なので、外部から簡単にアクセス出来ないように<a class="keyword" href="http://d.hatena.ne.jp/keyword/Basic%C7%A7%BE%DA">Basic認証</a>をかけた。<br>
 いくつかやり方があると思うが、<code>app/controllers/application_controller.rb</code>に設定を追加した。<br>
 ユーザ名とパスワードをベタ書きだと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>に上げてる場合は丸見えになってしまうので<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>でやりましょう。</p>
-
-<pre><code class="language-ruby">http_basic_authenticate_with :name =&gt; ENV['BASIC_AUTH_USERNAME'], :password =&gt; ENV['BASIC_AUTH_PASSWORD'] if Rails.env == &quot;staging&quot;
-</code></pre>
-
-<p>heroku側では<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>を設定してあげる。</p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">http_basic_authenticate_with <span style="color:#e6db74">:name</span> <span style="color:#f92672">=</span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">ENV</span><span style="color:#f92672">[</span><span style="color:#e6db74">&#39;BASIC_AUTH_USERNAME&#39;</span><span style="color:#f92672">]</span>, <span style="color:#e6db74">:password</span> <span style="color:#f92672">=</span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">ENV</span><span style="color:#f92672">[</span><span style="color:#e6db74">&#39;BASIC_AUTH_PASSWORD&#39;</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">Rails</span><span style="color:#f92672">.</span>env <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">staging</span><span style="color:#e6db74">&#34;</span>
+</code></pre></div><p>heroku側では<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>を設定してあげる。</p>
 <pre><code>$ heroku config:set BASIC_AUTH_USERNAME=&quot;xxxxx&quot; BASIC_AUTH_PASSWORD=&quot;xxxxx&quot; --app app-name
 $ heroku config --app app-name
 BASIC_AUTH_PASSWORD:      xxxxx
 BASIC_AUTH_USERNAME:      xxxxx 
-</code></pre>
-
-<h1>
+</code></pre><h1>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>連携で自動デプロイ</h1>
-
 <p>今更ながら<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>と連携した自動デプロイ機能があることを知った…<br>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>へ<code>git push origin master</code>すればheroku側にも反映される機能だ。<br>
 昔使った時には<code>git push origin master</code>と<code>git push heroku master</code>と２回コマンド打ってたのでめんどいなーと思ってた。<br>
 デプロイが楽なのでステージング環境としてはほんとに優秀だと思う。</p>
-
-<p><p><a href="http://kayakuguri.github.io/blog/2015/02/10/heroku-github-sync/">[heroku]githubから自動でherokuにデプロイ - KayaMemo</a></p>
-</body></p>
+<p><a href="http://kayakuguri.github.io/blog/2015/02/10/heroku-github-sync/">[heroku]githubから自動でherokuにデプロイ - KayaMemo</a></p>
+</body>
 
                     </div>
                     

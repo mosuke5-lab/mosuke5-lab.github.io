@@ -9,7 +9,7 @@
     <meta name="description" content="@mosuke5のブログサイト。クラウド技術やアプリ開発、インフラ系ツールなどを主に情報発信しています。">
     <link rel="canonical" href="https://blog.mosuke.tech/categories/%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E9%96%8B%E7%99%BA/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/categories/%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E9%96%8B%E7%99%BA/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="アプリケーション開発 | Goldstine研究所">
@@ -82,7 +82,7 @@
                     </header>
 
                     <div class="post-description">
-                        <p>あけましておめでとうございます。<a href="https://twitter.com/mosuke5" target="_blank">@mosuke5</a>です。<br />
+                        <p>あけましておめでとうございます。<a href="https://twitter.com/mosuke5" target="_blank">@mosuke5</a>です。<br>
 マイクロサービスのデモアプリケーションとして<a href='https://microservices-demo.github.io/' target='_blank'>Sock Shop</a>は有名ですよね。
 日本語でもたくさんのSock Shopの紹介やインストール記事がでています。しかし、自分もそうだったのですが、なんとなく起動して動かして、終わりとなっているものがおおく、どんな観点でこのSock Shopをいじっていけばいいかの情報が足りないと感じました。
 機会があり、Sock Shopをさわるタイミングがあったので、実際にどんなデータ構造になっているのか、マイクロサービスゆえの課題など、Sock Shopから少しでも多くの学びが得られるようにこの記事を書きます。</p>
@@ -111,9 +111,8 @@
                     </header>
 
                     <div class="post-description">
-                        <p>こんにちは。<a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br />
+                        <p>こんにちは。<a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br>
 みなさん普段の監視はどのように行っていますか？Datadog使っていますか？</p>
-
 <p>最近<a href="https://www.datadoghq.com/">Datadog</a>を触る機会が多いのですが、Datadogはobservabilityの3本柱ということで、メトリックとトレース(APM)とログ、この3つを統合した監視サービスであることを強くおしだしています。
 3つの分野のそれぞれに対応したOSSやサービスは多いですが、統合されてシームレスに連携できる点はDatadogの非常に強いポイントと感じます。
 さて、そんななかでDatadog APM (Application Perfomance Monitoring) が強力だったので紹介したいのと、その仕組みを探っていきましょう。</p>
@@ -142,21 +141,17 @@
                     </header>
 
                     <div class="post-description">
-                        <p>お久しぶりです。@mosuke5です。<br />
+                        <p>お久しぶりです。@mosuke5です。<br>
 新しい会社に入って１ヶ月ほど経ちましたが生きています。
 今回は、ElasticSearchを題材にしますが外部コンポーネントを利用しているアプリケーションのテストについてです。
 すごく初歩的なところですが、いくつか考えなければいけないポイントもあったのでまとめました。</p>
-
 <h2 id="はじめに">はじめに</h2>
-
 <p>今回の題材は非常にシンプルな検索機能をもったアプリケーションです。
 構成はアプリケーションはRailsで、検索エンジンを担うのがElastiCsearchという前提です。</p>
-
 <p>アプリケーションがもつmethodは３つで以下としています。</p>
-
 <ol>
-<li>GET &lsquo;/&rsquo;  =&gt; &lsquo;Hello&rsquo;を返す</li>
-<li>GET &lsquo;/search&rsquo; =&gt; GETパラメータ&rsquo;q&rsquo;のキーワードで検索した結果をjsonで返す</li>
+<li>GET &lsquo;/&rsquo;  =&gt; &lsquo;Hello'を返す</li>
+<li>GET &lsquo;/search&rsquo; =&gt; GETパラメータ&rsquo;q'のキーワードで検索した結果をjsonで返す</li>
 <li>POST &lsquo;/update&rsquo; =&gt; 所定のjsonファイルをPOSTするとbulkでinsertされ、その結果をjsonで返す</li>
 </ol>
                     </div>
@@ -211,15 +206,12 @@ SlideShare APIってあるのか？そしてGoogleAppsScriptもほとんどや�
                     </header>
 
                     <div class="post-description">
-                        <p>早いものGWも終わり一週間が経ってしまいました。<br />
+                        <p>早いものGWも終わり一週間が経ってしまいました。<br>
 長期の連休になるとだいたい自分は趣味のアプリケーション開発をよくすすめています（ふだんからやりたいけどなかなかできない）。今年のGWも趣味アプリケーションの開発をしてました。</p>
-
 <p>いま作っているアプリケーションは自分の英語学習用のサービスなのですが(サービスについては別途どこかでご紹介したい)、新しい技術を実際に試す場としても利用しています。自分はいつも趣味アプリケーションで新しいことを試してみて、よかったらそれを職場にもっていくことが多いです。</p>
-
 <p>アプリケーションはRailsで書いているのですが、Railsの他にMySQLやNginx、ElasticSearch、Kibanaなど関連するコンポーネントが多いです。
 そのため、Docker Composeを利用して動かすことにしています。Dockerは以前から使っていたのですが、実際にアプリケーションのせてとして開発・運用してみると、いろいろ問題があり試行錯誤することになりました。</p>
-
-<p>GWはその部分と主に格闘していて、最終的にそこそこ良い開発フローを整えることができました。今日はそのご紹介です。<br />
+<p>GWはその部分と主に格闘していて、最終的にそこそこ良い開発フローを整えることができました。今日はそのご紹介です。<br>
 ※もちろん、現時点でのやり方であり、改善しているので現状と異なることも多いと思います。</p>
                     </div>
                     <div class="read-more-link">
@@ -246,12 +238,11 @@ SlideShare APIってあるのか？そしてGoogleAppsScriptもほとんどや�
                     </header>
 
                     <div class="post-description">
-                        <p>こんにちは@mosuke5です。<br />
-もともとApach+PHPで動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになりました。理由は、もともと社内ネットワークでのみ利用するシステムだったのですが、インターネットの外からも利用することになり、インターネットからの入り口にリバースプロキシを導入したからです。<br />
-つまり、Nginx-&gt;Apache-&gt;PHPという構成になりました。<br />
+                        <p>こんにちは@mosuke5です。<br>
+もともとApach+PHPで動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになりました。理由は、もともと社内ネットワークでのみ利用するシステムだったのですが、インターネットの外からも利用することになり、インターネットからの入り口にリバースプロキシを導入したからです。<br>
+つまり、Nginx-&gt;Apache-&gt;PHPという構成になりました。<br>
 リバースプロキシを導入した際によく問題となることだが、Apacheからみるとすべてリバースプロキシから通信がきているようにみえます。
 接続元のIPアドレスがすべてリバースプロキシのもの変わってしまいます。</p>
-
 <p>そこで、HTTPヘッダーに接続元のIPアドレス追加しアプリ側（PHP）で受け取る方法とその際の注意点を書きます。</p>
                     </div>
                     <div class="read-more-link">
@@ -356,7 +347,7 @@ SlideShare APIってあるのか？そしてGoogleAppsScriptもほとんどや�
                     </header>
 
                     <div class="post-description">
-                        ※ブログのドメイン変更によりはてブが消えてしまいましたが、450はてぶくらいついてました。こちらが当時の痕跡 2014年の秋から@mogull
+                        ※ブログのドメイン変更によりはてブが消えてしまいましたが、450はてぶくらいついてました。こちらが当時の痕跡 2014年の秋から`@mogul
                     </div>
                     <div class="read-more-link">
                         <a href="https://blog.mosuke.tech/entry/2015/07/19/135844/">全文を読む</a>

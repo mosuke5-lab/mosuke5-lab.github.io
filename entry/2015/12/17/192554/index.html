@@ -9,7 +9,7 @@
     <meta name="description" content="Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。そして、serverspecを使って、インフラテストも行っていますが。その運用にいくつか課題点ありました。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/12/17/192554/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2015/12/17/192554/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="AnsibleとServerspecの実行をRakeタスクにまとめる | Goldstine研究所">
@@ -80,120 +80,89 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>こんにちは<a href="https://twitter.com/mosuke5">もーすけ</a>です。<br />
+                        <p>こんにちは<a href="https://twitter.com/mosuke5">もーすけ</a>です。<br>
 私が趣味で開発しているシステムでは、Ansibleを使って、サーバ構築からアプリケーションのデプロイまで実行できるように管理しています。
 そして、serverspecを使って、そのサーバに対するインフラテストも行っています。しかし、その運用にいくつか課題点がありました。</p>
-
 <p>その課題点についてと、課題点へ対策したことについて書きます。</p>
-
 <h2 id="課題だったこと">課題だったこと</h2>
-
 <h3 id="課題1-デプロイとテストをそれぞれ実行していた">(課題1) デプロイとテストをそれぞれ実行していた</h3>
-
 <p>Ansibleでのデプロイとserverspecのテストはそれぞれ別のコマンドで実行していました。</p>
-
 <pre><code>$ ansible-playbook site.yml -i hosts
 $ bundle exec rake serverspec 
-</code></pre>
-
-<p>2つ実行することが面倒であり、面倒であるがゆえにserverspecの実行を怠ったりしていました。
+</code></pre><p>2つ実行することが面倒であり、面倒であるがゆえにserverspecの実行を怠ったりしていました。
 これではテストの効果があまり発揮できませんね。
 CIで自動実行すればいいのでは？というのがありますが、本番環境への適応はそれでいいのですが、
 このシステムは開発環境はローカルPCのVagrant上に構築しており、手元でのプロビジョニングには、手動でのAnsible実行を必要としている状況でした。</p>
-
 <h3 id="課題2-sudoパスワードをうまく管理できなかった">(課題2) sudoパスワードをうまく管理できなかった</h3>
-
 <p>上のような課題1について、真っ先に以下の様にコマンドを続けることを思いつきました。</p>
-
 <pre><code>$ ansible -playbook site.yml -i hosts; bundle exec rake serverspec 
-</code></pre>
-
-<p>しかし、この方法ではansible実行終了後にserverspecを実行する際にsudoパスワードが再度聞かれるため、
-コマンドを打ったまま「放置」ができませんでした。<br />
+</code></pre><p>しかし、この方法ではansible実行終了後にserverspecを実行する際にsudoパスワードが再度聞かれるため、
+コマンドを打ったまま「放置」ができませんでした。<br>
 <span style="font-size: 80%">※もちろん、sudoパスワードを要求しないようにユーザ設定をすればできますが、多くの場合ではセキュリティ上難しかったりすると思います。ssh接続は鍵認証、sudoには必ずパスワードを要求するようにしています。</span></p>
-
-<p>また、Ansibleもserverspecにもコマンド実行時にsudoパスワードを記述する方法があります。<br />
+<p>また、Ansibleもserverspecにもコマンド実行時にsudoパスワードを記述する方法があります。<br>
 Ansibleでは、<code>ansible.cfg</code>に<code>sudo_password</code>を記述、あるいはコマンド実行時に<code>--extra-args</code>でsudoパスワードを指定できます。
 serverspecでも環境変数で<code>SUDO_PASSWORD</code>が指定できます。</p>
-
 <pre><code>ansible -playbook site.yml -i --extra-args='ansible_sudo_pass=xxxxxxxx'
 bundle exec rake serverspec SUDO_PASSWORD=xxxxxxxx 
-</code></pre>
-
-<p>ですが、おわかりの通り、<b>コマンドの履歴にもパスワードが残ります</b>。
+</code></pre><p>ですが、おわかりの通り、<b>コマンドの履歴にもパスワードが残ります</b>。
 あまり良い方法ではないと思っています。</p>
-
 <h3 id="課題3-タスクの実行方法がバラバラ">(課題3) タスクの実行方法がバラバラ</h3>
-
 <p>デプロイはansibleコマンドで実行、テストはrakeで実行、他のタスクはシェルスクリプト。
 といったように、タスクによって実行方法が異なってしまう状況になっていました。
 運用的にとても不便でしたので、１つに統一したいと思っていました。</p>
-
 <h2 id="アプリケーションの運用に必要なことはrakeタスクで実行する">アプリケーションの運用に必要なことはRakeタスクで実行する</h2>
-
 <p>上で述べたような課題点をクリアするように、下記の要件を満たすように工夫をしました。</p>
-
 <ul>
 <li>デプロイ、テストが同じ形式で実行できる</li>
 <li>sudoパスワードをベタ書きすることなく実行できる</li>
 <li>sudoパスワードの入力を一回だけにする</li>
 </ul>
-
 <p>結論は、すべてRakeタスクで実行できるようにしました。
 タスク一覧を見ると以下の様な感じになりました。（※実行結果は例であり実際の内容とは少し異なる。）</p>
-
 <pre><code>$ bundle exec rake -T
 rake deploy:development    # Deploy to development server
 rake deploy:production     # Deploy to production server
 rake serverspec            # Run serverspec to all hosts
 rake serverspec:app        # Run serverspec to app server
 rake serverspec:db        # Run serverspec to db server 
-</code></pre>
+</code></pre><p>Rakefileの実装例（一部省略）</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">desc <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Deploy and Test</span><span style="color:#e6db74">&#34;</span>
+namespace <span style="color:#e6db74">:deploy</span> <span style="color:#66d9ef">do</span>
+  require <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">io/console</span><span style="color:#e6db74">&#34;</span>
+  require <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">open3</span><span style="color:#e6db74">&#34;</span>
 
-<p>Rakefileの実装例（一部省略）</p>
+  <span style="color:#66d9ef">STDOUT</span><span style="color:#f92672">.</span>sync <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+  desc <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Deploy to development server</span><span style="color:#e6db74">&#34;</span>
+  task <span style="color:#e6db74">:development</span> <span style="color:#66d9ef">do</span>
+    <span style="color:#75715e"># sudoパスワードははじめに１回だけ聞くようにします。</span>
+    sudo_password <span style="color:#f92672">=</span> ask_sudo_password
 
-<pre><code class="language-ruby">desc &quot;Deploy and Test&quot;
-namespace :deploy do
-  require &quot;io/console&quot;
-  require &quot;open3&quot;
+    <span style="color:#75715e"># デプロイとテストを同時に実行します。</span>
+    deploy_and_test(<span style="color:#e6db74">&#39;development&#39;</span>, sudo_password)
+  <span style="color:#66d9ef">end</span>
 
-  STDOUT.sync = true
-  desc &quot;Deploy to development server&quot;
-  task :development do
-    # sudoパスワードははじめに１回だけ聞くようにします。
-    sudo_password = ask_sudo_password
+  <span style="color:#75715e"># デプロイとテストの同時実行関数</span>
+  <span style="color:#66d9ef">def</span> <span style="color:#a6e22e"></span><span style="color:#f92672"></span><span style="color:#a6e22e">deploy_and_test</span>(env, sudo_password)
+    deploy_cmd <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">ansible-playbook -i </span><span style="color:#e6db74">#{</span>env<span style="color:#e6db74">}</span><span style="color:#e6db74"> site.yml --extra-vars &#39;ansible_sudo_pass=</span><span style="color:#e6db74">#{</span>sudo_password<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&#34;</span>
+    test_cmd <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">bundle exec rake serverspec ENVIRONMENT=</span><span style="color:#e6db74">#{</span>env<span style="color:#e6db74">}</span><span style="color:#e6db74"> SUDO_PASSWORD=</span><span style="color:#e6db74">#{</span>sudo_password<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+    <span style="color:#66d9ef">Open3</span><span style="color:#f92672">.</span>pipeline(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">#{</span>deploy_cmd<span style="color:#e6db74">}</span><span style="color:#e6db74">; </span><span style="color:#e6db74">#{</span>test_cmd<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+  <span style="color:#66d9ef">end</span>
 
-    # デプロイとテストを同時に実行します。
-    deploy_and_test('development', sudo_password)
-  end
-
-  # デプロイとテストの同時実行関数
-  def deploy_and_test(env, sudo_password)
-    deploy_cmd = &quot;ansible-playbook -i #{env} site.yml --extra-vars 'ansible_sudo_pass=#{sudo_password}'&quot;
-    test_cmd = &quot;bundle exec rake serverspec ENVIRONMENT=#{env} SUDO_PASSWORD=#{sudo_password}&quot;
-    Open3.pipeline(&quot;#{deploy_cmd}; #{test_cmd}&quot;)
-  end
-
-  # sudoパスワードを要求関数
-  def ask_sudo_password
-    print &quot;SUDO Password: &quot;
-    sudo_password = STDIN.noecho &amp;:gets
-  end
-end
-</code></pre>
-
-<h2 id="まとめ">まとめ</h2>
-
+  <span style="color:#75715e"># sudoパスワードを要求関数</span>
+  <span style="color:#66d9ef">def</span> <span style="color:#a6e22e"></span><span style="color:#f92672"></span><span style="color:#a6e22e">ask_sudo_password</span>
+    print <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">SUDO Password: </span><span style="color:#e6db74">&#34;</span>
+    sudo_password <span style="color:#f92672">=</span> <span style="color:#66d9ef">STDIN</span><span style="color:#f92672">.</span>noecho <span style="color:#f92672">&amp;</span><span style="color:#e6db74">:gets</span>
+  <span style="color:#66d9ef">end</span>
+<span style="color:#66d9ef">end</span>
+</code></pre></div><h2 id="まとめ">まとめ</h2>
 <p>タスクによってその実行方法が異なることは運用上とても不便です。
 とくに慣れている言語でタスクが整理されていることによって以下のような恩恵を受けれるようになります。</p>
-
 <ul>
 <li>テストの実行し忘れがなくなる</li>
 <li>ドキュメントも残しやすくなる</li>
 <li>慣れている言語で整理されることによりメンテしやすくなる。</li>
 <li>チームメンバーへの運用方法の伝授も楽になる</li>
 </ul>
-
 <p>保守性を考えて、慣れている言語やアプリケーションのスタックに合わせてタスクを統一することを選択肢の一つに入れるといいかもしれません。</p>
                     </div>
                     

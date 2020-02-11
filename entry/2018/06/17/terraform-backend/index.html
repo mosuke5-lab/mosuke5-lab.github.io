@@ -9,7 +9,7 @@
     <meta name="description" content="Terraformのbackend機能の必要性から使い方まで説明します。backend機能は複数人でTerraformを利用する際の必須機能です。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2018/06/17/terraform-backend/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2018/06/17/terraform-backend/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Terraformのbackend機能を利用してstateファイルを共有する | Goldstine研究所">
@@ -80,25 +80,18 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>Terraformのbackend機能について紹介します。<br />
+                        <p>Terraformのbackend機能について紹介します。<br>
 まずはbackend機能が必要な理由についてから説明していきます。</p>
-
 <h2 id="なぜbackend機能が必要か">なぜbackend機能が必要か</h2>
-
-<p>Terraformでは、その実行結果をstateファイルを使って管理します。<br />
-<code>terraform apply</code>を実行すると必ずstateファイルが作成されます。<br />
+<p>Terraformでは、その実行結果をstateファイルを使って管理します。<br>
+<code>terraform apply</code>を実行すると必ずstateファイルが作成されます。<br>
 stateファイルには、Terraformの実行によって、どのようなりソースが作成されたか、そのリソースのIDや設定内容などを保存しています。Terraformの定義を変更し、再びTerraformを実行する際には、stateファイルを参照し、どの箇所を変更するかなどを判断します。もし、stateファイルを削除してしまうと、またゼロからすべてのリソースを作成することになってしまいます。</p>
-
 <p>このように、重要な役割を果たすstateファイルですが、複数人でTerraformを利用する場面において、stateファイルの共有が重要になります。このstateファイルの共有にbackend機能がとても有効です。</p>
-
 <p>backend機能を利用することで、stateファイルを実行環境のローカル環境に作成するのではなく、リモートの共有ストレージなどに保存することができます。
 たとえば、Amazon S3などに保存することができます。</p>
-
 <h2 id="backendの設定と実行">backendの設定と実行</h2>
-
-<p>backend機能を有効にする方法はとても簡単です。<br />
+<p>backend機能を有効にする方法はとても簡単です。<br>
 Terraformの定義ファイルに下記のように設定を追加するだけで利用することができます。以下はAmazon S3に保存するのを例としています。</p>
-
 <pre><code>terraform {
   backend &quot;s3&quot; {
     bucket = &quot;mosuke5&quot;
@@ -106,36 +99,25 @@ Terraformの定義ファイルに下記のように設定を追加するだけ�
     region = &quot;ap-northeast-1&quot;
   }
 }
-</code></pre>
-
-<p>上の例だと必要な情報は３つです。</p>
-
+</code></pre><p>上の例だと必要な情報は３つです。</p>
 <ul>
 <li>どのS3バケットに保存するか</li>
 <li>ファイル名をどうするか</li>
 <li>Bucketのリージョンはどこか</li>
 </ul>
-
 <p>もちろん、S3に保存する場合はAWSのProvider設定が必要です。
-AWSのリソースをTerraformで管理している場合にはすでに記述済みなはずですので、そのままでいいと思います。<br />
+AWSのリソースをTerraformで管理している場合にはすでに記述済みなはずですので、そのままでいいと思います。<br>
 たとえば、OpenStack環境の構築をTerraformで行っており、StateファイルをS3に保存したい、といった場合にはAWSのProvider設定も忘れないように注意してください。</p>
-
 <p>実際に、<code>terraform apply</code>を実行後、S3内を確認すると、下記のようにstateファイルが保存されていることが確認できました。</p>
-
-<p><img src="/image/terraform-backend-s3.png" alt="terraform-backend-s3" /></p>
-
+<p><img src="/image/terraform-backend-s3.png" alt="terraform-backend-s3"></p>
 <h2 id="s3を使うならバージョンニング機能を有効にしよう">S3を使うならバージョンニング機能を有効にしよう</h2>
-
-<p>公式ドキュメントで推奨されていることですが、S3をbackendに利用する場合にはS3のバージョンニング機能を有効にすることをおすすめします。<br />
+<p>公式ドキュメントで推奨されていることですが、S3をbackendに利用する場合にはS3のバージョンニング機能を有効にすることをおすすめします。<br>
 S3の<a href="https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/Versioning.html">バージョンニング機能</a>は名前の通りですが、S3内のオブジェクトのバージョン管理をしてくれる機能です。
 この機能を有効にすることで、誤ってファイルを消してしまった際のリカバリーなどに活用できます。</p>
-
 <p>上で述べたように、StateファイルはTerraformにおいて非常に大事なファイルです。
 こちらを削除してしまうと、現在のインフラストラクチャの状態を把握することができず、事実上Terraformでの管理ができなくなってしまいます。そのため、このバージョンニングの機能はとても重要なものになるでしょう。</p>
-
 <p>バージョンニングを有効にすると下記のようにStateファイルのバージョン管理ができることを確認できました。</p>
-
-<p><img src="/image/terraform-backend-s3-versioning.png" alt="terraform-backend-s3-versioning" /></p>
+<p><img src="/image/terraform-backend-s3-versioning.png" alt="terraform-backend-s3-versioning"></p>
                     </div>
                     
                     

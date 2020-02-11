@@ -9,7 +9,7 @@
     <meta name="description" content="GoogleAppsScript(GAS)からSlideShare APIを使ってスライド情報をスプレッドシートに書き込むことをやってみました。SlideShare APIの使い方含め説明します。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2018/12/20/slideshare-api-by-gas/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2018/12/20/slideshare-api-by-gas/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="SlideShare APIをGoogleAppsScriptから利用する方法 | Goldstine研究所">
@@ -82,23 +82,15 @@
                     <div class="post-description">
                         <p>どうも、SlideShareの記事の管理をスプレッドシートでやりたいというちょっとした自分のニーズがあって、
 SlideShare APIってあるのか？そしてGoogleAppsScriptもほとんどやったことがない、自分でしたが試してみたのでメモっておきます。</p>
-
 <h2 id="slideshare-api">SlideShare API</h2>
-
 <p>結論から言うと<a href="https://www.slideshare.net/developers">SlideShare API</a>ありました。</p>
-
 <p>利用できるAPIは執筆時点では8個で、主にスライドを検索したり、スライドの情報を編集や削除といったところがメインです。
 スライドをアップロードするのはAPIがなさそうなので投稿や更新は自動化できなさそうでした。</p>
-
 <p>利用するには以下のバリデーションや認証が必要です。</p>
-
 <h3 id="apiバリデーション">APIバリデーション</h3>
-
 <p>まずはAPI KEYを取得するためにこちらの「<a href="https://www.slideshare.net/developers/applyforapi">Apply for API key</a>」から申請しましょう。</p>
-
 <p>API Keyを申請するとメールにて、<code>api_key</code>と<code>shared_secret</code>の2つが送られてきます。
 実際にAPIを利用するためには、以下の３つの情報をそろえる必要があります。</p>
-
 <table>
 <thead>
 <tr>
@@ -106,135 +98,111 @@ SlideShare APIってあるのか？そしてGoogleAppsScriptもほとんどや�
 <th>description</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>api_key</td>
 <td>こちらはメールで送られてくる通りのapi_key</td>
 </tr>
-
 <tr>
 <td>ts</td>
 <td>タイムスタンプ。Unix timestampの秒までのもの</td>
 </tr>
-
 <tr>
 <td>hash</td>
 <td>shared_secretとtsのくっつけた文字列をSHA1ハッシュしたもの</td>
 </tr>
 </tbody>
 </table>
-
-<p>たとえば、shared_secretが&rdquo;abcdef&rdquo;でタイムスタンプが&rdquo;1545315685&rdquo;の場合、
-&ldquo;abcdef1545315685&rdquo;をsha1ハッシュすればいいということです。</p>
-
+<p>たとえば、shared_secretが&quot;abcdef&quot;でタイムスタンプが&quot;1545315685&quot;の場合、
+&ldquo;abcdef1545315685&quot;をsha1ハッシュすればいいということです。</p>
 <pre><code>$ echo -n &quot;abcdef1545315685&quot; | sha1sum
 e4d673a71b769782541920b7acfcee92a686b91c  -
-</code></pre>
-
-<h3 id="認証">認証</h3>
-
+</code></pre><h3 id="認証">認証</h3>
 <p>プライベートなデータを取得するような一部のAPIでは、上のバリデーションとはべつに、
 認証で<code>username</code>と<code>password</code>が必要です。</p>
-
-<h3 id="get-slideshows-by-user-apiを使ってみる">get_slideshows_by_user APIを使ってみる</h3>
-
+<h3 id="get_slideshows_by_user-apiを使ってみる">get_slideshows_by_user APIを使ってみる</h3>
 <p>では実際に<code>get_slideshows_by_user</code>を、まず手作業で実行していきたいと思います。
 このAPIでは公開情報のみ使うので認証は必要ありません。
 必須パラメータは<code>username_for</code>のみなので、取得したいユーザの名前だけで大丈夫です。
 今回は、<code>mosuke5</code>のスライドを取得してみます。</p>
-
-<p><code>get_slideshows_by_user</code>の必要なメッソドやパラメータ<br />
-<img src="/image/slideshare_api_by_user.png" alt="slideshare-api" /></p>
-
+<p><code>get_slideshows_by_user</code>の必要なメッソドやパラメータ<br>
+<img src="/image/slideshare_api_by_user.png" alt="slideshare-api"></p>
 <p>メソッドはGETなので、URLの後ろにパラメータを付けて下記のようにリクエストURLを完成させます。
 ブラウザからアクセスしてみて、成功していればXMLが返ってくるはずです。</p>
-
 <pre><code>https://www.slideshare.net/api/2/get_slideshows_by_user?api_key=xxxxx&amp;ts=1545315685&amp;hash=xxxxxxxxxxxx&amp;username_for=mosuke5
-</code></pre>
-
-<pre><code class="language-xml">&lt;User&gt;
-  &lt;Name&gt;mosuke5&lt;/Name&gt;
-  &lt;Count&gt;16&lt;/Count&gt;
-&lt;Slideshow&gt;
-  &lt;ID&gt;124228224&lt;/ID&gt;
-  &lt;Title&gt;Double 11を支えるApsaraDB for Redis (AliEaters #8)&lt;/Title&gt;
-  &lt;Description&gt;Alibaba Cloudで提供しているマネージドのRedisの概要や特徴とTaobao内での利用について少しだけ触れます。元ネタはAlibaba Cloudの国際チームが投稿しているブログです。&lt;/Description&gt;
-  &lt;Status&gt;2&lt;/Status&gt;
-  &lt;Username&gt;mosuke5&lt;/Username&gt;
-  &lt;URL&gt;https://www.slideshare.net/mosuke5/double-11apsaradb-for-redis-alieaters-8&lt;/URL&gt;
-  &lt;ThumbnailURL&gt;//cdn.slidesharecdn.com/ss_thumbnails/apsaradbforredis-181128061230-thumbnail.jpg?cb=1543385711&lt;/ThumbnailURL&gt;
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml"><span style="color:#f92672">&lt;User</span><span style="color:#f92672">&gt;</span>
+  <span style="color:#f92672">&lt;Name</span><span style="color:#f92672">&gt;</span>mosuke5<span style="color:#f92672">&lt;/Name&gt;</span>
+  <span style="color:#f92672">&lt;Count</span><span style="color:#f92672">&gt;</span>16<span style="color:#f92672">&lt;/Count&gt;</span>
+<span style="color:#f92672">&lt;Slideshow</span><span style="color:#f92672">&gt;</span>
+  <span style="color:#f92672">&lt;ID</span><span style="color:#f92672">&gt;</span>124228224<span style="color:#f92672">&lt;/ID&gt;</span>
+  <span style="color:#f92672">&lt;Title</span><span style="color:#f92672">&gt;</span>Double 11を支えるApsaraDB for Redis (AliEaters #8)<span style="color:#f92672">&lt;/Title&gt;</span>
+  <span style="color:#f92672">&lt;Description</span><span style="color:#f92672">&gt;</span>Alibaba Cloudで提供しているマネージドのRedisの概要や特徴とTaobao内での利用について少しだけ触れます。元ネタはAlibaba Cloudの国際チームが投稿しているブログです。<span style="color:#f92672">&lt;/Description&gt;</span>
+  <span style="color:#f92672">&lt;Status</span><span style="color:#f92672">&gt;</span>2<span style="color:#f92672">&lt;/Status&gt;</span>
+  <span style="color:#f92672">&lt;Username</span><span style="color:#f92672">&gt;</span>mosuke5<span style="color:#f92672">&lt;/Username&gt;</span>
+  <span style="color:#f92672">&lt;URL</span><span style="color:#f92672">&gt;</span>https://www.slideshare.net/mosuke5/double-11apsaradb-for-redis-alieaters-8<span style="color:#f92672">&lt;/URL&gt;</span>
+  <span style="color:#f92672">&lt;ThumbnailURL</span><span style="color:#f92672">&gt;</span>//cdn.slidesharecdn.com/ss_thumbnails/apsaradbforredis-181128061230-thumbnail.jpg?cb=1543385711<span style="color:#f92672">&lt;/ThumbnailURL&gt;</span>
   ...
-</code></pre>
-
-<h2 id="gasで実行する">GASで実行する</h2>
-
+</code></pre></div><h2 id="gasで実行する">GASで実行する</h2>
 <p>もともとは、スプレッドシートでSlideShareの投稿を管理したい用途があって、
 GoogleAppsScript(GAS)で実行したいと思っていました。
 GASは初心者なのですが、これを機にすこしさわってみようかなと思い、こちらをGASで実行してみました、</p>
-
 <p>SHA1でハッシュする関数は用意されていなかったので、ググりながら下記のように自分で関数を用意する必要がありました。
 それ意外は、上で手動で実行したのをGASでほぼ再現したのみです。
 取得したXMLの結果を、スプレッドシートに書き込むという部分は特有な部分ですが慣れれば簡単そうでした。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">api_key</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;xxxxx&#34;</span>,
+    <span style="color:#a6e22e">shared_secret</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;xxxxx&#34;</span>
 
-<pre><code class="language-javascript">var api_key = &quot;xxxxx&quot;,
-    shared_secret = &quot;xxxxx&quot;
-
-function main() {
-  var username = &quot;mosuke5&quot;
-  var bk = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = bk.getSheetByName(&quot;SlideShare&quot;);
-  var xml = getSlideshowsByUser(api_key, shared_secret, username);
-  var document = XmlService.parse(xml);
-  var entries = document.getRootElement().getChildren('Slideshow');
-  for (var i = 0; i &lt; entries.length; i++) {
-    var slide_id = entries[i].getChild('ID').getText();
-    var slide_title = entries[i].getChild('Title').getText();
-    var slide_url = entries[i].getChild('URL').getText();
-    var slide_username = entries[i].getChild('Username').getText();
-    var slide_created_at = entries[i].getChild('Created').getText();
+<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;mosuke5&#34;</span>
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">bk</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">bk</span>.<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;SlideShare&#34;</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">xml</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getSlideshowsByUser</span>(<span style="color:#a6e22e">api_key</span>, <span style="color:#a6e22e">shared_secret</span>, <span style="color:#a6e22e">username</span>);
+  <span style="color:#66d9ef">var</span> document <span style="color:#f92672">=</span> <span style="color:#a6e22e">XmlService</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">xml</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">entries</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">getRootElement</span>().<span style="color:#a6e22e">getChildren</span>(<span style="color:#e6db74">&#39;Slideshow&#39;</span>);
+  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">entries</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">slide_id</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">entries</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">getChild</span>(<span style="color:#e6db74">&#39;ID&#39;</span>).<span style="color:#a6e22e">getText</span>();
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">slide_title</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">entries</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">getChild</span>(<span style="color:#e6db74">&#39;Title&#39;</span>).<span style="color:#a6e22e">getText</span>();
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">slide_url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">entries</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">getChild</span>(<span style="color:#e6db74">&#39;URL&#39;</span>).<span style="color:#a6e22e">getText</span>();
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">slide_username</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">entries</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">getChild</span>(<span style="color:#e6db74">&#39;Username&#39;</span>).<span style="color:#a6e22e">getText</span>();
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">slide_created_at</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">entries</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">getChild</span>(<span style="color:#e6db74">&#39;Created&#39;</span>).<span style="color:#a6e22e">getText</span>();
     
-    var row = i + 1
-    sheet.getRange('A' + row).setValue(slide_id);
-    sheet.getRange('B' + row).setValue(slide_title);
-    sheet.getRange('C' + row).setValue(slide_url);
-    sheet.getRange('D' + row).setValue(slide_username);
-    sheet.getRange('E' + row).setValue(slide_created_at);
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">row</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+    <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#e6db74">&#39;A&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">row</span>).<span style="color:#a6e22e">setValue</span>(<span style="color:#a6e22e">slide_id</span>);
+    <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#e6db74">&#39;B&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">row</span>).<span style="color:#a6e22e">setValue</span>(<span style="color:#a6e22e">slide_title</span>);
+    <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#e6db74">&#39;C&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">row</span>).<span style="color:#a6e22e">setValue</span>(<span style="color:#a6e22e">slide_url</span>);
+    <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#e6db74">&#39;D&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">row</span>).<span style="color:#a6e22e">setValue</span>(<span style="color:#a6e22e">slide_username</span>);
+    <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#e6db74">&#39;E&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">row</span>).<span style="color:#a6e22e">setValue</span>(<span style="color:#a6e22e">slide_created_at</span>);
   }
 }
 
-function getSlideshowsByUser(api_key, shared_secret, username_for) {
-  var date = new Date();
-  var ts = Math.floor(date.getTime()/1000).toString();
-  var hash = toSHA1(shared_secret + ts);
-  var base_url = &quot;https://www.slideshare.net/api/2/get_slideshows_by_user&quot;;
-  var request_url = base_url + '?api_key=' + api_key + '&amp;ts=' + ts + '&amp;hash=' + hash + '&amp;username_for=' + username_for;
-  return UrlFetchApp.fetch(request_url).getContentText();
+<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getSlideshowsByUser</span>(<span style="color:#a6e22e">api_key</span>, <span style="color:#a6e22e">shared_secret</span>, <span style="color:#a6e22e">username_for</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">date</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ts</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">date</span>.<span style="color:#a6e22e">getTime</span>()<span style="color:#f92672">/</span><span style="color:#ae81ff">1000</span>).<span style="color:#a6e22e">toString</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hash</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">toSHA1</span>(<span style="color:#a6e22e">shared_secret</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ts</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">base_url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.slideshare.net/api/2/get_slideshows_by_user&#34;</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">request_url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">base_url</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;?api_key=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">api_key</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&amp;ts=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ts</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&amp;hash=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">hash</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&amp;username_for=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">username_for</span>;
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">request_url</span>).<span style="color:#a6e22e">getContentText</span>();
 }
 
-function toSHA1(text) {
-  var rawHash = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_1, text);
-  var txtHash = &quot;&quot;;
+<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">toSHA1</span>(<span style="color:#a6e22e">text</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rawHash</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeDigest</span>(<span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">DigestAlgorithm</span>.<span style="color:#a6e22e">SHA_1</span>, <span style="color:#a6e22e">text</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">txtHash</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
   
-  for (i = 0; i &lt; rawHash.length; i++) {
-	 var hashVal = rawHash[i];
-	 if (hashVal &lt; 0) {
-		hashVal += 256;
+  <span style="color:#66d9ef">for</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">rawHash</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+	 <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hashVal</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">rawHash</span>[<span style="color:#a6e22e">i</span>];
+	 <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">hashVal</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+		<span style="color:#a6e22e">hashVal</span> <span style="color:#f92672">+=</span> <span style="color:#ae81ff">256</span>;
 	 }
-	 if (hashVal.toString(16).length == 1) {
-		txtHash += '0';
+	 <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">hashVal</span>.<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>).<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>) {
+		<span style="color:#a6e22e">txtHash</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#39;0&#39;</span>;
 	 }
-	 txtHash += hashVal.toString(16);
+	 <span style="color:#a6e22e">txtHash</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">hashVal</span>.<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>);
   }
-  return txtHash;
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">txtHash</span>;
 }
-</code></pre>
-
-<p><img src="/image/slideshare_api_to_spreadsheet.png" alt="slideshare-api-to-spreadsheet" /></p>
-
+</code></pre></div><p><img src="/image/slideshare_api_to_spreadsheet.png" alt="slideshare-api-to-spreadsheet"></p>
 <h2 id="さいごに">さいごに</h2>
-
-<p><a href="https://github.com/google/clasp">google/clasp</a>というツールもあって、ローカル環境でもGASのコードが書けるようになってきています。<br />
+<p><a href="https://github.com/google/clasp">google/clasp</a>というツールもあって、ローカル環境でもGASのコードが書けるようになってきています。<br>
 まだまだ勝手がわからないのですが、業務Hackに役立ちそうのは間違いなしです。</p>
                     </div>
                     

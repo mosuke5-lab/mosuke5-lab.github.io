@@ -9,7 +9,7 @@
     <meta name="description" content="Terraformのimport機能の使い方と使う際の注意ポイントについてまとめました。import機能を利用したあとの運用を見据えた対応などについてです。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2018/06/20/terraform_import/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2018/06/20/terraform_import/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Terraformのimportの使い方と注意ポイント | Goldstine研究所">
@@ -80,29 +80,20 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>ここずっとTerraformの基本的な部分の投稿がつづいている@mosuke5です。<br />
-理由は、Terraformを最近結構触ることが多いのもあるが、今まであんまり使ってこなかった機能をきちんとキャッチアップして、より効率的にTerraformを活用できるようにしようと思っているからです。<br />
+                        <p>ここずっとTerraformの基本的な部分の投稿がつづいている@mosuke5です。<br>
+理由は、Terraformを最近結構触ることが多いのもあるが、今まであんまり使ってこなかった機能をきちんとキャッチアップして、より効率的にTerraformを活用できるようにしようと思っているからです。<br>
 と、まあ余談はおいておき、import機能をやっていきます。</p>
-
 <p>import機能についてはできることもなんとなくしっていたが、自分の手でやったことがなかったのでやってみようと思っています。</p>
-
 <h2 id="使い所">使い所</h2>
-
-<p>importは、Terraformで現状管理されていない既存のクラウド上のリソースをTerraform管理できるように取り込むことのできる機能です。<br />
+<p>importは、Terraformで現状管理されていない既存のクラウド上のリソースをTerraform管理できるように取り込むことのできる機能です。<br>
 今まで、手動で管理していたクラウドリソースをTerraformでの管理にに変更していきたい、あるいは、Terraformに非対応だったリソースは手動で作っていたが、対応したのでTerraformに取り込んでいきたい、こういったユースケースがよくあります。</p>
-
 <h2 id="使い方と注意ポイント">使い方と注意ポイント</h2>
-
-<p>今回は、既存のAlibaba Cloud上のVPCリソースをTerraformにimportしていきたいと思います。(AWSでも同様です。)<br />
+<p>今回は、既存のAlibaba Cloud上のVPCリソースをTerraformにimportしていきたいと思います。(AWSでも同様です。)<br>
 まずはじめに、importしたいリソースについて、空の定義をしておく必要があります。</p>
-
 <pre><code># terraform.tf
 resource &quot;alicloud_vpc&quot; &quot;vpc&quot; {
 }
-</code></pre>
-
-<p>つぎにリソースをimportしていきます。リソースをimportするには、対象のリソースを特定する必要があるため、リソースのIDが必要になります。既存でリソースを作っている場合には、コンソールやAPIなどを使って確認する必要があります。</p>
-
+</code></pre><p>つぎにリソースをimportしていきます。リソースをimportするには、対象のリソースを特定する必要があるため、リソースのIDが必要になります。既存でリソースを作っている場合には、コンソールやAPIなどを使って確認する必要があります。</p>
 <pre><code>$ terraform import alicloud_vpc.vpc vpc-6webta8bkuhm33t4aax0j
 alicloud_vpc.vpc: Import complete!
   Imported alicloud_vpc (ID: vpc-6webta8bkuhm33t4aax0j)
@@ -112,11 +103,8 @@ Import successful!
 
 The resources that were imported are shown above. These resources are now in
 your Terraform state and will henceforth be managed by Terraform.
-</code></pre>
-
-<p>そうすると、Terraformにおいて一番重要とも言えるstateファイルに、<br />
+</code></pre><p>そうすると、Terraformにおいて一番重要とも言えるstateファイルに、<br>
 importしたリソースが書き込まれていることが確認できます。</p>
-
 <pre><code>$ terraform state show
 terraform state show
 id              = vpc-6webta8bkuhm33t4aax0j
@@ -126,25 +114,19 @@ name            = test_vpc
 route_table_id  = vtb-6wehepczi546xvuboemxx
 router_id       = vrt-6we56st0wcuucpiglodk4
 router_table_id = vtb-6wehepczi546xvuboemxx
-</code></pre>
-
-<p>しかし、importを利用には注意点があります。<br />
-現状(version 0.11.7 現在)では、importしたリソースについて、stateファイルにそのリソースを書き込んでくれるのみとなっています。<br />
+</code></pre><p>しかし、importを利用には注意点があります。<br>
+現状(version 0.11.7 現在)では、importしたリソースについて、stateファイルにそのリソースを書き込んでくれるのみとなっています。<br>
 つまりどういうことかというと、現状terraformの定義ファイルにはVPCは空の定義のため、Stateファイルとの差がでてしまっています。現状とコードに差分がある状態です。
 この状態で、実行しても必須項目の定義もされていないためエラーになってしまいます。</p>
-
-<p>importしたあと、実際に取り込んだリソースと定義を合わせていく必要があります。<br />
+<p>importしたあと、実際に取り込んだリソースと定義を合わせていく必要があります。<br>
 以下のように設定を足していく必要があります。</p>
-
 <pre><code># terraform.tf
 resource &quot;alicloud_vpc&quot; &quot;vpc&quot; {
   name        = &quot;test_vpc&quot;
   description = &quot;This is test_vpc.&quot;
   cidr_block  = &quot;192.168.0.0/16&quot;
 }
-</code></pre>
-
-<p>以上、注意点含めてぜひ活用していってください。</p>
+</code></pre><p>以上、注意点含めてぜひ活用していってください。</p>
                     </div>
                     
                     

@@ -9,7 +9,7 @@
     <meta name="description" content=" Ethernetシールドを使ってネットワークへ繋げる。 とりあえずは、スモールステップでPCとの1対1の通信。       PCとの1対1通信      構成図   Arduinoソースコード  #include &lt;SPI.h&gt;">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2014/09/13/111537/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2014/09/13/111537/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="ArduinoをEthernetシールドを使ってネットワークへ繋げる | Goldstine研究所">
@@ -80,128 +80,99 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>もーすけです。前回はArduinoの入門の記事を書きました。<br />
+                        <p>もーすけです。前回はArduinoの入門の記事を書きました。<br>
 今日は、Ethernetシールドを使ってネットワークへ繋げることをやってみます。
 Arduinoは標準のままでは、PCとケーブルでつないでシリアル通信しかできません。
 やはりデータの取得したあとにサーバに送ったり、サーバ上のデータを元に挙動を変えたり、ネットワーク通信は必須です。
 というわけでEthernetシールドも買ったので活用していきます。</p>
-
-<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2014/07/21/231946/" data-iframely-url="//cdn.iframe.ly/0bOcPc1"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
-
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2014/07/21/231946/" data-iframely-url="//cdn.iframe.ly/0bOcPc1"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
 <h2 id="pcとの1対1通信">PCとの1対1通信</h2>
-
-<p>まずは、スモールステップでPCとの1対1の通信を確認します。<br />
+<p>まずは、スモールステップでPCとの1対1の通信を確認します。<br>
 ArduinoにEthernetシールドを装着して、LANケーブルでダイレクトにPCとつなぎます。
 このときのIPアドレスが何かは注意しておきましょう。</p>
-
 <h3 id="構成図">構成図</h3>
-
 <p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140907/20140907231747.png" alt="f:id:mosuke5:20140907231747p:plain" title="f:id:mosuke5:20140907231747p:plain" class="hatena-fotolife" itemprop="image"></span></p></p>
-
 <h3 id="arduinoソースコード">Arduinoソースコード</h3>
-
 <p>ArduinoのソースコードでIPアドレスを指定できます。
 PC側とレンジをそろえましょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#</span><span style="color:#75715e">include</span> <span style="color:#75715e">&lt;SPI.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">include</span> <span style="color:#75715e">&lt;Ethernet.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+byte MAC[] <span style="color:#f92672">=</span> {<span style="color:#ae81ff">0x90</span>,<span style="color:#ae81ff">0xA2</span>,<span style="color:#ae81ff">0xDA</span>,<span style="color:#ae81ff">0x0F</span>,<span style="color:#ae81ff">0x8B</span>,<span style="color:#ae81ff">0xA2</span>};
+byte IP[]  <span style="color:#f92672">=</span> {<span style="color:#ae81ff">192</span>,<span style="color:#ae81ff">168</span>,<span style="color:#ae81ff">11</span>,<span style="color:#ae81ff">3</span>};
 
-<pre><code class="language-c">#include &lt;SPI.h&gt;
-#include &lt;Ethernet.h&gt;
-
-byte MAC[] = {0x90,0xA2,0xDA,0x0F,0x8B,0xA2};
-byte IP[]  = {192,168,11,3};
-
-void setup()
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setup</span>()
 {
   Ethernet.begin(MAC,IP);
 }
 
-void loop()
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">loop</span>()
 {
 }
-</code></pre>
-
-<h3 id="疎通確認">疎通確認</h3>
-
+</code></pre></div><h3 id="疎通確認">疎通確認</h3>
 <p>PCからArduinoに対してPingを売ってみます。
-疎通あれば成功です。<br />
+疎通あれば成功です。<br>
 Ping確認ヨシ!!</p>
-
 <pre><code>% ping 192.168.100.3
 PING 192.168.100.3 (192.168.100.3): 56 data bytes
 Request timeout for icmp_seq 0
 64 bytes from 192.168.100.3: icmp_seq=1 ttl=128 time=0.576 ms
 64 bytes from 192.168.100.3: icmp_seq=2 ttl=128 time=0.425 ms
 64 bytes from 192.168.100.3: icmp_seq=3 ttl=128 time=0.302 ms 
-</code></pre>
-
-<p>Pingが通っているので問題ないのですが、せっかくなのでARPテーブルを見ておきます。<br />
+</code></pre><p>Pingが通っているので問題ないのですが、せっかくなのでARPテーブルを見ておきます。<br>
 マックアドレスの取得もヨシ!!</p>
-
 <pre><code>% arp -a
 ? (192.168.100.3) at 90:a2:da:f:8b:a2 on en4 ifscope [ethernet]
 ? (192.168.100.255) at ff:ff:ff:ff:ff:ff on en4 ifscope [ethernet] 
-</code></pre>
-
-<h2 id="dhcpを使って家内lan接続">DHCPを使って家内LAN接続</h2>
-
-<p>先程はスタティックでArduinoにIPアドレスをふりました。<br />
+</code></pre><h2 id="dhcpを使って家内lan接続">DHCPを使って家内LAN接続</h2>
+<p>先程はスタティックでArduinoにIPアドレスをふりました。<br>
 実際の買うようの場面ではDHCPを利用したいです。</p>
-
 <h3 id="構成図-1">構成図</h3>
-
-<p><img src="/image/arduino_ethernet.png" alt="arduino-dhcp" /></p>
-
+<p><img src="/image/arduino_ethernet.png" alt="arduino-dhcp"></p>
 <p>普段はあまり利用しないかもしれませんが、家庭にある無線LANルータにはたいていの場合はLANケーブルのポートがあります。
 そこから有線LANケーブルを伸ばしArduinoに結線します。無線LANルータがDHCPサーバとなります。
 DHCPによるIPアドレスの取得はとても容易で以下のようにマックアドレスを指定するのみです。</p>
-
 <pre><code>Ethernet.begin(mac) 
-</code></pre>
-
-<p>以下はArduino公式サイトに則って実施したもの。<br>
+</code></pre><p>以下はArduino公式サイトに則って実施したもの。<br>
 <a href="http://arduino.cc/en/Tutorial/DhcpAddressPrinter">Arduino - DhcpAddressPrinter</a></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#</span><span style="color:#75715e">include</span> <span style="color:#75715e">&lt;SPI.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">include</span> <span style="color:#75715e">&lt;Ethernet.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">//Mac Address Static
+</span><span style="color:#75715e"></span>byte mac[] <span style="color:#f92672">=</span> {<span style="color:#ae81ff">0x90</span>,<span style="color:#ae81ff">0xA2</span>,<span style="color:#ae81ff">0xDA</span>,<span style="color:#ae81ff">0x0F</span>,<span style="color:#ae81ff">0x8B</span>,<span style="color:#ae81ff">0xA2</span>};
 
-<pre><code class="language-c">#include &lt;SPI.h&gt;
-#include &lt;Ethernet.h&gt;
-
-//Mac Address Static
-byte mac[] = {0x90,0xA2,0xDA,0x0F,0x8B,0xA2};
-
-void setup()
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setup</span>()
 {
-  // Open serial communications and wait for port to open:
-  Serial.begin(9600);
+  <span style="color:#75715e">// Open serial communications and wait for port to open:
+</span><span style="color:#75715e"></span>  Serial.begin(<span style="color:#ae81ff">9600</span>);
 
-  // start the Ethernet connection:
-  if (Ethernet.begin(mac) == 0) {
-    Serial.println(&quot;Failed to configure Ethernet using DHCP&quot;);
-    // no point in carrying on, so do nothing forevermore:
-    for(;;)
+  <span style="color:#75715e">// start the Ethernet connection:
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (Ethernet.begin(mac) <span style="color:#f92672">=</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>) {
+    Serial.println(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Failed to configure Ethernet using DHCP</span><span style="color:#e6db74">&#34;</span>);
+    <span style="color:#75715e">// no point in carrying on, so do nothing forevermore:
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">for</span>(;;)
       ;
       
   }
-  // print your local IP address:
-  Serial.print(&quot;My IP address: &quot;);
-  for (byte thisByte = 0; thisByte &lt; 4; thisByte++) {
-    // print the value of each byte of the IP address:
-    Serial.print(Ethernet.localIP()[thisByte], DEC);
-    Serial.print(&quot;.&quot;); 
+  <span style="color:#75715e">// print your local IP address:
+</span><span style="color:#75715e"></span>  Serial.print(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">My IP address: </span><span style="color:#e6db74">&#34;</span>);
+  <span style="color:#66d9ef">for</span> (byte thisByte <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; thisByte <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">4</span>; thisByte<span style="color:#f92672">+</span><span style="color:#f92672">+</span>) {
+    <span style="color:#75715e">// print the value of each byte of the IP address:
+</span><span style="color:#75715e"></span>    Serial.print(Ethernet.localIP()[thisByte], DEC);
+    Serial.print(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">.</span><span style="color:#e6db74">&#34;</span>); 
   }
   Serial.println();
 }
 
-。{
-  Serial.println(&quot;abc&quot;);
-  delay(3000);
+<span style="color:#960050;background-color:#1e0010">。</span>{
+  Serial.println(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">abc</span><span style="color:#e6db74">&#34;</span>);
+  delay(<span style="color:#ae81ff">3000</span>);
 }
-</code></pre>
-
-<p>ArduinoにIPアドレスが割り当てられたかどうか確認するには、無線LANルータにアクセスして確認できます。
+</code></pre></div><p>ArduinoにIPアドレスが割り当てられたかどうか確認するには、無線LANルータにアクセスして確認できます。
 マックアドレスとIPアドレスのヒモ付のテーブルが大抵の場合あるのでそちらをみると確認しやすいですよ。</p>
-
 <h2 id="まとめ">まとめ</h2>
-
-<p>Arduinoを実用的に利用するためにEthernetシールドを使って通信できるようにしてみました。<br />
-前回やったArduinoの基礎とこのネットワークの設定ができれば、かなりおもしろいことができるようになりますね。<br />
+<p>Arduinoを実用的に利用するためにEthernetシールドを使って通信できるようにしてみました。<br>
+前回やったArduinoの基礎とこのネットワークの設定ができれば、かなりおもしろいことができるようになりますね。<br>
 ものづくりに挑戦していきましょう。</p>
                     </div>
                     

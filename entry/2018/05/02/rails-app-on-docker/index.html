@@ -9,7 +9,7 @@
     <meta name="description" content="RailsをDocker Composeを使って開発・運用したときの（自分的）ベストプラクティス。Dockerを使う上で発生する課題に対するアプローチ。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2018/05/02/rails-app-on-docker/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2018/05/02/rails-app-on-docker/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Docker Compose上でのRailsアプリケーションの開発フロー | Goldstine研究所">
@@ -80,85 +80,61 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>早いものGWも終わり一週間が経ってしまいました。<br />
+                        <p>早いものGWも終わり一週間が経ってしまいました。<br>
 長期の連休になるとだいたい自分は趣味のアプリケーション開発をよくすすめています（ふだんからやりたいけどなかなかできない）。今年のGWも趣味アプリケーションの開発をしてました。</p>
-
 <p>いま作っているアプリケーションは自分の英語学習用のサービスなのですが(サービスについては別途どこかでご紹介したい)、新しい技術を実際に試す場としても利用しています。自分はいつも趣味アプリケーションで新しいことを試してみて、よかったらそれを職場にもっていくことが多いです。</p>
-
 <p>アプリケーションはRailsで書いているのですが、Railsの他にMySQLやNginx、ElasticSearch、Kibanaなど関連するコンポーネントが多いです。
 そのため、Docker Composeを利用して動かすことにしています。Dockerは以前から使っていたのですが、実際にアプリケーションのせてとして開発・運用してみると、いろいろ問題があり試行錯誤することになりました。</p>
-
-<p>GWはその部分と主に格闘していて、最終的にそこそこ良い開発フローを整えることができました。今日はそのご紹介です。<br />
+<p>GWはその部分と主に格闘していて、最終的にそこそこ良い開発フローを整えることができました。今日はそのご紹介です。<br>
 ※もちろん、現時点でのやり方であり、改善しているので現状と異なることも多いと思います。</p>
-
 <h2 id="課題だったこと">課題だったこと</h2>
-
 <p>すでに上で書きましたが、アプリを動かすコンポーネントも多かったということでDocker Composeを使うことにしました。
 本番環境をDocker Composeで動かすとなると、開発環境もcomposeで動かしたほうがいいと考えました。
 理由はいくつかありますが、コンポーネントが多いので開発環境を構築するのに手間がかかるのでそこでもcomposeを使いたいというのと、運用になれるためにも可能な限りは開発環境でも本番と同じフローを行うべきと考えました。</p>
-
 <p>しかし、実際にはじめてみるとといろいろな問題がでてきました。たとえば、</p>
-
 <ul>
 <li>その１：開発環境はどうするべきか</li>
 <li>その２：アプリケーションコードをどうやってコンテナに配置するか</li>
 <li>その３：本番の環境にどうやってデプロイするか</li>
 </ul>
-
 <p>まずはじめに課題になったことが、開発環境としてアプリケーション(Rails)のコードをどこでどうやって書くかという問題でした。
 アプリケーションをDockerコンテナで動かす場合には、いくつかのソースコードの配置方法があります。</p>
-
-<p>１つ目は、コンテナ内部にアプリケーションのソースコードを配置する方法です。<br />
+<p>１つ目は、コンテナ内部にアプリケーションのソースコードを配置する方法です。<br>
 アプリケーションのソースコードごとコンテナイメージにするため、シンプルで本番環境へのデプロイも簡単です。
-一方、アプリケーション開発時にそのままの方法で行うと、コンテナ内部にあるソースコードを直接編集する必要がでてきます。もちろんですが辛い話です。<br />
+一方、アプリケーション開発時にそのままの方法で行うと、コンテナ内部にあるソースコードを直接編集する必要がでてきます。もちろんですが辛い話です。<br>
 理由は書くまでもないですが、そもそもコンテナ内にSSHアクセスすること自体がバッドプラクティスであり、またコンテナのプロセスがもし落ちた場合にはソースコードごと消え去ります。</p>
-
-<p>２つ目は、Dockerのボリュームの機能を利用して、ソースコードをコンテナと共有する方法です。<br />
+<p>２つ目は、Dockerのボリュームの機能を利用して、ソースコードをコンテナと共有する方法です。<br>
 ホスト側にソースコードを置けるので、直接編集ができますし、それをコンテナ側と共有できます。一番理にかなってそうですが、こちらも実際にやってみると、すべて解決！というわけにはいきませんでした。</p>
-
-<p>例えばRailsの場合、ソースコードはボリュームマウントでローカルのPCからは見えていますが、それを実行するRubyの環境はコンテナ内ということになります。<br />
+<p>例えばRailsの場合、ソースコードはボリュームマウントでローカルのPCからは見えていますが、それを実行するRubyの環境はコンテナ内ということになります。<br>
 つまり、RailsのRakeタスクなどを実行する場合も必ずコンテナ側からの実行を行う必要があります。これは、いずれにせよdocker-composeで運用する以上、本番環境では発生するのですが、スピーディに行いたい開発の場面ではすこし辛かったです。
 これはそれほど問題ではないですが、それ以上に、アプリケーションのデプロイがdocker-composeの他のコンポーネントの運用フローと別になってしまうことが一番大変なことでした。正直コンテナ化のうまみが少なくなるなと感じました。</p>
-
-<p>このような問題があり、試行錯誤した結果、後述するようなフローとしました。<br />
+<p>このような問題があり、試行錯誤した結果、後述するようなフローとしました。<br>
 いまのところはこの流れが一番ストレスなくうまくいっています。</p>
-
 <h2 id="docker-composeを使ったアプリケーションのデプロイフロー">Docker Composeを使ったアプリケーションのデプロイフロー</h2>
-
-<p>結果的にどうなったか、まず図で示します。<br />
-<img src="/image/rails_development_flow.png" alt="development_flow" /></p>
-
-<p>本構成のポイントはまず、DevelopmentとStagingとProductionの3ステージに分けたことです。<br />
+<p>結果的にどうなったか、まず図で示します。<br>
+<img src="/image/rails_development_flow.png" alt="development_flow"></p>
+<p>本構成のポイントはまず、DevelopmentとStagingとProductionの3ステージに分けたことです。<br>
 趣味アプリケーションにしてはやりすぎでは？と自分でも思っていたのですが、結果的にこれで落ち着きました。
 DevelopmentとStagingはステージは別れているが同一マシーン上の話です。</p>
-
 <p>Developmentの特徴は、Railsのアプリケーションはマシーンのローカル上で直接に動かしている点です。
 そして、関連するコンポーネントであるMySQLとElasticSearchはDocker Compose上で動かしています。
-Railsアプリケーションはローカルですが、そこにDocker Composeで動いているMySQLやElasticSearchなどのDB群に接続する構成です。（実際にはNginxもこの時点で動作していますが、使わないので無視）<br />
+Railsアプリケーションはローカルですが、そこにDocker Composeで動いているMySQLやElasticSearchなどのDB群に接続する構成です。（実際にはNginxもこの時点で動作していますが、使わないので無視）<br>
 なんだかんだいって、開発環境はローカルの操作感が最高っていうことですね。一方で、関連するコンポーネントも多いので、Docker-Composeのいいところも使いたいという発想です。</p>
-
 <p>Railsアプリケーションの方で、変更をGitレポジトリへPushすると、CI runnerが動き、アプリケーションのDockerイメージを作ります。
 その際には、本番環境へのデプロイの容易さを考えて、アプリケーションのコードはまるごとコンテナイメージの中に組み込みました。</p>
-
-<p>Dockerイメージが出来上がってしまえば、もうやることは単純です。<br />
+<p>Dockerイメージが出来上がってしまえば、もうやることは単純です。<br>
 デプロイしたい環境で、<code>docker-compose pull</code>して、<code>docker-compose up</code>のみです。</p>
-
-<p>はじめは、Stagingはなく、Dockerイメージがビルドでき次第、そのままProductionへ投入していました。<br />
-ですが、コンテナ化することによって発生する不具合なども多く困りました。また、docker-composeの操作を行うのが、ほぼ本番環境のみになるため、不慣れでいろいろとやらかしたりしました。<br />
+<p>はじめは、Stagingはなく、Dockerイメージがビルドでき次第、そのままProductionへ投入していました。<br>
+ですが、コンテナ化することによって発生する不具合なども多く困りました。また、docker-composeの操作を行うのが、ほぼ本番環境のみになるため、不慣れでいろいろとやらかしたりしました。<br>
 というわけで結果的にStagingが設けられました。</p>
-
 <p>大まかな流れは上のとおりですが、さらにそれをスムーズに行うために行った工夫点などを書いていきます。</p>
-
 <h2 id="dockerイメージのビルドを速くする">Dockerイメージのビルドを速くする</h2>
-
-<p>アプリケーションをDockerイメージの中にいれることにしたわけですが、Dockerイメージをビルドするたびに、依存パッケージのインストールが走り非常に遅くイライラしました。<br />
+<p>アプリケーションをDockerイメージの中にいれることにしたわけですが、Dockerイメージをビルドするたびに、依存パッケージのインストールが走り非常に遅くイライラしました。<br>
 これについては有名な話ですが、Dockerfileに少し工夫するだけで解消できます。</p>
-
 <p>アプリケーションを配置する前に依存パッケージのインストールを実行しておくことことで効率化しました。
 これは、Dockerはイメージをビルドするときにレイヤーごとにキャッシュを行うのですが、それを利用したものです。
-頻繁に変更が行われるのはアプリケーションのソースコード部分であり、依存パッケージは頻繁には変更されないのでキャッシュをうまく使いましょうということです。<br />
+頻繁に変更が行われるのはアプリケーションのソースコード部分であり、依存パッケージは頻繁には変更されないのでキャッシュをうまく使いましょうということです。<br>
 (Ruby2.3.1なのはきにしないで&hellip;)</p>
-
 <pre><code># Dockerfile
 FROM ruby:2.3.1
 RUN apt-get update &amp;&amp; apt-get upgrade -y
@@ -177,57 +153,46 @@ RUN bundle install
 ADD . /usr/local/src/app/
 RUN bundle exec rake assets:precompile
 CMD [&quot;bundle&quot;, &quot;exec&quot;, &quot;rails&quot;, &quot;server&quot;, &quot;-b&quot;, &quot;0.0.0.0&quot;, &quot;-p&quot;, &quot;3001&quot;]
-</code></pre>
-
-<h2 id="gitlab-ciでdockerイメージを自動ビルドする">Gitlab-ciでDockerイメージを自動ビルドする</h2>
-
-<p>Dockerイメージの作成を高速化したと言いましたが、とはいってもそれなりの時間もかかりますし、手作業で行うのがしんどくなってきたので、イメージ作成を自動化させました。<br />
-今回はレポジトリにGitlabを使っていたので、Gitlab-ciを使って行いました。<br />
+</code></pre><h2 id="gitlab-ciでdockerイメージを自動ビルドする">Gitlab-ciでDockerイメージを自動ビルドする</h2>
+<p>Dockerイメージの作成を高速化したと言いましたが、とはいってもそれなりの時間もかかりますし、手作業で行うのがしんどくなってきたので、イメージ作成を自動化させました。<br>
+今回はレポジトリにGitlabを使っていたので、Gitlab-ciを使って行いました。<br>
 正直な話、GitlabはCI/CDのインテグレーションあたりが気に入っていて、今回もそれが理由で採用しました。</p>
-
-<p>以下の<code>gitlab-ci.yml</code>は、ほぼGitlabのドキュメントに載っているとおりです。<br />
+<p>以下の<code>gitlab-ci.yml</code>は、ほぼGitlabのドキュメントに載っているとおりです。<br>
 <code>Master</code>ブランチにコミットがあった場合のみビルドするようにだけ変更しました。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#75715e"># gitlab-ci.yml</span>
+<span style="color:#66d9ef">image</span>: docker:stable
 
-<pre><code class="language-yml"># gitlab-ci.yml
-image: docker:stable
-
-services:
+<span style="color:#66d9ef">services</span>:
   - docker:dind
 
-stages:
+<span style="color:#66d9ef">stages</span>:
   - release
 
-variables:
-  CONTAINER_IMAGE: registry.gitlab.com/$CI_PROJECT_PATH
-  DOCKER_DRIVER: overlay2
+<span style="color:#66d9ef">variables</span>:
+  <span style="color:#66d9ef">CONTAINER_IMAGE</span>: registry.gitlab.com/$CI_PROJECT_PATH
+  <span style="color:#66d9ef">DOCKER_DRIVER</span>: overlay2
 
-before_script:
+<span style="color:#66d9ef">before_script</span>:
   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
 
-release-image:
-  stage: release
-  script:
-    - docker pull $CONTAINER_IMAGE:latest || true
+<span style="color:#66d9ef">release-image</span>:
+  <span style="color:#66d9ef">stage</span>: release
+  <span style="color:#66d9ef">script</span>:
+    - docker pull $CONTAINER_IMAGE:latest || <span style="color:#66d9ef">true</span>
     - docker build --cache-from $CONTAINER_IMAGE:latest --tag $CONTAINER_IMAGE:$CI_BUILD_REF --tag $CONTAINER_IMAGE:latest .
     - docker push $CONTAINER_IMAGE:$CI_BUILD_REF
     - docker push $CONTAINER_IMAGE:latest
-  only: 
+  <span style="color:#66d9ef">only</span>: 
     - master
-</code></pre>
-
-<h2 id="dockerイメージに適切にタグを付ける">Dockerイメージに適切にタグを付ける</h2>
-
-<p>Gitlab-ciを使った自動ビルドで重要な点は、自動化だけではありません。<br />
-DockerイメージにGitのコミットのハッシュ値をイメージのタグとしてつけているのですが、これがとても重要です。<br />
+</code></pre></div><h2 id="dockerイメージに適切にタグを付ける">Dockerイメージに適切にタグを付ける</h2>
+<p>Gitlab-ciを使った自動ビルドで重要な点は、自動化だけではありません。<br>
+DockerイメージにGitのコミットのハッシュ値をイメージのタグとしてつけているのですが、これがとても重要です。<br>
 それは、本番環境にデプロイしたあとに不具合があった場合のロールバック対応に非常に重要なためです。
 不具合があった場合に、Gitのコミットの履歴からさかのぼりたいIDをゲットして、そのIDのついたタグのイメージに戻すことができます。これがDockerイメージとソースコードとが紐付いているとてもいい理由かと思っています。</p>
-
 <h2 id="今後について">今後について</h2>
-
-<p>Dockerはサービスオーケストレーションとして便利ではありますが、ローカルでの開発では必ずしもベストでないこともあり、そのいいところをどるかというところでの試行錯誤でした。<br />
-結果的に、この状態になり、インフラの運用はかなり楽になり、アプリケーションの開発にもかなり集中できるようになってきました。<br />
+<p>Dockerはサービスオーケストレーションとして便利ではありますが、ローカルでの開発では必ずしもベストでないこともあり、そのいいところをどるかというところでの試行錯誤でした。<br>
+結果的に、この状態になり、インフラの運用はかなり楽になり、アプリケーションの開発にもかなり集中できるようになってきました。<br>
 次のステージはいったんアプリケーション側の開発に集中しサービス側を磨いていくことになるかなと思います。</p>
-
 <p>Docker関連の調査は、仕事でも行っているのでまた知見がたまれば報告します。</p>
                     </div>
                     

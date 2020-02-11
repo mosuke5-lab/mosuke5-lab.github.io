@@ -9,7 +9,7 @@
     <meta name="description" content="Sock Shopを使ってマイクロサービスの体験をしていきます。マイクロサービスの特徴や課題を体験できるようにシナリオを作りました。ただ起動して終わりではなく、Sock Shopからより多くのことを学ぶきっかけとなればと思います。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2020/01/22/sockshop/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/01/22/sockshop/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Sock Shopを使ったマイクロサービス体験のハンズオン | Goldstine研究所">
@@ -80,46 +80,34 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>あけましておめでとうございます。<a href="https://twitter.com/mosuke5" target="_blank">@mosuke5</a>です。<br />
+                        <p>あけましておめでとうございます。<a href="https://twitter.com/mosuke5" target="_blank">@mosuke5</a>です。<br>
 マイクロサービスのデモアプリケーションとして<a href='https://microservices-demo.github.io/' target='_blank'>Sock Shop</a>は有名ですよね。
 日本語でもたくさんのSock Shopの紹介やインストール記事がでています。しかし、自分もそうだったのですが、なんとなく起動して動かして、終わりとなっているものがおおく、どんな観点でこのSock Shopをいじっていけばいいかの情報が足りないと感じました。
 機会があり、Sock Shopをさわるタイミングがあったので、実際にどんなデータ構造になっているのか、マイクロサービスゆえの課題など、Sock Shopから少しでも多くの学びが得られるようにこの記事を書きます。</p>
-
 <h2 id="sock-shopを動かす">Sock Shopを動かす</h2>
-
 <p>Sock Shopはdocker-composeを始め、Kubernetesなど多様な環境で動かせるようになっています。
 この記事では、Kubernetesを例に書きますが、どの環境で動かしていただいても構いません。
 本ブログでは起動方法については割愛します。お好みの環境で動かしてみてください。</p>
-
 <p>また、OpenShift上でSock Shopを動かしたい場合は<a href="https://github.com/mosuke5/microservices-demo-openshift">こちらのレポジトリ</a>も参考にしてください。</p>
-
 <h2 id="sock-shopのアーキテクチャ">Sock Shopのアーキテクチャ</h2>
-
 <p>Sock Shopのデザインは下記の通りで、Java, NodeJS, Goなどとマイクロサービスの特徴であるポリグロットを体現しています。
 ポリグロットな構成に「できる」、というだけで戦略なしに「やっていい」というわけではないので、この点は誤解ないように理解していきましょう。詳細は<a href="front-end-rh-mori-sock-shop.3d6a.kepcodevops.openshiftapps.com">こちら</a>。</p>
-
-<p><img src="/image/sockshop-architecture.png" alt="application-design" /></p>
-
+<p><img src="/image/sockshop-architecture.png" alt="application-design"></p>
 <h2 id="データ構造を見る">データ構造を見る</h2>
-
-<p>まずは、データ構造を見ていきます。<br />
+<p>まずは、データ構造を見ていきます。<br>
 マイクロサービスでは、どこのサービスでどのようにデータを持つかは非常に重要です。
 Sock Shopではデータベースを持つサービスが4つあります。
 下では、サンプルの出力結果を表示しておきますが、ぜひ自分の目で確かめていくといいです。</p>
-
 <ul>
 <li>catalogue (mysql)</li>
 <li>user (mongodb)</li>
 <li>cart (mongodb)</li>
 <li>order (mongodb)</li>
 </ul>
-
 <h3 id="catalogue">catalogue</h3>
-
 <p>靴下の商品情報や、靴下のタグの情報を管理するcatalogueサービスのデータベース構造を示します。
 MySQLを利用しており、非常にわかりやすいデータ構造となっています。
 <code>sock</code>テーブルでは靴下の情報を<code>tag</code>テーブルでは靴下のタグ情報を管理しており、それらは1対nの関係性なので、<code>sock_tag</code>テーブルで中間テーブルとして機能させています。</p>
-
 <pre><code>mysql&gt; desc sock;
 +-------------+--------------+------+-----+---------+-------+
 | Field       | Type         | Null | Key | Default | Extra |
@@ -165,13 +153,9 @@ mysql&gt; select * from tag;
 |     10 | magic  |
 |     11 | green  |
 +--------+--------+
-</code></pre>
-
-<h3 id="user">user</h3>
-
+</code></pre><h3 id="user">user</h3>
 <p>続いて、ユーザを管理するサービスです。
 mongodbのcollectionは3つ存在します。</p>
-
 <pre><code>&gt; show collections;
 addresses
 cards
@@ -207,12 +191,8 @@ customers
   &quot;postcode&quot; : &quot;111-1111&quot;,
   &quot;links&quot; : {  }
 }
-</code></pre>
-
-<h3 id="cart">cart</h3>
-
+</code></pre><h3 id="cart">cart</h3>
 <p>次は、ショッピングカートです。</p>
-
 <pre><code>&gt; show collections
 cart
 item
@@ -236,14 +216,10 @@ item
   &quot;unitPrice&quot; : 15
 }
 ...
-</code></pre>
-
-<h3 id="order">order</h3>
-
-<p>最後は、注文履歴を管理するorderサービスです。<br />
+</code></pre><h3 id="order">order</h3>
+<p>最後は、注文履歴を管理するorderサービスです。<br>
 orderサービスの中では、注文した商品のIDのみ保有し、そのデータは持っていないことは少し頭の片隅に覚えておいてください。
 後ほど、サービスをまたいだデータの取得に関して考えていきます。</p>
-
 <pre><code>&gt; show collections;
 customerOrder
 
@@ -319,32 +295,24 @@ customerOrder
   &quot;date&quot; : ISODate(&quot;2020-01-11T07:33:24.861Z&quot;),
   &quot;total&quot; : 88.29000091552734
 }
-</code></pre>
-
-<h3 id="データ分割による弊害">データ分割による弊害</h3>
-
-<p>このアプリケーションではマイクロサービス特有のデータの分割による問題がしっかり発生しています。<br />
+</code></pre><h3 id="データ分割による弊害">データ分割による弊害</h3>
+<p>このアプリケーションではマイクロサービス特有のデータの分割による問題がしっかり発生しています。<br>
 靴下を注文したあと、注文履歴を見るページでは、注文の情報と注文した商品の情報の両方を表示しています。
 しかし、catalogueとorderの2つでサービスを分離しているため、これらの情報をまとめて取得することができません。</p>
-
-<p><img src="/image/sockshop-order-screen.png" alt="sockshop-order-screen" /></p>
-
-<p>では、どのように取得しているか見ていきます。<br />
+<p><img src="/image/sockshop-order-screen.png" alt="sockshop-order-screen"></p>
+<p>では、どのように取得しているか見ていきます。<br>
 下記のように、orderサービスに問い合わせたあと、注文した商品を別でcatalogueサービスに問い合わせにいっています。
-いわゆるN+1問題が発生しています(<a href-"https://github.com/microservices-demo/front-end/blob/5e21067c2011a1f220322a704c9984fa206c4d12/public/customer-order.html#L205" target="_blank">該当のコード</a>)。
+いわゆるN+1問題が発生しています(&lt;a href-&ldquo;<a href="https://github.com/microservices-demo/front-end/blob/5e21067c2011a1f220322a704c9984fa206c4d12/public/customer-order.html#L205%22">https://github.com/microservices-demo/front-end/blob/5e21067c2011a1f220322a704c9984fa206c4d12/public/customer-order.html#L205&quot;</a> target=&rdquo;_blank&quot;&gt;該当のコード</a>)。
 これは、マイクロサービスではよく発生します。</p>
-
-<p><img src="/image/sockshop-order.png" alt="sockshop-order" /></p>
-
-<p>解決へのアプローチはいくつかあります。<br />
+<p><img src="/image/sockshop-order.png" alt="sockshop-order"></p>
+<p>解決へのアプローチはいくつかあります。<br>
 どれがいいということはなく、データの特性などによるのですが、以下のようなポイントを考えていくといいと思います。</p>
-
 <ol>
 <li>そもそもデータの特性はどうか？
-
 <ul>
 <li>リアルタイムに更新が必要な情報か。</li>
-</ul></li>
+</ul>
+</li>
 <li>DBを非正規化して対応するか？</li>
 <li>オーダー処理をイベントとして保存しておくか？</li>
 <li>複数のitemを取得できるAPIをつくるか？</li>
@@ -352,21 +320,15 @@ customerOrder
 <li>BFFで結合、キャッシュするか？</li>
 <li>item情報を同期するか？CQRSパターンを採用するか？</li>
 </ol>
-
 <h2 id="apiを実行する">APIを実行する</h2>
-
 <p>商品オーダーのAPIなどは当然ながら認証しないとと実行できません。
 残念ながら、認証の方法などについてドキュメントに書いていなかったので補足していきます。
-認証はクッキーを使います。<br />
+認証はクッキーを使います。<br>
 試しに、ログインセッションを持たないまま、オーダーAPIを実行してみるとログインしてくれとエラーが返ってきます。</p>
-
 <pre><code>$ curl -XGET $FRONTEND_ADDRESS/orders
 {&quot;message&quot;:&quot;User not logged in.&quot;,&quot;error&quot;:{}}
-</code></pre>
-
-<p>ログインには&rdquo;username:password&rdquo;をbase64でエンコードしたものが必要です(<a href="https://github.com/microservices-demo/front-end/blob/5d9a4272fec3983250364917d8ea7a210cdbf58c/public/js/client.js#L23">該当コード</a>)。<br />
+</code></pre><p>ログインには&quot;username:password&quot;をbase64でエンコードしたものが必要です(<a href="https://github.com/microservices-demo/front-end/blob/5d9a4272fec3983250364917d8ea7a210cdbf58c/public/js/client.js#L23">該当コード</a>)。<br>
 コマンドラインで生成するか、こちらのような<a href="https://uic.jp/base64encode/">Base64エンコードをしてくれるWebサービス</a>で生成しましょう。</p>
-
 <pre><code>$ echo -n &quot;user:password&quot; | base64
 dXNlcjpwYXNzd29yZA==
 
@@ -378,10 +340,7 @@ $ cat cookie.txt
 # This file was generated by libcurl! Edit at your own risk.
 
 xxxxxxx
-</code></pre>
-
-<p>ログインができているか確認します。オーダー情報が返ってきていれば成功です。</p>
-
+</code></pre><p>ログインができているか確認します。オーダー情報が返ってきていれば成功です。</p>
 <pre><code>$ curl -XGET -b cookie.txt $FRONTEND_ADDRESS/orders
 [
     {
@@ -427,115 +386,81 @@ xxxxxxx
         }
     }
 ]
-</code></pre>
-
-<p>ログインさえできてしまえば、同じ要領で他のAPIも実行することが可能です。
+</code></pre><p>ログインさえできてしまえば、同じ要領で他のAPIも実行することが可能です。
 APIは<a href="https://microservices-demo.github.io/api/index.html">こちらを参考</a>にしながら実行していくことが可能です。</p>
-
-<h2 id="独立性-回復性">独立性、回復性</h2>
-
+<h2 id="独立性回復性">独立性、回復性</h2>
 <p>マイクロサービスのメリットの中には、サービスが独立することによる、デプロイやスケールのしやすさや回復性があります。
 実際に特定のサービスの停止・スケール・デプロイをやってみます。</p>
-
 <h3 id="cartsサービスの停止">cartsサービスの停止</h3>
-
-<p>マイクロサービスの回復性について考えてみます。<br />
+<p>マイクロサービスの回復性について考えてみます。<br>
 cartsサービスを落としてみて、どんな影響があるか確認してみます。</p>
-
 <pre><code>$ kubectl scale --replicas=0 deployment/carts
-</code></pre>
-
-<ul>
+</code></pre><ul>
 <li>オーダーはできるか？</li>
 <li>他のコンポーネントへの影響は？</li>
 <li>ユーザ体験はどう変わったか？</li>
 </ul>
-
 <h4 id="デグレードの実装">デグレードの実装</h4>
-
 <p>cartsサービスを落としたあと、UI上からカートボタンが消えました。（ボタンが消えるのにタイムラグがあるのはまあサンプル実装だから大目に見ようｗ）
 これは、よくあるデグレードの考え方を実装しているからです。マイクロサービスでは、利用するマイクロサービスがどういう状態か把握し、防御的な実装をいれることがあります。
 その１つの例になりますでしょうか。
 <a href="https://github.com/microservices-demo/front-end/blob/5d9a4272fec3983250364917d8ea7a210cdbf58c/public/navbar.html#L227">該当のコード</a></p>
-
 <h4 id="サーキットブレーカについて">サーキットブレーカについて</h4>
-
-<p>cartsサービスを落とした状態で、ブラウザのデバッグツールを開いて、cartsサービスへの通信状況を見てみましょう。<br />
+<p>cartsサービスを落とした状態で、ブラウザのデバッグツールを開いて、cartsサービスへの通信状況を見てみましょう。<br>
 アクセスの度にcartsサービスのタイムアウトを待っているのがわかるのがわかります。
 このサンプルではサーキットブレーカの実装は入っていません。こういった通信状況をみているとなぜサーキットブレーカが必要なのか、など感じてくるかと思います。</p>
-
 <h3 id="front-endのスケールとデプロイ">front-endのスケールとデプロイ</h3>
-
-<p>マイクロサービスのスケーリングについて考えてみます。<br />
+<p>マイクロサービスのスケーリングについて考えてみます。<br>
 マイクロサービスでは特定のサービスのみをスケールすることが容易であることが特徴の１つです。
 以下、実行することは非常に簡単なわけですが、重要なのはそのサービスの独立性です。
 １サービスで１チームと仮に想定した場合、チームの動きやすさを想像することができると思います。</p>
-
 <p>ためしにフロントエンドサービスをスケールさせてみてみましょう。</p>
-
 <pre><code>$ kubectl scale --replicas=3 deployment/front-end 
-</code></pre>
-
-<p>フロントエンドのコンテナイメージを変更してデプロイしてみます。<br />
+</code></pre><p>フロントエンドのコンテナイメージを変更してデプロイしてみます。<br>
 サンプルで、背景色を変更したフロントエンドのイメージを用意しました。</p>
-
-<pre><code class="language-yaml">apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: front-end
-  namespace: sock-shop
-spec:
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        name: front-end
-    spec:
-      containers:
-      - name: front-end
-        image: mosuke5/front-end:master-bd5039f4
-        #image: weaveworksdemos/front-end:0.3.12
-</code></pre>
-
-<h2 id="非同期通信">非同期通信</h2>
-
-<p>マイクロサービスアーキテクチャでは、サービス間の通信をどのように行うかは重要な選択の１つです。<br />
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: extensions/v1beta1
+<span style="color:#66d9ef">kind</span>: Deployment
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: front-end
+  <span style="color:#66d9ef">namespace</span>: sock-shop
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">replicas</span>: <span style="color:#ae81ff">1</span>
+  <span style="color:#66d9ef">template</span>:
+    <span style="color:#66d9ef">metadata</span>:
+      <span style="color:#66d9ef">labels</span>:
+        <span style="color:#66d9ef">name</span>: front-end
+    <span style="color:#66d9ef">spec</span>:
+      <span style="color:#66d9ef">containers</span>:
+      - <span style="color:#66d9ef">name</span>: front-end
+        <span style="color:#66d9ef">image</span>: mosuke5/front-end:master-bd5039f4
+        <span style="color:#75715e">#image: weaveworksdemos/front-end:0.3.12</span>
+</code></pre></div><h2 id="非同期通信">非同期通信</h2>
+<p>マイクロサービスアーキテクチャでは、サービス間の通信をどのように行うかは重要な選択の１つです。<br>
 Sock Shopでも、アーキテクチャデザインの図を見ると、shippingサービスはRabbitMQに対してデータを送り、queue-masterが処理していることがわかります。</p>
-
 <p><code>shipping</code>サービスと<code>queue-master</code>サービスのPodのログを見ながら、画面上からオーダー処理を行ってみましょう。
 ログからキューへの書き込みおよび、キューからの受信を確認することができます。</p>
-
-<p>非同期通信のメリットは、通信先の相手の状態に関係なく通信できることです。<br />
+<p>非同期通信のメリットは、通信先の相手の状態に関係なく通信できることです。<br>
 例えば、あなたがAWSなどのパブリッククラウドで仮想サーバを作成すると仮定します。
 作成する仮想サーバの設定をしたあと、作成ボタンを押してから実際にできあがるまで約5分程度かかります。
 同期的処理では、仮想サーバが出来上がるまでの間、ずっと待っていなければいけません。その間、ブラウザのタブを閉じたりしてはいけません。
 非同期処理では、「仮想サーバの作成を受け付けました」とレスポンスを先に返すことが可能であり、実際の作成は裏側で行うことができます。
-これにより、仮想サーバが出来上がるまでの間、自由に他のことをすることができます。<br />
+これにより、仮想サーバが出来上がるまでの間、自由に他のことをすることができます。<br>
 一般的に、時間のかかる処理や、同期的な処理では間に合わない場合などに利用されることが多いです。</p>
-
 <h2 id="トレーシング">トレーシング</h2>
-
 <p>Soch Shopでは、トレーシングも体験することができます。
 jaegerなどのコンポーネントをデプロイします。デプロイについてはドキュメントには書かれておらず、Githubにあるマニフェストファイルを使って起動することが必要です。
 <a href="https://github.com/microservices-demo/microservices-demo/tree/master/deploy/kubernetes/manifests-jaeger">こちら</a>を参考にしてください。</p>
-
 <p>下記のような画面にアクセスできれば成功です。</p>
-
-<p><img src="/image/jaeger-query.png" alt="jaeger-query" /></p>
-
+<p><img src="/image/jaeger-query.png" alt="jaeger-query"></p>
 <p>トレーシングのコンポーネント起動後に、もう一度Sock Shopで購入などの様々なアクションを実行しましょう。
 起動後はSock Shop内でのアクションがjaeger内部に保存されていきます。
 検索から<code>orders</code>サービスで検索をし、<code>orders: http:/orders</code>を探してみましょう。
 靴下の注文処理の裏側では、userやpaymentなど複数のサービスにまたいで処理が行われていることがわかってきます。</p>
-
-<p><img src="/image/jaeger-query-order.png" alt="jaeger-query-order" /></p>
-
+<p><img src="/image/jaeger-query-order.png" alt="jaeger-query-order"></p>
 <p>paymentサービスに障害が起きたと仮定し、paymentサービスを落としたあとに、もう一度購入操作をしてみましょう。
 この複雑な処理のなかでもどこでエラーが起きたか一目瞭然に確認することができます。</p>
-
 <h2 id="フィードバック">フィードバック</h2>
-
-<p>Sock Shopを使ったマイクロサービスの体験を紹介してきました。<br />
+<p>Sock Shopを使ったマイクロサービスの体験を紹介してきました。<br>
 もっと〇〇なことも体験できるよ、とかシナリオとして入れたほうがいい、というものがあればリクエストください。
 みなさんでマイクロサービスを理解するいいきっかけを作れればと思っています。</p>
                     </div>

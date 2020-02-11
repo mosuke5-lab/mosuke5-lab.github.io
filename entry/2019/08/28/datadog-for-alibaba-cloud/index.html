@@ -9,7 +9,7 @@
     <meta name="description" content="DatadogのAlibaba Cloud integrationを試してみました。できることできないこと、注意点などまとめました。待望のDatadog連携なので期待です。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/08/28/datadog-for-alibaba-cloud/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/08/28/datadog-for-alibaba-cloud/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="DatadogのAlibaba Cloud integrationでできること | Goldstine研究所">
@@ -80,85 +80,56 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>仕事でDatadogを触る機会があり、フリートライアルのアカウントを作りました。<br />
+                        <p>仕事でDatadogを触る機会があり、フリートライアルのアカウントを作りました。<br>
 ちょうどいい機会だったので、前々から試したいと思っていたAlibaba Cloudとの連携について試してみました。
 この連携は2019年の3月くらいに開始したものです。</p>
-
-<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.datadoghq.com/blog/monitor-alibaba-cloud-datadog/" data-iframely-url="//cdn.iframe.ly/bkZv6KL?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
-
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.datadoghq.com/blog/monitor-alibaba-cloud-datadog/" data-iframely-url="//cdn.iframe.ly/bkZv6KL?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
 <h2 id="datadogでの監視の仕組み">Datadogでの監視の仕組み</h2>
-
-<p>Alibaba Cloudに限らずではあるのですが、Datadogにはクラウドとの連携の機能があります。<br />
+<p>Alibaba Cloudに限らずではあるのですが、Datadogにはクラウドとの連携の機能があります。<br>
 こちらと通常のサーバの監視とでなにが違うかみていきます。
 基本的なことですが、非常に重要なことなので本ブログでも紹介します。</p>
-
-<p><img src="/image/datadog-alibaba-integration.png" alt="datadog-integration" /></p>
-
-<p>Datadogではデータの取得方法が2つあります。<br />
+<p><img src="/image/datadog-alibaba-integration.png" alt="datadog-integration"></p>
+<p>Datadogではデータの取得方法が2つあります。<br>
 1つ目は、図の上にあわらした、サーバにagentをインストールする方法です。いままでの監視システムでも同じようなことを行っていたかと思います。APMメトリックを取得する場合もagentのインストールが必要です。
 メトリック情報とログ収集を同じagentでできて一括管理できるのは非常に良いと思います。また、対応しているデータの種類も豊富です。</p>
-
-<p>2つ目は、integrationという機能を使った方法です。<br />
-Datadogではagentをサーバにインストールする方法に加えて、integrationという外部サービスやミドルウェアと連携するための機能をもっています。この機能では、現在350以上の連携を用意していて、その中にはAWSなどをはじめとしたパブリッククラウドとの連携があります。Alibaba Cloudとの連携が今年の3月にリリースしました。<br />
+<p>2つ目は、integrationという機能を使った方法です。<br>
+Datadogではagentをサーバにインストールする方法に加えて、integrationという外部サービスやミドルウェアと連携するための機能をもっています。この機能では、現在350以上の連携を用意していて、その中にはAWSなどをはじめとしたパブリッククラウドとの連携があります。Alibaba Cloudとの連携が今年の3月にリリースしました。<br>
 この機能では、必要な認証情報をDatadogに登録すると、DatadogがAlibaba CloudのAPIを代わりに実行しメトリックをDatadog内に取り込んでくれます。</p>
-
 <h2 id="alibaba-cloud-integrationでできること">Alibaba Cloud integrationでできること</h2>
-
 <h3 id="取得できるデータ">取得できるデータ</h3>
-
-<p>取得できる情報はたくさんあるので、公式ドキュメントのリンクを貼っておきます。<br />
+<p>取得できる情報はたくさんあるので、公式ドキュメントのリンクを貼っておきます。<br>
 現在以下に記載のメトリックを収集することができます。</p>
-
-<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://docs.datadoghq.com/ja/integrations/alibaba_cloud/" data-iframely-url="//cdn.iframe.ly/zQmVRgo"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
-
-<p>Alibaba Cloudのマネージドサービス、例えばRDSやSLBといったサービスはこの機能で収集するのがいいです。マネージドサービスではユーザ自信でagentなどを導入することができないので、Alibaba CloudのAPIからデータを取得する必要があります。<br />
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://docs.datadoghq.com/ja/integrations/alibaba_cloud/" data-iframely-url="//cdn.iframe.ly/zQmVRgo"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<p>Alibaba Cloudのマネージドサービス、例えばRDSやSLBといったサービスはこの機能で収集するのがいいです。マネージドサービスではユーザ自信でagentなどを導入することができないので、Alibaba CloudのAPIからデータを取得する必要があります。<br>
 ECSインスタンスの情報も取得できますが、あくまでクラウドとしてサーバの外から取得できる情報しか連携できないので、より詳細な情報をとりたい場合はagentのインストールが必要です。</p>
-
 <h3 id="ホストの監視登録追加">ホストの監視登録追加</h3>
-
-<p>agentを入れなくても、動いているホストは判定してdatadog側に連携してくれます。<br />
+<p>agentを入れなくても、動いているホストは判定してdatadog側に連携してくれます。<br>
 リージョンやAZ、アカウントIDなどいくつかのタグをつけてくれます。
 このタグがあることによってメトリックの絞り込みなどに非常に便利です。</p>
-
-<p><img src="/image/datadog-ecs-instance-info.png" alt="ecs-instance" /></p>
-
+<p><img src="/image/datadog-ecs-instance-info.png" alt="ecs-instance"></p>
 <h3 id="プリセットのダッシュボード">プリセットのダッシュボード</h3>
-
-<p>いくつかのプリセットのダッシュボードも用意されています。<br />
+<p>いくつかのプリセットのダッシュボードも用意されています。<br>
 integrationを有効にさえすれば以下のようなダッシュボードの閲覧が可能です。</p>
-
-<p><img src="/image/datadog-alibaba-dashboard.png" alt="datadog-dashboard" /></p>
-
+<p><img src="/image/datadog-alibaba-dashboard.png" alt="datadog-dashboard"></p>
 <h2 id="alibaba-cloud-integrationでできないこと">Alibaba Cloud integrationでできないこと</h2>
-
 <h3 id="料金の表示">料金の表示</h3>
-
-<p>もしAWSでDatadogをお使いの方なら料金もダッシュボードに表示したいと思われるでしょう。<br />
+<p>もしAWSでDatadogをお使いの方なら料金もダッシュボードに表示したいと思われるでしょう。<br>
 現在は対応していません。原理的にはたしかAlibaba Cloudもbilling apiを公開していたはずなので実装は可能です。
 待つしかないです。</p>
-
 <h3 id="cloudmonitorからの連携">CloudMonitorからの連携</h3>
-
 <p>一番個人的にはやりたかったことなのですが、Alibaba CloudにはCloudMonitorと呼ばれる監視サービスがあり、
 そちらにもCloudMonitor agetnがあります。
 CloudMonitor agentは無料で利用できるもので、こちらを使って取得したデータをCloudMonitor API経由でdatadogへ連携させたかったのですがこれがいまはできないようです。</p>
-
 <p>Datadog Agentを入れることがベストではあるのですが、いろいろな事情で全台のサーバにインストールできないこともあるかなと思うので、これができるといろいろと便利です。もしかして、datadogが売れなくなっちゃうからそういうことはできない？笑</p>
-
-<p><img src="/image/datadog-cloudmonitor-integration.png" alt="cloudmonitor" /></p>
-
+<p><img src="/image/datadog-cloudmonitor-integration.png" alt="cloudmonitor"></p>
 <h2 id="注意点">注意点</h2>
-
 <p>注意点としては、注意というほどでもないのですが、
 Datadogはクラウド連携すると、稼働しているホストをタグをつけて登録してくれます。
-AWSのインスタンスと同時に管理していると、AZ名がかぶることがあるので、AZのみでフィルターをかけると一緒にカウントされてしまうので注意しましょう。&rdquo;ap-northeast-1a&rdquo;が完全にかぶります。</p>
-
+AWSのインスタンスと同時に管理していると、AZ名がかぶることがあるので、AZのみでフィルターをかけると一緒にカウントされてしまうので注意しましょう。&ldquo;ap-northeast-1a&quot;が完全にかぶります。</p>
 <h2 id="まとめ">まとめ</h2>
-
-<p>というわけで、Datadog for Alibaba Cloudを見てきました。<br />
+<p>というわけで、Datadog for Alibaba Cloudを見てきました。<br>
 Alibaba Cloudはグルーバル基準で連携できるいい監視サービスが今までなく、Datadogは待望でした。
 まだやれることはすくないのですが、これでも十分にAlibaba CloudユーザがDatadogを採用するメリットは大きいと考えています。</p>
-
 <p>これからの進化にも期待しましょう。</p>
                     </div>
                     

@@ -9,7 +9,7 @@
     <meta name="description" content=" 去年に続き、2015年で技術分野でなにがあったか簡単に振り返りました。 2014年を思い返して… - Goldstine研究所  1. Vim::Factoryの開発と公開    2014年の秋から@mogulla3と定期的にインフラ関連">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/12/28/150042/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2015/12/28/150042/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="2015年振り返り | Goldstine研究所">
@@ -80,43 +80,30 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><body>
+                        <body>
 <p>去年に続き、2015年で技術分野でなにがあったか簡単に振り返りました。<br>
-<a href="https://blog.mosuke.tech/entry/2015/01/01/161826">2014年を思い返して… - Goldstine研究所</a></p></p>
-
+<a href="https://blog.mosuke.tech/entry/2015/01/01/161826">2014年を思い返して… - Goldstine研究所</a></p>
 <h1>1. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの開発と公開</h1>
-
 <p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20151227/20151227172616.png" alt="f:id:mosuke5:20151227172616p:plain:w300" title="f:id:mosuke5:20151227172616p:plain:w300" class="hatena-fotolife" style="width:300px" itemprop="image"></span></p>
-
 <p>2014年の秋から@mogulla3と定期的にインフラ関連技術の勉強会をやってきていて、<br>
 はじめはインプットの勉強会だけを主にやってきていたのですが、<br>
 サービスを作る中でインフラ関連技術を駆使し勉強したいと思うようなっていました。<br>
 そこで、今年は「<a class="keyword" href="http://d.hatena.ne.jp/keyword/vim">vim</a>の設定をブラウザ上で即体感できるサービス <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factory」の開発をしました。</p>
-
 <p><a href="/entry/2015/07/19/135844/">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った - Goldstine研究所</a></p>
-
 <h4>良かった点</h4>
-
 <ul>
 <li>新しい技術などを組み合わせながら学習しがいのあるサービスを作れたこと</li>
 <li>サービスの実現技術を公開しそれなりの反響を得られたこと</li>
 </ul>
-
 <h4>悪かった点</h4>
-
 <ul>
 <li>内部的な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>の変更ばかりに時間を取られサービスそのものの改良ができなかったこと</li>
 </ul>
-
 <h1>2. インフラ関連の構築や運用、仕組みづくり</h1>
-
 <p>主に仕事の話になりますが、今年はインフラ関連の構築や運用に多く携わった気がします。<br>
 （結構、雑な感じに書き残します。）</p>
-
 <h3>(1) メールサーバの構築と運用</h3>
-
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Postfix">Postfix</a>を使ったメールサーバの構築と運用に携わりました。</p>
-
 <ul>
 <li>そもそもメールサーバってなんだっけってところからはじまったのを思い出します。</li>
 <li>とにかく運用を楽にしたかったので、その部分に多くの工夫をしました。</li>
@@ -127,13 +114,10 @@
 <li>冗長性のために２つのリージョンに分散させたりもしました。</li>
 <li>目新しいことはないですが、わりと運用が楽な感じに作れたのでほんとによかったなと振り返って思います。</li>
 </ul>
-
 <h3>(2) インターネットから社内NWへの入口としてのリバプロサーバ構築</h3>
-
 <p>インターネットから社内NWにあるシステムを利用できるようにするために、<br>
 リバースプロキシサーバを構築しました。（運用はこれから）<br>
 いわゆる<a class="keyword" href="http://d.hatena.ne.jp/keyword/DMZ">DMZ</a>構成におけるリバプロです。</p>
-
 <ul>
 <li>技術的なところで言うと、corosync+pacemakerを使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF%A5%EA%A5%F3%A5%B0">クラスタリング</a>を組みました。</li>
 <li>
@@ -142,37 +126,27 @@
 <li>運用が始まってからそのあたりの実用性が確認できそうです。</li>
 <li>ちなみにNginxでリバースプロキシたてました。</li>
 </ul>
-
 <h3>(3) 仮想環境構築とか</h3>
-
 <p>仮想環境というと、今まで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>などの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>として、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>などのIaaSとして使うばかりでした。<br>
 今年は、<a class="keyword" href="http://d.hatena.ne.jp/keyword/KVM">KVM</a>を利用してプロダクションの仮想基盤を作るなどやりました。<br>
 仮想化ってそもそもなんだっけ？というもう少し基礎よりの知識と向き合う機会がありました。</p>
-
 <p>また、主に来年の話になるがOpenStackなどを使った<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>環境を「作る・運用する」にも携わっていきそうです。<br>
 すこしづつOpenStackをかじり始めました。</p>
-
 <h3>(4) Ansibleの活用と布教活動</h3>
-
 <p>Ansibleの利用は去年から始めていたことですが、<br>
 今年はより活用することと、社内での布教活動を行いました。</p>
-
 <p>活用でいうと、サーバの構築はAnsibleで行ってアプリケーションのデプロイは<br>
 別の方法でやる（手動とか…）というふうになっていたので、<br>
 Ansibleを使ってアプリケーションのデプロイまですべて行うようにしてきました。</p>
-
 <p>また、こういった取り組みを社内（部内）で広めて他のチームにも活用してもらおうと、<br>
 布教活動してしたりしてきました。</p>
-
 <h1>まとめ。来年の抱負的な</h1>
-
 <ul>
 <li>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryを自分が使いたいと思うようなサービスにする</li>
 <li>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryをベースにより自分たちが学習できる環境を作る</li>
 <li>引き続き、インフラ系エンジニア？っぽい感じで邁進する
-
 <ul>
 <li>OpenStackの運用とかやりたい</li>
 <li>
@@ -181,9 +155,8 @@ Ansibleを使ってアプリケーションのデプロイまですべて行う�
 </li>
 <li>ISUCONにでます（あれば…）</li>
 </ul>
-
-<p><p>では良いお年を。</p>
-</body></p>
+<p>では良いお年を。</p>
+</body>
 
                     </div>
                     

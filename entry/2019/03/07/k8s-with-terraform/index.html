@@ -9,7 +9,7 @@
     <meta name="description" content="TerraformでKubernetes上のリソースを管理する方法およびそのメリット・デメリットをみてみます。こちらをふまえ、最近のOperatorの動きなどを考察してみたいと思います。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Kubernetes上のリソースをTerraformで管理するメリットとデメリット | Goldstine研究所">
@@ -80,144 +80,118 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>@mosuke5です。早くも3月になってしまいました。<br />
+                        <p>@mosuke5です。早くも3月になってしまいました。<br>
 しかし、個人的にはこの2か月は非常に動きがあった2か月でしたのでいろいろ楽しかったです。</p>
-
-<p>さて、本題ですが、、<br />
-わたしの好きなTerraformを使ってKubernetesクラスタ上のリソースを管理するのをやってみたいと思います。<br />
+<p>さて、本題ですが、、<br>
+わたしの好きなTerraformを使ってKubernetesクラスタ上のリソースを管理するのをやってみたいと思います。<br>
 そもそもKubernetesをTeraformで管理するとなると2つのレイヤーの話があります。
 今回は、後者のほうに重きを置いてお伝えします。</p>
-
 <ol>
 <li>KubernetesクラスターそのものをTerraformで管理する</li>
 <li>Kubernetesクラスター上のリソースをTerraformで管理する</li>
 </ol>
-
 <h2 id="kubernetesクラスターそのものをterraformで操る">KubernetesクラスターそのものをTerraformで操る</h2>
-
 <p>こちらは軽く流していきますが、Terraformでクラウドのサービスを操ることができるので、もしKubernetesのサービスを提供している場合は、下記のようにクラスターそのものを構築することが容易です。
 こちらは、Alibaba CloudのContainer Serviceを起動する例としていてます。</p>
-
-<pre><code class="language-json">provider &quot;alicloud&quot; {
-  access_key = &quot;${var.access_key}&quot;
-  secret_key = &quot;${var.secret_key}&quot;
-  region     = &quot;${var.region}&quot;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">v</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">d</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">r</span> <span style="color:#e6db74">&#34;alicloud&#34;</span> {
+  <span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">k</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">y</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;${var.access_key}&#34;</span>
+  <span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">k</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">y</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;${var.secret_key}&#34;</span>
+  <span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">g</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">n</span>     <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;${var.region}&#34;</span>
 }
 
-resource &quot;alicloud_cs_kubernetes&quot; &quot;main&quot; {
-  name_prefix = &quot;my-first-k8s&quot;
-  availability_zone = &quot;${data.alicloud_zones.default.zones.0.id}&quot;
-  new_nat_gateway = true
-  master_instance_types = [&quot;ecs.n4.small&quot;]
-  worker_instance_types = [&quot;ecs.n4.small&quot;]
-  worker_numbers = [3]
-  key_name = &quot;hogekey&quot;
-  pod_cidr = &quot;192.168.1.0/24&quot;
-  service_cidr = &quot;192.168.2.0/24&quot;
-  enable_ssh = true
-  install_cloud_monitor = true
+<span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">u</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">e</span> <span style="color:#e6db74">&#34;alicloud_cs_kubernetes&#34;</span> <span style="color:#e6db74">&#34;main&#34;</span> {
+  <span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">m</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">f</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">x</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;my-first-k8s&#34;</span>
+  <span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">v</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">b</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">y</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">z</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">e</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;${data.alicloud_zones.default.zones.0.id}&#34;</span>
+  <span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">w</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">g</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">w</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">y</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#66d9ef">true</span>
+  <span style="color:#960050;background-color:#1e0010">m</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">y</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">s</span> <span style="color:#960050;background-color:#1e0010">=</span> [<span style="color:#e6db74">&#34;ecs.n4.small&#34;</span>]
+  <span style="color:#960050;background-color:#1e0010">w</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">k</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">y</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">s</span> <span style="color:#960050;background-color:#1e0010">=</span> [<span style="color:#e6db74">&#34;ecs.n4.small&#34;</span>]
+  <span style="color:#960050;background-color:#1e0010">w</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">k</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">u</span><span style="color:#960050;background-color:#1e0010">m</span><span style="color:#960050;background-color:#1e0010">b</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">s</span> <span style="color:#960050;background-color:#1e0010">=</span> [<span style="color:#ae81ff">3</span>]
+  <span style="color:#960050;background-color:#1e0010">k</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">y</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">m</span><span style="color:#960050;background-color:#1e0010">e</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;hogekey&#34;</span>
+  <span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">d</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">d</span><span style="color:#960050;background-color:#1e0010">r</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;192.168.1.0/24&#34;</span>
+  <span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">v</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">d</span><span style="color:#960050;background-color:#1e0010">r</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;192.168.2.0/24&#34;</span>
+  <span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">b</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">h</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#66d9ef">true</span>
+  <span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">u</span><span style="color:#960050;background-color:#1e0010">d</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">m</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">r</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#66d9ef">true</span>
 }
-</code></pre>
-
-<h2 id="kubernetes上のリソースをterraformから操るメリットとデメリット">Kubernetes上のリソースをTerraformから操るメリットとデメリット</h2>
-
+</code></pre></div><h2 id="kubernetes上のリソースをterraformから操るメリットとデメリット">Kubernetes上のリソースをTerraformから操るメリットとデメリット</h2>
 <p>次はクラスターそのものではなくて、クラスター上のリソースをどう扱うかを見ていきます。
 そもそもKubernetesクラスタのリソースはmanifestファイルで扱うことが一般的です。
 Terraformで管理するメリット/デメリットってどんなところにあるのか考えてみたいと思います。</p>
-
 <h3 id="メリット">メリット</h3>
-
 <ul>
 <li>stateファイルを使って状態管理、差分管理ができる</li>
 <li>他の豊富なproviderと組み合わせて利用ができる</li>
 <li>削除が容易</li>
 </ul>
-
 <h3 id="デメリット">デメリット</h3>
-
 <ul>
 <li>対応リソースが少ない or 最新のリソースへの対応が遅い</li>
 <li>manifestで十分な感じもある</li>
 </ul>
-
 <h2 id="hello-world">Hello world</h2>
-
-<h3 id="認証-provider設定">認証、provider設定</h3>
-
+<h3 id="認証provider設定">認証、provider設定</h3>
 <p>まずは試してみます。認証ですが、いろんな方法がありますが、もしすでに<code>~/.kube/config</code>にクライアント証明の入った設定ファイルがあるのならば、特に設定することなく利用できます。
 認証に、<code>servicea ccount</code>のtokenを利用している場合などは、既定の設定をいれる必要があります。
 ここでは、<code>~/.kube/config</code>があるので以下だけのProvider設定で行きます。</p>
-
 <pre><code>provider &quot;kubernetes&quot; {}
-</code></pre>
-
-<h3 id="deploymentを作ってみる">Deploymentを作ってみる</h3>
-
+</code></pre><h3 id="deploymentを作ってみる">Deploymentを作ってみる</h3>
 <p>例えばすごく単純に、Nginxが3つ立ち上がるdeploymentを作ることとします。
 manifestなら以下のようになりますね。</p>
-
-<pre><code class="language-yaml">apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-sample-deployment
-spec:
-  selector:
-    matchLabels:
-      app: nginx-sample
-  replicas: 3
-  template:
-    metadata:
-      labels:
-        app: nginx-sample
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-</code></pre>
-
-<p>こちらをTerraformで記述していくとどうなるのか。<br />
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: apps/v1
+<span style="color:#66d9ef">kind</span>: Deployment
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: nginx-sample-deployment
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">selector</span>:
+    <span style="color:#66d9ef">matchLabels</span>:
+      <span style="color:#66d9ef">app</span>: nginx-sample
+  <span style="color:#66d9ef">replicas</span>: <span style="color:#ae81ff">3</span>
+  <span style="color:#66d9ef">template</span>:
+    <span style="color:#66d9ef">metadata</span>:
+      <span style="color:#66d9ef">labels</span>:
+        <span style="color:#66d9ef">app</span>: nginx-sample
+    <span style="color:#66d9ef">spec</span>:
+      <span style="color:#66d9ef">containers</span>:
+      - <span style="color:#66d9ef">name</span>: nginx
+        <span style="color:#66d9ef">image</span>: nginx:latest
+        <span style="color:#66d9ef">ports</span>:
+        - <span style="color:#66d9ef">containerPort</span>: <span style="color:#ae81ff">80</span>
+</code></pre></div><p>こちらをTerraformで記述していくとどうなるのか。<br>
 書いてみた所感だと、ストラクチャーはもちろんmanifestファイルと同じなので書きやすいのですが、
 一部のArgumentsの名前がmanifestで書くものと異なります。
 例えば、<code>matchLabels</code>を<code>match_labels</code>としなければいけなかったりします。
 このあたりが少し面倒という印象です。</p>
-
-<pre><code class="language-json">resource &quot;kubernetes_deployment&quot; &quot;test&quot; {
-  metadata {
-    name = &quot;nginx-sample-deployment&quot;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">u</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">e</span> <span style="color:#e6db74">&#34;kubernetes_deployment&#34;</span> <span style="color:#e6db74">&#34;test&#34;</span> {
+  <span style="color:#960050;background-color:#1e0010">m</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">d</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">a</span> <span style="color:#960050;background-color:#1e0010">{</span>
+    <span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">m</span><span style="color:#960050;background-color:#1e0010">e</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;nginx-sample-deployment&#34;</span>
   }
 
-  spec {
-    selector {
-      match_labels {
-        app = &quot;nginx-sample-deployment&quot;
+  <span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">c</span> {
+    <span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">r</span> <span style="color:#960050;background-color:#1e0010">{</span>
+      <span style="color:#960050;background-color:#1e0010">m</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">h</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">b</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">s</span> <span style="color:#960050;background-color:#1e0010">{</span>
+        <span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">p</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;nginx-sample-deployment&#34;</span>
       }
-    }
-    replicas = 3
-    template {
-      metadata {
-        labels {
-          app = &quot;nginx-sample-deployment&quot;
+    <span style="color:#960050;background-color:#1e0010">}</span>
+    <span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">s</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#ae81ff">3</span>
+    <span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">m</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">e</span> {
+      <span style="color:#960050;background-color:#1e0010">m</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">d</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">a</span> <span style="color:#960050;background-color:#1e0010">{</span>
+        <span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">b</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">s</span> <span style="color:#960050;background-color:#1e0010">{</span>
+          <span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">p</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;nginx-sample-deployment&#34;</span>
         }
-      }
-      spec {
-        container {
-          name = &quot;nignx&quot;
-          image = &quot;nginx:latest&quot;
-          port {
-            container_port = 80
+      <span style="color:#960050;background-color:#1e0010">}</span>
+      <span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">c</span> {
+        <span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">r</span> <span style="color:#960050;background-color:#1e0010">{</span>
+          <span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">m</span><span style="color:#960050;background-color:#1e0010">e</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;nignx&#34;</span>
+          <span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">m</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">g</span><span style="color:#960050;background-color:#1e0010">e</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;nginx:latest&#34;</span>
+          <span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">t</span> {
+            <span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">t</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#960050;background-color:#1e0010">8</span><span style="color:#960050;background-color:#1e0010">0</span>
           }
         }
-      }
-    }
-  }
-}
-</code></pre>
-
-<p>Terraform管理のいいところは、なんといっても、この<code>terraform plan</code>によるDry-runができることですね。
+      <span style="color:#960050;background-color:#1e0010">}</span>
+    <span style="color:#960050;background-color:#1e0010">}</span>
+  <span style="color:#960050;background-color:#1e0010">}</span>
+<span style="color:#960050;background-color:#1e0010">}</span>
+</code></pre></div><p>Terraform管理のいいところは、なんといっても、この<code>terraform plan</code>によるDry-runができることですね。
 やってみます。</p>
-
 <pre><code>$ terraform plan
 Refreshing Terraform state in-memory prior to plan...
 The refreshed state will be used to calculate this plan, but will not be
@@ -240,10 +214,7 @@ Terraform will perform the following actions:
 (中略)
 
 Plan: 1 to add, 0 to change, 0 to destroy.
-</code></pre>
-
-<p>差分を確認してapplyしてデプロイしていきます。</p>
-
+</code></pre><p>差分を確認してapplyしてデプロイしていきます。</p>
 <pre><code>$ terraform apply
 (中略)
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
@@ -257,12 +228,9 @@ NAME                                        READY     STATUS    RESTARTS   AGE
 nginx-sample-deployment-6c668d7f76-2djrb    1/1       Running   0          49s
 nginx-sample-deployment-6c668d7f76-5ncww    1/1       Running   0          49s
 nginx-sample-deployment-6c668d7f76-t9lfp    1/1       Running   0          49s
-</code></pre>
-
-<p>変更があったと仮定して、Terraformの定義ファイルの中身を少し変えてみます。
-レプリカ数とコンテナ名を変更してみました。<br />
+</code></pre><p>変更があったと仮定して、Terraformの定義ファイルの中身を少し変えてみます。
+レプリカ数とコンテナ名を変更してみました。<br>
 変更の差分を確認できるのはやっぱりTerraformで管理する最大のメリットですね。</p>
-
 <pre><code>$ terraform plan
 kubernetes_deployment.test: Refreshing state... (ID: default/nginx-sample-deployment)
 
@@ -279,16 +247,11 @@ Terraform will perform the following actions:
       spec.0.template.0.spec.0.container.0.name: &quot;nignx&quot; =&gt; &quot;nignx-hogege&quot;
 
 Plan: 0 to add, 1 to change, 0 to destroy.
-</code></pre>
-
-<h2 id="kubernetes側からクラウドリソースを制御する動き">Kubernetes側からクラウドリソースを制御する動き</h2>
-
+</code></pre><h2 id="kubernetes側からクラウドリソースを制御する動き">Kubernetes側からクラウドリソースを制御する動き</h2>
 <p>しかし最近はKubernetes側からクラウドリソースを制御するようにするという動きが顕著です。
-先日Redhatがオープンした<a href="https://www.operatorhub.io/">OperatorHub.io</a>ではAWSもカスタムリソースを提供していて、DynamoDBやSQSなどの一部のクラウドリソースをKubernetesから扱えるようにするモジュールを提供しています。<br />
+先日Redhatがオープンした<a href="https://www.operatorhub.io/">OperatorHub.io</a>ではAWSもカスタムリソースを提供していて、DynamoDBやSQSなどの一部のクラウドリソースをKubernetesから扱えるようにするモジュールを提供しています。<br>
 こちらについては、まだ試せていないので試したら別でブログに書こうと思います。</p>
-
 <p>以上にみてきたように、Terraformではstate管理ができるので、それゆえに差分管理やDry-runなどの機能が使えて便利な側面がありました。一方で、Kubernetes側からのクラウドリソースの管理の流れをみると、アプリケーション寄りの人はこちらのほうがスタンダードになってくるかなと思っている部分もあります。</p>
-
 <p>今後の動きが楽しみです。</p>
                     </div>
                     

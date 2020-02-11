@@ -9,7 +9,7 @@
     <meta name="description" content="Terraformのworkspace機能の入門から、実践的な利用方法までご紹介します。条件分岐(IF)などを使ったリソース名のコントロールなどを行いました。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2018/06/16/terraform-workspaces/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2018/06/16/terraform-workspaces/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Terraform workspaceを利用して環境毎のリソース名の変更を行う | Goldstine研究所">
@@ -80,17 +80,13 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>Terraformのバージョン0.9以降で追加された、workspace機能について自分の環境で使い始めたので、その使い方やtipsなどを残していきたいと思います。<br />
+                        <p>Terraformのバージョン0.9以降で追加された、workspace機能について自分の環境で使い始めたので、その使い方やtipsなどを残していきたいと思います。<br>
 workspaceは名前から推測できますが、同じTerraformのコードをワークスペース（環境）ごとに使い分けることのできる機能です。例えば、productionとdevelopmentの2つのworkspaceを作れば、同じTerraformコードを利用してこの2つの環境で別のリソースを作成していくことができます。</p>
-
-<p>Terraformでは、実行結果をstateファイルに保存することで、インフラストラクチャの状態を管理することができます。(<a href="https://www.terraform.io/docs/state/">ドキュメント</a>)<br />
+<p>Terraformでは、実行結果をstateファイルに保存することで、インフラストラクチャの状態を管理することができます。(<a href="https://www.terraform.io/docs/state/">ドキュメント</a>)<br>
 このworkspace機能を利用すると、このstateファイルを環境ごとに分けて管理するようになります。このあたりは使い方をみながら理解していきましょう。</p>
-
 <h2 id="workspaceはじめの一歩">workspaceはじめの一歩</h2>
-
 <p>まず、workspace機能は以下5つの機能しかなく、とてもシンプルです。
 基本的には、workspaceを作る、切り替える、消す。それが主なところです。</p>
-
 <pre><code>$ terraform workspace -h
 Usage: terraform workspace
 
@@ -102,11 +98,8 @@ Subcommands:
     new       Create a new workspace
     select    Select a workspace
     show      Show the name of the current workspace
-</code></pre>
-
-<p>はじめは<code>default</code>というworkspaceになっています。
+</code></pre><p>はじめは<code>default</code>というworkspaceになっています。
 それでは、<code>development</code>というworkspaceを作ってみます。</p>
-
 <pre><code>$ terraform workspace list
 * default
 
@@ -116,11 +109,8 @@ Created and switched to workspace &quot;development&quot;!
 $ terraform workspace list
   default
 * development
-</code></pre>
-
-<p><code>development</code>のworkspaceが作られ、切り替わっていることがわかります。<br />
+</code></pre><p><code>development</code>のworkspaceが作られ、切り替わっていることがわかります。<br>
 また、この状態でディレクトリを表示すると<code>terraform.tfstate.d/</code>というディレクトリができていることが確認できます。その中に、<code>development/</code>があります。tfstateファイルがこの中に保存されるようにな、環境ごとにstateファイルの保実行状態を管理できるようになるというものです。</p>
-
 <pre><code>$ ls -l
 -rw-r--r-- 1 mosuke5 197609 1056 Jun 16 19:24 main.tf
 drwxr-xr-x 1 mosuke5 197609    0 Jun 16 19:24 terraform.tfstate.d/
@@ -128,22 +118,14 @@ drwxr-xr-x 1 mosuke5 197609    0 Jun 16 19:24 terraform.tfstate.d/
 
 $ ls -l terraform.tfstate.d
 drwxr-xr-x 1 mosuke5 197609 0 Jun 16 19:24 development/
-</code></pre>
-
-<h2 id="実践的な利用を考える">実践的な利用を考える</h2>
-
+</code></pre><h2 id="実践的な利用を考える">実践的な利用を考える</h2>
 <p>入門部分をご紹介しましたが、これを実践でどのように利用していくのか、自分が趣味プロダクトを例にとって紹介します。</p>
-
-<p>開発環境と本番環境で分離するためにworkspaceを利用しています。<br />
+<p>開発環境と本番環境で分離するためにworkspaceを利用しています。<br>
 作成するリソースは開発環境と本番環境で同様であるが、もちろん設定内容が環境ごとに変わることもあります。環境ごとどのように設定をわけてるか３つの観点で紹介します。</p>
-
 <h3 id="tfvarsファイルを分ける">tfvarsファイルを分ける</h3>
-
 <p>まずは、Terraformの変数ファイルである<code>tfvars</code>ファイルを環境ごとにわけました。
 具体的には<code>terraform.tfvars.development</code>と<code>terraform.tfvars.production</code>にわけ、実行時に<code>-var-file</code>オプションを利用して、適切なファイルを選択するようにしました。</p>
-
 <p>development時の実行方法についてです。</p>
-
 <pre><code>$ ls -l ./terraform.tfvars.*
 terraform.tfvars.development
 terraform.tfvars.production
@@ -155,44 +137,31 @@ $ terraform workspace list
   production
 $ terraform plan -var-file=terraform.tfvars.development
 $ terraform apply -var-file=terraform.tfvars.development
-</code></pre>
-
-<h3 id="リソース名をworkspaceごとに変える">リソース名をworkspaceごとに変える</h3>
-
-<p>リソースに付ける名前ですが、同一の名前をつけてしまうと見分けがつかなくなります。場合によっては同一名称を付けることができないこともあります。<br />
+</code></pre><h3 id="リソース名をworkspaceごとに変える">リソース名をworkspaceごとに変える</h3>
+<p>リソースに付ける名前ですが、同一の名前をつけてしまうと見分けがつかなくなります。場合によっては同一名称を付けることができないこともあります。<br>
 いくつかやり方がありますが、リソース名については<code>project_name</code>という変数を用意しており、環境ごとにその名前をわけることにしています。</p>
-
 <p>terraformでは、workspaceの名前を変数的に利用することも可能です。
 そちらの方法については次でご紹介します。</p>
-
 <pre><code># terraform.tfvars.development
 project_name = &quot;mosuke5-gillsearch-dev&quot;
 region = &quot;ap-northeast-1&quot;
 ....
-</code></pre>
-
-<pre><code># terraform.tfvars.production
+</code></pre><pre><code># terraform.tfvars.production
 project_name = &quot;mosuke5-gillsearch-prod&quot;
 region = &quot;ap-northeast-1&quot;
 ....
-</code></pre>
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">v</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">b</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">e</span> <span style="color:#e6db74">&#34;project_name&#34;</span> {}
 
-<pre><code class="language-json">variable &quot;project_name&quot; {}
+<span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">u</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">e</span> <span style="color:#e6db74">&#34;aws_vpc&#34;</span> <span style="color:#e6db74">&#34;vpc&#34;</span> {
+  <span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">d</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">b</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">k</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;192.168.1.0/24&#34;</span>
 
-resource &quot;aws_vpc&quot; &quot;vpc&quot; {
-  cidr_block = &quot;192.168.1.0/24&quot;
-
-  tags {
-    Name = &quot;${var.project_name}-vpc&quot;
+  <span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">g</span><span style="color:#960050;background-color:#1e0010">s</span> {
+    <span style="color:#960050;background-color:#1e0010">N</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">m</span><span style="color:#960050;background-color:#1e0010">e</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;${var.project_name}-vpc&#34;</span>
   }
 }
-</code></pre>
-
-<h3 id="productionのときだけ名前を変えたい">productionのときだけ名前を変えたい</h3>
-
-<p>DNSをCloudFlareで管理しているのですが（<a href="https://blog.mosuke.tech/entry/2018/01/01/terraform-dns/">参照</a>）、DNSレコードを以下のように環境によって変える必要がありました。<br />
+</code></pre></div><h3 id="productionのときだけ名前を変えたい">productionのときだけ名前を変えたい</h3>
+<p>DNSをCloudFlareで管理しているのですが（<a href="https://blog.mosuke.tech/entry/2018/01/01/terraform-dns/">参照</a>）、DNSレコードを以下のように環境によって変える必要がありました。<br>
 workspace名をうまく使えばできそうですが、production環境だけはworkspaceの名前をいれるわけにはいきません。Terraformの条件分岐を使って以下のように実現しました。</p>
-
 <table>
 <thead>
 <tr>
@@ -200,39 +169,37 @@ workspace名をうまく使えばできそうですが、production環境だけ�
 <th align="right">Domain</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td align="left">production</td>
 <td align="right">gill-search.mosuke.tech</td>
 </tr>
-
 <tr>
 <td align="left">development</td>
 <td align="right">development.gill-search.mosuke.tech</td>
 </tr>
-
 <tr>
 <td align="left">staging</td>
 <td align="right">staging.gill-search.mosuke.tech</td>
 </tr>
+<tr>
+<td align="left">※<code>gill-search.mosuke.tech</code>というのがサービスのURL。</td>
+<td></td>
+</tr>
 </tbody>
 </table>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">u</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">e</span> <span style="color:#e6db74">&#34;cloudflare_record&#34;</span> <span style="color:#e6db74">&#34;gill-search&#34;</span> {
+  <span style="color:#960050;background-color:#1e0010">d</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">m</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">n</span>  <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;${var.cloudflare_domain}&#34;</span> <span style="color:#960050;background-color:#1e0010">#</span> <span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#960050;background-color:#1e0010">-</span> <span style="color:#e6db74">&#34;mosuke.tech&#34;</span><span style="color:#960050;background-color:#1e0010">が</span><span style="color:#960050;background-color:#1e0010">は</span><span style="color:#960050;background-color:#1e0010">い</span><span style="color:#960050;background-color:#1e0010">る</span>
 
-<p>※<code>gill-search.mosuke.tech</code>というのがサービスのURL。</p>
+  <span style="color:#960050;background-color:#1e0010">#</span> <span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">d</span><span style="color:#960050;background-color:#1e0010">u</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">の</span><span style="color:#960050;background-color:#1e0010">と</span><span style="color:#960050;background-color:#1e0010">き</span><span style="color:#960050;background-color:#1e0010">の</span><span style="color:#960050;background-color:#1e0010">み</span><span style="color:#960050;background-color:#1e0010">任</span><span style="color:#960050;background-color:#1e0010">意</span><span style="color:#960050;background-color:#1e0010">の</span><span style="color:#960050;background-color:#1e0010">値</span><span style="color:#960050;background-color:#1e0010">で</span><span style="color:#960050;background-color:#1e0010">、</span><span style="color:#960050;background-color:#1e0010">そ</span><span style="color:#960050;background-color:#1e0010">れ</span><span style="color:#960050;background-color:#1e0010">以</span><span style="color:#960050;background-color:#1e0010">外</span><span style="color:#960050;background-color:#1e0010">の</span><span style="color:#960050;background-color:#1e0010">と</span><span style="color:#960050;background-color:#1e0010">き</span><span style="color:#960050;background-color:#1e0010">に</span><span style="color:#960050;background-color:#1e0010">は</span><span style="color:#960050;background-color:#1e0010">w</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">k</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">名</span><span style="color:#960050;background-color:#1e0010">を</span><span style="color:#960050;background-color:#1e0010">入</span><span style="color:#960050;background-color:#1e0010">れ</span><span style="color:#960050;background-color:#1e0010">た</span><span style="color:#960050;background-color:#1e0010">い</span><span style="color:#960050;background-color:#1e0010">と</span><span style="color:#960050;background-color:#1e0010">思</span><span style="color:#960050;background-color:#1e0010">っ</span><span style="color:#960050;background-color:#1e0010">て</span><span style="color:#960050;background-color:#1e0010">い</span><span style="color:#960050;background-color:#1e0010">た</span><span style="color:#960050;background-color:#1e0010">。</span>
+  <span style="color:#960050;background-color:#1e0010">n</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">m</span><span style="color:#960050;background-color:#1e0010">e</span>    <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;${terraform.workspace == &#34;</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">d</span><span style="color:#960050;background-color:#1e0010">u</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">n</span><span style="color:#e6db74">&#34; ? &#34;</span><span style="color:#960050;background-color:#1e0010">g</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">h</span><span style="color:#e6db74">&#34; : &#34;</span><span style="color:#960050;background-color:#1e0010">$</span>{<span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">f</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">m</span><span style="color:#960050;background-color:#1e0010">.</span><span style="color:#960050;background-color:#1e0010">w</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">k</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">e</span>}<span style="color:#960050;background-color:#1e0010">.</span><span style="color:#960050;background-color:#1e0010">g</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">h</span><span style="color:#e6db74">&#34;}&#34;</span>
 
-<pre><code class="language-json">resource &quot;cloudflare_record&quot; &quot;gill-search&quot; {
-  domain  = &quot;${var.cloudflare_domain}&quot; # &lt;- &quot;mosuke.tech&quot;がはいる
-
-  # productionのときのみ任意の値で、それ以外のときにはworkspace名を入れたいと思っていた。
-  name    = &quot;${terraform.workspace == &quot;production&quot; ? &quot;gill-search&quot; : &quot;${terraform.workspace}.gill-search&quot;}&quot;
-
-  value   = &quot;${aws_eip.main.public_ip}&quot;
-  type    = &quot;A&quot;
-  ttl     = 1
-  proxied = true
+  <span style="color:#960050;background-color:#1e0010">v</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">u</span><span style="color:#960050;background-color:#1e0010">e</span>   <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;${aws_eip.main.public_ip}&#34;</span>
+  <span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">y</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">e</span>    <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;A&#34;</span>
+  <span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">l</span>     <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#ae81ff">1</span>
+  <span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">x</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">d</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#66d9ef">true</span>
 }
-</code></pre>
+</code></pre></div>
                     </div>
                     
                     

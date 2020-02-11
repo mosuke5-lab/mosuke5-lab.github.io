@@ -9,7 +9,7 @@
     <meta name="description" content="サービスの管理画面へSSHのローカルポート越しにhttpsで接続したい場面があります。その際の接続方法の注意点について書きました。接続するプロトコルの確認が重要です。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/02/11/172123/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2015/02/11/172123/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="SSHポートフォワードを通してhttps接続をするときの注意点 | Goldstine研究所">
@@ -80,66 +80,43 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>こんにちは、もーすけです。<br />
+                        <p>こんにちは、もーすけです。<br>
 SSHローカルフォワードを使いこなしてますか？SSHを制するものはインフラを制するとも言われています。最近良く使っているのですが、ローカルポートフォワードでhttps接続をする際に間違えやすいポイントがあるので紹介します。</p>
-
-<p>下記は、以前に書いたSSHのローカルポートフォワードに関する記事です。まず基本的な概念や使い方を知りたい方は書きを参照してください。
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2014/12/31/170545/" data-iframely-url="//cdn.iframe.ly/wDM0LAq"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
-
+<p>下記は、以前に書いたSSHのローカルポートフォワードに関する記事です。まず基本的な概念や使い方を知りたい方は書きを参照してください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2014/12/31/170545/" data-iframely-url="//cdn.iframe.ly/wDM0LAq"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
 <h2 id="1-やりたいこと">1. やりたいこと</h2>
-
 <p>今回やりたいことは、httpsでサービスを提供しているサーバへ、SSHローカルポートフォワーディングを使って接続するということです。
 該当のサーバへは、ネットワーク上、直接的に接続ができないためにポートフォワーディングを使って接続することをやりたいと考えています。
 ポートフォワーディングについてわからないよ、という方は上にはった記事をまずご覧ください。</p>
-
 <p>具体的なユースケースだと、KubernetesやGrafanaのダッシュボード(管理画面)などインターネットにそのまま公開していないが、接続にhttpsを接続に要求しており、SSH越しで接続したいなどがが考えられます。。</p>
-
 <p>このブログでのサンプルとして以下を想定します。</p>
-
 <ul>
 <li>とあるサブネット内に踏み台のEC2とGrafanaサーバがある。</li>
 <li>踏み台へはSSH可能で、それ以外からサブネット内に通信することは現状できない。</li>
 <li>Grafanaサーバは<code>https://grafana.mosuke.local</code>でSSLでリッスンしている。</li>
 </ul>
-
-<p><img src="/image/ssh-portforward-ssl.png" alt="ssh-portforward-ssl" /></p>
-
+<p><img src="/image/ssh-portforward-ssl.png" alt="ssh-portforward-ssl"></p>
 <h2 id="2-行ったこと">2. 行ったこと</h2>
-
-<p>対象のGrafanaサーバがhttpsで接続が可能なので、ローカル端末のポート5000(任意のポート)を踏み台サーバを経由してGrafanaサーバの443ポートにフォワードすれば問題ないと考えました。<br />
+<p>対象のGrafanaサーバがhttpsで接続が可能なので、ローカル端末のポート5000(任意のポート)を踏み台サーバを経由してGrafanaサーバの443ポートにフォワードすれば問題ないと考えました。<br>
 つまり、下記のようにsshでポートフォワーディング接続をしたあと、ブラウザから接続を試みました。</p>
-
 <pre><code>// 対象のサーバへローカルポートフォワードのため接続する。セッションはそのまま。
 $ ssh -L5000:grafana.mosuke.local:443 user@ec2-fumidai.example.com
-</code></pre>
-
-<ul>
+</code></pre><ul>
 <li>※ec2-fumidai.example.com: 踏み台のEC2のホスト名とする</li>
 <li>※grafana.mosuke.local: Grafanaサーバのプライベートホスト名とする　</li>
 </ul>
-
-<p>これでローカルフォワーディングの設定は終わったので、ブラウザから以下に接続すれば接続できると考えていました。しかし実際は接続することができませんでした。<br />
+<p>これでローカルフォワーディングの設定は終わったので、ブラウザから以下に接続すれば接続できると考えていました。しかし実際は接続することができませんでした。<br>
 それはなぜでしょうか？一度立ち止まって考えてみましょう。</p>
-
 <pre><code>http://localhost:5000 
-</code></pre>
-
-<h2 id="3-何が間違いだったか">3. 何が間違いだったか</h2>
-
+</code></pre><h2 id="3-何が間違いだったか">3. 何が間違いだったか</h2>
 <p>正しくは以下のようにhttpsプロトコルで接続をしなければいけません。「http<span style="color: #ff0000">s</span>」で接続が必要です。</p>
-
 <pre><code>https://localhost:5000 
-</code></pre>
-
-<p>よく考えればアタリマエのことですよね。<br />
-URLのはじめの&lt;http(s)&gt;の部分は<b>プロトコル</b>で最後の&lt;:5000&gt;の部分は<b>ポート番号</b>。<br />
+</code></pre><p>よく考えればアタリマエのことですよね。<br>
+URLのはじめの&lt;http(s)&gt;の部分は<b>プロトコル</b>で最後の&lt;:5000&gt;の部分は<b>ポート番号</b>。<br>
 <u><b><a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>は443のポートを一般的に使うが、ポート443が<a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>というわけではありません。</b></u></p>
-
-<p>そのため、ポート番号にかかわらず適切なプロトコルでの接続が必要です。リダイレクトしてくれるものならばいいですが、そうではないケースも実際にはありました。<br />
+<p>そのため、ポート番号にかかわらず適切なプロトコルでの接続が必要です。リダイレクトしてくれるものならばいいですが、そうではないケースも実際にはありました。<br>
 とても基本的なことだが、HTTPとHTTPSだと見落としてしまうこともあるので注意してください。</p>
-
 <h2 id="4-まとめ">4. まとめ</h2>
-
 <p>非常に単純なことではあるのですが間違えやすいポイントかと思います。ローカルポートフォワードの接続先で443ポートを指定したので感覚的にhttpsにしていると思いがちです。実際に接続するプロトコルがなにか、改めて見直してみるとこういったミスは軽減できるし、非常に重要なことです。</p>
                     </div>
                     

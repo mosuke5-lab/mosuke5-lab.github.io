@@ -9,7 +9,7 @@
     <meta name="description" content="serverlessconf tokyo 2016に参加してきた。サーバレスとはなにか、そしてクラウドの提供側の立場からみてサーバレスはどんな意図や戦略があるのかみていきます。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2016/10/02/212420/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2016/10/02/212420/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="サーバーレスとはなにか。クラウドロックインを加速させる一手 | Goldstine研究所">
@@ -80,45 +80,32 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><body>
+                        <body>
 <p><a href="http://tokyo.serverlessconf.io/">ServerlessConf Tokyo</a>に参加してきた。<br>
 今年8月から<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%D6%A5%EA%A5%C3%A5%AF%A5%AF%A5%E9%A5%A6%A5%C9">パブリッククラウド</a>の事業に異動していて、<br>
-開発者の立場より<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>提供側の立場として参加してきたので、また面白かった。</p></p>
-
+開発者の立場より<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>提供側の立場として参加してきたので、また面白かった。</p>
 <p>せっかくなので、自分なりにサーバレスについてまとめる。<br>
 クラウド提供側の立場から見たサーバレスについて考えてみます。</p>
-
 <h2>1. サーバレスってなんだっけ</h2>
-
 <p>カンファレンスの中でもサーバレスの定義についてはいろいろな意見がでていた。<br>
 Martin Fowlerのブログではサーバレスの定義として下記２つが書いてある。</p>
-
 <ul>
 <li>BaaS (Backend as a Service) : ex) firebase</li>
 <li>FaaS (Function as a Service) : ex) <a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda</li>
 </ul>
-
 <p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fmartinfowler.com%2Farticles%2Fserverless.html" title="Serverless Architectures" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://martinfowler.com/articles/serverless.html">martinfowler.com</a></cite></p>
-
 <p>ですが、ここでは焦点を絞って話すためにもFaaSということにしておく。<br>
 主にFaaSについて話したいのと、BaaSもいれてしまうと<a class="keyword" href="http://d.hatena.ne.jp/keyword/SaaS">SaaS</a>もサーバレスとかややこしいことになるので。</p>
-
 <h3>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda</h3>
-
 <p>なんといってもサーバレスの概念を推し進めたのは<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambdaでしょう。<br>
 説明はいまさら不要だと思うが、少しだけ。</p>
-
 <blockquote><p>コードを <a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda にアップロードすると、サービスが <a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> インフラストラクチャを使用してコードの実行を代行するコンピューティングサービスです。コードをアップロードして、Lambda 関数と呼ばれる関数を作成することで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a> Lambda がコードを実行するサーバーのプロビジョニングおよび管理を行います。(<a href="https://aws.amazon.com/jp/lambda/details/">https://aws.amazon.com/jp/lambda/details/</a>)</p></blockquote>
-
 <p>課金モデルは関数呼び出した回数、および実行に利用したコンピュートのスペックによって決まる。<br>
 また特徴的なことは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>の他のサービスで発生したイベントをトリガーに実行できること。<br>
 例えば、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Amazon%20S3">Amazon S3</a>にファイルアップロードされたことをトリガーにLambdaを実行できるのだ。</p>
-
 <h3>サーバレスの特徴</h3>
-
 <p>サーバレス自体そしてサーバレスで実装することの特徴しては下記がある。</p>
-
 <ol>
 <li>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>上のイベントを契機に実行できる</li>
@@ -126,28 +113,20 @@ Martin Fowlerのブログではサーバレスの定義として下記２つが�
 <li>実行環境は独立していて、コードは基本的にstatelessである</li>
 <li>上記のようにimmutableでstatelessな構造につくるからこそスケールしやすい</li>
 </ol>
-
 <h2>2. どんな用途で利用しているか</h2>
-
 <h3>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>基盤のイベントをトリガーとして</h3>
-
 <p>個人的に一番強力だと思っている使い方。上で説明したとおりだが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>上のプロダクトに対してのイベントをトリガーに処理を行うことができる。<br>
 例えばこんな場合を想定してみよう。</p>
-
 <p>ユーザが写真をアップロードするサービスで、アップロードした写真にたいして何かしらの画像解析をしてメタ情報を持ちたいとする。<br>
 ざっと従来のやりかただと２つくらいやり方が思い浮かぶ。</p>
-
 <h4>(1) アップロードするたびに<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>で画像解析をする</h4>
-
 <ul>
 <li>解析にほとんど時間がかからない場合などはこれでいいと思う</li>
 <li>時間がかかるようなだとユーザへのレスポンスが遅くなる</li>
 <li>速くしようと思うとスケールアップで対応するしかない（やばい）</li>
 </ul>
-
 <h4>(2) <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>でやる</h4>
-
 <ul>
 <li>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>で画像解析はまとめてやる。一番よくあるのでは？</li>
@@ -156,29 +135,20 @@ Martin Fowlerのブログではサーバレスの定義として下記２つが�
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>でまとめて処理した場合、どこかでコケたときが辛い</li>
 <li>この例ならそうでもないが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%C3%A5%C1%BD%E8%CD%FD">バッチ処理</a>ではたいていスケールアウトが辛い</li>
 </ul>
-
 <p>このケースに対してLambdaであればどうなるか。<br>
 1000件のアップロードに対して、1000回のLambda実行によって対応できる。<br>
 これは何万件きても同じことで、スケールの面で大変優れている。<br>
 また、1件ごとに処理するため、エラーが発生した場合に原因などとても追いやすい。</p>
-
 <h3>アプリの<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>として</h3>
-
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>でいうと、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/Gateway">Gateway</a>と組み合わせて、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>サーバとして利用するケース。<br>
 S3などのデータストアに直接アクセスできるように作ることもできるため、ファイルアップロードなどで使われることが多いとか。<br>
 個人的には今のところあまり魅力的には感じない使い方。</p>
-
 <h3>事例紹介</h3>
-
 <p>カンファレンスのなかで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%FC%B7%D0%BF%B7%CA%B9">日経新聞</a>社さんののサーバレス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>の事例が一番よかったのでぜひ目を通しほしい。</p>
-
 <p><iframe allowfullscreen="true" allowtransparency="true" frameborder="0" height="463" id="talk_frame_361815" mozallowfullscreen="true" src="//speakerdeck.com/player/b4286c46056c404cbd272e253033d0df" style="border:0; padding:0; margin:0; background:transparent;" webkitallowfullscreen="true" width="710"></iframe><cite class="hatena-citation"><a href="https://speakerdeck.com/ikait/serverless-architecture-supports-nikkeis-paper-viewer">speakerdeck.com</a></cite></p>
-
 <p>ポイントとしては下記。見事にLambdaの特徴を活かした利用をしている。</p>
-
 <ul>
 <li>新聞は基本的には朝刊と夕刊の２回で限られたときだけ処理する点
-
 <ul>
 <li>常時稼働させたくない。EC2立ち上げっぱなしにする必要がない。</li>
 </ul>
@@ -186,26 +156,21 @@ S3などのデータストアに直接アクセスできるように作ること
 <li>しかし、号外や速報など臨時の場合もただあり、それにも備えられる点</li>
 <li>日によってニュースの量が異なるため、いつでもスケールできる必要がある点</li>
 </ul>
-
 <h2>3. <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ベンダーからみたサーバレスの立ち位置</h2>
-
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ベンダーにとってサーバレスはどういう立ち位置なのだろうか。<br>
 ぼくは<span style="font-size: 150%">「各サービスの横串」</span>と考えています。<br>
 EC2、S3、RDSなどなどそれぞれのサービスは単体としてとてもよくできている。<br>
 しかし横の連携をしようと思うと別途様々な工夫が必要なのが現状だ。</p>
-
 <p>サーバレスはその横の連携を担うのだ。<br>
 各サービス間を紐で固く結びつけてしまう。<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>ロックインを加速させる役割も持つ。</p>
-
 <p>そして、IoTへの布石。<br>
 IoTの世界ではリアルタイムなセンサーの情報のやりとりでデ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4">バイ</a>スとデータセンタ間の通信遅延が許容できないことがある。<br>
 そこでいま研究が進んでいるエッジコンピューティング（フォグコンピューティングとも）などがあるが、<br>
 LambdaのようにImmutable, Statelessが前提で作られる、どこの環境でも実行可能な状態はIoTと相性がいいようにみえる。</p>
-
-<p><p>今後どうなっていくかはわからないが、<br>
+<p>今後どうなっていくかはわからないが、<br>
 デ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4">バイ</a>スに近いエッジコンピューティング側はLambdaでさばき、そのさばいたデータを中央のデータセンターへ、<br>
 なんていうことが主流になってくるかもしれない。と思うとFaaSの存在は見逃せない気がしてくる。</p>
-</body></p>
+</body>
                     </div>
                     
                     

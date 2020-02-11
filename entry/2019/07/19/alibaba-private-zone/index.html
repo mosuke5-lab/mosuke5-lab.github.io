@@ -9,7 +9,7 @@
     <meta name="description" content="Alibaba CloudのPrivateZoneというVPC内での名前解決の機能について確認してみました。CENとの組み合わせで日中間での名前解決ができるようになることは非常にいい進化と感じています。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/07/19/alibaba-private-zone/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/07/19/alibaba-private-zone/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Alibaba CloudでのPrivate DNS(PrivateZone)の仕様と用途の解説 | Goldstine研究所">
@@ -80,40 +80,29 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>お疲れ様です。mosuke5です。<br />
+                        <p>お疲れ様です。mosuke5です。<br>
 Alibaba Cloudのプライベートの名前解決機能である、<a href="https://www.alibabacloud.com/products/private-zone" target="_bkank">PrivateZone</a>の仕様とその用途について解説していきます。</p>
-
 <h2 id="privatezoneとは">PrivateZoneとは</h2>
-
 <p>Alibaba CloudにはDNSのサービスがあり、インターネットからのアクセスに対しては昔から名前解決をすることができました。
 しかし、VPC内部でだけ使うプライベートアドレスに対しての名前解決については今までできませんでした。
 PrivateZoneは、VPC内部だけで使えるDNSです。
 この機能により、VPC内部でのシステム間の連携やサーバ管理などが楽になります。</p>
-
 <h2 id="名前解決のパターン検証">名前解決のパターン検証</h2>
-
 <p>使い方は簡単なので、本ブログでは使い方の説明はしません。
 確認したことをベースに書き残していきます。</p>
-
-<p>まずはZoneを作ります。プライベートの空間なのでZoneの名前は適当に&rdquo;mosuke.local&rdquo;としました。<br />
+<p>まずはZoneを作ります。プライベートの空間なのでZoneの名前は適当に&quot;mosuke.local&quot;としました。<br>
 作成したZoneはVPCとBind（紐づけ）することができます。紐づけたVPCからのみ名前解決ができるようになります。
 ちなみに、複数のVPCと紐付けることができますので、異なるVPC間での名前解決も可能です。
 これは、日中をつなぐ構成にはいいですね。</p>
-
 <h3 id="ecsの名前解決">ECSの名前解決</h3>
-
-<p>まずは、紐づけしたVPCの中にECSを1台立てます。<br />
+<p>まずは、紐づけしたVPCの中にECSを1台立てます。<br>
 そのECSのプライベートIPアドレスをAレコードとして登録します。
-設定は以上です。<br />
+設定は以上です。<br>
 AWSのRoute53のプライベートDNSとは違って、VPC側の設定などは特に必要ありません。</p>
-
 <pre><code>aaaa.mosuke.local  A 192.168.1.205 
-</code></pre>
-
-<p>作成したECSにログインして、確認してみます。
-ECS側もとくに設定はいじる必要はありません。<br />
+</code></pre><p>作成したECSにログインして、確認してみます。
+ECS側もとくに設定はいじる必要はありません。<br>
 しっかりプライベートアドレスで名前解決ができていることが確認できました。</p>
-
 <pre><code># dig aaaa.mosuke.local
 
 ; &lt;&lt;&gt;&gt; DiG 9.9.4-RedHat-9.9.4-74.1.al7.1 &lt;&lt;&gt;&gt; test.mosuke.local
@@ -134,19 +123,12 @@ test.mosuke.local.	60	IN	A	192.168.1.205
 ;; SERVER: 100.100.2.136#53(100.100.2.136)
 ;; WHEN: 金  7月 19 13:25:04 CST 2019
 ;; MSG SIZE  rcvd: 62
-</code></pre>
-
-<h3 id="ワイルドカードでの名前解決">ワイルドカードでの名前解決</h3>
-
+</code></pre><h3 id="ワイルドカードでの名前解決">ワイルドカードでの名前解決</h3>
 <p>わけあってワイルドカードでの名前解決も確認しました。
 下記のとおり、レコードを登録。</p>
-
 <pre><code>*.apps.mosuke.local A 192.168.1.205 
-</code></pre>
-
-<p>*の部分がなんであっても<code>192.168.1.205</code>を返す想定です。
+</code></pre><p>*の部分がなんであっても<code>192.168.1.205</code>を返す想定です。
 <code>a.apps.mosuke.local</code>と<code>ab.apps.mosuke.local</code>を試してみますが、期待通りでした。</p>
-
 <pre><code># dig a.apps.mosuke.local
 
 ; &lt;&lt;&gt;&gt; DiG 9.9.4-RedHat-9.9.4-74.1.al7.1 &lt;&lt;&gt;&gt; a.apps.mosuke.local
@@ -190,19 +172,12 @@ ab.apps.mosuke.local.	60	IN	A	192.168.1.205
 ;; WHEN: 金  7月 19 13:25:47 CST 2019
 ;; MSG SIZE  rcvd: 65
 
-</code></pre>
-
-<h3 id="rdsなどのマネージドサービスの名前解決">RDSなどのマネージドサービスの名前解決</h3>
-
+</code></pre><h3 id="rdsなどのマネージドサービスの名前解決">RDSなどのマネージドサービスの名前解決</h3>
 <p>ECSだけではなく、RDSなどのマネージドサービスでエンドポイントを持つものにも役に立ちます。
 RDSを１つ構築して、そのエンドポイントをCNAMEとして登録しました。</p>
-
 <pre><code>db.mosuke.local  CNAME  rm-0iwmm56ph2qe2v9n6.mysql.japan.rds.aliyuncs.com
-</code></pre>
-
-<p>接続するときに、<code>db.mosuke.local</code>と任意のものを指定できるようになったのはいいですね。<br />
+</code></pre><p>接続するときに、<code>db.mosuke.local</code>と任意のものを指定できるようになったのはいいですね。<br>
 DBの入れ替えなど発生してもアプリケーション側で変更がいらないです。</p>
-
 <pre><code># dig db.mosuke.local
 
 ; &lt;&lt;&gt;&gt; DiG 9.9.4-RedHat-9.9.4-74.1.al7.1 &lt;&lt;&gt;&gt; db.mosuke.local
@@ -236,27 +211,17 @@ Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
 Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 
 MySQL [(none)]&gt;
-</code></pre>
-
-<h3 id="vpc間の名前解決">VPC間の名前解決</h3>
-
-<p>続いて、VPC間です。<br />
+</code></pre><h3 id="vpc間の名前解決">VPC間の名前解決</h3>
+<p>続いて、VPC間です。<br>
 Alibaba CloudではCENといったプロダクトで日本と中国のリージョンのVPCをプライベートネットワークで結ぶのは定石です。
 こちらの構成でも非常に役に立ちます。今回は同じリージョン内のもう１つのVPCとしましたが同じことが国際間でもできます。</p>
-
 <h4 id="概要図">概要図</h4>
-
-<p><img src="/image/alibaba-cen-ping.png" alt="cen-ping" /></p>
-
+<p><img src="/image/alibaba-cen-ping.png" alt="cen-ping"></p>
 <h4 id="cenの設定">CENの設定</h4>
-
-<p><img src="/image/alibaba-cen-setting.png" alt="cen-setting" /></p>
-
+<p><img src="/image/alibaba-cen-setting.png" alt="cen-setting"></p>
 <h4 id="結果">結果</h4>
-
 <p>VPC BのインスタンスからVPC AのインスタンスとVPC A内のRDSに対して疎通確認を行いました。
 期待通りの結果です。</p>
-
 <pre><code># ping aaaa.mosuke.local
 PING aaaa.mosuke.local (192.168.1.205) 56(84) bytes of data.
 64 bytes from 192.168.1.205 (192.168.1.205): icmp_seq=1 ttl=64 time=0.367 ms
@@ -276,10 +241,7 @@ PING rm-0iwmm56ph2qe2v9n6.mysql.japan.rds.aliyuncs.com (192.168.1.206) 56(84) by
 --- rm-0iwmm56ph2qe2v9n6.mysql.japan.rds.aliyuncs.com ping statistics ---
 3 packets transmitted, 3 received, 0% packet loss, time 2019ms
 rtt min/avg/max/mdev = 0.162/0.174/0.189/0.015 ms
-</code></pre>
-
-<h2 id="まとめ">まとめ</h2>
-
+</code></pre><h2 id="まとめ">まとめ</h2>
 <p>Alibaba CloudにできたPrivateZoneを試してみました。
 確認した限り、必要なことはおおむねできそうでよいです。
 とくに、Alibaba Cloudの最大のユースケースである、日中間で利用した際の通信でDNSを使えるのでなかなかいい進化ではないかと思っています。</p>

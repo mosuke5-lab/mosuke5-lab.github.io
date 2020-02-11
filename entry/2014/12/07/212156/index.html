@@ -9,7 +9,7 @@
     <meta name="description" content=" VPS1台でインフラ勉強シリーズでVPN構築を行った。Softeatherを使って、VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにします">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2014/12/07/212156/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2014/12/07/212156/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="【VPS1台でインフラ勉強】SoftEtherを使ってVPN構築 | Goldstine研究所">
@@ -80,23 +80,19 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><body>
+                        <body>
 <p>おつかれさまです。もーすけです。<br>
-VPS1台でインフラ勉強シリーズの第3回目でVPN構築を行ったのでその知見を残しておきます。</p></p>
-
-<p><li>第1回 <a href="https://blog.mosuke.tech/entry/2014/10/09/230555/">サーバ複数台構成、Nginxでリバースプロキシ構築</a></li>
+VPS1台でインフラ勉強シリーズの第3回目でVPN構築を行ったのでその知見を残しておきます。</p>
+<li>第1回 <a href="https://blog.mosuke.tech/entry/2014/10/09/230555/">サーバ複数台構成、Nginxでリバースプロキシ構築</a></li>
 <li>第2回 <a href="https://blog.mosuke.tech/entry/2014/11/09/171436">HAProxyでロードバランサ構築</a></li>
-<li>第3回 SoftEtherを使ってVPN構築</li></p>
-
-<p><div class="section">
+<li>第3回 SoftEtherを使ってVPN構築</li>
+<div class="section">
     <h2>1. 実施したこと</h2>
-    <p>VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。</p></p>
-
-<p><div class="section">
+    <p>VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。</p>
+<div class="section">
     <p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20141207200544.png" alt="f:id:mosuke5:20141207200544p:plain" title="f:id:mosuke5:20141207200544p:plain" class="hatena-fotolife" itemprop="image"></span><br>
-</p></p>
-
-<p></div>
+</p>
+</div>
 </div>
 <div class="section">
     <h2>2. 環境</h2>
@@ -105,9 +101,8 @@ VPS1台でインフラ勉強シリーズの第3回目でVPN構築を行ったの
 ・CPU：仮想２コア<br>
 ・HDD：100GB<br>
 ・OS：CentOS7<br>
-・サーバ仮想化：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>(Utuntu13)</p></p>
-
-<p></div>
+・サーバ仮想化：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>(Utuntu13)</p>
+</div>
 <div class="section">
     <h2>3. <a class="keyword" href="http://d.hatena.ne.jp/keyword/SoftEther">SoftEther</a>のインストール</h2>
     <p>インストール手順は公式ドキュメント通りなので簡単にコマンドのみ記述しておく。<br>
@@ -117,8 +112,7 @@ VPS1台でインフラ勉強シリーズの第3回目でVPN構築を行ったの
 <a href="http://www.softether-download.com/ja.aspx?product=softether">SoftEther ダウンロード センター</a></p>
 <p>・<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DD%A1%BC%A5%CD%A5%F3%A5%C8">コンポーネント</a>：<a class="keyword" href="http://d.hatena.ne.jp/keyword/SoftEther">SoftEther</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a> Server<br>
 ・プラットフォーム：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Linux">Linux</a><br>
-・CPU：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Intel">Intel</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/x86">x86</a> / <a class="keyword" href="http://d.hatena.ne.jp/keyword/AMD64">AMD64</a>(64bit)</p></p>
-
+・CPU：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Intel">Intel</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/x86">x86</a> / <a class="keyword" href="http://d.hatena.ne.jp/keyword/AMD64">AMD64</a>(64bit)</p>
 <pre><code>## ダウンロード
 $ wget ttp://jp.softether-download.com/files/softether/v4.08-9449-rtm-2014.06.08-tree/Linux/SoftEther%20VPN%20Server/64bit%20-%20Intel%20x64%20or%20AMD64/softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz
 
@@ -200,33 +194,25 @@ vpnserver      	0:off	1:off	2:on	3:on	4:on	5:on	6:off
 
 ##起動
 $ sudo /etc/init.d/vpnserver start  
-</code></pre>
-
-<p></div>
+</code></pre></div>
 <div class="section">
-    <h2>4. 設定</h2></p>
-
-<p><div class="section">
-    <h4>(1)管理者パスワードの設定</h4></p>
-
+    <h2>4. 設定</h2>
+<div class="section">
+    <h4>(1)管理者パスワードの設定</h4>
 <pre><code>## vpnserverへ接続
 $ sudo ./vpncmd localhost:443 /SERVER
 
 ## 管理者パスワード設定
 VPN Server&gt; ServerPasswordSet 
-</code></pre>
-
-<p></div>
+</code></pre></div>
 <div class="section">
     <h4>(2)仮想HUBの作成</h4>
     <p>デフォルトで「default」という仮想がHUBがあるのでそれで構築。<br>
-自分の仮想HUBを作りたければHubCreateでつくれる。</p></p>
-
-<pre><code>VPN Server&gt; HubCreate 
-</code></pre>
-
+自分の仮想HUBを作りたければHubCreateでつくれる。</p>
+```
+VPN Server> HubCreate 
+```
 <p>※HELPコマンドがだいぶ使えるので使おう。日本語で書かれているのでわかりやすいです。</p>
-
 <pre><code>VPN Server&gt;HELP
 下記の 205 個のコマンドが使用できます:
  About                      - バージョン情報の表示
@@ -235,108 +221,95 @@ VPN Server&gt; ServerPasswordSet
  AcDel                      - 接続元 IP 制限リスト内のルールの削除
  AcList                     - 接続元 IP 制限リストのルール一覧の取得
 (...以下略) 
-</code></pre>
-
-<p></div>
+</code></pre></div>
 <div class="section">
     <h4>(3) <a class="keyword" href="http://d.hatena.ne.jp/keyword/IPsec">IPsec</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a> サーバー機能の有効化</h4>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>のトンネリングをするにあたって事前共有鍵が必要なので作成する必要がある。</p></p>
-
-<pre><code>VPN Server&gt;IPsecEnable
+    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>のトンネリングをするにあたって事前共有鍵が必要なので作成する必要がある。</p>
+```
+VPN Server>IPsecEnable
     IPsecEnable コマンド - IPsec VPN サーバー機能の有効化 / 無効化
     L2TP over IPsec サーバー機能を有効 (yes / no): yes
     Raw L2TP サーバー機能を有効 (yes / no): yes
     EtherIP / L2TPv3 over IPsec サーバー機能を有効 (yes / no): yes
     IPsec 事前共有鍵の文字列 (9 文字以下を推奨): *******
     VPN 接続時に仮想 HUB 名が省略された場合のデフォルト仮想 HUB 名: Default 
-</code></pre>
-
-<p></div>
+```
+</div>
 <div class="section">
     <h4>(4) グループとユーザの作成</h4>
     <p>ユーザを作成するにはグループの作成が必要なので先にグループを作る。<br>
-また、ユーザを作ったでではパスワードが設定されないので忘れずにパスワード設定。</p></p>
-
-<pre><code>VPN Server&gt;Hub Default
-VPN Server/DEFAULT&gt;GroupCreate
+また、ユーザを作ったでではパスワードが設定されないので忘れずにパスワード設定。</p>
+```
+VPN Server>Hub Default
+VPN Server/DEFAULT>GroupCreate
     GroupCreate コマンド - グループの作成
     グループ名: mygroup
     グループの本名: mygroup
     グループの説明: mygroup
+<p>VPN Server/DEFAULT&gt;UserCreate
+UserCreate コマンド - ユーザーの作成
+ユーザー名: myuser
+参加するグループ名: mygroup
+ユーザーの本名: myuser
+ユーザーの説明: myuser
+コマンドは正常に終了しました。</p>
+<h2 id="ユーザを作っただけではパスワードが設定されないので">ユーザを作っただけではパスワードが設定されないので</h2>
+<p>VPN Server/DEFAULT&gt; UserPasswordSet</p>
+<pre><code>&lt;/div&gt;
+&lt;div class=&quot;section&quot;&gt;
+    &lt;h4&gt;(5) ローカルブリッジの設定&lt;/h4&gt;
+    &lt;p&gt;次にローカルブリッジの設定をする。&lt;br&gt;
+ローカルブリッジは&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/VPN&quot;&gt;VPN&lt;/a&gt;の仮想ネットワークと、LAN の実ネットワーク（ここでは&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/VPS&quot;&gt;VPS&lt;/a&gt;ホストサーバと仮想Webサーバ間のローカルネットワーク）をつなげる設定です。&lt;br&gt;
+ローカルブリッジを行うLANカードを指定する必要があるが、ここでは仮想の「vboxnet0」を使用します。&lt;/p&gt;
+</code></pre><p>VPN Server/DEFAULT&gt;BridgeCreate
+BridgeCreate コマンド - ローカルブリッジ接続の作成
+ブリッジする仮想 HUB 名: Default
+ブリッジ先のデバイス名: vboxnet0</p>
+<pre><code>&lt;/div&gt;
+&lt;div class=&quot;section&quot;&gt;
+    &lt;h4&gt;(6) &lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/DHCP&quot;&gt;DHCP&lt;/a&gt;の設定&lt;/h4&gt;
+    &lt;p&gt;&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/VPN&quot;&gt;VPN&lt;/a&gt;クライアント側に割り当てる&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&quot;&gt;IPアドレス&lt;/a&gt;のレンジを決めてあげます。&lt;br&gt;
+今回は最小限構成で実現するため、ローカルの&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&quot;&gt;IPアドレス&lt;/a&gt;は同一セグメントとしました。&lt;br&gt;
+192.168.33.0/24を利用セグメントとした。&lt;br&gt;
+また、サーバ側に割り当てているIPとバッティングしないように192.168.33.20以降を&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/DHCP&quot;&gt;DHCP&lt;/a&gt;のIPレンジとした。&lt;/p&gt;
+</code></pre><p>##まずは有効化。これをやらないと「PPPサーバーとの接続が確立ができません」ってなってハマります。
+VPN Server/example&gt; SecureNatEnable</p>
+<p>VPN Server/DEFAULT&gt;DhcpSet
+DhcpSet コマンド - SecureNAT 機能の仮想 DHCP サーバー機能の設定の変更
+配布するアドレス帯の開始点: 192.168.33.20
+配布するアドレス帯の終了点: 192.168.33.50
+サブネットマスク: 255.255.255.0
+リース期限 (秒): 7200
+デフォルトゲートウェイ (未設定可):
+DNS サーバー 1 (未設定可):
+DNS サーバー 2 (未設定可):
+ドメイン名:
+ログの保存 (yes / no): yes</p>
+<pre><code>&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot;&gt;
+    &lt;h2&gt;5. &lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/VPN&quot;&gt;VPN&lt;/a&gt;接続試験&lt;/h2&gt;
+    &lt;p&gt;&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/iPhone&quot;&gt;iPhone&lt;/a&gt;の&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/VPN&quot;&gt;VPN&lt;/a&gt;の設定から以下のように設定をする。&lt;br&gt;
+アカウントの部分は「ユーザ名@仮想Hub名」にすること。&lt;br&gt;
+&lt;span itemscope itemtype=&quot;http://schema.org/Photograph&quot;&gt;&lt;img src=&quot;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207212531.jpg&quot; alt=&quot;f:id:mosuke5:20141207212531j:plain&quot; title=&quot;f:id:mosuke5:20141207212531j:plain&quot; class=&quot;hatena-fotolife&quot; itemprop=&quot;image&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;br&gt;
+&lt;p&gt;接続すると、ローカルのIPが割り当てられていることを確認。&lt;br&gt;
+途中で切れているが192.168.33.21が割り当てられました。&lt;br&gt;
+&lt;span itemscope itemtype=&quot;http://schema.org/Photograph&quot;&gt;&lt;img src=&quot;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207212546.jpg&quot; alt=&quot;f:id:mosuke5:20141207212546j:plain&quot; title=&quot;f:id:mosuke5:20141207212546j:plain&quot; class=&quot;hatena-fotolife&quot; itemprop=&quot;image&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/VPN&quot;&gt;VPN&lt;/a&gt;につないだ状態でブラウザから192.168.33.10にアクセスすると”It works!!!”。&lt;br&gt;
+&lt;span itemscope itemtype=&quot;http://schema.org/Photograph&quot;&gt;&lt;img src=&quot;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207212556.jpg&quot; alt=&quot;f:id:mosuke5:20141207212556j:plain&quot; title=&quot;f:id:mosuke5:20141207212556j:plain&quot; class=&quot;hatena-fotolife&quot; itemprop=&quot;image&quot;&gt;&lt;/span&gt;&lt;br&gt;
+&lt;/p&gt;
 
-VPN Server/DEFAULT&gt;UserCreate
-    UserCreate コマンド - ユーザーの作成
-    ユーザー名: myuser
-    参加するグループ名: mygroup
-    ユーザーの本名: myuser
-    ユーザーの説明: myuser
-    コマンドは正常に終了しました。
+&lt;/div&gt;
+&lt;div class=&quot;section&quot;&gt;
+    &lt;h2&gt;6 最後に&lt;/h2&gt;
+    &lt;p&gt;&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/VPN&quot;&gt;VPN&lt;/a&gt;の構築そのものはなんとかできるが、やはり奥は深い。&lt;br&gt;
+挙動がまだ不安定な部分もあるので、きちんと仕組みを理解していくことと、&lt;br&gt;
+今回は&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/VPN&quot;&gt;VPN&lt;/a&gt;クライアント側とアクセス先サーバを同一セグメントとしたので、L3の設定などをして違うセグメントにもアクセスできるようにしていきたい。&lt;/p&gt;
 
-## ユーザを作っただけではパスワードが設定されないので
-VPN Server/DEFAULT&gt; UserPasswordSet 
+&lt;/div&gt;
+&lt;/body&gt;
 </code></pre>
-
-<p></div>
-<div class="section">
-    <h4>(5) ローカルブリッジの設定</h4>
-    <p>次にローカルブリッジの設定をする。<br>
-ローカルブリッジは<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>の仮想ネットワークと、LAN の実ネットワーク（ここでは<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>ホストサーバと仮想Webサーバ間のローカルネットワーク）をつなげる設定です。<br>
-ローカルブリッジを行うLANカードを指定する必要があるが、ここでは仮想の「vboxnet0」を使用します。</p></p>
-
-<pre><code>VPN Server/DEFAULT&gt;BridgeCreate
-    BridgeCreate コマンド - ローカルブリッジ接続の作成
-    ブリッジする仮想 HUB 名: Default
-    ブリッジ先のデバイス名: vboxnet0 
-</code></pre>
-
-<p></div>
-<div class="section">
-    <h4>(6) <a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>の設定</h4>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>クライアント側に割り当てる<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>のレンジを決めてあげます。<br>
-今回は最小限構成で実現するため、ローカルの<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>は同一セグメントとしました。<br>
-192.168.33.0/24を利用セグメントとした。<br>
-また、サーバ側に割り当てているIPとバッティングしないように192.168.33.20以降を<a class="keyword" href="http://d.hatena.ne.jp/keyword/DHCP">DHCP</a>のIPレンジとした。</p></p>
-
-<pre><code>##まずは有効化。これをやらないと「PPPサーバーとの接続が確立ができません」ってなってハマります。
-VPN Server/example&gt; SecureNatEnable
-
-VPN Server/DEFAULT&gt;DhcpSet
-    DhcpSet コマンド - SecureNAT 機能の仮想 DHCP サーバー機能の設定の変更
-    配布するアドレス帯の開始点: 192.168.33.20
-    配布するアドレス帯の終了点: 192.168.33.50
-    サブネットマスク: 255.255.255.0
-    リース期限 (秒): 7200
-    デフォルトゲートウェイ (未設定可):
-    DNS サーバー 1 (未設定可):
-    DNS サーバー 2 (未設定可):
-    ドメイン名:
-    ログの保存 (yes / no): yes 
-</code></pre>
-
-<p></div>
-</div>
-<div class="section">
-    <h2>5. <a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>接続試験</h2>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/iPhone">iPhone</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>の設定から以下のように設定をする。<br>
-アカウントの部分は「ユーザ名@仮想Hub名」にすること。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207212531.jpg" alt="f:id:mosuke5:20141207212531j:plain" title="f:id:mosuke5:20141207212531j:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<br>
-<p>接続すると、ローカルのIPが割り当てられていることを確認。<br>
-途中で切れているが192.168.33.21が割り当てられました。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207212546.jpg" alt="f:id:mosuke5:20141207212546j:plain" title="f:id:mosuke5:20141207212546j:plain" class="hatena-fotolife" itemprop="image"></span></p>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>につないだ状態でブラウザから192.168.33.10にアクセスすると”It works!!!”。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207212556.jpg" alt="f:id:mosuke5:20141207212556j:plain" title="f:id:mosuke5:20141207212556j:plain" class="hatena-fotolife" itemprop="image"></span><br>
-</p></p>
-
-<p></div>
-<div class="section">
-    <h2>6 最後に</h2>
-    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>の構築そのものはなんとかできるが、やはり奥は深い。<br>
-挙動がまだ不安定な部分もあるので、きちんと仕組みを理解していくことと、<br>
-今回は<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>クライアント側とアクセス先サーバを同一セグメントとしたので、L3の設定などをして違うセグメントにもアクセスできるようにしていきたい。</p></p>
-
-<p></div>
-</body></p>
                     </div>
                     
                     

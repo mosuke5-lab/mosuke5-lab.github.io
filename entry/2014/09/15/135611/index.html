@@ -9,7 +9,7 @@
     <meta name="description" content=" 最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。 例えば以下の状況を考える。 【やりたいこと】 「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」  【DBの構造】 カラム名：型">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2014/09/15/135611/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2014/09/15/135611/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="D3.js、DBからのデータ連携方法の検討 | Goldstine研究所">
@@ -80,19 +80,13 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>こんにちは。もーすけです。<br />
+                        <p>こんにちは。もーすけです。<br>
 Web上でのデータのグラフ化にどんな方法をとっていますか？いろいろ検討して<a href="https://d3js.org/">D3.js</a>が非常に良さそうだったので使ってみています。今回、データベースにあるデータを読み込ませる方法についていくつか検討してみました。</p>
-
 <p>例えば以下の状況を考えます。</p>
-
 <h3 id="やりたいこと">やりたいこと</h3>
-
 <p>「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」</p>
-
 <h3 id="dbの構造">DBの構造</h3>
-
 <p>すごく単純に下記のテーブル構造とします。</p>
-
 <table>
 <thead>
 <tr>
@@ -100,83 +94,64 @@ Web上でのデータのグラフ化にどんな方法をとっていますか�
 <th>データ型</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>date</td>
 <td>datetime</td>
 </tr>
-
 <tr>
 <td>value</td>
 <td>int</td>
 </tr>
 </tbody>
 </table>
-
 <p>※また、下記ではSinatra上で行っているが、他の言語でも同じ考え方が可能です。</p>
-
-<h3 id="1-簡単なapiのようなものを利用する-h3">(1) 簡単なAPIのようなものを利用する</h3></h3>
-
+<h3 id="1-簡単なapiのようなものを利用するh3">(1) 簡単なAPIのようなものを利用する</h3></h3>
 <p>先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、
 これが一番複雑にならずに良いと思いました。</p>
-
 <p>Sinatra側で/csvにアクセスするとcsvファイルをダウンロードできるようにします。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#75715e">#Sinatra側</span>
+get <span style="color:#e6db74">&#39;/csv&#39;</span> <span style="color:#66d9ef">do</span>
+    content_type <span style="color:#e6db74">&#39;application/csv&#39;</span>
+    attachment <span style="color:#e6db74">&#39;download.csv&#39;</span>
 
-<pre><code class="language-ruby">#Sinatra側
-get '/csv' do
-    content_type 'application/csv'
-    attachment 'download.csv'
+    <span style="color:#75715e">#DBからデータ取得(Activerecord利用)</span>
+    @data   <span style="color:#f92672">=</span> <span style="color:#66d9ef">Model</span><span style="color:#f92672">.</span>all()
 
-    #DBからデータ取得(Activerecord利用)
-    @data   = Model.all()
+    <span style="color:#75715e">#出力するCSVデータの変数。csvヘッダーを先につけている。</span>
+    @csv <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">date,value</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
 
-    #出力するCSVデータの変数。csvヘッダーを先につけている。
-    @csv = &quot;date,value\n&quot;
-
-    #DBのデータをCSVの形にして格納
-    @data.each do |d|
-        @csv += d.date.to_s + &quot;,&quot; + d.value.to_s + &quot;\n&quot;
-    end
+    <span style="color:#75715e">#DBのデータをCSVの形にして格納</span>
+    @data<span style="color:#f92672">.</span>each <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>d<span style="color:#f92672">|</span>
+        @csv <span style="color:#f92672">+=</span> d<span style="color:#f92672">.</span>date<span style="color:#f92672">.</span>to_s <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">,</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> d<span style="color:#f92672">.</span>value<span style="color:#f92672">.</span>to_s <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+    <span style="color:#66d9ef">end</span>
     
-    #csvtest.erbというビューに出力
-    erb :csvtest, :layout =&gt; false
-end
-</code></pre>
-
-<p>こうすることで<code>http://*****/csv</code>にアクセスするとcsvファイルとしてダウンロードできる状態になります。
-条件指定をしてデータをダウンロードできるようにしたい場合はGETでパラメータ指定できるようにすれば良いと思います。<br />
+    <span style="color:#75715e">#csvtest.erbというビューに出力</span>
+    erb <span style="color:#e6db74">:csvtest</span>, <span style="color:#e6db74">:layout</span> <span style="color:#f92672">=</span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">false</span>
+<span style="color:#66d9ef">end</span>
+</code></pre></div><p>こうすることで<code>http://*****/csv</code>にアクセスするとcsvファイルとしてダウンロードできる状態になります。
+条件指定をしてデータをダウンロードできるようにしたい場合はGETでパラメータ指定できるようにすれば良いと思います。<br>
 また、今回はcsvにしているがjsonなどの他の形式でも同様のことがいえる。もっと複雑な構造のデータを扱うのであればjsonを利用すべきです。</p>
-
 <p>このエンドポイントを使って、D3.js側で以下のように読み込ませる。
 d3.jsのcsvを読み込ませる関数の引数にURLを指定してあげればそれで終了。</p>
-
-<pre><code class="language-javascript">d3.csv(&quot;/csv&quot;, function(error, data) {
-    (中略)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">d3</span>.<span style="color:#a6e22e">csv</span>(<span style="color:#e6db74">&#34;/csv&#34;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">error</span>, <span style="color:#a6e22e">data</span>) {
+    (<span style="color:#a6e22e">中略</span>)
 }
-</code></pre>
-
-<h3 id="2-javascriptコードの中でruby変数を展開させる">(2) javascriptコードの中でRuby変数を展開させる</h3>
-
+</code></pre></div><h3 id="2-javascriptコードの中でruby変数を展開させる">(2) javascriptコードの中でRuby変数を展開させる</h3>
 <p>d3.jsのdatasetの中でRuby変数を展開させる。ビューにJavascriptを書いているので、ビューの中で変数展開するのと同じ要領。
 しかし、jsコードにRubyコードも交じるのはアンチパターンと言えよう。</p>
-
-<pre><code class="language-javascript">var dataset = [
-&lt;% @data.each do |d| %&gt;
-    {date:&lt;%= d.date%&gt;, value:&lt;%= d.value %&gt;},
-&lt;% end %&gt;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataset</span> <span style="color:#f92672">=</span> [
+<span style="color:#f92672">&lt;</span><span style="color:#f92672">%</span> <span style="color:#960050;background-color:#1e0010">@</span><span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">each</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span><span style="color:#a6e22e">d</span><span style="color:#f92672">|</span> <span style="color:#f92672">%</span><span style="color:#f92672">&gt;</span>
+    {<span style="color:#a6e22e">date</span><span style="color:#f92672">:</span><span style="color:#f92672">&lt;</span><span style="color:#f92672">%=</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">date</span><span style="color:#f92672">%</span><span style="color:#f92672">&gt;</span>, <span style="color:#a6e22e">value</span><span style="color:#f92672">:</span><span style="color:#f92672">&lt;</span><span style="color:#f92672">%=</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">value</span> <span style="color:#f92672">%</span><span style="color:#f92672">&gt;</span>},
+<span style="color:#f92672">&lt;</span><span style="color:#f92672">%</span> <span style="color:#a6e22e">end</span> <span style="color:#f92672">%</span><span style="color:#f92672">&gt;</span>
 ];
-</code></pre>
-
-<h3 id="3-csvファイルをおいておく">(3) CSVファイルをおいておく</h3>
-
+</code></pre></div><h3 id="3-csvファイルをおいておく">(3) CSVファイルをおいておく</h3>
 <p>こちらはリアルタイムな更新でなれけばこれはこれでありかもしれない。
 publicのフォルダに予めcsvファイルを設置しておき、以下のようにd3.jsで読み込ませる。</p>
-
-<pre><code class="language-javascript">d3.csv(&quot;test.csv&quot;, function(error, data) {
-    (中略)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">d3</span>.<span style="color:#a6e22e">csv</span>(<span style="color:#e6db74">&#34;test.csv&#34;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">error</span>, <span style="color:#a6e22e">data</span>) {
+    (<span style="color:#a6e22e">中略</span>)
 }
-</code></pre>
+</code></pre></div>
                     </div>
                     
                     

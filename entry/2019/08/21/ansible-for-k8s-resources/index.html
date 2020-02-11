@@ -9,7 +9,7 @@
     <meta name="description" content="Ansibleを使ったKubernetes上のリソース管理について試してみました。manifestファイルの適応の選択肢として考えるきっかけになればと思います。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/08/21/ansible-for-k8s-resources/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/08/21/ansible-for-k8s-resources/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Kubernetes上のリソースをAnsibleで管理する | Goldstine研究所">
@@ -80,142 +80,111 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>お久しぶりです。@mosuke5です。<br />
+                        <p>お久しぶりです。@mosuke5です。<br>
 Kubernetes上のリソースをどのように管理していますか？
 <code>kubectl apply -f manifest-file.yml</code> のようにkubectlを使うことがまず多いのかなと思います。
 自分もそのようにデプロイすることがおおいです。
 今日はAnsibleを用いてKubernetes上のリソースを管理することを試してみたいと思います。</p>
-
 <h2 id="kubernetesモジュール">Kubernetesモジュール</h2>
-
-<p>AnsibleにはKubernetes上のリソースを操作するためのモジュールが用意されています。<br />
+<p>AnsibleにはKubernetes上のリソースを操作するためのモジュールが用意されています。<br>
 <a href="https://docs.ansible.com/ansible/latest/modules/k8s_module.html#k8s-raw-module" target="_blank">k8s – Manage Kubernetes (K8s) objects — Ansible Documentation</a></p>
-
 <p>似たモジュールに<a href="https://docs.ansible.com/ansible/latest/modules/kubernetes_module.html" target="_blank">kubernetes</a>というのがあるのですが、こちらはDepricatedになっており、Ansible2.9以降で削除される予定とのことなので、上のものを利用しましょう。</p>
-
 <h2 id="ansibleでkubernetes上のリソースを管理する">AnsibleでKubernetes上のリソースを管理する</h2>
-
-<p>それでは早速<code>k8s</code>モジュールを使って行きたいと思います。まずは事前準備です。<br />
+<p>それでは早速<code>k8s</code>モジュールを使って行きたいと思います。まずは事前準備です。<br>
 このモジュールではいくつかrequirementがあります。内部ではopenshiftのpythonライブラリを利用しているようなので忘れずインストールしましょう。</p>
-
-<pre><code> $ pip install openshift
-</code></pre>
-
-<p>認証の方法も一通り用意されています。<br />
- 基本的にAnsibleを実行する端末でkubeconfigなりtokenを使ってkubectlが使える環境であれば問題ないです。
- 内部的にはkubectlを使うわけではないですが、認証の方法は同じです。</p>
-
+<pre><code>$ pip install openshift
+</code></pre><p>認証の方法も一通り用意されています。<br>
+基本的にAnsibleを実行する端末でkubeconfigなりtokenを使ってkubectlが使える環境であれば問題ないです。
+内部的にはkubectlを使うわけではないですが、認証の方法は同じです。</p>
 <h3 id="まずは試す">まずは試す</h3>
-
-<p>まずはスタンダードにansibleのtaskに直接リソース情報を書いてみます。<br />
+<p>まずはスタンダードにansibleのtaskに直接リソース情報を書いてみます。<br>
 基本的には<code>resource_definition</code>の部分にmanifestのyamlが入るイメージです。
 この程度の量なら問題ないですが、行数が増えてくるとだいぶ辛いですね。</p>
-
-<pre><code class="language-yaml">- name: Create nginx deployment
-  k8s:
-    namespace: gillsearch-development
-    resource_definition:
-      apiVersion: apps/v1
-      kind: Deployment
-      metadata:
-        creationTimestamp: null
-        labels:
-          run: nginx
-        name: nginx
-      spec:
-        replicas: 1
-        selector:
-          matchLabels:
-            run: nginx
-        strategy: {}
-        template:
-          metadata:
-            creationTimestamp: null
-            labels:
-              run: nginx
-          spec:
-            containers:
-            - image: nginx:latest
-              name: nginx
-              resources: {}
-      status: {}
-</code></pre>
-
-<h3 id="既存のmanifestファイルを利用する">既存のmanifestファイルを利用する</h3>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">- <span style="color:#66d9ef">name</span>: Create nginx deployment
+  <span style="color:#66d9ef">k8s</span>:
+    <span style="color:#66d9ef">namespace</span>: gillsearch-development
+    <span style="color:#66d9ef">resource_definition</span>:
+      <span style="color:#66d9ef">apiVersion</span>: apps/v1
+      <span style="color:#66d9ef">kind</span>: Deployment
+      <span style="color:#66d9ef">metadata</span>:
+        <span style="color:#66d9ef">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
+        <span style="color:#66d9ef">labels</span>:
+          <span style="color:#66d9ef">run</span>: nginx
+        <span style="color:#66d9ef">name</span>: nginx
+      <span style="color:#66d9ef">spec</span>:
+        <span style="color:#66d9ef">replicas</span>: <span style="color:#ae81ff">1</span>
+        <span style="color:#66d9ef">selector</span>:
+          <span style="color:#66d9ef">matchLabels</span>:
+            <span style="color:#66d9ef">run</span>: nginx
+        <span style="color:#66d9ef">strategy</span>: {}
+        <span style="color:#66d9ef">template</span>:
+          <span style="color:#66d9ef">metadata</span>:
+            <span style="color:#66d9ef">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
+            <span style="color:#66d9ef">labels</span>:
+              <span style="color:#66d9ef">run</span>: nginx
+          <span style="color:#66d9ef">spec</span>:
+            <span style="color:#66d9ef">containers</span>:
+            - <span style="color:#66d9ef">image</span>: nginx:latest
+              <span style="color:#66d9ef">name</span>: nginx
+              <span style="color:#66d9ef">resources</span>: {}
+      <span style="color:#66d9ef">status</span>: {}
+</code></pre></div><h3 id="既存のmanifestファイルを利用する">既存のmanifestファイルを利用する</h3>
 <p>上の方法では、辛いケースも多く出てくると思います。
 また、すでに書いてあるmanifestもあることも多いと思いますので、既存のmanifestファイルから読みたいです。
-このようにファイルから読み出すことももちろん可能です。<br />
+このようにファイルから読み出すことももちろん可能です。<br>
 <code>./templates/nginx-from-file.yml</code>は通常通りのmanifestファイルです。</p>
-
-<pre><code class="language-yaml">- name: Create nginx deployment
-  k8s:
-    namespace: gillsearch-development
-    state: present
-    src: ./templates/nginx-from-file.yml
-</code></pre>
-
-<h3 id="templateを使ってmanifestを生成して利用する">Templateを使ってmanifestを生成して利用する</h3>
-
-<p>manifestファイルをそのまま利用するのであればAnsibleを使うメリットは少なくなってしまうかなと思います。<br />
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">- <span style="color:#66d9ef">name</span>: Create nginx deployment
+  <span style="color:#66d9ef">k8s</span>:
+    <span style="color:#66d9ef">namespace</span>: gillsearch-development
+    <span style="color:#66d9ef">state</span>: present
+    <span style="color:#66d9ef">src</span>: ./templates/nginx-from-file.yml
+</code></pre></div><h3 id="templateを使ってmanifestを生成して利用する">Templateを使ってmanifestを生成して利用する</h3>
+<p>manifestファイルをそのまま利用するのであればAnsibleを使うメリットは少なくなってしまうかなと思います。<br>
 AnsibleではJinja2を使ったテンプレートの機能があるのでこれを活用しない手はありません。
 例えば、Nginxのデプロイメントのレプリカ数を変数にしてmanifestファイルをテンプレート化して使ってみます。</p>
-
 <pre><code>- name: Create nginx deployment
   k8s:
     namespace: gillsearch-development
     state: present
     resource_definition: &quot;{{ lookup('template', './templates/nginx-from-template.yml.j2') }}&quot;
-</code></pre>
-
-<p><code>./templates/nginx-from-template.yml.j2</code>内で変数展開などが可能。</p>
-
-<pre><code class="language-yaml">apiVersion: apps/v1
-kind: Deployment
-metadata:
-  creationTimestamp: null
-  labels:
-    run: nginx-from-template
-  name: nginx-from-template
-spec:
-  replicas: {{ nginx_replicas }}  ## &lt;--ここ
-  selector:
-    matchLabels:
-      run: nginx-from-template
-  strategy: {}
-  template:
-    metadata:
-      creationTimestamp: null
-      labels:
-        run: nginx-from-template
-    spec:
-      containers:
-      - image: nginx:latest
-        name: nginx-from-template
-        resources: {}
-</code></pre>
-
-<p>この例は簡単な例ですが、AnsibleのTemplateや他の機能を使うことで、
+</code></pre><p><code>./templates/nginx-from-template.yml.j2</code>内で変数展開などが可能。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: apps/v1
+<span style="color:#66d9ef">kind</span>: Deployment
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
+  <span style="color:#66d9ef">labels</span>:
+    <span style="color:#66d9ef">run</span>: nginx-from-template
+  <span style="color:#66d9ef">name</span>: nginx-from-template
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">replicas</span>: {{ nginx_replicas }}  <span style="color:#75715e">## &lt;--ここ</span>
+  <span style="color:#66d9ef">selector</span>:
+    <span style="color:#66d9ef">matchLabels</span>:
+      <span style="color:#66d9ef">run</span>: nginx-from-template
+  <span style="color:#66d9ef">strategy</span>: {}
+  <span style="color:#66d9ef">template</span>:
+    <span style="color:#66d9ef">metadata</span>:
+      <span style="color:#66d9ef">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
+      <span style="color:#66d9ef">labels</span>:
+        <span style="color:#66d9ef">run</span>: nginx-from-template
+    <span style="color:#66d9ef">spec</span>:
+      <span style="color:#66d9ef">containers</span>:
+      - <span style="color:#66d9ef">image</span>: nginx:latest
+        <span style="color:#66d9ef">name</span>: nginx-from-template
+        <span style="color:#66d9ef">resources</span>: {}
+</code></pre></div><p>この例は簡単な例ですが、AnsibleのTemplateや他の機能を使うことで、
 環境ごとでの（例えばProductionとTest環境）とで挙動や値を変えることももちろん可能です。</p>
-
 <h2 id="ansibleで管理するメリットについて考える">Ansibleで管理するメリットについて考える</h2>
-
-<p>それではAnsibleを使ってKubernetesを管理するメリットについてもう少し考えてみたいと思います。<br />
+<p>それではAnsibleを使ってKubernetesを管理するメリットについてもう少し考えてみたいと思います。<br>
 基本的にAnsibleの機能をどう活かすかというところにつきるわけですが、どんな活用法があるでしょうか。</p>
-
 <h3 id="1-template機能を利用できる">1. Template機能を利用できる</h3>
-
-<p>上の例でも見てきましたが、Template機能を使えることはまず１つメリットとして考えられると思います。<br />
+<p>上の例でも見てきましたが、Template機能を使えることはまず１つメリットとして考えられると思います。<br>
 もちろんHelmなど他のツールでもKubernetesのmanifestのテンプレート化などは可能ですが、Ansibleでも同様に可能です。
 AnsibleではJinja2のテンプレートエンジンを利用していますが、変数展開はもちろんif文なども利用でき活用の幅は大きいと思います。</p>
-
 <h3 id="2-ansible-vaultを利用してシークレット情報の管理ができる">2. ansible-vaultを利用してシークレット情報の管理ができる</h3>
-
-<p>Ansibleにはシークレット情報を暗号化できる<a href="https://docs.ansible.com/ansible/latest/user_guide/vault.html" target="_blank">ansible-vault</a>という機能・コマンドがあります。<br />
-こちらを使うことで、Kubernetesのsecretリソースの管理にも活用できる点は良いポイントかもしれません。<br />
+<p>Ansibleにはシークレット情報を暗号化できる<a href="https://docs.ansible.com/ansible/latest/user_guide/vault.html" target="_blank">ansible-vault</a>という機能・コマンドがあります。<br>
+こちらを使うことで、Kubernetesのsecretリソースの管理にも活用できる点は良いポイントかもしれません。<br>
 例えば、credential情報をvar_fileとして記述しansible-vaultで暗号化して保存しておくとします。
 そうするとKubernetesのSecretを作る際に下記のように展開して作成することも可能です。</p>
-
 <pre><code>apiVersion: v1
 data:
   password: {{ password | b64encode }}
@@ -223,26 +192,17 @@ kind: Secret
 metadata:
   creationTimestamp: null
   name: mysecret
-</code></pre>
-
-<h3 id="3-他の作業の流れに組み込みやすい">3. 他の作業の流れに組み込みやすい</h3>
-
+</code></pre><h3 id="3-他の作業の流れに組み込みやすい">3. 他の作業の流れに組み込みやすい</h3>
 <p>Ansibleはもとはサーバのプロビジョニングツールとしての位置づけが強いツールですが、今となっては今回のKubernetesやクラウドサービスなど様々なツールのプロビジョニングに活用されています。
 そのため、他のツールやサーバ上の管理の流れと一部としてKubernetesの制御しやすいのは特徴的なポイントです。</p>
-
 <p>例えば、Kubernetes上にリソースをデプロイ後に、DNSの設定を追加・変更するなどのKubernetes以外の操作と組み合わせしやすいかと思います。</p>
-
 <h2 id="まとめ">まとめ</h2>
-
 <p>Ansibleを使って、Kubernetes上のリソースに対する操作をやってみました。
 Ansibleという使い慣れているツールで、Templateやvaultの機能を利用できるのは良いポイントと感じました。
 実際の運用に組み込めるか、採用するかどうかはいろいろ考えてみないとわかりませんが、選択肢の１つとしてありかなと現時点では思っています。</p>
-
 <h2 id="関連情報">関連情報</h2>
-
 <p>過去に書いた関連情報を掲載しておきます。</p>
-
-<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/" data-iframely-url="//cdn.iframe.ly/al5KMSQ"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/" data-iframely-url="//cdn.iframe.ly/al5KMSQ"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
                     </div>
                     
                     

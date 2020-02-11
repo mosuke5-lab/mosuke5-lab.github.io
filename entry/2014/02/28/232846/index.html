@@ -9,7 +9,7 @@
     <meta name="description" content=" テーブルを内部結合するとき、いつもINNER JOINを使って書いていたが、 「FROM句のあとに複数のテーブルを書いてWHERE句で絞り込む」やり方があることを知った。  INNER JOIN型  SELECT * FROM table">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2014/02/28/232846/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2014/02/28/232846/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="INNER JOIN とWHERE結合の違いについて理解する | Goldstine研究所">
@@ -80,29 +80,21 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>こんにちは。@mosuke5です。<br />
-近頃、<a href="https://www.jitec.ipa.go.jp/1_11seido/db.html">データベーススペシャリスト</a>の資格試験の勉強をしています。理由は、普段システムの開発・運用を行っているのですが、障害がデータベース起因のことが非常に多いです。また社内にデータベースに詳しい人も少ないので、どうしてもベンダー頼みになってしまうことも多いからです。<br />
+                        <p>こんにちは。@mosuke5です。<br>
+近頃、<a href="https://www.jitec.ipa.go.jp/1_11seido/db.html">データベーススペシャリスト</a>の資格試験の勉強をしています。理由は、普段システムの開発・運用を行っているのですが、障害がデータベース起因のことが非常に多いです。また社内にデータベースに詳しい人も少ないので、どうしてもベンダー頼みになってしまうことも多いからです。<br>
 データベースの運用とは少しまた違うのですが、その第一歩としてデータベーススペシャリストを撮ろうと考えています。</p>
-
 <h5 id="追記">追記</h5>
-
 <p>その後無事に資格の取得できました。</p>
-
 <h2 id="テーブル結合の２つの記述方法">テーブル結合の２つの記述方法</h2>
-
 <p>RDBMSを勉強すれば、すぐにテーブル結合について学びます。２つのテーブルの情報を何かのキーを使って結合するものです。
-その結合の方法について、データベーススペシャリストの勉強をしていると見慣れない記述方法がされており戸惑ったことがこのブログを書いたきっかけです。<br />
+その結合の方法について、データベーススペシャリストの勉強をしていると見慣れない記述方法がされており戸惑ったことがこのブログを書いたきっかけです。<br>
 普段、アプリケーションの開発時にテーブルを内部結合するときには、<code>INNER JOIN</code>を使って書いていましたが、
 「FROM句のあとに複数のテーブルを書いてWHERE句で絞り込む」という記述方法もあるようです。
 具体的に何が違うのか？同じなのか？書き方はどうか？見ていきます。</p>
-
 <h3 id="前提">前提</h3>
-
 <p>以下のようなuserテーブルとorderテーブルがあると想定します。
 そして、テーブル結合によりorderの内容とuserを紐づけたいとします。</p>
-
 <h4 id="userテーブル">userテーブル</h4>
-
 <table>
 <thead>
 <tr>
@@ -111,20 +103,17 @@
 <th>age</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>1</td>
 <td>Taro Shinagawa</td>
 <td>24</td>
 </tr>
-
 <tr>
 <td>2</td>
 <td>Hiroshi Meguro</td>
 <td>35</td>
 </tr>
-
 <tr>
 <td>3</td>
 <td>Goro Gotanda</td>
@@ -132,9 +121,7 @@
 </tr>
 </tbody>
 </table>
-
 <h4 id="orderテーブル">orderテーブル</h4>
-
 <table>
 <thead>
 <tr>
@@ -143,26 +130,22 @@
 <th>product</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>1</td>
 <td>1</td>
 <td>りんご</td>
 </tr>
-
 <tr>
 <td>2</td>
 <td>2</td>
 <td>なし</td>
 </tr>
-
 <tr>
 <td>3</td>
 <td>1</td>
 <td>おれんじ</td>
 </tr>
-
 <tr>
 <td>4</td>
 <td>3</td>
@@ -170,26 +153,16 @@
 </tr>
 </tbody>
 </table>
-
 <h3 id="inner-join型">INNER JOIN型</h3>
-
 <p>まずは、INNER JOIN型です。自分は一番見慣れた形式です。</p>
-
-<pre><code class="language-mysql">SELECT * FROM order INNER JOIN user ON order.user_id=user.user_id
-</code></pre>
-
-<h3 id="where型">WHERE型</h3>
-
-<pre><code class="language-mysql">SELECT * FROM user,order WHERE order.user_id=user.user_id
-</code></pre>
-
-<p>結果は一緒です。ですが記法的にすこし考え方が異なりそうです。その考え方がわかればたいしたことはないです。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">order</span> <span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">ON</span> <span style="color:#66d9ef">order</span>.user_id<span style="color:#f92672">=</span><span style="color:#66d9ef">user</span>.user_id
+</code></pre></div><h3 id="where型">WHERE型</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">user</span>,<span style="color:#66d9ef">order</span> <span style="color:#66d9ef">WHERE</span> <span style="color:#66d9ef">order</span>.user_id<span style="color:#f92672">=</span><span style="color:#66d9ef">user</span>.user_id
+</code></pre></div><p>結果は一緒です。ですが記法的にすこし考え方が異なりそうです。その考え方がわかればたいしたことはないです。
 INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをくっつけます。と解釈できますね。</p>
-
 <p>一方、WHERE型は、まず<code>SELECT * FROM user,order</code>これの結果を考えるとわかりやすいです。
 テーブル名を２つ並べるとクロスでかけ合わせます。
 この中から、userのuser_idとorderのorder_idが同じものを選ぶ、と考えればWHERE型も納得ができますね。</p>
-
 <table>
 <thead>
 <tr>
@@ -201,7 +174,6 @@ INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをく
 <th>product</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>1</td>
@@ -211,7 +183,6 @@ INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをく
 <td>1</td>
 <td>りんご</td>
 </tr>
-
 <tr>
 <td>2</td>
 <td>Hiroshi Meguro</td>
@@ -220,7 +191,6 @@ INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをく
 <td>1</td>
 <td>りんご</td>
 </tr>
-
 <tr>
 <td>3</td>
 <td>Goro Gotanda</td>
@@ -229,7 +199,6 @@ INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをく
 <td>1</td>
 <td>りんご</td>
 </tr>
-
 <tr>
 <td>1</td>
 <td>Taro Shinagawa</td>
@@ -238,7 +207,6 @@ INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをく
 <td>2</td>
 <td>なし</td>
 </tr>
-
 <tr>
 <td>2</td>
 <td>Hiroshi Meguro</td>
@@ -247,7 +215,6 @@ INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをく
 <td>2</td>
 <td>なし</td>
 </tr>
-
 <tr>
 <td>3</td>
 <td>Goro Gotanda</td>
@@ -256,7 +223,6 @@ INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをく
 <td>2</td>
 <td>なし</td>
 </tr>
-
 <tr>
 <td>1</td>
 <td>Taro Shinagawa</td>
@@ -265,7 +231,6 @@ INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをく
 <td>1</td>
 <td>おれんじ</td>
 </tr>
-
 <tr>
 <td>2</td>
 <td>Hiroshi Meguro</td>
@@ -274,7 +239,6 @@ INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをく
 <td>1</td>
 <td>おれんじ</td>
 </tr>
-
 <tr>
 <td>3</td>
 <td>Goro Gotanda</td>
@@ -283,7 +247,6 @@ INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをく
 <td>1</td>
 <td>おれんじ</td>
 </tr>
-
 <tr>
 <td>1</td>
 <td>Taro Shinagawa</td>
@@ -292,7 +255,6 @@ INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをく
 <td>3</td>
 <td>ぶどう</td>
 </tr>
-
 <tr>
 <td>2</td>
 <td>Hiroshi Meguro</td>
@@ -301,7 +263,6 @@ INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをく
 <td>3</td>
 <td>ぶどう</td>
 </tr>
-
 <tr>
 <td>3</td>
 <td>Goro Gotanda</td>
@@ -312,48 +273,41 @@ INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをく
 </tr>
 </tbody>
 </table>
-
 <h2 id="どちらがよいか">どちらがよいか</h2>
-
 <p>どちらがよいか？という見出しにしましたが、どちらがいいということは基本的にないと思います。
-しかし、頭のなかの理解のしやすさや、その他SQLの運用のことをいろいろ考えてみると、やはりFROM句の後にテーブルを複数書いてWHEREで結合させるのはナンセンスだと自分は考えています。<br />
-例えば、内部結合に加え、外部結合もある場合を考えてみます。
-<p>WHERE型</p></p>
-
-<pre><code class="language-mysql">SELECT * 
-FROM table1, table2 #←結合させたいもの
-LEFT OUTER JOIN (
-　・
-　・
-&lt;副問い合わせとか長いSQLが入ると想定&gt;
-　・
-　・
-) AS sub
-ON table1.id=sub.id AND table2.id=sub.id
-WHERE table1.id=table2.id #←結合条件
- 
-</code></pre>
-
-<p><p>table1とtable2を内部結合させたいのに、肝心の何と何を結合させるかの部分の&rdquo;WHERE table1.id=table2.id&rdquo;が離れてしまい、SQL文全体として何をしたいかわかりずらいきがします。</p>
-<p>一方、INNER JOINなら</p></p>
-
-<pre><code class="language-mysql">SELECT * 
+しかし、頭のなかの理解のしやすさや、その他SQLの運用のことをいろいろ考えてみると、やはりFROM句の後にテーブルを複数書いてWHEREで結合させるのはナンセンスだと自分は考えています。<br>
+例えば、内部結合に加え、外部結合もある場合を考えてみます。</p>
+<p>WHERE型</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> 
+<span style="color:#66d9ef">FROM</span> table1, table2 <span style="color:#75715e">#←結合させたいもの
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">LEFT</span> <span style="color:#66d9ef">OUTER</span> <span style="color:#66d9ef">JOIN</span> (
+　<span style="color:#960050;background-color:#1e0010">・</span>
+　<span style="color:#960050;background-color:#1e0010">・</span>
+<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">副</span><span style="color:#960050;background-color:#1e0010">問</span><span style="color:#960050;background-color:#1e0010">い</span><span style="color:#960050;background-color:#1e0010">合</span><span style="color:#960050;background-color:#1e0010">わ</span><span style="color:#960050;background-color:#1e0010">せ</span><span style="color:#960050;background-color:#1e0010">と</span><span style="color:#960050;background-color:#1e0010">か</span><span style="color:#960050;background-color:#1e0010">長</span><span style="color:#960050;background-color:#1e0010">い</span>SQLが入ると想定<span style="color:#f92672">&gt;</span>
+　<span style="color:#960050;background-color:#1e0010">・</span>
+　<span style="color:#960050;background-color:#1e0010">・</span>
+) <span style="color:#66d9ef">AS</span> sub
+<span style="color:#66d9ef">ON</span> table1.id<span style="color:#f92672">=</span>sub.id <span style="color:#66d9ef">AND</span> table2.id<span style="color:#f92672">=</span>sub.id
+<span style="color:#66d9ef">WHERE</span> table1.id<span style="color:#f92672">=</span>table2.id <span style="color:#75715e">#←結合条件
+</span><span style="color:#75715e"></span> 
+</code></pre></div><p>table1とtable2を内部結合させたいのに、肝心の何と何を結合させるかの部分の"WHERE table1.id=table2.id"が離れてしまい、SQL文全体として何をしたいかわかりずらいきがします。</p>
+<p>一方、INNER JOINなら</p>
+```mysql
+SELECT * 
 FROM table1
 INNER JOIN table2 ON table1.id=table2.id #←結合させたいものと結合条件が一緒
 LEFT OUTER JOIN (
 　・
 　・
-&lt;副問い合わせとか長いSQLが入ると想定&gt;
+<副問い合わせとか長いSQLが入ると想定>
 　・
 　・
 ) AS sub
 ON table1.id=sub.id
- 
-</code></pre>
-
-<p>上記のように、結合させたいテーブルと結合させる条件がくっつくため、全体としてなにをしたいかわかりやすいと考えます。
+<pre><code>
+上記のように、結合させたいテーブルと結合させる条件がくっつくため、全体としてなにをしたいかわかりやすいと考えます。
 慣れの問題や書き方によって改善できるのかもしれませんが、圧倒的にINNER JOINがわかりやすいのではないかと考えています。
-みなさんはどうかんがえていますか？</p>
+みなさんはどうかんがえていますか？</code></pre>
                     </div>
                     
                     

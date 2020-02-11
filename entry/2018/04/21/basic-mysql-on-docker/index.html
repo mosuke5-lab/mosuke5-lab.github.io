@@ -9,7 +9,7 @@
     <meta name="description" content="Dockerを使ってMySQLをセットアップする際の知見について。ユーザやデータベスの作成、テストデータのインポートなどの方法。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2018/04/21/basic-mysql-on-docker/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2018/04/21/basic-mysql-on-docker/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="DockerでのMySQLのセットアップ方法とその仕組みを理解する | Goldstine研究所">
@@ -80,101 +80,72 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>こんにちは。もーすけです。<br />
+                        <p>こんにちは。もーすけです。<br>
 個人で作っているサービスをDockerベースで動かしているのだが、MySQL使いたくなってきて導入することになった。
 Docker上のMySQL利用ははじめてだったので、いろいろわからないところがあった。その知見をまとめる。</p>
-
 <h2 id="コンテナに期待すること">コンテナに期待すること</h2>
-
 <p>筆者の場合は、アプリ部分はRuby on Railsを利用している。
 そのため、基本的に、アプリケーション側からDBマイグレーションの機能などを使って、テーブルの作成やテストデータのインポートは行うことを前提にしている。
 おそらく、Ruby on Rails以外のWebアプリケーションフレームワークでも同様の利用の仕方をするはずだ。
 そうなると、コンテナとして行ってほしいのは、そもそもMySQLの起動はもちろん、データベース作成と、それを操作するためのユーザの設定などだ。</p>
-
 <h2 id="起動と基本設定">起動と基本設定</h2>
-
 <p>MySQLのDockerイメージがあるので動かすだけならば特に難しいことはなにもない。</p>
-
 <pre><code>$ docker run --name mysql -d -p 3306:3306 mysql
-</code></pre>
-
-<p>しかし、MySQLの基本設定や、そもそもrootユーザのパスワードなどどうすればいいのか。<br />
+</code></pre><p>しかし、MySQLの基本設定や、そもそもrootユーザのパスワードなどどうすればいいのか。<br>
 データベースやユーザはどうやって作ることができるのか。このあたりは当然ながら一番はじめに気になる部分である。</p>
-
 <p>ドキュメント読むとすぐにわかるが、
 MySQLのDockerコンテナを起動するときに環境変数を設定することである程度は設定できることがわかる。（<a href="https://hub.docker.com/_/mysql/">公式ドキュメント</a>）
 下記は、よく利用するであろう基本的な設定ができる環境変数だ。</p>
-
 <ul>
 <li><code>MYSQL_ROOT_PASSWORD</code>: rootユーザパスワード</li>
 <li><code>MYSQL_DATABASE</code>: 作成するデータベース名</li>
 <li><code>MYSQL_USER</code>: 作成するユーザ名。上で作ったデータベースに関する操作権限を持つ</li>
 <li><code>MYSQL_PASSWORD</code>: 上のユーザのパスワード</li>
 </ul>
-
 <p>例えば、rootパスワードを設定したい場合は以下のようにすればよい。</p>
-
 <pre><code>$ docker run --name mysql -e MYSQL_ROOT_PASSWORD=mysecret -d -p 3306:3306 mysql
-</code></pre>
-
-<h2 id="dockerfileをのぞく">Dockerfileをのぞく</h2>
-
+</code></pre><h2 id="dockerfileをのぞく">Dockerfileをのぞく</h2>
 <p>Dockerfileの中身を見ていくと、より仕組みが理解できる。
 MySQLのDockerイメージで立ち上げのときの実行される、<code>docker-entrypoint.sh</code>の中身をみるよいい。</p>
-
-<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/docker-library/mariadb/blob/master/docker-entrypoint.sh" data-iframely-url="//cdn.iframe.ly/nNIVaxs"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
-
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/docker-library/mariadb/blob/master/docker-entrypoint.sh" data-iframely-url="//cdn.iframe.ly/nNIVaxs"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
 <p>次のように、環境変数が設定されている場合に、それにそってデータベースの作成やユーザ設定を行ってくれることがわかる。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$MYSQL_DATABASE<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+	echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">CREATE DATABASE IF NOT EXISTS \`</span>$MYSQL_DATABASE<span style="color:#e6db74">\` ;</span><span style="color:#e6db74">&#34;</span> | <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>mysql[@]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+	mysql<span style="color:#f92672">+=</span><span style="color:#f92672">(</span> <span style="color:#e6db74">&#34;</span>$MYSQL_DATABASE<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">)</span>
+<span style="color:#66d9ef">fi</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$MYSQL_USER<span style="color:#e6db74">&#34;</span> -a <span style="color:#e6db74">&#34;</span>$MYSQL_PASSWORD<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+	echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">CREATE USER &#39;</span>$MYSQL_USER<span style="color:#e6db74">&#39;@&#39;%&#39; IDENTIFIED BY &#39;</span>$MYSQL_PASSWORD<span style="color:#e6db74">&#39; ;</span><span style="color:#e6db74">&#34;</span> | <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>mysql[@]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
 
-<pre><code class="language-shell">if [ &quot;$MYSQL_DATABASE&quot; ]; then
-	echo &quot;CREATE DATABASE IF NOT EXISTS \`$MYSQL_DATABASE\` ;&quot; | &quot;${mysql[@]}&quot;
-	mysql+=( &quot;$MYSQL_DATABASE&quot; )
-fi
-</code></pre>
+	<span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$MYSQL_DATABASE<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+		echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">GRANT ALL ON \`</span>$MYSQL_DATABASE<span style="color:#e6db74">\`.* TO &#39;</span>$MYSQL_USER<span style="color:#e6db74">&#39;@&#39;%&#39; ;</span><span style="color:#e6db74">&#34;</span> | <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>mysql[@]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+	<span style="color:#66d9ef">fi</span>
 
-<pre><code class="language-shell">if [ &quot;$MYSQL_USER&quot; -a &quot;$MYSQL_PASSWORD&quot; ]; then
-	echo &quot;CREATE USER '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD' ;&quot; | &quot;${mysql[@]}&quot;
-
-	if [ &quot;$MYSQL_DATABASE&quot; ]; then
-		echo &quot;GRANT ALL ON \`$MYSQL_DATABASE\`.* TO '$MYSQL_USER'@'%' ;&quot; | &quot;${mysql[@]}&quot;
-	fi
-
-	echo 'FLUSH PRIVILEGES ;' | &quot;${mysql[@]}&quot;
-fi
-</code></pre>
-
-<h2 id="さらなる応用">さらなる応用</h2>
-
-<p>しかし、環境変数で設定できる項目には限りがある。<br />
+	echo <span style="color:#e6db74">&#39;FLUSH PRIVILEGES ;&#39;</span> | <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>mysql[@]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+<span style="color:#66d9ef">fi</span>
+</code></pre></div><h2 id="さらなる応用">さらなる応用</h2>
+<p>しかし、環境変数で設定できる項目には限りがある。<br>
 それ以上のことを行いたい場合には別の方法で行う必要がある。
 鍵をにぎるのが同じく<code>docker-entrypoint.sh</code>の中に記述のある、<code>/docker-entrypoint-initdb.d/</code>だ。
 このディレクトリにある、シェルスクリプトやsqlファイルが実行されるようになっている。
 もし、セットアップで独自の処理を実行したい場合には、コンテナ起動時にこのディレクトリにファイルを置けばいい。一番簡単なのはボリュームをマウントすることだ。
 例えば、テーブルの作成やテストデータのインポートなど任意の処理を実行させることができる。</p>
-
-<pre><code class="language-shell">for f in /docker-entrypoint-initdb.d/*; do
-	case &quot;$f&quot; in
-		*.sh)     echo &quot;$0: running $f&quot;; . &quot;$f&quot; ;;
-		*.sql)    echo &quot;$0: running $f&quot;; &quot;${mysql[@]}&quot; &lt; &quot;$f&quot;; echo ;;
-		*.sql.gz) echo &quot;$0: running $f&quot;; gunzip -c &quot;$f&quot; | &quot;${mysql[@]}&quot;; echo ;;
-		*)        echo &quot;$0: ignoring $f&quot; ;;
-	esac
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#66d9ef">for</span> f in /docker-entrypoint-initdb.d/*; <span style="color:#66d9ef">do</span>
+	<span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;</span>$f<span style="color:#e6db74">&#34;</span> in
+		*.sh<span style="color:#f92672">)</span>     echo <span style="color:#e6db74">&#34;</span>$0<span style="color:#e6db74">: running </span>$f<span style="color:#e6db74">&#34;</span>; . <span style="color:#e6db74">&#34;</span>$f<span style="color:#e6db74">&#34;</span> ;;
+		*.sql<span style="color:#f92672">)</span>    echo <span style="color:#e6db74">&#34;</span>$0<span style="color:#e6db74">: running </span>$f<span style="color:#e6db74">&#34;</span>; <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>mysql[@]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> &lt; <span style="color:#e6db74">&#34;</span>$f<span style="color:#e6db74">&#34;</span>; echo ;;
+		*.sql.gz<span style="color:#f92672">)</span> echo <span style="color:#e6db74">&#34;</span>$0<span style="color:#e6db74">: running </span>$f<span style="color:#e6db74">&#34;</span>; gunzip -c <span style="color:#e6db74">&#34;</span>$f<span style="color:#e6db74">&#34;</span> | <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>mysql[@]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>; echo ;;
+		*<span style="color:#f92672">)</span>        echo <span style="color:#e6db74">&#34;</span>$0<span style="color:#e6db74">: ignoring </span>$f<span style="color:#e6db74">&#34;</span> ;;
+	<span style="color:#66d9ef">esac</span>
 	echo
-done
-</code></pre>
-
-<p>起動のタイミングだけはおさえておくとよい。<br />
+<span style="color:#66d9ef">done</span>
+</code></pre></div><p>起動のタイミングだけはおさえておくとよい。<br>
 これらの処理自体が下記IF文の中に記述されており、データベースのinitializeのタイミングに実行されることになっている。
 もし、initialize後に<code>/docker-entrypoint-initdb.d/</code>にファイルを置いても実行されないので注意だ。</p>
-
-<pre><code class="language-shell">if [ ! -d &quot;$DATADIR/mysql&quot; ]; then
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> ! -d <span style="color:#e6db74">&#34;</span>$DATADIR<span style="color:#e6db74">/mysql</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
     ....
-done
-</code></pre>
-
-<h2 id="さいごに">さいごに</h2>
-
-<p>Dockerを使ったMySQLの実行方法と設定についてみてきた。<br />
+<span style="color:#66d9ef">done</span>
+</code></pre></div><h2 id="さいごに">さいごに</h2>
+<p>Dockerを使ったMySQLの実行方法と設定についてみてきた。<br>
 このようにDockerfileを少しのぞいてみるだけでより多くのことがわかる。
 勇気をもってDockerfileをのぞくと視野が広がること間違いなしだ。</p>
                     </div>

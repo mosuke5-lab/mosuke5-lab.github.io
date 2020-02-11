@@ -9,7 +9,7 @@
     <meta name="description" content="はてなブログからHugoに移行した。移行した理由は移行に際して行ったことをご紹介します。例えば、Hugoを運用するアーキテクチャや移行時に利用したスクリプトや注意事項など。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2017/05/28/blog_migration/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2017/05/28/blog_migration/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="はてなブログからHugoに移行。移行の際に行ったことまとめ。 | Goldstine研究所">
@@ -80,67 +80,49 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>2017年5月27日に2014年2月から約3年3ヶ月程度使ってきたはてなブログからHugoを使ったブログへ移行をした。<br />
-長らく使いやすいブログを提供してきたはてなさんにはとても感謝している。<br />
-はてなブログはとても魅力なブログプラットフォームであると感じているし、いまでもそう思うのだけれどいくつかの判断をした結果Hugoへの移行を決めた。<br />
+                        <p>2017年5月27日に2014年2月から約3年3ヶ月程度使ってきたはてなブログからHugoを使ったブログへ移行をした。<br>
+長らく使いやすいブログを提供してきたはてなさんにはとても感謝している。<br>
+はてなブログはとても魅力なブログプラットフォームであると感じているし、いまでもそう思うのだけれどいくつかの判断をした結果Hugoへの移行を決めた。<br>
 本記事では、移行を決めた理由や移行する際に行ったこと、Hugoの実行環境などを紹介する。</p>
-
-<h2 id="1-hugoに移行した理由">1.Hugoに移行した理由</h2>
-
-<p>Hugoに移行した理由というか、はてなブログから別のところに移行しようとした理由になるのだが、<br />
+<h2 id="1hugoに移行した理由">1.Hugoに移行した理由</h2>
+<p>Hugoに移行した理由というか、はてなブログから別のところに移行しようとした理由になるのだが、<br>
 端的に言うと以下のとおりだ。</p>
-
 <ul>
 <li>常時SSL化したかった</li>
 <li>HTTP/2に対応したかった</li>
 <li>独自ドメイン(mosuke.tech)を利用したかった</li>
 </ul>
-
 <p>Hugo以外にももちろん他のツールやサイトも検討を行った。</p>
-
 <ul>
 <li>はてなブログPro</li>
 <li>jekyll</li>
 <li>medium</li>
 </ul>
-
-<p>まず、はてなブログProだが、もっとも手間がかからず独自ドメイン利用もできてよかったのだが、<br />
+<p>まず、はてなブログProだが、もっとも手間がかからず独自ドメイン利用もできてよかったのだが、<br>
 SSL化とHTTP/2化はやはり難しかったので外部を検討した。</p>
-
-<p>次にGithub製のJelyllだが、Github Pagesとの相性もよくはじめに検討はじめたものだった。<br />
-Ruby製ということもあり、自分に馴染みのあるツールで最有力候補だった。<br />
+<p>次にGithub製のJelyllだが、Github Pagesとの相性もよくはじめに検討はじめたものだった。<br>
+Ruby製ということもあり、自分に馴染みのあるツールで最有力候補だった。<br>
 しかし、後発のHugoの完成度の高さ、コンパイルの速さ、気に入ったテンプレートがあった、という理由でHugoに劣った。</p>
-
-<p>最後にmediumだが、自前で構築することなくやりたいことのすべてを実現していた。<br />
-正直一番いいのではないかとも思う（笑）<br />
-最終的には、よりカスタマイズ度の高いHugoを選んだ。特にこれといった理由はない。<br />
+<p>最後にmediumだが、自前で構築することなくやりたいことのすべてを実現していた。<br>
+正直一番いいのではないかとも思う（笑）<br>
+最終的には、よりカスタマイズ度の高いHugoを選んだ。特にこれといった理由はない。<br>
 ちょうどGo言語をやってみたいモチベーションがあったので、これをきっかけに勉強がはかどればいいなぁくらいの気持ちはあった。</p>
-
-<h2 id="2-移行に際して行ったこと">2.移行に際して行ったこと</h2>
-
-<h3 id="2-1-hugoでのサイト構築-アーキテクチャ">2-1.Hugoでのサイト構築、アーキテクチャ</h3>
-
-<p>Github上でHugoを管理し、コンパイルしてできたPublicファイルを、Github Pages対応の別のレポジトリで管理。<br />
-独自ドメイン利用、SSL対応、HTTP/2対応するためにフロントにCloudFlareを利用した。<br />
-後述するが、CloudFlareはとても便利なツールだが、キャッシュの扱いは気をつけてなければいけない。<br />
+<h2 id="2移行に際して行ったこと">2.移行に際して行ったこと</h2>
+<h3 id="2-1hugoでのサイト構築アーキテクチャ">2-1.Hugoでのサイト構築、アーキテクチャ</h3>
+<p>Github上でHugoを管理し、コンパイルしてできたPublicファイルを、Github Pages対応の別のレポジトリで管理。<br>
+独自ドメイン利用、SSL対応、HTTP/2対応するためにフロントにCloudFlareを利用した。<br>
+後述するが、CloudFlareはとても便利なツールだが、キャッシュの扱いは気をつけてなければいけない。<br>
 図にすると以下のとおりだ。</p>
-
-<p><img src="/image/hugo-architecture.png" alt="hugo-architecture" /></p>
-
-<h3 id="2-2-記事の移行">2-2.記事の移行</h3>
-
-<p>はてなブログはそのままのこし、新規に書くブログからHugoへ移行することも検討したが、<br />
+<p><img src="/image/hugo-architecture.png" alt="hugo-architecture"></p>
+<h3 id="2-2記事の移行">2-2.記事の移行</h3>
+<p>はてなブログはそのままのこし、新規に書くブログからHugoへ移行することも検討したが、<br>
 せっかくなのではてなブログ時代に書いた記事もすべて移行することを決めた。</p>
-
-<p>はてなブログからデータのエクスポートができる。<br />
-<img src="/image/hatena-blog-entry-export.png" alt="hatena-blog-entry-export" /></p>
-
-<p>エクスポートしたファイルを簡単なスクリプトを作ってHugoファイルへの変換を行った。（<a href="https://github.com/mosuke5/hatena-blog-parser">Github mosuke5/hatena-blog-parser</a>）<br />
-正直このツールは汎用的なものではない。このスクリプトだけではうまく行かない部分も多数ある。<br />
+<p>はてなブログからデータのエクスポートができる。<br>
+<img src="/image/hatena-blog-entry-export.png" alt="hatena-blog-entry-export"></p>
+<p>エクスポートしたファイルを簡単なスクリプトを作ってHugoファイルへの変換を行った。（<a href="https://github.com/mosuke5/hatena-blog-parser">Github mosuke5/hatena-blog-parser</a>）<br>
+正直このツールは汎用的なものではない。このスクリプトだけではうまく行かない部分も多数ある。<br>
 いくぶんかsedなど使って（たまに手動編集・・・）して整えた。。</p>
-
 <h4 id="はてなブログのエクスポートファイルのフォーマット">はてなブログのエクスポートファイルのフォーマット</h4>
-
 <pre><code>--------
 AUTHOR: mosuke5
 TITLE: 万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する
@@ -160,10 +142,7 @@ BODY:
 
 &lt;p&gt;&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/Amazon%20S3&quot;&gt;Amazon S3&lt;/a&gt;をはじめとして、オブジェクトストレージが身近になってきています。&lt;br/&gt;
 各&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9&quot;&gt;クラウド&lt;/a&gt;ベンダーはオブジェクトストレージサービスを提供しています。&lt;/p&gt;
-</code></pre>
-
-<h4 id="変換後のhugoファイルフォーマット">変換後のHugoファイルフォーマット</h4>
-
+</code></pre><h4 id="変換後のhugoファイルフォーマット">変換後のHugoファイルフォーマット</h4>
 <pre><code>+++
 Categories = [&quot;オブジェクトストレージ&quot;, &quot;ObjectStorage&quot;, &quot;クラウド&quot;, &quot;S3&quot;]
 Description = &quot; 1.はじめに  Amazon S3をはじめとして、オブジェクトストレージが身近になってきています。 各クラウドベンダーはオブジェクトストレージサービスを提供しています。   Amazon S3  Azure Blob Storage  G&quot;
@@ -178,101 +157,75 @@ archive = [&quot;2017&quot;]
 
 &lt;p&gt;&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/Amazon%20S3&quot;&gt;Amazon S3&lt;/a&gt;をはじめとして、オブジェクトストレージが身近になってきています。&lt;br/&gt;
 各&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9&quot;&gt;クラウド&lt;/a&gt;ベンダーはオブジェクトストレージサービスを提供しています。&lt;/p&gt;
-</code></pre>
-
-<h3 id="2-3-リダイレクト関連">2-3.リダイレクト関連</h3>
-
-<h4 id="1-リダイレクト処理">(1)リダイレクト処理</h4>
-
-<p>はてなブログのデザイン設定から「ヘッダー」→「タイトル下」に、ブログ移転をお知らせする文言とリダイレクト処理を書いた。<br />
+</code></pre><h3 id="2-3リダイレクト関連">2-3.リダイレクト関連</h3>
+<h4 id="1リダイレクト処理">(1)リダイレクト処理</h4>
+<p>はてなブログのデザイン設定から「ヘッダー」→「タイトル下」に、ブログ移転をお知らせする文言とリダイレクト処理を書いた。<br>
 これですべてのページのタイトル下に「ブログ移転しました。5秒後にリダイレクトします。（リンク先URL）」が表示し、5秒後にリダイレクトするようにした。</p>
-
-<pre><code class="language-javascript">&lt;p style=&quot;max-width: 1024px; margin: 0 auto;&quot;&gt;&lt;span style=&quot;font-size: 150%; color: white;&quot;&gt;ブログ移転しました。5秒後にリダイレクトします。&lt;/span&gt;&lt;br /&gt;
-&lt;script type=&quot;text/javascript&quot; language=&quot;javascript&quot;&gt;
-    // 新urlの作成
-    var domain = &quot;https://blog.mosuke.tech&quot;;
-    var path = location.pathname;
-    if(path !== '/'){
-    	var url = domain + path; 
-    }else{
-    	var url = domain;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">p</span> <span style="color:#a6e22e">style</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;max-width: 1024px; margin: 0 auto;&#34;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">span</span> <span style="color:#a6e22e">style</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;font-size: 150%; color: white;&#34;</span><span style="color:#f92672">&gt;</span><span style="color:#a6e22e">ブログ移転しました</span><span style="color:#960050;background-color:#1e0010">。</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">秒後にリダイレクトします</span><span style="color:#960050;background-color:#1e0010">。</span><span style="color:#f92672">&lt;</span><span style="color:#e6db74">/span&gt;&lt;br /</span><span style="color:#f92672">&gt;</span>
+<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">script</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/javascript&#34;</span> <span style="color:#a6e22e">language</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;javascript&#34;</span><span style="color:#f92672">&gt;</span>
+    <span style="color:#75715e">// 新urlの作成
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">domain</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://blog.mosuke.tech&#34;</span>;
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">path</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">pathname</span>;
+    <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">path</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;/&#39;</span>){
+    	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">domain</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">path</span>; 
+    }<span style="color:#66d9ef">else</span>{
+    	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">domain</span>;
     }
 
-     // リンクhtmlの書き出し
-    document.write(&quot;&lt;a href=\&quot;&quot; + url + &quot;\&quot;&gt;&quot; + url + &quot;&lt;/a&gt;&lt;/p&gt;&quot;);
+     <span style="color:#75715e">// リンクhtmlの書き出し
+</span><span style="color:#75715e"></span>    document.<span style="color:#a6e22e">write</span>(<span style="color:#e6db74">&#34;&lt;a href=\&#34;&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\&#34;&gt;&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&lt;/a&gt;&lt;/p&gt;&#34;</span>);
 
-    var doc = document;
-    var link = doc.getElementsByTagName(&quot;link&quot;)[0];
-    link.href = url;
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">doc</span> <span style="color:#f92672">=</span> document;
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">link</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">doc</span>.<span style="color:#a6e22e">getElementsByTagName</span>(<span style="color:#e6db74">&#34;link&#34;</span>)[<span style="color:#ae81ff">0</span>];
+    <span style="color:#a6e22e">link</span>.<span style="color:#a6e22e">href</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">url</span>;
 
-    // リダイレクト
-    var head = doc.getElementsByTagName(&quot;head&quot;)[0];
-    var meta = doc.createElement(&quot;meta&quot;);
-    meta.setAttribute(&quot;http-equiv&quot;,&quot;refresh&quot;);
-    meta.setAttribute(&quot;content&quot;,&quot;0; URL=&quot;+url);
-    head.appendChild(meta);
-&lt;/script&gt;
-</code></pre>
-
-<h4 id="2-スマホサイトでのリダイレクト">(2)スマホサイトでのリダイレクト</h4>
-
-<p>スマホで開いた時にも同様の動作をして欲しかったのだが、私の設定ではもともと、<br />
-スマホは別デザインとなっていて、うえで設定したJSが実行されない。<br />
-スマホ用でHTML/JSを埋め込むのは有料プランでしかできず、<br />
+    <span style="color:#75715e">// リダイレクト
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">head</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">doc</span>.<span style="color:#a6e22e">getElementsByTagName</span>(<span style="color:#e6db74">&#34;head&#34;</span>)[<span style="color:#ae81ff">0</span>];
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">meta</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">doc</span>.<span style="color:#a6e22e">createElement</span>(<span style="color:#e6db74">&#34;meta&#34;</span>);
+    <span style="color:#a6e22e">meta</span>.<span style="color:#a6e22e">setAttribute</span>(<span style="color:#e6db74">&#34;http-equiv&#34;</span>,<span style="color:#e6db74">&#34;refresh&#34;</span>);
+    <span style="color:#a6e22e">meta</span>.<span style="color:#a6e22e">setAttribute</span>(<span style="color:#e6db74">&#34;content&#34;</span>,<span style="color:#e6db74">&#34;0; URL=&#34;</span><span style="color:#f92672">+</span><span style="color:#a6e22e">url</span>);
+    <span style="color:#a6e22e">head</span>.<span style="color:#a6e22e">appendChild</span>(<span style="color:#a6e22e">meta</span>);
+<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">&gt;</span>
+</code></pre></div><h4 id="2スマホサイトでのリダイレクト">(2)スマホサイトでのリダイレクト</h4>
+<p>スマホで開いた時にも同様の動作をして欲しかったのだが、私の設定ではもともと、<br>
+スマホは別デザインとなっていて、うえで設定したJSが実行されない。<br>
+スマホ用でHTML/JSを埋め込むのは有料プランでしかできず、<br>
 「詳細設定」の「レスポンシブデザイン」にチェックを入れることで、スマホで表示した場合もPCと同じ画面を出すようにして対応した。</p>
-
 <pre><code>[x] レスポンシブデザイン
 スマートフォンでもPCと同じデザイン設定でブログを表示します。レスポンシブデザインのテーマを設定しているときのみ使用してください。
-</code></pre>
-
-<h4 id="3-googleへのアドレス変更通知">(3)Googleへのアドレス変更通知</h4>
-
-<p>一般的にブログのドメイン変更を行った場合は、<br />
-変更元のサイトで301リダイレクトを行ってGoogleに恒久的にサイトが移動したことを伝える。<br />
-しかし、はてなブログを利用しているとWebサーバレベルでの変更はできず、301リダイレクトができない。<br />
-Canonicalを変更したりしたが、うまくGoogle Search Consoleに変更を読み取らせることができなかった。<br />
+</code></pre><h4 id="3googleへのアドレス変更通知">(3)Googleへのアドレス変更通知</h4>
+<p>一般的にブログのドメイン変更を行った場合は、<br>
+変更元のサイトで301リダイレクトを行ってGoogleに恒久的にサイトが移動したことを伝える。<br>
+しかし、はてなブログを利用しているとWebサーバレベルでの変更はできず、301リダイレクトができない。<br>
+Canonicalを変更したりしたが、うまくGoogle Search Consoleに変更を読み取らせることができなかった。<br>
 （いい方法あったら教えてください…）</p>
-
 <p>なので結局、移行時の手順は以下で進めた。</p>
-
 <ol>
 <li>新サイト(blog.mosuke.tech)を公開</li>
 <li>はてなブログに<code>http-equiv=&quot;refresh&quot;</code>を追加してリダイレクト</li>
 </ol>
-
-<h2 id="3-4-cloudflareのキャッシュ削除">3-4.CloudFlareのキャッシュ削除</h2>
-
-<p>フロントにCloudFlareを利用していると書いた。<br />
-Hugoは静的ブログサイトなので、基本的にCloudFlare側で全てキャッシュする。<br />
+<h2 id="3-4cloudflareのキャッシュ削除">3-4.CloudFlareのキャッシュ削除</h2>
+<p>フロントにCloudFlareを利用していると書いた。<br>
+Hugoは静的ブログサイトなので、基本的にCloudFlare側で全てキャッシュする。<br>
 そのため、ブログ記事の更新やデザインの本番への反映が時間かかる。</p>
-
-<p>CloudFlareは便利なものでapiを用意している。<br />
-簡単だが、以下のようなキャッシュ全削除スクリプトを用意した。<br />
+<p>CloudFlareは便利なものでapiを用意している。<br>
+簡単だが、以下のようなキャッシュ全削除スクリプトを用意した。<br>
 参考: <a href="https://blog.mosuke.tech/entry/2017/05/29/how_to_use_cloudflare_api/">「CloudFlare APIを使ってキャッシュを削除する」</a></p>
-
-<pre><code class="language-shell">#!/bin/sh
-curl -X DELETE &quot;https://api.cloudflare.com/client/v4/zones/$1/purge_cache&quot; \
-     -H &quot;X-Auth-Email: $2&quot; \
-     -H &quot;X-Auth-Key: $3&quot; \
-     -H &quot;Content-Type: application/json&quot; \
-     --data '{&quot;purge_everything&quot;:true}'
-</code></pre>
-
-<h3 id="後日談">後日談</h3>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e">#!/bin/sh
+</span><span style="color:#75715e"></span>curl -X DELETE <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">https://api.cloudflare.com/client/v4/zones/</span>$1<span style="color:#e6db74">/purge_cache</span><span style="color:#e6db74">&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>     -H <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">X-Auth-Email: </span>$2<span style="color:#e6db74">&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>     -H <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">X-Auth-Key: </span>$3<span style="color:#e6db74">&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>     -H <span style="color:#e6db74">&#34;Content-Type: application/json&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>     --data <span style="color:#e6db74">&#39;{&#34;purge_everything&#34;:true}&#39;</span>
+</code></pre></div><h3 id="後日談">後日談</h3>
 <p>上記のようなシェルを用意し、最終的にはCI/CDのパイプラインの中で実行するようにした。</p>
-
-<h2 id="4-今後の課題">4.今後の課題</h2>
-
-<p>まずは新しいHugoの環境でブログを書いて、課題点など洗いだしていく必要がある。<br />
-あとは、はてなブログからの移行でだいぶSEOあたり下がったと思う。<br />
-そのあたりの挽回をどうするかはこれからの検討課題。<br />
+<h2 id="4今後の課題">4.今後の課題</h2>
+<p>まずは新しいHugoの環境でブログを書いて、課題点など洗いだしていく必要がある。<br>
+あとは、はてなブログからの移行でだいぶSEOあたり下がったと思う。<br>
+そのあたりの挽回をどうするかはこれからの検討課題。<br>
 あとは、デプロイからCloudFlareのキャッシュ削除の流れはぜひ自動化していきたい。</p>
-
 <h2 id="追記">追記</h2>
-
 <p>その後の取り組みを追記しておきます。</p>
-
 <ul>
 <li><a href="https://blog.mosuke.tech/entry/2017/06/04/hugo_deployment_with_wercker/">Werckerを使ってHugo+Github PagesのCI/CD環境を整備する</a></li>
 <li><a href="https://blog.mosuke.tech/entry/2017/06/12/hugo_optimize_image/">Hugo、PageSpeed対策で自動で画像を圧縮する</a></li>

@@ -9,7 +9,7 @@
     <meta name="description" content=" 前回の【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築に続き、同様の環境を用いて、ロードバランサ構築を行った。 ロードバランサの構築にはHAProxyを利用した。       1. 環境      前回同様で">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2014/11/09/171436/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2014/11/09/171436/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="【VPS1台でインフラ勉強】HAProxyでロードバランサーを構築 | Goldstine研究所">
@@ -80,20 +80,16 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>こんにちは。もーすけです。<br />
+                        <p>こんにちは。もーすけです。<br>
 前回の<a href="https://blog.mosuke.tech/entry/2014/10/09/230555">【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築</a>に続き、同様の環境を用いて、ロードバランサ構築を行っていきます。
 ロードバランサの構築には<a href="entry/2014/11/09/171436/">HAProxy</a>を利用します。</p>
-
 <ul>
 <li>第1回 <a href="https://blog.mosuke.tech/entry/2014/10/09/230555">サーバ複数台構成、Nginxでリバースプロキシ構築</a></li>
 <li>第2回 HAProxyでロードバランサ構築</li>
 <li>第3回 <a href="https://blog.mosuke.tech/entry/2014/12/07/212156">SoftEtherを使ってVPN構築</a></li>
 </ul>
-
 <h2 id="1-環境">1. 環境</h2>
-
 <p>前回同様で、さくらVPSの1GBのプラン1台のみ利用します。もちろん、ローカルのPCでやっていただいても構いません。VPSでわざわざやっている理由は、人と共同でやっていたため、共有環境におきたかったのと、これからさくらのVPS上で作っていく予定があるからです。</p>
-
 <ul>
 <li>メモリ：１GB</li>
 <li>CPU：仮想２コア</li>
@@ -102,23 +98,15 @@
 <li>サーバ仮想化：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>(Utuntu13)</li>
 <li>ロードバランサ：<a href="http://www.haproxy.org/">HAProxy - The Reliable, High Performance TCP/HTTP Load Balancer</a></li>
 </ul>
-
 <h2 id="2-構成図">2. 構成図</h2>
-
-<p>非常に簡単ですが、下記の構成を実際に作っていきます。<br />
+<p>非常に簡単ですが、下記の構成を実際に作っていきます。<br>
 <span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141109/20141109170337.png" alt="f:id:mosuke5:20141109170337p:plain" title="f:id:mosuke5:20141109170337p:plain" class="hatena-fotolife" itemprop="image"></span></p>
-
 <h2 id="3-ロードバランサの構築">3. ロードバランサの構築</h2>
-
 <h3 id="ホストサーバ側の設定">■ホストサーバ側の設定</h3>
-
 <p>インストールはyumで入れることが可能です。</p>
-
 <pre><code>#HAProxyインストール
 $ sudo yum install haproxy
-</code></pre>
-
-<pre><code>#設定はすごく簡単で以下のファイルのみ。実際に
+</code></pre><pre><code>#設定はすごく簡単で以下のファイルのみ。実際に
 $ sudo vim /etc/haproxy/haproxy.cfg
 
 #---------------------------------------------------------------------
@@ -188,18 +176,12 @@ backend hoge
     balance     roundrobin
     server      web10 192.168.33.10:80 check inter 3000 fall 2 rise 2
     server      web11 192.168.33.11:80 check inter 3000 fall 2 rise 2 
-</code></pre>
-
-<p>ロードバランサを80番ポートで待ち受けたい場合には、ApacheやNginxが起動していないことは確認しておきましょう。
+</code></pre><p>ロードバランサを80番ポートで待ち受けたい場合には、ApacheやNginxが起動していないことは確認しておきましょう。
 立ち上がっているとそもそも、HAProxyの起動に失敗するはずです。</p>
-
 <pre><code>$ sudo systemctl stop nginx
 $ sudo systemctl stop httpd 
-</code></pre>
-
-<p>HAProxyのログをsyslogに残すように設定します。<br />
+</code></pre><p>HAProxyのログをsyslogに残すように設定します。<br>
 ただしメインのmessageではなく、独自のファイルに書くために以下の設定します。</p>
-
 <pre><code>##ログの格納場所作成
 $ sudo mkdir /var/log/haproxy
 
@@ -216,48 +198,33 @@ SYSLOGD_OPTIONS=&quot;-r&quot;
 
 ## haproxyの起動
 $ sudo systemctl start haproxy 
-</code></pre>
-
-<h3 id="l4-l7のロードバランサ">L4, L7のロードバランサ</h3>
-
+</code></pre><h3 id="l4-l7のロードバランサ">L4, L7のロードバランサ</h3>
 <p>次に行く前にL4とL7ロードバランサの違いについて確認します。
 こちらは非常に重要な概念なので、HAProxyをはじめ、AWSなどのクラウドでELBロードバランサを利用する際も役に立ちますので、かならず抑えておきましょう。</p>
-
 <p>L4ロードバランサは、名前の通りL4でのロードバランサになりますので、実際のHTTPの処理はバックエンドのサーバで行います。
 一方、L7ロードバランサはどちらかというとリバースプロキシ的な役割で、ロードバランサ自身がHTTPの処理を行います。
 その後にバックエンドのサーバに対してもう一度HTTPでリクエストを行います。</p>
-
-<p>どう使い分けるべきか？<br />
+<p>どう使い分けるべきか？<br>
 それはどの処理をどのサーバで行わせたいか？に基本つきます。
 たとえば、L7ロードバランサを使用した場合は、SSLの終端をロードバランサで行うことが可能です。
 実際のユーザから見えるIPアドレスのホストとの間はロードバランサになるなりますので。
 バックエンドのサーバとSSL通信をするかは、もっと内部的な要件によって決められるということになります。</p>
-
-<p>WebサーバでもあえてL4のロードバランサを使いたいこともあります。<br />
+<p>WebサーバでもあえてL4のロードバランサを使いたいこともあります。<br>
 この記事を書いた数年後の話になるのですが、HTTP2に対応したサイトを作りたいと考えましたが、ロードバランサが対応していなかったため、ロードバランサはL4で受け付けて、L7をバックエンドのサーバで受け付けるようにしました。バックエンドのサーバでは最新版のNginxに変更が可能で新しいプロトコルへの対応も可能だったためです。</p>
-
-<p>下記サイトも参考にしてみてください。<br />
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.atmarkit.co.jp/ait/articles/0302/05/news001.html" data-iframely-url="//cdn.iframe.ly/GegycpB?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
-
+<p>下記サイトも参考にしてみてください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.atmarkit.co.jp/ait/articles/0302/05/news001.html" data-iframely-url="//cdn.iframe.ly/GegycpB?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
 <h3 id="webサーバの設定">■Webサーバの設定</h3>
-
-<p>バックエンドのWebサーバ構築は省くが、Apache2をインストールしただけです。<br />
+<p>バックエンドのWebサーバ構築は省くが、Apache2をインストールしただけです。<br>
 仮想でのサーバ構築は前回を参照。
 <a href="https://blog.mosuke.tech/entry/2014/10/09/230555">【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築</a></p>
-
-<p>ヘルスチェック用のhtml設置しておくとわかりやすいです。<br />
+<p>ヘルスチェック用のhtml設置しておくとわかりやすいです。<br>
 負荷分散されていることを確認するために、内容の異なるヘルスチェック用のHTMLをおいておくと非常にわかりやすいです。</p>
-
 <pre><code>## /var/www/html配下にヘルスチェック用のhtml設置
 $ sudo touch health_check.html 
-</code></pre>
-
-<h2 id="4-動作試験">4. 動作試験</h2>
-
+</code></pre><h2 id="4-動作試験">4. 動作試験</h2>
 <p>ブラウザよりホストサーバへアクセスします。
-きちんとロードバランスされていることを確認します。確認方法は、もしヘルスチェック用のHTMLの中身を変えていればそれでわかるとおもいます。あるいはログから確認する必要があります。<br />
+きちんとロードバランスされていることを確認します。確認方法は、もしヘルスチェック用のHTMLの中身を変えていればそれでわかるとおもいます。あるいはログから確認する必要があります。<br>
 HAProxy側のログは以下のとおり。</p>
-
 <pre><code>$ sudo tail -f /var/log/haproxy/haproxy.conf
 
 ##起動した時。L7のhealt checkが走っている
@@ -278,10 +245,7 @@ Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 40
 Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &quot;OK&quot;, check duration: 8ms, status: 1/2 DOWN.
 Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &quot;OK&quot;, check duration: 6ms, status: 2/2 UP.
 Server hoge/web11 is UP. 2 active and 0 backup servers online. 0 sessions requeued, 0 total in queue. 
-</code></pre>
-
-<p>Webサーバ側の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>ログを見てみると。</p>
-
+</code></pre><p>Webサーバ側の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>ログを見てみると。</p>
 <pre><code>$ sudo tail -f /var/log/apache2/access.log
 
 ##ロードバランサからのヘルスチェックが来ていることがわかる。
@@ -293,11 +257,8 @@ Server hoge/web11 is UP. 2 active and 0 backup servers online. 0 sessions requeu
 ##Webからのアクセスが来た場合
 ##SorceのIPはロードバランサにIPになっているが、UserAgentなど書き込まれていることを確認。
 192.168.33.1 - - [09/Nov/2014:08:10:06 +0000] &quot;GET / HTTP/1.1&quot; 200 488 &quot;-&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10) AppleWebKit/600.1.25 (KHTML, like Gecko) Version/8.0 Safari/600.1.25&quot; 
-</code></pre>
-
-<h2 id="まとめ">まとめ</h2>
-
-<p>HAProxyのインストール設定自体は非常に簡単で、ロードバランサといえど恐れる必要はなかったです。<br />
+</code></pre><h2 id="まとめ">まとめ</h2>
+<p>HAProxyのインストール設定自体は非常に簡単で、ロードバランサといえど恐れる必要はなかったです。<br>
 それ以上にやはり重要なのは、L4/L7ロードバランサの違いやその使いみち。ここを理解しておくことが非常に重要です。
 クラウド時代になり、ロードバランサを用意する敷居が今まで以上に低くなってきたからこそ、そこの概念を抑えることは必須です。</p>
                     </div>

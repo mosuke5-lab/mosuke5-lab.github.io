@@ -9,7 +9,7 @@
     <meta name="description" content="CloudFlareのAPIを利用してキャッシュを削除する方法を紹介。ブログをHugoに移行し、フロントにCloudFlareを利用している。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2017/05/29/how_to_use_cloudflare_api/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2017/05/29/how_to_use_cloudflare_api/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="CloudFlare APIを使ってキャッシュを削除する | Goldstine研究所">
@@ -80,28 +80,21 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>最近ブログをはてなブログからHugoへ移行した。<br />
-HugoのフロントにCloudFlareを利用している。<br />
-ブログ移行についてはこちらを参照。<br />
+                        <p>最近ブログをはてなブログからHugoへ移行した。<br>
+HugoのフロントにCloudFlareを利用している。<br>
+ブログ移行についてはこちらを参照。<br>
 「<a href="https://blog.mosuke.tech/entry/2017/05/28/blog_migration/">はてなブログからHugoに移行。その際に行ったあれこれ。</a>」</p>
-
-<p>コンテンツをアップロードした場合などにCloudFlareのキャッシュを削除したく、<br />
+<p>コンテンツをアップロードした場合などにCloudFlareのキャッシュを削除したく、<br>
 APIを利用して効率よく作業できる環境を整えた。</p>
-
 <h1 id="使い方">使い方</h1>
-
-<p>CloudFlareのAPIドキュメントはかなり充実している。<br />
-キャッシュの全削除については下記に記載がある。<br />
+<p>CloudFlareのAPIドキュメントはかなり充実している。<br>
+キャッシュの全削除については下記に記載がある。<br>
 <a href="https://api.cloudflare.com/#zone-purge-all-files">https://api.cloudflare.com/#zone-purge-all-files</a></p>
-
-<p>利用方法をみると、<code>DELETE /zones/:identifier/purge_cache</code>とあるが、<br />
+<p>利用方法をみると、<code>DELETE /zones/:identifier/purge_cache</code>とあるが、<br>
 <code>:identifier</code>がなんのことかはじめわからずはじめ苦戦した。</p>
-
 <h2 id="identifierの確認">identifierの確認</h2>
-
-<p><code>identifier</code>は下記APIで確認できる。<br />
+<p><code>identifier</code>は下記APIで確認できる。<br>
 このAPIで返ってくるはじめの<code>id</code>が<code>idenitifer</code>だ。</p>
-
 <pre><code>curl -X GET &quot;https://api.cloudflare.com/client/v4/zones \
     ?name=&lt;your site&gt; \
     &amp;status=active \
@@ -113,9 +106,7 @@ APIを利用して効率よく作業できる環境を整えた。</p>
     -H &quot;X-Auth-Email: &lt;your email&gt;&quot; \
     -H &quot;X-Auth-Key: &lt;your api key&gt;&quot; \
     -H &quot;Content-Type: application/json&quot; 
-</code></pre>
-
-<pre><code>{
+</code></pre><pre><code>{
   &quot;result&quot;: [
     {
       &quot;id&quot;: &quot;xxxxxxxxxxxxxxxxxxxxxxx&quot;,
@@ -134,24 +125,17 @@ APIを利用して効率よく作業できる環境を整えた。</p>
     }
   ]
 }
-</code></pre>
-
-<h2 id="キャッシュの削除">キャッシュの削除</h2>
-
-<p>うえで手に入れた<code>identifier</code>を使って、ドキュメント通り<code>purge_cache</code>を実行するだけだ。<br />
+</code></pre><h2 id="キャッシュの削除">キャッシュの削除</h2>
+<p>うえで手に入れた<code>identifier</code>を使って、ドキュメント通り<code>purge_cache</code>を実行するだけだ。<br>
 このAPIをデプロイの過程に組み込み効率よく運用できている。</p>
-
 <pre><code>curl -X DELETE &quot;https://api.cloudflare.com/client/v4/zones/&lt;identifier&gt;/purge_cache&quot; \
      -H &quot;X-Auth-Email: &lt;your email&gt;&quot; \
      -H &quot;X-Auth-Key: &lt;your api key&gt;&quot; \
      -H &quot;Content-Type: application/json&quot; \
      --data '{&quot;purge_everything&quot;:true}'
-</code></pre>
-
-<h2 id="さいごに">さいごに</h2>
-
-<p>最近のサービスではめずらしくないが、APIに対応しているのはやはりいい。<br />
-毎度全キャッシュを消してしまっているのはどうかとは思うがそこは今後の改善点だ。<br />
+</code></pre><h2 id="さいごに">さいごに</h2>
+<p>最近のサービスではめずらしくないが、APIに対応しているのはやはりいい。<br>
+毎度全キャッシュを消してしまっているのはどうかとは思うがそこは今後の改善点だ。<br>
 本件とは関係ないがCloudFlareはterraformにも対応しているし、かなり運用には便利そう。</p>
                     </div>
                     

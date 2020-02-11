@@ -9,7 +9,7 @@
     <meta name="description" content=" CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にMySQL-shared-compatの役割を知らず困ったことがあったのでまとめました。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/04/15/171127/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2015/04/15/171127/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Ansibleで最新のMySQLをインストールする。MySQL-shared-compatの役割。 | Goldstine研究所">
@@ -80,82 +80,64 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にハマったことをまとめた。<br />
+                        <p>CentOS 6.5環境でAnsibleを使って最新のMySQLのセットアップをしようと思った際にハマったことをまとめた。<br>
 本質的にはAnsibleというよりLinux RPMパッケージのはなし。
 非常に簡単なサンプルコードも載せて解説します。</p>
-
 <h2 id="1-背景">(1) 背景</h2>
-
 <p>まずは、本記事を書くに至った経緯から少し整理していきます。</p>
-
 <ol>
 <li>Ansibleでmysqlを使ったサーバを構築(CentOS6.5)することになった
-
 <ul>
 <li>MySQLのバージョンは5.6を採用</li>
-</ul></li>
+</ul>
+</li>
 <li>MySQLの公式rpmをダウンロードしインストール
-
 <ul>
 <li>インストールしたもの
-
 <ul>
 <li>MySQL-client</li>
 <li>MySQL-devel</li>
 <li>MySQL-server</li>
 <li>MySQL-shared</li>
-</ul></li>
-</ul></li>
+</ul>
+</li>
+</ul>
+</li>
 <li>MySQL-sharedをインストールする際にデフォルトの<code>mysql-libs</code>と競合しインストール失敗</li>
 <li>mysql-libsをアンインストールしインストールに再挑戦</li>
 <li>AnsibleでMySQLの操作をするにはMySQL-pythonが必要なのでインストール</li>
 <li>MySQL-pythonをインストールするにはさっきアンインストールしたmysql-libsが必要…</li>
 <li>MySQL-shared-compatというパッケージの役割を知る</li>
 </ol>
-
 <h2 id="2-mysql-shared-compatというパッケージ">(2) MySQL-shared-compatというパッケージ</h2>
-
 <p>上で起きたことを一言でまとめると、mysql-libsというパッケージは多くの他のパッケージの依存関係となっており、公式のMySQL5.6をインストールすることで、他のパッケージがいれられない状況となっていた。</p>
-
-<p>そんな状況を解決するためにMySQL-shared-compatというパッケージが用意されている。<br />
-MySQL-shared-compatは「過去のMySQLバージョン向けの共有クライアントライブラリが納められているもの」だ。<br />
+<p>そんな状況を解決するためにMySQL-shared-compatというパッケージが用意されている。<br>
+MySQL-shared-compatは「過去のMySQLバージョン向けの共有クライアントライブラリが納められているもの」だ。<br>
 このパッケージをインストールすることで、mysql-libsの代わりになり、mysql-libsをインストールしなくても他のソフトウエアをインスーツできるようになる。</p>
-
-<p>パッケージの詳細を知りたい方は下記参照をおすすめ。<br />
+<p>パッケージの詳細を知りたい方は下記参照をおすすめ。<br>
 <a href="http://y-ken.hatenablog.com/entry/inside-of-libmysqlclient-with-mysql-shared-compat" target="_blank">MySQL-5.5.6から仕様が変わった「MySQL-shared-compat」の中身を徹底解剖 - Y-Ken Studio</a>&lt;</p>
-
-<p>ちなみに豆知識だが、この業界で&rdquo;compat&rdquo;という単語がよく使われるが、これは&rdquo;compatibility&rdquo;の略で「互換性」とかそういう意味。</p>
-
-<p><h2>(3) サンプルコード</h2>
-内容は非常に簡単なものだが、MySQLをインストールするansibleをGithubにあげた。playbookを書く参考になればと。<br />
-<a href="https://github.com/mosuke5/mysql-ansible">mosuke5/mysql-ansible · GitHub</a></p>
-
+<p>ちなみに豆知識だが、この業界で&quot;compat&quot;という単語がよく使われるが、これは&quot;compatibility&quot;の略で「互換性」とかそういう意味。</p>
+<h2>(3) サンプルコード</h2>
+内容は非常に簡単なものだが、MySQLをインストールするansibleをGithubにあげた。playbookを書く参考になればと。  
+<a href="https://github.com/mosuke5/mysql-ansible">mosuke5/mysql-ansible · GitHub</a>
 <p>特徴としては、インターネット上からRPMをダウンロードしてインストールする際に、<br>
 Ansibleでも「ダウンロード」→「インストール」の流れを踏む人が多いが、以下のようにするとシンプルになる。<br>
 varsでインストールしたいrpmやその取得先を記述しておいて、task側ではyumでnameにvarsで定義した変数を読むだけでできる。</p>
-
 <p><code>role/mysql/vars/main.yml</code></p>
-
-<pre><code class="language-yaml">mysql_url: http://ftp.jaist.ac.jp/pub/mysql/Downloads/MySQL-5.6
-mysql_ver: &quot;5.6.24-1&quot;
-mysql_rpms:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">mysql_url</span>: http://ftp.jaist.ac.jp/pub/mysql/Downloads/MySQL<span style="color:#ae81ff">-5.6</span>
+<span style="color:#66d9ef">mysql_ver</span>: <span style="color:#e6db74">&#34;5.6.24-1&#34;</span>
+<span style="color:#66d9ef">mysql_rpms</span>:
   - MySQL-client-{{ mysql_ver }}.el6.x86_64.rpm
   - MySQL-shared-compat-{{ mysql_ver }}.el6.x86_64.rpm
   - MySQL-shared-{{ mysql_ver }}.el6.x86_64.rpm
   - MySQL-devel-{{ mysql_ver }}.el6.x86_64.rpm
   - MySQL-server-{{ mysql_ver }}.el6.x86_64.rpm
  
-</code></pre>
-
-<p><code>role/mysql/tasks/main.yml</code></p>
-
-<pre><code class="language-yaml">- name: Install MySQL without MySQL-shared
-  yum: name={{ mysql_url}}/{{ item }}
-  with_items: mysql_rpms
-</code></pre>
-
-<h2 id="4-まとめ">(4) まとめ</h2>
-
+</code></pre></div><p><code>role/mysql/tasks/main.yml</code></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">- <span style="color:#66d9ef">name</span>: Install MySQL without MySQL-shared
+  <span style="color:#66d9ef">yum</span>: name={{ mysql_url}}/{{ item }}
+  <span style="color:#66d9ef">with_items</span>: mysql_rpms
+</code></pre></div><h2 id="4-まとめ">(4) まとめ</h2>
 <p>パッケージ管理のデッドロックにハマってしまい、どうしようかと悩んでいたが、
 よくしらべると解決策をきちんと用意してくれていた。
 こうやってみていくと１つ１つのパッケージがどんな役割を果たしているのか少しずつ興味もわいてきた。

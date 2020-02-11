@@ -9,7 +9,7 @@
     <meta name="description" content="Hugoを利用したブログ運用環境で、GoogleのPageSpeed対策で画像を自動で圧縮する環境を整えた。optipngとjpegtranを利用。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2017/06/12/hugo_optimize_image/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2017/06/12/hugo_optimize_image/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Hugo、PageSpeed対策で自動で画像を圧縮する | Goldstine研究所">
@@ -80,47 +80,34 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>最近Hugoを使ったブログに移転した。<br />
+                        <p>最近Hugoを使ったブログに移転した。<br>
 「<a href="https://blog.mosuke.tech/entry/2017/05/28/blog_migration/">はてなブログからHugoに移行。その際に行ったあれこれ。</a>」</p>
-
-<p>せっかくブログを運営するからにはSEOも少しがんばりたい。<br />
-PageSpeedで画像を最適化できるよっていわれたので、画像を圧縮させようと思った。<br />
-しかし、気がつくと忘れてしまったりするので、<br />
+<p>せっかくブログを運営するからにはSEOも少しがんばりたい。<br>
+PageSpeedで画像を最適化できるよっていわれたので、画像を圧縮させようと思った。<br>
+しかし、気がつくと忘れてしまったりするので、<br>
 Werckerを使って自動で最適化させることにした。</p>
-
-<h1 id="werckerでのci-cd環境">WerckerでのCI/CD環境</h1>
-
-<p>まず、Werckerを使ったCI/CD環境だが、こちらを参考にしてほしい。<br />
+<h1 id="werckerでのcicd環境">WerckerでのCI/CD環境</h1>
+<p>まず、Werckerを使ったCI/CD環境だが、こちらを参考にしてほしい。<br>
 「<a href="https://blog.mosuke.tech/entry/2017/06/04/hugo_deployment_with_wercker/">Werckerを使ってHugo+Github PagesのCI/CD環境を整備する</a>」</p>
-
 <h1 id="画像圧縮処理">画像圧縮処理</h1>
-
-<p>ブログの中で使う画像は、JPEGとPNGが混じっている。<br />
+<p>ブログの中で使う画像は、JPEGとPNGが混じっている。<br>
 そのため、両方に対応して画像を圧縮する必要があった。</p>
-
-<p>画像の圧縮ツールはPageSpeedが推奨してきた、<br />
+<p>画像の圧縮ツールはPageSpeedが推奨してきた、<br>
 <code>optipng</code>と<code>jpegtran</code>を利用することにした。</p>
-
 <ul>
 <li><a href="http://optipng.sourceforge.net/">OptiPNG: Advanced PNG Optimizer</a></li>
 <li><a href="http://jpegclub.org/jpegtran/">jpegtran</a></li>
 </ul>
-
-<p>処理自体はいたってシンプル。<br />
+<p>処理自体はいたってシンプル。<br>
 次のシェル(<code>optimize_image.sh</code>)を用意した。</p>
-
 <pre><code>#!/bin/sh
 find ./static/image/ -name &quot;*.png&quot; | xargs optipng -o5
 find ./static/image/ -name &quot;*.jpg&quot; -type f -exec jpegtran -copy none -optimize -outfile {} {} \;
-</code></pre>
-
-<h1 id="werckerに組み込む">Werckerに組み込む</h1>
-
-<p><code>wercker.yml</code>のbuildの段階で最適化を仕込めばおわり。<br />
-ただし、すべての画像ファイルをデプロイのたびに最適化すると時間がかかる。<br />
-定期的にローカルで圧縮してgitに更新しておいたほうがいいだろう。<br />
+</code></pre><h1 id="werckerに組み込む">Werckerに組み込む</h1>
+<p><code>wercker.yml</code>のbuildの段階で最適化を仕込めばおわり。<br>
+ただし、すべての画像ファイルをデプロイのたびに最適化すると時間がかかる。<br>
+定期的にローカルで圧縮してgitに更新しておいたほうがいいだろう。<br>
 あくまで、忘れてしまった時のためにCIでまかなってくれるというスタンスで利用している。</p>
-
 <pre><code>- script:
   name: optimize image size
   code: |

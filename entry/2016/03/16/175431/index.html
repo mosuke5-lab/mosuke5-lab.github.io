@@ -9,7 +9,7 @@
     <meta name="description" content=" ある実装についてどのように実装するか悩んだ。 その悩んだ過程や実装案をメモする。似たようなケースの実装案として参考になればと思う。  状況  ある申請に対して、検査Aと検査Bを行い、その検査状態・検査日時を管理・閲覧するシステムがあるとす">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2016/03/16/175431/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2016/03/16/175431/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="実装案を使って、DBのViewの使いどころを検討する | Goldstine研究所">
@@ -80,24 +80,19 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><body>
+                        <body>
 <p>ある実装についてどのように実装するか悩んだ。<br>
-その悩んだ過程や実装案をメモする。似たようなケースの実装案として参考になればと思う。</p></p>
-
+その悩んだ過程や実装案をメモする。似たようなケースの実装案として参考になればと思う。</p>
 <h2>状況</h2>
-
 <p>ある申請に対して、検査Aと検査Bを行い、その検査状態・検査日時を管理・閲覧するシステムがあるとする。  <br>
 申請のテーブルは下記とする。</p>
-
 <ul>
 <li>id: int</li>
 <li>name: varchar(20)  # どうでもいいので無視していい</li>
 <li>check_a: datetime  # 検査すると実施した日時がはいる</li>
 <li>check_b: datetime  # 検査すると実施した日時がはいる</li>
 </ul>
-
 <p>UIとして下記のように表示したいと考えている。</p>
-
 <table>
 <thead>
 <tr>
@@ -139,91 +134,65 @@
 </tr>
 </tbody>
 </table>
-
 <h4>※<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%F3%A5%C1%A5%D1%A5%BF%A1%BC%A5%F3">アンチパターン</a>だろ！？</h4>
-
 <p>そもそも<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%F3%A5%C1%A5%D1%A5%BF%A1%BC%A5%F3">アンチパターン</a>の「マルチカラム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%C8%A5%EA%A5%D3%A5%E5%A1%BC%A5%C8">アトリビュート</a>」じゃないの？と思うかもしれない。<br>
 この場合は、この設計が一番という前提でお願いしたい。</p>
-
-<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.amazon.co.jp/SQL%25E3%2582%25A2%25E3%2583%25B3%25E3%2583%2581%25E3%2583%2591%25E3%2582%25BF%25E3%2583%25BC%25E3%2583%25B3-Bill-Karwin/dp/4873115892" data-iframely-url="//cdn.iframe.ly/npZLonr?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
-
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.amazon.co.jp/SQL%25E3%2582%25A2%25E3%2583%25B3%25E3%2583%2581%25E3%2583%2591%25E3%2582%25BF%25E3%2583%25BC%25E3%2583%25B3-Bill-Karwin/dp/4873115892" data-iframely-url="//cdn.iframe.ly/npZLonr?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
 <h2>実装の検討</h2>
-
 <p>いくつかの実装パターンを検討した。<br>
 結果的に今回は実装案４のViewを使うのがいいのではないかと考えた。 <br>
 が、Viewにもデメリットがある。必ずしもViewがいいというものではないことは留意。</p>
-
 <h3>(実装案１) SQL側で頑張る</h3>
-
 <p>まず、データを取り出す際に<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>で頑張ることを思いつくはずだ。<br>
 例えば以下みたいに。</p>
-
-<pre><code class="language-sql">select
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">select</span>
   id,
   name,
-  case
-    when check_a is null and check_b is null  then '検査未完了'
-    when check_a is not null and check_b is not null then '検査完了 '
-    else '検査途中'
-  end as check_status
-from request
+  <span style="color:#66d9ef">case</span>
+    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span>  <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査未完了</span><span style="color:#e6db74">&#39;</span>
+    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査完了 </span><span style="color:#e6db74">&#39;</span>
+    <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査途中</span><span style="color:#e6db74">&#39;</span>
+  <span style="color:#66d9ef">end</span> <span style="color:#66d9ef">as</span> check_status
+<span style="color:#66d9ef">from</span> request
  
-</code></pre>
-
-<p>これが悪いとはいわない。<br>
+</code></pre></div><p>これが悪いとはいわない。<br>
 だが、例えば同じような表示方法で他の条件式で取得したい時があるだろう。</p>
-
-<pre><code class="language-sql">select
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">select</span>
   id,
   name,
-  case
-    when check_a is null and check_b is null  then '検査未完了'
-    when check_a is not null and check_b is not null then '検査完了 '
-    else '検査途中'
-  end as check_status
-from request
-where name = 'xxxxx'
+  <span style="color:#66d9ef">case</span>
+    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span>  <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査未完了</span><span style="color:#e6db74">&#39;</span>
+    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査完了 </span><span style="color:#e6db74">&#39;</span>
+    <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査途中</span><span style="color:#e6db74">&#39;</span>
+  <span style="color:#66d9ef">end</span> <span style="color:#66d9ef">as</span> check_status
+<span style="color:#66d9ef">from</span> request
+<span style="color:#66d9ef">where</span> name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">xxxxx</span><span style="color:#e6db74">&#39;</span>
  
-</code></pre>
-
-<p>もし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>の中に同じ形なのに条件だけがことなる<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が出てきてしまったら、
+</code></pre></div><p>もし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>の中に同じ形なのに条件だけがことなる<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が出てきてしまったら、
 ヤバイと感じてくるはずだ。</p>
-
 <p>そして、<a class="keyword" href="http://d.hatena.ne.jp/keyword/ActiveRecord">ActiveRecord</a>のようなORマッパーを使っている場合、<br>
 case文などを利用し始めた時点で、生<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を書かなければいけなくなる。<br>
 これも不吉な感じがしてくる。</p>
-
 <h2>(実装案２) アプリケーションのview側で頑張る</h2>
-
 <p>SQLが複雑になるのがいやなら、アプリケーションのview側で頑張ることもできる。ここで言っているviewはDBのview機能ではなく、アプリケーションのHTMLを生成するview機能のことだ。<br>
 とりあえずデータは全部生でもらっておいて</p>
-
-<pre><code class="language-sql">select * from request;
-</code></pre>
-
-<p>HTML出力の時に頑張る。(下記は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>のERB想定で記述)</p>
-
-<pre><code class="language-ruby">&lt;% if(request.check_a.nil? and request.check_b.nil?) %&gt;
-  &lt;span&gt;検査完了&lt;/span&gt; 
-&lt;% elsif(!request.check_a.nil? and !request.check_b.nil?) %&gt;
-  &lt;span&gt;検査未実施&lt;/span&gt; 
-&lt;% else %&gt;
-  &lt;span&gt;検査途中&lt;/span&gt; 
-&lt;% end %&gt;
-</code></pre>
-
-<p>ありといえばありだが、もっと条件が複雑になると条件式の管理が大変になってきそうだ。</p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> request;
+</code></pre></div><p>HTML出力の時に頑張る。(下記は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>のERB想定で記述)</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#f92672">&lt;</span><span style="color:#e6db74">% if(request.check_a.nil? </span> <span style="color:#f92672">and</span> request<span style="color:#f92672">.</span>check_b<span style="color:#f92672">.</span>nil?) <span style="color:#e6db74">%&gt;
+</span><span style="color:#e6db74">  &lt;span&gt;</span><span style="color:#960050;background-color:#1e0010">検</span><span style="color:#960050;background-color:#1e0010">査</span><span style="color:#960050;background-color:#1e0010">完</span><span style="color:#960050;background-color:#1e0010">了</span><span style="color:#f92672">&lt;</span><span style="color:#e6db74">/</span><span style="color:#e6db74">span&gt; 
+</span><span style="color:#e6db74">&lt;% elsif(!request.check_a.nil? and !request.check_b.nil?) %&gt;
+</span><span style="color:#e6db74">  &lt;span&gt;検査未実施&lt;</span><span style="color:#e6db74">/s</span>pan<span style="color:#f92672">&gt;</span> 
+<span style="color:#f92672">&lt;</span><span style="color:#e6db74">% else </span> <span style="color:#e6db74">%&gt;
+</span><span style="color:#e6db74">  &lt;span&gt;</span><span style="color:#960050;background-color:#1e0010">検</span><span style="color:#960050;background-color:#1e0010">査</span><span style="color:#960050;background-color:#1e0010">途</span><span style="color:#960050;background-color:#1e0010">中</span><span style="color:#f92672">&lt;</span><span style="color:#e6db74">/</span><span style="color:#e6db74">span&gt; 
+</span><span style="color:#e6db74">&lt;% end %&gt;
+</span></code></pre></div><p>ありといえばありだが、もっと条件が複雑になると条件式の管理が大変になってきそうだ。</p>
 <p>出力部分をhelperなどに書いて関数化も考えた。<br>
 だが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>でERBを利用して出力する場合はいいが、<br>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>でも出力する場合には<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>ヘルパーは利用できない。<br>
 とても嫌な予感がした。</p>
-
 <h2>(実装案３) DBの設計の変更で頑張る</h2>
-
 <p>そもそもテーブルの設計を変えてしまう方法も検討した。<br>
 テーブルの中で検査状態を持つのだ。</p>
-
 <ul>
 <li>id: int</li>
 <li>name: varchar(20)</li>
@@ -231,44 +200,33 @@ case文などを利用し始めた時点で、生<a class="keyword" href="http:/
 <li>check_b: datetime</li>
 <li>check_status: int</li>
 </ul>
-
 <p>サーバサイド側で頑張らなきゃいけなくてとても実装する気になれなかったし、これってどうなの？</p>
-
 <h2>(実装案４) Viewを利用して頑張る</h2>
-
 <p>上３つで見てきたように、いろいろ考えたけどどれもイケてなかった。<br>
 そこで思いついたのがデータベースの機能の「View」だ。</p>
-
 <p>Veiwを使ってよく利用する形を事前に作っておくことでいろいろ解決することがわかった。</p>
-
-<pre><code class="language-sql">create view view_request as
-select
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">create</span> <span style="color:#66d9ef">view</span> view_request <span style="color:#66d9ef">as</span>
+<span style="color:#66d9ef">select</span>
   id,
   name,
-  case
-    when check_a is null and check_b is null  then '検査未完了'
-    when check_a is not null and check_b is not null then '検査完了 '
-    else '検査途中'
-  end as check_status
-from request
-</code></pre>
-
-<p>上記で作ったViewを参照することでいくつものメリットが生まれた。</p>
-
+  <span style="color:#66d9ef">case</span>
+    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span>  <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査未完了</span><span style="color:#e6db74">&#39;</span>
+    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査完了 </span><span style="color:#e6db74">&#39;</span>
+    <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査途中</span><span style="color:#e6db74">&#39;</span>
+  <span style="color:#66d9ef">end</span> <span style="color:#66d9ef">as</span> check_status
+<span style="color:#66d9ef">from</span> request
+</code></pre></div><p>上記で作ったViewを参照することでいくつものメリットが生まれた。</p>
 <ol>
 <li>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/ActiveRecord">ActiveRecord</a>が利用できるようになりコードが綺麗になった</li>
 <li>重複した<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が減った</li>
 <li>実現のためのコードをほとんど書かなくて済んだ</li>
 </ol>
-
 <p>だが、もちろんView機能が万能でないことは抑えておく必要がある。<br>
 Viewのデメリットは利用する前にしっかり確認してほしい。</p>
-
 <p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fitpro.nikkeibp.co.jp%2Farticle%2FCOLUMN%2F20071126%2F287920%2F%3Frt%3Dnocnt" title="[データベース編]ビュー、トリガーを多用してはいけない" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://itpro.nikkeibp.co.jp/article/COLUMN/20071126/287920/?rt=nocnt">itpro.nikkeibp.co.jp</a></cite></p>
-
-<p><p>もっといい実装があれば教えて下さい。</p>
-</body></p>
+<p>もっといい実装があれば教えて下さい。</p>
+</body>
 
                     </div>
                     

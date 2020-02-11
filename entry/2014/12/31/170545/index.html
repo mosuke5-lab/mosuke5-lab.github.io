@@ -9,7 +9,7 @@
     <meta name="description" content=" SSHを制するものがインフラを制する。SSHのローカルポートフォワーディングの活用場面や活用方法について解説していきます。AWS上でプライベートネットワークのRDSに接続する方法などもみていきます。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2014/12/31/170545/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2014/12/31/170545/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="SSHを制してインフラを制する。ローカルポートフォワードを使いこなす | Goldstine研究所">
@@ -80,114 +80,71 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>SSHを単なるサーバへのログインのツールとして使っていませんか？<br />
+                        <p>SSHを単なるサーバへのログインのツールとして使っていませんか？<br>
 SSHを制する者がインフラを制する、なんていわれることもあります。
 SSHにはポートフォワーディングをはじめとしたいろんな使い方があります。
 今日は実際にローカルポートフォワーディングを理解しみなさんに使いこなしてもらえるようになっていただこうと思います。</p>
-
 <h2 id="どういうときに必要なの">どういうときに必要なの</h2>
-
-<p>どういうときにポートフォワーディングが必要なのでしょうか？<br />
+<p>どういうときにポートフォワーディングが必要なのでしょうか？<br>
 ネットワーク的に直接とどかない（ただしサーバを経由すればとどく）環境に直接的に接続したい場面がありませんか？
 まずは、いくつか活用場面をご紹介します。</p>
-
 <h3 id="プライベートネットワークのamazon-rdsに接続したい">プライベートネットワークのAmazon RDSに接続したい</h3>
-
 <p>クラウド上でシステムを構築しているとよく遭遇するケースです。
 RDS（データベース）をプライベートネットワークに配置しているため、インターネットから直接アクセスできません。
-踏み台サーバはあり、踏み台サーバからならデータベースに接続ができますが、GUIのソフトウェアを使いたいなど、ローカルのPCから直接接続したいことがあります。<br />
+踏み台サーバはあり、踏み台サーバからならデータベースに接続ができますが、GUIのソフトウェアを使いたいなど、ローカルのPCから直接接続したいことがあります。<br>
 具体的に図に表すと以下のとおりです。</p>
-
-<p><img src="/image/ssh-portforward-rds.png" alt="ssh-portforward-rds" /></p>
-
+<p><img src="/image/ssh-portforward-rds.png" alt="ssh-portforward-rds"></p>
 <p>直接的にRDSに接続ができませんが、SSHのポートフォワーディングを使うと、ローカルのPCからたとえばmysqlコマンドなどで接続できるようになります。
 もちろん、ネットワークの経路は、踏み台を経由しています。</p>
-
 <h3 id="インターネットに公開していないサーバ上のサービスにアクセスしたい">インターネットに公開していないサーバ上のサービスにアクセスしたい</h3>
-
 <p>次のケースは、とあるサーバ上に動かしているソフトウェアにブラウザから接続したいが、そのソフトウェアがインターネットから直接アクセスできるように指定ないケースです。
 下図ではGrafanaというツールにしていますが、なんのソフトウェアでも構わず、ElasticSearchでもいいし、ApacheのようなWebサーバでも構いません。重要なのは、対象のサーバからlocalhostとして接続できるが、外部ネットワークからは接続できない場合を想定しています。</p>
-
-<p><img src="/image/ssh-portforward-grafana.png" alt="ssh-portforward-grafana" /></p>
-
+<p><img src="/image/ssh-portforward-grafana.png" alt="ssh-portforward-grafana"></p>
 <h2 id="環境と実現したいこと">環境と実現したいこと</h2>
-
-<p>では、上のようなことがどのように実現できるのか？<br />
+<p>では、上のようなことがどのように実現できるのか？<br>
 例では、インターネット上にあるさくらのVPSの上に仮想マシンでWebサーバを立ち上げた、ということにしておきます。
 実現したいことは、VPSのサーバ上に立ち上がっている仮想マシンのWebサーバに、ローカルのPCのブラウザからアクセスするというものです。</p>
-
-<p><img src="/image/20141231162958.png" alt="ssh-portforward-example" /></p>
-
+<p><img src="/image/20141231162958.png" alt="ssh-portforward-example"></p>
 <p>ローカルPCからexample.jp(VPSのサーバ)へはSSHできる状態です。</p>
-
 <pre><code>[local pc] $ ssh username@example.jp 
 ログイン可能
-</code></pre>
-
-<p>また、仮想サーバ上のWebサーバのポート番号は80でVPSのホストサーバからはWebサーバへ接続できる状態です。<br />
+</code></pre><p>また、仮想サーバ上のWebサーバのポート番号は80でVPSのホストサーバからはWebサーバへ接続できる状態です。<br>
 VPSのホストからcurlを使って仮想サーバの80番ポートにリクエストを投げると、Hello Worldが返ってきます。</p>
-
 <pre><code>[example.jp] $ curl 192.168.33.10
 &lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello World! Virtual Web Server&lt;/h1&gt;
 &lt;/body&gt;&lt;/html&gt; 
-</code></pre>
-
-<h2 id="ローカルポートフォワードの実行">ローカルポートフォワードの実行</h2>
-
+</code></pre><h2 id="ローカルポートフォワードの実行">ローカルポートフォワードの実行</h2>
 <p>しかし、この状態では、仮想マシン上のWebサーバにたいしてローカルPCから直接はアクセスできません。
-そこで、SSHのローカルポートフォワーディングの出番です。ローカルPCから以下を実行してみます。<br />
-以下のコマンドは、<br />
-<strong>ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす</strong><br />
+そこで、SSHのローカルポートフォワーディングの出番です。ローカルPCから以下を実行してみます。<br>
+以下のコマンドは、<br>
+<strong>ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす</strong><br>
 と解釈するとわかりやすいです。</p>
-
 <pre><code>[local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp 
-</code></pre>
-
-<p>上を実行すると、いつもどおりSSHでログインした状態になります。
+</code></pre><p>上を実行すると、いつもどおりSSHでログインした状態になります。
 「セッションを切らずに」、ブラウザから<code>http://localhost:8888</code>にアクセスするとなんと、ローカルホストにつないだはずが、example.jp上の仮想Webサーバのhtmlが帰ってくるのがわかります。</p>
-
-<p><img src="/image/20141231163932.png" alt="ssh-portforward-access" /></p>
-
+<p><img src="/image/20141231163932.png" alt="ssh-portforward-access"></p>
 <h2 id="rdsの例の場合">RDSの例の場合</h2>
-
-<p>上の例はあまり実用的ではないので、AWS RDSの例も考えてみましょう。<br />
+<p>上の例はあまり実用的ではないので、AWS RDSの例も考えてみましょう。<br>
 以下の条件だとするとこうできます</p>
-
-<p><img src="/image/ssh-portforward-rds-2.png" alt="ssh-portforward-rds-2" /></p>
-
-<p>次のようにSSH接続していきます。こう解釈するとわかりやすいです。<br />
+<p><img src="/image/ssh-portforward-rds-2.png" alt="ssh-portforward-rds-2"></p>
+<p>次のようにSSH接続していきます。こう解釈するとわかりやすいです。<br>
 <strong>ローカルPCのポート8888での接続はfumidai.example.jpからみて「xxxx.rds.amazonaws.comのポート3306」に飛ばす</strong></p>
-
 <pre><code>[local pc] $ ssh -L8888:xxxx.rds.amazonaws.com:3306 username@fumidai.example.jp 
-</code></pre>
-
-<p>SSHセッションは維持したまま、別ターミナルでmysql接続していきます。</p>
-
+</code></pre><p>SSHセッションは維持したまま、別ターミナルでmysql接続していきます。</p>
 <pre><code>[local pc] $ mysql -u user -p -H 127.0.0.1:8888
-</code></pre>
-
-<h3 id="セキュリティはどうなの">セキュリティはどうなの？</h3>
-
+</code></pre><h3 id="セキュリティはどうなの">セキュリティはどうなの？</h3>
 <p>ローカルポートフォワーディングのSSHコマンドで、ローカルPCからリモートホスト(example.jp)までトンネルをはっています。そのトンネルの中をhttp通信やmysqlの通信を流しています。そのため、セキュリティ的にも安心できます。</p>
-
 <h2 id="最後に">最後に</h2>
-
-<p>SSHのローカルポートフォワーディングが普段の業務の中で役立つ場面がでてきましたか？<br />
+<p>SSHのローカルポートフォワーディングが普段の業務の中で役立つ場面がでてきましたか？<br>
 SSHは他にもたくさんのことができ、ポートフォワードだけみても他にも「リモートポートフォワード」や「ダイナミックポートフォワード」などがあります。SSHに関しては、下記の書籍がおすすめです。興味持った方は書籍などを参考にしながらSSHについて理解を深めていくととてもいいと思います。</p>
-
 <div class="amazlet-box" style="margin-bottom:0px;"><div class="amazlet-image" style="float:left;margin:0px 12px 1px 0px;"><a href="https://amzn.to/37qD3gL" ="amazletlink" target="_blank"><img src="https://images-fe.ssl-images-amazon.com/images/I/51Dsiu40MbL._SL160_.jpg" alt="OpenSSH[実践]入門 (Software Design plus)" style="border: none;" /></a></div><div class="amazlet-info" style="line-height:120%; margin-bottom: 10px"><div class="amazlet-" style="margin-bottom:10px;line-height:120%"><a href="https://amzn.to/37qD3gL" ="amazletlink" target="_blank">OpenSSH[実践]入門 (Software Design plus)</a><div class="amazlet-powered-date" style="font-size:80%;margin-top:5px;line-height:120%">posted with amazlet at 19.12.28</div></div><div class="amazlet-detail">川本 安武 <br />技術評論社 <br />売り上げランキング: 322,977<br /></div><div class="amazlet-sub-info" style="float: left;"><div class="amazlet-link" style="margin-top: 5px"><a href="https://amzn.to/37qD3gL" ="amazletlink" target="_blank">Amazon.co.jpで詳細を見る</a></div></div></div><div class="amazlet-footer" style="clear: left"></div></div>
-
-<h2 id="おまけ-多段ssh">おまけ、多段SSH</h2>
-
+<h2 id="おまけ多段ssh">おまけ、多段SSH</h2>
 <p>今日の構成にも近いが、以前のブログ<a href="https://blog.mosuke.tech/entry/2014/11/09/171436/">【VPS1台でインフラ勉強】HAProxyでロードバランサーを構築</a>で、VPSのホストサーバ上に仮想でさらにいつくかのサーバを立てました。
 仮想のサーバにアクセスするには、ホストサーバにアクセスしてから更にSSHをしなければなりませんでした。
 多段SSHの設定をして、一回のSSH接続で仮想サーバにアクセスすることもできます。
-以下の図で言うと、web10, web11(192.168.33.<sup>10</sup>&frasl;<sub>11</sub>)に一発でSSHできるようになるわけです。</p>
-
-<p><img src="/image/20141109170337.png" alt="ssh" /></p>
-
+以下の図で言うと、web10, web11(192.168.33.10/11)に一発でSSHできるようになるわけです。</p>
+<p><img src="/image/20141109170337.png" alt="ssh"></p>
 <p>設定のサンプルは下記のとおりです。クライアントPC側に以下の設定をすることで完了します。</p>
-
 <pre><code>$ vim ~/.ssh/config
 host gateway
     HostName xxxxx.xxx

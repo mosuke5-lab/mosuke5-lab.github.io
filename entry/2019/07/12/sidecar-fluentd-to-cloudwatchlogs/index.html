@@ -9,7 +9,7 @@
     <meta name="description" content="Sidecar方式のFluentdでCloudWatch logsへログを集約することについての検討をしてみました。試すことで向き不向きや、役立つワークロードが見えてきました。選択肢の1つとして検討するといいです。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/07/12/sidecar-fluentd-to-cloudwatchlogs/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/07/12/sidecar-fluentd-to-cloudwatchlogs/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Sidecar方式のFluentdでCloudWatch logsへログを集約することについての検討 | Goldstine研究所">
@@ -80,41 +80,27 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br />
+                        <p><a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br>
 Kubernetes上でのアプリケーションのロギングについてFluentdを使ってどうできるか考えていきます。
 今回はサイドカー方式という方法を使ってFluentdでAWS CloudWatch logsへ集約することについてやってみました。</p>
-
 <p>FluentdとAWSの連携については、以前にそういえばこんなものもかきましたので、参考にしてください。自分も復習で見返しました。</p>
-
-<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2017/09/03/fluentd_to_dynamodb/" data-iframely-url="//cdn.iframe.ly/fUX8Gqb"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
-
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2017/09/03/fluentd_to_dynamodb/" data-iframely-url="//cdn.iframe.ly/fUX8Gqb"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
 <h2 id="実現すること">実現すること</h2>
-
 <p>今回やりたいことは、Kubernetes上で動かしているアプリケーションに対して、サイドカーとしてFluentdを動かしてログをCloudWatch logsに送ることです。アプリケーションは、ブログでの例ではNginxにしました。実際にはNginxや独自のアプリケーションだったり様々かなと思います。</p>
-
 <p>まず、背景としては、ロギングの方法についてはいくつかあるが、それぞれを実際に行うとどんな印象か・使い勝手かといったところが知りたいので行いました。
 Kubernetesでのロギングについての考え方は英語ですが<a href="https://kubernetes.io/docs/concepts/cluster-administration/logging/" target="_blank">こちらを参考</a>にするといいです。本ブログは、ロギングはサイドカーでやるのがいい！、という話ではありませんので注意してください。</p>
-
 <p>また、ログの送付先ですが、いろいろと選択肢があると思います。Kubernetesクラスター上にElasticSearchなどを立てる、DatadogのようなSaaSを使うなどなど。
 ロギングや監視などは可能な限り省力化したく、運用の手間がかからず安い値段から始められるものがいいということで、一旦CloudWatch logsにしてみました。（CloudWatch logsが使いづらいのはしっている！！笑）
 他のサービスでも基本的な考え方は一緒なので応用できると思います。</p>
-
-<h2 id="結果-所感">結果・所感</h2>
-
-<p>先にこちらをやってみた結果を書くと、やってみた感じアプリケーションのログをサイドカーのFluentdで収集するのは場面によりますがあまり得ではないと現時点で考えました。<br />
+<h2 id="結果所感">結果・所感</h2>
+<p>先にこちらをやってみた結果を書くと、やってみた感じアプリケーションのログをサイドカーのFluentdで収集するのは場面によりますがあまり得ではないと現時点で考えました。<br>
 理由は、サイドカーのデメリットはPod毎にサイドカーコンテナが必要だということです。Fluentdもまあまあメモリを食うので、ロギングというほぼどんなアプリケーションにも必要なものについてサイドカーで載せる必要はないと思っています。
 サイドカーではなくDaemonSetとしてFluentdを動かすのが一番よさそうです。</p>
-
 <p>Twitterで聞いてみたところ、標準出力以外に複数のファイルにログを吐く場合にサイドカーでのFluetndを使うという意見もありました。</p>
-
 <h2 id="fluentdの設定について">fluentdの設定について</h2>
-
 <p>コンテナ化する場合はまずは通常のサーバなりローカルで設定や概念を理解することをおすすめします。自分もこちらを実施するに当たり、一度テスト用のEC2の上で動作など確認しました。</p>
-
-<h3 id="fluent-conf">fluent.conf</h3>
-
+<h3 id="fluentconf">fluent.conf</h3>
 <p>利用するfluent.confは次のようなものとします。</p>
-
 <pre><code>&lt;source&gt;
   @type tail
   path /var/log/nginx/access.log
@@ -135,144 +121,118 @@ Kubernetesでのロギングについての考え方は英語ですが<a href="h
   log_stream_name fluentd
   auto_create_stream true
 &lt;/match&gt;
-</code></pre>
-
-<h3 id="source">source</h3>
-
-<p>Nginxのaccess.logを対象としました。<br />
+</code></pre><h3 id="source">source</h3>
+<p>Nginxのaccess.logを対象としました。<br>
 流れとしては<source>でまず対象のログをどう取得するかを決めます。
 この場合はTailというプラグインを使った収集を使っています。
 この対象になったログにはnginx.accessというタグをつけました。
 これは後ほどフィルターしたり他の場所に転送するための判断材料になります。</p>
-
 <h3 id="fileter">fileter</h3>
-
-<p><filter>はあとからつけました。なくても動作はします。<br />
+<p><filter>はあとからつけました。なくても動作はします。<br>
 これをつけた理由はKubernetesのLivenessProbeでのヘルスチェックのログを排除するためです。</p>
-
 <h3 id="match">match</h3>
-
 <p>転送先を設定します。今回はAWSのCloudWatch logsに送りたかったので、プラグインをインストールする必要があります。こちらのプラグインを利用しました。</p>
-
-<p><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs" data-iframely-url="//cdn.iframe.ly/hePgjOd"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script></p>
-
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/fluent-plugins-nursery/fluent-plugin-cloudwatch-logs" data-iframely-url="//cdn.iframe.ly/hePgjOd"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
 <p>利用するには、下記のようにgemでインストールします。
 DockerHubで公開されているfluentdのコンテナイメージには当然インストールされておらず、都度インストールするのはめんどくさいので、プラグインがインストールされた状態のコンテナイメージを作っておきました。
 （個人で遊びで使うときはいつもGitlabのイメージレジストリを使っています。Gitlabを使ったコンテナイメージの自動ビルドについては過去に<a href="https://blog.mosuke.tech/entry/2018/05/02/rails-app-on-docker/">こちらの記事の一部</a>として書いています。）</p>
-
 <pre><code>gem install fluent-plugin-cloudwatch-logs
-</code></pre>
-
-<p>Fluentdは、AWSに送付するので、AWSへのアクセス権限が必要です。<br />
+</code></pre><p>Fluentdは、AWSに送付するので、AWSへのアクセス権限が必要です。<br>
 コンテナ上でIAMロールを使うのはちょっと大変なので(コンテナ環境におけるIAMロールの扱いについてはどこかで別途書きたいですね)、専用のユーザとポリシーを作成し、API Keyを環境変数で渡すことにしました。こちらは次のDeploymentの部分で説明します。</p>
-
 <h2 id="deploymentに組み込む">Deploymentに組み込む</h2>
-
 <p>Kubernetes上のDeploymentに組み込むわけですが、サイドカー方式での基本的なロギングの考え方は以下のようになります。</p>
-
-<p><img src="/image/sidecar-fluentd-overview.png" alt="sidecar-fluentd-ovewview" /></p>
-
+<p><img src="/image/sidecar-fluentd-overview.png" alt="sidecar-fluentd-ovewview"></p>
 <p>最終的には下記のようなマニフェストになりますが、ポイントは次の3つです。</p>
-
 <ol>
 <li>PodはKubernetesのデプロイの最小単位ではありますが、そのなかにコンテナは複数配備することができます。メインはNginxなのですが、サイドカーとしてFluentdコンテナを配備しています。</li>
 <li>各コンテナでログを共有できるように、ボリューム共有(EmptyDir)をマウントしています。</li>
 <li>AWSのAPI KeyなどをSecretとして環境変数で渡しています。</li>
 </ol>
-
 <p>その他下記コメントをまぜました。</p>
-
-<pre><code class="language-yaml">apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-        volumeMounts:
-        # Nginxのconfgiをconfigmapでマウント
-        - name: config-volume
-          mountPath: /etc/nginx/conf.d
-        # fluentdコンテナと共有するためのボリューム
-        - name: log-volume
-          mountPath: /var/log/nginx
-        livenessProbe:
-          httpGet:
-            path: /healthcheck
-            port: 80
-      - name: fluentd
-        # プラグインをインストールした独自イメージをプライベートレジストリから取得
-        image: registry.gitlab.com/private-group/fluentd:latest
-        volumeMounts:
-        # Nginxコンテナと共有するためのボリューム
-        - name: log-volume
-          mountPath: /var/log/nginx
-        # fluentdのconfgiをconfigmapでマウント
-        - name: fluentd-config-volume
-          mountPath: /fluentd/etc/
-        # AWSのAPI Keyなどを環境変数でセット
-        env:
-        - name: AWS_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: beeglobal-app
-              key: aws_access_key_id
-        - name: AWS_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: beeglobal-app
-              key: aws_access_key_secret
-        - name: AWS_REGION
-          valueFrom:
-            secretKeyRef:
-              name: beeglobal-app
-              key: aws_region
-      # プライベートレジストリへのアクセスシークレット
-      imagePullSecrets:
-      - name: gitlab-docker-registry
-      volumes:
-      - name: config-volume
-        configMap:
-          name: nginx-conf
-          items:
-          - key: proxy.conf
-            path: proxy.conf
-      - name: fluentd-config-volume
-        configMap:
-          name: fluentd-conf
-          items:
-          - key: fluent.conf
-            path: fluent.conf
-      # コンテナ間でシェアするボリューム
-      - name: log-volume
-        emptyDir: {}
-</code></pre>
-
-<h2 id="動作確認">動作確認</h2>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: apps/v1
+<span style="color:#66d9ef">kind</span>: Deployment
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: nginx-deployment
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">replicas</span>: <span style="color:#ae81ff">2</span>
+  <span style="color:#66d9ef">selector</span>:
+    <span style="color:#66d9ef">matchLabels</span>:
+      <span style="color:#66d9ef">app</span>: nginx
+  <span style="color:#66d9ef">template</span>:
+    <span style="color:#66d9ef">metadata</span>:
+      <span style="color:#66d9ef">labels</span>:
+        <span style="color:#66d9ef">app</span>: nginx
+    <span style="color:#66d9ef">spec</span>:
+      <span style="color:#66d9ef">containers</span>:
+      - <span style="color:#66d9ef">name</span>: nginx
+        <span style="color:#66d9ef">image</span>: nginx:latest
+        <span style="color:#66d9ef">ports</span>:
+        - <span style="color:#66d9ef">containerPort</span>: <span style="color:#ae81ff">80</span>
+        <span style="color:#66d9ef">volumeMounts</span>:
+        <span style="color:#75715e"># Nginxのconfgiをconfigmapでマウント</span>
+        - <span style="color:#66d9ef">name</span>: config-volume
+          <span style="color:#66d9ef">mountPath</span>: /etc/nginx/conf.d
+        <span style="color:#75715e"># fluentdコンテナと共有するためのボリューム</span>
+        - <span style="color:#66d9ef">name</span>: log-volume
+          <span style="color:#66d9ef">mountPath</span>: /var/log/nginx
+        <span style="color:#66d9ef">livenessProbe</span>:
+          <span style="color:#66d9ef">httpGet</span>:
+            <span style="color:#66d9ef">path</span>: /healthcheck
+            <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">80</span>
+      - <span style="color:#66d9ef">name</span>: fluentd
+        <span style="color:#75715e"># プラグインをインストールした独自イメージをプライベートレジストリから取得</span>
+        <span style="color:#66d9ef">image</span>: registry.gitlab.com/private-group/fluentd:latest
+        <span style="color:#66d9ef">volumeMounts</span>:
+        <span style="color:#75715e"># Nginxコンテナと共有するためのボリューム</span>
+        - <span style="color:#66d9ef">name</span>: log-volume
+          <span style="color:#66d9ef">mountPath</span>: /var/log/nginx
+        <span style="color:#75715e"># fluentdのconfgiをconfigmapでマウント</span>
+        - <span style="color:#66d9ef">name</span>: fluentd-config-volume
+          <span style="color:#66d9ef">mountPath</span>: /fluentd/etc/
+        <span style="color:#75715e"># AWSのAPI Keyなどを環境変数でセット</span>
+        <span style="color:#66d9ef">env</span>:
+        - <span style="color:#66d9ef">name</span>: AWS_ACCESS_KEY_ID
+          <span style="color:#66d9ef">valueFrom</span>:
+            <span style="color:#66d9ef">secretKeyRef</span>:
+              <span style="color:#66d9ef">name</span>: beeglobal-app
+              <span style="color:#66d9ef">key</span>: aws_access_key_id
+        - <span style="color:#66d9ef">name</span>: AWS_SECRET_ACCESS_KEY
+          <span style="color:#66d9ef">valueFrom</span>:
+            <span style="color:#66d9ef">secretKeyRef</span>:
+              <span style="color:#66d9ef">name</span>: beeglobal-app
+              <span style="color:#66d9ef">key</span>: aws_access_key_secret
+        - <span style="color:#66d9ef">name</span>: AWS_REGION
+          <span style="color:#66d9ef">valueFrom</span>:
+            <span style="color:#66d9ef">secretKeyRef</span>:
+              <span style="color:#66d9ef">name</span>: beeglobal-app
+              <span style="color:#66d9ef">key</span>: aws_region
+      <span style="color:#75715e"># プライベートレジストリへのアクセスシークレット</span>
+      <span style="color:#66d9ef">imagePullSecrets</span>:
+      - <span style="color:#66d9ef">name</span>: gitlab-docker-registry
+      <span style="color:#66d9ef">volumes</span>:
+      - <span style="color:#66d9ef">name</span>: config-volume
+        <span style="color:#66d9ef">configMap</span>:
+          <span style="color:#66d9ef">name</span>: nginx-conf
+          <span style="color:#66d9ef">items</span>:
+          - <span style="color:#66d9ef">key</span>: proxy.conf
+            <span style="color:#66d9ef">path</span>: proxy.conf
+      - <span style="color:#66d9ef">name</span>: fluentd-config-volume
+        <span style="color:#66d9ef">configMap</span>:
+          <span style="color:#66d9ef">name</span>: fluentd-conf
+          <span style="color:#66d9ef">items</span>:
+          - <span style="color:#66d9ef">key</span>: fluent.conf
+            <span style="color:#66d9ef">path</span>: fluent.conf
+      <span style="color:#75715e"># コンテナ間でシェアするボリューム</span>
+      - <span style="color:#66d9ef">name</span>: log-volume
+        <span style="color:#66d9ef">emptyDir</span>: {}
+</code></pre></div><h2 id="動作確認">動作確認</h2>
 <p>podを確認すると、2/2とふたつのコンテナが起動していることがきちんと確認できる。
 今回のようなサイドカー方式にすると、Nginxコンテナは標準出力でログを吐き出さなくなるので、<code>kubectl logs</code>でログは確認できないことは要注意しておきましょう。</p>
-
 <pre><code>$ kubectl get pod
 NAME                                           READY   STATUS    RESTARTS   AGE
 nginx-deployment-58b86c84bb-6mggw   2/2     Running   0          22h
-</code></pre>
-
-<p>またAWSコンソール側にも少しラグはあるものの、送付されていることが確認できました。
+</code></pre><p>またAWSコンソール側にも少しラグはあるものの、送付されていることが確認できました。
 もし、AWS側に来ない場合には、fluentdコンテナのログを確認してエラーが出てないかなど確認してみましょう。</p>
-
 <pre><code>$ kubectl logs nginx-deployment-58b86c84bb-6mggw -c fluentd
 2019-07-11 08:20:09 +0000 [info]: starting fluentd-1.6.0 pid=6 ruby=&quot;2.5.5&quot;
 2019-07-11 08:20:09 +0000 [info]: spawn command to main:  cmdline=[&quot;/usr/bin/ruby&quot;, &quot;-Eascii-8bit:ascii-8bit&quot;, &quot;/usr/bin/fluentd&quot;, &quot;-c&quot;, &quot;/fluentd/etc/fluent.conf&quot;, &quot;-p&quot;, &quot;/fluentd/plugins&quot;, &quot;--under-supervisor&quot;]
@@ -285,12 +245,8 @@ nginx-deployment-58b86c84bb-6mggw   2/2     Running   0          22h
 2019-07-11 08:20:09 +0000 [info]: #0 starting fluentd worker pid=14 ppid=6 worker=0
 2019-07-11 08:20:09 +0000 [info]: #0 following tail of /var/log/nginx/access.log
 2019-07-11 08:20:09 +0000 [info]: #0 fluentd worker is now running worker=0
-</code></pre>
-
-<p><img src="/image/cloudwatchlogs-from-fluentd.png" alt="cloudwatchlogs" /></p>
-
+</code></pre><p><img src="/image/cloudwatchlogs-from-fluentd.png" alt="cloudwatchlogs"></p>
 <h2 id="まとめ">まとめ</h2>
-
 <p>Kubernetes上のアプリケーションについて、Sidecar方式でのロギングをやってみました。
 冒頭の結果のところにも書きましたが、ロギングという観点でいうとSidecarではない方法でのアプローチのほうが便利そうでした。
 一方でこういったアプローチが必要な場面もあることがわかり、１つの選択肢として重要かなと考えています。</p>

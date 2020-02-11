@@ -9,7 +9,7 @@
     <meta name="description" content=" 1. はじめに  ぼくはフロントエンドは本業ではありません。 jsはあまり好きではありません。 そしてAjax通信後にhtmlをアウトプットする際にjsの変数の中にhtmlを書いていくソースコードがもっと好きではありません。(後述) それ">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/06/13/231917/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2015/06/13/231917/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Ajaxの嫌いだった部分をJsRenderで心地良くした | Goldstine研究所">
@@ -80,75 +80,60 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><body>
-<h1>1. はじめに</h1></p>
-
+                        <body>
+<h1>1. はじめに</h1>
 <p>ぼくはフロントエンドは本業ではありません。<br>
 jsはあまり好きではありません。<br>
 そして<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>通信後にhtmlをアウトプットする際にjsの変数の中にhtmlを書いていく<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>がもっと好きではありません。(後述)<br>
 それをJSテンプレートエンジンを使ってシンプルにしてみたって話です。
 （JsRenderの使い方を書いたものではありません。）</p>
-
 <h1>2. <a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>が嫌いだった理由</h1>
-
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>はユーザ体感的にはいいのだけれど、<br>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>の結果受け取った<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>などのデータを使ってhtmlを出力とかやると<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>が煩雑になるので嫌いだった。</p>
-
 <p>例として<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>で/xxxxxにリクエストを投げて、その結果(<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>データ)を使ってhtmlを出力するものを考えると。</p>
-
-<pre><code class="language-javascript">/* jsonデータは下記が返ってくるとする
-[
-    {
-        id: '1',
-        name: 'らーめん',
-        text: 'らーめんはやっぱり濃厚鶏そばです。'
-    },
-    {
-        id: '2',
-        name: 'うどん',
-        text: 'うどんはやっぱり釜揚げうどんです。'
-    }
-]
-*/
-$.ajax({
-  type: &quot;GET&quot;,
-  url: &quot;/xxxxx&quot;,
-  dataType: &quot;json&quot;,
-  success: function(data){
-    var html = '';
-    data.forEach(function (e) {
-      html += '&lt;div id=&quot;' + e.id + '&quot;&gt;';
-      html += '&lt;h1&gt;' + e.name + '&lt;/h1&gt;';
-      html += '&lt;p&gt;' + e.text + '&lt;/p&gt;';
-      html += '&lt;/div&gt;';
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">/* jsonデータは下記が返ってくるとする
+</span><span style="color:#75715e">[
+</span><span style="color:#75715e">    {
+</span><span style="color:#75715e">        id: &#39;1&#39;,
+</span><span style="color:#75715e">        name: &#39;らーめん&#39;,
+</span><span style="color:#75715e">        text: &#39;らーめんはやっぱり濃厚鶏そばです。&#39;
+</span><span style="color:#75715e">    },
+</span><span style="color:#75715e">    {
+</span><span style="color:#75715e">        id: &#39;2&#39;,
+</span><span style="color:#75715e">        name: &#39;うどん&#39;,
+</span><span style="color:#75715e">        text: &#39;うどんはやっぱり釜揚げうどんです。&#39;
+</span><span style="color:#75715e">    }
+</span><span style="color:#75715e">]
+</span><span style="color:#75715e">*/</span>
+<span style="color:#a6e22e">$</span>.<span style="color:#a6e22e">ajax</span>({
+  <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;GET&#34;</span>,
+  <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;/xxxxx&#34;</span>,
+  <span style="color:#a6e22e">dataType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;json&#34;</span>,
+  <span style="color:#a6e22e">success</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">data</span>){
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">html</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>;
+    <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">e</span>) {
+      <span style="color:#a6e22e">html</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#39;&lt;div id=&#34;&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">id</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&#34;&gt;&#39;</span>;
+      <span style="color:#a6e22e">html</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#39;&lt;h1&gt;&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">name</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&lt;/h1&gt;&#39;</span>;
+      <span style="color:#a6e22e">html</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#39;&lt;p&gt;&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">text</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&lt;/p&gt;&#39;</span>;
+      <span style="color:#a6e22e">html</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#39;&lt;/div&gt;&#39;</span>;
     });
-    $(&quot;#result&quot;).append(html);
+    <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#34;#result&#34;</span>).<span style="color:#a6e22e">append</span>(<span style="color:#a6e22e">html</span>);
   },
 })
-</code></pre>
-
-<p>jsの変数の中にhtmlが含まれる。<br>
+</code></pre></div><p>jsの変数の中にhtmlが含まれる。<br>
 <b>そう、jsの変数の中にhtmlが！！</b><br>
 この規模ならまだいいが、もう少しhtmlが肥大化してくると最悪である。<br>
 これがどうしても許せない。</p>
-
 <h1>3.jsのテンプレートエンジンを使ってみた</h1>
-
 <p>上の問題をなんとかできないかと思っていたところ、jsのテンプレートエンジンにいきついた。<br>
 jsのテンプレートエンジンは多数あるのだが今回はJsRenderを採用し、<a class="keyword" href="http://d.hatena.ne.jp/keyword/ajax">ajax</a>を心地よく使うことができるようになった。</p>
-
 <p><a href="http://www.jsviews.com/">JsRender/JsViews</a></p>
-
 <h3>3-1. jsテンプレートエンジンの選定について</h3>
-
 <p>以下のまとめなど参考にするといいが、多数ある。
 <iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fqiita.com%2FKumamon%2Fitems%2F7db7c8f5e5ace3b40874" title="JavaScriptテンプレートエンジンまとめ - Qiita" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://qiita.com/Kumamon/items/7db7c8f5e5ace3b40874">JavaScriptテンプレートエンジンまとめ - Qiita</a></iframe><cite class="hatena-citation"><a href="http://qiita.com/Kumamon/items/7db7c8f5e5ace3b40874">qiita.com</a></cite></p>
-
 <p>用途としては下記のような感じで選んだ。</p>
-
 <ul>
 <li>クライアントサイドで利用できる
-
 <ul>
 <li>特にサーバサイドで使える必要はなかった</li>
 </ul>
@@ -157,42 +142,32 @@ jsのテンプレートエンジンは多数あるのだが今回はJsRenderを�
 <li>for文やif文はつかえること</li>
 <li>プレ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB">コンパイル</a>とかは必要なかった</li>
 </ul>
-
 <h3>3-2. JsRenderを使えばここまで<a class="keyword" href="http://d.hatena.ne.jp/keyword/ajax">ajax</a>がシンプルになった</h3>
-
 <p>JsRenderを利用して先ほどの<a class="keyword" href="http://d.hatena.ne.jp/keyword/ajax">ajax</a>部分を書き直すと以下のようになる。</p>
-
 <h4>js側</h4>
-
-<pre><code class="language-javascript">$.ajax({
-  type: &quot;GET&quot;,
-  url: &quot;/xxxxx&quot;,
-  dataType: &quot;json&quot;,
-  success: function(data){
-    var template = $.templates(&quot;#result-template&quot;);   // テンプレートを指定
-    var htmlOutput = template.render(data);   //テンプレート内に変数展開
-    $(&quot;#result&quot;).html(htmlOutput);   //出力
-  },
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">$</span>.<span style="color:#a6e22e">ajax</span>({
+  <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;GET&#34;</span>,
+  <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;/xxxxx&#34;</span>,
+  <span style="color:#a6e22e">dataType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;json&#34;</span>,
+  <span style="color:#a6e22e">success</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">data</span>){
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">template</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">$</span>.<span style="color:#a6e22e">templates</span>(<span style="color:#e6db74">&#34;#result-template&#34;</span>);   <span style="color:#75715e">// テンプレートを指定
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">htmlOutput</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">template</span>.<span style="color:#a6e22e">render</span>(<span style="color:#a6e22e">data</span>);   <span style="color:#75715e">//テンプレート内に変数展開
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#34;#result&#34;</span>).<span style="color:#a6e22e">html</span>(<span style="color:#a6e22e">htmlOutput</span>);   <span style="color:#75715e">//出力
+</span><span style="color:#75715e"></span>  },
 })
-</code></pre>
-
-<h4>html側</h4>
-
-<pre><code class="language-html">&lt;div id=&quot;result&quot;&gt;&lt;/div&gt;
-&lt;script id=&quot;result-template&quot; type=&quot;text/x-jsrender&quot;&gt;
-&lt;div id=&quot;{{:id}}&quot;&gt;
-  &lt;h1&gt;{{:name}}&lt;/h1&gt;
-  &lt;p&gt;{{:text}}&lt;/p&gt;
-&lt;/div&gt;
-&lt;/script&gt;
-</code></pre>
-
-<p>何が素晴らしいって、ロジックの部分と、ビュー部分を綺麗に分離できたこと。<br>
+</code></pre></div><h4>html側</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;result&#34;</span>&gt;&lt;/<span style="color:#f92672">div</span>&gt;
+&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;result-template&#34;</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/x-jsrender&#34;</span>&gt;
+<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;{{:id}}&#34;</span><span style="color:#f92672">&gt;</span>
+  <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">h1</span><span style="color:#f92672">&gt;</span>{{<span style="color:#f92672">:</span><span style="color:#a6e22e">name</span>}}<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#960050;background-color:#1e0010">h</span><span style="color:#960050;background-color:#1e0010">1</span><span style="color:#960050;background-color:#1e0010">&gt;</span>
+  <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">p</span><span style="color:#f92672">&gt;</span>{{<span style="color:#f92672">:</span><span style="color:#a6e22e">text</span>}}<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">&gt;</span>
+<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#960050;background-color:#1e0010">d</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">v</span><span style="color:#960050;background-color:#1e0010">&gt;</span>
+&lt;/<span style="color:#f92672">script</span>&gt;
+</code></pre></div><p>何が素晴らしいって、ロジックの部分と、ビュー部分を綺麗に分離できたこと。<br>
 いや、サーバサイドなら当たり前のようにやっていたことなんだけど、<br>
 JsRenderを使えばクライアントサイドでも簡単に実装できて最高でした。</p>
-
-<p><p>以上。</p>
-</body></p>
+<p>以上。</p>
+</body>
 
                     </div>
                     

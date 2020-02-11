@@ -9,7 +9,7 @@
     <meta name="description" content="TerraformでCloudFlareのDNSの設定を行います。AWSのEIPを使ってCloudFlareのDNSを設定します。その際の設定のポイントなどを解説します。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2018/01/01/terraform-dns/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2018/01/01/terraform-dns/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="TerraformでCloudFlareのDNS設定を操る | Goldstine研究所">
@@ -80,28 +80,21 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>あけましておめでとうございます。今年も本ブログおよびmosuke5をよろしくお願いします。<br />
+                        <p>あけましておめでとうございます。今年も本ブログおよびmosuke5をよろしくお願いします。<br>
 新年元旦のブログなので軽く。年末年始は普段できない開発をやっていて、そこでできたちょっとしたメモを。</p>
-
 <p>趣味で作っているサービスで、基盤はAWSを利用し、CloudFlareも利用したい理由もありDNSの設定などはRoute53ではなくCloudFlareで制御する必要があった。複数のサービスをまたいで設定を管理できるTerraformの出番なわけだが、その設定方法についてメモしておく。</p>
-
 <h2 id="設定方法">設定方法</h2>
-
-<p>まずはAWS側の設定を見ておく。<br />
+<p>まずはAWS側の設定を見ておく。<br>
 今回はELB使うわけではなかったので、EC2インスタンスにElasticIPをバインドした。
 aws側のTerraformのコードでいつも通りEIPを購入する。</p>
-
 <pre><code># aws.tf
 resource &quot;aws_eip&quot; &quot;main&quot; {
   instance = &quot;${aws_instance.main.id}&quot;
   vpc      = true
 }
-</code></pre>
-
-<p>次に、CloudFlare側のコードをみる。<br />
-CloudFlareをTerraformで扱うには３つの情報が必要なのでここは変数化しておくとよい。<br />
+</code></pre><p>次に、CloudFlare側のコードをみる。<br>
+CloudFlareをTerraformで扱うには３つの情報が必要なのでここは変数化しておくとよい。<br>
 providerを指定し、あとはresouceを書いていく。</p>
-
 <pre><code># cloudflare.tf
 variable &quot;cloudflare_email&quot; {}
 variable &quot;cloudflare_token&quot; {}
@@ -129,9 +122,7 @@ resource &quot;cloudflare_record&quot; &quot;gill-search&quot; {
   ttl    = 1
   proxied = true
 }
-</code></pre>
-
-<ul>
+</code></pre><ul>
 <li><code>domain</code>はCloudFlareで管理しているドメイン名を入力。今回の場合は<code>mosuke.tech</code>を管理しているのでそれを入力。</li>
 <li><code>name</code>は今回Aレコードなのでサブドメインに当たる部分。</li>
 <li><code>value</code>は実際にIPアドレス。なので今回はAWS EIPの値が入る。<code>${aws_eip.main.public_ip}</code></li>
@@ -139,17 +130,13 @@ resource &quot;cloudflare_record&quot; &quot;gill-search&quot; {
 <li><code>ttl</code>は名前の通り、TTLの値。１にすると、CloudFlareの設定で言うAutomaticになる。</li>
 <li><code>proxied</code>はCloudFlareの仕組みによるもの。次に説明する。</li>
 </ul>
-
 <h2 id="cloudflareのdns">CloudFlareのDNS</h2>
-
-<p>設定すると下記のようになるのだが、右側のオレンジやグレーの雲マークが注目だ。<br />
-<img src="/image/cloudflare_dns.png" alt="cloudflare_proxy" /></p>
-
+<p>設定すると下記のようになるのだが、右側のオレンジやグレーの雲マークが注目だ。<br>
+<img src="/image/cloudflare_dns.png" alt="cloudflare_proxy"></p>
 <p>CloudFlareでのDNSは、普通のDNSとちがってProxyの設定のON/OFFが必要だ。なぜなら、もともとCloudFlareはHTTP Proxyであり、それによってキャッシュしたりセキュリティを高めたりするものだからだ。
 なので、例えばSSHで接続などHTTPプロトコル以外を通そうとするとCloudFlareが邪魔になる。
 そのため、サービスで利用するHTTP用のアクセスルートと管理で利用するSSH用のアクセスルートを分けておくといい。</p>
-
-<p><img src="/image/cloudflare_proxy.png" alt="cloudflare_proxy" /></p>
+<p><img src="/image/cloudflare_proxy.png" alt="cloudflare_proxy"></p>
                     </div>
                     
                     

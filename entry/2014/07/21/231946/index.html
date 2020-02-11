@@ -9,7 +9,7 @@
     <meta name="description" content=" 前々からArduino自体はもっていたし、ちょろっと触ったことはあったのだが、 大学時代の研究室の仲間とArduino勉強会をやることになり、それに向けて友人と再入門したのでそのときのメモ。 Arduino入門にこれだけは知っておきたい事">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2014/07/21/231946/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2014/07/21/231946/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="これだけは抑えておきたい、Arduino入門時に学ぶべきこと | Goldstine研究所">
@@ -80,14 +80,12 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><body>
+                        <body>
 <p>もーすけです。前々からArduino自体はもっていたし、ちょろっと触ったことはあったのだが、
 最近に大学時代の研究室の仲間とArduino勉強会をやることになり、それに向けて友人と再入門したので入門プログラムを作ってみた。<br>
 Arduino入門時にこれだけは知っておきたい事項をプログラム形式にまとめた。</p>
-<p>もちろん、不足部分もたくさんあるが、これだけわかれば楽しめるようになると思う。</p></p>
-
+<p>もちろん、不足部分もたくさんあるが、これだけわかれば楽しめるようになると思う。</p>
 <p>以下が入門プログラム。</p>
-
 <ol>
 <li><a href="#program1">LEDの点灯</a></li>
 <li><a href="#program2">PCとArduino間のシリアル通信</a></li>
@@ -96,7 +94,6 @@ Arduino入門時にこれだけは知っておきたい事項をプログラム�
 <li><a href="#program5">Processingとの連携</a></li>
 <li><a href="#program6">電池でArduinoを動作させる</a></li>
 </ol>
-
 <p>【用意したもの】<br>
 基本は以下の２つ</p>
 <div class="hatena-asin-detail">
@@ -175,286 +172,265 @@ Arduino入門時にこれだけは知っておきたい事項をプログラム�
 <h2>2. PCと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>間のシリアル通信</h2>センサーで取得したデータ等をPC側に渡すシリアル通信。<br>
 まずは最初なので、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>本体側で文字列を適当に出力させてそれを表示する。<p>はじめは"<a class="keyword" href="http://d.hatena.ne.jp/keyword/hoge">hoge</a>"だけを出力させたのだが、ひたすら<a class="keyword" href="http://d.hatena.ne.jp/keyword/hoge">hoge</a>が並ぶだけなので<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>側の処理がよく見えなかったので、<br>
 以下のサンプルのようにした。また、回路側はなにもいじっていない。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
 
-<pre><code class="language-c">int i = 0;
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setup</span>(){
 
-void setup(){
-
-  //シリアル通信の宣言
-  Serial.begin(9600);
+  <span style="color:#75715e">//シリアル通信の宣言
+</span><span style="color:#75715e"></span>  Serial.begin(<span style="color:#ae81ff">9600</span>);
 
 }
 
-void loop(){
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">loop</span>(){
 
-  Serial.print(&quot;hoge&quot;);
+  Serial.print(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">hoge</span><span style="color:#e6db74">&#34;</span>);
   Serial.println(i);
-  i++;
+  i<span style="color:#f92672">+</span><span style="color:#f92672">+</span>;
   
-  delay(300);
+  delay(<span style="color:#ae81ff">300</span>);
 
 }
-</code></pre>
-
-<p>出力結果</p>
-
+</code></pre></div><p>出力結果</p>
 <pre><code>hoge1
 hoge2
 hoge3
  .... 
-</code></pre>
-
-<p><img src="/image/arduino_architecture1.png"></p>
+</code></pre><p><img src="/image/arduino_architecture1.png"></p>
 <p></p>
 <h2>3. 超音波距離センサの利用</h2>次のステップとしてセンサーの利用を行った。<br>
 はじめ温度センサーを利用したのだが、温度の変化は室内ではわかりづらかったので「超音波距離センサ」を利用した。<br>
 ここでは超音波距離センサを利用するが、大事なことはセンサーの種類ではなく、センサーを利用した入力である。<p>【作ったもの】<br>
 超音波距離センサにて測定した物体との距離をシリアルモニターで表示するもの。</p>
 <p>【<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>】</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// 送信側のピン番号
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> TRIGPIN <span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span>; 
 
-<pre><code class="language-c">// 送信側のピン番号
-const int TRIGPIN = 8; 
+<span style="color:#75715e">// 受信側のピン番号
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> ECHOPIN <span style="color:#f92672">=</span> <span style="color:#ae81ff">9</span>;
 
-// 受信側のピン番号
-const int ECHOPIN = 9;
+<span style="color:#75715e">// HIGHの時間（μ秒）
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> CTM <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
 
-// HIGHの時間（μ秒）
-const int CTM = 10;
+<span style="color:#75715e">// 時間差（μ秒）
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> dur;
 
-// 時間差（μ秒）
-int dur;
+<span style="color:#75715e">// 距離（ｃｍ）
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">float</span> dis;
 
-// 距離（ｃｍ）
-float dis;
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setup</span>() {
 
-void setup() {
-
-  //シリアル通信の宣言
-  Serial.begin (9600);
+  <span style="color:#75715e">//シリアル通信の宣言
+</span><span style="color:#75715e"></span>  Serial.begin (<span style="color:#ae81ff">9600</span>);
   
   pinMode(TRIGPIN, OUTPUT);
   pinMode(ECHOPIN, INPUT); 
 
 }
 
-void loop() {
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">loop</span>() {
   
   digitalWrite(TRIGPIN, HIGH);
   delayMicroseconds(CTM);
   digitalWrite(TRIGPIN, LOW);
   
-  // 超音波が物体にあたり跳ね返ってくるまでの時間を測定
-  dur = pulseIn(ECHOPIN, HIGH);
+  <span style="color:#75715e">// 超音波が物体にあたり跳ね返ってくるまでの時間を測定
+</span><span style="color:#75715e"></span>  dur <span style="color:#f92672">=</span> pulseIn(ECHOPIN, HIGH);
   
-  //物体までの距離に変換
-  dis  = (float) dur*0.017;
+  <span style="color:#75715e">//物体までの距離に変換
+</span><span style="color:#75715e"></span>  dis  <span style="color:#f92672">=</span> (<span style="color:#66d9ef">float</span>) dur<span style="color:#f92672">*</span><span style="color:#ae81ff">0.017</span>;
   
-  //シリアルモニタへ出力
-  Serial.print(dis);
-  Serial.println(&quot; cm&quot;);
+  <span style="color:#75715e">//シリアルモニタへ出力
+</span><span style="color:#75715e"></span>  Serial.print(dis);
+  Serial.println(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74"> cm</span><span style="color:#e6db74">&#34;</span>);
   
-  delay(500);
+  delay(<span style="color:#ae81ff">500</span>);
   
 }
-</code></pre>
-
-<p>【回路】<br>
+</code></pre></div><p>【回路】<br>
 <img src="/image/arduino_architecture2.png"></p>
 <p></p>
 <h2>4. 超音波距離センサとLEDの組み合わせ</h2>センサーを用いいた入力方法・LEDを使った出力方法について学んだので、それらを組み合わせて以下のものを作成。<p>【作ったもの】<br>
 超音波距離センサを用いて、物体がある一定以上近づいた場合には赤LED の点灯を、<br>
 物体がある一定以上離れている場合（あるいは物体がない場合）には青LEDの点灯をするもの。</p>
 <p>【<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>】</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// 送信側のピン番号
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> TRIGPIN <span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span>; 
 
-<pre><code class="language-c">// 送信側のピン番号
-const int TRIGPIN = 8; 
+<span style="color:#75715e">// 受信側のピン番号
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> ECHOPIN <span style="color:#f92672">=</span> <span style="color:#ae81ff">9</span>;
 
-// 受信側のピン番号
-const int ECHOPIN = 9;
+<span style="color:#75715e">// HIGHの時間（μ秒）
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> CTM <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
 
-// HIGHの時間（μ秒）
-const int CTM = 10;
+<span style="color:#75715e">// 青LED
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> LED_BLUE <span style="color:#f92672">=</span> <span style="color:#ae81ff">12</span>;
 
-// 青LED
-const int LED_BLUE = 12;
+<span style="color:#75715e">// 赤LED
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> LED_RED <span style="color:#f92672">=</span> <span style="color:#ae81ff">13</span>;
 
-// 赤LED
-const int LED_RED = 13;
+<span style="color:#75715e">// 時間差（μ秒）
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> dur;
 
-// 時間差（μ秒）
-int dur;
+<span style="color:#75715e">// 距離（ｃｍ）
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">float</span> dis;
 
-// 距離（ｃｍ）
-float dis;
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setup</span>() {
 
-void setup() {
-
-  // シリアル通信の宣言
-  Serial.begin (9600);
+  <span style="color:#75715e">// シリアル通信の宣言
+</span><span style="color:#75715e"></span>  Serial.begin (<span style="color:#ae81ff">9600</span>);
   
-  // 超音波距離センサ
-  pinMode(TRIGPIN, OUTPUT);
+  <span style="color:#75715e">// 超音波距離センサ
+</span><span style="color:#75715e"></span>  pinMode(TRIGPIN, OUTPUT);
   pinMode(ECHOPIN, INPUT); 
   
-  // LED
-  pinMode(LED_BLUE, OUTPUT);
+  <span style="color:#75715e">// LED
+</span><span style="color:#75715e"></span>  pinMode(LED_BLUE, OUTPUT);
   pinMode(LED_RED, OUTPUT); 
 
 }
 
-void loop() {
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">loop</span>() {
   
   digitalWrite(TRIGPIN, HIGH);
   delayMicroseconds(CTM);
   digitalWrite(TRIGPIN, LOW);
   
-  // 超音波が物体にあたり跳ね返ってくるまでの時間を測定
-  dur = pulseIn(ECHOPIN, HIGH);
+  <span style="color:#75715e">// 超音波が物体にあたり跳ね返ってくるまでの時間を測定
+</span><span style="color:#75715e"></span>  dur <span style="color:#f92672">=</span> pulseIn(ECHOPIN, HIGH);
   
-  // 物体までの距離に変換
-  dis = (float) dur * 0.017;
+  <span style="color:#75715e">// 物体までの距離に変換
+</span><span style="color:#75715e"></span>  dis <span style="color:#f92672">=</span> (<span style="color:#66d9ef">float</span>) dur <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.017</span>;
   
-  // シリアルモニタへ出力
-  Serial.print(dis);
-  Serial.println(&quot; cm&quot;);
+  <span style="color:#75715e">// シリアルモニタへ出力
+</span><span style="color:#75715e"></span>  Serial.print(dis);
+  Serial.println(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74"> cm</span><span style="color:#e6db74">&#34;</span>);
   
-  // 距離が50cm以上なら青LEDを光らせる
-  if(dis &lt; 50) {
+  <span style="color:#75715e">// 距離が50cm以上なら青LEDを光らせる
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span>(dis <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">50</span>) {
     digitalWrite(LED_BLUE,HIGH);
     digitalWrite(LED_RED,LOW);
   
-  // 50cm未満なら赤LEDを光らせる
-  }else{
+  <span style="color:#75715e">// 50cm未満なら赤LEDを光らせる
+</span><span style="color:#75715e"></span>  }<span style="color:#66d9ef">else</span>{
     digitalWrite(LED_BLUE,LOW);
     digitalWrite(LED_RED,HIGH);
     
   }
   
-  delay(500);
+  delay(<span style="color:#ae81ff">500</span>);
   
 }
-</code></pre>
-
-<p><br>
+</code></pre></div><p><br>
 【回路】<br>
 <span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140721/20140721222730.png" alt="f:id:mosuke5:20140721222730p:plain" title="f:id:mosuke5:20140721222730p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 <p></p>
 <h2>5. Processingとの連携</h2>シリアル通信で受け取ったデータをシリアルモニターで表示するだけでなく、Processingで受け取ることもできる。<br>
 Processingで受け取ったデータをとりあえず、出力するところまで実施した。<p>【<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>側】</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// 送信側のピン番号
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> TRIGPIN <span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span>; 
 
-<pre><code class="language-c">// 送信側のピン番号
-const int TRIGPIN = 8; 
+<span style="color:#75715e">// 受信側のピン番号
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> ECHOPIN <span style="color:#f92672">=</span> <span style="color:#ae81ff">9</span>;
 
-// 受信側のピン番号
-const int ECHOPIN = 9;
+<span style="color:#75715e">// HIGHの時間（μ秒）
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> CTM <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
 
-// HIGHの時間（μ秒）
-const int CTM = 10;
+<span style="color:#75715e">// 時間差（μ秒）
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> dur;
 
-// 時間差（μ秒）
-int dur;
+<span style="color:#75715e">// 距離（ｃｍ）
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">float</span> dis;
 
-// 距離（ｃｍ）
-float dis;
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setup</span>() {
 
-void setup() {
-
-  //シリアル通信の宣言
-  Serial.begin (9600);
+  <span style="color:#75715e">//シリアル通信の宣言
+</span><span style="color:#75715e"></span>  Serial.begin (<span style="color:#ae81ff">9600</span>);
   
   pinMode(TRIGPIN, OUTPUT);
   pinMode(ECHOPIN, INPUT); 
 
 }
 
-void loop() {
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">loop</span>() {
   
   digitalWrite(TRIGPIN, HIGH);
   delayMicroseconds(CTM);
   digitalWrite(TRIGPIN, LOW);
   
-  // 超音波が物体にあたり跳ね返ってくるまでの時間を測定
-  dur = pulseIn(ECHOPIN, HIGH);
+  <span style="color:#75715e">// 超音波が物体にあたり跳ね返ってくるまでの時間を測定
+</span><span style="color:#75715e"></span>  dur <span style="color:#f92672">=</span> pulseIn(ECHOPIN, HIGH);
   
-  //物体までの距離に変換
-  dis  = (float) dur * 0.017;
+  <span style="color:#75715e">//物体までの距離に変換
+</span><span style="color:#75715e"></span>  dis  <span style="color:#f92672">=</span> (<span style="color:#66d9ef">float</span>) dur <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.017</span>;
   
-  //シリアルモニタへ出力
-  Serial.println(dis);
+  <span style="color:#75715e">//シリアルモニタへ出力
+</span><span style="color:#75715e"></span>  Serial.println(dis);
   
-  delay(500);
+  delay(<span style="color:#ae81ff">500</span>);
   
 }
+</code></pre></div><p>【Processing側】</p>
+```c
+import processing.serial.*;
+<p>int val;
+Serial myPort;</p>
+<p>void setup() {
+String arduinoPort = Serial.list()[3];
+myPort = new Serial(this, arduinoPort, 9600);
+}</p>
+<p>void draw() {
+println(val);
+}</p>
+<p>void serialEvent(Serial p){</p>
+<p>val=myPort.read();
+delay(1000);</p>
+<p>}</p>
+<pre><code> 
+&lt;p&gt;なんか受け取れているけど、これであっているか検討します…&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;h2&gt;6. 電池で&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/Arduino&quot;&gt;Arduino&lt;/a&gt;を動作させる&lt;/h2&gt;通常、&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/Arduino&quot;&gt;Arduino&lt;/a&gt;はPCから電源をとっているため、PCと切り離してしまうと動かなくなる。&lt;br&gt;
+しかし、PCと繋いでいないと動作できない&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/Arduino&quot;&gt;Arduino&lt;/a&gt;なんて必要ない…とも思う。&lt;p&gt;&lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/Arduino&quot;&gt;Arduino&lt;/a&gt;を電池で動かす方法はいたって簡単で以下の２つを用意して接続するだけ。&lt;/p&gt;
+&lt;div class=&quot;hatena-asin-detail&quot;&gt;
+&lt;a href=&quot;http://www.amazon.co.jp/exec/obidos/ASIN/B000FHVRLE/hatena-blog-22/&quot;&gt;&lt;img src=&quot;http://ecx.images-amazon.com/images/I/41IakcNEXoL._SL160_.jpg&quot; class=&quot;hatena-asin-detail-image&quot; alt=&quot;Panasonic 9V型アルカリ乾電池 1本 6LR61YXJ/1S&quot; title=&quot;Panasonic 9V型アルカリ乾電池 1本 6LR61YXJ/1S&quot;&gt;&lt;/a&gt;&lt;div class=&quot;hatena-asin-detail-info&quot;&gt;
+&lt;p class=&quot;hatena-asin-detail-title&quot;&gt;&lt;a href=&quot;http://www.amazon.co.jp/exec/obidos/ASIN/B000FHVRLE/hatena-blog-22/&quot;&gt;Panasonic 9V型アルカリ乾電池 1本 6LR61YXJ/1S&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;span class=&quot;hatena-asin-detail-label&quot;&gt;出版社/メーカー:&lt;/span&gt; &lt;a class=&quot;keyword&quot; href=&quot;http://d.hatena.ne.jp/keyword/%A5%D1%A5%CA%A5%BD%A5%CB%A5%C3%A5%AF&quot;&gt;パナソニック&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;span class=&quot;hatena-asin-detail-label&quot;&gt;発売日:&lt;/span&gt; 2006/04/10&lt;/li&gt;
+&lt;li&gt;
+&lt;span class=&quot;hatena-asin-detail-label&quot;&gt;メディア:&lt;/span&gt; エレクトロニクス&lt;/li&gt;
+&lt;li&gt; &lt;span class=&quot;hatena-asin-detail-label&quot;&gt;クリック&lt;/span&gt;: 2回&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://d.hatena.ne.jp/asin/B000FHVRLE/hatena-blog-22&quot; target=&quot;_blank&quot;&gt;この商品を含むブログを見る&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;hatena-asin-detail-foot&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;hatena-asin-detail&quot;&gt;
+&lt;a href=&quot;http://www.amazon.co.jp/exec/obidos/ASIN/0101625138/hatena-blog-22/&quot;&gt;&lt;img src=&quot;http://ecx.images-amazon.com/images/I/311H0nRslqL._SL160_.jpg&quot; class=&quot;hatena-asin-detail-image&quot; alt=&quot;DC 9V電池スナップ＋2.1mm DCプラグ  並行輸入品&quot; title=&quot;DC 9V電池スナップ＋2.1mm DCプラグ  並行輸入品&quot;&gt;&lt;/a&gt;&lt;div class=&quot;hatena-asin-detail-info&quot;&gt;
+&lt;p class=&quot;hatena-asin-detail-title&quot;&gt;&lt;a href=&quot;http://www.amazon.co.jp/exec/obidos/ASIN/0101625138/hatena-blog-22/&quot;&gt;DC 9V電池スナップ＋2.1mm DCプラグ  並行輸入品&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;span class=&quot;hatena-asin-detail-label&quot;&gt;出版社/メーカー:&lt;/span&gt; Gadgettown&lt;/li&gt;
+&lt;li&gt;
+&lt;span class=&quot;hatena-asin-detail-label&quot;&gt;メディア:&lt;/span&gt; &lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://d.hatena.ne.jp/asin/0101625138/hatena-blog-22&quot; target=&quot;_blank&quot;&gt;この商品を含むブログを見る&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;hatena-asin-detail-foot&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;これらを以下のように接続する。&lt;br&gt;
+&lt;span itemscope itemtype=&quot;http://schema.org/Photograph&quot;&gt;&lt;a href=&quot;http://f.hatena.ne.jp/mosuke5/20140721222037&quot; class=&quot;hatena-fotolife&quot; itemprop=&quot;url&quot;&gt;&lt;img src=&quot;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140721/20140721222037.jpg&quot; alt=&quot;f:id:mosuke5:20140721222037j:image:w500&quot; title=&quot;f:id:mosuke5:20140721222037j:image:w500&quot; class=&quot;hatena-fotolife&quot; style=&quot;width:500px&quot; itemprop=&quot;image&quot;&gt;&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;br&gt;
+&lt;p&gt;以上で入門まとめは終わりだが、&lt;br&gt;
+その他にも以下を購入しているので次はもっと高度なことを実践したい。&lt;br&gt;
+・&lt;a href=&quot;http://www.switch-science.com/catalog/224/&quot;&gt;XBee ZB / ワイヤアンテナ型 - スイッチサイエンス&lt;/a&gt;&lt;br&gt;
+・&lt;a href=&quot;http://www.switch-science.com/catalog/786/&quot;&gt;Arduino ワイヤレスプロトシールド - スイッチサイエンス&lt;/a&gt;&lt;br&gt;
+・&lt;a href=&quot;http://www.switch-science.com/catalog/1031/&quot;&gt;XBee USB アダプター(リセットスイッチ付き) - スイッチサイエンス&lt;/a&gt;&lt;br&gt;
+・&lt;a href=&quot;http://www.switch-science.com/catalog/838/&quot;&gt;Arduino イーサネットシールド R3 - スイッチサイエンス&lt;/a&gt;&lt;/p&gt;
+&lt;/body&gt;
 </code></pre>
-
-<p><p>【Processing側】</p></p>
-
-<pre><code class="language-c">import processing.serial.*;
-
-int val;
-Serial myPort;
-
-void setup() {
-  String arduinoPort = Serial.list()[3]; 
-  myPort = new Serial(this, arduinoPort, 9600); 
-}
-
-void draw() {
-  println(val);
-}
-
-void serialEvent(Serial p){
-
-  val=myPort.read();
-  delay(1000);
-
-}
-</code></pre>
-
-<p><p>なんか受け取れているけど、これであっているか検討します…</p>
-<p></p>
-<h2>6. 電池で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>を動作させる</h2>通常、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>はPCから電源をとっているため、PCと切り離してしまうと動かなくなる。<br>
-しかし、PCと繋いでいないと動作できない<a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>なんて必要ない…とも思う。<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Arduino">Arduino</a>を電池で動かす方法はいたって簡単で以下の２つを用意して接続するだけ。</p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/B000FHVRLE/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/41IakcNEXoL._SL160_.jpg" class="hatena-asin-detail-image" alt="Panasonic 9V型アルカリ乾電池 1本 6LR61YXJ/1S" title="Panasonic 9V型アルカリ乾電池 1本 6LR61YXJ/1S"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B000FHVRLE/hatena-blog-22/">Panasonic 9V型アルカリ乾電池 1本 6LR61YXJ/1S</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%CA%A5%BD%A5%CB%A5%C3%A5%AF">パナソニック</a>
-</li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2006/04/10</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> エレクトロニクス</li>
-<li> <span class="hatena-asin-detail-label">クリック</span>: 2回</li>
-<li><a href="http://d.hatena.ne.jp/asin/B000FHVRLE/hatena-blog-22" target="_blank">この商品を含むブログを見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/0101625138/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/311H0nRslqL._SL160_.jpg" class="hatena-asin-detail-image" alt="DC 9V電池スナップ＋2.1mm DCプラグ  並行輸入品" title="DC 9V電池スナップ＋2.1mm DCプラグ  並行輸入品"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/0101625138/hatena-blog-22/">DC 9V電池スナップ＋2.1mm DCプラグ  並行輸入品</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> Gadgettown</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> </li>
-<li><a href="http://d.hatena.ne.jp/asin/0101625138/hatena-blog-22" target="_blank">この商品を含むブログを見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
-<p>これらを以下のように接続する。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><a href="http://f.hatena.ne.jp/mosuke5/20140721222037" class="hatena-fotolife" itemprop="url"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20140721/20140721222037.jpg" alt="f:id:mosuke5:20140721222037j:image:w500" title="f:id:mosuke5:20140721222037j:image:w500" class="hatena-fotolife" style="width:500px" itemprop="image"></a></span></p>
-<br>
-<p>以上で入門まとめは終わりだが、<br>
-その他にも以下を購入しているので次はもっと高度なことを実践したい。<br>
-・<a href="http://www.switch-science.com/catalog/224/">XBee ZB / ワイヤアンテナ型 - スイッチサイエンス</a><br>
-・<a href="http://www.switch-science.com/catalog/786/">Arduino ワイヤレスプロトシールド - スイッチサイエンス</a><br>
-・<a href="http://www.switch-science.com/catalog/1031/">XBee USB アダプター(リセットスイッチ付き) - スイッチサイエンス</a><br>
-・<a href="http://www.switch-science.com/catalog/838/">Arduino イーサネットシールド R3 - スイッチサイエンス</a></p>
-</body></p>
                     </div>
                     
                     

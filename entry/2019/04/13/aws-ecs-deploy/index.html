@@ -9,7 +9,7 @@
     <meta name="description" content="Amaozn ECSを利用した際のFargateの仕組みやそのデプロイフローを解説します。Fargateが単なるコンテナではなくVMである点など興味深いことが見えてきました。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/04/13/aws-ecs-deploy/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/04/13/aws-ecs-deploy/" />
-    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="generator" content="Hugo 0.64.0" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Amazon ECSを使った際のFargateの仕組みとそのデプロイフローを学ぶ | Goldstine研究所">
@@ -80,142 +80,113 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>ニート最終日の<a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br />
+                        <p>ニート最終日の<a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br>
 今日は、Amazon ECSからみる、AWSのコンテナ戦略やECSへのデプロイフローなどについて解説します。
 自分はDockerやKubernetesなどを触ってきましたが、AWS特有のコンテナサービスであるECS, Fargateを調査していくとAWSの戦略などいろんな発見がありました。</p>
-
 <h2 id="全体像">全体像</h2>
-
-<p>Amazon ECSで実現することの全体像は下記の通りです。<br />
+<p>Amazon ECSで実現することの全体像は下記の通りです。<br>
 大きく右と左で分かれていて、左側のAWS上ではECS(Fargateのタスク)でNginxで静的なデータを返すWebサーバを配置。前段にALBで分散してアクセスできるようにしています。
 右側では、Gitlabを用いて、そのECSに対して変更をデプロイを行います。</p>
-
-<p><img src="/image/overview-deploy-to-ecs-with-gitlab.png" alt="overview" /></p>
-
+<p><img src="/image/overview-deploy-to-ecs-with-gitlab.png" alt="overview"></p>
 <h2 id="fargateの動き">Fargateの動き</h2>
-
-<p>まず、Fargateについてです。個人的に一番盛り上がっていたポイントです！！<br />
+<p>まず、Fargateについてです。個人的に一番盛り上がっていたポイントです！！<br>
 Amazon ECSではタスクを実行する環境をEC2かFargateか選ぶことができます。
 今回はサーバレスで起動できるFargateを採用したのですが、触り始めてすぐにある違和感に気づきました。
 それは、<strong>Fargateが単なるコンテナではない</strong>、ということです。
 どういうことかというと、Fargate Taskをスケールさせた際にALB配下のターゲットがFargateのIPアドレスであり、また全てが同じ80番ポートだったということです。
-以下のスクリーンショットは3台にFargateをスケールさせたときのALBのターゲットです。<br />
+以下のスクリーンショットは3台にFargateをスケールさせたときのALBのターゲットです。<br>
 みなさんは、これをみて違和感に気づきましたでしょうか？</p>
-
-<p><img src="/image/ecs-alb-targets.png" alt="alb-targets" /></p>
-
+<p><img src="/image/ecs-alb-targets.png" alt="alb-targets"></p>
 <p>もしFargateを単なるコンテナとして見るならば、すべてがポート80であることは不自然です。
 なぜかというと、コンテナはホストサーバの上に複数立ち上がることが一般的です。
 ホスト上では80ポートは1つしか使えないため、もしすべてのコンテナが80ポートでアクセスできるためにはそれぞれのコンテナが別々のホストでないといけないからです。
 1コンテナに対して1VMというのは一般的には考えづらく、これはなんだ？？と思っていました。</p>
-
 <p>自分はKubernetesは触っており、kube-proxyによるコンテナの分散を見ていたから余計にそのように感じるのかもしれません。
 Kubernetesではロードバランサが直接コンテナに分散することはなく、ワーカーノードに対してロードバランサの振り先が設定されます。
 その上で、ワーカーノード上のkube-proxyが適切なコンテナへのリクエストの振り分けを行います。そのため、例えば80番ポートを利用するコンテナも、コンテナのホスト側のポートが必ずしも80である必要はない、というものです。
 下記は、<a href="https://www.slideshare.net/mosuke5/alibabacloudkubernetes">こちらのスライドの抜粋</a>。</p>
-
-<p><img src="/image/kubeproxy-why-loadbalanced.png" alt="kube-proxy" /></p>
-
-<p>実際に、この違和感はすぐにとあることを思い出して納得しました。<br />
+<p><img src="/image/kubeproxy-why-loadbalanced.png" alt="kube-proxy"></p>
+<p>実際に、この違和感はすぐにとあることを思い出して納得しました。<br>
 それは少し前にAWSが公表していたFirecrackerというオープンソースです。こちらでは、125msでmicroVMを立ち上げることのできるソフトウェアで、こちらをFargateやLambdaに利用しているとのことでした。
 つまり、<strong>Fargateはたんなるコンテナではなく、やはりひとつのVMとして動作しているということ</strong>です。
 詳しくはこちらの記事をみるといいでしょう。</p>
-
 <p><a href="https://aws.amazon.com/jp/blogs/news/firecracker-lightweight-virtualization-for-serverless-computing/">Firecracker – サーバーレスコンピューティングのための軽量な仮想化機能 | Amazon Web Services ブログ</a></p>
-
-<p>ちなみに、料金をみるとFargateは少しお高めに設定されています。<br />
+<p>ちなみに、料金をみるとFargateは少しお高めに設定されています。<br>
 最近値下がったとはいえ、例えば1vCPU, 1GB memoryのFargateコンピューティングを1ヵ月動かすと、大体4400円/月くらいかかります。高いですね。
 しかし、料金体系的にメモリを増やしてもそこまで高くならないのがポイントかもしれません。
 1vCPU, 4GB memoryのFargateコンピューティングを1ヵ月動かしても、5500-6000円/月とそこまで変わりません。
 仮に小スペックでも上のようにFirecrackerでVMとして起動するのでそういう意味で高いのかもしれませんね。（真相はしりません.）</p>
-
 <h2 id="ecsへのデプロイ">ECSへのデプロイ</h2>
-
 <p>さて、ECSを利用したときのFargateの動きが理解できたところで、実際にECSへのデプロイを行っていきます。
 ECSへのデプロイは、<a href="https://github.com/silinternational/ecs-deploy">ecs-deploy</a>というオープンソースを利用しました。</p>
-
-<p>@mogulla3がツールの解説をしているのでこちらを参考にするといいと思います。<br />
+<p>@mogulla3がツールの解説をしているのでこちらを参考にするといいと思います。<br>
 <a href="https://sandragon.hatenablog.com/entry/2019/04/14/211209">ecs-deployを使ったAmazon ECSへのデプロイの裏側</a></p>
-
 <p>アプリの変更から自動的にコンテナイメージを生成してデプロイするまでをGitlabを活用しました。
 下記のような<code>.gitlab-ci.yml</code>をアプリのレポジトリに配置して、Masterブランチへのコミットをトリガーに、Dockerイメージの生成とAWS ECSへのデプロイを行いました。Dockerイメージにはgitのコミット番号を振り、切り戻しなどしやすいようにしています。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-YAML" data-lang="YAML"><span style="color:#66d9ef">image</span>: docker:stable
 
-<pre><code class="language-YAML">image: docker:stable
-
-services:
+<span style="color:#66d9ef">services</span>:
   - docker:dind
 
-stages:
+<span style="color:#66d9ef">stages</span>:
   - build
   - deploy
 
-variables:
-  CONTAINER_IMAGE: registry.gitlab.com/$CI_PROJECT_PATH
-  DOCKER_DRIVER: overlay2
+<span style="color:#66d9ef">variables</span>:
+  <span style="color:#66d9ef">CONTAINER_IMAGE</span>: registry.gitlab.com/$CI_PROJECT_PATH
+  <span style="color:#66d9ef">DOCKER_DRIVER</span>: overlay2
 
-before_script:
+<span style="color:#66d9ef">before_script</span>:
   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
   - apk add jq python3
   - apk add bash
   - pip3 install awscli
   
-release-image:
-  stage: build
-  script:
-    - docker pull $CONTAINER_IMAGE:latest || true
+<span style="color:#66d9ef">release-image</span>:
+  <span style="color:#66d9ef">stage</span>: build
+  <span style="color:#66d9ef">script</span>:
+    - docker pull $CONTAINER_IMAGE:latest || <span style="color:#66d9ef">true</span>
     - docker build --cache-from $CONTAINER_IMAGE:latest --tag $CONTAINER_IMAGE:$CI_BUILD_REF --tag $CONTAINER_IMAGE:latest .
     - docker push $CONTAINER_IMAGE:$CI_BUILD_REF
     - docker push $CONTAINER_IMAGE:latest
-  only: 
+  <span style="color:#66d9ef">only</span>: 
     - master
 
-deploy:
-  stage: deploy
-  script:
+<span style="color:#66d9ef">deploy</span>:
+  <span style="color:#66d9ef">stage</span>: deploy
+  <span style="color:#66d9ef">script</span>:
     - wget https://raw.githubusercontent.com/silinternational/ecs-deploy/master/ecs-deploy -O /usr/bin/ecs-deploy
     - chmod +x /usr/bin/ecs-deploy
     - ecs-deploy -c &lt;ECS cluster name&gt; -n &lt;ECS service name&gt; -i $CONTAINER_IMAGE:$CI_BUILD_REF
-  only: 
+  <span style="color:#66d9ef">only</span>: 
     - master
-</code></pre>
-
-<h2 id="secretmanager連携">SecretManager連携</h2>
-
+</code></pre></div><h2 id="secretmanager連携">SecretManager連携</h2>
 <p>Fargateのタスクで利用するDockerイメージはプライベートレポジトリに格納されているものです。
 プライベートレポジトリから取得するためには認証がいるのですが、ここでしょうもないことにハマりました。
-設定自体は<a href="https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/private-auth.html">こちらのドキュメント</a>をみながらやっていたのですが、うまくいかない状況でした。<br />
+設定自体は<a href="https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/private-auth.html">こちらのドキュメント</a>をみながらやっていたのですが、うまくいかない状況でした。<br>
 下記は出ていたエラーメッセージです。IAMのポリシーがおかしいというのは分かっていたのですが、はじめなにがおかしいかわかりませんでした。</p>
-
 <pre><code>Asm fetching secret from the service for arn:aws:secretsmanager:ap-northeast-1:xxxxxxxxxx:secret:gitlab-sample-registry-y54JnU: AccessDeniedException: User: arn:aws:sts::xxxxxxxxxx:assumed-role/ecsTaskExecutionRole/14edf050-3d47-4c90-8e13-cb4a6d0e67a1 is not authorized to perform: secretsmanager:GetSecretValue on resource: arn:aws:secretsmanager:ap-northeast-1:xxxxxxxxxx:secret:gitlab-sample-registry-y54JnU status code: 400, request id: 83b3a590-db73-43d8-a0cb-abf894994173
-</code></pre>
-
-<p>IAMのロールのポリシーの設定で下記を設定する必要があるのですが、<code>Resource</code>ででてくる<code>secret_name</code>に少し罠がありました。</p>
-
-<pre><code class="language-json">{
-  &quot;Version&quot;: &quot;2012-10-17&quot;,
-  &quot;Statement&quot;: 
+</code></pre><p>IAMのロールのポリシーの設定で下記を設定する必要があるのですが、<code>Resource</code>ででてくる<code>secret_name</code>に少し罠がありました。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+  <span style="color:#f92672">&#34;Version&#34;</span>: <span style="color:#e6db74">&#34;2012-10-17&#34;</span>,
+  <span style="color:#f92672">&#34;Statement&#34;</span>: 
     {
-      &quot;Effect&quot;: &quot;Allow&quot;,
-      &quot;Action&quot;: [
-        &quot;kms:Decrypt&quot;,
-        &quot;secretsmanager:GetSecretValue&quot;
+      <span style="color:#f92672">&#34;Effect&#34;</span>: <span style="color:#e6db74">&#34;Allow&#34;</span>,
+      <span style="color:#f92672">&#34;Action&#34;</span>: [
+        <span style="color:#e6db74">&#34;kms:Decrypt&#34;</span>,
+        <span style="color:#e6db74">&#34;secretsmanager:GetSecretValue&#34;</span>
       ],
-      &quot;Resource&quot;: [
-        &quot;arn:aws:secretsmanager:region:aws_account_id:secret:secret_name&quot;,
-        &quot;arn:aws:kms:region:aws_account_id:key:key_id&quot;     
+      <span style="color:#f92672">&#34;Resource&#34;</span>: [
+        <span style="color:#e6db74">&#34;arn:aws:secretsmanager:region:aws_account_id:secret:secret_name&#34;</span>,
+        <span style="color:#e6db74">&#34;arn:aws:kms:region:aws_account_id:key:key_id&#34;</span>     
       ]
     }
-  ]
+  <span style="color:#960050;background-color:#1e0010">]</span>
 }
-</code></pre>
-
-<p>secret managerの下記の画面の「Secret Name」ではなく、ARNの末尾の値のことでした。ここは初心者には間違えやすいので注意してください。</p>
-
-<p><img src="/image/aws-secret-name-edited.png" alt="secret-name" /></p>
-
+</code></pre></div><p>secret managerの下記の画面の「Secret Name」ではなく、ARNの末尾の値のことでした。ここは初心者には間違えやすいので注意してください。</p>
+<p><img src="/image/aws-secret-name-edited.png" alt="secret-name"></p>
 <h2 id="まとめ">まとめ</h2>
-
-<p>Amazon ECSでタスクの実行にFargateを利用する際に知っておくべき、Fargeteの仕組みやECSへのデプロイ方法を見てきました。Fargateの仕組みについては、一見クラウド利用者からすると無関係な知識のように見えますが、コンテナのセキュリティやクラウドを真に理解して使っていくためには必要な知識と言えます。<br />
+<p>Amazon ECSでタスクの実行にFargateを利用する際に知っておくべき、Fargeteの仕組みやECSへのデプロイ方法を見てきました。Fargateの仕組みについては、一見クラウド利用者からすると無関係な知識のように見えますが、コンテナのセキュリティやクラウドを真に理解して使っていくためには必要な知識と言えます。<br>
 今後ECSを使っていく人のすこしでも参考になればと思います。</p>
                     </div>
                     
