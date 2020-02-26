@@ -101,10 +101,10 @@ Kubernetesでのロギングについての考え方は英語ですが<a href="h
 <p>コンテナ化する場合はまずは通常のサーバなりローカルで設定や概念を理解することをおすすめします。自分もこちらを実施するに当たり、一度テスト用のEC2の上で動作など確認しました。</p>
 <h3 id="fluentconf">fluent.conf</h3>
 <p>利用するfluent.confは次のようなものとします。</p>
-<pre><code>&lt;source&gt;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&lt;source&gt;
   @type tail
   path /var/log/nginx/access.log
-  format /^(?&lt;remote&gt;[^ ]*) (?&lt;host&gt;[^ ]*) (?&lt;user&gt;[^ ]*) \[(?&lt;time&gt;[^\]]*)\] &quot;(?&lt;method&gt;\S+)(?: +(?&lt;path&gt;[^ ]*) +\S*)?&quot; (?&lt;code&gt;[^ ]*) (?&lt;size&gt;[^ ]*)(?: &quot;(?&lt;referer&gt;[^\&quot;]*)&quot; &quot;(?&lt;agent&gt;[^\&quot;]*)&quot; &quot;(?&lt;forwarder&gt;[^\&quot;]*)&quot;)?/
+  format /^(?&lt;remote&gt;[^ ]*) (?&lt;host&gt;[^ ]*) (?&lt;user&gt;[^ ]*) \[(?&lt;time&gt;[^\]]*)\] &#34;(?&lt;method&gt;\S+)(?: +(?&lt;path&gt;[^ ]*) +\S*)?&#34; (?&lt;code&gt;[^ ]*) (?&lt;size&gt;[^ ]*)(?: &#34;(?&lt;referer&gt;[^\&#34;]*)&#34; &#34;(?&lt;agent&gt;[^\&#34;]*)&#34; &#34;(?&lt;forwarder&gt;[^\&#34;]*)&#34;)?/
   time_format %d/%b/%Y:%H:%M:%S %z
   tag nginx.access
   pos_file /fluentd/log/nginx.pos
@@ -121,7 +121,7 @@ Kubernetesでのロギングについての考え方は英語ですが<a href="h
   log_stream_name fluentd
   auto_create_stream true
 &lt;/match&gt;
-</code></pre><h3 id="source">source</h3>
+</code></pre></div><h3 id="source">source</h3>
 <p>Nginxのaccess.logを対象としました。<br>
 流れとしては<source>でまず対象のログをどう取得するかを決めます。
 この場合はTailというプラグインを使った収集を使っています。
@@ -136,8 +136,8 @@ Kubernetesでのロギングについての考え方は英語ですが<a href="h
 <p>利用するには、下記のようにgemでインストールします。
 DockerHubで公開されているfluentdのコンテナイメージには当然インストールされておらず、都度インストールするのはめんどくさいので、プラグインがインストールされた状態のコンテナイメージを作っておきました。
 （個人で遊びで使うときはいつもGitlabのイメージレジストリを使っています。Gitlabを使ったコンテナイメージの自動ビルドについては過去に<a href="https://blog.mosuke.tech/entry/2018/05/02/rails-app-on-docker/">こちらの記事の一部</a>として書いています。）</p>
-<pre><code>gem install fluent-plugin-cloudwatch-logs
-</code></pre><p>Fluentdは、AWSに送付するので、AWSへのアクセス権限が必要です。<br>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">gem install fluent-plugin-cloudwatch-logs
+</code></pre></div><p>Fluentdは、AWSに送付するので、AWSへのアクセス権限が必要です。<br>
 コンテナ上でIAMロールを使うのはちょっと大変なので(コンテナ環境におけるIAMロールの扱いについてはどこかで別途書きたいですね)、専用のユーザとポリシーを作成し、API Keyを環境変数で渡すことにしました。こちらは次のDeploymentの部分で説明します。</p>
 <h2 id="deploymentに組み込む">Deploymentに組み込む</h2>
 <p>Kubernetes上のDeploymentに組み込むわけですが、サイドカー方式での基本的なロギングの考え方は以下のようになります。</p>
@@ -228,24 +228,24 @@ DockerHubで公開されているfluentdのコンテナイメージには当然�
 </code></pre></div><h2 id="動作確認">動作確認</h2>
 <p>podを確認すると、2/2とふたつのコンテナが起動していることがきちんと確認できる。
 今回のようなサイドカー方式にすると、Nginxコンテナは標準出力でログを吐き出さなくなるので、<code>kubectl logs</code>でログは確認できないことは要注意しておきましょう。</p>
-<pre><code>$ kubectl get pod
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod
 NAME                                           READY   STATUS    RESTARTS   AGE
 nginx-deployment-58b86c84bb-6mggw   2/2     Running   0          22h
-</code></pre><p>またAWSコンソール側にも少しラグはあるものの、送付されていることが確認できました。
+</code></pre></div><p>またAWSコンソール側にも少しラグはあるものの、送付されていることが確認できました。
 もし、AWS側に来ない場合には、fluentdコンテナのログを確認してエラーが出てないかなど確認してみましょう。</p>
-<pre><code>$ kubectl logs nginx-deployment-58b86c84bb-6mggw -c fluentd
-2019-07-11 08:20:09 +0000 [info]: starting fluentd-1.6.0 pid=6 ruby=&quot;2.5.5&quot;
-2019-07-11 08:20:09 +0000 [info]: spawn command to main:  cmdline=[&quot;/usr/bin/ruby&quot;, &quot;-Eascii-8bit:ascii-8bit&quot;, &quot;/usr/bin/fluentd&quot;, &quot;-c&quot;, &quot;/fluentd/etc/fluent.conf&quot;, &quot;-p&quot;, &quot;/fluentd/plugins&quot;, &quot;--under-supervisor&quot;]
-2019-07-11 08:20:09 +0000 [info]: gem 'fluent-plugin-cloudwatch-logs' version '0.7.3'
-2019-07-11 08:20:09 +0000 [info]: gem 'fluentd' version '1.6.0'
-2019-07-11 08:20:09 +0000 [info]: adding filter pattern=&quot;nginx.access&quot; type=&quot;grep&quot;
-2019-07-11 08:20:09 +0000 [warn]: #0 'exclude1' parameter is deprecated: Use &lt;exclude&gt; section
-2019-07-11 08:20:09 +0000 [info]: adding match pattern=&quot;nginx.**&quot; type=&quot;cloudwatch_logs&quot;
-2019-07-11 08:20:09 +0000 [info]: adding source type=&quot;tail&quot;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl logs nginx-deployment-58b86c84bb-6mggw -c fluentd
+2019-07-11 08:20:09 +0000 [info]: starting fluentd-1.6.0 pid=6 ruby=&#34;2.5.5&#34;
+2019-07-11 08:20:09 +0000 [info]: spawn command to main:  cmdline=[&#34;/usr/bin/ruby&#34;, &#34;-Eascii-8bit:ascii-8bit&#34;, &#34;/usr/bin/fluentd&#34;, &#34;-c&#34;, &#34;/fluentd/etc/fluent.conf&#34;, &#34;-p&#34;, &#34;/fluentd/plugins&#34;, &#34;--under-supervisor&#34;]
+2019-07-11 08:20:09 +0000 [info]: gem &#39;fluent-plugin-cloudwatch-logs&#39; version &#39;0.7.3&#39;
+2019-07-11 08:20:09 +0000 [info]: gem &#39;fluentd&#39; version &#39;1.6.0&#39;
+2019-07-11 08:20:09 +0000 [info]: adding filter pattern=&#34;nginx.access&#34; type=&#34;grep&#34;
+2019-07-11 08:20:09 +0000 [warn]: #0 &#39;exclude1&#39; parameter is deprecated: Use &lt;exclude&gt; section
+2019-07-11 08:20:09 +0000 [info]: adding match pattern=&#34;nginx.**&#34; type=&#34;cloudwatch_logs&#34;
+2019-07-11 08:20:09 +0000 [info]: adding source type=&#34;tail&#34;
 2019-07-11 08:20:09 +0000 [info]: #0 starting fluentd worker pid=14 ppid=6 worker=0
 2019-07-11 08:20:09 +0000 [info]: #0 following tail of /var/log/nginx/access.log
 2019-07-11 08:20:09 +0000 [info]: #0 fluentd worker is now running worker=0
-</code></pre><p><img src="/image/cloudwatchlogs-from-fluentd.png" alt="cloudwatchlogs"></p>
+</code></pre></div><p><img src="/image/cloudwatchlogs-from-fluentd.png" alt="cloudwatchlogs"></p>
 <h2 id="まとめ">まとめ</h2>
 <p>Kubernetes上のアプリケーションについて、Sidecar方式でのロギングをやってみました。
 冒頭の結果のところにも書きましたが、ロギングという観点でいうとSidecarではない方法でのアプローチのほうが便利そうでした。

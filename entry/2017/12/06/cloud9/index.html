@@ -121,12 +121,12 @@ Cloud9上で動くターミナルは端末からログインしているわけ�
 <p>Hugoサーバを立ち上げて、実際に書いた記事を確認する必要がありますが、こういった仮想環境上だと一つ問題があります。
 それは端末からCloud9で編集しているサーバに対してアクセスしなければいけなという点です。
 そのためにはHugoサーバを立ち上げ時にベースURLとして、サーバのグローバルIPアドレスを指定する必要がありました。</p>
-<pre><code>$ hugo server -D -b &lt;Global IPaddress&gt; --bind 0.0.0.0
-</code></pre><p>Cloud9ではしばらく利用していないと、自動的にEC2インスタンスを停止し費用の節約をしてくれます。<br>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ hugo server -D -b &lt;Global IPaddress&gt; --bind 0.0.0.0
+</code></pre></div><p>Cloud9ではしばらく利用していないと、自動的にEC2インスタンスを停止し費用の節約をしてくれます。<br>
 しかし、AWSの仮想インスタンスの仕様上、一度インスタンスを停止し起動すると、IPアドレスなどが変更されてしうので、Hugoサーバを立ち上げるときのグローバルIPが毎回変わってしまいます。毎回調べて貼り付けるのはナンセンスすぎます。<br>
 というわけで、AWSにはメタデータという便利な機能があるので、以下のようにサーバを起動するようにして解決しました。</p>
-<pre><code>$ hugo server -D -b `curl http://169.254.169.254/latest/meta-data/public-ipv4` --bind 0.0.0.0
-</code></pre><p>メタデータの機能を知らない方は下記を見ておきましょう。<br>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ hugo server -D -b `curl http://169.254.169.254/latest/meta-data/public-ipv4` --bind 0.0.0.0
+</code></pre></div><p>メタデータの機能を知らない方は下記を見ておきましょう。<br>
 <a href="http://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/ec2-instance-metadata.html">インスタンスメタデータとユーザーデータ</a></p>
 <h3 id="セキュリティグループの設定">セキュリティグループの設定</h3>
 <p>あたりまえですが、AWSのEC2上なのでHugoサーバで使う1313ポート（デフォルトでは）はセキュリティグループで開放しておきましょう。</p>

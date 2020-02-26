@@ -95,29 +95,29 @@ APIを利用して効率よく作業できる環境を整えた。</p>
 <h2 id="identifierの確認">identifierの確認</h2>
 <p><code>identifier</code>は下記APIで確認できる。<br>
 このAPIで返ってくるはじめの<code>id</code>が<code>idenitifer</code>だ。</p>
-<pre><code>curl -X GET &quot;https://api.cloudflare.com/client/v4/zones \
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">curl -X GET &#34;https://api.cloudflare.com/client/v4/zones \
     ?name=&lt;your site&gt; \
     &amp;status=active \
     &amp;page=1 \
     &amp;per_page=20 \
     &amp;order=status \
     &amp;direction=desc \
-    &amp;match=all&quot; \
-    -H &quot;X-Auth-Email: &lt;your email&gt;&quot; \
-    -H &quot;X-Auth-Key: &lt;your api key&gt;&quot; \
-    -H &quot;Content-Type: application/json&quot; 
-</code></pre><pre><code>{
-  &quot;result&quot;: [
+    &amp;match=all&#34; \
+    -H &#34;X-Auth-Email: &lt;your email&gt;&#34; \
+    -H &#34;X-Auth-Key: &lt;your api key&gt;&#34; \
+    -H &#34;Content-Type: application/json&#34; 
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{
+  &#34;result&#34;: [
     {
-      &quot;id&quot;: &quot;xxxxxxxxxxxxxxxxxxxxxxx&quot;,
-      &quot;name&quot;: &quot;mosuke.tech&quot;,
-      &quot;status&quot;: &quot;active&quot;,
-      &quot;paused&quot;: false,
-      &quot;type&quot;: &quot;full&quot;,
-      &quot;development_mode&quot;: 0,
-      &quot;name_servers&quot;: [
-        &quot;rudy.ns.cloudflare.com&quot;,
-        &quot;sofia.ns.cloudflare.com&quot;
+      &#34;id&#34;: &#34;xxxxxxxxxxxxxxxxxxxxxxx&#34;,
+      &#34;name&#34;: &#34;mosuke.tech&#34;,
+      &#34;status&#34;: &#34;active&#34;,
+      &#34;paused&#34;: false,
+      &#34;type&#34;: &#34;full&#34;,
+      &#34;development_mode&#34;: 0,
+      &#34;name_servers&#34;: [
+        &#34;rudy.ns.cloudflare.com&#34;,
+        &#34;sofia.ns.cloudflare.com&#34;
       ],
       ...
       (中略)
@@ -125,15 +125,15 @@ APIを利用して効率よく作業できる環境を整えた。</p>
     }
   ]
 }
-</code></pre><h2 id="キャッシュの削除">キャッシュの削除</h2>
+</code></pre></div><h2 id="キャッシュの削除">キャッシュの削除</h2>
 <p>うえで手に入れた<code>identifier</code>を使って、ドキュメント通り<code>purge_cache</code>を実行するだけだ。<br>
 このAPIをデプロイの過程に組み込み効率よく運用できている。</p>
-<pre><code>curl -X DELETE &quot;https://api.cloudflare.com/client/v4/zones/&lt;identifier&gt;/purge_cache&quot; \
-     -H &quot;X-Auth-Email: &lt;your email&gt;&quot; \
-     -H &quot;X-Auth-Key: &lt;your api key&gt;&quot; \
-     -H &quot;Content-Type: application/json&quot; \
-     --data '{&quot;purge_everything&quot;:true}'
-</code></pre><h2 id="さいごに">さいごに</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">curl -X DELETE &#34;https://api.cloudflare.com/client/v4/zones/&lt;identifier&gt;/purge_cache&#34; \
+     -H &#34;X-Auth-Email: &lt;your email&gt;&#34; \
+     -H &#34;X-Auth-Key: &lt;your api key&gt;&#34; \
+     -H &#34;Content-Type: application/json&#34; \
+     --data &#39;{&#34;purge_everything&#34;:true}&#39;
+</code></pre></div><h2 id="さいごに">さいごに</h2>
 <p>最近のサービスではめずらしくないが、APIに対応しているのはやはりいい。<br>
 毎度全キャッシュを消してしまっているのはどうかとは思うがそこは今後の改善点だ。<br>
 本件とは関係ないがCloudFlareはterraformにも対応しているし、かなり運用には便利そう。</p>

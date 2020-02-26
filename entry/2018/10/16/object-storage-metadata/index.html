@@ -100,19 +100,19 @@
 HTTP Headerへの記載する用途として使うのが一番ふさわしいといえるでしょう。</p>
 <p>試しに、とあるオブジェクトに対して<code>x-amz-meta-mosuke</code>というのを追加してみてHTTPのレスポンスHeaderをみてみました。
 レスポンスに追加したメタデータが追加されていることがわかります。</p>
-<pre><code>$ curl -I https://s3-ap-northeast-1.amazonaws.com/mosuke5-bucket/some-object
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -I https://s3-ap-northeast-1.amazonaws.com/mosuke5-bucket/some-object
 HTTP/1.1 200 OK
 x-amz-id-2: juKYB/CT2Y6tKwZtCzx+ekySq3urohsF2tJGume+mvSmwd/oYw4AMue5rLPp4D9L8q7M3Z8x/T0=
 x-amz-request-id: 8CF6A3284876D199
 Date: Sat, 20 Oct 2018 09:41:27 GMT
 Last-Modified: Sat, 20 Oct 2018 09:41:25 GMT
-ETag: &quot;66cebd6dbb821d5b43777c8f3362acad&quot;
+ETag: &#34;66cebd6dbb821d5b43777c8f3362acad&#34;
 x-amz-meta-mosuke5: tsuikashitayo
 Accept-Ranges: bytes
 Content-Type: application/octet-stream
 Content-Length: 277965
 Server: AmazonS3
-</code></pre><h2 id="タグ機能を利用する">タグ機能を利用する</h2>
+</code></pre></div><h2 id="タグ機能を利用する">タグ機能を利用する</h2>
 <p>メタデータとは別に「タグ」という機能が2016年ごろに追加されました。<br>
 こちらもメタデータと同様にキーバリューの形でタグを登録できます。<br>
 主な用途としては、AWSも公式に発表していますが、下記のようなことを想定しているようです。</p>

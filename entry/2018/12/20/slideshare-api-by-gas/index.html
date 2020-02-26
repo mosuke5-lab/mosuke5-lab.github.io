@@ -115,9 +115,9 @@ SlideShare APIってあるのか？そしてGoogleAppsScriptもほとんどや�
 </table>
 <p>たとえば、shared_secretが&quot;abcdef&quot;でタイムスタンプが&quot;1545315685&quot;の場合、
 &ldquo;abcdef1545315685&quot;をsha1ハッシュすればいいということです。</p>
-<pre><code>$ echo -n &quot;abcdef1545315685&quot; | sha1sum
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ echo -n &#34;abcdef1545315685&#34; | sha1sum
 e4d673a71b769782541920b7acfcee92a686b91c  -
-</code></pre><h3 id="認証">認証</h3>
+</code></pre></div><h3 id="認証">認証</h3>
 <p>プライベートなデータを取得するような一部のAPIでは、上のバリデーションとはべつに、
 認証で<code>username</code>と<code>password</code>が必要です。</p>
 <h3 id="get_slideshows_by_user-apiを使ってみる">get_slideshows_by_user APIを使ってみる</h3>
@@ -129,8 +129,8 @@ e4d673a71b769782541920b7acfcee92a686b91c  -
 <img src="/image/slideshare_api_by_user.png" alt="slideshare-api"></p>
 <p>メソッドはGETなので、URLの後ろにパラメータを付けて下記のようにリクエストURLを完成させます。
 ブラウザからアクセスしてみて、成功していればXMLが返ってくるはずです。</p>
-<pre><code>https://www.slideshare.net/api/2/get_slideshows_by_user?api_key=xxxxx&amp;ts=1545315685&amp;hash=xxxxxxxxxxxx&amp;username_for=mosuke5
-</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml"><span style="color:#f92672">&lt;User</span><span style="color:#f92672">&gt;</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">https://www.slideshare.net/api/2/get_slideshows_by_user?api_key=xxxxx&amp;ts=1545315685&amp;hash=xxxxxxxxxxxx&amp;username_for=mosuke5
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml"><span style="color:#f92672">&lt;User</span><span style="color:#f92672">&gt;</span>
   <span style="color:#f92672">&lt;Name</span><span style="color:#f92672">&gt;</span>mosuke5<span style="color:#f92672">&lt;/Name&gt;</span>
   <span style="color:#f92672">&lt;Count</span><span style="color:#f92672">&gt;</span>16<span style="color:#f92672">&lt;/Count&gt;</span>
 <span style="color:#f92672">&lt;Slideshow</span><span style="color:#f92672">&gt;</span>

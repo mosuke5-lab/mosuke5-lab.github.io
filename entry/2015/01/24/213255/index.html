@@ -94,25 +94,25 @@
 </li>
 </ul>
 <p>docker runに-uオプションがあるので、これで実現できると思った。</p>
-<pre><code>[host] $ sudo docker run -u=user_name -i -t image_name /bin/bash 
-</code></pre><p>しかし…以下を確認してみると…</p>
-<pre><code>[docker] $ pwd
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[host] $ sudo docker run -u=user_name -i -t image_name /bin/bash 
+</code></pre></div><p>しかし…以下を確認してみると…</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[docker] $ pwd
 [docker] $ echo $PATH
 [docker] $ alias
  
-</code></pre><p>ディレクトリは "/" だし、PATHも通ってない。<br>
+</code></pre></div><p>ディレクトリは "/" だし、PATHも通ってない。<br>
 どうやら.<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>_profileなどは読んでいないようだ。普通にログインした状態とは違う。</p>
 <p>dockerで-uでユーザを指定し場合、指定したuserでコマンドを実行するが、<br>
 サーバにユーザでログインしてからコマンドを実行するわけではないらしい。</p>
 <p>ディレクトリはどうやら-wオプションで解決できるようだが…</p>
-<pre><code>[host] $ sudo docker run -u=user_name -w /home/user_name -i -t image_name /bin/bash 
-</code></pre><pre><code>[docker] $ pwd
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[host] $ sudo docker run -u=user_name -w /home/user_name -i -t image_name /bin/bash 
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[docker] $ pwd
 /home/user_name 
-</code></pre><p>ディレクトリはおっけーだが、<br .>
+</code></pre></div><p>ディレクトリはおっけーだが、<br .>
 当然ながら依然として.bash_profileを読み込んでいるわけではない。</p>
 <p>というわけで、docker起動時のコマンドをsuにしてしまうことで解決できることを思いついた。</p>
-<pre><code>[host] $ sudo docker run -i -t image_name su - username 
-</code></pre><p>suでスイッチユーザすれば、bash_profileもホームディレクトリも全部解決だ！！</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[host] $ sudo docker run -i -t image_name su - username 
+</code></pre></div><p>suでスイッチユーザすれば、bash_profileもホームディレクトリも全部解決だ！！</p>
 </body>
 
                     </div>

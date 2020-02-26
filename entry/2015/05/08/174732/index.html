@@ -87,8 +87,8 @@ production環境で動作させようとしたら動かなくなってしまっ�
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Sinatra">Sinatra</a>を使ってアプリケーションを作っていて、development環境で完成したので、
 prorudction環境で動作させようとしたら、jsのエラーが出るようになってしまい、正常に動かなくなった。</p>
 <p>アクセスすると、以下のエラーがでる。要は<a class="keyword" href="http://d.hatena.ne.jp/keyword/jquery">jquery</a>がないとのこと。</p>
-<pre><code>Uncaught ReferenceError: $ is not defined 
-</code></pre><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/jQuery">jQuery</a>はもちろん読み込ませてるし、なんでproduction環境でだけこのような事象が起きたのか？</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">Uncaught ReferenceError: $ is not defined 
+</code></pre></div><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/jQuery">jQuery</a>はもちろん読み込ませてるし、なんでproduction環境でだけこのような事象が起きたのか？</p>
 <h2>ソースコード</h2>
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/sinatra">sinatra</a>のメインアプリケーションであるapp.rbには以下のように、<a class="keyword" href="http://d.hatena.ne.jp/keyword/sinatra">sinatra</a>-assetpackを利用してjsを読み込んでいる。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">assets <span style="color:#66d9ef">do</span>

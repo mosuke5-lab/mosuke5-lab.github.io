@@ -92,10 +92,10 @@ SoftwareDesignの2015年7月号を見ながら、何度目かの入門をした�
 <h1>インストール</h1>
 <p>今回<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>の環境で行っています。<br>
 今日時点ではバージョン2.2まででていますが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/brew">brew</a>では2.1がインストールされました。</p>
-<pre><code>$ brew install tmux
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ brew install tmux
 $ tmux -V
 tmux 2.1 
-</code></pre><h1>起動</h1>
+</code></pre></div><h1>起動</h1>
 <p><code>$ tmux</code>と入力すると、tmuxが起動し<code>$ exit</code>で抜けることができます。<br>
 これから説明していきますが、tmuxの機能を利用するときプレフィックスキーを入力する必要があります。<br>
 デフォルトではプレフィックスキーは<code>Ctrl-b</code>になっています。</p>
@@ -123,29 +123,29 @@ tmuxを起動した状態で<code>Ctrl-b</code>+<code>d</code>を押してみよ
 そうすると下のステータスバーも消え、元のターミナルに戻ってきたと思う。<br>
 これをデタッチといい、tmuxが終了したわけではない。</p>
 <p>プロセスを確認すると、tmuxがまだ存在してることがわかる。</p>
-<pre><code>$ ps -ef | grep tmux
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ps -ef | grep tmux
   501 16038     1   0  9:26PM ??         0:02.26 tmux
   501 17800 13345   0 11:53PM ttys005    0:00.00 grep tmux 
-</code></pre><p><code>tmux ls</code>で現在のtmuxのセッションの一覧がみれます。</p>
-<pre><code>$ tmux ls
+</code></pre></div><p><code>tmux ls</code>で現在のtmuxのセッションの一覧がみれます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ tmux ls
 0: 1 windows (created Thu Apr 14 21:26:19 2016) [129x32] 
-</code></pre><p>ではアタッチしてみよう。下記で元のtmuxに戻ってくるはずです。</p>
-<pre><code>$ tmux attach 
-</code></pre><p>デタッチしている間もバックグラウンドでプログラムは動き続けています。<br>
+</code></pre></div><p>ではアタッチしてみよう。下記で元のtmuxに戻ってくるはずです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ tmux attach 
+</code></pre></div><p>デタッチしている間もバックグラウンドでプログラムは動き続けています。<br>
 試しに、tmux上でvmstatなどを打ってデタッチしてアタッチすると動き続けていることがわかると思います。</p>
 <h1>pstree見るといい</h1>
 <p>tmuxの概念を理解するにはpstreeをみるといい。<br>
 tmuxを使わずにpstreeコマンドを打つと、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のプロセスの下でpstreeが動いているのがわかる。</p>
-<pre><code>$ pstree -p
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ pstree -p
 systemd(1)
     ├─sshd(13589)─┬─sshd(15066)───sshd(15068)───bash(15069)───pstree(15115) 
-</code></pre><p>一方、tmuxを起動し、tmux上でpstreeを実行すると、<a class="keyword" href="http://d.hatena.ne.jp/keyword/sshd">sshd</a>のプロセスの下にはtmuxが動いており、<br>
+</code></pre></div><p>一方、tmuxを起動し、tmux上でpstreeを実行すると、<a class="keyword" href="http://d.hatena.ne.jp/keyword/sshd">sshd</a>のプロセスの下にはtmuxが動いており、<br>
 pstreeコマンドはtmuxプロセスの下で動いている。</p>
-<pre><code>$ pstree -p
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ pstree -p
 systemd(1)
     ├─sshd(13589)─┬─sshd(15066)───sshd(15068)───bash(15069)───tmux(15146)
     └─tmux(15148)───bash(15149)───pstree(15168) 
-</code></pre><p>なにがいいたいかというと、tmuxの上で動かすプロセスは<a class="keyword" href="http://d.hatena.ne.jp/keyword/sshd">sshd</a>とは別プロセスで動いているということ。<br>
+</code></pre></div><p>なにがいいたいかというと、tmuxの上で動かすプロセスは<a class="keyword" href="http://d.hatena.ne.jp/keyword/sshd">sshd</a>とは別プロセスで動いているということ。<br>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>が切れても動作し続けるとはまあそういうことです。</p>
 <h1>カスタマイズ</h1>
 <p>tmuxはカスタマイズ性に優れます（ようです）。<code>.tmux.conf</code>を修正することでカスタマイズ可能です。<br>
@@ -155,7 +155,7 @@ systemd(1)
 <li>ペインのサイズを<a class="keyword" href="http://d.hatena.ne.jp/keyword/vim">vim</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AD%A1%BC%A5%D0%A5%A4%A5%F3%A5%C9">キーバインド</a>で調整できるようにする</li>
 <li>ウィンドウの分割を<code>|</code>と<code>-</code>でできるようにする</li>
 </ul>
-<pre><code># プレフィックスキー
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># プレフィックスキー
 unbind C-b
 set-option -g prefix C-t
 
@@ -168,7 +168,7 @@ bind -r L resize-pane -R 5
 # window分割（わかりやすくていいね！）
 bind | split-window -h
 bind - split-window -v 
-</code></pre><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AD%A1%BC%A5%D0%A5%A4%A5%F3%A5%C9">キーバインド</a>でペインのサイズ自由自在！
+</code></pre></div><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AD%A1%BC%A5%D0%A5%A4%A5%F3%A5%C9">キーバインド</a>でペインのサイズ自由自在！
 <span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160415/20160415000811.gif" alt="f:id:mosuke5:20160415000811g:plain" title="f:id:mosuke5:20160415000811g:plain" class="hatena-fotolife" itemprop="image"></span></p>
 </body>
 

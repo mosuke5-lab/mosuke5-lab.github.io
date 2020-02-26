@@ -92,8 +92,8 @@ Kubernetes上のリソースをどのように管理していますか？
 <h2 id="ansibleでkubernetes上のリソースを管理する">AnsibleでKubernetes上のリソースを管理する</h2>
 <p>それでは早速<code>k8s</code>モジュールを使って行きたいと思います。まずは事前準備です。<br>
 このモジュールではいくつかrequirementがあります。内部ではopenshiftのpythonライブラリを利用しているようなので忘れずインストールしましょう。</p>
-<pre><code>$ pip install openshift
-</code></pre><p>認証の方法も一通り用意されています。<br>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ pip install openshift
+</code></pre></div><p>認証の方法も一通り用意されています。<br>
 基本的にAnsibleを実行する端末でkubeconfigなりtokenを使ってkubectlが使える環境であれば問題ないです。
 内部的にはkubectlを使うわけではないですが、認証の方法は同じです。</p>
 <h3 id="まずは試す">まずは試す</h3>
@@ -142,12 +142,12 @@ Kubernetes上のリソースをどのように管理していますか？
 <p>manifestファイルをそのまま利用するのであればAnsibleを使うメリットは少なくなってしまうかなと思います。<br>
 AnsibleではJinja2を使ったテンプレートの機能があるのでこれを活用しない手はありません。
 例えば、Nginxのデプロイメントのレプリカ数を変数にしてmanifestファイルをテンプレート化して使ってみます。</p>
-<pre><code>- name: Create nginx deployment
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">- name: Create nginx deployment
   k8s:
     namespace: gillsearch-development
     state: present
-    resource_definition: &quot;{{ lookup('template', './templates/nginx-from-template.yml.j2') }}&quot;
-</code></pre><p><code>./templates/nginx-from-template.yml.j2</code>内で変数展開などが可能。</p>
+    resource_definition: &#34;{{ lookup(&#39;template&#39;, &#39;./templates/nginx-from-template.yml.j2&#39;) }}&#34;
+</code></pre></div><p><code>./templates/nginx-from-template.yml.j2</code>内で変数展開などが可能。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: apps/v1
 <span style="color:#66d9ef">kind</span>: Deployment
 <span style="color:#66d9ef">metadata</span>:
@@ -185,14 +185,14 @@ AnsibleではJinja2のテンプレートエンジンを利用していますが�
 こちらを使うことで、Kubernetesのsecretリソースの管理にも活用できる点は良いポイントかもしれません。<br>
 例えば、credential情報をvar_fileとして記述しansible-vaultで暗号化して保存しておくとします。
 そうするとKubernetesのSecretを作る際に下記のように展開して作成することも可能です。</p>
-<pre><code>apiVersion: v1
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: v1
 data:
   password: {{ password | b64encode }}
 kind: Secret
 metadata:
   creationTimestamp: null
   name: mysecret
-</code></pre><h3 id="3-他の作業の流れに組み込みやすい">3. 他の作業の流れに組み込みやすい</h3>
+</code></pre></div><h3 id="3-他の作業の流れに組み込みやすい">3. 他の作業の流れに組み込みやすい</h3>
 <p>Ansibleはもとはサーバのプロビジョニングツールとしての位置づけが強いツールですが、今となっては今回のKubernetesやクラウドサービスなど様々なツールのプロビジョニングに活用されています。
 そのため、他のツールやサーバ上の管理の流れと一部としてKubernetesの制御しやすいのは特徴的なポイントです。</p>
 <p>例えば、Kubernetes上にリソースをデプロイ後に、DNSの設定を追加・変更するなどのKubernetes以外の操作と組み合わせしやすいかと思います。</p>

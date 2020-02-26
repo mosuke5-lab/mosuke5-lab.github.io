@@ -132,8 +132,8 @@ Terraformで管理するメリット/デメリットってどんなところに�
 <p>まずは試してみます。認証ですが、いろんな方法がありますが、もしすでに<code>~/.kube/config</code>にクライアント証明の入った設定ファイルがあるのならば、特に設定することなく利用できます。
 認証に、<code>servicea ccount</code>のtokenを利用している場合などは、既定の設定をいれる必要があります。
 ここでは、<code>~/.kube/config</code>があるので以下だけのProvider設定で行きます。</p>
-<pre><code>provider &quot;kubernetes&quot; {}
-</code></pre><h3 id="deploymentを作ってみる">Deploymentを作ってみる</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">provider &#34;kubernetes&#34; {}
+</code></pre></div><h3 id="deploymentを作ってみる">Deploymentを作ってみる</h3>
 <p>例えばすごく単純に、Nginxが3つ立ち上がるdeploymentを作ることとします。
 manifestなら以下のようになりますね。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: apps/v1
@@ -192,7 +192,7 @@ manifestなら以下のようになりますね。</p>
 <span style="color:#960050;background-color:#1e0010">}</span>
 </code></pre></div><p>Terraform管理のいいところは、なんといっても、この<code>terraform plan</code>によるDry-runができることですね。
 やってみます。</p>
-<pre><code>$ terraform plan
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform plan
 Refreshing Terraform state in-memory prior to plan...
 The refreshed state will be used to calculate this plan, but will not be
 persisted to local or remote state storage.
@@ -207,15 +207,15 @@ Terraform will perform the following actions:
 
   + kubernetes_deployment.test
       id:                                                            &lt;computed&gt;
-      metadata.#:                                                    &quot;1&quot;
+      metadata.#:                                                    &#34;1&#34;
       metadata.0.generation:                                         &lt;computed&gt;
-      metadata.0.name:                                               &quot;nginx-sample-deployment&quot;
-      metadata.0.namespace:                                          &quot;default&quot;
+      metadata.0.name:                                               &#34;nginx-sample-deployment&#34;
+      metadata.0.namespace:                                          &#34;default&#34;
 (中略)
 
 Plan: 1 to add, 0 to change, 0 to destroy.
-</code></pre><p>差分を確認してapplyしてデプロイしていきます。</p>
-<pre><code>$ terraform apply
+</code></pre></div><p>差分を確認してapplyしてデプロイしていきます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform apply
 (中略)
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
@@ -228,10 +228,10 @@ NAME                                        READY     STATUS    RESTARTS   AGE
 nginx-sample-deployment-6c668d7f76-2djrb    1/1       Running   0          49s
 nginx-sample-deployment-6c668d7f76-5ncww    1/1       Running   0          49s
 nginx-sample-deployment-6c668d7f76-t9lfp    1/1       Running   0          49s
-</code></pre><p>変更があったと仮定して、Terraformの定義ファイルの中身を少し変えてみます。
+</code></pre></div><p>変更があったと仮定して、Terraformの定義ファイルの中身を少し変えてみます。
 レプリカ数とコンテナ名を変更してみました。<br>
 変更の差分を確認できるのはやっぱりTerraformで管理する最大のメリットですね。</p>
-<pre><code>$ terraform plan
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform plan
 kubernetes_deployment.test: Refreshing state... (ID: default/nginx-sample-deployment)
 
 ------------------------------------------------------------------------
@@ -243,11 +243,11 @@ Resource actions are indicated with the following symbols:
 Terraform will perform the following actions:
 
   ~ kubernetes_deployment.test
-      spec.0.replicas:                           &quot;3&quot; =&gt; &quot;5&quot;
-      spec.0.template.0.spec.0.container.0.name: &quot;nignx&quot; =&gt; &quot;nignx-hogege&quot;
+      spec.0.replicas:                           &#34;3&#34; =&gt; &#34;5&#34;
+      spec.0.template.0.spec.0.container.0.name: &#34;nignx&#34; =&gt; &#34;nignx-hogege&#34;
 
 Plan: 0 to add, 1 to change, 0 to destroy.
-</code></pre><h2 id="kubernetes側からクラウドリソースを制御する動き">Kubernetes側からクラウドリソースを制御する動き</h2>
+</code></pre></div><h2 id="kubernetes側からクラウドリソースを制御する動き">Kubernetes側からクラウドリソースを制御する動き</h2>
 <p>しかし最近はKubernetes側からクラウドリソースを制御するようにするという動きが顕著です。
 先日Redhatがオープンした<a href="https://www.operatorhub.io/">OperatorHub.io</a>ではAWSもカスタムリソースを提供していて、DynamoDBやSQSなどの一部のクラウドリソースをKubernetesから扱えるようにするモジュールを提供しています。<br>
 こちらについては、まだ試せていないので試したら別でブログに書こうと思います。</p>

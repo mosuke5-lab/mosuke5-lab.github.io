@@ -99,19 +99,19 @@ SSHローカルフォワードを使いこなしてますか？SSHを制する�
 <h2 id="2-行ったこと">2. 行ったこと</h2>
 <p>対象のGrafanaサーバがhttpsで接続が可能なので、ローカル端末のポート5000(任意のポート)を踏み台サーバを経由してGrafanaサーバの443ポートにフォワードすれば問題ないと考えました。<br>
 つまり、下記のようにsshでポートフォワーディング接続をしたあと、ブラウザから接続を試みました。</p>
-<pre><code>// 対象のサーバへローカルポートフォワードのため接続する。セッションはそのまま。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// 対象のサーバへローカルポートフォワードのため接続する。セッションはそのまま。
 $ ssh -L5000:grafana.mosuke.local:443 user@ec2-fumidai.example.com
-</code></pre><ul>
+</code></pre></div><ul>
 <li>※ec2-fumidai.example.com: 踏み台のEC2のホスト名とする</li>
 <li>※grafana.mosuke.local: Grafanaサーバのプライベートホスト名とする　</li>
 </ul>
 <p>これでローカルフォワーディングの設定は終わったので、ブラウザから以下に接続すれば接続できると考えていました。しかし実際は接続することができませんでした。<br>
 それはなぜでしょうか？一度立ち止まって考えてみましょう。</p>
-<pre><code>http://localhost:5000 
-</code></pre><h2 id="3-何が間違いだったか">3. 何が間違いだったか</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">http://localhost:5000 
+</code></pre></div><h2 id="3-何が間違いだったか">3. 何が間違いだったか</h2>
 <p>正しくは以下のようにhttpsプロトコルで接続をしなければいけません。「http<span style="color: #ff0000">s</span>」で接続が必要です。</p>
-<pre><code>https://localhost:5000 
-</code></pre><p>よく考えればアタリマエのことですよね。<br>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">https://localhost:5000 
+</code></pre></div><p>よく考えればアタリマエのことですよね。<br>
 URLのはじめの&lt;http(s)&gt;の部分は<b>プロトコル</b>で最後の&lt;:5000&gt;の部分は<b>ポート番号</b>。<br>
 <u><b><a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>は443のポートを一般的に使うが、ポート443が<a class="keyword" href="http://d.hatena.ne.jp/keyword/https">https</a>というわけではありません。</b></u></p>
 <p>そのため、ポート番号にかかわらず適切なプロトコルでの接続が必要です。リダイレクトしてくれるものならばいいですが、そうではないケースも実際にはありました。<br>

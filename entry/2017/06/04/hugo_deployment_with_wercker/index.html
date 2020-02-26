@@ -154,11 +154,11 @@ Werckerを利用するには自分のレポジトリに<code>wercker.yml</code>�
 以下部分の<code>version</code>は、自分のローカルの環境のHugoバージョンときちんと合わせるとよい。<br>
 公式ドキュメントを参考にしてこの環境を作ったが、はじめドキュメントのままコピペで行っていたので、一部ビルド結果が本番環境だけ異なることがあり、はまった。<br>
 <a href="https://gohugo.io/tutorials/automated-deployments/#using-hugo-build">Automated deployments with Wercker</a></p>
-<pre><code>    - arjen/hugo-build:
-        version: &quot;0.20&quot;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">    - arjen/hugo-build:
+        version: &#34;0.20&#34;
         theme: purehugo
         flags: --buildDrafts=false
-</code></pre><h2 id="デプロイはleipertgit-pushを使った">デプロイは&rsquo;leipert/git-push'を使った</h2>
+</code></pre></div><h2 id="デプロイはleipertgit-pushを使った">デプロイは&rsquo;leipert/git-push'を使った</h2>
 <p>公式ドキュメントでは<code>lukevivier/gh-pages</code>の利用を紹介している。<br>
 しかし、現状Github pagesは<code>master</code>ブランチのコードをビルドするようにできている。<br>
 このツールではどうしても<code>gh-page</code>ブランチにデプロイするため、用途と合わなかった。

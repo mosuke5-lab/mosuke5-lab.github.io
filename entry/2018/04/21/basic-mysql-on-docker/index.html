@@ -90,8 +90,8 @@ Docker上のMySQL利用ははじめてだったので、いろいろわからな
 そうなると、コンテナとして行ってほしいのは、そもそもMySQLの起動はもちろん、データベース作成と、それを操作するためのユーザの設定などだ。</p>
 <h2 id="起動と基本設定">起動と基本設定</h2>
 <p>MySQLのDockerイメージがあるので動かすだけならば特に難しいことはなにもない。</p>
-<pre><code>$ docker run --name mysql -d -p 3306:3306 mysql
-</code></pre><p>しかし、MySQLの基本設定や、そもそもrootユーザのパスワードなどどうすればいいのか。<br>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ docker run --name mysql -d -p 3306:3306 mysql
+</code></pre></div><p>しかし、MySQLの基本設定や、そもそもrootユーザのパスワードなどどうすればいいのか。<br>
 データベースやユーザはどうやって作ることができるのか。このあたりは当然ながら一番はじめに気になる部分である。</p>
 <p>ドキュメント読むとすぐにわかるが、
 MySQLのDockerコンテナを起動するときに環境変数を設定することである程度は設定できることがわかる。（<a href="https://hub.docker.com/_/mysql/">公式ドキュメント</a>）
@@ -103,8 +103,8 @@ MySQLのDockerコンテナを起動するときに環境変数を設定するこ
 <li><code>MYSQL_PASSWORD</code>: 上のユーザのパスワード</li>
 </ul>
 <p>例えば、rootパスワードを設定したい場合は以下のようにすればよい。</p>
-<pre><code>$ docker run --name mysql -e MYSQL_ROOT_PASSWORD=mysecret -d -p 3306:3306 mysql
-</code></pre><h2 id="dockerfileをのぞく">Dockerfileをのぞく</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ docker run --name mysql -e MYSQL_ROOT_PASSWORD=mysecret -d -p 3306:3306 mysql
+</code></pre></div><h2 id="dockerfileをのぞく">Dockerfileをのぞく</h2>
 <p>Dockerfileの中身を見ていくと、より仕組みが理解できる。
 MySQLのDockerイメージで立ち上げのときの実行される、<code>docker-entrypoint.sh</code>の中身をみるよいい。</p>
 <div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/docker-library/mariadb/blob/master/docker-entrypoint.sh" data-iframely-url="//cdn.iframe.ly/nNIVaxs"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>

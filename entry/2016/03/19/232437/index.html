@@ -124,7 +124,7 @@ Skeletonは<b>"A dead simple, responsive boilerplate."</b>をうたっている�
 いろいろと調べている時にあることに気づいた。</p>
 <p>Aレコードに登録した<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を逆引きで調べると、pages.<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>.comが出てくるが、<br>
 pages.<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>.comをdigすると違う結果が返ってくる。</p>
-<pre><code>$ dig -x 192.30.252.153
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ dig -x 192.30.252.153
 ;; ANSWER SECTION:
 153.252.30.192.in-addr.arpa. 3600 IN    PTR pages.github.com.
 
@@ -132,11 +132,11 @@ $ dig pages.github.com
 ;; ANSWER SECTION:
 pages.github.com.   900 IN  CNAME   github.map.fastly.net.
 github.map.fastly.net.  23  IN  A   103.245.222.133[f:id:mosuke5:20160319233634j:plain] 
-</code></pre><p>後者のほうでは、fastly（CDN）の結果が返ってくる。<br>
+</code></pre></div><p>後者のほうでは、fastly（CDN）の結果が返ってくる。<br>
 つまり、カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>を設定しなければ、通常はCDN経由で通信されるが、<br>
 カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>を割り当てるとCDNを利用できないのではないかということがわかった。</p>
 <p>実際に<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ping">Ping</a>で確かめてみる。明らかに速度差がでている。</p>
-<pre><code>% ping mosuke5.github.io
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% ping mosuke5.github.io
 PING github.map.fastly.net (103.245.222.133): 56 data bytes
 64 bytes from 103.245.222.133: icmp_seq=0 ttl=58 time=18.485 ms
 64 bytes from 103.245.222.133: icmp_seq=1 ttl=58 time=19.108 ms
@@ -152,7 +152,7 @@ PING mosuke.tech (192.30.252.154): 56 data bytes
 64 bytes from 192.30.252.154: icmp_seq=2 ttl=52 time=203.178 ms
 64 bytes from 192.30.252.154: icmp_seq=3 ttl=52 time=201.345 ms
 64 bytes from 192.30.252.154: icmp_seq=4 ttl=52 time=205.125 ms 
-</code></pre><p>また、それぞれの<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>から場所も調べてみた。<br>
+</code></pre></div><p>また、それぞれの<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>から場所も調べてみた。<br>
 CDN利用時がオーストラリア、そうでないとアメリカ西海岸ということがわかった。
 <p>以上のことをまとめつつ、地図に表した。
 <span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160319/20160319233634.jpg" alt="f:id:mosuke5:20160319233634j:plain" title="f:id:mosuke5:20160319233634j:plain" class="hatena-fotolife" itemprop="image"></span></p>

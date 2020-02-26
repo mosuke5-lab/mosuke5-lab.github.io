@@ -87,7 +87,7 @@ workspaceは名前から推測できますが、同じTerraformのコードを�
 <h2 id="workspaceはじめの一歩">workspaceはじめの一歩</h2>
 <p>まず、workspace機能は以下5つの機能しかなく、とてもシンプルです。
 基本的には、workspaceを作る、切り替える、消す。それが主なところです。</p>
-<pre><code>$ terraform workspace -h
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform workspace -h
 Usage: terraform workspace
 
   Create, change and delete Terraform workspaces.
@@ -98,27 +98,27 @@ Subcommands:
     new       Create a new workspace
     select    Select a workspace
     show      Show the name of the current workspace
-</code></pre><p>はじめは<code>default</code>というworkspaceになっています。
+</code></pre></div><p>はじめは<code>default</code>というworkspaceになっています。
 それでは、<code>development</code>というworkspaceを作ってみます。</p>
-<pre><code>$ terraform workspace list
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform workspace list
 * default
 
 $ terraform workspace new development
-Created and switched to workspace &quot;development&quot;!
+Created and switched to workspace &#34;development&#34;!
 
 $ terraform workspace list
   default
 * development
-</code></pre><p><code>development</code>のworkspaceが作られ、切り替わっていることがわかります。<br>
+</code></pre></div><p><code>development</code>のworkspaceが作られ、切り替わっていることがわかります。<br>
 また、この状態でディレクトリを表示すると<code>terraform.tfstate.d/</code>というディレクトリができていることが確認できます。その中に、<code>development/</code>があります。tfstateファイルがこの中に保存されるようにな、環境ごとにstateファイルの保実行状態を管理できるようになるというものです。</p>
-<pre><code>$ ls -l
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ls -l
 -rw-r--r-- 1 mosuke5 197609 1056 Jun 16 19:24 main.tf
 drwxr-xr-x 1 mosuke5 197609    0 Jun 16 19:24 terraform.tfstate.d/
 -rw-r--r-- 1 mosuke5 197609  298 Jun 14 20:58 terraform.tfvars
 
 $ ls -l terraform.tfstate.d
 drwxr-xr-x 1 mosuke5 197609 0 Jun 16 19:24 development/
-</code></pre><h2 id="実践的な利用を考える">実践的な利用を考える</h2>
+</code></pre></div><h2 id="実践的な利用を考える">実践的な利用を考える</h2>
 <p>入門部分をご紹介しましたが、これを実践でどのように利用していくのか、自分が趣味プロダクトを例にとって紹介します。</p>
 <p>開発環境と本番環境で分離するためにworkspaceを利用しています。<br>
 作成するリソースは開発環境と本番環境で同様であるが、もちろん設定内容が環境ごとに変わることもあります。環境ごとどのように設定をわけてるか３つの観点で紹介します。</p>
@@ -126,7 +126,7 @@ drwxr-xr-x 1 mosuke5 197609 0 Jun 16 19:24 development/
 <p>まずは、Terraformの変数ファイルである<code>tfvars</code>ファイルを環境ごとにわけました。
 具体的には<code>terraform.tfvars.development</code>と<code>terraform.tfvars.production</code>にわけ、実行時に<code>-var-file</code>オプションを利用して、適切なファイルを選択するようにしました。</p>
 <p>development時の実行方法についてです。</p>
-<pre><code>$ ls -l ./terraform.tfvars.*
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ls -l ./terraform.tfvars.*
 terraform.tfvars.development
 terraform.tfvars.production
 
@@ -137,20 +137,20 @@ $ terraform workspace list
   production
 $ terraform plan -var-file=terraform.tfvars.development
 $ terraform apply -var-file=terraform.tfvars.development
-</code></pre><h3 id="リソース名をworkspaceごとに変える">リソース名をworkspaceごとに変える</h3>
+</code></pre></div><h3 id="リソース名をworkspaceごとに変える">リソース名をworkspaceごとに変える</h3>
 <p>リソースに付ける名前ですが、同一の名前をつけてしまうと見分けがつかなくなります。場合によっては同一名称を付けることができないこともあります。<br>
 いくつかやり方がありますが、リソース名については<code>project_name</code>という変数を用意しており、環境ごとにその名前をわけることにしています。</p>
 <p>terraformでは、workspaceの名前を変数的に利用することも可能です。
 そちらの方法については次でご紹介します。</p>
-<pre><code># terraform.tfvars.development
-project_name = &quot;mosuke5-gillsearch-dev&quot;
-region = &quot;ap-northeast-1&quot;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># terraform.tfvars.development
+project_name = &#34;mosuke5-gillsearch-dev&#34;
+region = &#34;ap-northeast-1&#34;
 ....
-</code></pre><pre><code># terraform.tfvars.production
-project_name = &quot;mosuke5-gillsearch-prod&quot;
-region = &quot;ap-northeast-1&quot;
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># terraform.tfvars.production
+project_name = &#34;mosuke5-gillsearch-prod&#34;
+region = &#34;ap-northeast-1&#34;
 ....
-</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">v</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">b</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">e</span> <span style="color:#e6db74">&#34;project_name&#34;</span> {}
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">v</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">a</span><span style="color:#960050;background-color:#1e0010">b</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">e</span> <span style="color:#e6db74">&#34;project_name&#34;</span> {}
 
 <span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">e</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">u</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">e</span> <span style="color:#e6db74">&#34;aws_vpc&#34;</span> <span style="color:#e6db74">&#34;vpc&#34;</span> {
   <span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">d</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">_</span><span style="color:#960050;background-color:#1e0010">b</span><span style="color:#960050;background-color:#1e0010">l</span><span style="color:#960050;background-color:#1e0010">o</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">k</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;192.168.1.0/24&#34;</span>

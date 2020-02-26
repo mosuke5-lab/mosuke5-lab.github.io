@@ -103,13 +103,13 @@
 <h2 id="ドキュメント">ドキュメント</h2>
 <p>Kustomizeを実際に触っていく上でハマったポイントもあったのでご紹介します。<br>
 Kustomizeはkubernetes v1.14からkubectlに組み込まれることになりました。実際に、<code>kubectl -h</code>でヘルプを見てみてもわかります。</p>
-<pre><code>Advanced Commands:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">Advanced Commands:
   kustomize      Build a kustomization target from a directory or a remote url.
-</code></pre><p>kubectlに統合されているのはバージョンが最新のものではありません。また、Kustomizeも進化が早いので機能差分がでてくることもめずらくありません。</p>
+</code></pre></div><p>kubectlに統合されているのはバージョンが最新のものではありません。また、Kustomizeも進化が早いので機能差分がでてくることもめずらくありません。</p>
 <p>自分も使っていく中で何度か下記のようなエラーメッセージに出くわしました。下記の例だと、<code>envs</code>というフィールドがありませんというエラーです。公式ドキュメントを見て記述していたのですが、kubectlに見込まれているバージョンではそのフィールドがなかったということです。</p>
-<pre><code>$ kubectl kustomize .
-Error: couldn't make target for ../../base: json: unknown field &quot;envs&quot;
-</code></pre><p>そのため、ドキュメントをみる場合は使っている方法に合わせて使い分けるといいです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl kustomize .
+Error: couldn&#39;t make target for ../../base: json: unknown field &#34;envs&#34;
+</code></pre></div><p>そのため、ドキュメントをみる場合は使っている方法に合わせて使い分けるといいです。</p>
 <ul>
 <li><a href="https://kubectl.docs.kubernetes.io/pages/reference/kustomize.html">kubectlに組み込まれたKustomizeを使う場合</a></li>
 <li><a href="https://github.com/kubernetes-sigs/kustomize/tree/master/docs">Kustomize本家を利用する場合</a></li>
@@ -118,14 +118,14 @@ Error: couldn't make target for ../../base: json: unknown field &quot;envs&quot;
 <h3 id="hello-world">Hello World</h3>
 <p>Kustomizeはサンプルもいくつか用意してくれているので始めるのは簡単です。Hello World的には<a href="https://github.com/kubernetes-sigs/kustomize/tree/master/examples/helloWorld">こちら</a>が良いと思います。</p>
 <p><code>kustomization.yml</code>が下記の通り書いてありますが、resourcesに記載の３ファイルを対象に共通のlabelを付与するという意味になります。</p>
-<pre><code>commonLabels:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">commonLabels:
   app: hello
 
 resources:
 - deployment.yaml
 - service.yaml
 - configMap.yaml
-</code></pre><h3 id="configmapgenerator">configMapGenerator</h3>
+</code></pre></div><h3 id="configmapgenerator">configMapGenerator</h3>
 <p>上のHello Worldの例ではマニフェストに<code>configMap.yaml</code>が含まれていましたが、configMapを生成するには、もうひとつ<code>configMapGenerator</code>という機能を使うこともできます。(<a href="https://github.com/kubernetes-sigs/kustomize/blob/master/docs/fields.md#configmapgenerator">公式ドキュメント</a>)</p>
 <p>こちらの機能を使うと、configMapを作成時に名前にハッシュ値が付きます。そして、configMapに変更があった場合に、そのハッシュ値も変更され別のconfigMapとして保存されます。また、そのconfigMapを参照しているDeploymentなどのconfigMapの名前も変更してくれます。
 それによって、configMapを変更時にアプリ側のPodsの再作成もされます。運用面を考えると非常に便利な機能です。</p>
@@ -141,7 +141,7 @@ overlayは名前の通り「覆う」的な意味なので、Baseのマニュフ
 <li>本番環境用のNginxのServiceはType=LoadBalancerにする</li>
 </ul>
 <p>ファイル構造はこのような形です。</p>
-<pre><code>.
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">.
 ├── base
 │   ├── kustomization.yml
 │   ├── nginx-deployment.yml
@@ -152,7 +152,7 @@ overlayは名前の通り「覆う」的な意味なので、Baseのマニュフ
     └── production
         ├── change-nginx-service-to-loadbalancer.yml
         └── kustomization.yml
-</code></pre><p>baseには共通のマニフェストです。出力すると下記のとおりです。
+</code></pre></div><p>baseには共通のマニフェストです。出力すると下記のとおりです。
 見ておいてほしいのは<code>nginx-servce</code>のTypeです。baseマニフェストでは<code>ClusterIP</code>を指定しています。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">$ kubectl kustomize base
 <span style="color:#66d9ef">apiVersion</span>: v1

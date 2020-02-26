@@ -99,11 +99,11 @@ PrivateZoneは、VPC内部だけで使えるDNSです。
 そのECSのプライベートIPアドレスをAレコードとして登録します。
 設定は以上です。<br>
 AWSのRoute53のプライベートDNSとは違って、VPC側の設定などは特に必要ありません。</p>
-<pre><code>aaaa.mosuke.local  A 192.168.1.205 
-</code></pre><p>作成したECSにログインして、確認してみます。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">aaaa.mosuke.local  A 192.168.1.205 
+</code></pre></div><p>作成したECSにログインして、確認してみます。
 ECS側もとくに設定はいじる必要はありません。<br>
 しっかりプライベートアドレスで名前解決ができていることが確認できました。</p>
-<pre><code># dig aaaa.mosuke.local
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># dig aaaa.mosuke.local
 
 ; &lt;&lt;&gt;&gt; DiG 9.9.4-RedHat-9.9.4-74.1.al7.1 &lt;&lt;&gt;&gt; test.mosuke.local
 ;; global options: +cmd
@@ -123,13 +123,13 @@ test.mosuke.local.	60	IN	A	192.168.1.205
 ;; SERVER: 100.100.2.136#53(100.100.2.136)
 ;; WHEN: 金  7月 19 13:25:04 CST 2019
 ;; MSG SIZE  rcvd: 62
-</code></pre><h3 id="ワイルドカードでの名前解決">ワイルドカードでの名前解決</h3>
+</code></pre></div><h3 id="ワイルドカードでの名前解決">ワイルドカードでの名前解決</h3>
 <p>わけあってワイルドカードでの名前解決も確認しました。
 下記のとおり、レコードを登録。</p>
-<pre><code>*.apps.mosuke.local A 192.168.1.205 
-</code></pre><p>*の部分がなんであっても<code>192.168.1.205</code>を返す想定です。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">*.apps.mosuke.local A 192.168.1.205 
+</code></pre></div><p>*の部分がなんであっても<code>192.168.1.205</code>を返す想定です。
 <code>a.apps.mosuke.local</code>と<code>ab.apps.mosuke.local</code>を試してみますが、期待通りでした。</p>
-<pre><code># dig a.apps.mosuke.local
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># dig a.apps.mosuke.local
 
 ; &lt;&lt;&gt;&gt; DiG 9.9.4-RedHat-9.9.4-74.1.al7.1 &lt;&lt;&gt;&gt; a.apps.mosuke.local
 ;; global options: +cmd
@@ -172,13 +172,13 @@ ab.apps.mosuke.local.	60	IN	A	192.168.1.205
 ;; WHEN: 金  7月 19 13:25:47 CST 2019
 ;; MSG SIZE  rcvd: 65
 
-</code></pre><h3 id="rdsなどのマネージドサービスの名前解決">RDSなどのマネージドサービスの名前解決</h3>
+</code></pre></div><h3 id="rdsなどのマネージドサービスの名前解決">RDSなどのマネージドサービスの名前解決</h3>
 <p>ECSだけではなく、RDSなどのマネージドサービスでエンドポイントを持つものにも役に立ちます。
 RDSを１つ構築して、そのエンドポイントをCNAMEとして登録しました。</p>
-<pre><code>db.mosuke.local  CNAME  rm-0iwmm56ph2qe2v9n6.mysql.japan.rds.aliyuncs.com
-</code></pre><p>接続するときに、<code>db.mosuke.local</code>と任意のものを指定できるようになったのはいいですね。<br>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">db.mosuke.local  CNAME  rm-0iwmm56ph2qe2v9n6.mysql.japan.rds.aliyuncs.com
+</code></pre></div><p>接続するときに、<code>db.mosuke.local</code>と任意のものを指定できるようになったのはいいですね。<br>
 DBの入れ替えなど発生してもアプリケーション側で変更がいらないです。</p>
-<pre><code># dig db.mosuke.local
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># dig db.mosuke.local
 
 ; &lt;&lt;&gt;&gt; DiG 9.9.4-RedHat-9.9.4-74.1.al7.1 &lt;&lt;&gt;&gt; db.mosuke.local
 ;; global options: +cmd
@@ -208,10 +208,10 @@ Server version: 5.7.25-log Source distribution
 
 Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
 
-Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+Type &#39;help;&#39; or &#39;\h&#39; for help. Type &#39;\c&#39; to clear the current input statement.
 
 MySQL [(none)]&gt;
-</code></pre><h3 id="vpc間の名前解決">VPC間の名前解決</h3>
+</code></pre></div><h3 id="vpc間の名前解決">VPC間の名前解決</h3>
 <p>続いて、VPC間です。<br>
 Alibaba CloudではCENといったプロダクトで日本と中国のリージョンのVPCをプライベートネットワークで結ぶのは定石です。
 こちらの構成でも非常に役に立ちます。今回は同じリージョン内のもう１つのVPCとしましたが同じことが国際間でもできます。</p>
@@ -222,7 +222,7 @@ Alibaba CloudではCENといったプロダクトで日本と中国のリージ�
 <h4 id="結果">結果</h4>
 <p>VPC BのインスタンスからVPC AのインスタンスとVPC A内のRDSに対して疎通確認を行いました。
 期待通りの結果です。</p>
-<pre><code># ping aaaa.mosuke.local
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># ping aaaa.mosuke.local
 PING aaaa.mosuke.local (192.168.1.205) 56(84) bytes of data.
 64 bytes from 192.168.1.205 (192.168.1.205): icmp_seq=1 ttl=64 time=0.367 ms
 64 bytes from 192.168.1.205 (192.168.1.205): icmp_seq=2 ttl=64 time=0.282 ms
@@ -241,7 +241,7 @@ PING rm-0iwmm56ph2qe2v9n6.mysql.japan.rds.aliyuncs.com (192.168.1.206) 56(84) by
 --- rm-0iwmm56ph2qe2v9n6.mysql.japan.rds.aliyuncs.com ping statistics ---
 3 packets transmitted, 3 received, 0% packet loss, time 2019ms
 rtt min/avg/max/mdev = 0.162/0.174/0.189/0.015 ms
-</code></pre><h2 id="まとめ">まとめ</h2>
+</code></pre></div><h2 id="まとめ">まとめ</h2>
 <p>Alibaba CloudにできたPrivateZoneを試してみました。
 確認した限り、必要なことはおおむねできそうでよいです。
 とくに、Alibaba Cloudの最大のユースケースである、日中間で利用した際の通信でDNSを使えるのでなかなかいい進化ではないかと思っています。</p>

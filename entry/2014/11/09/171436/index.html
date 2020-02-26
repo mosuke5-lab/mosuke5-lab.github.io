@@ -104,9 +104,9 @@
 <h2 id="3-ロードバランサの構築">3. ロードバランサの構築</h2>
 <h3 id="ホストサーバ側の設定">■ホストサーバ側の設定</h3>
 <p>インストールはyumで入れることが可能です。</p>
-<pre><code>#HAProxyインストール
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">#HAProxyインストール
 $ sudo yum install haproxy
-</code></pre><pre><code>#設定はすごく簡単で以下のファイルのみ。実際に
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">#設定はすごく簡単で以下のファイルのみ。実際に
 $ sudo vim /etc/haproxy/haproxy.cfg
 
 #---------------------------------------------------------------------
@@ -135,7 +135,7 @@ global
     stats socket /var/lib/haproxy/stats
 
 #---------------------------------------------------------------------
-# common defaults that all the 'listen' and 'backend' sections will
+# common defaults that all the &#39;listen&#39; and &#39;backend&#39; sections will
 # use if not designated in their block
 #---------------------------------------------------------------------
 defaults
@@ -176,29 +176,29 @@ backend hoge
     balance     roundrobin
     server      web10 192.168.33.10:80 check inter 3000 fall 2 rise 2
     server      web11 192.168.33.11:80 check inter 3000 fall 2 rise 2 
-</code></pre><p>ロードバランサを80番ポートで待ち受けたい場合には、ApacheやNginxが起動していないことは確認しておきましょう。
+</code></pre></div><p>ロードバランサを80番ポートで待ち受けたい場合には、ApacheやNginxが起動していないことは確認しておきましょう。
 立ち上がっているとそもそも、HAProxyの起動に失敗するはずです。</p>
-<pre><code>$ sudo systemctl stop nginx
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo systemctl stop nginx
 $ sudo systemctl stop httpd 
-</code></pre><p>HAProxyのログをsyslogに残すように設定します。<br>
+</code></pre></div><p>HAProxyのログをsyslogに残すように設定します。<br>
 ただしメインのmessageではなく、独自のファイルに書くために以下の設定します。</p>
-<pre><code>##ログの格納場所作成
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">##ログの格納場所作成
 $ sudo mkdir /var/log/haproxy
 
 ##syslogの設定変更
 $ vim /etc/rsyslog.d/haproxy.conf
    $ModLoad imudp
    $UDPServerRun 514
-   $template Haproxy,&quot;%msg%\n&quot;
+   $template Haproxy,&#34;%msg%\n&#34;
    local6.* -/var/log/haproxy/haproxy.log;Haproxy
 
 $ vim /etc/sysconfig/rsyslog
 以下を追加
-SYSLOGD_OPTIONS=&quot;-r&quot;
+SYSLOGD_OPTIONS=&#34;-r&#34;
 
 ## haproxyの起動
 $ sudo systemctl start haproxy 
-</code></pre><h3 id="l4-l7のロードバランサ">L4, L7のロードバランサ</h3>
+</code></pre></div><h3 id="l4-l7のロードバランサ">L4, L7のロードバランサ</h3>
 <p>次に行く前にL4とL7ロードバランサの違いについて確認します。
 こちらは非常に重要な概念なので、HAProxyをはじめ、AWSなどのクラウドでELBロードバランサを利用する際も役に立ちますので、かならず抑えておきましょう。</p>
 <p>L4ロードバランサは、名前の通りL4でのロードバランサになりますので、実際のHTTPの処理はバックエンドのサーバで行います。
@@ -219,45 +219,45 @@ $ sudo systemctl start haproxy
 <a href="https://blog.mosuke.tech/entry/2014/10/09/230555">【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築</a></p>
 <p>ヘルスチェック用のhtml設置しておくとわかりやすいです。<br>
 負荷分散されていることを確認するために、内容の異なるヘルスチェック用のHTMLをおいておくと非常にわかりやすいです。</p>
-<pre><code>## /var/www/html配下にヘルスチェック用のhtml設置
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">## /var/www/html配下にヘルスチェック用のhtml設置
 $ sudo touch health_check.html 
-</code></pre><h2 id="4-動作試験">4. 動作試験</h2>
+</code></pre></div><h2 id="4-動作試験">4. 動作試験</h2>
 <p>ブラウザよりホストサーバへアクセスします。
 きちんとロードバランスされていることを確認します。確認方法は、もしヘルスチェック用のHTMLの中身を変えていればそれでわかるとおもいます。あるいはログから確認する必要があります。<br>
 HAProxy側のログは以下のとおり。</p>
-<pre><code>$ sudo tail -f /var/log/haproxy/haproxy.conf
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo tail -f /var/log/haproxy/haproxy.conf
 
 ##起動した時。L7のhealt checkが走っている
 Proxy main started.
 Proxy hoge started.
-Health check for server hoge/web10 succeeded, reason: Layer7 check passed, code: 200, info: &quot;OK&quot;, check duration: 33ms, status: 2/2 UP.
-Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &quot;OK&quot;, check duration: 12ms, status: 2/2 UP.
+Health check for server hoge/web10 succeeded, reason: Layer7 check passed, code: 200, info: &#34;OK&#34;, check duration: 33ms, status: 2/2 UP.
+Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &#34;OK&#34;, check duration: 12ms, status: 2/2 UP.
 
 ##webサーバ側でapacheを停止
-Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &quot;Not Found&quot;, check duration: 13ms, status: 1/2 UP.
-Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &quot;Not Found&quot;, check duration: 8ms, status: 0/2 DOWN.
+Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &#34;Not Found&#34;, check duration: 13ms, status: 1/2 UP.
+Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &#34;Not Found&#34;, check duration: 8ms, status: 0/2 DOWN.
 
 ##webサーバ側でhealth_check.htmlを削除した時も同様に
-Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &quot;Not Found&quot;, check duration: 13ms, status: 1/2 UP.
-Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &quot;Not Found&quot;, check duration: 8ms, status: 0/2 DOWN.
+Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &#34;Not Found&#34;, check duration: 13ms, status: 1/2 UP.
+Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &#34;Not Found&#34;, check duration: 8ms, status: 0/2 DOWN.
 
 ##webサーバ側でhealth_check.htmlを復活させた時
-Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &quot;OK&quot;, check duration: 8ms, status: 1/2 DOWN.
-Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &quot;OK&quot;, check duration: 6ms, status: 2/2 UP.
+Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &#34;OK&#34;, check duration: 8ms, status: 1/2 DOWN.
+Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &#34;OK&#34;, check duration: 6ms, status: 2/2 UP.
 Server hoge/web11 is UP. 2 active and 0 backup servers online. 0 sessions requeued, 0 total in queue. 
-</code></pre><p>Webサーバ側の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>ログを見てみると。</p>
-<pre><code>$ sudo tail -f /var/log/apache2/access.log
+</code></pre></div><p>Webサーバ側の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>ログを見てみると。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo tail -f /var/log/apache2/access.log
 
 ##ロードバランサからのヘルスチェックが来ていることがわかる。
-192.168.33.1 - - [09/Nov/2014:08:07:43 +0000] &quot;GET /health_check.html HTTP/1.0&quot; 200 276 &quot;-&quot; &quot;Proxy-Check&quot;
-192.168.33.1 - - [09/Nov/2014:08:07:46 +0000] &quot;GET /health_check.html HTTP/1.0&quot; 200 276 &quot;-&quot; &quot;Proxy-Check&quot;
-192.168.33.1 - - [09/Nov/2014:08:07:49 +0000] &quot;GET /health_check.html HTTP/1.0&quot; 200 276 &quot;-&quot; &quot;Proxy-Check&quot;
-192.168.33.1 - - [09/Nov/2014:08:07:52 +0000] &quot;GET /health_check.html HTTP/1.0&quot; 200 276 &quot;-&quot; &quot;Proxy-Check&quot;
+192.168.33.1 - - [09/Nov/2014:08:07:43 +0000] &#34;GET /health_check.html HTTP/1.0&#34; 200 276 &#34;-&#34; &#34;Proxy-Check&#34;
+192.168.33.1 - - [09/Nov/2014:08:07:46 +0000] &#34;GET /health_check.html HTTP/1.0&#34; 200 276 &#34;-&#34; &#34;Proxy-Check&#34;
+192.168.33.1 - - [09/Nov/2014:08:07:49 +0000] &#34;GET /health_check.html HTTP/1.0&#34; 200 276 &#34;-&#34; &#34;Proxy-Check&#34;
+192.168.33.1 - - [09/Nov/2014:08:07:52 +0000] &#34;GET /health_check.html HTTP/1.0&#34; 200 276 &#34;-&#34; &#34;Proxy-Check&#34;
 
 ##Webからのアクセスが来た場合
 ##SorceのIPはロードバランサにIPになっているが、UserAgentなど書き込まれていることを確認。
-192.168.33.1 - - [09/Nov/2014:08:10:06 +0000] &quot;GET / HTTP/1.1&quot; 200 488 &quot;-&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10) AppleWebKit/600.1.25 (KHTML, like Gecko) Version/8.0 Safari/600.1.25&quot; 
-</code></pre><h2 id="まとめ">まとめ</h2>
+192.168.33.1 - - [09/Nov/2014:08:10:06 +0000] &#34;GET / HTTP/1.1&#34; 200 488 &#34;-&#34; &#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10) AppleWebKit/600.1.25 (KHTML, like Gecko) Version/8.0 Safari/600.1.25&#34; 
+</code></pre></div><h2 id="まとめ">まとめ</h2>
 <p>HAProxyのインストール設定自体は非常に簡単で、ロードバランサといえど恐れる必要はなかったです。<br>
 それ以上にやはり重要なのは、L4/L7ロードバランサの違いやその使いみち。ここを理解しておくことが非常に重要です。
 クラウド時代になり、ロードバランサを用意する敷居が今まで以上に低くなってきたからこそ、そこの概念を抑えることは必須です。</p>

@@ -96,9 +96,9 @@
 </ul>
 <h1>1. 開発環境でよくするアプリの起動</h1>
 <p>開発環境では、アプリケーションのログの閲覧性なども兼ねて以下のようにアプリを起動していた。</p>
-<pre><code>$ bundle exec rackup
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ bundle exec rackup
 $ bundle exec thin start 
-</code></pre><p>でも、これではいつまでたってもプロダクション環境での利用はできません。</p>
+</code></pre></div><p>でも、これではいつまでたってもプロダクション環境での利用はできません。</p>
 <h1>2. 上記方法ではプロダクション環境で利用できない理由</h1>
 <p>当然のことながら、プロダクション環境ではいちいち手動でコマンドを実行しアプリケーションを立ち上げるわけにはいかない。<br>
 例えば、なんらかの理由でサーバが再起動してしまった場合には、<br>
@@ -164,16 +164,16 @@ bundle_exec_thin <span style="color:#f92672">(</span><span style="color:#f92672"
 :
  
 </code></pre></div><p>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>も完成したし、実際にserviceコマンドで実行してみる。</p>
-<pre><code>$ sudo service sample-app start
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo service sample-app start
 /usr/bin/env: ruby: No such file or directory 
-</code></pre><p>んん。。。起動せず、撃沈…</p>
+</code></pre></div><p>んん。。。起動せず、撃沈…</p>
 <h3>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作る上での注意</h3>
 <p>起動しなかった原因に移る前に、起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を作る上での注意点を１つ。<br>
 chkconfigで認識させるためには冒頭のCHKCONFIG INFO部分(<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%E1%A5%F3%A5%C8%A5%A2%A5%A6%A5%C8">コメントアウト</a>部分)も重要になってくる。<br>
 CHKCONFIG INFO部分を書かないままchkconfigでaddしようとすると以下のように怒られます。</p>
-<pre><code>$ sudo chkconfig --add sample-app
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo chkconfig --add sample-app
 service sample-app does not support chkconfig 
-</code></pre><h1>4. serviceコマンド実行時のPATHのはなし</h1>
+</code></pre></div><h1>4. serviceコマンド実行時のPATHのはなし</h1>
 <p>なぜ、serviceコマンドでthinを起動できなかったのか。<br>
 調べていくと意外なことがわかった。<br>
 serviceコマンドを実行すると中で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>のPATHが上書きされてしまう。</p>
@@ -181,9 +181,9 @@ serviceコマンドを実行すると中で<a class="keyword" href="http://d.hat
 <a href="http://heartbeats.jp/hbblog/2013/06/service-start-stop.html">デーモンの起動・終了にはserviceコマンドを利用しよう - インフラエンジニアway - Powered by HEARTBEATS</a></p>
 <p>試しに、起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>内にPATHの出力を仕込んで確かめてみる。<br>
 起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>に<code>echo $PATH</code>を仕込んだ。</p>
-<pre><code>$ sudo service sample-app start
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo service sample-app start
 /sbin:/usr/sbin:/bin:/usr/bin 
-</code></pre><p>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>内でbundleや<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>がインストールされているディレクトリに<br>
+</code></pre></div><p>起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>内でbundleや<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>がインストールされているディレクトリに<br>
 PATHを通すことで、解決することにした。<br>
 （もっと美しい方法があれば教えて下さい。。。）</p>
 <h1>5. 起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>修正(完成版)</h1>
@@ -233,13 +233,13 @@ bundle_exec_thin <span style="color:#f92672">(</span><span style="color:#f92672"
 </code></pre></div><p>(PATHを通したのでbundleコマンドはフルパスでなくても大丈夫ですよ...)</p>
 <p>最後に起動<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を<code>/etc/init.d</code>以下に配置し、
 忘れずにchkconfigに登録しましょう。</p>
-<pre><code>$ sudo chkconfig --add sample-app 
-</code></pre><h1>【おまけ】sudo だと<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>やgem、bundleが使えない？</h1>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo chkconfig --add sample-app 
+</code></pre></div><h1>【おまけ】sudo だと<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>やgem、bundleが使えない？</h1>
 <p>rootユーザでは<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>やgem, bundleが使えるけど、sudoで実行すると使えない…<br>
 という悩みの人も多いのではないだろうか。</p>
-<pre><code>$ sudo gem install xxxxx
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo gem install xxxxx
 sudo: gem: command not found 
-</code></pre><p>sudoでの実行はrootユーザで実行することなのになぜ実行できないか。<br>
+</code></pre></div><p>sudoでの実行はrootユーザで実行することなのになぜ実行できないか。<br>
 これはsudoを使うときに/usr/local/binが許可されていないからだ。<br>
 visudoでsecure_pathの設定を見直すとよい。<br>
 <a href="http://www.xmisao.com/2013/10/11/sudoers-secure_path.html">sudoersのsecure_pathについて -- ぺけみさお</a></p>

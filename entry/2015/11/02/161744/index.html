@@ -174,7 +174,7 @@ describe port(<span style="color:#ae81ff">80</span><span style="color:#f92672"><
 <h3>テストをサーバの役割毎にまとめる</h3>
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%A3%A5%EC%A5%AF%A5%C8">ディレクト</a>リの主な構成は下記のようになっています。<br>
 （実際にはもっとファイルやホストが多いですがイメージです。）</p>
-<pre><code>├ Rakefile
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">├ Rakefile
 ├ spec/
 │ └ spec_helper.rb
 │ ├ base/
@@ -185,7 +185,7 @@ describe port(<span style="color:#ae81ff">80</span><span style="color:#f92672"><
 │ └ app/
 │     └ vimfactory-app_spec.rb
 └ sshconfig 
-</code></pre><p>nginxなどを搭載するプロキシサーバと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>があり、それぞれにロールを割り振ります。<br>
+</code></pre></div><p>nginxなどを搭載するプロキシサーバと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>があり、それぞれにロールを割り振ります。<br>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/Rakefile">Rakefile</a>内に書いてます。もし記述が増えるようだと別ファイルに切り出すと思います。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">hosts <span style="color:#f92672">=</span> <span style="color:#f92672">[</span>
   {
@@ -213,8 +213,8 @@ describe port(<span style="color:#ae81ff">80</span><span style="color:#f92672"><
 options <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">SSH</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Config</span><span style="color:#f92672">.</span>for(host, <span style="color:#f92672">[</span>config<span style="color:#f92672">]</span>)
  
 </code></pre></div><p>実行時に指定します。</p>
-<pre><code>bundle exec rake serverspec SSH_CONFIG=sshconfig 
-</code></pre><h3>デプロイ作業での活用</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">bundle exec rake serverspec SSH_CONFIG=sshconfig 
+</code></pre></div><h3>デプロイ作業での活用</h3>
 <p>serverspecは主に、インフラの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C6%A5%B9%A5%C8%B6%EE%C6%B0%B3%AB%C8%AF">テスト駆動開発</a>のために導入したのですが、
 本番環境でのデプロイ作業（インフラ設定の変更）にも大活躍しています。</p>
 <p>デプロイ作業時に、下記ステップで行うことで、デプロイ作業の安心感を得るとともに、<br>

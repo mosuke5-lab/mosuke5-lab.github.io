@@ -135,10 +135,10 @@ Railsアプリケーションはローカルですが、そこにDocker Compose�
 これは、Dockerはイメージをビルドするときにレイヤーごとにキャッシュを行うのですが、それを利用したものです。
 頻繁に変更が行われるのはアプリケーションのソースコード部分であり、依存パッケージは頻繁には変更されないのでキャッシュをうまく使いましょうということです。<br>
 (Ruby2.3.1なのはきにしないで&hellip;)</p>
-<pre><code># Dockerfile
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># Dockerfile
 FROM ruby:2.3.1
 RUN apt-get update &amp;&amp; apt-get upgrade -y
-RUN gem install bundler -v &quot;1.15.4&quot;
+RUN gem install bundler -v &#34;1.15.4&#34;
 RUN mkdir /usr/local/src/app
 
 # ----- ここから注目 -----
@@ -152,8 +152,8 @@ RUN bundle install
 # アプリケーション本体コードの配置
 ADD . /usr/local/src/app/
 RUN bundle exec rake assets:precompile
-CMD [&quot;bundle&quot;, &quot;exec&quot;, &quot;rails&quot;, &quot;server&quot;, &quot;-b&quot;, &quot;0.0.0.0&quot;, &quot;-p&quot;, &quot;3001&quot;]
-</code></pre><h2 id="gitlab-ciでdockerイメージを自動ビルドする">Gitlab-ciでDockerイメージを自動ビルドする</h2>
+CMD [&#34;bundle&#34;, &#34;exec&#34;, &#34;rails&#34;, &#34;server&#34;, &#34;-b&#34;, &#34;0.0.0.0&#34;, &#34;-p&#34;, &#34;3001&#34;]
+</code></pre></div><h2 id="gitlab-ciでdockerイメージを自動ビルドする">Gitlab-ciでDockerイメージを自動ビルドする</h2>
 <p>Dockerイメージの作成を高速化したと言いましたが、とはいってもそれなりの時間もかかりますし、手作業で行うのがしんどくなってきたので、イメージ作成を自動化させました。<br>
 今回はレポジトリにGitlabを使っていたので、Gitlab-ciを使って行いました。<br>
 正直な話、GitlabはCI/CDのインテグレーションあたりが気に入っていて、今回もそれが理由で採用しました。</p>

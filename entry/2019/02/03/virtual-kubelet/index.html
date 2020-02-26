@@ -173,7 +173,7 @@ KubernetesからVirtual KubeletのノードにPodの配置を行うと、Virtual
 ここではAlibaba Cloudの新サービスである<a href="https://www.alibabacloud.com/products/elastic-container-instance">Elastic Container Instance</a>(略称ECI)をターゲットにして説明します。</p>
 <p>ECIは非常にシンプルなサービスです。
 CLIから実行できるAPIリストをみても、現在６つだけです。</p>
-<pre><code>$ aliyun eci help
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ aliyun eci help
 Available Api List:
   CreateContainerGroup
   DeleteContainerGroup
@@ -181,7 +181,7 @@ Available Api List:
   DescribeContainerGroups
   DescribeContainerLog
   ExecContainerCommand
-</code></pre><p>ECIは基本的にContainerGroupを作成・削除、コマンド実行、そのほかログや状態閲覧しかできません。
+</code></pre></div><p>ECIは基本的にContainerGroupを作成・削除、コマンド実行、そのほかログや状態閲覧しかできません。
 ContainerGroupと呼ばれているものが、Kubernetesでいう<a href="https://www.alibabacloud.com/help/doc-detail/91315.htm">Podと似た概念</a>で、ネットワークやストレージなどのリソースを共有する複数のコンテナの集合体のことです。</p>
 <p>設定できる項目は主に下記の通りで、KubernetesのPodsとおおよそ同じですが、VPCやSecutiryGroupはクラウド特有の設定になります。<br>
 ECIは、実際のコンテナを実行するためのノードを持たなくても、実行イメージを指定さえすれば実行できるというのが最大の特徴です。</p>
@@ -274,7 +274,7 @@ Virtual KubeletをKubernetes上で動かすためのサンプルのYAMLは中国
 </code></pre></div><p>上のマニュフェストを実行後、ノードとPodを確認すると動いていることが確認できるはずです。
 ノードでは実在はしないが仮想ノードとして&quot;virtual-kubelet&quot;というのが追加されています。
 このノードを登録し、司令塔をだすのがpodで表示される&quot;alicloud-virtual-kubelet-xxxxx&quot;になります。</p>
-<pre><code>$ kubectl apply -f virtual-kubelet.yaml
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f virtual-kubelet.yaml
 $ kubectl get node
 NAME                                    STATUS    ROLES     AGE       VERSION
 ap-northeast-1.i-6we4hocj9kh3qr082fxq   Ready     &lt;none&gt;    12d       v1.11.5
@@ -287,7 +287,7 @@ virtual-kubelet                         Ready     agent     4d        v1.11.2
 $ kubectl get pods
 NAME                                        READY     STATUS           RESTARTS   AGE
 alicloud-virtual-kubelet-55d7c8b89d-khjsh   1/1       Running          0          3d
-</code></pre><h2 id="virtual-kubeletでeciを操作する">Virtual KubeletでECIを操作する</h2>
+</code></pre></div><h2 id="virtual-kubeletでeciを操作する">Virtual KubeletでECIを操作する</h2>
 <p>それでは、次にさっそく、KubernetesからこのECIに対してPodを配置してみたいと思います。
 Virtual Kubeletのノードに対してnginxを実行させる簡単なマニュフェストを用意して実行します。<br>
 nodeSelectorでVirtual Kubeletのノードを指定し、そこに配置するようにマニュフェストを書きます。</p>
@@ -309,12 +309,12 @@ nodeSelectorでVirtual Kubeletのノードを指定し、そこに配置する�
   - <span style="color:#66d9ef">key</span>: alibabacloud.com/eci
     <span style="color:#66d9ef">operator</span>: <span style="color:#e6db74">&#34;Exists&#34;</span>
     <span style="color:#66d9ef">effect</span>: NoSchedule
-</code></pre></div><pre><code>$ kubectl apply -f vk_pod.yaml
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f vk_pod.yaml
 $ kubectl get pods
 NAME                                        READY     STATUS           RESTARTS   AGE
 alicloud-virtual-kubelet-55d7c8b89d-khjsh   1/1       Running          0          3d
 mypod                                       1/1       Running          0          3d
-</code></pre><p>実際にECI側のコンソールを見てみるとちゃんとコンテナが起動していました。<br>
+</code></pre></div><p>実際にECI側のコンソールを見てみるとちゃんとコンテナが起動していました。<br>
 <img src="/image/virtual-kubelet-eci-console.png" alt="virtual-kubelet-ec-console"></p>
 <h3 id="eciのネットワーク">ECIのネットワーク</h3>
 <p>Virtual Kubeletのプロセスを起動させるときに、もしKubernetesクラスターと同じネットワークを指定すれば、KubernetesのPodとECIで動作するコンテナは同一のネットワークにすることができます。。

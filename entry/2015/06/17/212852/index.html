@@ -112,15 +112,15 @@
     }
 }
 </code></pre></div><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>実行すると以下のエラーに襲われた。</p>
-<pre><code>$ php oil refine migrate
-Uncaught exception Fuel\Core\Database_Exception: SQLSTATE[42601]: Syntax error: 7 ERROR: syntax error at or near &quot;DEFAULT&quot;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ php oil refine migrate
+Uncaught exception Fuel\Core\Database_Exception: SQLSTATE[42601]: Syntax error: 7 ERROR: syntax error at or near &#34;DEFAULT&#34;
 LINE 5: )DEFAULT CHARACTER SET utf8;
-^ with query: &quot;CREATE TABLE IF NOT EXISTS &quot;migration&quot; (
-&quot;type&quot; varchar(25) NOT NULL,
-&quot;name&quot; varchar(50) NOT NULL,
-&quot;migration&quot; varchar(100) DEFAULT '' NOT NULL
-)DEFAULT CHARACTER SET utf8;&quot; 
-</code></pre><h1>理由</h1>
+^ with query: &#34;CREATE TABLE IF NOT EXISTS &#34;migration&#34; (
+&#34;type&#34; varchar(25) NOT NULL,
+&#34;name&#34; varchar(50) NOT NULL,
+&#34;migration&#34; varchar(100) DEFAULT &#39;&#39; NOT NULL
+)DEFAULT CHARACTER SET utf8;&#34; 
+</code></pre></div><h1>理由</h1>
 <p>しょっぱなから躓くわけだが…</p>
 <p>初めて<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を実行する際には<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>管理用のテーブルを作る。<br>
 そのテーブルを作る<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が下記の通り発行されている。</p>
@@ -137,22 +137,22 @@ LINE 5: )DEFAULT CHARACTER SET utf8;
 <p>解決方法は下記の記事がわかりやすかった。
 <iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fqiita.com%2Fhirobow%2Fitems%2F8c2c379b33f0040480b7" title="FuelPHP で PDOによるPostgreSQL接続の罠 - Qiita" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://qiita.com/hirobow/items/8c2c379b33f0040480b7">FuelPHP で PDOによるPostgreSQL接続の罠 - Qiita</a></iframe><cite class="hatena-citation"><a href="http://qiita.com/hirobow/items/8c2c379b33f0040480b7">qiita.com</a></cite></p>
 <p>簡単に言うとdbのコンフィグで、charsetをnullにすると<code>DEFAULT CHARACTER SET xxx</code>部分が発行されない。</p>
-<pre><code>'charset' =&gt; NULL, 
-</code></pre><h1>2. PRIMARY KEYの問題</h1>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&#39;charset&#39; =&gt; NULL, 
+</code></pre></div><h1>2. PRIMARY KEYの問題</h1>
 <h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a></h1>
 <p>1.の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%B8%BB%FA%A5%B3%A1%BC%A5%C9">文字コード</a>の問題は解決して、さあもう一度<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を！と思って実行するもさらなるエラーに阻まれる。</p>
-<pre><code>$ php oil refine migrate
-Uncaught exception Fuel\Core\Database_Exception: SQLSTATE[42601]: Syntax error: 7 ERROR: syntax error at or near &quot;(&quot;
-LINE 2: &quot;id&quot; int(5) NOT NULL,
-^ with query: &quot;CREATE TABLE IF NOT EXISTS &quot;users&quot; (
-&quot;id&quot; int(5) NOT NULL,
-&quot;name&quot; text NOT NULL,
-PRIMARY KEY &quot;id&quot; (&quot;id&quot;)
-);&quot; 
-</code></pre><p>理由は1のときと一緒。<br>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ php oil refine migrate
+Uncaught exception Fuel\Core\Database_Exception: SQLSTATE[42601]: Syntax error: 7 ERROR: syntax error at or near &#34;(&#34;
+LINE 2: &#34;id&#34; int(5) NOT NULL,
+^ with query: &#34;CREATE TABLE IF NOT EXISTS &#34;users&#34; (
+&#34;id&#34; int(5) NOT NULL,
+&#34;name&#34; text NOT NULL,
+PRIMARY KEY &#34;id&#34; (&#34;id&#34;)
+);&#34; 
+</code></pre></div><p>理由は1のときと一緒。<br>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>では以下の構文は使えないのだ…</p>
-<pre><code>PRIMARY KEY &quot;id&quot; (&quot;id&quot;) 
-</code></pre><h1>3. 結局</h1>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">PRIMARY KEY &#34;id&#34; (&#34;id&#34;) 
+</code></pre></div><h1>3. 結局</h1>
 <p>つまるところ<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>(すくなくとも1.7までは)では、<a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を行う環境がちゃんと整っていないということ。<br>
 しかたないので、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>は生<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を書くことにしました。</p>
 <p>PRIMARY KEYを後から別途で付与するとか考えたけど、<br>

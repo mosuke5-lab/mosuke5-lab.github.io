@@ -113,18 +113,18 @@ byte IP[]  <span style="color:#f92672">=</span> {<span style="color:#ae81ff">192
 <p>PCからArduinoに対してPingを売ってみます。
 疎通あれば成功です。<br>
 Ping確認ヨシ!!</p>
-<pre><code>% ping 192.168.100.3
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% ping 192.168.100.3
 PING 192.168.100.3 (192.168.100.3): 56 data bytes
 Request timeout for icmp_seq 0
 64 bytes from 192.168.100.3: icmp_seq=1 ttl=128 time=0.576 ms
 64 bytes from 192.168.100.3: icmp_seq=2 ttl=128 time=0.425 ms
 64 bytes from 192.168.100.3: icmp_seq=3 ttl=128 time=0.302 ms 
-</code></pre><p>Pingが通っているので問題ないのですが、せっかくなのでARPテーブルを見ておきます。<br>
+</code></pre></div><p>Pingが通っているので問題ないのですが、せっかくなのでARPテーブルを見ておきます。<br>
 マックアドレスの取得もヨシ!!</p>
-<pre><code>% arp -a
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% arp -a
 ? (192.168.100.3) at 90:a2:da:f:8b:a2 on en4 ifscope [ethernet]
 ? (192.168.100.255) at ff:ff:ff:ff:ff:ff on en4 ifscope [ethernet] 
-</code></pre><h2 id="dhcpを使って家内lan接続">DHCPを使って家内LAN接続</h2>
+</code></pre></div><h2 id="dhcpを使って家内lan接続">DHCPを使って家内LAN接続</h2>
 <p>先程はスタティックでArduinoにIPアドレスをふりました。<br>
 実際の買うようの場面ではDHCPを利用したいです。</p>
 <h3 id="構成図-1">構成図</h3>
@@ -132,8 +132,8 @@ Request timeout for icmp_seq 0
 <p>普段はあまり利用しないかもしれませんが、家庭にある無線LANルータにはたいていの場合はLANケーブルのポートがあります。
 そこから有線LANケーブルを伸ばしArduinoに結線します。無線LANルータがDHCPサーバとなります。
 DHCPによるIPアドレスの取得はとても容易で以下のようにマックアドレスを指定するのみです。</p>
-<pre><code>Ethernet.begin(mac) 
-</code></pre><p>以下はArduino公式サイトに則って実施したもの。<br>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">Ethernet.begin(mac) 
+</code></pre></div><p>以下はArduino公式サイトに則って実施したもの。<br>
 <a href="http://arduino.cc/en/Tutorial/DhcpAddressPrinter">Arduino - DhcpAddressPrinter</a></p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#</span><span style="color:#75715e">include</span> <span style="color:#75715e">&lt;SPI.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">include</span> <span style="color:#75715e">&lt;Ethernet.h&gt;</span><span style="color:#75715e">

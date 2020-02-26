@@ -103,9 +103,9 @@
 同じLANをつかんでる人にVNC接続されてしまわないように、パスワードはきちんと設定しておきましょう。</p>
 <p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150809/20150809132421.png" alt="f:id:mosuke5:20150809132421p:plain" title="f:id:mosuke5:20150809132421p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 <p>もし、MacからVNC接続をした際に、「互換性のないバージョンです」とエラーが出てきてしまった場合には下記を設定しましょう。</p>
-<pre><code>$ gsettings set org.gnome.Vino require-encryption false 
-</code></pre><p>設定ができたら、きちんとサーバとしてVNC接続を待ち受けているか確認します。プロセスが立ち上がっているかどうかと、ポートがListenしているかどうかを確認してみます。また、iptablesやfirewalldなどのファイアウォールを設定している方は外部からの接続ができる状態か確認しましょう。</p>
-<pre><code>% ps -ef | grep vino
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ gsettings set org.gnome.Vino require-encryption false 
+</code></pre></div><p>設定ができたら、きちんとサーバとしてVNC接続を待ち受けているか確認します。プロセスが立ち上がっているかどうかと、ポートがListenしているかどうかを確認してみます。また、iptablesやfirewalldなどのファイアウォールを設定している方は外部からの接続ができる状態か確認しましょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% ps -ef | grep vino
 mosuke5  24414 24226  0 12:30 ?        00:00:21 /usr/lib/vino/vino-server --sm-disable
 mosuke5  25456 24470  0 13:19 pts/11   00:00:00 grep vino 
 
@@ -113,7 +113,7 @@ mosuke5  25456 24470  0 13:19 pts/11   00:00:00 grep vino
 COMMAND     PID    USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
 vino-serv 24414 mosuke5   13u  IPv6 156661      0t0  TCP *:5900 (LISTEN)
 vino-serv 24414 mosuke5   14u  IPv4 156662      0t0  TCP *:5900 (LISTEN)
-</code></pre><h2>MacからVNC接続する</h2>
+</code></pre></div><h2>MacからVNC接続する</h2>
 <p>Macには実は標準でVNCクライアントがついています。<br>
 特別なソフトウェアをインストールすることなくVNC接続できます。「移動」→「サーバへ接続」を選択し、vncプロトコルで対象のサーバのIPアドレスを入れれば接続できます。</p>
 <span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150812/20150812225515.png" alt="f:id:mosuke5:20150812225515p:plain" title="f:id:mosuke5:20150812225515p:plain" class="hatena-fotolife" itemprop="image"></span>
@@ -127,8 +127,8 @@ vino-serv 24414 mosuke5   14u  IPv4 156662      0t0  TCP *:5900 (LISTEN)
 <p>まずは、ローカルフォワードのSSH接続を行います。MacからUbuntuに向かってのSSH接続です。<br>
 下記のコマンドの意味は「自分の端末のポート8888に来た通信は、192.168.11.5からみてlocalhostのポート5900にとばします」です。
 `192.168.11.5`はUbuntuのIPアドレスと考えてください。</p>
-<pre><code>$ ssh -L8888:localhost:5900 mosuke5@192.168.11.5 
-</code></pre><p>上のコマンドでSSH接続した状態でなら、localhostのポート8888に接続するとUbuntuへVNC接続ができます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ssh -L8888:localhost:5900 mosuke5@192.168.11.5 
+</code></pre></div><p>上のコマンドでSSH接続した状態でなら、localhostのポート8888に接続するとUbuntuへVNC接続ができます。</p>
 <span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150812/20150812224539.png" alt="f:id:mosuke5:20150812224539p:plain" title="f:id:mosuke5:20150812224539p:plain" class="hatena-fotolife" itemprop="image"></span>
 <p>これでセキュアなVNCの完成です。<br>
 このようにすることで、VNCの接続経路をSSHでトンネリングすることで暗号化されます。また、SSHであれば公開鍵認証方式で接続できるので、パスワードという脆弱なものを利用しなくてすみます。ファイアウォールの設定もSSHさえ通っていれば十分なため外部からの攻撃にも強くなります。<br>

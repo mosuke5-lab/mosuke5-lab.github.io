@@ -110,8 +110,8 @@ Hugo-definedとUser-definedの２つです。</p>
 <h4 id="文字数カットする技">文字数カットする技</h4>
 <p><code>hasCJKLanguage = false</code>で長いサマリーを文字数指定でカットすることはできます。
 例えば、300文字でカットしたい場合、テンプレートファイル内で下記のように書くことで分量を調整することは可能です。ですが、文章の途中できれてしまい不自然になるため、あまりおすすめはしないです。</p>
-<pre><code>{{ substr .Summary 0 300 }}
-</code></pre><h3 id="user-defined">User-defined</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{{ substr .Summary 0 300 }}
+</code></pre></div><h3 id="user-defined">User-defined</h3>
 <p>続いてはUser-definedのサマリー機能について説明します。名前の通りHugoの利用者側でサマリー箇所を決めることができる機能です。サマリーとして区切りたい場所で<code>&lt;!--more--&gt;</code>を入れます。そうすると、冒頭から<code>&lt;!--more--&gt;</code>までがサマリーとなります。</p>
 <p>例として下記の文章（markdownファイル）の場合、冒頭の「タイトル通り」から<code>&lt;!--more--&gt;</code>までをサマリーとして扱ってくれるのである。</p>
 <pre>

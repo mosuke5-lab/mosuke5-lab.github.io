@@ -87,42 +87,42 @@
 <p>まずはAWS側の設定を見ておく。<br>
 今回はELB使うわけではなかったので、EC2インスタンスにElasticIPをバインドした。
 aws側のTerraformのコードでいつも通りEIPを購入する。</p>
-<pre><code># aws.tf
-resource &quot;aws_eip&quot; &quot;main&quot; {
-  instance = &quot;${aws_instance.main.id}&quot;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># aws.tf
+resource &#34;aws_eip&#34; &#34;main&#34; {
+  instance = &#34;${aws_instance.main.id}&#34;
   vpc      = true
 }
-</code></pre><p>次に、CloudFlare側のコードをみる。<br>
+</code></pre></div><p>次に、CloudFlare側のコードをみる。<br>
 CloudFlareをTerraformで扱うには３つの情報が必要なのでここは変数化しておくとよい。<br>
 providerを指定し、あとはresouceを書いていく。</p>
-<pre><code># cloudflare.tf
-variable &quot;cloudflare_email&quot; {}
-variable &quot;cloudflare_token&quot; {}
-variable &quot;cloudflare_domain&quot; {}
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># cloudflare.tf
+variable &#34;cloudflare_email&#34; {}
+variable &#34;cloudflare_token&#34; {}
+variable &#34;cloudflare_domain&#34; {}
 
-provider &quot;cloudflare&quot; {
-  email = &quot;${var.cloudflare_email}&quot;
-  token = &quot;${var.cloudflare_token}&quot;
+provider &#34;cloudflare&#34; {
+  email = &#34;${var.cloudflare_email}&#34;
+  token = &#34;${var.cloudflare_token}&#34;
 }
 
-resource &quot;cloudflare_record&quot; &quot;gill-search-manage&quot; {
-  domain = &quot;${var.cloudflare_domain}&quot;
-  name   = &quot;gill-search-manage&quot;
-  value  = &quot;${aws_eip.main.public_ip}&quot;
-  type   = &quot;A&quot;
+resource &#34;cloudflare_record&#34; &#34;gill-search-manage&#34; {
+  domain = &#34;${var.cloudflare_domain}&#34;
+  name   = &#34;gill-search-manage&#34;
+  value  = &#34;${aws_eip.main.public_ip}&#34;
+  type   = &#34;A&#34;
   ttl    = 1
   proxied = false
 }
 
-resource &quot;cloudflare_record&quot; &quot;gill-search&quot; {
-  domain = &quot;${var.cloudflare_domain}&quot;
-  name   = &quot;gill-search&quot;
-  value  = &quot;${aws_eip.main.public_ip}&quot;
-  type   = &quot;A&quot;
+resource &#34;cloudflare_record&#34; &#34;gill-search&#34; {
+  domain = &#34;${var.cloudflare_domain}&#34;
+  name   = &#34;gill-search&#34;
+  value  = &#34;${aws_eip.main.public_ip}&#34;
+  type   = &#34;A&#34;
   ttl    = 1
   proxied = true
 }
-</code></pre><ul>
+</code></pre></div><ul>
 <li><code>domain</code>はCloudFlareで管理しているドメイン名を入力。今回の場合は<code>mosuke.tech</code>を管理しているのでそれを入力。</li>
 <li><code>name</code>は今回Aレコードなのでサブドメインに当たる部分。</li>
 <li><code>value</code>は実際にIPアドレス。なので今回はAWS EIPの値が入る。<code>${aws_eip.main.public_ip}</code></li>

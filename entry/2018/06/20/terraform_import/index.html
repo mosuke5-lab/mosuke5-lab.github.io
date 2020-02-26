@@ -90,11 +90,11 @@
 <h2 id="使い方と注意ポイント">使い方と注意ポイント</h2>
 <p>今回は、既存のAlibaba Cloud上のVPCリソースをTerraformにimportしていきたいと思います。(AWSでも同様です。)<br>
 まずはじめに、importしたいリソースについて、空の定義をしておく必要があります。</p>
-<pre><code># terraform.tf
-resource &quot;alicloud_vpc&quot; &quot;vpc&quot; {
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># terraform.tf
+resource &#34;alicloud_vpc&#34; &#34;vpc&#34; {
 }
-</code></pre><p>つぎにリソースをimportしていきます。リソースをimportするには、対象のリソースを特定する必要があるため、リソースのIDが必要になります。既存でリソースを作っている場合には、コンソールやAPIなどを使って確認する必要があります。</p>
-<pre><code>$ terraform import alicloud_vpc.vpc vpc-6webta8bkuhm33t4aax0j
+</code></pre></div><p>つぎにリソースをimportしていきます。リソースをimportするには、対象のリソースを特定する必要があるため、リソースのIDが必要になります。既存でリソースを作っている場合には、コンソールやAPIなどを使って確認する必要があります。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform import alicloud_vpc.vpc vpc-6webta8bkuhm33t4aax0j
 alicloud_vpc.vpc: Import complete!
   Imported alicloud_vpc (ID: vpc-6webta8bkuhm33t4aax0j)
 alicloud_vpc.vpc: Refreshing state... (ID: vpc-6webta8bkuhm33t4aax0j)
@@ -103,9 +103,9 @@ Import successful!
 
 The resources that were imported are shown above. These resources are now in
 your Terraform state and will henceforth be managed by Terraform.
-</code></pre><p>そうすると、Terraformにおいて一番重要とも言えるstateファイルに、<br>
+</code></pre></div><p>そうすると、Terraformにおいて一番重要とも言えるstateファイルに、<br>
 importしたリソースが書き込まれていることが確認できます。</p>
-<pre><code>$ terraform state show
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform state show
 terraform state show
 id              = vpc-6webta8bkuhm33t4aax0j
 cidr_block      = 192.168.0.0/16
@@ -114,19 +114,19 @@ name            = test_vpc
 route_table_id  = vtb-6wehepczi546xvuboemxx
 router_id       = vrt-6we56st0wcuucpiglodk4
 router_table_id = vtb-6wehepczi546xvuboemxx
-</code></pre><p>しかし、importを利用には注意点があります。<br>
+</code></pre></div><p>しかし、importを利用には注意点があります。<br>
 現状(version 0.11.7 現在)では、importしたリソースについて、stateファイルにそのリソースを書き込んでくれるのみとなっています。<br>
 つまりどういうことかというと、現状terraformの定義ファイルにはVPCは空の定義のため、Stateファイルとの差がでてしまっています。現状とコードに差分がある状態です。
 この状態で、実行しても必須項目の定義もされていないためエラーになってしまいます。</p>
 <p>importしたあと、実際に取り込んだリソースと定義を合わせていく必要があります。<br>
 以下のように設定を足していく必要があります。</p>
-<pre><code># terraform.tf
-resource &quot;alicloud_vpc&quot; &quot;vpc&quot; {
-  name        = &quot;test_vpc&quot;
-  description = &quot;This is test_vpc.&quot;
-  cidr_block  = &quot;192.168.0.0/16&quot;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># terraform.tf
+resource &#34;alicloud_vpc&#34; &#34;vpc&#34; {
+  name        = &#34;test_vpc&#34;
+  description = &#34;This is test_vpc.&#34;
+  cidr_block  = &#34;192.168.0.0/16&#34;
 }
-</code></pre><p>以上、注意点含めてぜひ活用していってください。</p>
+</code></pre></div><p>以上、注意点含めてぜひ活用していってください。</p>
                     </div>
                     
                     

@@ -88,26 +88,26 @@ ElasticSearchを使っているのですがいつもAPI操作を忘れてしま�
 <h2 id="全般">全般</h2>
 <h3 id="ユーザ名とパスワードをつけてapiを実行する">ユーザ名とパスワードをつけてAPIを実行する</h3>
 <p>curlでのベーシック認証です。デフォルトでは、ユーザ名<code>elastic</code>、パスワード<code>password</code>とついていて使うことが多い。</p>
-<pre><code>$ curl  -u elastic:password -XGET 'localhost:9200/_cat/indices?v'
-</code></pre><h3 id="レスポンス結果を見やすくする">レスポンス結果を見やすくする</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl  -u elastic:password -XGET &#39;localhost:9200/_cat/indices?v&#39;
+</code></pre></div><h3 id="レスポンス結果を見やすくする">レスポンス結果を見やすくする</h3>
 <p>GETパラメータに<code>pretty</code>をつける。以下で違いを見てみる。</p>
-<pre><code>$ curl -XPUT 'localhost:9200/blog'
-{&quot;acknowledged&quot;:true,&quot;shards_acknowledged&quot;:true,&quot;index&quot;:&quot;blog&quot;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XPUT &#39;localhost:9200/blog&#39;
+{&#34;acknowledged&#34;:true,&#34;shards_acknowledged&#34;:true,&#34;index&#34;:&#34;blog&#34;
 
-$ curl -XPUT 'localhost:9200/blog?pretty'
+$ curl -XPUT &#39;localhost:9200/blog?pretty&#39;
 {
-  &quot;acknowledged&quot; : true,
-  &quot;shards_acknowledged&quot; : true,
-  &quot;index&quot; : &quot;blog&quot;
+  &#34;acknowledged&#34; : true,
+  &#34;shards_acknowledged&#34; : true,
+  &#34;index&#34; : &#34;blog&#34;
 }
-</code></pre><h2 id="インデックスドキュメント関連">インデックス、ドキュメント関連</h2>
+</code></pre></div><h2 id="インデックスドキュメント関連">インデックス、ドキュメント関連</h2>
 <h3 id="インデックスの一覧を確認する">インデックスの一覧を確認する</h3>
 <p>作成したインデックスを確認する。<code>index</code>は複数形になると<code>indices</code>になるので注意。</p>
-<pre><code>$ curl 'localhost:9200/_cat/indices?v'
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl &#39;localhost:9200/_cat/indices?v&#39;
 status index   uuid                   pri rep docs.count docs.deleted store.size pri.store.size
 yellow open   blog    rwvaOBVcRaSLqt3NDRFZ-w   5   1          0            0       324b           324b
-</code></pre><p>ちなみに<code>_cat</code>で出力できるものはこちらで確認できる。</p>
-<pre><code>$ curl -X GET 'localhost:9200/_cat'
+</code></pre></div><p>ちなみに<code>_cat</code>で出力できるものはこちらで確認できる。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -X GET &#39;localhost:9200/_cat&#39;
 =^.^=
 /_cat/allocation
 /_cat/shards
@@ -136,97 +136,97 @@ yellow open   blog    rwvaOBVcRaSLqt3NDRFZ-w   5   1          0            0    
 /_cat/repositories
 /_cat/snapshots/{repository}
 /_cat/templates
-</code></pre><h3 id="インデックスを作成する">インデックスを作成する</h3>
+</code></pre></div><h3 id="インデックスを作成する">インデックスを作成する</h3>
 <p><code>blog</code>という名前のインデックスを作成。Methodが<code>PUT</code>であることに注意。</p>
-<pre><code>$ curl -XPUT 'localhost:9200/blog'
-</code></pre><h3 id="インデックスの削除をする">インデックスの削除をする</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XPUT &#39;localhost:9200/blog&#39;
+</code></pre></div><h3 id="インデックスの削除をする">インデックスの削除をする</h3>
 <p><code>blog</code>という名前のインデックスを削除する。</p>
-<pre><code>$ curl -XDELETE localhost:9200/blog
-</code></pre><h3 id="インデックスのマッピングを確認する">インデックスのマッピングを確認する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XDELETE localhost:9200/blog
+</code></pre></div><h3 id="インデックスのマッピングを確認する">インデックスのマッピングを確認する</h3>
 <p>インデックスのマッピングを確認する。</p>
-<pre><code>// インデックス全体
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// インデックス全体
 $ curl -XGET localhost:9200/blog/_mapping?pretty
 true
 {
-  &quot;blog&quot; : {
-    &quot;mappings&quot; : {
-      &quot;user&quot; : {
-        &quot;properties&quot; : {
-          &quot;image_url&quot; : {
-            &quot;type&quot; : &quot;text&quot;,
-            &quot;index&quot; : false
+  &#34;blog&#34; : {
+    &#34;mappings&#34; : {
+      &#34;user&#34; : {
+        &#34;properties&#34; : {
+          &#34;image_url&#34; : {
+            &#34;type&#34; : &#34;text&#34;,
+            &#34;index&#34; : false
           },
-          &quot;last_login_at&quot; : {
-            &quot;type&quot; : &quot;date&quot;,
-            &quot;fields&quot; : {
-              &quot;keyword&quot; : {
-                &quot;type&quot; : &quot;keyword&quot;,
-                &quot;ignore_above&quot; : 256
+          &#34;last_login_at&#34; : {
+            &#34;type&#34; : &#34;date&#34;,
+            &#34;fields&#34; : {
+              &#34;keyword&#34; : {
+                &#34;type&#34; : &#34;keyword&#34;,
+                &#34;ignore_above&#34; : 256
               }
             },
 (略)
-</code></pre><pre><code>// 特定のタイプのみ
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// 特定のタイプのみ
 $ curl -XGET localhost:9200/blog/user/_mapping?pretty
-</code></pre><h3 id="バルクインサート">バルクインサート</h3>
+</code></pre></div><h3 id="バルクインサート">バルクインサート</h3>
 <p>データをバルクインサートする。バルクインサートするデータのサンプルフォーマットはこちら。</p>
-<pre><code>$ cat sample-data.json
-{ &quot;index&quot; : {} }
-{&quot;date&quot; : &quot;2017-08-13 10:00:00&quot;,&quot;title&quot; : &quot;ElasticSearch入門&quot;,&quot;body&quot; : &quot;ブログ記事の全文検索などをやりたくて、ElasticSearchはどんなもんじゃろか？と触ってみたのでメモ。ElasticSearchの入門についてはたくさんの記事がすでにでているので、ほぼ自分の理解のために残します。&quot;, &quot;tag&quot;: [&quot;ElasticSearch&quot;, &quot;入門&quot;]}
-{ &quot;index&quot; : {} }
-{&quot;date&quot; : &quot;2017-08-14 22:00:00&quot;,&quot;title&quot; : &quot;ElasticSearch実践&quot;,&quot;body&quot; : &quot;ElasticSearchを利用した実践的な検索方法などについて開設します。また、クラスターの組み方なども解説。&quot;,&quot;tag&quot;: [&quot;ElasticSearch&quot;, &quot;実践&quot;, &quot;検索&quot;]}
-{ &quot;index&quot; : {} }
-{&quot;date&quot; : &quot;2017-08-12 11:00:00&quot;,&quot;title&quot; : &quot;Hugoサマリー機能&quot;,&quot;body&quot; : &quot;今まで、ブログのトップページは最新の数記事の記事全文を掲載していました。  そのため、当然ながら記事内の画像や埋め込みの動画などすべて表示されるので、トップページの表示速度はとても遅くなります。  そこで、サマリーだけを表示しようとHugoの`{{ .Summary }}`を利用しようとしたのですが、とても長いサマリーが出てきてなぜかと困っていました。&quot;,&quot;tag&quot;: [&quot;Hugo&quot;, &quot;ブログ&quot;]}
-{ &quot;index&quot; : {} }
-{&quot;date&quot; : &quot;2017-08-04 11:00:00&quot;,&quot;title&quot; : &quot;英語でAWSソリューションアーキテクト認定の模擬試験を受けてみた&quot;,&quot;body&quot; : &quot;英語でAWSソリューションアーキテクト認定の模擬試験を受けてみたので報告。AWS認定試験ってどんなものか、英語の試験ってどんなものか、どんな学習をしたか、あたりの参考にしてください。&quot;,&quot;tag&quot;: [&quot;英語&quot;, &quot;AWS&quot;]}
-{ &quot;index&quot; : {} }
-{&quot;date&quot; : &quot;2017-07-14 20:00:00&quot;,&quot;title&quot; : &quot;Terraform×Rancherでマルチクラウドを一歩すすめる、を話してきた&quot;,&quot;body&quot; : &quot;TerraformとRancherを使って、マルチクラウドを環境の考え方についてはなしてきました。マルチクラウドのメリットや他のサービスとどう組み合わせていくか話しました。&quot;,&quot;tag&quot;: [&quot;Terraform&quot;, &quot;Rancher&quot;, &quot;マルチクラウド&quot;]}
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat sample-data.json
+{ &#34;index&#34; : {} }
+{&#34;date&#34; : &#34;2017-08-13 10:00:00&#34;,&#34;title&#34; : &#34;ElasticSearch入門&#34;,&#34;body&#34; : &#34;ブログ記事の全文検索などをやりたくて、ElasticSearchはどんなもんじゃろか？と触ってみたのでメモ。ElasticSearchの入門についてはたくさんの記事がすでにでているので、ほぼ自分の理解のために残します。&#34;, &#34;tag&#34;: [&#34;ElasticSearch&#34;, &#34;入門&#34;]}
+{ &#34;index&#34; : {} }
+{&#34;date&#34; : &#34;2017-08-14 22:00:00&#34;,&#34;title&#34; : &#34;ElasticSearch実践&#34;,&#34;body&#34; : &#34;ElasticSearchを利用した実践的な検索方法などについて開設します。また、クラスターの組み方なども解説。&#34;,&#34;tag&#34;: [&#34;ElasticSearch&#34;, &#34;実践&#34;, &#34;検索&#34;]}
+{ &#34;index&#34; : {} }
+{&#34;date&#34; : &#34;2017-08-12 11:00:00&#34;,&#34;title&#34; : &#34;Hugoサマリー機能&#34;,&#34;body&#34; : &#34;今まで、ブログのトップページは最新の数記事の記事全文を掲載していました。  そのため、当然ながら記事内の画像や埋め込みの動画などすべて表示されるので、トップページの表示速度はとても遅くなります。  そこで、サマリーだけを表示しようとHugoの`{{ .Summary }}`を利用しようとしたのですが、とても長いサマリーが出てきてなぜかと困っていました。&#34;,&#34;tag&#34;: [&#34;Hugo&#34;, &#34;ブログ&#34;]}
+{ &#34;index&#34; : {} }
+{&#34;date&#34; : &#34;2017-08-04 11:00:00&#34;,&#34;title&#34; : &#34;英語でAWSソリューションアーキテクト認定の模擬試験を受けてみた&#34;,&#34;body&#34; : &#34;英語でAWSソリューションアーキテクト認定の模擬試験を受けてみたので報告。AWS認定試験ってどんなものか、英語の試験ってどんなものか、どんな学習をしたか、あたりの参考にしてください。&#34;,&#34;tag&#34;: [&#34;英語&#34;, &#34;AWS&#34;]}
+{ &#34;index&#34; : {} }
+{&#34;date&#34; : &#34;2017-07-14 20:00:00&#34;,&#34;title&#34; : &#34;Terraform×Rancherでマルチクラウドを一歩すすめる、を話してきた&#34;,&#34;body&#34; : &#34;TerraformとRancherを使って、マルチクラウドを環境の考え方についてはなしてきました。マルチクラウドのメリットや他のサービスとどう組み合わせていくか話しました。&#34;,&#34;tag&#34;: [&#34;Terraform&#34;, &#34;Rancher&#34;, &#34;マルチクラウド&#34;]}
 
 // バルクインサート
-$ curl -H &quot;Content-Type: application/json&quot; -XPOST 'localhost:9200/blog/post/_bulk?pretty&amp;refresh' --data-binary @sample-data.json
-</code></pre><h3 id="マッピング">マッピング</h3>
+$ curl -H &#34;Content-Type: application/json&#34; -XPOST &#39;localhost:9200/blog/post/_bulk?pretty&amp;refresh&#39; --data-binary @sample-data.json
+</code></pre></div><h3 id="マッピング">マッピング</h3>
 <p>マッピングを定義ファイルから設定する。</p>
-<pre><code>$ cat user.json
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat user.json
 {
-  &quot;properties&quot; : {
-    &quot;last_login_at&quot; : {
-      &quot;type&quot; : &quot;date&quot;,
-      &quot;format&quot;: &quot;yyyy-MM-dd HH:mm:ss&quot;,
-      &quot;fields&quot; : {
-        &quot;keyword&quot; : {
-          &quot;type&quot; : &quot;keyword&quot;,
-          &quot;ignore_above&quot; : 256
+  &#34;properties&#34; : {
+    &#34;last_login_at&#34; : {
+      &#34;type&#34; : &#34;date&#34;,
+      &#34;format&#34;: &#34;yyyy-MM-dd HH:mm:ss&#34;,
+      &#34;fields&#34; : {
+        &#34;keyword&#34; : {
+          &#34;type&#34; : &#34;keyword&#34;,
+          &#34;ignore_above&#34; : 256
         }
       }
     },
-    &quot;user_name&quot; : {
-      &quot;type&quot; : &quot;text&quot;,
-      &quot;fields&quot; : {
-        &quot;keyword&quot; : {
-          &quot;type&quot; : &quot;keyword&quot;,
-          &quot;ignore_above&quot; : 256
+    &#34;user_name&#34; : {
+      &#34;type&#34; : &#34;text&#34;,
+      &#34;fields&#34; : {
+        &#34;keyword&#34; : {
+          &#34;type&#34; : &#34;keyword&#34;,
+          &#34;ignore_above&#34; : 256
         }
       }
     },
-    &quot;image_url&quot; : {
-      &quot;type&quot; : &quot;text&quot;,
-      &quot;index&quot;: false
+    &#34;image_url&#34; : {
+      &#34;type&#34; : &#34;text&#34;,
+      &#34;index&#34;: false
       }
     }
   }
 }
 
-$ curl -XPUT 'localhost:9200/blog/_mapping/user?pretty' -d @user.json
-</code></pre><h3 id="ドキュメントを削除する">ドキュメントを削除する</h3>
-<pre><code>$ curl -XDELETE localhost:9200/blog/user/123456
+$ curl -XPUT &#39;localhost:9200/blog/_mapping/user?pretty&#39; -d @user.json
+</code></pre></div><h3 id="ドキュメントを削除する">ドキュメントを削除する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XDELETE localhost:9200/blog/user/123456
 ($ curl -XDELETE localhost:9200/:index/:type/:id)
-</code></pre><h2 id="検索関連">検索関連</h2>
+</code></pre></div><h2 id="検索関連">検索関連</h2>
 <h3 id="基本検索">基本検索</h3>
-<pre><code>//&quot;ElasticSearch 入門&quot;というキーワードで検索
-$ curl 'localhost:9200/blog/_search?pretty' -d '
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">//&#34;ElasticSearch 入門&#34;というキーワードで検索
+$ curl &#39;localhost:9200/blog/_search?pretty&#39; -d &#39;
 {
-  &quot;query&quot;: { &quot;match&quot;: { &quot;body&quot;: &quot;ElasticSearch 入門&quot; } }
-}'
-</code></pre>
+  &#34;query&#34;: { &#34;match&#34;: { &#34;body&#34;: &#34;ElasticSearch 入門&#34; } }
+}&#39;
+</code></pre></div>
                     </div>
                     
                     
