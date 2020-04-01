@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubernetesのリソースの基本を今度こそ理解する | Goldstine研究所</title>
+    <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+    <meta name="propeller" content="78ffb64bf8546f1b32b8a4e4400f4c06">
+    <meta name="description" content="Kubernetesのリソース関連(Requests,Limits,QoS class,LimitRange)の基本についてまとめました。曖昧に設定していたリソース設定について理解するとデバッグにも役立ちます。">
+    <link rel="canonical" href="https://blog.mosuke.tech/entry/2020/03/31/kubernetes-resource/">
+    <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/03/31/kubernetes-resource/" />
+    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="twitter:card" content="summary">
+    
+    <meta name="twitter:title" content="Kubernetesのリソースの基本を今度こそ理解する | Goldstine研究所">
+    <meta name="twitter:description" content="Kubernetesのリソース関連(Requests,Limits,QoS class,LimitRange)の基本についてまとめました。曖昧に設定していたリソース設定について理解するとデバッグにも役立ちます。">
+    <meta name="twitter:site" content="@mosuke5" />
+    <meta name="twitter:creator" content="@mosuke5" />
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Kubernetesのリソースの基本を今度こそ理解する &middot; Goldstine研究所">
+    <meta property="og:description" content="Kubernetesのリソース関連(Requests,Limits,QoS class,LimitRange)の基本についてまとめました。曖昧に設定していたリソース設定について理解するとデバッグにも役立ちます。">
+    <meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
+    <meta property="og:site_name" content="Goldstine研究所" />
+    <meta property="og:url" content="https://blog.mosuke.tech/entry/2020/03/31/kubernetes-resource/" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+    <link rel="stylesheet" href="https://blog.mosuke.tech/css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="icon" type="image/png" href="/image/favicon.ico">
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-2753210161325997",
+        enable_page_level_ads: true
+      });
+    </script>
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
+            <h2 class="brand-tagline"> @mosuke5&#39;s Blog </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">31 Mar 2020, 09:56</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2020/03/31/kubernetes-resource/" class="post-title">Kubernetesのリソースの基本を今度こそ理解する</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Kubernetes" href="https://blog.mosuke.tech/categories/kubernetes">Kubernetes</a>
+                            
+                        </p>
+                    </header>
+                    <div class="post-description">
+                        <p>こんにちは。<a href="https://twitter.com/mosuke5">もーすけ</a>です。<br>
+コロナによる在宅勤務を行っている人も多いと思いますが、在宅は捗っていますか？
+テレビからYouTubeなどを使って、カフェの雑音などを流しておくと家の中でも雰囲気はがらっと変わって集中できたりします。
+イヤホンなどで流すよりも部屋全体に流れるようにテレビなどでやるとおすすめです。ぜひトライしてみてください。</p>
+<p>今日は、Kubernetesのリソースの基本についてまとめました。<br>
+自分自身が理解が不足していたこともありましたし、なんとなくでマニフェストのリソースを書いてハマってしまうことも多くあるなあと思ったからです。
+今回書いたリソースは主に３点（コンテナのへのリソース割り当て, QoS Class, LimitRange）ですが、この他にも様々なトピックがあります。機会あれば別にご紹介したいともいます。</p>
+<h2 id="コンテナへのリソース割り当て">コンテナへのリソース割り当て</h2>
+<h3 id="requestsとlimits">RequestsとLimits</h3>
+<p>Kubernetesでは、コンテナ単位でリソース（CPUとメモリー）の割り当て、制限を行うことができます。
+リソースの制限について、まずいちばんはじめに理解するべきはRequestsとLimitsです。
+例えばPodマニフェストに次のように<code>spec.containers[].resources</code>に<code>requests</code>と<code>limits</code>を指定することでコンテナへのリソース割り当てが可能です。
+<code>requests</code>と<code>limits</code>が意味することを理解しておくことが重要です。
+<code>requests</code>は使用するリソースの「下限値」を指し、<code>limits</code>は使用するリソースの「上限値」を指します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
+<span style="color:#66d9ef">kind</span>: Pod
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: frontend
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">containers</span>:
+  - <span style="color:#66d9ef">name</span>: wp
+    <span style="color:#66d9ef">image</span>: wordpress
+    <span style="color:#66d9ef">resources</span>:
+      <span style="color:#66d9ef">requests</span>:
+        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;64Mi&#34;</span>
+        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;250m&#34;</span>
+      <span style="color:#66d9ef">limits</span>:
+        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;128Mi&#34;</span>
+        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;500m&#34;</span>
+</code></pre></div><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>requests</td>
+<td>使用するリソースの「下限値」です</td>
+</tr>
+<tr>
+<td>limits</td>
+<td>使用するリソースの「上限値」です</td>
+</tr>
+</tbody>
+</table>
+<h3 id="リソースとpodのスケジューリング">リソースとPodのスケジューリング</h3>
+<p>KubernetesがPodをノードにスケジュールするときは、<code>requests</code>の値を見ます。
+下限値なので、下限値を確保できないノードにはスケジュールはもちろんされません。
+requestsの値を大きくしすぎると当然ながらスケジュールできなくなる可能性が高まるので注意です。
+だからといって<code>requests</code>を小さく設定し過ぎることも問題になりえるのでなんとなくで設定してはいけません。（後述します）</p>
+<h3 id="requestsとlimitsの大きな差">requestsとlimitsの大きな差</h3>
+<p><code>requests</code>を小さく設定することも問題になりえるのでなんとなくで設定してはいけません、と書きましたが、小さく設定すること自体が問題ではなく、<code>limits</code>と大きな差がある場合です。もし<code>requests</code>を小さくし、<code>limits</code>との大きな差が生まれるとどのようなことが起きるか考えてみましょう。
+Podのスケジューリングは<code>requests</code>の値を基準に行われるので、多くのPodが１つのノードに集約されます。
+そのため、下限値でノードのリソースを埋め尽くす結果となってしまいます。
+つまり、<code>requests</code>と<code>limits</code>に差をつけすぎると、Podがすぐにノードのリソース上限に達してしまい利用したいリソース量が利用できなくなってしまう可能性が高まります。
+後で紹介する、LimitRangeで<code>requests</code>と<code>limits</code>の比率に制限をかけることができるので、対策も可能です。</p>
+<h3 id="上限値を超えた場合">上限値を超えた場合</h3>
+<p>設定した<code>limits</code>の上限値を越えるとどうなるのでしょうか。<br>
+メモリーが設定した<code>limits</code>を超えた場合、oom killerによってPodは強制的に停止します。
+<code>limits.memory</code>はoom killerが発生しない程度に設定する必要があります。<br>
+CPUが上限を超える場合は、メモリーの場合とは異なりPodの強制停止はされません。上限以上のCPUを利用できないです。</p>
+<h3 id="resourceが未指定の場合">resourceが未指定の場合</h3>
+<p><code>resource</code>の値が未指定の場合は、基本的には利用できるだけリソースを利用する状態となります。
+しかし、LimitRangeでデフォルト値が設定してある場合、未指定でも自動的に設定されます。
+利用しているNamespaceにLimitRangeが設定されているかどうか確認しておくと良いです。
+また、現実の設定値は<code>kubectl describe pod xxxx</code>で確認するのがよいでしょう。<br>
+また、次に説明するQoS ClassでBestEffortとなるため、ノードのメモリーが不足した場合は最優先に停止対象のPodとして選ばれます。</p>
+<h2 id="qos-class">QoS class</h2>
+<p>上で説明した、<code>requests</code>と<code>limits</code>の設定によってKubernetesは、QoS Classという値をPodに設定します。
+この値は、自動的に付与されるものでユーザ側で任意に設定するものではありません。
+QoS Classは、ノードのリソースの上限などでKubernetesがPodを強制停止する際の対象を選定する際に利用されるものです。<br>
+QoS Classは以下の条件によって決定します。</p>
+<table>
+<thead>
+<tr>
+<th>QoS Class</th>
+<th>設定条件</th>
+<th>優先度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BestEffort</td>
+<td>requests, limitsともに未指定のとき</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Burstable</td>
+<td>1つ以上のrequestsかlimitsが設定されているとき(Guaranteedではない)</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Guaranteed</td>
+<td>requestsとlimitsが同じ値でCPU・メモリーともに設定されている</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p>例えば、ノードのメモリー上限に達すると（コンテナのlimitsの上限ではなく）、KubernetesはPodを強制的に退去(Evict)しリソースを確保します。その際に、QoS Classを参照します。BestEffortから順にPodを停止する動きを取ります。<br>
+実際に設定されているQoS Classを確認するには稼働しているPodをdescribeで見てみるとわかります。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl describe pod pod-name
+...
+Volumes:
+  default-token-xcrmt:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-xcrmt
+    Optional:    false
+QoS Class:       Burstable
+Node-Selectors:  &lt;none&gt;
+Tolerations:     node.kubernetes.io/memory-pressure:NoSchedule
+                 node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:          &lt;none&gt;
+</code></pre></div><h3 id="同じクラスだった場合">同じクラスだった場合</h3>
+<p>メモリーがノードの上限に達し、oom killerによってPodを強制停止をする場合にQoS Classによって停止するPodの優先度が決定すると書きましたが、同じクラスだった場合はスコアによってきまります。
+以下のKubernetesの公式ドキュメントに記載があるのですが、Busrstableの場合、Podのrequestしたメモリー量とノードのキャパシティの割合によってスコア付けされます。</p>
+<p><a href="https://kubernetes.io/docs/tasks/administer-cluster/out-of-resource/#node-oom-behavior" target="_blank">Configure Out of Resource Handling - Kubernetes</a></p>
+<h3 id="使いみち">使いみち</h3>
+<p>仕組みは理解できたとして、このQoSをどう使っていけばいいのでしょうか。<br>
+すべてを十分なリソースでGuaranteedにできるに越したことはないですが、
+確保した量と実際に使用する量に乖離がある場合もありますし、Podの収容効率もさがります。
+Webサーバのように複数台で分散可能で、一部のPodが停止しても大きな影響がないものはBurstableで、JobやStatefulなアプリケーションなどはGuaranteedを検討すると良いのではないかと思います。
+本番環境で動くアプリケーションではBusrstableはそもそもおすすめしません。</p>
+<h2 id="limitrange">LimitRange</h2>
+<p>LimitRangeというKubernetesリソースがあります。
+こちらを利用することで以下が設定できます。<br>
+(公式ドキュメント: <a href="https://kubernetes.io/docs/concepts/policy/limit-range/" target="_blank">Limit Ranges - Kubernetes</a>)</p>
+<ol>
+<li>デフォルトのLimitsの設定</li>
+<li>デフォルトのRequestsの設定</li>
+<li>最大のリソース使用量の設定</li>
+<li>最小のリソース使用量の設定</li>
+<li>LimitsとRequestsの割合の設定</li>
+</ol>
+<p>このLimitRangeを設定することで上で一部注意事項として書いたことの対策ができるようになります。<br>
+具体的には以下のようなことが対策できるようになります。</p>
+<ol>
+<li>BestEffortのQoS Classが設定されたPodを作らない</li>
+<li>LimitsとRequestsの大幅な差をさくす</li>
+<li>過剰なリソースの要求をさせない</li>
+</ol>
+<h3 id="設定とデバッグ">設定とデバッグ</h3>
+<p>LimitRangeはnamespace毎に設定できるものです。
+また、PodとContainerに対して設定が可能です。<br>
+設定方法は極めて簡単で、以下のようなマニフェストを適応するのみです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: <span style="color:#e6db74">&#34;v1&#34;</span>
+<span style="color:#66d9ef">kind</span>: <span style="color:#e6db74">&#34;LimitRange&#34;</span>
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: <span style="color:#e6db74">&#34;core-resource-limits&#34;</span>
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">limits</span>:
+    - <span style="color:#66d9ef">type</span>: <span style="color:#e6db74">&#34;Pod&#34;</span>
+      <span style="color:#66d9ef">max</span>:
+        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;2&#34;</span>
+        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;1Gi&#34;</span>
+      <span style="color:#66d9ef">min</span>:
+        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;200m&#34;</span>
+        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;6Mi&#34;</span>
+    - <span style="color:#66d9ef">type</span>: <span style="color:#e6db74">&#34;Container&#34;</span>
+      <span style="color:#66d9ef">max</span>:
+        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;2&#34;</span>
+        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;1Gi&#34;</span>
+      <span style="color:#66d9ef">min</span>:
+        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;100m&#34;</span>
+        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;4Mi&#34;</span>
+      <span style="color:#66d9ef">default</span>:
+        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;300m&#34;</span>
+        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;200Mi&#34;</span>
+      <span style="color:#66d9ef">defaultRequest</span>:
+        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;200m&#34;</span>
+        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;100Mi&#34;</span>
+      <span style="color:#66d9ef">maxLimitRequestRatio</span>:
+        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;2&#34;</span>
+        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;2&#34;</span>
+</code></pre></div><p>例えば、この場合<code>maxLimitRequestRatio.memory</code>が &ldquo;2&rdquo; に設定されており、メモリーのrequestsとlimitsの比率が２倍までとしています。この状態で、2倍以上の差のあるDeploymentをデプロイしてみます。</p>
+<p>deploymentはできていますが、Podが起動してきません。
+この場合、deploymentではなく、replicasetのeventを見ると良いです。
+実際に見るとメモリーのrequestsとlimitsの比率が2までの制限がかかっているが実際には4ほどある、という旨のエラーメッセージを確認できました。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get deployment
+NAME          READY   UP-TO-DATE   AVAILABLE   AGE
+debug-nginx   0/1     0            0           2m11s
+
+$ kubectl get replicaset
+NAME                     DESIRED   CURRENT   READY   AGE
+debug-nginx-6d7d6b87b9   1         0         0       93s
+
+$ kubectl describe replicaset debug-nginx-6d7d6b87b9
+...
+Events:
+  Type     Reason        Age                From                   Message
+  ----     ------        ----               ----                   -------
+  Warning  FailedCreate  31s                replicaset-controller  Error creating: pods &#34;debug-nginx-6d7d6b87b9-qplmn&#34; is forbidden: [maximum memory usage per Pod is 1Gi, but
+limit is 2147483648, maximum memory usage per Container is 1Gi, but limit is 2Gi, memory max limit to request ratio per Container is 2, but provided ratio is 4.096000]
+</code></pre></div><h2 id="まとめ">まとめ</h2>
+<p>Kubernetesにおけるリソースの基本となる３つの項目について見てきました。<br>
+最低限このくらいのことがわかっているとデバッグ作業に非常に役立つと感じています。
+なんとなくで設定していた方は今日で卒業してもらえればと思います。</p>
+<p>Kubernetesのリソースは、今日紹介したことの他にもNamespaceごとのリソースのクオータ制限をするResourceQuotaや、Podのオートスケーリング、スケジューリングなどなど非常に奥が深いです。
+より体系的に深く学びたい方は、ぜひともKubernetes完全ガイドをおすすめします。我らのバイブルです。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.amazon.co.jp/Kubernetes%25E5%25AE%258C%25E5%2585%25A8%25E3%2582%25AC%25E3%2582%25A4%25E3%2583%2589-impress-top-gear-%25E9%259D%2592%25E5%25B1%25B1/dp/4295004804" data-iframely-url="//cdn.iframe.ly/UdUbVWh?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+                    </div>
+                    
+                    
+                    <div class="related-post">
+                        <h5>関連する記事はこちら</h5>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/" onClick="ga('send','event','link','click','related-posts');">KubernetesにおけるCI/CD実践の勘所まとめ</a> (2020/03/04)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/02/26/cloud-native-devops/" onClick="ga('send','event','link','click','related-posts');">運用課題の指南書、Kubernetesで実践するクラウドネイティブDevOps</a> (2020/02/26)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/01/22/sockshop/" onClick="ga('send','event','link','click','related-posts');">Sock Shopを使ったマイクロサービス体験のハンズオン</a> (2020/01/22)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2019/08/21/ansible-for-k8s-resources/" onClick="ga('send','event','link','click','related-posts');">Kubernetes上のリソースをAnsibleで管理する</a> (2019/08/21)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2019/07/12/sidecar-fluentd-to-cloudwatchlogs/" onClick="ga('send','event','link','click','related-posts');">Sidecar方式のFluentdでCloudWatch logsへログを集約することについての検討</a> (2019/07/12)</li>
+                    	
+                    </div>
+                    
+                    <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+                            <a class="twitter-share-button"
+                            href="https://twitter.com/intent/tweet">
+                          Tweet</a>
+                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f03%2f31%2fkubernetes-resource%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <hr class="footer-hr" />
+<div class="footer-posts">
+    <h5>Latest Posts</h5>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/03/31/kubernetes-resource/" onClick="ga('send','event','link','click','latest-posts');">Kubernetesのリソースの基本を今度こそ理解する</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/03/28/strengths-finder/" onClick="ga('send','event','link','click','latest-posts');">ITエンジニアこそ「強み」を活かそう。ストレングスファインダーの活用</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/" onClick="ga('send','event','link','click','latest-posts');">KubernetesにおけるCI/CD実践の勘所まとめ</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/02/26/cloud-native-devops/" onClick="ga('send','event','link','click','latest-posts');">運用課題の指南書、Kubernetesで実践するクラウドネイティブDevOps</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/02/23/basic-of-agile/" onClick="ga('send','event','link','click','latest-posts');">本質を学ぶ、アジャイル・スクラム初心者におすすめの教材</a></li>
+    
+</div>
+<div class="footer-posts">
+    <h5>Featured Posts</h5>
+    <li><a href="https://blog.mosuke.tech/entry/2016/06/04/180122/" onClick="ga('send','event','link','click','featured-posts');">Nginxの仕組みについて入門</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2017/03/18/182252/" onClick="ga('send','event','link','click','featured-posts');">万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2015/07/19/135844/" onClick="ga('send','event','link','click','featured-posts');">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った</a></li>
+</div>
+<div class="search">
+    <h5>Search</h5>
+    <div class="google-search">
+    <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+<div class="gcse-search"></div>
+    </div>
+</div>
+<div class="links">
+    <h5>Links</h5>
+    <a class="pure-button" href="/about/" onClick="ga('send','event','link','click','about-this-site');"><i class="fa fa-info-circle"></i> About this site</a>
+    <a class="pure-button" href="/archive/" onClick="ga('send','event','link','click','archive');"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="/categories/" onClick="ga('send','event','link','click','categories');"><i class="fa fa-tag"></i> Categories</a>
+    <a class="pure-button" href="https://docs.google.com/forms/d/e/1FAIpQLSd6N53H7zfF8EBrvyezRizU1mQx-CP3vc_jG-WvxfRmCjHTpg/viewform" onClick="ga('send','event','link','click','contact');" target="_blank"><i class="fa fa-question-circle"></i> Contact</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml" onClick="ga('send','event','link','click','rss');"><i class="fa fa-rss"></i> rss</a>
+</div>
+<div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by <a class="hugo" href="https://gohugo.io/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+
+        </div>
+    </div>
+</div>
+<script>
+window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+  
+    return t;
+}(document, "script", "twitter-wjs"));
+</script>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-99596316-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
