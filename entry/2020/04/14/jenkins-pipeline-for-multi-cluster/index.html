@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jenkins pipelineで複数のOpenShiftクラスタを扱う | Goldstine研究所</title>
+    <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+    <meta name="propeller" content="78ffb64bf8546f1b32b8a4e4400f4c06">
+    <meta name="description" content="Jenkins pipelineで複数のOpenShiftクラスタを扱う方法について共有します。OpenShift Jenkins Pipeline Pluginを使ったマルチクラスタの扱いを紹介します。">
+    <link rel="canonical" href="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/">
+    <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/" />
+    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="twitter:card" content="summary">
+    
+    <meta name="twitter:title" content="Jenkins pipelineで複数のOpenShiftクラスタを扱う | Goldstine研究所">
+    <meta name="twitter:description" content="Jenkins pipelineで複数のOpenShiftクラスタを扱う方法について共有します。OpenShift Jenkins Pipeline Pluginを使ったマルチクラスタの扱いを紹介します。">
+    <meta name="twitter:site" content="@mosuke5" />
+    <meta name="twitter:creator" content="@mosuke5" />
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Jenkins pipelineで複数のOpenShiftクラスタを扱う &middot; Goldstine研究所">
+    <meta property="og:description" content="Jenkins pipelineで複数のOpenShiftクラスタを扱う方法について共有します。OpenShift Jenkins Pipeline Pluginを使ったマルチクラスタの扱いを紹介します。">
+    <meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
+    <meta property="og:site_name" content="Goldstine研究所" />
+    <meta property="og:url" content="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+    <link rel="stylesheet" href="https://blog.mosuke.tech/css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="icon" type="image/png" href="/image/favicon.ico">
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-2753210161325997",
+        enable_page_level_ads: true
+      });
+    </script>
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
+            <h2 class="brand-tagline"> @mosuke5&#39;s Blog </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">14 Apr 2020, 17:05</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/" class="post-title">Jenkins pipelineで複数のOpenShiftクラスタを扱う</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Kubernetes" href="https://blog.mosuke.tech/categories/kubernetes">Kubernetes</a><a class="post-category post-category-DevOps" href="https://blog.mosuke.tech/categories/devops">DevOps</a>
+                            
+                        </p>
+                    </header>
+                    <div class="post-description">
+                        <p>もーすけです。今日はJenkinsを使ったKubernetes(OpenShift)環境でのデプロイ関連についてです。<br>
+Jenkins pipelineで複数クラスタ（マルチクラスタ）を扱いたい場合の設定方法について確認したので共有します。</p>
+<h2 id="背景">背景</h2>
+<p>以前にskopeoを用いたコンテナイメージの別レジストリへのコピーする方法について書きました。
+イメージを別レジストリへコピーする目的は、イメージをビルドしたクラスタと本番環境が別クラスタの場合などがあります。
+必然的に、Jenkins pipelineで複数のOpenShiftのクラスタに対して操作したいということになります。
+やることは単純で、複数のクラスタの認証情報を用意して操作することになるわけですが、JenkinsのOpenShift Client Pluginを用いた方法についてメモしていきます。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/04/05/skopeo/" data-iframely-url="//cdn.iframe.ly/SsqYHwS"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<p>本ブログでは下記状況を想定します。</p>
+<ul>
+<li>OpenShiftを利用している</li>
+<li>OpenShift上のクラスタAでJenkinsを動作させている</li>
+<li>クラスタAはステージング環境として利用している</li>
+<li>クラスタBはプロダクション環境であり、上のJenkinsからアプリケーションをデプロイしたいと考えている</li>
+<li>Jenkins pipelineを使っており、OpenShiftの操作は<a href="https://github.com/openshift/jenkins-client-plugin" target="_blank">OpenShift Jenkins Pipeline Plugin</a>を用いている</li>
+</ul>
+<p><img src="/image/jenkins-pipeline-multi-cluster-overview.png" alt="jenkins-pipeline-multi-cluster-overview"></p>
+<h2 id="実装方法">実装方法</h2>
+<h3 id="serviceaccountの用意">ServiceAccountの用意</h3>
+<p>複数クラスタを扱うということは、Jenkinsが起動するクラスタとは異なるクラスタの操作をする必要があるということです。
+OpenShiftクラスタへの外部からの認証方法を検討しなければいけません。
+一般的にKubernetesへの認証方法はいくつかありますが、ここではServiceAccountを利用します。
+ServiceAccountはもともとは、Podで実行されるプロセスに割り当てるためのものですが、認証にも利用できます。
+ServiceAccountを削除すれば認証のTokenも削除できるので比較的便利です。</p>
+<p>環境B側にServiceAccountを作成しましょう（ここでは<code>jenkins-deploy</code>というServiceAccountを作ります）。<br>
+ServiceAccountは作成されると、Secret(Tokenなど)が自動的に作成されます。
+そのTokenを使って認証することができます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc create serviceaccount jenkins-deploy
+serviceaccount/jenkins-deploy created
+
+$ oc get secret
+NAME                             TYPE                                  DATA   AGE
+...
+jenkins-deploy-dockercfg-pjwrj   kubernetes.io/dockercfg               1      3m35s
+jenkins-deploy-token-bvf8p       kubernetes.io/service-account-token   4      3m35s
+jenkins-deploy-token-c5fhl       kubernetes.io/service-account-token   4      3m35s
+</code></pre></div><p>自動で作成されたSecretの中には、Tokenの他に証明書、Namespaceの情報が保存されています。<br>
+次のステップでこのTokenと証明書を利用していきます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc describe secrets jenkins-deploy-token-bvf8p
+Name:         jenkins-deploy-token-bvf8p
+Namespace:    mosuke5
+Labels:       &lt;none&gt;
+Annotations:  kubernetes.io/service-account.name: jenkins-deploy
+              kubernetes.io/service-account.uid: fa79ec6f-c055-4d2e-a369-e3d4b5dae2bd
+
+Type:  kubernetes.io/service-account-token
+
+Data
+====
+ca.crt:          5932 bytes
+namespace:       7 bytes
+service-ca.crt:  7133 bytes
+token:           xxxxxxxxxxxxxxxxxxxxxx
+</code></pre></div><p>次に操作できる権限についてです。<br>
+上で作成されたTokenを使って認証するわけですが、目的はJenkins pipelineからクラスタBにKubernetesリソースを作成したりのデプロイ操作です。
+そのため、ServiceAccountに対して権限設定（RBAC）をしてあげる必要があります。
+この権限設定は十分に注意しましょう。強い権限を与えすぎると、Jenkins Pipelineから必要以上の操作ができてしまいます。<br>
+下はeditのcluster roleを与えますが、プロジェクトに合わせて適切なロールを作成して割り当てるようにしてください。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc policy add-role-to-user edit system:serviceaccount:production:jenkins-deploy -n production
+clusterrole.rbac.authorization.k8s.io/edit added: &#34;system:serviceaccount:mosuke5:jenkins-deploy&#34;
+</code></pre></div><h3 id="jenkins設定">Jenkins設定</h3>
+<p>続いてJenkins側の設定を確認していきます。<br>
+のちに行うパイプランの設定次第では、この設定はなくても動くのですが、
+クラスタ固有の情報をJenkinsパイプランに記述することは望ましくありませんので、こちらに設定することをおすすめします。</p>
+<p>[Manage Jenkins -&gt; Configure System -&gt; OpenShift Client Plugin]からクラスタ追加の設定ができます。
+以下が設定例の画面です。
+設定のために用意するものは最低２つ、できれば３つあります。
+クラスタのAPIのエンドポイントと上で作成したToken(画面でいうCredentials)は必須です。クラスタのAPIエンドポイントは、Routerエンドポイントではないので注意してください。
+<code>Server Certificate Authority</code> は<code>Disable TLS Verify</code>にチェックを入れれば任意ですが、本番環境では設定することをおすすめします。</p>
+<p><img src="/image/jenkins-other-openshift-cluster.png" alt="jenkins-other-openshift-cluster"></p>
+<p>TokenはJenkinsのCredential Providerに保存して利用できます。</p>
+<p><img src="/image/jenkins-credential-provider-openshift-client.png" alt="jenkins-credential-provider-openshift-client"></p>
+<h3 id="pipeline">Pipeline</h3>
+<p>さて、最後にJenkinsfileによるパイプランの設定を確認していきます。<br>
+<code>openshift.withCluster()</code>で利用するクラスタを切り替えることができます。
+<code>openshift.withCluster('your-cluster')</code>の <code>'your-cluster'</code>には、一つ前のJenkins側の設定で記述した<code>Cluster Name</code>がはいります。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">pipeline {
+  agent {
+    kubernetes {
+      cloud &#39;openshift&#39;
+      label &#39;maven&#39;
+    }
+  }
+
+  stages {
+    stage(&#39;deploy to cluster A&#39;) {
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject(&#34;staging&#34;) {
+              echo &#34;Hello from ${openshift.cluster()}. Project: ${openshift.project()}&#34;
+              // 任意のデプロイ処理
+            }
+          }
+        }
+      }
+    }
+
+    stage(&#39;deploy to cluster B&#39;) {
+      steps {
+        script {
+          openshift.withCluster( &#39;prod-openshift&#39; ) {
+            openshift.withProject(&#39;production&#39;) {
+              echo &#34;Hello from ${openshift.cluster()}. Project: ${openshift.project()}&#34;
+              // 任意のデプロイ処理
+            }
+          }
+        }
+      }
+    }
+  }
+}
+</code></pre></div><h2 id="さいごに">さいごに</h2>
+<p>特に難しいこともなく、GithubのREADMEをきちんと読めばできることだったのですが、
+いくつか設定してハマったところもあったので書き残しました。
+Jenkinsはもう古いと思いつつも、JenkinsXやJenkins Opratorもでてきているので、まだまだお世話になりそうです。
+OpenShift x OpenShiftをガンガン使いこなしておきましょう。</p>
+
+                    </div>
+                    
+                    
+                    <div class="related-post">
+                        <h5>関連する記事はこちら</h5>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/" onClick="ga('send','event','link','click','related-posts');">KubernetesにおけるCI/CD実践の勘所まとめ</a> (2020/03/04)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/02/26/cloud-native-devops/" onClick="ga('send','event','link','click','related-posts');">運用課題の指南書、Kubernetesで実践するクラウドネイティブDevOps</a> (2020/02/26)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2019/08/21/ansible-for-k8s-resources/" onClick="ga('send','event','link','click','related-posts');">Kubernetes上のリソースをAnsibleで管理する</a> (2019/08/21)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/" onClick="ga('send','event','link','click','related-posts');">Kubernetes上のリソースをTerraformで管理するメリットとデメリット</a> (2019/03/07)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/04/09/kubernetes-namespace/" onClick="ga('send','event','link','click','related-posts');">Kubernetes、namespaceの分け方に迷った場合に考えること</a> (2020/04/09)</li>
+                    	
+                    </div>
+                    
+                    <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+                            <a class="twitter-share-button"
+                            href="https://twitter.com/intent/tweet">
+                          Tweet</a>
+                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f04%2f14%2fjenkins-pipeline-for-multi-cluster%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <hr class="footer-hr" />
+<div class="footer-posts">
+    <h5>Latest Posts</h5>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/" onClick="ga('send','event','link','click','latest-posts');">Jenkins pipelineで複数のOpenShiftクラスタを扱う</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/04/09/kubernetes-namespace/" onClick="ga('send','event','link','click','latest-posts');">Kubernetes、namespaceの分け方に迷った場合に考えること</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/04/05/skopeo/" onClick="ga('send','event','link','click','latest-posts');">Skopeoを利用したコンテナイメージのレジストリ間コピー</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/03/31/kubernetes-resource/" onClick="ga('send','event','link','click','latest-posts');">Kubernetesのリソースの基本を今度こそ理解する</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/03/28/strengths-finder/" onClick="ga('send','event','link','click','latest-posts');">ITエンジニアこそ「強み」を活かそう。ストレングスファインダーの活用</a></li>
+    
+</div>
+<div class="footer-posts">
+    <h5>Featured Posts</h5>
+    <li><a href="https://blog.mosuke.tech/entry/2016/06/04/180122/" onClick="ga('send','event','link','click','featured-posts');">Nginxの仕組みについて入門</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2017/03/18/182252/" onClick="ga('send','event','link','click','featured-posts');">万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2015/07/19/135844/" onClick="ga('send','event','link','click','featured-posts');">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った</a></li>
+</div>
+<div class="search">
+    <h5>Search</h5>
+    <div class="google-search">
+    <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+<div class="gcse-search"></div>
+    </div>
+</div>
+<div class="links">
+    <h5>Links</h5>
+    <a class="pure-button" href="/about/" onClick="ga('send','event','link','click','about-this-site');"><i class="fa fa-info-circle"></i> About this site</a>
+    <a class="pure-button" href="/archive/" onClick="ga('send','event','link','click','archive');"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="/categories/" onClick="ga('send','event','link','click','categories');"><i class="fa fa-tag"></i> Categories</a>
+    <a class="pure-button" href="https://docs.google.com/forms/d/e/1FAIpQLSd6N53H7zfF8EBrvyezRizU1mQx-CP3vc_jG-WvxfRmCjHTpg/viewform" onClick="ga('send','event','link','click','contact');" target="_blank"><i class="fa fa-question-circle"></i> Contact</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml" onClick="ga('send','event','link','click','rss');"><i class="fa fa-rss"></i> rss</a>
+</div>
+<div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by <a class="hugo" href="https://gohugo.io/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+
+        </div>
+    </div>
+</div>
+<script>
+window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+  
+    return t;
+}(document, "script", "twitter-wjs"));
+</script>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-99596316-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
