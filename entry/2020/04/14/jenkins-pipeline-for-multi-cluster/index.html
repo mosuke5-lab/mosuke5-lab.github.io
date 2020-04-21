@@ -105,7 +105,7 @@ OpenShiftクラスタへの外部からの認証方法を検討しなければ�
 ServiceAccountはもともとは、Podで実行されるプロセスに割り当てるためのものですが、認証にも利用できます。
 ServiceAccountを削除すれば認証のTokenも削除できるので比較的便利です。</p>
 <p>環境B側にServiceAccountを作成しましょう（ここでは<code>jenkins-deploy</code>というServiceAccountを作ります）。<br>
-ServiceAccountは作成されると、Secret(Tokenなど)が自動的に作成されます。
+ServiceAccountは作成されると、Secret(Tokenなど)が自動的に作成されます。（生成されるトークンに関する<a href="https://access.redhat.com/documentation/ja-jp/openshift_container_platform/4.3/html/authentication/understanding-and-creating-service-accounts" target="_blank">公式ドキュメント</a>）
 そのTokenを使って認証することができます。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc create serviceaccount jenkins-deploy
 serviceaccount/jenkins-deploy created
@@ -192,6 +192,53 @@ clusterrole.rbac.authorization.k8s.io/edit added: &#34;system:serviceaccount:mos
     }
   }
 }
+</code></pre></div><h2 id="serviceaccountを使ったレジストリへのアクセス">ServiceAccountを使ったレジストリへのアクセス</h2>
+<p>(2020/04/21追記)<br>
+本筋とは少しずれるのですが、複数クラスタを運用している場合、レジストリ間でのイメージのコピーが必要になります。
+イメージレジストリへの認証もServifeAccountを用いて行うことが実はできるのでお伝えします。
+上で、ServiceAccountを作成後にSecretが自動生成されると書きましたが、その中に<code>jenkins-deploy-dockercfg-pjwrj</code>という名前のSecretがありました。このSecretにはイメージレジストリの認証に利用できる情報が入っています。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get secret
+NAME                             TYPE                                  DATA   AGE
+...
+jenkins-deploy-dockercfg-pjwrj   kubernetes.io/dockercfg               1      3m35s
+jenkins-deploy-token-bvf8p       kubernetes.io/service-account-token   4      3m35s
+jenkins-deploy-token-c5fhl       kubernetes.io/service-account-token   4      3m35s
+</code></pre></div><p>中身はこんな具合です。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{
+  &#34;172.30.203.233:5000&#34;: {
+    &#34;username&#34;: &#34;serviceaccount&#34;,
+    &#34;password&#34;: &#34;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&#34;,
+    &#34;email&#34;: &#34;serviceaccount@example.org&#34;,
+    &#34;auth&#34;: &#34;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&#34;
+  },
+  ...
+}
+</code></pre></div><p>試しに、このServiceAccountの認証情報を使ってDocker CLIでクラスタ外部からログインしてみます。
+<code>~/.docker/config.json</code>を下記のように書いてログインができることを確認できます。
+下はDockerでのログインをしましたが、skopeoや<code>oc image mirror</code>コマンドで同様に認証が利用できます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat ~/.docker/config.json
+{
+	&#34;auths&#34;: {
+		&#34;your-openshift-registry-endpoint&#34;: {
+			&#34;auth&#34;: &#34;xxxxxxxxxxxxxxxxxxxxxxxxxxxxx&#34;
+		}
+	}
+}
+
+$ docker login your-openshift-registry-endpoint
+Authenticating with existing credentials...
+WARNING! Your password will be stored unencrypted in /Users/shinyamori/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+
+$ docker pull your-openshift-registry-endpoint/mosuke5/example:latest
+latest: Pulling from mosuke5/example
+26df34a7cd86: Pull complete
+f840832afa6e: Pull complete
+1827265676ce: Pull complete
+...
 </code></pre></div><h2 id="さいごに">さいごに</h2>
 <p>特に難しいこともなく、GithubのREADMEをきちんと読めばできることだったのですが、
 いくつか設定してハマったところもあったので書き残しました。
