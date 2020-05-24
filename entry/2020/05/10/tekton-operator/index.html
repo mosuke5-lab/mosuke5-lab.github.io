@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TektonのOperatorによるインストールとHello World | Goldstine研究所</title>
+    <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+    <meta name="propeller" content="78ffb64bf8546f1b32b8a4e4400f4c06">
+    <meta name="description" content="Tekton Operatorを用いて、Tektonのインストールをしていきます。OperatorとTekton本体、パイプラインタスクの関係性などを整理しながら説明します。最後に簡単なタスク実行も行っていきます。">
+    <link rel="canonical" href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/">
+    <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" />
+    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="twitter:card" content="summary">
+    
+    <meta name="twitter:title" content="TektonのOperatorによるインストールとHello World | Goldstine研究所">
+    <meta name="twitter:description" content="Tekton Operatorを用いて、Tektonのインストールをしていきます。OperatorとTekton本体、パイプラインタスクの関係性などを整理しながら説明します。最後に簡単なタスク実行も行っていきます。">
+    <meta name="twitter:site" content="@mosuke5" />
+    <meta name="twitter:creator" content="@mosuke5" />
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="TektonのOperatorによるインストールとHello World &middot; Goldstine研究所">
+    <meta property="og:description" content="Tekton Operatorを用いて、Tektonのインストールをしていきます。OperatorとTekton本体、パイプラインタスクの関係性などを整理しながら説明します。最後に簡単なタスク実行も行っていきます。">
+    <meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
+    <meta property="og:site_name" content="Goldstine研究所" />
+    <meta property="og:url" content="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+    <link rel="stylesheet" href="https://blog.mosuke.tech/css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="icon" type="image/png" href="/image/favicon.ico">
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-2753210161325997",
+        enable_page_level_ads: true
+      });
+    </script>
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
+            <h2 class="brand-tagline"> @mosuke5&#39;s Blog </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">10 May 2020, 15:15</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" class="post-title">TektonのOperatorによるインストールとHello World</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Kubernetes" href="https://blog.mosuke.tech/categories/kubernetes">Kubernetes</a><a class="post-category post-category-DevOps" href="https://blog.mosuke.tech/categories/devops">DevOps</a>
+                            
+                        </p>
+                    </header>
+                    <div class="post-description">
+                        <p><a href="https://twitter.com/mosuke5" target="_blank">もーすけ</a>です。
+GWはみなさんいかがお過ごしでしたか？<br>
+外に出れないGWという一生でもそんなことが2度あるかわかりませんが非常に大変な日々を過ごされたのではないかと思います。自分は、GWを使ってKubernetes Operatorの開発などに挑戦してみていました。
+このあたりの話は別で書きたいと思いますが、Kubernetesのよさについてさらに理解を深めた気がします。</p>
+<p>さて、今日はCloud NativeなCI/CDツールと言われているTektonについて。<br>
+何回かに分けて書こうと思いますが、Operatorによるインストール編です。</p>
+<h2 id="tekton">Tekton</h2>
+<p>みなさんは現在どんなCIツールを利用していますでしょうか？<br>
+<a href="https://tekton.dev/" target="_blank">Tekton</a>はKubernetes時代にKubernetes-nativeなCI/CDツールとして生まれました。
+CI/CDのプロセスの中で行う、ビルドやテスト、デプロイなどの処理をKubernetesのリソースとして実現するためのツールです。どういうことかというと、パイプラインやそのタスクの定義をみなさんがよく書いているKubernetesマニフェストとして管理できるということです。</p>
+<p>Kubernetes-nativeなCI/CDツールの対義としてトラディショナルCI/CDツールという表現をされることがあります。<br>
+例えば、Jenkinsもその1つです。（断っておくと、トラディショナルCI/CDツールが悪いという意味ではありません）
+JenkinsもいまKubernetes時代のためにうまれかわり、Jenkins Xなどのツールを出していますが、従来のJenkinsは中央集権的な管理であり、それゆえにプラグイン管理などが複雑化するなどの問題もありました。
+CIツールそのものの管理の複雑さを排除し、サーバレスでKubernetesのリソースとして実行できるプラットフォームとしてTektonは位置づけられています。</p>
+<h2 id="tekton-operator">Tekton Operator</h2>
+<p>Tektonの入門記事やインストールについての記事はいくつかでていますが、やはり自分でTektonを運用しようと思ったときはOperatorを使ってインストール・管理したいです。
+Operatorについて知らない方に簡単にお伝えすると、別名カスタムコントローラとも呼ばれており、Tektonのインストール自体を、Kubernetesのリソースとして定義できるようにするものです。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/tektoncd/operator" data-iframely-url="//cdn.iframe.ly/IKARWIp"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<p>Tekton OperatorとTekton本体、およびパイプラインタスクの実態の関係性は下記のようになっています。<br>
+これからインストールしようとしているのは左のOperatorです。OperatorはTekton本体を管理・インストールします。
+Tekton本体が、パイプラインの実態であるTaskなどを作成し管理します。</p>
+<p><img src="/image/tekton-operator-overview.png" alt="tekton-operator-overview"></p>
+<h2 id="operatorを使ってインストール">Operatorを使ってインストール</h2>
+<p>解説のコメントを入れながらインストールをしていきます。</p>
+<h3 id="crdの作成">CRDの作成</h3>
+<p>まずは、Githubレポジトリのクローンと、Tekton本体を管理するためのCRDsのデプロイを行っていきます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/tektoncd/operator
+$ cd operator
+
+// tekton operatorが動作するためのNamespaceの作成
+$ kubectl create ns tekton-operator
+
+// tekton自身を管理するためのCRDの作成
+$ kubectl apply -f deploy/crds/operator_v1alpha1_config_crd.yaml
+$ kubectl apply -f deploy/crds/operator_v1alpha1_addon_crd.yaml
+
+// 作成したCRDの確認
+$ kc get crds | grep tekton
+addons.operator.tekton.dev                  2020-05-08T14:51:21Z
+config.operator.tekton.dev                  2020-05-08T14:51:10Z
+</code></pre></div><h3 id="コントローライメージの作成">コントローライメージの作成</h3>
+<p>さっそくTekton Operatorの本体である、コントローラをデプロイしたいのですが、コントローラのコンテナイメージを公式では提供していません。
+そのため、このレポジトリから自分で作成する必要があります。<br>
+TektonのOperatorは<a href="https://github.com/operator-framework/operator-sdk" target="_blank">operator-sdk</a>と呼ばれるOperator開発のためのフレームワークで作成されていて、簡単にコンテナイメージをビルドできます。
+最終的に、ビルドしたイメージをDocker hub等で公開し、ダウンロードできるようにしておきましょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// Go moduleの有効化。Go開発でのパッケージ管理に使うものです
+$ export GO111MODULE=on
+
+// イメージビルド
+$ operator-sdk build mosuke5/openshift-pipelines-operator:abdc4db
+
+// dockerコマンドでイメージを確認
+% docker images
+REPOSITORY                              TAG       IMAGE ID        CREATED             SIZE
+mosuke5/openshift-pipelines-operator    abdc4db   1a6d27db0ade    About an hour ago   126MB
+
+// docker hubへアップロード
+$ docker push mosuke5/openshift-pipelines-operator:abdc4db
+The push refers to repository [docker.io/mosuke5/openshift-pipelines-operator]
+8735a82318c0: Pushed
+e43bb6002dda: Pushed
+7e2ff418c30b: Pushed
+d72d78bdfb8f: Pushed
+ae08c0ad8885: Layer already exists
+c94db2932445: Layer already exists
+abdc4db: digest: sha256:683976ac37b1b83e031b8eb73327dd7fa233fbf1e2cca0199ab49744970f8010 size: 1572
+</code></pre></div><p>dockerhubへのアップロードが終われば以下のように公開されているはずです。<br>
+<a href="https://hub.docker.com/repository/docker/mosuke5/openshift-pipelines-operator">https://hub.docker.com/repository/docker/mosuke5/openshift-pipelines-operator</a></p>
+<h3 id="コントローラのデプロイ">コントローラのデプロイ</h3>
+<p>いよいよ、Operatorの本体であるコントローラをデプロイします。<br>
+レポジトリの中にOperatorのコントローラをデプロイするためのマニフェストファイルが用意されていますが、<code>image</code>部分を上で作成したイメージに差し替える必要がありますので注意してください。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// imageを上で作成したものに変更する
+$ vim deploy/operator.yaml
+      containers:
+        - name: tekton-operator
+          # ↓ここを確認
+          image: mosuke5/openshift-pipelines-operator:abdc4db
+
+// tekton operatorのデプロイ
+// tekton operatorが利用するService Accountやroleもデプロイされます
+$ kubectl -n tekton-operator apply -f deploy/
+deployment.apps/tekton-operator created
+clusterrole.rbac.authorization.k8s.io/tekton-operator created
+clusterrolebinding.rbac.authorization.k8s.io/tekton-operator created
+serviceaccount/tekton-operator created
+
+// OperatorのコントローラPodが起動していることを確認
+$ kubectl get pod -n tekton-operator
+NAME                               READY   STATUS    RESTARTS   AGE
+tekton-operator-56f7c4fbc9-rxj7l   1/1     Running   0          6h42m
+
+// Namespaceを確認するとtekton-pipelinesが作成されている
+$ kubectl get ns | grep tekton
+tekton-operator        Active   12m
+tekton-pipelines       Active   16s
+
+// tekton-pipelines内には、Tektonの本体が起動しているのが確認できる
+$ kubectl get pod -n tekton-pipelines
+NAME                                          READY   STATUS    RESTARTS   AGE
+tekton-pipelines-controller-5d76dbf8b-dl6ns   1/1     Running   0          39s
+tekton-pipelines-webhook-c6c57f76-kt67d       1/1     Running   0          38s
+
+// CRDsを確認する
+$ kubectl get crds | grep tekton
+addons.operator.tekton.dev                  2020-05-08T14:51:21Z
+clustertasks.tekton.dev                     2020-05-10T15:56:00Z
+conditions.tekton.dev                       2020-05-10T15:56:00Z
+config.operator.tekton.dev                  2020-05-08T14:51:10Z
+pipelineresources.tekton.dev                2020-05-10T15:56:02Z
+pipelineruns.tekton.dev                     2020-05-10T15:56:01Z
+pipelines.tekton.dev                        2020-05-10T15:56:01Z
+taskruns.tekton.dev                         2020-05-10T15:56:02Z
+tasks.tekton.dev                            2020-05-10T15:56:02Z
+</code></pre></div><h3 id="自動で生成されるリソース">自動で生成されるリソース</h3>
+<p>Tekton Operatorをデプロイしただけにも関わらず、Tekton本体や<code>tasks</code>や<code>pipelines</code>などのCRDsもたくさんインストールされています。
+これは、Tekton Operatorが作成したリソースになります。
+Tekton Operatorのデプロイ時にService AccountやRoleも同時にデプロイしました。Tekton Operatorは、他のリソースを作成できる権限をもっています。</p>
+<p>また、Operatorを使ったことある方ならば違和感に少しお気づきかなと思いますが、Operator本体をインストールするための<code>config.operator.tekton.dev</code>のリソースを特になにも書いてませんがTekton本体がインストールされました。
+これはTekton Operatorの仕様で、デフォルトでは自動でTektonの本体をデプロイするようになっています。
+自動デプロイが嫌な方はOperatorのデプロイ時に、<code>deploy/operator.yaml</code>内に<code>--no-auto-install=true</code>のオプションを有効にしておく必要があります。</p>
+<h2 id="hello-world">Hello world</h2>
+<p>Tekton本体も起動したので、Hello World的に少しだけ動かしてみます。<br>
+動かし方については、別記事で紹介していきたいと思います。</p>
+<h3 id="マニフェスト">マニフェスト</h3>
+<p>Tektonはパイプラインやそのタスク自身もKubernetesのリソースとして扱えることが１つの特徴です。<br>
+まずは、マニフェストベースで実行してみます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// タスク定義を作成する
+// Ubuntuイメージで`hello world`と出力するだけの簡単なタスク
+$ vim hello-world-task.yaml
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: hello-world-task
+spec:
+  steps:
+    - name: output-helloworld
+      image: ubuntu
+      command: [&#34;echo&#34;]
+      args: [&#34;hello world&#34;]
+
+$ kubectl apply -f hellow-world-task.yaml
+task.tekton.dev/hello-world-task created
+
+$ kubectl get task
+NAME               AGE
+hello-world-task   3s
+</code></pre></div><p>上で作成した<code>hello-world-task</code>はタスクの定義だけであり、これだけでは実行されることはありません。<br>
+<code>TaskRun</code>リソースを用いて実際にタスクを実行できます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// TaskRunの定義を作成
+$ vim hello-world-task-run.yaml
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: hello-world-task-run
+spec:
+  taskRef:
+    name: hello-world-task
+
+// TaskRunのデプロイ
+$ kubectl apply -f hellow-world-task-run.yaml
+taskrun.tekton.dev/hello-world-task-run created
+
+// Podを確認するとなにやら動いているのが確認できる
+$ kubectl get pod
+NAME                             READY   STATUS            RESTARTS   AGE
+hello-world-task-run-pod-mjnmv   0/1     PodInitializing   0          10s
+
+$ kubectl get pod
+NAME                             READY   STATUS    RESTARTS   AGE
+hello-world-task-run-pod-mjnmv   1/1     Running   0          12s
+
+// Podのログを確認してみる
+$ kubectl logs -f hello-world-task-run-pod-mjnmv
+hello world
+</code></pre></div><h3 id="注意事項">注意事項</h3>
+<p>Tektonは、まだまだ進化が激しいプロダクトで、APIversionの更新もありました。<br>
+マニフェストを書く場合は、<code>apiVersion</code>に注意してください。古いブログだと、<code>apiVersion: tekton.dev/v1alpha1</code> を利用していることが多いですが、現在は <code>apiVersion: tekton.dev/v1beta1</code> が最新で、記述も大きく異なるものがあります。<br>
+公式ドキュメントを頼りにするのがいいでしょう。</p>
+<h3 id="tekton-cli">Tekton CLI</h3>
+<p>TektonはCLIも用意しており、CLI操作もいくぶんかできます。
+CLIのインストールはこちらを確認しましょう。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://tekton.dev/docs/cli/" data-iframely-url="//cdn.iframe.ly/oNbQMrC"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<p>インストールすると<code>tkn</code>コマンドが利用できるようになります。
+<code>tkn</code>コマンドは、<code>kubectl</code>と同じ認証情報を用いるので、<code>kubectl</code>が打てている環境ならばおそらくそのまま実行できるのではないかと思います。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// タスクの一覧をみる。上で作成したタスクが確認できる
+$ tkn task list
+NAME               DESCRIPTION   AGE
+hello-world-task                 2 minutes ago
+
+// 上で実行したログの結果をCLI経由で確認
+$ tkn task logs
+[output-helloworld] hello world
+</code></pre></div><p>CLI経由で今度はタスクを実行してみましょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// Taskの実行
+$ tkn task start hello-world-task
+Taskrun started: hello-world-task-run-w82p6
+
+// Taskの実行ログ確認
+$ tkn taskrun logs hello-world-task-run-w82p6 -f -n tekton-test
+[output-helloworld] hello world
+
+// TaskRunの確認
+$ tkn taskrun list
+NAME                         STARTED          DURATION     STATUS
+hello-world-task-run-w82p6   42 seconds ago   4 seconds    Succeeded
+hello-world-task-run         2 minutes ago    14 seconds   Succeeded
+</code></pre></div><p>上ではCLIでの実行やログの確認を行いましたが、当然ながら動きはマニフェストで行ったときと同じです。
+試しに<code>kubectl</code>でPodやTaskRunなどを覗いてみましょう。
+Kubernetesのリソースとして作成され、実行されていることが確認できるはずです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod
+NAME                                   READY   STATUS      RESTARTS   AGE
+hello-world-task-run-pod-mjnmv         0/1     Completed   0          93s
+hello-world-task-run-w82p6-pod-8rjsf   0/1     Completed   0          6s
+
+$ kubectl get taskrun
+NAME                         SUCCEEDED   REASON      STARTTIME   COMPLETIONTIME
+hello-world-task-run         True        Succeeded   2m30s       2m16s
+hello-world-task-run-w82p6   True        Succeeded   62s         58s
+</code></pre></div><h2 id="まとめ">まとめ</h2>
+<p>Kubernetes-nativeなCI/CDツールのTektonのOperatorによるインストールとHello Worldを見てきました。<br>
+Tektonの実践的な情報はあまり本記事には出せなかったので、続記事を出し次第、本記事にリンクを貼っていきたいと思います。もうしばらくお待ちいただければと思います。</p>
+                    </div>
+                    
+                    
+                    <div class="related-post">
+                        <h5>関連する記事はこちら</h5>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/" onClick="ga('send','event','link','click','related-posts');">イメージのプルの効率化を考える。kubernetes-image-puller の紹介</a> (2020/04/28)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/" onClick="ga('send','event','link','click','related-posts');">Jenkins pipelineで複数のOpenShiftクラスタを扱う</a> (2020/04/14)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/" onClick="ga('send','event','link','click','related-posts');">KubernetesにおけるCI/CD実践の勘所まとめ</a> (2020/03/04)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/02/26/cloud-native-devops/" onClick="ga('send','event','link','click','related-posts');">運用課題の指南書、Kubernetesで実践するクラウドネイティブDevOps</a> (2020/02/26)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2019/08/21/ansible-for-k8s-resources/" onClick="ga('send','event','link','click','related-posts');">Kubernetes上のリソースをAnsibleで管理する</a> (2019/08/21)</li>
+                    	
+                    </div>
+                    
+                    <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+                            <a class="twitter-share-button"
+                            href="https://twitter.com/intent/tweet">
+                          Tweet</a>
+                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f05%2f10%2ftekton-operator%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <hr class="footer-hr" />
+<div class="footer-posts">
+    <h5>Latest Posts</h5>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" onClick="ga('send','event','link','click','latest-posts');">TektonのOperatorによるインストールとHello World</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/" onClick="ga('send','event','link','click','latest-posts');">イメージのプルの効率化を考える。kubernetes-image-puller の紹介</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/" onClick="ga('send','event','link','click','latest-posts');">Jenkins pipelineで複数のOpenShiftクラスタを扱う</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/04/09/kubernetes-namespace/" onClick="ga('send','event','link','click','latest-posts');">Kubernetes、namespaceの分け方に迷った場合に考えること</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/04/05/skopeo/" onClick="ga('send','event','link','click','latest-posts');">Skopeoを利用したコンテナイメージのレジストリ間コピー</a></li>
+    
+</div>
+<div class="footer-posts">
+    <h5>Featured Posts</h5>
+    <li><a href="https://blog.mosuke.tech/entry/2016/06/04/180122/" onClick="ga('send','event','link','click','featured-posts');">Nginxの仕組みについて入門</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2017/03/18/182252/" onClick="ga('send','event','link','click','featured-posts');">万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2015/07/19/135844/" onClick="ga('send','event','link','click','featured-posts');">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った</a></li>
+</div>
+<div class="search">
+    <h5>Search</h5>
+    <div class="google-search">
+    <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+<div class="gcse-search"></div>
+    </div>
+</div>
+<div class="links">
+    <h5>Links</h5>
+    <a class="pure-button" href="/about/" onClick="ga('send','event','link','click','about-this-site');"><i class="fa fa-info-circle"></i> About this site</a>
+    <a class="pure-button" href="/archive/" onClick="ga('send','event','link','click','archive');"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="/categories/" onClick="ga('send','event','link','click','categories');"><i class="fa fa-tag"></i> Categories</a>
+    <a class="pure-button" href="https://docs.google.com/forms/d/e/1FAIpQLSd6N53H7zfF8EBrvyezRizU1mQx-CP3vc_jG-WvxfRmCjHTpg/viewform" onClick="ga('send','event','link','click','contact');" target="_blank"><i class="fa fa-question-circle"></i> Contact</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml" onClick="ga('send','event','link','click','rss');"><i class="fa fa-rss"></i> rss</a>
+</div>
+<div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by <a class="hugo" href="https://gohugo.io/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+
+        </div>
+    </div>
+</div>
+<script>
+window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+  
+    return t;
+}(document, "script", "twitter-wjs"));
+</script>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-99596316-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
