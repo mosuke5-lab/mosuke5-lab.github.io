@@ -195,7 +195,7 @@ clusterrole.rbac.authorization.k8s.io/edit added: &#34;system:serviceaccount:mos
 </code></pre></div><h2 id="serviceaccountを使ったレジストリへのアクセス">ServiceAccountを使ったレジストリへのアクセス</h2>
 <p>(2020/04/21追記)<br>
 本筋とは少しずれるのですが、複数クラスタを運用している場合、レジストリ間でのイメージのコピーが必要になります。
-イメージレジストリへの認証もServifeAccountを用いて行うことが実はできるのでお伝えします。
+イメージレジストリへの認証もServiceAccountを用いて行うことが実はできるのでお伝えします。
 上で、ServiceAccountを作成後にSecretが自動生成されると書きましたが、その中に<code>jenkins-deploy-dockercfg-pjwrj</code>という名前のSecretがありました。このSecretにはイメージレジストリの認証に利用できる情報が入っています。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get secret
 NAME                             TYPE                                  DATA   AGE
@@ -242,7 +242,7 @@ f840832afa6e: Pull complete
 </code></pre></div><h2 id="さいごに">さいごに</h2>
 <p>特に難しいこともなく、GithubのREADMEをきちんと読めばできることだったのですが、
 いくつか設定してハマったところもあったので書き残しました。
-組織で実現する場合には、認証方法をどうするか、ServifeAccountの権限をどうするか、ここがおそらく一番重要になるポイントになります。くれぐれも重大なトラブルの起こさないように権限設定は検討してください。</p>
+組織で実現する場合には、認証方法をどうするか、ServiceAccountの権限をどうするか、ここがおそらく一番重要になるポイントになります。くれぐれも重大なトラブルの起こさないように権限設定は検討してください。</p>
 <p>Jenkinsは少し古いと思いつつも、JenkinsXやJenkins Opratorもでてきているので、まだまだお世話になりそうです。
 OpenShift x Jenkinsをガンガン使いこなしていきましょう。</p>
                     </div>
