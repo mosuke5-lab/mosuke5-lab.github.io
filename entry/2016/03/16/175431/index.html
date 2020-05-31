@@ -9,7 +9,7 @@
     <meta name="description" content=" ある実装についてどのように実装するか悩んだ。 その悩んだ過程や実装案をメモする。似たようなケースの実装案として参考になればと思う。  状況  ある申請に対して、検査Aと検査Bを行い、その検査状態・検査日時を管理・閲覧するシステムがあるとす">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2016/03/16/175431/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2016/03/16/175431/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="実装案を使って、DBのViewの使いどころを検討する | Goldstine研究所">
@@ -149,9 +149,9 @@
   id,
   name,
   <span style="color:#66d9ef">case</span>
-    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span>  <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査未完了</span><span style="color:#e6db74">&#39;</span>
-    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査完了 </span><span style="color:#e6db74">&#39;</span>
-    <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査途中</span><span style="color:#e6db74">&#39;</span>
+    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span>  <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;検査未完了&#39;</span>
+    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;検査完了 &#39;</span>
+    <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#39;検査途中&#39;</span>
   <span style="color:#66d9ef">end</span> <span style="color:#66d9ef">as</span> check_status
 <span style="color:#66d9ef">from</span> request
  
@@ -161,12 +161,12 @@
   id,
   name,
   <span style="color:#66d9ef">case</span>
-    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span>  <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査未完了</span><span style="color:#e6db74">&#39;</span>
-    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査完了 </span><span style="color:#e6db74">&#39;</span>
-    <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査途中</span><span style="color:#e6db74">&#39;</span>
+    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span>  <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;検査未完了&#39;</span>
+    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;検査完了 &#39;</span>
+    <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#39;検査途中&#39;</span>
   <span style="color:#66d9ef">end</span> <span style="color:#66d9ef">as</span> check_status
 <span style="color:#66d9ef">from</span> request
-<span style="color:#66d9ef">where</span> name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">xxxxx</span><span style="color:#e6db74">&#39;</span>
+<span style="color:#66d9ef">where</span> name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;xxxxx&#39;</span>
  
 </code></pre></div><p>もし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>の中に同じ形なのに条件だけがことなる<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が出てきてしまったら、
 ヤバイと感じてくるはずだ。</p>
@@ -179,11 +179,11 @@ case文などを利用し始めた時点で、生<a class="keyword" href="http:/
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> request;
 </code></pre></div><p>HTML出力の時に頑張る。(下記は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>のERB想定で記述)</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#f92672">&lt;</span><span style="color:#e6db74">% if(request.check_a.nil? </span> <span style="color:#f92672">and</span> request<span style="color:#f92672">.</span>check_b<span style="color:#f92672">.</span>nil?) <span style="color:#e6db74">%&gt;
-</span><span style="color:#e6db74">  &lt;span&gt;</span><span style="color:#960050;background-color:#1e0010">検</span><span style="color:#960050;background-color:#1e0010">査</span><span style="color:#960050;background-color:#1e0010">完</span><span style="color:#960050;background-color:#1e0010">了</span><span style="color:#f92672">&lt;</span><span style="color:#e6db74">/</span><span style="color:#e6db74">span&gt; 
+</span><span style="color:#e6db74">  &lt;span&gt;</span><span style="color:#960050;background-color:#1e0010">検査完了</span><span style="color:#f92672">&lt;</span><span style="color:#e6db74">/span&gt; 
 </span><span style="color:#e6db74">&lt;% elsif(!request.check_a.nil? and !request.check_b.nil?) %&gt;
-</span><span style="color:#e6db74">  &lt;span&gt;検査未実施&lt;</span><span style="color:#e6db74">/s</span>pan<span style="color:#f92672">&gt;</span> 
+</span><span style="color:#e6db74">  &lt;span&gt;検査未実施&lt;/s</span>pan<span style="color:#f92672">&gt;</span> 
 <span style="color:#f92672">&lt;</span><span style="color:#e6db74">% else </span> <span style="color:#e6db74">%&gt;
-</span><span style="color:#e6db74">  &lt;span&gt;</span><span style="color:#960050;background-color:#1e0010">検</span><span style="color:#960050;background-color:#1e0010">査</span><span style="color:#960050;background-color:#1e0010">途</span><span style="color:#960050;background-color:#1e0010">中</span><span style="color:#f92672">&lt;</span><span style="color:#e6db74">/</span><span style="color:#e6db74">span&gt; 
+</span><span style="color:#e6db74">  &lt;span&gt;</span><span style="color:#960050;background-color:#1e0010">検査途中</span><span style="color:#f92672">&lt;</span><span style="color:#e6db74">/span&gt; 
 </span><span style="color:#e6db74">&lt;% end %&gt;
 </span></code></pre></div><p>ありといえばありだが、もっと条件が複雑になると条件式の管理が大変になってきそうだ。</p>
 <p>出力部分をhelperなどに書いて関数化も考えた。<br>
@@ -210,9 +210,9 @@ case文などを利用し始めた時点で、生<a class="keyword" href="http:/
   id,
   name,
   <span style="color:#66d9ef">case</span>
-    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span>  <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査未完了</span><span style="color:#e6db74">&#39;</span>
-    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査完了 </span><span style="color:#e6db74">&#39;</span>
-    <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">検査途中</span><span style="color:#e6db74">&#39;</span>
+    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">null</span>  <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;検査未完了&#39;</span>
+    <span style="color:#66d9ef">when</span> check_a <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">and</span> check_b <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">then</span> <span style="color:#e6db74">&#39;検査完了 &#39;</span>
+    <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#39;検査途中&#39;</span>
   <span style="color:#66d9ef">end</span> <span style="color:#66d9ef">as</span> check_status
 <span style="color:#66d9ef">from</span> request
 </code></pre></div><p>上記で作ったViewを参照することでいくつものメリットが生まれた。</p>

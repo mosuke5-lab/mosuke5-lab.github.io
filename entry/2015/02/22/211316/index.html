@@ -9,7 +9,7 @@
     <meta name="description" content=" bunlderを使ったWebアプリをプロダクション環境で動かすときに、アプリの起動をどうやって実現しているだろうか。  Apache Passengerを使う場合には、Apacheの起動がアプリの起動につながるので、アプリの起動はあまり気">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/02/22/211316/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2015/02/22/211316/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Ruby, thin(bundler利用)を使った環境でのアプリの自動起動設定 | Goldstine研究所">
@@ -135,9 +135,9 @@ SCRIPT_NAME<span style="color:#f92672">=</span>/etc/init.d/sample-app
 CONFIG_PATH<span style="color:#f92672">=</span>/path/to/config
 BUNDLE_CMD<span style="color:#f92672">=</span>/usr/local/bin/bundle
 
-bundle_exec_thin <span style="color:#f92672">(</span><span style="color:#f92672">)</span>
+bundle_exec_thin <span style="color:#f92672">()</span>
 <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">for</span> CONFIG_FILE in <span style="color:#e6db74">&#34;</span>$CONFIG_PATH<span style="color:#e6db74">/*.yml</span><span style="color:#e6db74">&#34;</span>; <span style="color:#66d9ef">do</span>
+    <span style="color:#66d9ef">for</span> CONFIG_FILE in <span style="color:#e6db74">&#34;</span>$CONFIG_PATH<span style="color:#e6db74">/*.yml&#34;</span>; <span style="color:#66d9ef">do</span>
         SITE_DIR<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>awk <span style="color:#e6db74">&#39;/^chdir:/ { print $2; }&#39;</span> $CONFIG_FILE<span style="color:#e6db74">`</span>
         cd $SITE_DIR
         $BUNDLE_CMD exec thin $1 -C $CONFIG_FILE
@@ -156,7 +156,7 @@ bundle_exec_thin <span style="color:#f92672">(</span><span style="color:#f92672"
         bundle_exec_thin restart
         ;;
   *<span style="color:#f92672">)</span>
-        echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Usage: </span>$SCRIPT_NAME<span style="color:#e6db74"> {start|stop|restart}</span><span style="color:#e6db74">&#34;</span> &gt;&amp;<span style="color:#ae81ff">2</span>
+        echo <span style="color:#e6db74">&#34;Usage: </span>$SCRIPT_NAME<span style="color:#e6db74"> {start|stop|restart}&#34;</span> &gt;&amp;<span style="color:#ae81ff">2</span>
         exit <span style="color:#ae81ff">3</span>
         ;;
 <span style="color:#66d9ef">esac</span>
@@ -202,9 +202,9 @@ SCRIPT_NAME<span style="color:#f92672">=</span>/etc/init.d/sample-app
 CONFIG_PATH<span style="color:#f92672">=</span>/path/to/config
 BUNDLE_CMD<span style="color:#f92672">=</span>/usr/local/bin/bundle
 
-bundle_exec_thin <span style="color:#f92672">(</span><span style="color:#f92672">)</span>
+bundle_exec_thin <span style="color:#f92672">()</span>
 <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">for</span> CONFIG_FILE in <span style="color:#e6db74">&#34;</span>$CONFIG_PATH<span style="color:#e6db74">/*.yml</span><span style="color:#e6db74">&#34;</span>; <span style="color:#66d9ef">do</span>
+    <span style="color:#66d9ef">for</span> CONFIG_FILE in <span style="color:#e6db74">&#34;</span>$CONFIG_PATH<span style="color:#e6db74">/*.yml&#34;</span>; <span style="color:#66d9ef">do</span>
         SITE_DIR<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>awk <span style="color:#e6db74">&#39;/^chdir:/ { print $2; }&#39;</span> $CONFIG_FILE<span style="color:#e6db74">`</span>
         cd $SITE_DIR
         $BUNDLE_CMD exec thin $1 -C $CONFIG_FILE
@@ -223,7 +223,7 @@ bundle_exec_thin <span style="color:#f92672">(</span><span style="color:#f92672"
         bundle_exec_thin restart
         ;;
   *<span style="color:#f92672">)</span>
-        echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Usage: </span>$SCRIPT_NAME<span style="color:#e6db74"> {start|stop|restart}</span><span style="color:#e6db74">&#34;</span> &gt;&amp;<span style="color:#ae81ff">2</span>
+        echo <span style="color:#e6db74">&#34;Usage: </span>$SCRIPT_NAME<span style="color:#e6db74"> {start|stop|restart}&#34;</span> &gt;&amp;<span style="color:#ae81ff">2</span>
         exit <span style="color:#ae81ff">3</span>
         ;;
 <span style="color:#66d9ef">esac</span>

@@ -9,7 +9,7 @@
     <meta name="description" content="Ansibleでサーバ構築からアプリケーションのデプロイまですべて実行できるようにしています。そして、serverspecを使って、インフラテストも行っていますが。その運用にいくつか課題点ありました。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/12/17/192554/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2015/12/17/192554/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="AnsibleとServerspecの実行をRakeタスクにまとめる | Goldstine研究所">
@@ -126,13 +126,13 @@ rake serverspec            # Run serverspec to all hosts
 rake serverspec:app        # Run serverspec to app server
 rake serverspec:db        # Run serverspec to db server 
 </code></pre></div><p>Rakefileの実装例（一部省略）</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">desc <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Deploy and Test</span><span style="color:#e6db74">&#34;</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">desc <span style="color:#e6db74">&#34;Deploy and Test&#34;</span>
 namespace <span style="color:#e6db74">:deploy</span> <span style="color:#66d9ef">do</span>
-  require <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">io/console</span><span style="color:#e6db74">&#34;</span>
-  require <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">open3</span><span style="color:#e6db74">&#34;</span>
+  require <span style="color:#e6db74">&#34;io/console&#34;</span>
+  require <span style="color:#e6db74">&#34;open3&#34;</span>
 
   <span style="color:#66d9ef">STDOUT</span><span style="color:#f92672">.</span>sync <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
-  desc <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Deploy to development server</span><span style="color:#e6db74">&#34;</span>
+  desc <span style="color:#e6db74">&#34;Deploy to development server&#34;</span>
   task <span style="color:#e6db74">:development</span> <span style="color:#66d9ef">do</span>
     <span style="color:#75715e"># sudoパスワードははじめに１回だけ聞くようにします。</span>
     sudo_password <span style="color:#f92672">=</span> ask_sudo_password
@@ -142,15 +142,15 @@ namespace <span style="color:#e6db74">:deploy</span> <span style="color:#66d9ef"
   <span style="color:#66d9ef">end</span>
 
   <span style="color:#75715e"># デプロイとテストの同時実行関数</span>
-  <span style="color:#66d9ef">def</span> <span style="color:#a6e22e"></span><span style="color:#f92672"></span><span style="color:#a6e22e">deploy_and_test</span>(env, sudo_password)
-    deploy_cmd <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">ansible-playbook -i </span><span style="color:#e6db74">#{</span>env<span style="color:#e6db74">}</span><span style="color:#e6db74"> site.yml --extra-vars &#39;ansible_sudo_pass=</span><span style="color:#e6db74">#{</span>sudo_password<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&#34;</span>
-    test_cmd <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">bundle exec rake serverspec ENVIRONMENT=</span><span style="color:#e6db74">#{</span>env<span style="color:#e6db74">}</span><span style="color:#e6db74"> SUDO_PASSWORD=</span><span style="color:#e6db74">#{</span>sudo_password<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+  <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">deploy_and_test</span>(env, sudo_password)
+    deploy_cmd <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ansible-playbook -i </span><span style="color:#e6db74">#{</span>env<span style="color:#e6db74">}</span><span style="color:#e6db74"> site.yml --extra-vars &#39;ansible_sudo_pass=</span><span style="color:#e6db74">#{</span>sudo_password<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;&#34;</span>
+    test_cmd <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bundle exec rake serverspec ENVIRONMENT=</span><span style="color:#e6db74">#{</span>env<span style="color:#e6db74">}</span><span style="color:#e6db74"> SUDO_PASSWORD=</span><span style="color:#e6db74">#{</span>sudo_password<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
     <span style="color:#66d9ef">Open3</span><span style="color:#f92672">.</span>pipeline(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">#{</span>deploy_cmd<span style="color:#e6db74">}</span><span style="color:#e6db74">; </span><span style="color:#e6db74">#{</span>test_cmd<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
   <span style="color:#66d9ef">end</span>
 
   <span style="color:#75715e"># sudoパスワードを要求関数</span>
-  <span style="color:#66d9ef">def</span> <span style="color:#a6e22e"></span><span style="color:#f92672"></span><span style="color:#a6e22e">ask_sudo_password</span>
-    print <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">SUDO Password: </span><span style="color:#e6db74">&#34;</span>
+  <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">ask_sudo_password</span>
+    print <span style="color:#e6db74">&#34;SUDO Password: &#34;</span>
     sudo_password <span style="color:#f92672">=</span> <span style="color:#66d9ef">STDIN</span><span style="color:#f92672">.</span>noecho <span style="color:#f92672">&amp;</span><span style="color:#e6db74">:gets</span>
   <span style="color:#66d9ef">end</span>
 <span style="color:#66d9ef">end</span>

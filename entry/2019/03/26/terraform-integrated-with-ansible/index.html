@@ -9,7 +9,7 @@
     <meta name="description" content="AnsibleからTerraformを実行するmoduleを触ってみました。こちらを使う上で考慮必要なことなどについてまとめました。またTerraformとAnsibleを連携する上での考え方もご紹介します。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/03/26/terraform-integrated-with-ansible/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/03/26/terraform-integrated-with-ansible/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="AnsibleのTerraform moduleを考察してみる | Goldstine研究所">
@@ -105,7 +105,7 @@ TerraformとAnsibleはカバーする領域が異なりますが、もちろん�
 </code></pre></div><p>以下はAnsibleのコードです。Terraformを実行するのは今回はローカル環境なので、実行の対象ホストはこのPCで、接続方式もlocalで問題ないです。Terraform moduleは機能自体も多くなく、Terraformを実行(apply)するだけなら下記だけで十分です。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># terraform_module_test.yml</span>
 ---
-- <span style="color:#66d9ef">hosts</span>: <span style="color:#ae81ff">127.0</span><span style="color:#ae81ff">.0</span><span style="color:#ae81ff">.1</span>
+- <span style="color:#66d9ef">hosts</span>: <span style="color:#ae81ff">127.0.0.1</span>
   <span style="color:#66d9ef">connection</span>: local
   <span style="color:#66d9ef">tasks</span>:
   - <span style="color:#66d9ef">name</span>: Exec terraform scripts

@@ -9,7 +9,7 @@
     <meta name="description" content=" Ethernetシールドを使ってネットワークへ繋げる。 とりあえずは、スモールステップでPCとの1対1の通信。       PCとの1対1通信      構成図   Arduinoソースコード  #include &lt;SPI.h&gt;">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2014/09/13/111537/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2014/09/13/111537/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="ArduinoをEthernetシールドを使ってネットワークへ繋げる | Goldstine研究所">
@@ -95,8 +95,8 @@ ArduinoにEthernetシールドを装着して、LANケーブルでダイレク�
 <h3 id="arduinoソースコード">Arduinoソースコード</h3>
 <p>ArduinoのソースコードでIPアドレスを指定できます。
 PC側とレンジをそろえましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#</span><span style="color:#75715e">include</span> <span style="color:#75715e">&lt;SPI.h&gt;</span><span style="color:#75715e">
-</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">include</span> <span style="color:#75715e">&lt;Ethernet.h&gt;</span><span style="color:#75715e">
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;SPI.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;Ethernet.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e"></span>
 byte MAC[] <span style="color:#f92672">=</span> {<span style="color:#ae81ff">0x90</span>,<span style="color:#ae81ff">0xA2</span>,<span style="color:#ae81ff">0xDA</span>,<span style="color:#ae81ff">0x0F</span>,<span style="color:#ae81ff">0x8B</span>,<span style="color:#ae81ff">0xA2</span>};
 byte IP[]  <span style="color:#f92672">=</span> {<span style="color:#ae81ff">192</span>,<span style="color:#ae81ff">168</span>,<span style="color:#ae81ff">11</span>,<span style="color:#ae81ff">3</span>};
@@ -135,8 +135,8 @@ DHCPによるIPアドレスの取得はとても容易で以下のようにマ�
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">Ethernet.begin(mac) 
 </code></pre></div><p>以下はArduino公式サイトに則って実施したもの。<br>
 <a href="http://arduino.cc/en/Tutorial/DhcpAddressPrinter">Arduino - DhcpAddressPrinter</a></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#</span><span style="color:#75715e">include</span> <span style="color:#75715e">&lt;SPI.h&gt;</span><span style="color:#75715e">
-</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">include</span> <span style="color:#75715e">&lt;Ethernet.h&gt;</span><span style="color:#75715e">
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;SPI.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;Ethernet.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e"></span>
 <span style="color:#75715e">//Mac Address Static
 </span><span style="color:#75715e"></span>byte mac[] <span style="color:#f92672">=</span> {<span style="color:#ae81ff">0x90</span>,<span style="color:#ae81ff">0xA2</span>,<span style="color:#ae81ff">0xDA</span>,<span style="color:#ae81ff">0x0F</span>,<span style="color:#ae81ff">0x8B</span>,<span style="color:#ae81ff">0xA2</span>};
@@ -147,25 +147,25 @@ DHCPによるIPアドレスの取得はとても容易で以下のようにマ�
 </span><span style="color:#75715e"></span>  Serial.begin(<span style="color:#ae81ff">9600</span>);
 
   <span style="color:#75715e">// start the Ethernet connection:
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (Ethernet.begin(mac) <span style="color:#f92672">=</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>) {
-    Serial.println(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Failed to configure Ethernet using DHCP</span><span style="color:#e6db74">&#34;</span>);
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (Ethernet.begin(mac) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+    Serial.println(<span style="color:#e6db74">&#34;Failed to configure Ethernet using DHCP&#34;</span>);
     <span style="color:#75715e">// no point in carrying on, so do nothing forevermore:
 </span><span style="color:#75715e"></span>    <span style="color:#66d9ef">for</span>(;;)
       ;
       
   }
   <span style="color:#75715e">// print your local IP address:
-</span><span style="color:#75715e"></span>  Serial.print(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">My IP address: </span><span style="color:#e6db74">&#34;</span>);
-  <span style="color:#66d9ef">for</span> (byte thisByte <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; thisByte <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">4</span>; thisByte<span style="color:#f92672">+</span><span style="color:#f92672">+</span>) {
+</span><span style="color:#75715e"></span>  Serial.print(<span style="color:#e6db74">&#34;My IP address: &#34;</span>);
+  <span style="color:#66d9ef">for</span> (byte thisByte <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; thisByte <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">4</span>; thisByte<span style="color:#f92672">++</span>) {
     <span style="color:#75715e">// print the value of each byte of the IP address:
 </span><span style="color:#75715e"></span>    Serial.print(Ethernet.localIP()[thisByte], DEC);
-    Serial.print(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">.</span><span style="color:#e6db74">&#34;</span>); 
+    Serial.print(<span style="color:#e6db74">&#34;.&#34;</span>); 
   }
   Serial.println();
 }
 
 <span style="color:#960050;background-color:#1e0010">。</span>{
-  Serial.println(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">abc</span><span style="color:#e6db74">&#34;</span>);
+  Serial.println(<span style="color:#e6db74">&#34;abc&#34;</span>);
   delay(<span style="color:#ae81ff">3000</span>);
 }
 </code></pre></div><p>ArduinoにIPアドレスが割り当てられたかどうか確認するには、無線LANルータにアクセスして確認できます。

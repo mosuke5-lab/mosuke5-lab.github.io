@@ -9,7 +9,7 @@
     <meta name="description" content=" Sinatraアプリケーションで、JSファイルを圧縮するsinatra-assetpackを利用していて、 production環境で動作させようとしたら動かなくなってしまった問題について調査した。  起こったこと  Sinatraを使っ">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/05/08/174732/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2015/05/08/174732/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="sinatra-assetpackをproduction環境で使う時にの注意点 | Goldstine研究所">
@@ -108,7 +108,7 @@ prorudction環境で動作させようとしたら、jsのエラーが出るよ�
 <span style="color:#66d9ef">end</span>
 </code></pre></div><p>layout.erbにはもちろん、libs.jsが先に来るように記述している。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#f92672">&lt;</span><span style="color:#e6db74">%= js :libs %&gt;
-</span><span style="color:#e6db74">&lt;%=</span> js <span style="color:#e6db74">:app</span> <span style="color:#f92672">%</span><span style="color:#f92672">&gt;</span>
+</span><span style="color:#e6db74">&lt;%=</span> js <span style="color:#e6db74">:app</span> <span style="color:#f92672">%&gt;</span>
 </code></pre></div><h2>sinatra-assetpackの挙動</h2>
 <p>productionでのみ発生する<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a>なので、改めて<a class="keyword" href="http://d.hatena.ne.jp/keyword/sinatra">sinatra</a>-assetpackのproduction環境時の挙動を確認した。<br>
 production環境では、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">複数</a>のjsファイルを1つのファイルにまとめ、圧縮を行う。</p>

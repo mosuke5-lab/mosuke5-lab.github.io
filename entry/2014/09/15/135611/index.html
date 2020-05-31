@@ -9,7 +9,7 @@
     <meta name="description" content=" 最近D3.jsを使う機会があり、DBのデータを読み込ませる方法についていくつか検討した。 例えば以下の状況を考える。 【やりたいこと】 「DBに格納されているデータを使って、D3.jsで折れ線グラフを描く」  【DBの構造】 カラム名：型">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2014/09/15/135611/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2014/09/15/135611/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="D3.js、DBからのデータ連携方法の検討 | Goldstine研究所">
@@ -119,15 +119,15 @@ get <span style="color:#e6db74">&#39;/csv&#39;</span> <span style="color:#66d9ef
     @data   <span style="color:#f92672">=</span> <span style="color:#66d9ef">Model</span><span style="color:#f92672">.</span>all()
 
     <span style="color:#75715e">#出力するCSVデータの変数。csvヘッダーを先につけている。</span>
-    @csv <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">date,value</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+    @csv <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;date,value</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
 
     <span style="color:#75715e">#DBのデータをCSVの形にして格納</span>
     @data<span style="color:#f92672">.</span>each <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>d<span style="color:#f92672">|</span>
-        @csv <span style="color:#f92672">+=</span> d<span style="color:#f92672">.</span>date<span style="color:#f92672">.</span>to_s <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">,</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> d<span style="color:#f92672">.</span>value<span style="color:#f92672">.</span>to_s <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+        @csv <span style="color:#f92672">+=</span> d<span style="color:#f92672">.</span>date<span style="color:#f92672">.</span>to_s <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;,&#34;</span> <span style="color:#f92672">+</span> d<span style="color:#f92672">.</span>value<span style="color:#f92672">.</span>to_s <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
     <span style="color:#66d9ef">end</span>
     
     <span style="color:#75715e">#csvtest.erbというビューに出力</span>
-    erb <span style="color:#e6db74">:csvtest</span>, <span style="color:#e6db74">:layout</span> <span style="color:#f92672">=</span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">false</span>
+    erb <span style="color:#e6db74">:csvtest</span>, <span style="color:#e6db74">:layout</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">false</span>
 <span style="color:#66d9ef">end</span>
 </code></pre></div><p>こうすることで<code>http://*****/csv</code>にアクセスするとcsvファイルとしてダウンロードできる状態になります。
 条件指定をしてデータをダウンロードできるようにしたい場合はGETでパラメータ指定できるようにすれば良いと思います。<br>
@@ -141,9 +141,9 @@ d3.jsのcsvを読み込ませる関数の引数にURLを指定してあげれば
 <p>d3.jsのdatasetの中でRuby変数を展開させる。ビューにJavascriptを書いているので、ビューの中で変数展開するのと同じ要領。
 しかし、jsコードにRubyコードも交じるのはアンチパターンと言えよう。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataset</span> <span style="color:#f92672">=</span> [
-<span style="color:#f92672">&lt;</span><span style="color:#f92672">%</span> <span style="color:#960050;background-color:#1e0010">@</span><span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">each</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span><span style="color:#a6e22e">d</span><span style="color:#f92672">|</span> <span style="color:#f92672">%</span><span style="color:#f92672">&gt;</span>
-    {<span style="color:#a6e22e">date</span><span style="color:#f92672">:</span><span style="color:#f92672">&lt;</span><span style="color:#f92672">%=</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">date</span><span style="color:#f92672">%</span><span style="color:#f92672">&gt;</span>, <span style="color:#a6e22e">value</span><span style="color:#f92672">:</span><span style="color:#f92672">&lt;</span><span style="color:#f92672">%=</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">value</span> <span style="color:#f92672">%</span><span style="color:#f92672">&gt;</span>},
-<span style="color:#f92672">&lt;</span><span style="color:#f92672">%</span> <span style="color:#a6e22e">end</span> <span style="color:#f92672">%</span><span style="color:#f92672">&gt;</span>
+<span style="color:#f92672">&lt;%</span> <span style="color:#960050;background-color:#1e0010">@</span><span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">each</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span><span style="color:#a6e22e">d</span><span style="color:#f92672">|</span> <span style="color:#f92672">%&gt;</span>
+    {<span style="color:#a6e22e">date</span><span style="color:#f92672">:&lt;%=</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">date</span><span style="color:#f92672">%&gt;</span>, <span style="color:#a6e22e">value</span><span style="color:#f92672">:&lt;%=</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">value</span> <span style="color:#f92672">%&gt;</span>},
+<span style="color:#f92672">&lt;%</span> <span style="color:#a6e22e">end</span> <span style="color:#f92672">%&gt;</span>
 ];
 </code></pre></div><h3 id="3-csvファイルをおいておく">(3) CSVファイルをおいておく</h3>
 <p>こちらはリアルタイムな更新でなれけばこれはこれでありかもしれない。

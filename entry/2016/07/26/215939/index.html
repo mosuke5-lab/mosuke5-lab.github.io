@@ -9,7 +9,7 @@
     <meta name="description" content="Nginx-&gt;Apache-&gt;PHPの構成で、x-forwarded-forなどの任意の追加したHTTPヘッダーをPHPで受け取る方法について解説します。サーバ変数に格納した際に名前が変わります。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2016/07/26/215939/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2016/07/26/215939/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="PHPでHTTPヘッダー、x-forwarded-forを受け取る方法 | Goldstine研究所">
@@ -96,7 +96,7 @@ X-Forwarded-Forというヘッダー名にNginxでもっている変数$proxy_ad
 （略）RFCの標準的なヘッダフィールドではないが、IETFのネットワーク作業部会 (Network Working Group) は2011年10月より同種のHTTPヘッダForwardedの標準化作業を開始した[1]。</p>
 </blockquote>
 <h2 id="phpでx-forwarded-forを受け取る">PHPでX-Forwarded-Forを受け取る</h2>
-<p>リバースプロキシで&rsquo;X-forwarded-For'という名前のHTTPヘッダーを追加したので、そのまま取得しようとするが、実はこのままだとうまくいきません。これはPHPのサーバ変数の仕様の問題です。PHPのサーバ変数に入れる際に、名前を規則に従って変更するからです。</p>
+<p>リバースプロキシで&rsquo;X-forwarded-For&rsquo;という名前のHTTPヘッダーを追加したので、そのまま取得しようとするが、実はこのままだとうまくいきません。これはPHPのサーバ変数の仕様の問題です。PHPのサーバ変数に入れる際に、名前を規則に従って変更するからです。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php">echo $_SERVER[&#39;X-Forwarded-For&#39;];
 // -&gt; 存在しない
 </code></pre></div><p>サーバ変数をvar_dumpを使って中身を確認してみると、HTTPが先頭についてて、すべて大文字になってて、ハイフンがアンスコに変わっていることが確認できます。</p>
@@ -123,7 +123,7 @@ $ tcpdump dst port 80 -X
      0x0020:  8018 0137 8dbe 0000 0101 080a d1dc c19e  .1..Host:.xxxxxx 
 </code></pre></div><h2 id="任意のhttpヘッダーつけた場合">任意のHTTPヘッダーつけた場合</h2>
 <p>それでは、X-Forwarded-For以外の任意のHTTPヘッダーをつけた場合も同様になるのか確認してみます。
-Nginxにて、&lsquo;my-header'という名前でヘッダーを追加してPHP側で受け取ります。</p>
+Nginxにて、&lsquo;my-header&rsquo;という名前でヘッダーを追加してPHP側で受け取ります。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">proxy_set_header my-header &#39;hogefugafoobar&#39;; 
 </code></pre></div><p><code>my-header</code>が<code>HTTP_MY_HEADER</code>に変わっていることが確認できた。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php">var_dump($_SERVER);

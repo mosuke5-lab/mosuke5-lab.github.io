@@ -9,7 +9,7 @@
     <meta name="description" content=" 1. はじめに  ぼくはフロントエンドは本業ではありません。 jsはあまり好きではありません。 そしてAjax通信後にhtmlをアウトプットする際にjsの変数の中にhtmlを書いていくソースコードがもっと好きではありません。(後述) それ">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/06/13/231917/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2015/06/13/231917/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Ajaxの嫌いだった部分をJsRenderで心地良くした | Goldstine研究所">
@@ -159,9 +159,9 @@ jsのテンプレートエンジンは多数あるのだが今回はJsRenderを�
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;result&#34;</span>&gt;&lt;/<span style="color:#f92672">div</span>&gt;
 &lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;result-template&#34;</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/x-jsrender&#34;</span>&gt;
 <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;{{:id}}&#34;</span><span style="color:#f92672">&gt;</span>
-  <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">h1</span><span style="color:#f92672">&gt;</span>{{<span style="color:#f92672">:</span><span style="color:#a6e22e">name</span>}}<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#960050;background-color:#1e0010">h</span><span style="color:#960050;background-color:#1e0010">1</span><span style="color:#960050;background-color:#1e0010">&gt;</span>
-  <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">p</span><span style="color:#f92672">&gt;</span>{{<span style="color:#f92672">:</span><span style="color:#a6e22e">text</span>}}<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">&gt;</span>
-<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#960050;background-color:#1e0010">d</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">v</span><span style="color:#960050;background-color:#1e0010">&gt;</span>
+  <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">h1</span><span style="color:#f92672">&gt;</span>{{<span style="color:#f92672">:</span><span style="color:#a6e22e">name</span>}}<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/h1&gt;</span>
+  <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">p</span><span style="color:#f92672">&gt;</span>{{<span style="color:#f92672">:</span><span style="color:#a6e22e">text</span>}}<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/p&gt;</span>
+<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/div&gt;</span>
 &lt;/<span style="color:#f92672">script</span>&gt;
 </code></pre></div><p>何が素晴らしいって、ロジックの部分と、ビュー部分を綺麗に分離できたこと。<br>
 いや、サーバサイドなら当たり前のようにやっていたことなんだけど、<br>

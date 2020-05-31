@@ -9,7 +9,7 @@
     <meta name="description" content="Werckerを使ったHugo&#43;Github Pages運用のサイトのCICDを紹介する。デプロイだけでなく、CloudFlareやSlack通知など周辺処理も紹介。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2017/06/04/hugo_deployment_with_wercker/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2017/06/04/hugo_deployment_with_wercker/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Werckerを使ってHugo&#43;Github PagesのCI/CD環境を整備する | Goldstine研究所">
@@ -119,7 +119,7 @@ Werckerを利用するには自分のレポジトリに<code>wercker.yml</code>�
     - <span style="color:#66d9ef">script</span>:
         <span style="color:#66d9ef">name</span>: download theme
         <span style="color:#66d9ef">code</span>: <span style="color:#e6db74">|
-</span><span style="color:#e6db74">           </span><span style="color:#e6db74"> </span><span style="color:#e6db74">$(git clone https://github.com/dplesca/purehugo ./themes/purehugo)</span>
+</span><span style="color:#e6db74">            $(git clone https://github.com/dplesca/purehugo ./themes/purehugo)</span>
     - <span style="color:#66d9ef">arjen/hugo-build</span>:
         <span style="color:#66d9ef">version</span>: <span style="color:#e6db74">&#34;0.20&#34;</span>
         <span style="color:#66d9ef">theme</span>: purehugo
@@ -144,7 +144,7 @@ Werckerを利用するには自分のレポジトリに<code>wercker.yml</code>�
     - <span style="color:#66d9ef">script</span>:
       <span style="color:#66d9ef">name</span>: delete cloudflare cache
       <span style="color:#66d9ef">code</span>: <span style="color:#e6db74">|
-</span><span style="color:#e6db74">       </span><span style="color:#e6db74"> </span><span style="color:#e6db74">sh ./scripts/delete_cache_all.sh ${CF_ZONE_ID} ${CF_EMAIL} ${CF_KEY}</span>
+</span><span style="color:#e6db74">        sh ./scripts/delete_cache_all.sh ${CF_ZONE_ID} ${CF_EMAIL} ${CF_KEY}</span>
     - <span style="color:#66d9ef">slack-notifier</span>:
       <span style="color:#66d9ef">channel</span>: $SLACK_CHANNEL
       <span style="color:#66d9ef">url</span>: $SLACK_URL
@@ -158,7 +158,7 @@ Werckerを利用するには自分のレポジトリに<code>wercker.yml</code>�
         version: &#34;0.20&#34;
         theme: purehugo
         flags: --buildDrafts=false
-</code></pre></div><h2 id="デプロイはleipertgit-pushを使った">デプロイは&rsquo;leipert/git-push'を使った</h2>
+</code></pre></div><h2 id="デプロイはleipertgit-pushを使った">デプロイは&rsquo;leipert/git-push&rsquo;を使った</h2>
 <p>公式ドキュメントでは<code>lukevivier/gh-pages</code>の利用を紹介している。<br>
 しかし、現状Github pagesは<code>master</code>ブランチのコードをビルドするようにできている。<br>
 このツールではどうしても<code>gh-page</code>ブランチにデプロイするため、用途と合わなかった。

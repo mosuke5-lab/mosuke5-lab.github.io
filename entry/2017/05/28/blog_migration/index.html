@@ -9,7 +9,7 @@
     <meta name="description" content="はてなブログからHugoに移行した。移行した理由は移行に際して行ったことをご紹介します。例えば、Hugoを運用するアーキテクチャや移行時に利用したスクリプトや注意事項など。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2017/05/28/blog_migration/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2017/05/28/blog_migration/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="はてなブログからHugoに移行。移行の際に行ったことまとめ。 | Goldstine研究所">
@@ -161,7 +161,7 @@ archive = [&#34;2017&#34;]
 <h4 id="1リダイレクト処理">(1)リダイレクト処理</h4>
 <p>はてなブログのデザイン設定から「ヘッダー」→「タイトル下」に、ブログ移転をお知らせする文言とリダイレクト処理を書いた。<br>
 これですべてのページのタイトル下に「ブログ移転しました。5秒後にリダイレクトします。（リンク先URL）」が表示し、5秒後にリダイレクトするようにした。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">p</span> <span style="color:#a6e22e">style</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;max-width: 1024px; margin: 0 auto;&#34;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">span</span> <span style="color:#a6e22e">style</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;font-size: 150%; color: white;&#34;</span><span style="color:#f92672">&gt;</span><span style="color:#a6e22e">ブログ移転しました</span><span style="color:#960050;background-color:#1e0010">。</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">秒後にリダイレクトします</span><span style="color:#960050;background-color:#1e0010">。</span><span style="color:#f92672">&lt;</span><span style="color:#e6db74">/span&gt;&lt;br /</span><span style="color:#f92672">&gt;</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">p</span> <span style="color:#a6e22e">style</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;max-width: 1024px; margin: 0 auto;&#34;</span><span style="color:#f92672">&gt;&lt;</span><span style="color:#a6e22e">span</span> <span style="color:#a6e22e">style</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;font-size: 150%; color: white;&#34;</span><span style="color:#f92672">&gt;</span><span style="color:#a6e22e">ブログ移転しました</span><span style="color:#960050;background-color:#1e0010">。</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">秒後にリダイレクトします</span><span style="color:#960050;background-color:#1e0010">。</span><span style="color:#f92672">&lt;</span><span style="color:#e6db74">/span&gt;&lt;br /</span><span style="color:#f92672">&gt;</span>
 <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">script</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/javascript&#34;</span> <span style="color:#a6e22e">language</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;javascript&#34;</span><span style="color:#f92672">&gt;</span>
     <span style="color:#75715e">// 新urlの作成
 </span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">domain</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://blog.mosuke.tech&#34;</span>;
@@ -185,7 +185,7 @@ archive = [&#34;2017&#34;]
     <span style="color:#a6e22e">meta</span>.<span style="color:#a6e22e">setAttribute</span>(<span style="color:#e6db74">&#34;http-equiv&#34;</span>,<span style="color:#e6db74">&#34;refresh&#34;</span>);
     <span style="color:#a6e22e">meta</span>.<span style="color:#a6e22e">setAttribute</span>(<span style="color:#e6db74">&#34;content&#34;</span>,<span style="color:#e6db74">&#34;0; URL=&#34;</span><span style="color:#f92672">+</span><span style="color:#a6e22e">url</span>);
     <span style="color:#a6e22e">head</span>.<span style="color:#a6e22e">appendChild</span>(<span style="color:#a6e22e">meta</span>);
-<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">&gt;</span>
+<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/script&gt;</span>
 </code></pre></div><h4 id="2スマホサイトでのリダイレクト">(2)スマホサイトでのリダイレクト</h4>
 <p>スマホで開いた時にも同様の動作をして欲しかったのだが、私の設定ではもともと、<br>
 スマホは別デザインとなっていて、うえで設定したJSが実行されない。<br>
@@ -212,9 +212,9 @@ Hugoは静的ブログサイトなので、基本的にCloudFlare側で全てキ
 簡単だが、以下のようなキャッシュ全削除スクリプトを用意した。<br>
 参考: <a href="https://blog.mosuke.tech/entry/2017/05/29/how_to_use_cloudflare_api/">「CloudFlare APIを使ってキャッシュを削除する」</a></p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e">#!/bin/sh
-</span><span style="color:#75715e"></span>curl -X DELETE <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">https://api.cloudflare.com/client/v4/zones/</span>$1<span style="color:#e6db74">/purge_cache</span><span style="color:#e6db74">&#34;</span> <span style="color:#ae81ff">\
-</span><span style="color:#ae81ff"></span>     -H <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">X-Auth-Email: </span>$2<span style="color:#e6db74">&#34;</span> <span style="color:#ae81ff">\
-</span><span style="color:#ae81ff"></span>     -H <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">X-Auth-Key: </span>$3<span style="color:#e6db74">&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#75715e"></span>curl -X DELETE <span style="color:#e6db74">&#34;https://api.cloudflare.com/client/v4/zones/</span>$1<span style="color:#e6db74">/purge_cache&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>     -H <span style="color:#e6db74">&#34;X-Auth-Email: </span>$2<span style="color:#e6db74">&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>     -H <span style="color:#e6db74">&#34;X-Auth-Key: </span>$3<span style="color:#e6db74">&#34;</span> <span style="color:#ae81ff">\
 </span><span style="color:#ae81ff"></span>     -H <span style="color:#e6db74">&#34;Content-Type: application/json&#34;</span> <span style="color:#ae81ff">\
 </span><span style="color:#ae81ff"></span>     --data <span style="color:#e6db74">&#39;{&#34;purge_everything&#34;:true}&#39;</span>
 </code></pre></div><h3 id="後日談">後日談</h3>

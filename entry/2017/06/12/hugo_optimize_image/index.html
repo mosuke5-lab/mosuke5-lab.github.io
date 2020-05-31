@@ -9,7 +9,7 @@
     <meta name="description" content="Hugoを利用したブログ運用環境で、GoogleのPageSpeed対策で画像を自動で圧縮する環境を整えた。optipngとjpegtranを利用。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2017/06/12/hugo_optimize_image/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2017/06/12/hugo_optimize_image/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Hugo、PageSpeed対策で自動で画像を圧縮する | Goldstine研究所">
@@ -102,7 +102,7 @@ Werckerを使って自動で最適化させることにした。</p>
 次のシェル(<code>optimize_image.sh</code>)を用意した。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#!/bin/sh
 </span><span style="color:#75715e"></span>find ./static/image/ -name <span style="color:#e6db74">&#34;*.png&#34;</span> | xargs optipng -o5
-find ./static/image/ -name <span style="color:#e6db74">&#34;*.jpg&#34;</span> -type f -exec jpegtran -copy none -optimize -outfile <span style="color:#f92672">{</span><span style="color:#f92672">}</span> <span style="color:#f92672">{</span><span style="color:#f92672">}</span> <span style="color:#ae81ff">\;</span>
+find ./static/image/ -name <span style="color:#e6db74">&#34;*.jpg&#34;</span> -type f -exec jpegtran -copy none -optimize -outfile <span style="color:#f92672">{}</span> <span style="color:#f92672">{}</span> <span style="color:#ae81ff">\;</span>
 </code></pre></div><h1 id="werckerに組み込む">Werckerに組み込む</h1>
 <p><code>wercker.yml</code>のbuildの段階で最適化を仕込めばおわり。<br>
 ただし、すべての画像ファイルをデプロイのたびに最適化すると時間がかかる。<br>

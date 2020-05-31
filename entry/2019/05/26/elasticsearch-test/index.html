@@ -9,7 +9,7 @@
     <meta name="description" content="ElasticSearchなどの外部コンポーネントが存在するときのRailsアプリでのテストで考慮ポイントを記載。Gitlab-CIでCIを回すことにも触れていく。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/05/26/elasticsearch-test/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/05/26/elasticsearch-test/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="[基礎] ElasticSerachなどの外部コンポーネントがあるときのテスト | Goldstine研究所">
@@ -89,8 +89,8 @@
 構成はアプリケーションはRailsで、検索エンジンを担うのがElastiCsearchという前提です。</p>
 <p>アプリケーションがもつmethodは３つで以下としています。</p>
 <ol>
-<li>GET &lsquo;/&rsquo;  =&gt; &lsquo;Hello'を返す</li>
-<li>GET &lsquo;/search&rsquo; =&gt; GETパラメータ&rsquo;q'のキーワードで検索した結果をjsonで返す</li>
+<li>GET &lsquo;/&rsquo;  =&gt; &lsquo;Hello&rsquo;を返す</li>
+<li>GET &lsquo;/search&rsquo; =&gt; GETパラメータ&rsquo;q&rsquo;のキーワードで検索した結果をjsonで返す</li>
 <li>POST &lsquo;/update&rsquo; =&gt; 所定のjsonファイルをPOSTするとbulkでinsertされ、その結果をjsonで返す</li>
 </ol>
 <h2 id="elasticsearchを使うテスト">ElasticSearchを使うテスト</h2>
@@ -132,13 +132,13 @@
   <span style="color:#75715e">#end</span>
 
   <span style="color:#75715e"># テストのHello world的なもの。</span>
-  test <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">should return index</span><span style="color:#e6db74">&#34;</span> <span style="color:#66d9ef">do</span>
-    get <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">/</span><span style="color:#e6db74">&#34;</span>
-    assert_equal <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Hello</span><span style="color:#e6db74">&#34;</span>, @response<span style="color:#f92672">.</span>body
+  test <span style="color:#e6db74">&#34;should return index&#34;</span> <span style="color:#66d9ef">do</span>
+    get <span style="color:#e6db74">&#34;/&#34;</span>
+    assert_equal <span style="color:#e6db74">&#34;Hello&#34;</span>, @response<span style="color:#f92672">.</span>body
   <span style="color:#66d9ef">end</span>
   
   <span style="color:#75715e"># テストデータのpostをしてエラーなくレスポンししたかどうか</span>
-  test <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">should upload blog data</span><span style="color:#e6db74">&#34;</span> <span style="color:#66d9ef">do</span>
+  test <span style="color:#e6db74">&#34;should upload blog data&#34;</span> <span style="color:#66d9ef">do</span>
     post_entry_data
     assert_response <span style="color:#e6db74">:success</span>
   <span style="color:#66d9ef">end</span>
@@ -146,7 +146,7 @@
   <span style="color:#75715e"># テストデータがきちんとインポートされているかの確認</span>
   <span style="color:#75715e"># テストの実行方法にもよりますが、テストケースは順番に実行されるとは限りません。</span>
   <span style="color:#75715e"># そのため、&#34;順番に依存しないよう&#34;にここで事前にまたテストデータのインポートを行います。</span>
-  test <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">should get search results</span><span style="color:#e6db74">&#34;</span> <span style="color:#66d9ef">do</span>
+  test <span style="color:#e6db74">&#34;should get search results&#34;</span> <span style="color:#66d9ef">do</span>
     post_entry_data
     get <span style="color:#e6db74">&#39;/search&#39;</span>, <span style="color:#e6db74">params</span>: { <span style="color:#e6db74">q</span>: <span style="color:#e6db74">&#39;keyword&#39;</span> }
     assert_response <span style="color:#e6db74">:success</span>
@@ -154,7 +154,7 @@
   <span style="color:#66d9ef">end</span>
   
   <span style="color:#75715e"># テストデータをpostする関数</span>
-  <span style="color:#66d9ef">def</span> <span style="color:#a6e22e"></span><span style="color:#f92672"></span><span style="color:#a6e22e">post_entry_data</span>
+  <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">post_entry_data</span>
     entries <span style="color:#f92672">=</span> fixture_file_upload(<span style="color:#66d9ef">Rails</span><span style="color:#f92672">.</span>root<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#39;test/fixtures/files/entries.json&#39;</span>))
     post <span style="color:#e6db74">&#39;/update&#39;</span>, <span style="color:#e6db74">params</span>: { <span style="color:#e6db74">file</span>: entries }
   <span style="color:#66d9ef">end</span>
@@ -181,9 +181,9 @@ servicesについてもdockerイメージを指定することで特定のサー
 
 <span style="color:#66d9ef">test</span>:
   <span style="color:#66d9ef">stage</span>: test
-  <span style="color:#66d9ef">image</span>: ruby:<span style="color:#ae81ff">2.5</span><span style="color:#ae81ff">.5</span>
+  <span style="color:#66d9ef">image</span>: ruby:<span style="color:#ae81ff">2.5.5</span>
   <span style="color:#66d9ef">services</span>:
-    - <span style="color:#66d9ef">name</span>: docker.elastic.co/elasticsearch/elasticsearch:<span style="color:#ae81ff">6.7</span><span style="color:#ae81ff">.2</span>
+    - <span style="color:#66d9ef">name</span>: docker.elastic.co/elasticsearch/elasticsearch:<span style="color:#ae81ff">6.7.2</span>
       <span style="color:#66d9ef">alias</span>: elasticsearch
   <span style="color:#66d9ef">before_script</span>:
     - apt-get update <span style="color:#75715e">&amp;&amp;</span> apt-get upgrade -y

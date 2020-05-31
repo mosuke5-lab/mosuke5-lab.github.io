@@ -9,7 +9,7 @@
     <meta name="description" content="GoogleAppsScript(GAS)からSlideShare APIを使ってスライド情報をスプレッドシートに書き込むことをやってみました。SlideShare APIの使い方含め説明します。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2018/12/20/slideshare-api-by-gas/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2018/12/20/slideshare-api-by-gas/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="SlideShare APIをGoogleAppsScriptから利用する方法 | Goldstine研究所">
@@ -130,17 +130,17 @@ e4d673a71b769782541920b7acfcee92a686b91c  -
 <p>メソッドはGETなので、URLの後ろにパラメータを付けて下記のようにリクエストURLを完成させます。
 ブラウザからアクセスしてみて、成功していればXMLが返ってくるはずです。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">https://www.slideshare.net/api/2/get_slideshows_by_user?api_key=xxxxx&amp;ts=1545315685&amp;hash=xxxxxxxxxxxx&amp;username_for=mosuke5
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml"><span style="color:#f92672">&lt;User</span><span style="color:#f92672">&gt;</span>
-  <span style="color:#f92672">&lt;Name</span><span style="color:#f92672">&gt;</span>mosuke5<span style="color:#f92672">&lt;/Name&gt;</span>
-  <span style="color:#f92672">&lt;Count</span><span style="color:#f92672">&gt;</span>16<span style="color:#f92672">&lt;/Count&gt;</span>
-<span style="color:#f92672">&lt;Slideshow</span><span style="color:#f92672">&gt;</span>
-  <span style="color:#f92672">&lt;ID</span><span style="color:#f92672">&gt;</span>124228224<span style="color:#f92672">&lt;/ID&gt;</span>
-  <span style="color:#f92672">&lt;Title</span><span style="color:#f92672">&gt;</span>Double 11を支えるApsaraDB for Redis (AliEaters #8)<span style="color:#f92672">&lt;/Title&gt;</span>
-  <span style="color:#f92672">&lt;Description</span><span style="color:#f92672">&gt;</span>Alibaba Cloudで提供しているマネージドのRedisの概要や特徴とTaobao内での利用について少しだけ触れます。元ネタはAlibaba Cloudの国際チームが投稿しているブログです。<span style="color:#f92672">&lt;/Description&gt;</span>
-  <span style="color:#f92672">&lt;Status</span><span style="color:#f92672">&gt;</span>2<span style="color:#f92672">&lt;/Status&gt;</span>
-  <span style="color:#f92672">&lt;Username</span><span style="color:#f92672">&gt;</span>mosuke5<span style="color:#f92672">&lt;/Username&gt;</span>
-  <span style="color:#f92672">&lt;URL</span><span style="color:#f92672">&gt;</span>https://www.slideshare.net/mosuke5/double-11apsaradb-for-redis-alieaters-8<span style="color:#f92672">&lt;/URL&gt;</span>
-  <span style="color:#f92672">&lt;ThumbnailURL</span><span style="color:#f92672">&gt;</span>//cdn.slidesharecdn.com/ss_thumbnails/apsaradbforredis-181128061230-thumbnail.jpg?cb=1543385711<span style="color:#f92672">&lt;/ThumbnailURL&gt;</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml"><span style="color:#f92672">&lt;User&gt;</span>
+  <span style="color:#f92672">&lt;Name&gt;</span>mosuke5<span style="color:#f92672">&lt;/Name&gt;</span>
+  <span style="color:#f92672">&lt;Count&gt;</span>16<span style="color:#f92672">&lt;/Count&gt;</span>
+<span style="color:#f92672">&lt;Slideshow&gt;</span>
+  <span style="color:#f92672">&lt;ID&gt;</span>124228224<span style="color:#f92672">&lt;/ID&gt;</span>
+  <span style="color:#f92672">&lt;Title&gt;</span>Double 11を支えるApsaraDB for Redis (AliEaters #8)<span style="color:#f92672">&lt;/Title&gt;</span>
+  <span style="color:#f92672">&lt;Description&gt;</span>Alibaba Cloudで提供しているマネージドのRedisの概要や特徴とTaobao内での利用について少しだけ触れます。元ネタはAlibaba Cloudの国際チームが投稿しているブログです。<span style="color:#f92672">&lt;/Description&gt;</span>
+  <span style="color:#f92672">&lt;Status&gt;</span>2<span style="color:#f92672">&lt;/Status&gt;</span>
+  <span style="color:#f92672">&lt;Username&gt;</span>mosuke5<span style="color:#f92672">&lt;/Username&gt;</span>
+  <span style="color:#f92672">&lt;URL&gt;</span>https://www.slideshare.net/mosuke5/double-11apsaradb-for-redis-alieaters-8<span style="color:#f92672">&lt;/URL&gt;</span>
+  <span style="color:#f92672">&lt;ThumbnailURL&gt;</span>//cdn.slidesharecdn.com/ss_thumbnails/apsaradbforredis-181128061230-thumbnail.jpg?cb=1543385711<span style="color:#f92672">&lt;/ThumbnailURL&gt;</span>
   ...
 </code></pre></div><h2 id="gasで実行する">GASで実行する</h2>
 <p>もともとは、スプレッドシートでSlideShareの投稿を管理したい用途があって、

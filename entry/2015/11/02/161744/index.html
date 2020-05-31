@@ -9,7 +9,7 @@
     <meta name="description" content="serverspecを使ったインフラのテストを導入してみました。その理由と実践してみての工夫点や悩んでいる点を共有します。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2015/11/02/161744/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2015/11/02/161744/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="serverspecを使ったインフラのテストを導入した理由と工夫している点 | Goldstine研究所">
@@ -109,7 +109,7 @@ describe service(<span style="color:#e6db74">&#39;httpd&#39;</span>) <span style
   it { should be_running   }
 <span style="color:#66d9ef">end</span>
 
-describe port(<span style="color:#ae81ff">80</span><span style="color:#f92672"></span>) <span style="color:#66d9ef">do</span>
+describe port(<span style="color:#ae81ff">80</span>) <span style="color:#66d9ef">do</span>
   it { should be_listening }
 <span style="color:#66d9ef">end</span>
  
@@ -189,12 +189,12 @@ describe port(<span style="color:#ae81ff">80</span><span style="color:#f92672"><
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/Rakefile">Rakefile</a>内に書いてます。もし記述が増えるようだと別ファイルに切り出すと思います。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">hosts <span style="color:#f92672">=</span> <span style="color:#f92672">[</span>
   {
-    <span style="color:#e6db74">:name</span>   <span style="color:#f92672">=</span><span style="color:#f92672">&gt;</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">proxy.vimfactory</span><span style="color:#e6db74">&#34;</span>,
-    <span style="color:#e6db74">:roles</span>  <span style="color:#f92672">=</span><span style="color:#f92672">&gt;</span> <span style="color:#e6db74">%w(</span><span style="color:#e6db74"> base proxy </span><span style="color:#e6db74">)</span>
+    <span style="color:#e6db74">:name</span>   <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;proxy.vimfactory&#34;</span>,
+    <span style="color:#e6db74">:roles</span>  <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">%w( base proxy )</span>
   },
   {
-    <span style="color:#e6db74">:name</span>   <span style="color:#f92672">=</span><span style="color:#f92672">&gt;</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">app.vimfactory</span><span style="color:#e6db74">&#34;</span>,
-    <span style="color:#e6db74">:roles</span>  <span style="color:#f92672">=</span><span style="color:#f92672">&gt;</span> <span style="color:#e6db74">%w(</span><span style="color:#e6db74"> base app </span><span style="color:#e6db74">)</span>
+    <span style="color:#e6db74">:name</span>   <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;app.vimfactory&#34;</span>,
+    <span style="color:#e6db74">:roles</span>  <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">%w( base app )</span>
   }
 <span style="color:#f92672">]</span>
  

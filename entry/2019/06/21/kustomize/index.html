@@ -9,7 +9,7 @@
     <meta name="description" content="Kubernetesのマニフェストファイルを自動生成できるツールであるKustomizeを紹介します。使おうと思った動機や使う上での注意点など書きました。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/06/21/kustomize/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/06/21/kustomize/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Kustomizeで環境ごとに異なるマニフェストを作る | Goldstine研究所">
@@ -186,7 +186,7 @@ overlayは名前の通り「覆う」的な意味なので、Baseのマニュフ
         <span style="color:#66d9ef">app</span>: nginx
     <span style="color:#66d9ef">spec</span>:
       <span style="color:#66d9ef">containers</span>:
-      - <span style="color:#66d9ef">image</span>: nginx:<span style="color:#ae81ff">1.17</span><span style="color:#ae81ff">.0</span>
+      - <span style="color:#66d9ef">image</span>: nginx:<span style="color:#ae81ff">1.17.0</span>
         <span style="color:#66d9ef">name</span>: nginx
         <span style="color:#66d9ef">ports</span>:
         - <span style="color:#66d9ef">containerPort</span>: <span style="color:#ae81ff">80</span>
@@ -244,7 +244,7 @@ $ cat overlays/production/change-nginx-service-to-loadbalancer.yml
         <span style="color:#66d9ef">app</span>: nginx
     <span style="color:#66d9ef">spec</span>:
       <span style="color:#66d9ef">containers</span>:
-      - <span style="color:#66d9ef">image</span>: nginx:<span style="color:#ae81ff">1.17</span><span style="color:#ae81ff">.0</span>
+      - <span style="color:#66d9ef">image</span>: nginx:<span style="color:#ae81ff">1.17.0</span>
         <span style="color:#66d9ef">name</span>: nginx
         <span style="color:#66d9ef">ports</span>:
         - <span style="color:#66d9ef">containerPort</span>: <span style="color:#ae81ff">80</span>

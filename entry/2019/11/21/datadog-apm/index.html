@@ -9,7 +9,7 @@
     <meta name="description" content="Datadog APMを体験しました。非常に強力で、いままでアプリケーションをいかに把握していなかった痛感しました。本ブログではAPMとはなにか、なぜ必要か、どんな情報が取得されているのかなど紹介します。">
     <link rel="canonical" href="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/">
     <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/" />
-    <meta name="generator" content="Hugo 0.64.0" />
+    <meta name="generator" content="Hugo 0.71.1" />
     <meta name="twitter:card" content="summary">
     
     <meta name="twitter:title" content="Datadog APMとトレーシングの仕組みについて | Goldstine研究所">
@@ -182,7 +182,7 @@ APMはApplication Performance Monigoringの略で、名前から想像ができ�
 こちらの例は、Ruby on Railsで動いているRedmineに対してDatadog APMを導入したものです。</p>
 <h4 id="設定の変更">設定の変更</h4>
 <p>Datadogの設定において、下記のように<code>my-custom.log</code>にログを出力するようにしておきます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">f <span style="color:#f92672">=</span> <span style="color:#66d9ef">File</span><span style="color:#f92672">.</span>new(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">my-custom.log</span><span style="color:#e6db74">&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">w+</span><span style="color:#e6db74">&#34;</span>)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">f <span style="color:#f92672">=</span> <span style="color:#66d9ef">File</span><span style="color:#f92672">.</span>new(<span style="color:#e6db74">&#34;my-custom.log&#34;</span>, <span style="color:#e6db74">&#34;w+&#34;</span>)
 <span style="color:#66d9ef">Datadog</span><span style="color:#f92672">.</span>configure <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>c<span style="color:#f92672">|</span>
   c<span style="color:#f92672">.</span>use <span style="color:#e6db74">:rails</span>
   c<span style="color:#f92672">.</span>tracer <span style="color:#e6db74">log</span>: <span style="color:#66d9ef">Logger</span><span style="color:#f92672">.</span>new(f)
