@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sock Shopを使ったサービスメッシュ体験のハンズオン | Goldstine研究所</title>
+    <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+    <meta name="propeller" content="78ffb64bf8546f1b32b8a4e4400f4c06">
+    <meta name="description" content="Sock Shopを使ったマイクロサービス体験ハンズオンにサービスメッシュを追加しました。サービスメッシュがどのような価値を生むのか自分の身体で体験するのにご活用ください。">
+    <link rel="canonical" href="https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/">
+    <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/" />
+    <meta name="generator" content="Hugo 0.71.1" />
+    <meta name="twitter:card" content="summary">
+    
+    <meta name="twitter:title" content="Sock Shopを使ったサービスメッシュ体験のハンズオン | Goldstine研究所">
+    <meta name="twitter:description" content="Sock Shopを使ったマイクロサービス体験ハンズオンにサービスメッシュを追加しました。サービスメッシュがどのような価値を生むのか自分の身体で体験するのにご活用ください。">
+    <meta name="twitter:site" content="@mosuke5" />
+    <meta name="twitter:creator" content="@mosuke5" />
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Sock Shopを使ったサービスメッシュ体験のハンズオン &middot; Goldstine研究所">
+    <meta property="og:description" content="Sock Shopを使ったマイクロサービス体験ハンズオンにサービスメッシュを追加しました。サービスメッシュがどのような価値を生むのか自分の身体で体験するのにご活用ください。">
+    <meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
+    <meta property="og:site_name" content="Goldstine研究所" />
+    <meta property="og:url" content="https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+    <link rel="stylesheet" href="https://blog.mosuke.tech/css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="icon" type="image/png" href="/image/favicon.ico">
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-2753210161325997",
+        enable_page_level_ads: true
+      });
+    </script>
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
+            <h2 class="brand-tagline"> @mosuke5&#39;s Blog </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">01 Jul 2020, 23:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/" class="post-title">Sock Shopを使ったサービスメッシュ体験のハンズオン</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Kubernetes" href="https://blog.mosuke.tech/categories/kubernetes">Kubernetes</a>
+                            
+                        </p>
+                    </header>
+                    <div class="post-description">
+                        <p>おひさしぶりです。もーすけです。<br>
+あっという間に６月が終わってしまい、６月はブログが書けませんでしたが、ブログで書きたいなと思うネタはいくつかありますので、時間のすきをみつけて書いていきたいと思います。</p>
+<p>以前に、Sock Shopを使ったマイクロサービスのハンズオン体験についてのブログを書きました。
+このネタに、Istioを使ったサービスメッシュを適応するハンズオンを追加したのでお知らせします。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/01/22/sockshop/" data-iframely-url="//cdn.iframe.ly/YDI2rVR"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h2 id="サービスメッシュとはなにか">サービスメッシュとはなにか</h2>
+<p>ここ最近、サービスメッシュを実際に手を動かしたりして学んでみて、サービスメッシュは「アプリケーションのすべてのトラフィックをSoftware Definedに制御できる仕組み」と理解しました。
+マイクロサービス化によって発生しうる、多くのネットワークに関する問題を、Kubernetesリソースとして管理しソフトウェア制御ができるようにすることで解決していくものです。
+このブログでは、サービスメッシュとはなにかを語るものではないですが、おそらくこのハンズオンを体験していただくと、その意味というのが理解できてくると感じています。</p>
+<h2 id="どのように体験できるか">どのように体験できるか</h2>
+<p>Istioのサンプルアプリケーションとして、よくbookinfoが利用されます。
+bookinfoは軽量なアプリケーションでよいのですが、「マイクロサービスを学ぶ」という文脈ではシンプルすぎて物足りなさを感じます。その点、Sock Shopはデータストアもあり、非同期通信もありとマイクロサービスを学ぶにはうってつけです。もちろん、サンプルアプリケーションでありアプリケーション自身の作りはあまりよくないところもあるのですが。</p>
+<p>そんなSock Shopを利用することで、よりリアルなマイクロサービスにおける課題をサービスメッシュでどう解決できるのか？という視点で学ぶことができます。
+今回はOpenShift Service Meshを使っているので、そのままKubenetesの環境で動作させることはできないのですが、OpenShiftでサービスメッシュにトライしようとしている人の糧になればと思います。（あるいは、直接体験はできないかもしれないですが、他のKubenetesでサービスメッシュをトライしようとしている人の参考になればと思います。）</p>
+<p>ハンズオンのテキストはこちらから参照できます。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/mosuke5/microservices-demo-openshift/blob/master/servicemesh/workshop-servicemesh.md" data-iframely-url="//cdn.iframe.ly/pEhhuZs"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h3 id="openshift-service-mesh">OpenShift Service Mesh</h3>
+<p>そもそもOpenShift Service Meshとは、Red Hatが提供しているサービスメッシュのサービスで、OpenShiftの一部として利用できるものです。実態は、Istio+α のサービスです。<br>
+Istio+α と書いたのは、OpenShift Service Meshは実際<a href="https://maistra.io/">maistra</a>とよばれるOSSをベースに作られているからです。このmaistraは、Istioをアップストリームとしながら足りない機能を付け加えたOSSです。マルチテナント機能が追加されたりしています。</p>
+<h3 id="マルチテナント対応">マルチテナント対応</h3>
+<p>OpenShift Service Meshでは、Istioコントロールプレーンがメッシュを適応するNamespaceを管理することができます。
+特定のNamespaceのみサービスメッシュを適応することや、同じクラスタ上にまったく別のサービスメッシュ設定をつくるなどが容易にできます。
+インストールとともにマルチテナント性を学んでいきます。</p>
+<p><img src="/image/istio-multitenancy.png" alt="multitenancy"></p>
+<h3 id="envoyプロキシの導入">Envoyプロキシの導入</h3>
+<p>サービスメッシュを実現するにあたっては、Envoy Proxyを導入しないことにははじまりません。Envoy Proxyがすべての通信をコントロールすることによって、サービスメッシュは成り立っています。
+では、どのようにEnvoy Proxyを導入することができるのでしょうか。
+非常に簡単です。PodのAnnotationsに<code>sidecar.istio.io/inject: true</code>を記述してあげることでPodが生成されるタイミングで動的にサイドカーコンテナとしてEnvoy Proxyが配置されます。</p>
+<p>なぜこんなことができるのか？と気になった方は、KubernetesのAPIリクエストの仕組みを学ぶと理解することができます。<a href="https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/">Admission Controller</a>とよばれる仕組みを利用してEnvoy Proxyをいれています。</p>
+<p><img src="/image/kubernetes-api-flow.png" alt="kubernetes-api-flow"></p>
+<h3 id="ingress経路の変更">Ingress経路の変更</h3>
+<p>OpenShift Service MeshのMemberRollに追加すると（サービスメッシュを適応すると）いままで、Route（Ingress）経由で通信できたいたアプリケーションに接続できなくなります。
+理由は、Service Meshでは「すべてのトラフィックをコントールしたい」という思想からIngressのトラフィックもEnvoy Proxyを通す必要が出てくるためです。
+クラスタ外からアクセスが必要なものは設定で対応する必要があります。</p>
+<p><img src="/image/istio-traffic-control.png" alt="istio-traffic-control"></p>
+<p>その他、複数バージョンのサービスをリリースした際のトラフィック分散などを体験できるようにしています。</p>
+<h3 id="サーキットブレーカー対応">サーキットブレーカー対応</h3>
+<p>こちらは、<a href="https://github.com/mosuke5/microservices-demo-openshift/blob/master/workshop-solutions.md">まえのハンズオン</a>をやっていただいたほうが実感がわきますが、サービスメッシュ導入前にとあるサービスを落とした場合、30秒ほどタイムアウトで待っていました。
+サービスメッシュを入れることで、サーキットブレーカーやより早いタイムアウトの設定が可能になり、アプリケーション層でハンドリングすることなく実装ができます。</p>
+<h3 id="kialiやprometheusを使った可視化">KialiやPrometheusを使った可視化</h3>
+<p>その他、サービスメッシュによって各サービス間のトラフィックの流れが可視化されます。kialiと呼ばれるサービスメッシュの可視化専用OSSがあり、そちらを利用したモニタリングなどについても触れていきます。</p>
+<p><img src="/image/kiali.gif" alt="kiali"></p>
+<h2 id="さいごに">さいごに</h2>
+<p>このハンズオンでは本当に基礎的なことの一部しか体験するものではないですが、サービスメッシュの価値やサービスメッシュが実現したいことというのはよく分かると思います。<br>
+しかし、やはりそれなりの学習コストがかかることや、複数のサービスをまたいだプロダクト全体に影響を及ぼす技術でもあり、それを本当に導入して使うかどうかという点は難しい課題と感じています。
+マイクロサービスにしてもKubernetesにしてもなんでも同じなのですが、サービスメッシュによって得たい効果はなんなのか？それはこの方法がベストなのか？この問いかけは忘れずに常に行わなければならないと思います。</p>
+                    </div>
+                    
+                    
+                    <div class="related-post">
+                        <h5>関連する記事はこちら</h5>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" onClick="ga('send','event','link','click','related-posts');">TektonのOperatorによるインストールとHello World</a> (2020/05/10)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/" onClick="ga('send','event','link','click','related-posts');">イメージのプルの効率化を考える。kubernetes-image-puller の紹介</a> (2020/04/28)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/" onClick="ga('send','event','link','click','related-posts');">Jenkins pipelineで複数のOpenShiftクラスタを扱う</a> (2020/04/14)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/04/09/kubernetes-namespace/" onClick="ga('send','event','link','click','related-posts');">Kubernetes、namespaceの分け方に迷った場合に考えること</a> (2020/04/09)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/04/05/skopeo/" onClick="ga('send','event','link','click','related-posts');">Skopeoを利用したコンテナイメージのレジストリ間コピー</a> (2020/04/05)</li>
+                    	
+                    </div>
+                    
+                    <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+                            <a class="twitter-share-button"
+                            href="https://twitter.com/intent/tweet">
+                          Tweet</a>
+                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f01%2fistio-sockshop%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <hr class="footer-hr" />
+<div class="footer-posts">
+    <h5>Latest Posts</h5>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/" onClick="ga('send','event','link','click','latest-posts');">Sock Shopを使ったサービスメッシュ体験のハンズオン</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" onClick="ga('send','event','link','click','latest-posts');">TektonのOperatorによるインストールとHello World</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/" onClick="ga('send','event','link','click','latest-posts');">イメージのプルの効率化を考える。kubernetes-image-puller の紹介</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/" onClick="ga('send','event','link','click','latest-posts');">Jenkins pipelineで複数のOpenShiftクラスタを扱う</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/04/09/kubernetes-namespace/" onClick="ga('send','event','link','click','latest-posts');">Kubernetes、namespaceの分け方に迷った場合に考えること</a></li>
+    
+</div>
+<div class="footer-posts">
+    <h5>Featured Posts</h5>
+    <li><a href="https://blog.mosuke.tech/entry/2016/06/04/180122/" onClick="ga('send','event','link','click','featured-posts');">Nginxの仕組みについて入門</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2017/03/18/182252/" onClick="ga('send','event','link','click','featured-posts');">万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2015/07/19/135844/" onClick="ga('send','event','link','click','featured-posts');">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った</a></li>
+</div>
+<div class="search">
+    <h5>Search</h5>
+    <div class="google-search">
+    <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+<div class="gcse-search"></div>
+    </div>
+</div>
+<div class="links">
+    <h5>Links</h5>
+    <a class="pure-button" href="/about/" onClick="ga('send','event','link','click','about-this-site');"><i class="fa fa-info-circle"></i> About this site</a>
+    <a class="pure-button" href="/archive/" onClick="ga('send','event','link','click','archive');"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="/categories/" onClick="ga('send','event','link','click','categories');"><i class="fa fa-tag"></i> Categories</a>
+    <a class="pure-button" href="https://docs.google.com/forms/d/e/1FAIpQLSd6N53H7zfF8EBrvyezRizU1mQx-CP3vc_jG-WvxfRmCjHTpg/viewform" onClick="ga('send','event','link','click','contact');" target="_blank"><i class="fa fa-question-circle"></i> Contact</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml" onClick="ga('send','event','link','click','rss');"><i class="fa fa-rss"></i> rss</a>
+</div>
+<div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by <a class="hugo" href="https://gohugo.io/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+
+        </div>
+    </div>
+</div>
+<script>
+window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+  
+    return t;
+}(document, "script", "twitter-wjs"));
+</script>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-99596316-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
