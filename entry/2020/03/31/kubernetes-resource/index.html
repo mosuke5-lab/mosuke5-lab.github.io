@@ -85,8 +85,8 @@
 テレビからYouTubeなどを使って、カフェの雑音などを流しておくと家の中でも雰囲気はがらっと変わって集中できたりします。
 イヤホンなどで流すよりも部屋全体に流れるようにテレビなどでやるとおすすめです。ぜひトライしてみてください。</p>
 <p>今日は、Kubernetesのリソースの基本についてまとめました。<br>
-自分自身が理解が不足していたこともありましたし、なんとなくでマニフェストのリソースを書いてハマってしまうことも多くあるなあと思ったからです。
-今回書いたリソースは主に３点（コンテナのへのリソース割り当て, QoS Class, LimitRange）ですが、この他にも様々なトピックがあります。機会あれば別にご紹介したいともいます。</p>
+なんとなくでマニフェストのリソースを設定してアプリケーションがエラーになってしまってトラブルシュートに困ったことのある方もおそらくおおいのではないでしょうか。
+今回は最低限ここだけは抑えておいたほうがいいだろう、と個人的に感じているリソースの４点（コンテナのへのリソース割り当て, QoS Class, LimitRange、ResourceQuota）についてまとめました。機会あれば別の観点もご紹介したいともいます。</p>
 <h2 id="コンテナへのリソース割り当て">コンテナへのリソース割り当て</h2>
 <h3 id="requestsとlimits">RequestsとLimits</h3>
 <p>Kubernetesでは、コンテナ単位でリソース（CPUとメモリー）の割り当て、制限を行うことができます。
@@ -275,11 +275,26 @@ Events:
   ----     ------        ----               ----                   -------
   Warning  FailedCreate  31s                replicaset-controller  Error creating: pods &#34;debug-nginx-6d7d6b87b9-qplmn&#34; is forbidden: [maximum memory usage per Pod is 1Gi, but
 limit is 2147483648, maximum memory usage per Container is 1Gi, but limit is 2Gi, memory max limit to request ratio per Container is 2, but provided ratio is 4.096000]
-</code></pre></div><h2 id="まとめ">まとめ</h2>
-<p>Kubernetesにおけるリソースの基本となる３つの項目について見てきました。<br>
+</code></pre></div><h2 id="resourcequota">ResourceQuota</h2>
+<p>ResourceQuotaとよばれる、Namespaceレベルに対して設定できるリソースです。<br>
+Namespace全体で、どのくらいのCPUやメモリ使用を許可するのかといった設定が可能です。
+その他、Podの<code>PriorityClass</code>に応じて、使用できるリソース量を調整することなどが可能です。</p>
+<p>使いみちとしては、例えばアプリケーション毎にNamespaceを分けていて、とあるアプリケーションの過多なリソース消費によって、クラスター全体に影響（あるいは別アプリケーションへ影響）を与えないようにするなどのために利用できます。
+各チーム・各アプリケーションのマルチテナント性がある場合には、特に重要な機能になります。</p>
+<p>詳しくはぜひ公式ドキュメントを参考にし、試してみましょう。<br>
+<a href="https://kubernetes.io/ja/docs/concepts/policy/resource-quotas/" target="_blank">リソースクォータ | Kubernetes</a></p>
+<h3 id="clusterresourcequota">ClusterResourceQuota</h3>
+<p>もし、OpenShiftをお使いの方は、もう一つ知っておくと便利なリソースがあります。<br>
+それはClusterResourceQuotaです。ResourceQuotaは１つのNamespaceレベルでの設定でしたが、ClusterResourceQuotaは複数のNamsをまたいだリソースの使用量を設定できるものです。<br>
+具体的な利用ユースケースでは、ユーザ毎に使用できるリソース量を調整するなどです。
+ユーザは任意に複数のNamespaceを作成できる権限をもつが、その作成した複数のNamespaceをトータルして、そのユーザが利用できるリソース使用量を決めることができるというものです。<br>
+社内の開発環境などで、ユーザごとにマルチテナント性が必要な場合などに検討するといいです。</p>
+<p><a href="https://access.redhat.com/documentation/ja-jp/openshift_container_platform/4.4/html/applications/setting-quotas-across-multiple-projects" target="_blank">5.2. 複数のプロジェクト間のリソースクォータ | Red Hat Customer Portal</a></p>
+<h2 id="まとめ">まとめ</h2>
+<p>Kubernetesにおけるリソースの基本となる４つの項目について見てきました。<br>
 最低限このくらいのことがわかっているとデバッグ作業に非常に役立つと感じています。
 なんとなくで設定していた方は今日で卒業してもらえればと思います。</p>
-<p>Kubernetesのリソースは、今日紹介したことの他にもNamespaceごとのリソースのクオータ制限をするResourceQuotaや、Podのオートスケーリング、スケジューリングなどなど非常に奥が深いです。
+<p>Kubernetesのリソースは、今日紹介したことの他にもPodのオートスケーリング、スケジューリングなどなど非常に奥が深い内容です。
 より体系的に深く学びたい方は、ぜひともKubernetes完全ガイドをおすすめします。我らのバイブルです。</p>
 <div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.amazon.co.jp/Kubernetes%25E5%25AE%258C%25E5%2585%25A8%25E3%2582%25AC%25E3%2582%25A4%25E3%2583%2589-impress-top-gear-%25E9%259D%2592%25E5%25B1%25B1/dp/4295004804" data-iframely-url="//cdn.iframe.ly/UdUbVWh?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
                     </div>
