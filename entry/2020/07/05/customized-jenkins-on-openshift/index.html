@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カスタマイズしたJenkinsを作成する方法 on OpenShift | Goldstine研究所</title>
+    <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+    <meta name="propeller" content="78ffb64bf8546f1b32b8a4e4400f4c06">
+    <meta name="description" content="OpenShift上でJenkinsを利用する際のプラグインの管理方法やカスタマイズの方法などをご紹介します。プラグインが消えてしまうなどの問題にどう対応したらよいかなどまとめています。">
+    <link rel="canonical" href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/">
+    <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" />
+    <meta name="generator" content="Hugo 0.71.1" />
+    <meta name="twitter:card" content="summary">
+    
+    <meta name="twitter:title" content="カスタマイズしたJenkinsを作成する方法 on OpenShift | Goldstine研究所">
+    <meta name="twitter:description" content="OpenShift上でJenkinsを利用する際のプラグインの管理方法やカスタマイズの方法などをご紹介します。プラグインが消えてしまうなどの問題にどう対応したらよいかなどまとめています。">
+    <meta name="twitter:site" content="@mosuke5" />
+    <meta name="twitter:creator" content="@mosuke5" />
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="カスタマイズしたJenkinsを作成する方法 on OpenShift &middot; Goldstine研究所">
+    <meta property="og:description" content="OpenShift上でJenkinsを利用する際のプラグインの管理方法やカスタマイズの方法などをご紹介します。プラグインが消えてしまうなどの問題にどう対応したらよいかなどまとめています。">
+    <meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
+    <meta property="og:site_name" content="Goldstine研究所" />
+    <meta property="og:url" content="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+    <link rel="stylesheet" href="https://blog.mosuke.tech/css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+    <link rel="icon" type="image/png" href="/image/favicon.ico">
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-2753210161325997",
+        enable_page_level_ads: true
+      });
+    </script>
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
+            <h2 class="brand-tagline"> @mosuke5&#39;s Blog </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">05 Jul 2020, 23:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" class="post-title">カスタマイズしたJenkinsを作成する方法 on OpenShift</a>
+
+                        <p class="post-meta">
+                            
+                                By <strong class="post-author">mosuke5</strong>
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Kubernetes" href="https://blog.mosuke.tech/categories/kubernetes">Kubernetes</a><a class="post-category post-category-DevOps" href="https://blog.mosuke.tech/categories/devops">DevOps</a>
+                            
+                        </p>
+                    </header>
+                    <div class="post-description">
+                        <p>こんにちは。もーすけです。<br>
+本日はRed Hatが提供しているKubernetesディストリビューションであるOpenShift上のJenkinsの管理に関するお話です。
+OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカスタマイズ方法などをご紹介します。
+ハマリポイントもあり困っている方も見かけたのでお役に立てばと思います。</p>
+<p>Jenkins本体ではなくJenkins agnetのカスタマイズに関しては以前に下記ブログを書いてますのでこちらをご参照ください。</p>
+<iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Frheb.hatenablog.com%2Fentry%2Fopenshift-custom-jenkins-agent" style="border: 0; width: 100%; height: 190px;" allowfullscreen scrolling="no"></iframe>
+<h2 id="課題">課題</h2>
+<p>OpenShiftでは、Red Hatが作成したJenkinsイメージが内包されており、簡単にOpenShiftと連携したJenkinsをインストールすることが可能です。<br>
+一番手っ取り早く試す方法としては下記のように<code>oc new-app</code>で、すでに用意されているテンプレートを用いて起動することです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// OpenShift v4.4で用意されているイメージ
+$ oc get is -n openshift | grep jenkins
+jenkins                xxx.com/openshift/jenkins                2,latest       24 hours ago
+jenkins-agent-maven    xxx.com/openshift/jenkins-agent-maven    latest,v4.0    24 hours ago
+jenkins-agent-nodejs   xxx.com/openshift/jenkins-agent-nodejs   latest,v4.0    24 hours ago
+
+// OpenShift v4.4で用意されているテンプレート
+$ oc get template -n openshift | grep jenkins
+jenkins-ephemeral               Jenkins service, without persistent storage....    8 (all set)     6
+jenkins-ephemeral-monitored     Jenkins service, without persistent storage....    9 (all set)     7
+jenkins-persistent              Jenkins service, with persistent storage....       10 (all set)    7
+jenkins-persistent-monitored    Jenkins service, with persistent storage....       11 (all set)    8
+
+// テンプレートを使って簡単に起動
+$ oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=10Gi --param DISABLE_ADMINISTRATIVE_MONITORS=true
+</code></pre></div><p>しかし、この状態のJenkinsを利用するにあたってはいくつかの問題があります。</p>
+<ol>
+<li>デフォルトで入っているプラグインが古いことがある</li>
+<li>追加でプラグインをインストールしたい</li>
+<li>ジョブの定義をはじめからしておきたい</li>
+<li>Jenkinsを起動しているマニフェストを編集したい</li>
+</ol>
+<h2 id="guiからプラグインをインストールアップデートするのではだめか">GUIからプラグインをインストール・アップデートするのではだめか？</h2>
+<p>プラグインのインストールやアップデートについて、Jenkinsの起動後にGUIから行うのでもいいのではないか？そう思われる方も多いかもしれません。
+しかしいくつかの観点で、GUIから行うことに問題があります。</p>
+<h3 id="問題その１jenkinsの複製ができない">問題その１：Jenkinsの複製ができない</h3>
+<p>GUIからプラグインをインストール・アップデートした場合には、そのJenkinsには当然ながらプラグイン管理ができますが、Jenkinsの作り直しや複製をしようとした場合に同じ作業を繰り返し行わなければいけません。<br>
+コンテナのメリットを活かした、再構築の容易性といったメリットを損なってしまいますのでイメージ化しておくことが重要です。</p>
+<p>また、Jenkinsのプラグインのインストール・アップデートは、その後にJenkins自身の再起動が必要になりますので、正直かなり手間がかかるということです。</p>
+<h3 id="問題その２特定の条件でインストールしたプラグインが消える">問題その２：特定の条件でインストールしたプラグインが消える</h3>
+<p>OpenShiftに内包されているJenkinsイメージには、ある特定の条件のときにイメージにもともと持っているプラグインに上書きするという処理があります。
+Jenkinsのイメージのバージョンが上がった際などに、強制的に上書きするようになっています。
+実際にあった例としては、OpenShiftのマイナーバージョンを上げたあとに、Jenkinsを再起動した際にforce_copy_pluginが実行されてアップデートしたプラグインなどがロールバックされてしまったなどです。</p>
+<p>気になる方は、Jenkinsのイメージのコードを見てみるといいです。<br>
+ソースコードの改変により行数が変わっている可能性がありますが、<code>force_copy_plugin</code>で検索すると見つかると思います。</p>
+<p><a href="https://github.com/openshift/jenkins/blob/release-4.4/2/contrib/s2i/run" target="_blank">Github: jenkins/run at release-4.4 · openshift/jenkins</a></p>
+<h2 id="jenkinsのイメージをカスタマイズする">Jenkinsのイメージをカスタマイズする</h2>
+<p>上で見てきたとおり、いくつかの理由でJenkins自身にプラグインをインストールしたりアップグレードしたい場合には、イメージ化しておくことが重要です。
+Jenkinsのイメージのカスタマイズは非常に簡単です。環境変数で指定できる項目もありますが、以下のドキュメントの通りイメージレベルで作ってしまったほうが運用が楽ではないかと思います。まずは以下のドキュメントを確かめてください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://access.redhat.com/documentation/ja-jp/openshift_container_platform/4.4/html/images/images-other-jenkins" data-iframely-url="//cdn.iframe.ly/ET99cFk"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h3 id="サンプル実装">サンプル実装</h3>
+<p>上のドキュメントを見ていただいて、すぐに理解できる方はよしなのですが、正直わかりづらい部分もあるかなと個人的に思います。
+サンプル実装を以下においておきましたので合わせて参考にしてみてください。<br>
+<code>plugins.txt</code>でプラグインの管理を<code>configuration/jobs/sample-job/config.xml</code>でジョブの設定を書いています。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/mosuke5/openshift-custom-jenkins" data-iframely-url="//cdn.iframe.ly/3eDTKnz"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h2 id="おすすめのプラグインのアップデート">おすすめのプラグインのアップデート</h2>
+<p>以下のプラグインはアップデートしておくことをおすすめします。（下の記述のバージョンは執筆時点のため確認の上修正してください）<br>
+JenkinsのKubernetesプラグインでDecralative記法を利用するのにバージョンが古くうまく動かないなどがあったためです。
+Gitも最新にしておくとパイプラインの記述でエラーに遭遇することが減ると思います。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">kubernetes:1.19.3
+pipeline-model-definition:1.6.0
+git:4.2.2
+git-client:3.2.1
+</code></pre></div><h2 id="マニフェストをカスタマイズする">マニフェストをカスタマイズする</h2>
+<p>最後にマニフェストのカスタマイズについてです。<br>
+OpenShiftでは、Jenkinsを起動するためのテンプレートが用意されています。
+冒頭で<code>oc new-app</code>でJenkinsを簡単に起動できるのもこのテンプレートが存在するおかげです。
+しかし、実際にこのテンプレートを使ってJenkinsを起動していると、リソースの都合上Jenkinsが遅くてしょうがないというケースがただありました。
+用意されているJenkinsのテンプレートでは、メモリーのリミットは設定できるのですが、CPU・メモリーのリクエスト値を設定しておきたいことがただあったのでテンプレートをカスタマイズして使います。</p>
+<p>元のテンプレートは参考にしつつ、自分でカスタマイズできるようにしておくと良いでしょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get template jenkins-persistent -o yaml &gt; my-jenkins-template.yaml
+
+// 任意に変更して管理する
+$ vim my-jenkins-template.yaml
+</code></pre></div><h2 id="まとめ">まとめ</h2>
+<p>OpenShift上でJenkinsを使うときのプラグイン管理やカスタマイズなど注意すべき点を見てきました。
+OpenShiftに内包されているJenkinsは、OpenShiftと連携しやすいようにカスタマイズされており、便利なのでぜひ使っていきたいのですが、そのままでみなさんのワークロードに合うとは正直思いません。<br>
+利用できる部分は利用しつつ、カスタマイズしていけるように準備しておくことが非常に重要と思っています。</p>
+<p>また、KubernetesにおけるCI/CDの実装の観点について深堀りして理解したい方はぜひ下記のブログもご参照ください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/" data-iframely-url="//cdn.iframe.ly/AWtNlfG"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+                    </div>
+                    
+                    
+                    <div class="related-post">
+                        <h5>関連する記事はこちら</h5>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" onClick="ga('send','event','link','click','related-posts');">TektonのOperatorによるインストールとHello World</a> (2020/05/10)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/" onClick="ga('send','event','link','click','related-posts');">イメージのプルの効率化を考える。kubernetes-image-puller の紹介</a> (2020/04/28)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/" onClick="ga('send','event','link','click','related-posts');">Jenkins pipelineで複数のOpenShiftクラスタを扱う</a> (2020/04/14)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/" onClick="ga('send','event','link','click','related-posts');">KubernetesにおけるCI/CD実践の勘所まとめ</a> (2020/03/04)</li>
+                    	
+                        <li><a href="https://blog.mosuke.tech/entry/2020/02/26/cloud-native-devops/" onClick="ga('send','event','link','click','related-posts');">運用課題の指南書、Kubernetesで実践するクラウドネイティブDevOps</a> (2020/02/26)</li>
+                    	
+                    </div>
+                    
+                    <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+                            <a class="twitter-share-button"
+                            href="https://twitter.com/intent/tweet">
+                          Tweet</a>
+                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f05%2fcustomized-jenkins-on-openshift%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <hr class="footer-hr" />
+<div class="footer-posts">
+    <h5>Latest Posts</h5>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" onClick="ga('send','event','link','click','latest-posts');">カスタマイズしたJenkinsを作成する方法 on OpenShift</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/" onClick="ga('send','event','link','click','latest-posts');">Sock Shopを使ったサービスメッシュ体験のハンズオン</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" onClick="ga('send','event','link','click','latest-posts');">TektonのOperatorによるインストールとHello World</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/" onClick="ga('send','event','link','click','latest-posts');">イメージのプルの効率化を考える。kubernetes-image-puller の紹介</a></li>
+    
+        <li><a href="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/" onClick="ga('send','event','link','click','latest-posts');">Jenkins pipelineで複数のOpenShiftクラスタを扱う</a></li>
+    
+</div>
+<div class="footer-posts">
+    <h5>Featured Posts</h5>
+    <li><a href="https://blog.mosuke.tech/entry/2016/06/04/180122/" onClick="ga('send','event','link','click','featured-posts');">Nginxの仕組みについて入門</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2017/03/18/182252/" onClick="ga('send','event','link','click','featured-posts');">万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する</a></li>
+    <li><a href="https://blog.mosuke.tech/entry/2015/07/19/135844/" onClick="ga('send','event','link','click','featured-posts');">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った</a></li>
+</div>
+<div class="search">
+    <h5>Search</h5>
+    <div class="google-search">
+    <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+<div class="gcse-search"></div>
+    </div>
+</div>
+<div class="links">
+    <h5>Links</h5>
+    <a class="pure-button" href="/about/" onClick="ga('send','event','link','click','about-this-site');"><i class="fa fa-info-circle"></i> About this site</a>
+    <a class="pure-button" href="/archive/" onClick="ga('send','event','link','click','archive');"><i class="fa fa-archive"></i> Arvhive</a>
+    <a class="pure-button" href="/categories/" onClick="ga('send','event','link','click','categories');"><i class="fa fa-tag"></i> Categories</a>
+    <a class="pure-button" href="https://docs.google.com/forms/d/e/1FAIpQLSd6N53H7zfF8EBrvyezRizU1mQx-CP3vc_jG-WvxfRmCjHTpg/viewform" onClick="ga('send','event','link','click','contact');" target="_blank"><i class="fa fa-question-circle"></i> Contact</a>
+    <a class="pure-button" href="https://blog.mosuke.tech/index.xml" onClick="ga('send','event','link','click','rss');"><i class="fa fa-rss"></i> rss</a>
+</div>
+<div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by <a class="hugo" href="https://gohugo.io/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+
+        </div>
+    </div>
+</div>
+<script>
+window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+  
+    return t;
+}(document, "script", "twitter-wjs"));
+</script>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-99596316-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
