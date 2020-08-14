@@ -1,86 +1,56 @@
-<!doctype html>
-<html lang="ja">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terraform workspaceを利用して環境毎のリソース名の変更を行う | Goldstine研究所</title>
-    <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
-    <meta name="propeller" content="78ffb64bf8546f1b32b8a4e4400f4c06">
-    <meta name="description" content="Terraformのworkspace機能の入門から、実践的な利用方法までご紹介します。条件分岐(IF)などを使ったリソース名のコントロールなどを行いました。">
-    <link rel="canonical" href="https://blog.mosuke.tech/entry/2018/06/16/terraform-workspaces/">
-    <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2018/06/16/terraform-workspaces/" />
-    <meta name="generator" content="Hugo 0.71.1" />
-    <meta name="twitter:card" content="summary">
-    
-    <meta name="twitter:title" content="Terraform workspaceを利用して環境毎のリソース名の変更を行う | Goldstine研究所">
-    <meta name="twitter:description" content="Terraformのworkspace機能の入門から、実践的な利用方法までご紹介します。条件分岐(IF)などを使ったリソース名のコントロールなどを行いました。">
-    <meta name="twitter:site" content="@mosuke5" />
-    <meta name="twitter:creator" content="@mosuke5" />
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="Terraform workspaceを利用して環境毎のリソース名の変更を行う &middot; Goldstine研究所">
-    <meta property="og:description" content="Terraformのworkspace機能の入門から、実践的な利用方法までご紹介します。条件分岐(IF)などを使ったリソース名のコントロールなどを行いました。">
-    <meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
-    <meta property="og:site_name" content="Goldstine研究所" />
-    <meta property="og:url" content="https://blog.mosuke.tech/entry/2018/06/16/terraform-workspaces/" />
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
-    <link rel="stylesheet" href="https://blog.mosuke.tech/css/all.min.css">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
-    <link rel="icon" type="image/png" href="/image/favicon.ico">
-    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-    <script>
-      (adsbygoogle = window.adsbygoogle || []).push({
-        google_ad_client: "ca-pub-2753210161325997",
-        enable_page_level_ads: true
-      });
-    </script>
-</head>
-<body>
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<div id="layout" class="pure-g">
-    <div class="sidebar pure-u-1 pure-u-md-1-4">
-    <div class="header">
-        <hgroup>
-            <h1 class="brand-title"><a href="https://blog.mosuke.tech">Goldstine研究所</a></h1>
-            <h2 class="brand-tagline"> @mosuke5&#39;s Blog </h2>
-        </hgroup>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
 
-        <nav class="nav">
-            <ul class="nav-list">
-                
-                
-            </ul>
-        </nav>
+<title>Terraform workspaceを利用して環境毎のリソース名の変更を行う</title><body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Kubernetes (Coming soon)</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="" target="_blank">Contact</a>
+        </li>
+      </ul>
     </div>
-</div>
-
-
-    <div class="content pure-u-1 pure-u-md-3-4">
-        <div>
+  </nav>
+</header><main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Terraform workspaceを利用して環境毎のリソース名の変更を行う</h1>
+    <div class="entry-sub-title">
+        <span class="">16 Jun 2018, 18:27</span>
+        <span class="">By mosuke5</span>
+        
             
-            <div class="posts">
-                <h1 class="content-subhead">16 Jun 2018, 18:27</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://blog.mosuke.tech/entry/2018/06/16/terraform-workspaces/" class="post-title">Terraform workspaceを利用して環境毎のリソース名の変更を行う</a>
-
-                        <p class="post-meta">
-                            
-                                By <strong class="post-author">mosuke5</strong>
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-DevOps" href="https://blog.mosuke.tech/categories/devops">DevOps</a><a class="post-category post-category-クラウド技術" href="https://blog.mosuke.tech/categories/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89%E6%8A%80%E8%A1%93">クラウド技術</a>
-                            
-                        </p>
-                    </header>
-                    <div class="post-description">
-                        <p>Terraformのバージョン0.9以降で追加された、workspace機能について自分の環境で使い始めたので、その使い方やtipsなどを残していきたいと思います。<br>
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+                <a class="badge badge-inf post-category post-category-クラウド技術" href="/categories/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89%E6%8A%80%E8%A1%93">クラウド技術</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>Terraformのバージョン0.9以降で追加された、workspace機能について自分の環境で使い始めたので、その使い方やtipsなどを残していきたいと思います。<br>
 workspaceは名前から推測できますが、同じTerraformのコードをワークスペース（環境）ごとに使い分けることのできる機能です。例えば、productionとdevelopmentの2つのworkspaceを作れば、同じTerraformコードを利用してこの2つの環境で別のリソースを作成していくことができます。</p>
 <p>Terraformでは、実行結果をstateファイルに保存することで、インフラストラクチャの状態を管理することができます。(<a href="https://www.terraform.io/docs/state/">ドキュメント</a>)<br>
 このworkspace機能を利用すると、このstateファイルを環境ごとに分けて管理するようになります。このあたりは使い方をみながら理解していきましょう。</p>
@@ -200,31 +170,20 @@ workspace名をうまく使えばできそうですが、production環境だけ�
   <span style="color:#960050;background-color:#1e0010">proxied</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#66d9ef">true</span>
 }
 </code></pre></div>
-                    </div>
-                    <div class="request-for-entry">
-                        <h5>フィードバック・相談 (β機能)</h5>
-                        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<br />
-                            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Terraform%20workspace%e3%82%92%e5%88%a9%e7%94%a8%e3%81%97%e3%81%a6%e7%92%b0%e5%a2%83%e6%af%8e%e3%81%ae%e3%83%aa%e3%82%bd%e3%83%bc%e3%82%b9%e5%90%8d%e3%81%ae%e5%a4%89%e6%9b%b4%e3%82%92%e8%a1%8c%e3%81%86" target="_blank" onClick="ga('send','event','link','click','request-for-entry');">執筆者に問い合わせてみる</a>
-                        </p>
-                    </div>
-                    
-                    
-                    <div class="related-post">
-                        <h5>関連する記事はこちら</h5>
-                    	
-                        <li><a href="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/" onClick="ga('send','event','link','click','related-posts');">Datadog APMとトレーシングの仕組みについて</a> (2019/11/21)</li>
-                    	
-                        <li><a href="https://blog.mosuke.tech/entry/2019/08/28/datadog-for-alibaba-cloud/" onClick="ga('send','event','link','click','related-posts');">DatadogのAlibaba Cloud integrationでできること</a> (2019/08/28)</li>
-                    	
-                        <li><a href="https://blog.mosuke.tech/entry/2018/06/20/terraform_import/" onClick="ga('send','event','link','click','related-posts');">Terraformのimportの使い方と注意ポイント</a> (2018/06/20)</li>
-                    	
-                        <li><a href="https://blog.mosuke.tech/entry/2018/06/17/terraform-backend/" onClick="ga('send','event','link','click','related-posts');">Terraformのbackend機能を利用してstateファイルを共有する</a> (2018/06/17)</li>
-                    	
-                        <li><a href="https://blog.mosuke.tech/entry/2018/06/08/terraform_multi_provider/" onClick="ga('send','event','link','click','related-posts');">Terraformで複数リージョンをまたいだリソース制御する</a> (2018/06/08)</li>
-                    	
-                    </div>
-                    
-                    <div id="disqus_thread"></div>
+    </div>
+    <div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="9c7b53bde768264a82d38720-text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a class="twitter-share-button" href="https://twitter.com/intent/tweet">Tweet</a>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+    <div class="entry-sub-content request-for-entry">
+        <h5>フィードバック・相談(β)</h5>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Terraform%20workspace%e3%82%92%e5%88%a9%e7%94%a8%e3%81%97%e3%81%a6%e7%92%b0%e5%a2%83%e6%af%8e%e3%81%ae%e3%83%aa%e3%82%bd%e3%83%bc%e3%82%b9%e5%90%8d%e3%81%ae%e5%a4%89%e6%9b%b4%e3%82%92%e8%a1%8c%e3%81%86" target="_blank" onClick="ga('send','event','link','click','request-for-entry');">執筆者に問い合わせてみる</a></p>
+    </div>
+    <div class="entry-sub-content disqus">
+        <div id="disqus_thread"></div>
 <script type="application/javascript">
     var disqus_config = function () {
     
@@ -244,93 +203,179 @@ workspace名をうまく使えばできそうですが、production環境だけ�
 </script>
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 <a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-                    <div class="post-share">
-                        <div class="post-share-links">
-                            <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
-                            <a class="twitter-share-button"
-                            href="https://twitter.com/intent/tweet">
-                          Tweet</a>
-                            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2018%2f06%2f16%2fterraform-workspaces%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
-                        </div>
-                    </div>
-                </section>
-            </div>
-            <hr class="footer-hr" />
-<div class="footer-posts">
-    <h5>Latest Posts</h5>
-    
-        <li><a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/" onClick="ga('send','event','link','click','latest-posts');">コンテナイメージを軽くする方法と、その原理原則を考える</a></li>
-    
-        <li><a href="https://blog.mosuke.tech/entry/2020/07/08/container-image-security/" onClick="ga('send','event','link','click','latest-posts');">コンテナイメージの脆弱性のリスクと対策についてNIST SP 800-190に沿って考える</a></li>
-    
-        <li><a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" onClick="ga('send','event','link','click','latest-posts');">カスタマイズしたJenkinsを作成する方法 on OpenShift</a></li>
-    
-        <li><a href="https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/" onClick="ga('send','event','link','click','latest-posts');">Sock Shopを使ったサービスメッシュ体験のハンズオン</a></li>
-    
-        <li><a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" onClick="ga('send','event','link','click','latest-posts');">TektonのOperatorによるインストールとHello World</a></li>
-    
-</div>
-<div class="footer-posts">
-    <h5>Featured Posts</h5>
-    <li><a href="https://blog.mosuke.tech/entry/2016/06/04/180122/" onClick="ga('send','event','link','click','featured-posts');">Nginxの仕組みについて入門</a></li>
-    <li><a href="https://blog.mosuke.tech/entry/2017/03/18/182252/" onClick="ga('send','event','link','click','featured-posts');">万能じゃない。オブジェクトストレージの仕組みと利用を正しく理解する</a></li>
-    <li><a href="https://blog.mosuke.tech/entry/2015/07/19/135844/" onClick="ga('send','event','link','click','featured-posts');">DockerとWebSocketを使って、vimの設定をブラウザで即体感できるサービスを作った</a></li>
-</div>
-<div class="search">
-    <h5>Search</h5>
-    <div class="google-search">
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/" onClick="ga('send','event','link','click','latest-posts');">コンテナイメージを軽くする方法と、その原理原則を考える</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/08/container-image-security/" onClick="ga('send','event','link','click','latest-posts');">コンテナイメージの脆弱性のリスクと対策についてNIST SP 800-190に沿って考える</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" onClick="ga('send','event','link','click','latest-posts');">カスタマイズしたJenkinsを作成する方法 on OpenShift</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/" onClick="ga('send','event','link','click','latest-posts');">Sock Shopを使ったサービスメッシュ体験のハンズオン</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" onClick="ga('send','event','link','click','latest-posts');">TektonのOperatorによるインストールとHello World</a></li>
+      
+    </ul>
+  </div>
+  
+  
+  <div class="sidebar-content related-post">
+    <h3>関連する記事</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/" onClick="ga('send','event','link','click','related-posts');">Datadog APMとトレーシングの仕組みについて</a> (2019/11/21)</li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/08/28/datadog-for-alibaba-cloud/" onClick="ga('send','event','link','click','related-posts');">DatadogのAlibaba Cloud integrationでできること</a> (2019/08/28)</li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2018/06/20/terraform_import/" onClick="ga('send','event','link','click','related-posts');">Terraformのimportの使い方と注意ポイント</a> (2018/06/20)</li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2018/06/17/terraform-backend/" onClick="ga('send','event','link','click','related-posts');">Terraformのbackend機能を利用してstateファイルを共有する</a> (2018/06/17)</li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2018/06/08/terraform_multi_provider/" onClick="ga('send','event','link','click','related-posts');">Terraformで複数リージョンをまたいだリソース制御する</a> (2018/06/08)</li>
+      
+    </ul>
+  </div>
+  
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud">alibaba-cloud (9)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/aws">aws (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/devops">devops (28)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/kubernetes">kubernetes (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba">アプリケーション開発 (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88">イベント (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89">インフラ構築 (25)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2">キャリア (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93">クラウド技術 (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a">コンテナ (7)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8">ブログ運用 (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e8%8b%b1%e8%aa%9e">英語 (1)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93">資格試験 (7)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/archive/2014">2014年 Archive (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2015">2015年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2016">2016年 Archive (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2017">2017年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2018">2018年 Archive (17)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2019">2019年 Archive (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2020">2020年 Archive (15)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>サイト内検索</h3>
     <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
-<div class="gcse-search"></div>
-    </div>
+    <div class="gcse-search"></div>
+  </div>
 </div>
-<div class="links">
-    <h5>Links</h5>
-    <a class="pure-button" href="/about/" onClick="ga('send','event','link','click','about-this-site');"><i class="fa fa-info-circle"></i> About this site</a>
-    <a class="pure-button" href="/archive/" onClick="ga('send','event','link','click','archive');"><i class="fa fa-archive"></i> Arvhive</a>
-    <a class="pure-button" href="/categories/" onClick="ga('send','event','link','click','categories');"><i class="fa fa-tag"></i> Categories</a>
-    <a class="pure-button" href="https://docs.google.com/forms/d/e/1FAIpQLSd6N53H7zfF8EBrvyezRizU1mQx-CP3vc_jG-WvxfRmCjHTpg/viewform" onClick="ga('send','event','link','click','contact');" target="_blank"><i class="fa fa-question-circle"></i> Contact</a>
-    <a class="pure-button" href="https://blog.mosuke.tech/index.xml" onClick="ga('send','event','link','click','rss');"><i class="fa fa-rss"></i> rss</a>
-</div>
-<div class="footer">
-    <div class="pure-menu pure-menu-horizontal pure-menu-open">
-        <ul>
-            <li>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by <a class="hugo" href="https://gohugo.io/" target="_blank">hugo</a></li>
-        </ul>
-    </div>
-</div>
-
-        </div>
-    </div>
-</div>
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script>
-window.twttr = (function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0],
-      t = window.twttr || {};
-    if (d.getElementById(id)) return t;
-    js = d.createElement(s);
-    js.id = id;
-    js.src = "https://platform.twitter.com/widgets.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  
-    t._e = [];
-    t.ready = function(f) {
-      t._e.push(f);
-    };
-  
-    return t;
-}(document, "script", "twitter-wjs"));
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+    ga('create', 'UA-99596316-1', 'auto');
+    ga('send', 'pageview');
+    
 </script>
-
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-99596316-1', 'auto');
-ga('send', 'pageview');
-
-</script>
-
-</body>
+ 
+        <script>
+            window.twttr = (function(d, s, id) {
+                var js, fjs = d.getElementsByTagName(s)[0],
+                  t = window.twttr || {};
+                if (d.getElementById(id)) return t;
+                js = d.createElement(s);
+                js.id = id;
+                js.src = "https://platform.twitter.com/widgets.js";
+                fjs.parentNode.insertBefore(js, fjs);
+              
+                t._e = [];
+                t.ready = function(f) {
+                  t._e.push(f);
+                };
+              
+                return t;
+            }(document, "script", "twitter-wjs"));
+        </script>
+    </body>
 </html>
