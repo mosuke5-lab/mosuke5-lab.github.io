@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+
+<title>ZabbixでKubernetesの監視を検討する（Prometheus exporter, Kubernetes API）</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/" />
+<meta name="twitter:card" content="summary">
+
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+
+<meta name="twitter:title" content="ZabbixでKubernetesの監視を検討する（Prometheus exporter, Kubernetes API） &middot; Goldstine研究所">
+<meta name="twitter:description" content="Zabbixは使い慣れた監視ツールのひとつかと思います。Kuberntes環境でZabbixは活用できるのか？Prometheusとどうつかいわけていけばいいのか？そのヒントを探るために検証しました。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ZabbixでKubernetesの監視を検討する（Prometheus exporter, Kubernetes API） &middot; Goldstine研究所">
+<meta property="og:description" content="Zabbixは使い慣れた監視ツールのひとつかと思います。Kuberntes環境でZabbixは活用できるのか？Prometheusとどうつかいわけていけばいいのか？そのヒントを探るために検証しました。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+
+
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Kubernetes (Coming soon)</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://docs.google.com/forms/d/e/1FAIpQLSd6N53H7zfF8EBrvyezRizU1mQx-CP3vc_jG-WvxfRmCjHTpg/viewform" target="_blank" onClick="ga('send','event','link','click','contact');">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header><main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>ZabbixでKubernetesの監視を検討する（Prometheus exporter, Kubernetes API）</h1>
+    <div class="entry-sub-title">
+        <span class="">13 Aug 2020, 18:40</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-kubernetes" href="/categories/kubernetes">kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、<a href="https://twitter.com/mosuke5" target="_blank">mosuke5</a> です。
+本日は、ZabbixでKubernetesの監視をどこまで頑張れるか考えてみたいと思います。
+クラウドネイティブな環境ならPrometheusとそう単純に思うところですが、使い慣れたツールに統合したいことも当然ありますし、選択肢はいろいろあるべきですね。
+どんな方法で実現できるのかみていきましょう。</p>
+<h2 id="環境">環境</h2>
+<p>まず本検証の環境ですが下記で行いました。<br>
+GKEやEKS、バニラKubernetesなどでも当然同じ様に可能です。</p>
+<ul>
+<li>Kubernetes: OpenShift 4.4.8 (Kubernetes 1.17)</li>
+<li>Zabbix: 4.4.9
+<ul>
+<li>Kubernetesクラスタ上に立てました</li>
+</ul>
+</li>
+</ul>
+<p>下記の内容の中で <code>oc</code> というコマンドを利用していますが、<code>kubectl</code>と置き換えてお読みください。</p>
+<h2 id="prometheus-exporterを利用する">Prometheus exporterを利用する</h2>
+<p>Zabbixを用いてKubernetesの監視を行う場合に、まず重要になってくる機能が <a href="https://www.zabbix.com/documentation/4.4/manual/config/items/itemtypes/prometheus" target="_blank">Prometheus Check</a> です。
+ZabbixをもちいているのにPrometheus？と思うかもしれませんが、こちらはPrometheus本体とは関係なく、ZabbixがPrometheus exporterのフォーマットを解釈できる機能のことです。</p>
+<p>Prometheus exporterとは、Prometheus本体がデータを取得する際に利用する、メトリクスを公開する方法です。Prometheus Checkの機能があることで、Prometheus向けに公開しているメトリクス情報をZabbixに取り込むことができてしまうのです。</p>
+<h3 id="node_exporter">node_exporter</h3>
+<p>Prometheus exporterの代表例として<a href="https://github.com/prometheus/node_exporter" target="_blank">node_exporter</a> があります。
+node_exporterはKubernetesのノードの監視などでよく用いられるソフトウェアで、ハードウェアやOSのメトリクスを公開するためのexporterです。
+わたしが試したOpenShiftの環境でも、デフォルトでインストールされています。</p>
+<p>それでは早速node_exporterで取得できるメトリクスをZabbixに取り込んでみます。<br>
+node_exporter自身は、<code>openshift-monitoring</code>というnamespace内に<code>9100</code>ポートで公開しています。
+また、node_exporterの本体はDaemonSetを用いて各ノードで動作しています。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get service node-exporter -n openshift-monitoring
+NAME            TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
+node-exporter   ClusterIP   None         &lt;none&gt;        9100/TCP   6d19h
+
+$ oc get pod -n openshift-monitoring | grep node-exporter
+node-exporter-4d7q4                            2/2     Running   0          6d19h
+node-exporter-59x5k                            2/2     Running   0          6d19h
+node-exporter-64vs2                            2/2     Running   0          6d19h
+node-exporter-78976                            2/2     Running   0          5d17h
+node-exporter-9xhws                            2/2     Running   0          6d19h
+node-exporter-cdxlt                            2/2     Running   0          5d18h
+node-exporter-mzk8r                            2/2     Running   0          6d19h
+</code></pre></div><p>同一クラスタ内のPodからcurlでメトリクスを取得できることを確認しておきます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl https://node-exporter.openshift-monitoring.svc.cluster.local:9100/metrics -k --header &#34;Authorization: Bearer $TOKEN&#34;
+# HELP go_gc_duration_seconds A summary of the GC invocation durations.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile=&#34;0&#34;} 7.871e-06
+go_gc_duration_seconds{quantile=&#34;0.25&#34;} 2.3049e-05
+go_gc_duration_seconds{quantile=&#34;0.5&#34;} 6.5209e-05
+go_gc_duration_seconds{quantile=&#34;0.75&#34;} 8.6643e-05
+go_gc_duration_seconds{quantile=&#34;1&#34;} 0.000362445
+go_gc_duration_seconds_sum 0.064433758
+go_gc_duration_seconds_count 886
+...
+</code></pre></div><p>ZabbixがPrometheusを取り込むプロセスは以下のとおりです。</p>
+<ol>
+<li>監視アイテムで、HTTPエージェントを選択しnode_exporterの値を取得する設定をします。
+<ul>
+<li>タイプ: <code>HTTPエージェント</code></li>
+<li>URL: <code>https://node-exporter.openshift-monitoring.svc.cluster.local:9100/metrics</code>
+<ul>
+<li>node_exporterまでのパスを指定</li>
+<li>ZabbixがKubernetesクラスタ上にあるため内部パスを指定しましたが、外部のZabbixからの場合は疎通がとれるように設定する必要があります。</li>
+</ul>
+</li>
+<li>認証はHTTP Headerに追加
+<ul>
+<li><code>Authorization: Bearer YOUR-TOKEN</code></li>
+</ul>
+</li>
+<li>データ型：<code>テキスト</code>
+<ul>
+<li>テキスト情報としてnode_exporterの情報を取得（すべてのメトリクスを一度テキストとして保存）</li>
+</ul>
+</li>
+<li>ヒストリの保存期間: <code>ヒストリを保存しない</code>
+<ul>
+<li>node_exporterの情報は非常に多いため、ここではヒストリ保存は行いません</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>依存アイテムを用いて、上記のマスターアイテムから必要な情報のみを取り出す設定をする。
+<ul>
+<li>保存前処理設定
+<ul>
+<li>種類: <code>Prometheusパターン</code></li>
+<li>パラメータ: <code>node_cpu_guest_seconds_total{cpu=&quot;0&quot;,mode=&quot;user&quot;}</code>
+<ul>
+<li>取得したいパラメータを指定</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>監視したい項目分だけ依存アイテムを作成する</li>
+<li><a href="https://www.zabbix.com/integrations/prometheus" target="_blank">node-exporterのTemplate</a>が用意されているのでこちらを利用すると設定が容易です</li>
+</ul>
+</li>
+</ol>
+<p>下記は参考に設定のスクリーンショットを掲載します。</p>
+<p>httpエージェントアイテムの作成<br>
+<img src="/image/zabbix-item-httpagent.png" alt="zabbix-item"></p>
+<p>依存アイテムの作成<br>
+<img src="/image/zabbix-item-dependency.png" alt="zabbix-item-dependency"></p>
+<p>Prometheusパターンの設定<br>
+<img src="/image/zabbix-prometheus-pattern.png" alt="zabbix-prometheus-pattern"></p>
+<h2 id="kubernetes-apiを利用する">Kubernetes APIを利用する</h2>
+<p>次に、Kubernetesの監視においてすべてをexporterでまかなえるわけではありません。
+たとえば、Kubernetes上の特定のPodのステータスを確認したいなどといった、Kubernetes APIの実行結果を監視したいこともあると思います。
+こちらについても、原理的には上のPrometheus exporterと同様で実現することが可能です。
+Prometheus exporterを利用する場合には保存前処理にPrometheusパターンを活用しましたが、JSONもパースできます。Kubernetes APIはJSONレスポンスを返すので当然活用できます。</p>
+<p>実際に、特定のPodのステータスを取得してみます。<br>
+<code>zabbix</code> namespace内にある<code>debug</code>Podの情報を取得します。</p>
+<p>まずは、通常通りcurlでAPI実行できるか確認します。ついでにJSONフォーマットも確認しておきます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl https://your-api-server-endpoint:6443/api/v1/namespaces/zabbix/pods/debug -k --header &#34;Authorization: Bearer $TOKEN&#34;
+{
+  &#34;kind&#34;: &#34;Pod&#34;,
+  &#34;apiVersion&#34;: &#34;v1&#34;,
+  &#34;metadata&#34;: {
+    &#34;name&#34;: &#34;debug&#34;,
+    &#34;namespace&#34;: &#34;zabbix&#34;
+  },
+  ...
+  &#34;status&#34;: {
+    &#34;phase&#34;: &#34;Running&#34;,
+  ...
+  }
+}
+</code></pre></div><ol>
+<li>監視アイテムで、HTTPエージェントでnode_exporterを
+<ul>
+<li>タイプ: <code>HTTPエージェント</code></li>
+<li>URL: <code>https://your-api-server-endpoint:6443/api/v1/namespaces/zabbix/pods/debug</code>
+<ul>
+<li>監視したいKubernetes APIのエンドポイントを指定</li>
+<li>上記は、namespceが <code>zabbix</code> の <code>debug</code>という名前のPod情報を取得する例です</li>
+</ul>
+</li>
+<li>認証はHTTP Headerに追加
+<ul>
+<li><code>Authorization: Bearer YOUR-TOKEN</code></li>
+</ul>
+</li>
+<li>データ型：<code>テキスト</code>
+<ul>
+<li>テキスト情報としてnode_exporterの情報を取得（すべてのメトリクスを一度テキストとして保存）</li>
+</ul>
+</li>
+<li>ヒストリの保存期間: <code>ヒストリを保存しない</code></li>
+</ul>
+</li>
+<li>依存アイテムを用いて、上記のマスターアイテムから必要な情報のみを取り出し
+<ul>
+<li>保存前処理で、jsonのフォーマットをパースできる</li>
+<li>特定のメトリクスのみ取り出して登録</li>
+<li>監視したい項目分だけ依存アイテムを作成</li>
+<li>保存前処理設定
+<ul>
+<li>種類: <code>JSONPath</code></li>
+<li>パラメータ: <code>$.status.phase</code>
+<ul>
+<li>取得したいパラメータを指定</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>監視したい項目分だけ依存アイテムを作成する</li>
+</ul>
+</li>
+</ol>
+<p>PodのStatusを下記のように取得できました。<br>
+<img src="/image/zabbix-pod-status.png" alt="zabbix-pod-status"></p>
+<h2 id="zabbixの弱いところ">Zabbixの弱いところ</h2>
+<p>上記のような形式で、Prometheus exporterから値を取得したり、Kubernetes APIを利用したKubernetes上のリソースの監視などができることが確認できました。
+一方で、やはりPrometheusがKubernetes時代（よりダイナミックにリソースが変化する時代）に適していると思う理由として、サービスディスカバリの強さがあると感じています。
+Zabbixはあくまで静的な環境における監視に特化していると感じています。特定の監視については十分にZabbixも活用できそうですが、Kubernetes上で動作するダイナミックなアプリケーションやPodへの適応はすこし難しいかもしれません。</p>
+<h2 id="まとめ">まとめ</h2>
+<p>Zabbixを使ったKubernetesの監視について少し検証してみました。
+Prometheus exporterやKubernetes APIを駆使すれば実現できる幅も広がりそうです。
+ここまでできることがわかったので、あとは「なにを監視すればいいか」をしっかり見定められればZabbixでも十分よい監視を実現できると考えます。</p>
+    </div>
+    <div class="entry-sub-content request-for-entry">
+        <h5>フィードバック・相談(β)</h5>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Zabbix%e3%81%a7Kubernetes%e3%81%ae%e7%9b%a3%e8%a6%96%e3%82%92%e6%a4%9c%e8%a8%8e%e3%81%99%e3%82%8b%ef%bc%88Prometheus%20exporter%2c%20Kubernetes%20API%ef%bc%89" target="_blank" onClick="ga('send','event','link','click','request-for-entry');">執筆者に問い合わせてみる</a></p>
+    </div>
+    <div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+    <div class="entry-sub-content disqus">
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/" onClick="ga('send','event','link','click','latest-posts');">ZabbixでKubernetesの監視を検討する（Prometheus exporter, Kubernetes API）</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/" onClick="ga('send','event','link','click','latest-posts');">コンテナイメージを軽くする方法と、その原理原則を考える</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/08/container-image-security/" onClick="ga('send','event','link','click','latest-posts');">コンテナイメージの脆弱性のリスクと対策についてNIST SP 800-190に沿って考える</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" onClick="ga('send','event','link','click','latest-posts');">カスタマイズしたJenkinsを作成する方法 on OpenShift</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/" onClick="ga('send','event','link','click','latest-posts');">Sock Shopを使ったサービスメッシュ体験のハンズオン</a></li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="ga('send','event','link','click','categories');">alibaba-cloud (9)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="ga('send','event','link','click','categories');">aws (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="ga('send','event','link','click','categories');">devops (28)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="ga('send','event','link','click','categories');">kubernetes (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="ga('send','event','link','click','categories');">アプリケーション開発 (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="ga('send','event','link','click','categories');">イベント (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="ga('send','event','link','click','categories');">インフラ構築 (25)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="ga('send','event','link','click','categories');">キャリア (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="ga('send','event','link','click','categories');">クラウド技術 (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="ga('send','event','link','click','categories');">コンテナ (7)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="ga('send','event','link','click','categories');">ブログ運用 (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e8%8b%b1%e8%aa%9e" onClick="ga('send','event','link','click','categories');">英語 (1)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="ga('send','event','link','click','categories');">資格試験 (7)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="ga('send','event','link','click','archive');">2014年 Archive (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="ga('send','event','link','click','archive');">2015年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="ga('send','event','link','click','archive');">2016年 Archive (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="ga('send','event','link','click','archive');">2017年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="ga('send','event','link','click','archive');">2018年 Archive (17)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="ga('send','event','link','click','archive');">2019年 Archive (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="ga('send','event','link','click','archive');">2020年 Archive (16)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/" onClick="ga('send','event','link','click','related-posts');">Virtual Kubeletとは何か。Alibaba Cloud上で実際に動かして検証する</a> (2019/02/03)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+    ga('create', 'UA-99596316-1', 'auto');
+    ga('send', 'pageview');
+    
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>
