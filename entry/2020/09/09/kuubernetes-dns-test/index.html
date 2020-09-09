@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+
+<title>KubernetesのPod内からの名前解決を検証する</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2020/09/09/kuubernetes-dns-test/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/09/09/kuubernetes-dns-test/" />
+<meta name="twitter:card" content="summary">
+
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+
+<meta name="twitter:title" content="KubernetesのPod内からの名前解決を検証する &middot; Goldstine研究所">
+<meta name="twitter:description" content="KubernetesのPod内でどのように名前解決されるのか検証して確かめてみました。tcpdumpなどを活用しながら確認していくことでより実践的なトラブルシューティングに役立てる知見を得ることができました。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="KubernetesのPod内からの名前解決を検証する &middot; Goldstine研究所">
+<meta property="og:description" content="KubernetesのPod内でどのように名前解決されるのか検証して確かめてみました。tcpdumpなどを活用しながら確認していくことでより実践的なトラブルシューティングに役立てる知見を得ることができました。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2020/09/09/kuubernetes-dns-test/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+
+
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Kubernetes (Coming soon)</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://docs.google.com/forms/d/e/1FAIpQLSd6N53H7zfF8EBrvyezRizU1mQx-CP3vc_jG-WvxfRmCjHTpg/viewform" target="_blank" onClick="ga('send','event','link','click','contact');">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header><main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>KubernetesのPod内からの名前解決を検証する</h1>
+    <div class="entry-sub-title">
+        <span class="">09 Sep 2020, 17:45</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>もーすけです。本日は最近おこなったトラブルシューティングの中で、自分がKubernetesのDNSまわりについて理解が乏しく手こずっていたのでその内容について簡単に書いていきたいと思います。</p>
+<h2 id="前提">前提</h2>
+<p>これからcurlをhttpサーバに打ったり、digを行ったりしますが、Kubernetes内の下記のような環境で行ってます。</p>
+<p><img src="/image/kubernetes-dns-test-overview.png" alt="overview"></p>
+<h2 id="kubernetesのserviceへのアクセス">KubernetesのServiceへのアクセス</h2>
+<p>Serviceへは <code>service.namespace.svc.cluster.local</code> で名前解決ができ、アクセスできます。
+こちらは基礎的なことなので知っている方も多いかと思います。もし知らなかったという方は、デバッグに非常に役立ちますのでぜひ理解しておくといいです。
+(公式ドキュメント: <a href="https://kubernetes.io/ja/docs/concepts/services-networking/dns-pod-service/" target="_blank">ServiceとPodに対するDNS - Kubernetes</a>)</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># curl -I http://httpd-example.mosuke5.svc.cluster.local:8080
+HTTP/1.1 200 OK
+Date: Wed, 09 Sep 2020 08:59:19 GMT
+Server: Apache/2.4.34 (Red Hat) OpenSSL/1.0.2k-fips
+Last-Modified: Wed, 09 Sep 2020 04:45:46 GMT
+ETag: &#34;924b-5aeda1ff7f280&#34;
+Accept-Ranges: bytes
+Content-Length: 37451
+Content-Type: text/html; charset=UTF-8
+</code></pre></div><h2 id="resolvconf">resolv.conf</h2>
+<p>PodはどこのDNSサーバを利用して通信できているのでしょうか。
+Pod内の <code>/etc/resolv.conf</code> をのぞいてみます。
+(この時点ではPodの<code>spec.dnsPolicy</code>は何も記述しないものとしています。)</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># cat /etc/resolv.conf
+search mosuke5.svc.cluster.local svc.cluster.local cluster.local ap-southeast-1.compute.internal
+nameserver 172.30.0.10
+options ndots:5
+</code></pre></div><p><code>nameserver 172.30.0.10</code> となっていますが、Kubernetes内に存在するcoreDNSのServiceのIPアドレスです。
+クラスタ内部のDNS問い合わせにいっていることがわかります。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubeclt get service
+NAME          TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)                  AGE
+dns-default   ClusterIP   172.30.0.10   &lt;none&gt;        53/UDP,53/TCP,9153/TCP   26h
+</code></pre></div><p><code>search</code> をみると、<code>mosuke5.svc.cluster.local svc.cluster.local cluster.local ap-southeast-1.compute.internal</code> と複数ドメインが記述されています。クラスタの環境にもよると思いますが、この環境はAWSのEC2上のクラスタのためAWSのインターナルのドメインも含めて4つの記述があります。</p>
+<p>上の設定があることで、必ずしも <code>httpd-example.mosuke5.svc.cluster.local</code> のようにフルの名前でなくてもアクセスが可能ということになります。
+試しに<code>Service名</code>と<code>Service名.Namespace名</code>で接続を試みますが接続可能です。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># curl -I httpd-example:8080
+HTTP/1.1 200 OK
+Date: Wed, 09 Sep 2020 09:16:42 GMT
+Server: Apache/2.4.34 (Red Hat) OpenSSL/1.0.2k-fips
+Last-Modified: Wed, 09 Sep 2020 04:45:46 GMT
+ETag: &#34;924b-5aeda1ff7f280&#34;
+Accept-Ranges: bytes
+Content-Length: 37451
+Content-Type: text/html; charset=UTF-8
+
+# curl -I httpd-example.mosuke5:8080
+HTTP/1.1 200 OK
+Date: Wed, 09 Sep 2020 09:16:50 GMT
+Server: Apache/2.4.34 (Red Hat) OpenSSL/1.0.2k-fips
+Last-Modified: Wed, 09 Sep 2020 04:45:46 GMT
+ETag: &#34;924b-5aeda1ff7f280&#34;
+Accept-Ranges: bytes
+Content-Length: 37451
+Content-Type: text/html; charset=UTF-8
+</code></pre></div><h2 id="digやnslookupを使う">digやnslookupを使う</h2>
+<p>上の例では、curlでServiceに対して接続しにいきました。その過程で名前解決もされていました。<br>
+現実のトラブルシューティングでは、digやnslookupを用いてIPアドレスを確認したいことも多くあると思います。
+実際に、digやnslookupを使ってIPアドレスを引いてみたいと思います。</p>
+<p>しかし、digでなんのオプションもなしに実行してみましたがAレコードが返ってきません。
+ちなみにnslookupでは、アドレスは正しくひけています。これはなぜでしょうか？</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># dig httpd-example
+
+; &lt;&lt;&gt;&gt; DiG 9.11.22-RedHat-9.11.22-1.fc32 &lt;&lt;&gt;&gt; httpd-example
+;; global options: +cmd
+;; Got answer:
+;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NXDOMAIN, id: 33678
+;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+; COOKIE: 668ad3bad60bfc44 (echoed)
+;; QUESTION SECTION:
+;httpd-example.			IN	A
+
+;; AUTHORITY SECTION:
+.			30	IN	SOA	a.root-servers.net. nstld.verisign-grs.com. 2020090900 1800 900 604800 86400
+
+;; Query time: 74 msec
+;; SERVER: 172.30.0.10#53(172.30.0.10)
+;; WHEN: Wed Sep 09 09:18:18 UTC 2020
+;; MSG SIZE  rcvd: 129
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># nslookup httpd-example
+Server:		172.30.0.10
+Address:	172.30.0.10#53
+
+Name:	httpd-example.mosuke5.svc.cluster.local
+Address: 172.30.147.209
+</code></pre></div><p>こちらはKubernetesの話ではまったくありませんが、digはオプションをつけない状態では、<code>/etc/resolv.conf</code>のsearchは読んでいません。
+digを使ってアドレスをひくときは、<code>httpd-example.mosuke5.svc.cluster.local</code>とフルの名前を用いるか、<code>+search</code> オプションをつけて、<code>/etc/resolv.conf</code>から設定を使うようにするといいです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># dig httpd-example +search
+...
+;; ANSWER SECTION:
+httpd-example.mosuke5.svc.cluster.local. 5 IN A	172.30.147.209
+...
+</code></pre></div><h2 id="tcpdumpで詳細をみてみる">tcpdumpで詳細をみてみる</h2>
+<p>pod内でtcpdumpを起動してみてみます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># tcpdump port 53
+...
+</code></pre></div><p>tcpdumpを起動した状態で、<code>dig google.com +search</code> を実行してみます。
+そうするとおもしろいことがおきます。
+下記の通り、5つのクエリを発行して <code>google.com</code> のアドレスにたどり着けていることがわかります。</p>
+<ol>
+<li><code>google.com.mosuke5.svc.cluster.local.</code></li>
+<li><code>google.com.svc.cluster.local.</code></li>
+<li><code>google.com.cluster.local.</code></li>
+<li><code>google.com.ap-southeast-1.compute.internal.</code></li>
+<li><code>google.com.</code></li>
+</ol>
+<p>以下はdigを実行した際のtcpdumpのログです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">10:13:38.113836 IP debug.55582 &gt; dns-default.openshift-dns.svc.cluster.local.domain: 501+ [1au] A? google.com.mosuke5.svc.cluster.local. (77)
+10:13:38.115079 IP dns-default.openshift-dns.svc.cluster.local.domain &gt; debug.55582: 501 NXDomain*- 0/1/1 (170)
+10:13:38.115350 IP debug.49587 &gt; dns-default.openshift-dns.svc.cluster.local.domain: 15110+ [1au] A? google.com.svc.cluster.local. (69)
+10:13:38.115815 IP dns-default.openshift-dns.svc.cluster.local.domain &gt; debug.49587: 15110 NXDomain*- 0/1/1 (162)
+10:13:38.116056 IP debug.56245 &gt; dns-default.openshift-dns.svc.cluster.local.domain: 52411+ [1au] A? google.com.cluster.local. (65)
+10:13:38.117719 IP dns-default.openshift-dns.svc.cluster.local.domain &gt; debug.56245: 52411 NXDomain*- 0/1/1 (158)
+10:13:38.117958 IP debug.44526 &gt; dns-default.openshift-dns.svc.cluster.local.domain: 49759+ [1au] A? google.com.ap-southeast-1.compute.internal. (83)
+10:13:38.119446 IP dns-default.openshift-dns.svc.cluster.local.domain &gt; debug.44526: 49759 NXDomain 0/0/1 (83)
+10:13:38.119649 IP debug.56412 &gt; dns-default.openshift-dns.svc.cluster.local.domain: 54109+ [1au] A? google.com. (51)
+10:13:38.121954 IP dns-default.openshift-dns.svc.cluster.local.domain &gt; debug.56412: 54109 6/0/1 A 74.125.68.102, A 74.125.68.138, A 74.125.68.100, A 74.125.68.101, A 74.125.68.139, A 74.125.68.113 (207)
+</code></pre></div><p>この現象は、<code>/etc/resolv.conf</code>に<code>options ndots:5</code>の設定があることと関係しています。<br>
+上でservice名だけで名前がひけたように、<code>search</code> に記載されたドメインで検索をかけにいくということです。もし仮に、<code>google.com.svc.cluster.local</code>などでレコードが登録されていた場合、こちらが優先されるため、本物の<code>google.com</code>へはアクセスできなくなるということです。</p>
+<h2 id="dnsの設定を変える">dnsの設定を変える</h2>
+<p>前の項目で紹介したように、Podから外部接続する際にクラスタ内のドメインを再帰的に検索したりするのは効率が悪いです。あるいは、別のDNSサーバを利用したいこともあります。
+このようなケースでは、Podには<code>spec.dnsPolicy</code>という設定があり、こちらを利用することでコントロールができます。(公式ドキュメント: <a href="https://kubernetes.io/ja/docs/concepts/services-networking/dns-pod-service/#pod%E3%81%AEdns%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC" target="_blank">PodのDNSポリシー</a>)</p>
+<p>本ブログでは詳しくは紹介しませんが、DNS設定を変更したいときはまず <code>spec.dnsPolicy</code> の設定を検討してみてください。詳細な設定についてはぜひわれわれのバイブルである完全ガイド様におまかせします。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.amazon.co.jp/Kubernetes%25E5%25AE%258C%25E5%2585%25A8%25E3%2582%25AC%25E3%2582%25A4%25E3%2583%2589-%25E7%25AC%25AC2%25E7%2589%2588-Top-Gear-%25E2%25BB%2598%25E2%25BC%25AD/dp/4295009792" data-iframely-url="//cdn.iframe.ly/o1xk9gJ?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+    </div>
+    <div class="entry-sub-content request-for-entry">
+        <h5>フィードバック・相談(β)</h5>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Kubernetes%e3%81%aePod%e5%86%85%e3%81%8b%e3%82%89%e3%81%ae%e5%90%8d%e5%89%8d%e8%a7%a3%e6%b1%ba%e3%82%92%e6%a4%9c%e8%a8%bc%e3%81%99%e3%82%8b" target="_blank" onClick="ga('send','event','link','click','request-for-entry');">執筆者に問い合わせてみる</a></p>
+    </div>
+    <div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+    <div class="entry-sub-content disqus">
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/09/09/kuubernetes-dns-test/" onClick="ga('send','event','link','click','latest-posts');">KubernetesのPod内からの名前解決を検証する</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/" onClick="ga('send','event','link','click','latest-posts');">ZabbixでKubernetesの監視を検討する（Prometheus exporter, Kubernetes API）</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/" onClick="ga('send','event','link','click','latest-posts');">コンテナイメージを軽くする方法と、その原理原則を考える</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/08/container-image-security/" onClick="ga('send','event','link','click','latest-posts');">コンテナイメージの脆弱性のリスクと対策についてNIST SP 800-190に沿って考える</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" onClick="ga('send','event','link','click','latest-posts');">カスタマイズしたJenkinsを作成する方法 on OpenShift</a></li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="ga('send','event','link','click','categories');">alibaba-cloud (9)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="ga('send','event','link','click','categories');">aws (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="ga('send','event','link','click','categories');">devops (28)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="ga('send','event','link','click','categories');">kubernetes (21)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="ga('send','event','link','click','categories');">アプリケーション開発 (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="ga('send','event','link','click','categories');">イベント (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="ga('send','event','link','click','categories');">インフラ構築 (25)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="ga('send','event','link','click','categories');">キャリア (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="ga('send','event','link','click','categories');">クラウド技術 (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="ga('send','event','link','click','categories');">コンテナ (7)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="ga('send','event','link','click','categories');">ブログ運用 (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e8%8b%b1%e8%aa%9e" onClick="ga('send','event','link','click','categories');">英語 (1)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="ga('send','event','link','click','categories');">資格試験 (7)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="ga('send','event','link','click','archive');">2014年 Archive (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="ga('send','event','link','click','archive');">2015年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="ga('send','event','link','click','archive');">2016年 Archive (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="ga('send','event','link','click','archive');">2017年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="ga('send','event','link','click','archive');">2018年 Archive (17)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="ga('send','event','link','click','archive');">2019年 Archive (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="ga('send','event','link','click','archive');">2020年 Archive (17)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/" onClick="ga('send','event','link','click','related-posts');">ZabbixでKubernetesの監視を検討する（Prometheus exporter, Kubernetes API）</a> (2020/08/13)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/" onClick="ga('send','event','link','click','related-posts');">コンテナイメージを軽くする方法と、その原理原則を考える</a> (2020/07/09)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/08/container-image-security/" onClick="ga('send','event','link','click','related-posts');">コンテナイメージの脆弱性のリスクと対策についてNIST SP 800-190に沿って考える</a> (2020/07/08)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" onClick="ga('send','event','link','click','related-posts');">カスタマイズしたJenkinsを作成する方法 on OpenShift</a> (2020/07/05)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+    ga('create', 'UA-99596316-1', 'auto');
+    ga('send', 'pageview');
+    
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>
