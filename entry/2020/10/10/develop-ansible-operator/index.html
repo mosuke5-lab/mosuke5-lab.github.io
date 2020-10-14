@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+
+<title>OperatorSDK for Ansible の開発。チュートリアルの次の一歩（未完）</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2020/10/10/develop-ansible-operator/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/10/10/develop-ansible-operator/" />
+<meta name="twitter:card" content="summary">
+
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+
+<meta name="twitter:title" content="OperatorSDK for Ansible の開発。チュートリアルの次の一歩（未完） &middot; Goldstine研究所">
+<meta name="twitter:description" content="OperatorSDKを用いてAnsible Operatorを開発する際のTipsをまとめまています。チュートリアルのあとにやったほうがいいことを中心に紹介します。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OperatorSDK for Ansible の開発。チュートリアルの次の一歩（未完） &middot; Goldstine研究所">
+<meta property="og:description" content="OperatorSDKを用いてAnsible Operatorを開発する際のTipsをまとめまています。チュートリアルのあとにやったほうがいいことを中心に紹介します。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2020/10/10/develop-ansible-operator/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+
+
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Kubernetes (Coming soon)</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://docs.google.com/forms/d/e/1FAIpQLSd6N53H7zfF8EBrvyezRizU1mQx-CP3vc_jG-WvxfRmCjHTpg/viewform" target="_blank" onClick="ga('send','event','link','click','contact');">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header><main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>OperatorSDK for Ansible の開発。チュートリアルの次の一歩（未完）</h1>
+    <div class="entry-sub-title">
+        <span class="">10 Oct 2020, 14:06</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。<br>
+本日は、Kubernetes Operatorの開発に関する情報提供をしたいと思います。
+Operatorってなに？ってかたやより内部実装を学びたい方はぜひこちらの書籍（<a href="https://amzn.to/34SwsvS">実践入門 Kubernetesカスタムコントローラーへの道</a>）を参考にしてください。</p>
+<p>Operator開発にはOperatorSDKを利用するのが非常に便利です。Go, Ansible, Helmなどを用いて開発できるのですが、今回はAnsibleを使ったOperatorについて書きます。
+OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメントのチュートリアルを実施したあとに何をすればいいのか？とっつきにくいさもあります。
+というわけで、このブログでは、チュートリアル後に何をすればいいか？どんなことを確認していけばいいのか？という観点でまとめてみましたので、ぜひ参考にしてOperator開発を楽しんでください。</p>
+<p>まだチュートリアルをやっていないよ、というかたはこちらから済ましてみましょう。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://sdk.operatorframework.io/docs/building-operators/ansible/tutorial/" data-iframely-url="//cdn.iframe.ly/2QAR3qE"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h2 id="環境">環境</h2>
+<p>まず環境について書いておきます。
+チュートリアルを終えられている想定のため細かいことは不要かと思いますが、記載しておきます。</p>
+<ul>
+<li>作業環境: MacBook Pro (13-inch, 2017), macOS Catalina 10.15.7</li>
+<li>Kubernetes環境: OpenShift 4.4.8
+<ul>
+<li>minikubeなででも当然大丈夫です</li>
+</ul>
+</li>
+</ul>
+<h3 id="operatorsdk">OperatorSDK</h3>
+<p>macOSの環境だったため、<code>brew</code> でインストールしました。
+<a href="https://sdk.operatorframework.io/docs/installation/install-operator-sdk/">公式ドキュメント</a>を見ながら各自の環境でインストールしてください。
+OperatorSDKは、v1.0を前提としています。それ以前のバージョンとは大きく仕様が変更になっているため気をつけてください。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ brew install operator-sdk
+$ operator-sdk version
+operator-sdk version: &#34;v1.0.1&#34;, commit: &#34;4169b318b578156ed56530f373d328276d040a1b&#34;, kubernetes version: &#34;v1.18.2&#34;, go version: &#34;go1.15.2 darwin/amd64&#34;, GOOS: &#34;darwin&#34;, GOARCH: &#34;amd64&#34;
+</code></pre></div><h3 id="ansible">Ansible</h3>
+<p>Operator開発に必ずしもAnsibleは必要ありません。
+もし、Kubernetesクラスタ上でしか動作させないというのであれば開発端末へのAnsibleのインストールは不要ですが、やはり動作確認のために開発端末上で確認できたほうが当然よいです。
+開発端末にAnsibleをインストールしておくことを推奨します。自分は <code>pip</code> でインストールしました。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ pip3 install --user ansible
+...
+$ ansible --version
+ansible 2.10.2
+  config file = None
+  configured module search path = [&#39;/Users/shinyamori/.ansible/plugins/modules&#39;, &#39;/usr/share/ansible/plugins/modules&#39;]
+  ansible python module location = /Users/shinyamori/Library/Python/3.8/lib/python/site-packages/ansible
+  executable location = /Users/shinyamori/Library/Python/3.8/bin//ansible
+  python version = 3.8.5 (default, Jul 21 2020, 10:48:26) [Clang 11.0.3 (clang-1103.0.32.62)]
+</code></pre></div><h3 id="その他のツール">その他のツール</h3>
+<p>その他、ローカルでの実行・開発をするには下記が必要になります。</p>
+<ul>
+<li>ansible-runner</li>
+<li>ansible-runner-http</li>
+<li>docker</li>
+<li>make</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ pip3 install --user ansible-runner
+$ ansible-runner --version
+1.4.6
+
+$ pip3 install --user ansible-runner-http
+$ pip3 list | grep ansible-runner-http
+ansible-runner-http 1.0.0
+</code></pre></div><p>Operatorは最終的にコンテナとして動作させます。
+コンテナイメージのビルドや後述するOperatorのテストでDockerを使うのでインストールしておきます。
+mac環境ではDocker Desktopを入れておけばいいでしょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ docker version
+Client: Docker Engine - Community
+ Cloud integration  0.1.18
+ Version:           19.03.13
+ API version:       1.40
+ Go version:        go1.13.15
+ Git commit:        4484c46d9d
+ Built:             Wed Sep 16 16:58:31 2020
+ OS/Arch:           darwin/amd64
+ Experimental:      true
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          19.03.13
+  API version:      1.40 (minimum version 1.12)
+  Go version:       go1.13.15
+  Git commit:       4484c46d9d
+  Built:            Wed Sep 16 17:07:04 2020
+  OS/Arch:          linux/amd64
+  Experimental:     true
+ containerd:
+  Version:          v1.3.7
+  GitCommit:        8fba4e9a7d01810a393d5d25a3621dc101981175
+ runc:
+  Version:          1.0.0-rc10
+  GitCommit:        dc9208a3303feef5b3839f4323d9beb36df0a9dd
+ docker-init:
+  Version:          0.18.0
+  GitCommit:        fec3683
+</code></pre></div><p>Operator開発時にはMakefileを用いた操作を多用します。<code>make</code> の有無も確認しておきましょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ make --version
+GNU Make 3.81
+...
+</code></pre></div><h2 id="チュートリアルの次の一歩">チュートリアルの次の一歩</h2>
+<p>それでは本題に入っていきます。<br>
+チュートリアルを終えたあとにどんなことを確認しておけばいいか？という観点でいくつかまとめました。
+最終的なサンプルコードとしては追って公開する予定です。</p>
+<h3 id="operatorのコンテナイメージの実体を知りたい">Operatorのコンテナイメージの実体を知りたい</h3>
+<p>開発したOperatorは <code>make docker-build docker-push xxxx</code> にてコンテナイメージを作成後、<code>make deploy</code> でKubernetesクラスタ上にデプロイすることが可能です。
+このときに作成したコンテナイメージとは何なのか気になったので、どこを確認すればいいかみておきます。</p>
+<p>まず、<code>make docker-build</code> で作成するイメージは、プロジェクト内にあるDockerfileを用いてビルドされます。
+やっていることは非常に簡単で、<code>quay.io/operator-framework/ansible-operator:v1.0.1</code> に開発したplaybookやrole, watches.yamlをコピーしているのみです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat Dockerfile
+FROM quay.io/operator-framework/ansible-operator:v1.0.1
+
+COPY requirements.yml ${HOME}/requirements.yml
+RUN ansible-galaxy collection install -r ${HOME}/requirements.yml \
+ &amp;&amp; chmod -R ug+rwx ${HOME}/.ansible
+
+COPY watches.yaml ${HOME}/watches.yaml
+COPY roles/ ${HOME}/roles/
+COPY playbooks/ ${HOME}/playbooks/
+</code></pre></div><p>では、このベースイメージとなっている <code>quay.io/operator-framework/ansible-operator:v1.0.1</code> の実体はどこにあるのかを探ってみます。<br>
+operator-framework/operator-sdk 内の <code>hack/image/ansible/Dockerfile</code> が実体です。
+<a href="https://github.com/operator-framework/operator-sdk/blob/master/hack/image/ansible/Dockerfile">https://github.com/operator-framework/operator-sdk/blob/master/hack/image/ansible/Dockerfile</a></p>
+<p>ベースイメージも非常にシンプルで、Ansibleなど必要なライブラリを基本的にインストールしているのみです。動かしている実体はGoで実装された <code>ansible-operator</code> というコマンドです。
+こちらの動作を追うにはGitHubで <a href="https://github.com/operator-framework/operator-sdk/tree/master/internal/ansible">operator-sdk/internal/ansible</a> をのぞくといいでしょう。</p>
+<h3 id="makeでできることを確認したい">makeでできることを確認したい</h3>
+<p>ドキュメントをいろいろ読んでいくと <code>make</code> でいろいろな作業を行います。<br>
+操作については、<code>Makefile</code>の中身を必ず見ておきましょう。<code>Makefile</code>に慣れていない人は一度こちらのサイトを見ておくと良いです。慣れればただのシェルの実行なので難しくないです。</p>
+<p><a href="http://omilab.naist.jp/~mukaigawa/misc/Makefile.html">Makefileの解説</a></p>
+<table>
+<thead>
+<tr>
+<th>コマンド</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>make install</td>
+<td>CRDのみをクラスタにインストールする。ローカル開発時に利用する。</td>
+</tr>
+<tr>
+<td>make uninstall</td>
+<td>CRDをクラスタから削除する。</td>
+</tr>
+<tr>
+<td>make deploy</td>
+<td>CRDやOperatorのDeployment、RoleなどOperatorを動作させるために必要な一式をクラスタにデプロイする。</td>
+</tr>
+<tr>
+<td>make undeploy</td>
+<td>Operatorを動作させるために必要な一式をクラスタから削除する。</td>
+</tr>
+<tr>
+<td>make docker-build</td>
+<td>Operatorのコンテナイメージをビルドする。</td>
+</tr>
+<tr>
+<td>make docker-push</td>
+<td>OperatorのコンテナイメージをレジストリにPushする。</td>
+</tr>
+<tr>
+<td>make run</td>
+<td>ローカル上でOperatorを実行する。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="crdの定義をカスタマイズしたい">CRDの定義をカスタマイズしたい</h3>
+<p>サンプルで作成されるCRDは実は未完成です。<br>
+とくになんの定義もされていない状態であり、何でも定義できてしまいます。
+値のバリデーションや必須項目の入力をさせることができないです。
+Ansible OperatorではこのCRDは自動生成されることなく自分で記述する必要があります。</p>
+<p>たとえば、以下のような定義のMemcachedオブジェクトを作りたいとします。
+<code>size</code>がPodの数で、<code>imagetag</code>が利用するイメージのタグ名です。
+<code>size</code>については入力が必須であり、<code>imagetag</code>は未指定の場合のデフォルト値を設定したいという状態です。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: cache.example.com/v1
+<span style="color:#66d9ef">kind</span>: Memcached
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: memcached-sample
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">size</span>: <span style="color:#ae81ff">3</span>  <span style="color:#75715e"># &lt;- 必須項目</span>
+  <span style="color:#66d9ef">imagetag</span>: hogehogetag  <span style="color:#75715e"># &lt;- オプション項目</span>
+</code></pre></div><p>このような定義を作るためには、下記のようにCRDファイルを修正する必要があります。（途中、省略しています）</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">$ cat config/crd/bases/cache.example.com_memcacheds.yaml
+---
+<span style="color:#66d9ef">apiVersion</span>: apiextensions.k8s.io/v1
+<span style="color:#66d9ef">kind</span>: CustomResourceDefinition
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: memcacheds.cache.example.com
+<span style="color:#66d9ef">spec</span>:
+  ...
+    <span style="color:#66d9ef">schema</span>:
+      <span style="color:#66d9ef">openAPIV3Schema</span>:
+        <span style="color:#66d9ef">description</span>: Memcached is the Schema for the memcacheds API
+        <span style="color:#66d9ef">properties</span>:
+          <span style="color:#66d9ef">apiVersion</span>:
+            <span style="color:#66d9ef">description</span>: <span style="color:#e6db74">&#39;APIVersion defines the versioned schema of this representation
+</span><span style="color:#e6db74">              of an object. Servers should convert recognized schemas to the latest
+</span><span style="color:#e6db74">              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources&#39;</span>
+            <span style="color:#66d9ef">type</span>: string
+          <span style="color:#66d9ef">kind</span>:
+            <span style="color:#66d9ef">description</span>: <span style="color:#e6db74">&#39;Kind is a string value representing the REST resource this
+</span><span style="color:#e6db74">              object represents. Servers may infer this from the endpoint the client
+</span><span style="color:#e6db74">              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds&#39;</span>
+            <span style="color:#66d9ef">type</span>: string
+          <span style="color:#66d9ef">metadata</span>:
+            <span style="color:#66d9ef">type</span>: object
+          <span style="color:#66d9ef">spec</span>:
+            <span style="color:#66d9ef">description</span>: MemcachedSpec defines the desired state of Memcached
+            <span style="color:#66d9ef">properties</span>:
+              <span style="color:#66d9ef">size</span>:
+                <span style="color:#66d9ef">description</span>: Size is the size of the memcached deployment
+                <span style="color:#66d9ef">format</span>: int32
+                <span style="color:#66d9ef">type</span>: integer
+              <span style="color:#66d9ef">imagetag</span>:
+                <span style="color:#66d9ef">description</span>: Image Tag is the name of image tag
+                <span style="color:#66d9ef">type</span>: string
+                <span style="color:#66d9ef">default</span>: <span style="color:#e6db74">&#34;latest&#34;</span>
+            <span style="color:#66d9ef">required</span>:
+              - size
+            <span style="color:#66d9ef">type</span>: object
+          <span style="color:#66d9ef">status</span>:
+            ...
+</code></pre></div><p>このようにCRDを定義することで、CRを作成する際のバリデーションを実現できたり、<code>kubectl expain</code> で定義を確認することなどができるようになります。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl explain memcached.spec
+KIND:     Memcached
+VERSION:  cache.example.com/v1
+
+RESOURCE: spec &lt;Object&gt;
+
+DESCRIPTION:
+     MemcachedSpec defines the desired state of Memcached
+
+FIELDS:
+   imagetag	&lt;string&gt;
+     Image Tag is the name of image tag
+
+   size	&lt;integer&gt; -required-
+     Size is the size of the memcached deployment
+</code></pre></div><h3 id="ローカルで実行したい">ローカルで実行したい</h3>
+<p>OperatorをいちいちKubernetesクラスタにデプロイして検証するには結構手間がかかりたいへんです。Operatorもローカル（開発端末上）で検証できるに越したことはありません。
+ローカルでの実行方法を覚えておくと非常に便利です。上で紹介しましたが、<code>make run</code> でansible-operatorをローカル環境で実行が可能です。
+Operator自身はローカルで実行可能ですが、Kubernetesクラスタはないと動作確認ができないので、リモート上のKubernetesかDocker Desktopなどでローカル上のKubernetesが必要にはなります。
+下記、イメージを図にしました。</p>
+<p><img src="/image/ansible-operator-on-laptop.png" alt="ansible-operator-on-laptop"></p>
+<h3 id="playbookを実行したい">playbookを実行したい</h3>
+<p>チュートリアルのサンプルでは、AnsibleのRoleのみを書いた例でした。
+より凝った処理を行おうと思うと、Ansibleらしくplaybookを調整ループ（reconciliation loop）の中で実行したいと思うはずです。
+Ansible Operatorでは、<code>watches.yaml</code> に、playbookのファイルのパスを指定することでansible playbookを実行できます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">---
+<span style="color:#75715e"># Use the &#39;create api&#39; subcommand to add watches to this file.</span>
+- <span style="color:#66d9ef">version</span>: v1
+  <span style="color:#66d9ef">group</span>: cache.example.com
+  <span style="color:#66d9ef">kind</span>: Memcached
+  <span style="color:#66d9ef">role</span>: memcached
+- <span style="color:#66d9ef">version</span>: v1alpha1
+  <span style="color:#66d9ef">group</span>: cache.example.com
+  <span style="color:#66d9ef">kind</span>: MyDeployment
+  <span style="color:#66d9ef">playbook</span>: playbooks/mydeployment.yaml
+<span style="color:#75715e"># +kubebuilder:scaffold:watch</span>
+</code></pre></div><h3 id="外部リソースを監視したい">外部リソースを監視したい</h3>
+<p>Kubernetes内のリソースではなく、外部のリソースを監視した結果でKubernetesリソースを変更したいこともあるでしょう。
+実際にこの例では、あるWebサーバの返すレスポンスの値に応じてPod数を変更したいと考えていたとします。
+こういう場合は、<code>reconcilePeriod</code> を設定するといいです。以下の場合、10秒ごとに調整ループを実行することになり、Kubernetes外のイベントへの調整が可能になります。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">---
+- <span style="color:#66d9ef">version</span>: v1
+  <span style="color:#66d9ef">group</span>: cache.example.com
+  <span style="color:#66d9ef">kind</span>: MyExternalDeployment
+  <span style="color:#66d9ef">playbook</span>: playbooks/myexternaldeployment.yml
+  <span style="color:#66d9ef">reconcilePeriod</span>: 10s
+  <span style="color:#66d9ef">watchDependentResources</span>: False
+</code></pre></div><h3 id="apiバージョンを追加したい">APIバージョンを追加したい</h3>
+<p>Operatorを開発し運用していくと、途中のバージョンからCRDのスキーマレベルで変更したいなどの大きな変更をしたいということは訪れるはずです。
+APIバージョンを新しく追加したい場合はどうすればいいか調べてみました。</p>
+<p>本来であれば、同じリソース名でapiVersionのみを変更し対応したいところですが、現状のansible-operaotorでは複数APIバージョンには対応していません。
+今後のバージョンアップに期待です。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/operator-framework/operator-sdk/issues/2950" data-iframely-url="//cdn.iframe.ly/Su69ApK"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h3 id="利用できる変数を確認したい">利用できる変数を確認したい</h3>
+<p>playbookを書いていると、KubernetesのCRで定義した情報を変数として利用したいことがでてきます。その変数をどの様にとりだしたらいいかわからなくなることがあるので、変数をダンプするすべを覚えておくといいです。
+APIのグループとkind名で一定の命名規則で変数が格納されます。下の例だと <code>group = cache.example.com</code> で <code>kind = MyExternalDeployment</code> の場合、<code>_cache_example_com_myexternaldeployment</code> という名前で生成されます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">- name: &#34;dump variables vars&#34;
+  debug: var=vars
+
+TASK [dump variables vars] ********************************
+ok: [localhost] =&gt; {
+    &#34;vars&#34;: {
+        &#34;_cache_example_com_myexternaldeployment&#34;: {
+            &#34;apiVersion&#34;: &#34;cache.example.com/v1&#34;,
+            &#34;kind&#34;: &#34;MyExternalDeployment&#34;,
+            &#34;metadata&#34;: {
+                &#34;annotations&#34;: {
+                    &#34;ansible.sdk.operatorframework.io/verbosity&#34;: &#34;5&#34;,
+                    &#34;kubectl.kubernetes.io/last-applied-configuration&#34;: &#34;{\&#34;apiVersion\&#34;:\&#34;cache.example.com/v1\&#34;,\&#34;kind\&#34;:\&#34;MyExternalDeployment\&#34;,\&#34;metadata\&#34;:{\&#34;annota
+tions\&#34;:{\&#34;ansible.sdk.operatorframework.io/verbosity\&#34;:\&#34;5\&#34;},\&#34;name\&#34;:\&#34;myexternaldeployment-sample\&#34;,\&#34;namespace\&#34;:\&#34;default\&#34;},\&#34;spec\&#34;:{\&#34;imagetag\&#34;:\&#34;latest\&#34;,\&#34;mon
+itoringUrl\&#34;:\&#34;https://raw.githubusercontent.com/mosuke5/ansible-operator-practice/master/config/testdata/sample.json\&#34;}}\n&#34;
+                },
+                &#34;creationTimestamp&#34;: &#34;2020-10-14T04:30:15Z&#34;,
+                &#34;generation&#34;: 1,
+                &#34;name&#34;: &#34;myexternaldeployment-sample&#34;,
+                &#34;namespace&#34;: &#34;default&#34;,
+                &#34;resourceVersion&#34;: &#34;591896&#34;,
+                &#34;selfLink&#34;: &#34;/apis/cache.example.com/v1/namespaces/default/myexternaldeployments/myexternaldeployment-sample/status&#34;,
+                &#34;uid&#34;: &#34;cae902e5-05d9-40ea-93b5-1896c53eab59&#34;
+            },
+            &#34;spec&#34;: {
+                &#34;imagetag&#34;: &#34;latest&#34;,
+                &#34;monitoringUrl&#34;: &#34;https://raw.githubusercontent.com/mosuke5/ansible-operator-practice/master/config/testdata/sample.json&#34;
+            },
+</code></pre></div><h3 id="operatorを監視したい">Operatorを監視したい</h3>
+<p>OperatorSDKで実行されるプロセスには、Prometheus形式のメトリクスを出力するエンドポイントが内包されています。
+OperatorSDKを用いて起動したOperatorのメトリクスをPrometheusで取得することは非常に容易です。
+一番簡単に確認する方法としては、<code>make run</code> で起動したあとに、<code>localhost:8888/metrics</code> にブラウザから接続することです。下記のようなメトリクスが出力されていることが確認できるはずです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># HELP aggregator_openapi_v2_regeneration_count [ALPHA] Counter of OpenAPI v2 spec regeneration count broken down by causing APIService name and reason.
+# TYPE aggregator_openapi_v2_regeneration_count counter
+aggregator_openapi_v2_regeneration_count{apiservice=&#34;*&#34;,reason=&#34;startup&#34;} 0
+aggregator_openapi_v2_regeneration_count{apiservice=&#34;k8s_internal_local_delegation_chain_0000000002&#34;,reason=&#34;update&#34;} 0
+aggregator_openapi_v2_regeneration_count{apiservice=&#34;v1.apps.openshift.io&#34;,reason=&#34;add&#34;} 0
+aggregator_openapi_v2_regeneration_count{apiservice=&#34;v1.apps.openshift.io&#34;,reason=&#34;update&#34;} 0
+aggregator_openapi_v2_regeneration_count{apiservice=&#34;v1.authorization.openshift.io&#34;,reason=&#34;add&#34;} 0
+aggregator_openapi_v2_regeneration_count{apiservice=&#34;v1.authorization.openshift.io&#34;,reason=&#34;update&#34;} 0
+aggregator_openapi_v2_regeneration_count{apiservice=&#34;v1.build.openshift.io&#34;,reason=&#34;add&#34;} 0
+aggregator_openapi_v2_regeneration_count{apiservice=&#34;v1.build.openshift.io&#34;,reason=&#34;update&#34;} 0
+aggregator_openapi_v2_regeneration_count{apiservice=&#34;v1.image.openshift.io&#34;,reason=&#34;add&#34;} 0
+...
+</code></pre></div>
+    </div>
+    <div class="entry-sub-content request-for-entry">
+        <h5>フィードバック・相談(β)</h5>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=OperatorSDK%20for%20Ansible%20%e3%81%ae%e9%96%8b%e7%99%ba%e3%80%82%e3%83%81%e3%83%a5%e3%83%bc%e3%83%88%e3%83%aa%e3%82%a2%e3%83%ab%e3%81%ae%e6%ac%a1%e3%81%ae%e4%b8%80%e6%ad%a9%ef%bc%88%e6%9c%aa%e5%ae%8c%ef%bc%89" target="_blank" onClick="ga('send','event','link','click','request-for-entry');">執筆者に問い合わせてみる</a></p>
+    </div>
+    <div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+    <div class="entry-sub-content disqus">
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/10/10/develop-ansible-operator/" onClick="ga('send','event','link','click','latest-posts');">OperatorSDK for Ansible の開発。チュートリアルの次の一歩（未完）</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/09/09/kuubernetes-dns-test/" onClick="ga('send','event','link','click','latest-posts');">KubernetesのPod内からの名前解決を検証する</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/" onClick="ga('send','event','link','click','latest-posts');">ZabbixでKubernetesの監視を検討する（Prometheus exporter, Kubernetes API）</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/" onClick="ga('send','event','link','click','latest-posts');">コンテナイメージを軽くする方法と、その原理原則を考える</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/08/container-image-security/" onClick="ga('send','event','link','click','latest-posts');">コンテナイメージの脆弱性のリスクと対策についてNIST SP 800-190に沿って考える</a></li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="ga('send','event','link','click','categories');">alibaba-cloud (9)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="ga('send','event','link','click','categories');">aws (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="ga('send','event','link','click','categories');">devops (28)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="ga('send','event','link','click','categories');">kubernetes (22)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="ga('send','event','link','click','categories');">アプリケーション開発 (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="ga('send','event','link','click','categories');">イベント (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="ga('send','event','link','click','categories');">インフラ構築 (25)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="ga('send','event','link','click','categories');">キャリア (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="ga('send','event','link','click','categories');">クラウド技術 (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="ga('send','event','link','click','categories');">コンテナ (7)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="ga('send','event','link','click','categories');">ブログ運用 (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e8%8b%b1%e8%aa%9e" onClick="ga('send','event','link','click','categories');">英語 (1)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="ga('send','event','link','click','categories');">資格試験 (7)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="ga('send','event','link','click','archive');">2014年 Archive (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="ga('send','event','link','click','archive');">2015年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="ga('send','event','link','click','archive');">2016年 Archive (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="ga('send','event','link','click','archive');">2017年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="ga('send','event','link','click','archive');">2018年 Archive (17)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="ga('send','event','link','click','archive');">2019年 Archive (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="ga('send','event','link','click','archive');">2020年 Archive (18)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/09/09/kuubernetes-dns-test/" onClick="ga('send','event','link','click','related-posts');">KubernetesのPod内からの名前解決を検証する</a> (2020/09/09)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/" onClick="ga('send','event','link','click','related-posts');">ZabbixでKubernetesの監視を検討する（Prometheus exporter, Kubernetes API）</a> (2020/08/13)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/" onClick="ga('send','event','link','click','related-posts');">コンテナイメージを軽くする方法と、その原理原則を考える</a> (2020/07/09)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/08/container-image-security/" onClick="ga('send','event','link','click','related-posts');">コンテナイメージの脆弱性のリスクと対策についてNIST SP 800-190に沿って考える</a> (2020/07/08)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+    ga('create', 'UA-99596316-1', 'auto');
+    ga('send', 'pageview');
+    
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>
