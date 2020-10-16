@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <link rel="stylesheet" href="/css/main.css">
 
-<title>OperatorSDK for Ansible の開発。チュートリアルの次の一歩（未完）</title>
+<title>OperatorSDK for Ansible の開発。チュートリアルの次の一歩</title>
 <link rel="canonical" href="https://blog.mosuke.tech/entry/2020/10/10/develop-ansible-operator/">
 <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/10/10/develop-ansible-operator/" />
 <meta name="twitter:card" content="summary">
@@ -16,10 +16,10 @@
 <meta name="twitter:site" content="@mosuke5" />
 <meta name="twitter:creator" content="@mosuke5" />
 
-<meta name="twitter:title" content="OperatorSDK for Ansible の開発。チュートリアルの次の一歩（未完） &middot; Goldstine研究所">
+<meta name="twitter:title" content="OperatorSDK for Ansible の開発。チュートリアルの次の一歩 &middot; Goldstine研究所">
 <meta name="twitter:description" content="OperatorSDKを用いてAnsible Operatorを開発する際のTipsをまとめまています。チュートリアルのあとにやったほうがいいことを中心に紹介します。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="OperatorSDK for Ansible の開発。チュートリアルの次の一歩（未完） &middot; Goldstine研究所">
+<meta property="og:title" content="OperatorSDK for Ansible の開発。チュートリアルの次の一歩 &middot; Goldstine研究所">
 <meta property="og:description" content="OperatorSDKを用いてAnsible Operatorを開発する際のTipsをまとめまています。チュートリアルのあとにやったほうがいいことを中心に紹介します。">
 <meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
@@ -60,7 +60,7 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
-    <h1>OperatorSDK for Ansible の開発。チュートリアルの次の一歩（未完）</h1>
+    <h1>OperatorSDK for Ansible の開発。チュートリアルの次の一歩</h1>
     <div class="entry-sub-title">
         <span class="">10 Oct 2020, 14:06</span>
         <span class="">By mosuke5</span>
@@ -368,7 +368,36 @@ itoringUrl\&#34;:\&#34;https://raw.githubusercontent.com/mosuke5/ansible-operato
                 &#34;imagetag&#34;: &#34;latest&#34;,
                 &#34;monitoringUrl&#34;: &#34;https://raw.githubusercontent.com/mosuke5/ansible-operator-practice/master/config/testdata/sample.json&#34;
             },
-</code></pre></div><h3 id="operatorを監視したい">Operatorを監視したい</h3>
+</code></pre></div><h3 id="operatorの挙動をテストしたい">Operatorの挙動をテストしたい</h3>
+<p>ソフトウェア開発でテストコードを書くのと同じ様に、Operator開発でも（しかもAnsibleを使った開発でも）テストが書けます。
+Ansibleのテストツールで有名な<a href="https://molecule.readthedocs.io/en/latest/">molecule</a>を用いることができます。</p>
+<p>最新版のOperatorSDKでは、<a href="https://github.com/kubernetes-sigs/kind">kind</a>(kubernetes in docker)を用いて、ローカル内でテストができるように設計されています。
+ローカル環境でテストしたい場合は、Dockerとmoleculeのインストールを忘れず行いましょう。
+<code>molecule/verify.yml</code>内に<code>molecule/default/tasks/*_test.yml</code>のテストが実行されるように定義されています。
+独自のテストシナリオは、<code>molecule/default/tasks/*_test.yml</code>に書いていけば問題ありません。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">molecule
+├── default
+│   ├── converge.yml
+│   ├── create.yml
+│   ├── destroy.yml
+│   ├── kustomize.yml
+│   ├── molecule.yml
+│   ├── prepare.yml
+│   ├── tasks
+│   │   ├── memcached_test.yml
+│   │   ├── mydeployment_test.yml
+│   │   └── myexternaldeployment_test.yml
+│   └── verify.yml
+└── kind
+    ├── converge.yml
+    ├── create.yml
+    ├── destroy.yml
+    └── molecule.yml
+</code></pre></div><p>Operator開発でのテストは、基本的に<code>アクションする</code>→<code>Kubernetes APIを実行する</code>→<code>結果を確認する</code>の3ステップで実施できます。
+たとえば、<code>CRのreplicasを変更する</code>→<code>Kubernetes APIで特定のPodの情報を取る</code>→<code>期待する数に変動したか確認する</code>などです。
+下記にサンプルを書いてみましたので参照ください。（随時ブラッシュアップ中）</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/mosuke5/ansible-operator-practice/blob/master/molecule/default/tasks/memcached_test.yml" data-iframely-url="//cdn.iframe.ly/6t2BdTo"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h3 id="operatorを監視したい">Operatorを監視したい</h3>
 <p>OperatorSDKで実行されるプロセスには、Prometheus形式のメトリクスを出力するエンドポイントが内包されています。
 OperatorSDKを用いて起動したOperatorのメトリクスをPrometheusで取得することは非常に容易です。
 一番簡単に確認する方法としては、<code>make run</code> で起動したあとに、<code>localhost:8888/metrics</code> にブラウザから接続することです。下記のようなメトリクスが出力されていることが確認できるはずです。</p>
@@ -384,11 +413,13 @@ aggregator_openapi_v2_regeneration_count{apiservice=&#34;v1.build.openshift.io&#
 aggregator_openapi_v2_regeneration_count{apiservice=&#34;v1.build.openshift.io&#34;,reason=&#34;update&#34;} 0
 aggregator_openapi_v2_regeneration_count{apiservice=&#34;v1.image.openshift.io&#34;,reason=&#34;add&#34;} 0
 ...
-</code></pre></div>
+</code></pre></div><h2 id="さいごに">さいごに</h2>
+<p>Operatorの自作はまだまだ情報もすくなく難しく感じるかもしれません。
+しかし、OperatorSDKはかなり優秀で、Operatorのロジック部分に集中できるフレームワークです。ちょっとした仕組みとなにをすればいいかわかればおそらくみなさんもOperator開発をガンガン進められるのではないかと思います。</p>
     </div>
     <div class="entry-sub-content request-for-entry">
         <h5>フィードバック・相談(β)</h5>
-        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=OperatorSDK%20for%20Ansible%20%e3%81%ae%e9%96%8b%e7%99%ba%e3%80%82%e3%83%81%e3%83%a5%e3%83%bc%e3%83%88%e3%83%aa%e3%82%a2%e3%83%ab%e3%81%ae%e6%ac%a1%e3%81%ae%e4%b8%80%e6%ad%a9%ef%bc%88%e6%9c%aa%e5%ae%8c%ef%bc%89" target="_blank" onClick="ga('send','event','link','click','request-for-entry');">執筆者に問い合わせてみる</a></p>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=OperatorSDK%20for%20Ansible%20%e3%81%ae%e9%96%8b%e7%99%ba%e3%80%82%e3%83%81%e3%83%a5%e3%83%bc%e3%83%88%e3%83%aa%e3%82%a2%e3%83%ab%e3%81%ae%e6%ac%a1%e3%81%ae%e4%b8%80%e6%ad%a9" target="_blank" onClick="ga('send','event','link','click','request-for-entry');">執筆者に問い合わせてみる</a></p>
     </div>
     <div class="entry-sub-content post-share">
         <div class="post-share-links">
@@ -424,7 +455,7 @@ aggregator_openapi_v2_regeneration_count{apiservice=&#34;v1.image.openshift.io&#
     <h3>最近の記事</h3>
     <ul class="list-group">
       
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/10/10/develop-ansible-operator/" onClick="ga('send','event','link','click','latest-posts');">OperatorSDK for Ansible の開発。チュートリアルの次の一歩（未完）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/10/10/develop-ansible-operator/" onClick="ga('send','event','link','click','latest-posts');">OperatorSDK for Ansible の開発。チュートリアルの次の一歩</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/09/09/kuubernetes-dns-test/" onClick="ga('send','event','link','click','latest-posts');">KubernetesのPod内からの名前解決を検証する</a></li>
       
