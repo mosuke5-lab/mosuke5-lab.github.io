@@ -130,25 +130,25 @@ Terraformで管理するメリット/デメリットってどんなところに�
 </code></pre></div><h3 id="deploymentを作ってみる">Deploymentを作ってみる</h3>
 <p>例えばすごく単純に、Nginxが3つ立ち上がるdeploymentを作ることとします。
 manifestなら以下のようになりますね。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: apps/v1
-<span style="color:#66d9ef">kind</span>: Deployment
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: nginx-sample-deployment
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">selector</span>:
-    <span style="color:#66d9ef">matchLabels</span>:
-      <span style="color:#66d9ef">app</span>: nginx-sample
-  <span style="color:#66d9ef">replicas</span>: <span style="color:#ae81ff">3</span>
-  <span style="color:#66d9ef">template</span>:
-    <span style="color:#66d9ef">metadata</span>:
-      <span style="color:#66d9ef">labels</span>:
-        <span style="color:#66d9ef">app</span>: nginx-sample
-    <span style="color:#66d9ef">spec</span>:
-      <span style="color:#66d9ef">containers</span>:
-      - <span style="color:#66d9ef">name</span>: nginx
-        <span style="color:#66d9ef">image</span>: nginx:latest
-        <span style="color:#66d9ef">ports</span>:
-        - <span style="color:#66d9ef">containerPort</span>: <span style="color:#ae81ff">80</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-sample-deployment</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx-sample</span>
+  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">3</span>
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx-sample</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
+        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:latest</span>
+        <span style="color:#f92672">ports</span>:
+        - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">80</span>
 </code></pre></div><p>こちらをTerraformで記述していくとどうなるのか。<br>
 書いてみた所感だと、ストラクチャーはもちろんmanifestファイルと同じなので書きやすいのですが、
 一部のArgumentsの名前がmanifestで書くものと異なります。

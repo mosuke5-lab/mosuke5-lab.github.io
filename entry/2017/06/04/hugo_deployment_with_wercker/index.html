@@ -105,44 +105,44 @@ hugo側のファイル・レポジトリ管理をするだけでよくなった�
 Werckerを利用するには自分のレポジトリに<code>wercker.yml</code>を配置する必要があり、<br>
 このファイルに記述のとおりに自動化処理を行わせる。<br>
 本記事ではWerckerの細かい話は割愛するが、以下が<code>wercker.yml</code>だ。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#66d9ef">box</span>: debian
-<span style="color:#66d9ef">build</span>:
-  <span style="color:#66d9ef">steps</span>:
-    - <span style="color:#66d9ef">install-packages</span>:
-        <span style="color:#66d9ef">packages</span>: git
-    - <span style="color:#66d9ef">script</span>:
-        <span style="color:#66d9ef">name</span>: download theme
-        <span style="color:#66d9ef">code</span>: <span style="color:#e6db74">|
-</span><span style="color:#e6db74">            $(git clone https://github.com/dplesca/purehugo ./themes/purehugo)</span>
-    - <span style="color:#66d9ef">arjen/hugo-build</span>:
-        <span style="color:#66d9ef">version</span>: <span style="color:#e6db74">&#34;0.20&#34;</span>
-        <span style="color:#66d9ef">theme</span>: purehugo
-        <span style="color:#66d9ef">flags</span>: --buildDrafts=<span style="color:#66d9ef">false</span>
-  <span style="color:#66d9ef">after-steps</span>:
-    - <span style="color:#66d9ef">slack-notifier</span>:
-      <span style="color:#66d9ef">channel</span>: $SLACK_CHANNEL
-      <span style="color:#66d9ef">url</span>: $SLACK_URL
-      <span style="color:#66d9ef">username</span>: wercker_bot
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">box</span>: <span style="color:#ae81ff">debian</span>
+<span style="color:#f92672">build</span>:
+  <span style="color:#f92672">steps</span>:
+    - <span style="color:#f92672">install-packages</span>:
+        <span style="color:#f92672">packages</span>: <span style="color:#ae81ff">git</span>
+    - <span style="color:#f92672">script</span>:
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">download theme</span>
+        <span style="color:#f92672">code</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">            </span>            <span style="color:#ae81ff">$(git clone https://github.com/dplesca/purehugo ./themes/purehugo)</span>
+    - <span style="color:#f92672">arjen/hugo-build</span>:
+        <span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;0.20&#34;</span>
+        <span style="color:#f92672">theme</span>: <span style="color:#ae81ff">purehugo</span>
+        <span style="color:#f92672">flags</span>: --<span style="color:#ae81ff">buildDrafts=false</span>
+  <span style="color:#f92672">after-steps</span>:
+    - <span style="color:#f92672">slack-notifier</span>:
+      <span style="color:#f92672">channel</span>: <span style="color:#ae81ff">$SLACK_CHANNEL</span>
+      <span style="color:#f92672">url</span>: <span style="color:#ae81ff">$SLACK_URL</span>
+      <span style="color:#f92672">username</span>: <span style="color:#ae81ff">wercker_bot</span>
 
-<span style="color:#66d9ef">deploy</span>:
-  <span style="color:#66d9ef">steps</span>:
-    - <span style="color:#66d9ef">install-packages</span>:
-        <span style="color:#66d9ef">packages</span>: git ssh-client curl
-    - <span style="color:#66d9ef">leipert/git-push</span>:
-        <span style="color:#66d9ef">gh_oauth</span>: $GIT_TOKEN
-        <span style="color:#66d9ef">repo</span>: mosuke5-lab/mosuke5-lab.github.io
-        <span style="color:#66d9ef">branch</span>: master
-        <span style="color:#66d9ef">basedir</span>: public
-        <span style="color:#66d9ef">gh_pages_domain</span>: blog.mosuke.tech
-  <span style="color:#66d9ef">after-steps</span>:
-    - <span style="color:#66d9ef">script</span>:
-      <span style="color:#66d9ef">name</span>: delete cloudflare cache
-      <span style="color:#66d9ef">code</span>: <span style="color:#e6db74">|
-</span><span style="color:#e6db74">        sh ./scripts/delete_cache_all.sh ${CF_ZONE_ID} ${CF_EMAIL} ${CF_KEY}</span>
-    - <span style="color:#66d9ef">slack-notifier</span>:
-      <span style="color:#66d9ef">channel</span>: $SLACK_CHANNEL
-      <span style="color:#66d9ef">url</span>: $SLACK_URL
-      <span style="color:#66d9ef">username</span>: wercker_bot
+<span style="color:#f92672">deploy</span>:
+  <span style="color:#f92672">steps</span>:
+    - <span style="color:#f92672">install-packages</span>:
+        <span style="color:#f92672">packages</span>: <span style="color:#ae81ff">git ssh-client curl</span>
+    - <span style="color:#f92672">leipert/git-push</span>:
+        <span style="color:#f92672">gh_oauth</span>: <span style="color:#ae81ff">$GIT_TOKEN</span>
+        <span style="color:#f92672">repo</span>: <span style="color:#ae81ff">mosuke5-lab/mosuke5-lab.github.io</span>
+        <span style="color:#f92672">branch</span>: <span style="color:#ae81ff">master</span>
+        <span style="color:#f92672">basedir</span>: <span style="color:#ae81ff">public</span>
+        <span style="color:#f92672">gh_pages_domain</span>: <span style="color:#ae81ff">blog.mosuke.tech</span>
+  <span style="color:#f92672">after-steps</span>:
+    - <span style="color:#f92672">script</span>:
+      <span style="color:#f92672">name</span>: <span style="color:#ae81ff">delete cloudflare cache</span>
+      <span style="color:#f92672">code</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">        </span>        <span style="color:#ae81ff">sh ./scripts/delete_cache_all.sh ${CF_ZONE_ID} ${CF_EMAIL} ${CF_KEY}</span>
+    - <span style="color:#f92672">slack-notifier</span>:
+      <span style="color:#f92672">channel</span>: <span style="color:#ae81ff">$SLACK_CHANNEL</span>
+      <span style="color:#f92672">url</span>: <span style="color:#ae81ff">$SLACK_URL</span>
+      <span style="color:#f92672">username</span>: <span style="color:#ae81ff">wercker_bot</span>
 </code></pre></div><h2 id="ビルド時のhugoバージョンはきちんと書く">ビルド時のhugoバージョンはきちんと書く</h2>
 <p><code>wercker.yml</code>を書く際に注意する点の１つがhugoバージョンの明記だ。<br>
 以下部分の<code>version</code>は、自分のローカルの環境のHugoバージョンときちんと合わせるとよい。<br>

@@ -298,7 +298,7 @@ customerOrder
 <p><img src="/image/sockshop-order-screen.png" alt="sockshop-order-screen"></p>
 <p>では、どのように取得しているか見ていきます。<br>
 下記のように、orderサービスに問い合わせたあと、注文した商品を別でcatalogueサービスに問い合わせにいっています。
-いわゆるN+1問題が発生しています(&lt;a href-&ldquo;<a href="https://github.com/microservices-demo/front-end/blob/5e21067c2011a1f220322a704c9984fa206c4d12/public/customer-order.html#L205%22">https://github.com/microservices-demo/front-end/blob/5e21067c2011a1f220322a704c9984fa206c4d12/public/customer-order.html#L205&quot;</a> target=&rdquo;_blank&quot;&gt;該当のコード</a>)。
+いわゆるN+1問題が発生しています(&lt;a href-&ldquo;<a href="https://github.com/microservices-demo/front-end/blob/5e21067c2011a1f220322a704c9984fa206c4d12/public/customer-order.html#L205%22">https://github.com/microservices-demo/front-end/blob/5e21067c2011a1f220322a704c9984fa206c4d12/public/customer-order.html#L205&quot;</a> target=&quot;_blank&rdquo;&gt;該当のコード</a>)。
 これは、マイクロサービスではよく発生します。</p>
 <p><img src="/image/sockshop-order.png" alt="sockshop-order"></p>
 <p>解決へのアプローチはいくつかあります。<br>
@@ -414,21 +414,21 @@ cartsサービスを落としてみて、どんな影響があるか確認して
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl scale --replicas=3 deployment/front-end 
 </code></pre></div><p>フロントエンドのコンテナイメージを変更してデプロイしてみます。<br>
 サンプルで、背景色を変更したフロントエンドのイメージを用意しました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: extensions/v1beta1
-<span style="color:#66d9ef">kind</span>: Deployment
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: front-end
-  <span style="color:#66d9ef">namespace</span>: sock-shop
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">replicas</span>: <span style="color:#ae81ff">1</span>
-  <span style="color:#66d9ef">template</span>:
-    <span style="color:#66d9ef">metadata</span>:
-      <span style="color:#66d9ef">labels</span>:
-        <span style="color:#66d9ef">name</span>: front-end
-    <span style="color:#66d9ef">spec</span>:
-      <span style="color:#66d9ef">containers</span>:
-      - <span style="color:#66d9ef">name</span>: front-end
-        <span style="color:#66d9ef">image</span>: mosuke5/front-end:master-bd5039f4
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">extensions/v1beta1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">front-end</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">sock-shop</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">front-end</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">front-end</span>
+        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">mosuke5/front-end:master-bd5039f4</span>
         <span style="color:#75715e">#image: weaveworksdemos/front-end:0.3.12</span>
 </code></pre></div><h2 id="非同期通信">非同期通信</h2>
 <p>マイクロサービスアーキテクチャでは、サービス間の通信をどのように行うかは重要な選択の１つです。<br>

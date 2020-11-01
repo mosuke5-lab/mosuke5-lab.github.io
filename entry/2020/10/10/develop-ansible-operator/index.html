@@ -236,54 +236,54 @@ Ansible OperatorではこのCRDは自動生成されることなく自分で記�
 <p>たとえば、以下のような定義のMemcachedオブジェクトを作りたいとします。
 <code>size</code>がPodの数で、<code>imagetag</code>が利用するイメージのタグ名です。
 <code>size</code>については入力が必須であり、<code>imagetag</code>は未指定の場合のデフォルト値を設定したいという状態です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: cache.example.com/v1
-<span style="color:#66d9ef">kind</span>: Memcached
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: memcached-sample
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">size</span>: <span style="color:#ae81ff">3</span>  <span style="color:#75715e"># &lt;- 必須項目</span>
-  <span style="color:#66d9ef">imagetag</span>: hogehogetag  <span style="color:#75715e"># &lt;- オプション項目</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">cache.example.com/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Memcached</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">memcached-sample</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">size</span>: <span style="color:#ae81ff">3</span>  <span style="color:#75715e"># &lt;- 必須項目</span>
+  <span style="color:#f92672">imagetag</span>: <span style="color:#ae81ff">hogehogetag </span> <span style="color:#75715e"># &lt;- オプション項目</span>
 </code></pre></div><p>このような定義を作るためには、下記のようにCRDファイルを修正する必要があります。（途中、省略しています）</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">$ cat config/crd/bases/cache.example.com_memcacheds.yaml
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#ae81ff">$ cat config/crd/bases/cache.example.com_memcacheds.yaml</span>
 ---
-<span style="color:#66d9ef">apiVersion</span>: apiextensions.k8s.io/v1
-<span style="color:#66d9ef">kind</span>: CustomResourceDefinition
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: memcacheds.cache.example.com
-<span style="color:#66d9ef">spec</span>:
-  ...
-    <span style="color:#66d9ef">schema</span>:
-      <span style="color:#66d9ef">openAPIV3Schema</span>:
-        <span style="color:#66d9ef">description</span>: Memcached is the Schema for the memcacheds API
-        <span style="color:#66d9ef">properties</span>:
-          <span style="color:#66d9ef">apiVersion</span>:
-            <span style="color:#66d9ef">description</span>: <span style="color:#e6db74">&#39;APIVersion defines the versioned schema of this representation
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apiextensions.k8s.io/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">CustomResourceDefinition</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">memcacheds.cache.example.com</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#ae81ff">...</span>
+    <span style="color:#f92672">schema</span>:
+      <span style="color:#f92672">openAPIV3Schema</span>:
+        <span style="color:#f92672">description</span>: <span style="color:#ae81ff">Memcached is the Schema for the memcacheds API</span>
+        <span style="color:#f92672">properties</span>:
+          <span style="color:#f92672">apiVersion</span>:
+            <span style="color:#f92672">description</span>: <span style="color:#e6db74">&#39;APIVersion defines the versioned schema of this representation
 </span><span style="color:#e6db74">              of an object. Servers should convert recognized schemas to the latest
 </span><span style="color:#e6db74">              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources&#39;</span>
-            <span style="color:#66d9ef">type</span>: string
-          <span style="color:#66d9ef">kind</span>:
-            <span style="color:#66d9ef">description</span>: <span style="color:#e6db74">&#39;Kind is a string value representing the REST resource this
+            <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
+          <span style="color:#f92672">kind</span>:
+            <span style="color:#f92672">description</span>: <span style="color:#e6db74">&#39;Kind is a string value representing the REST resource this
 </span><span style="color:#e6db74">              object represents. Servers may infer this from the endpoint the client
 </span><span style="color:#e6db74">              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds&#39;</span>
-            <span style="color:#66d9ef">type</span>: string
-          <span style="color:#66d9ef">metadata</span>:
-            <span style="color:#66d9ef">type</span>: object
-          <span style="color:#66d9ef">spec</span>:
-            <span style="color:#66d9ef">description</span>: MemcachedSpec defines the desired state of Memcached
-            <span style="color:#66d9ef">properties</span>:
-              <span style="color:#66d9ef">size</span>:
-                <span style="color:#66d9ef">description</span>: Size is the size of the memcached deployment
-                <span style="color:#66d9ef">format</span>: int32
-                <span style="color:#66d9ef">type</span>: integer
-              <span style="color:#66d9ef">imagetag</span>:
-                <span style="color:#66d9ef">description</span>: Image Tag is the name of image tag
-                <span style="color:#66d9ef">type</span>: string
-                <span style="color:#66d9ef">default</span>: <span style="color:#e6db74">&#34;latest&#34;</span>
-            <span style="color:#66d9ef">required</span>:
-              - size
-            <span style="color:#66d9ef">type</span>: object
-          <span style="color:#66d9ef">status</span>:
-            ...
+            <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
+          <span style="color:#f92672">metadata</span>:
+            <span style="color:#f92672">type</span>: <span style="color:#ae81ff">object</span>
+          <span style="color:#f92672">spec</span>:
+            <span style="color:#f92672">description</span>: <span style="color:#ae81ff">MemcachedSpec defines the desired state of Memcached</span>
+            <span style="color:#f92672">properties</span>:
+              <span style="color:#f92672">size</span>:
+                <span style="color:#f92672">description</span>: <span style="color:#ae81ff">Size is the size of the memcached deployment</span>
+                <span style="color:#f92672">format</span>: <span style="color:#ae81ff">int32</span>
+                <span style="color:#f92672">type</span>: <span style="color:#ae81ff">integer</span>
+              <span style="color:#f92672">imagetag</span>:
+                <span style="color:#f92672">description</span>: <span style="color:#ae81ff">Image Tag is the name of image tag</span>
+                <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
+                <span style="color:#f92672">default</span>: <span style="color:#e6db74">&#34;latest&#34;</span>
+            <span style="color:#f92672">required</span>:
+              - <span style="color:#ae81ff">size</span>
+            <span style="color:#f92672">type</span>: <span style="color:#ae81ff">object</span>
+          <span style="color:#f92672">status</span>:
+            <span style="color:#ae81ff">...</span>
 </code></pre></div><p>このようにCRDを定義することで、CRを作成する際のバリデーションを実現できたり、<code>kubectl expain</code> で定義を確認することなどができるようになります。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl explain memcached.spec
 KIND:     Memcached
@@ -312,26 +312,26 @@ Operator自身はローカルで実行可能ですが、Kubernetesクラスタ�
 Ansible Operatorでは、<code>watches.yaml</code> に、playbookのファイルのパスを指定することでansible playbookを実行できます。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">---
 <span style="color:#75715e"># Use the &#39;create api&#39; subcommand to add watches to this file.</span>
-- <span style="color:#66d9ef">version</span>: v1
-  <span style="color:#66d9ef">group</span>: cache.example.com
-  <span style="color:#66d9ef">kind</span>: Memcached
-  <span style="color:#66d9ef">role</span>: memcached
-- <span style="color:#66d9ef">version</span>: v1alpha1
-  <span style="color:#66d9ef">group</span>: cache.example.com
-  <span style="color:#66d9ef">kind</span>: MyDeployment
-  <span style="color:#66d9ef">playbook</span>: playbooks/mydeployment.yaml
+- <span style="color:#f92672">version</span>: <span style="color:#ae81ff">v1</span>
+  <span style="color:#f92672">group</span>: <span style="color:#ae81ff">cache.example.com</span>
+  <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Memcached</span>
+  <span style="color:#f92672">role</span>: <span style="color:#ae81ff">memcached</span>
+- <span style="color:#f92672">version</span>: <span style="color:#ae81ff">v1alpha1</span>
+  <span style="color:#f92672">group</span>: <span style="color:#ae81ff">cache.example.com</span>
+  <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">MyDeployment</span>
+  <span style="color:#f92672">playbook</span>: <span style="color:#ae81ff">playbooks/mydeployment.yaml</span>
 <span style="color:#75715e"># +kubebuilder:scaffold:watch</span>
 </code></pre></div><h3 id="外部リソースを監視したい">外部リソースを監視したい</h3>
 <p>Kubernetes内のリソースではなく、外部のリソースを監視した結果でKubernetesリソースを変更したいこともあるでしょう。
 実際にこの例では、あるWebサーバの返すレスポンスの値に応じてPod数を変更したいと考えていたとします。
 こういう場合は、<code>reconcilePeriod</code> を設定するといいです。以下の場合、10秒ごとに調整ループを実行することになり、Kubernetes外のイベントへの調整が可能になります。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">---
-- <span style="color:#66d9ef">version</span>: v1
-  <span style="color:#66d9ef">group</span>: cache.example.com
-  <span style="color:#66d9ef">kind</span>: MyExternalDeployment
-  <span style="color:#66d9ef">playbook</span>: playbooks/myexternaldeployment.yml
-  <span style="color:#66d9ef">reconcilePeriod</span>: 10s
-  <span style="color:#66d9ef">watchDependentResources</span>: False
+- <span style="color:#f92672">version</span>: <span style="color:#ae81ff">v1</span>
+  <span style="color:#f92672">group</span>: <span style="color:#ae81ff">cache.example.com</span>
+  <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">MyExternalDeployment</span>
+  <span style="color:#f92672">playbook</span>: <span style="color:#ae81ff">playbooks/myexternaldeployment.yml</span>
+  <span style="color:#f92672">reconcilePeriod</span>: <span style="color:#ae81ff">10s</span>
+  <span style="color:#f92672">watchDependentResources</span>: <span style="color:#66d9ef">False</span>
 </code></pre></div><h3 id="apiバージョンを追加したい">APIバージョンを追加したい</h3>
 <p>Operatorを開発し運用していくと、途中のバージョンからCRDのスキーマレベルで変更したいなどの大きな変更をしたいということは訪れるはずです。
 APIバージョンを新しく追加したい場合はどうすればいいか調べてみました。</p>

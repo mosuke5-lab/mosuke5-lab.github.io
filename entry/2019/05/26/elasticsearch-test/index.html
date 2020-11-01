@@ -168,24 +168,24 @@ servicesについてもdockerイメージを指定することで特定のサー
 また、<code>alias</code>を設定すると、その名前でサービスにアクセスできます。
 <code>alias</code>に<code>elasticsearch</code>と指定し、Rails側のElasticSearchのホストを指定する環境変数に同じように<code>elasticsearch</code>と指定することで簡単に接続が可能です。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#75715e"># .gitlab-ci.yml</span>
-<span style="color:#66d9ef">stages</span>:
-  - test
+<span style="color:#f92672">stages</span>:
+  - <span style="color:#ae81ff">test</span>
 
-<span style="color:#66d9ef">test</span>:
-  <span style="color:#66d9ef">stage</span>: test
-  <span style="color:#66d9ef">image</span>: ruby:<span style="color:#ae81ff">2.5.5</span>
-  <span style="color:#66d9ef">services</span>:
-    - <span style="color:#66d9ef">name</span>: docker.elastic.co/elasticsearch/elasticsearch:<span style="color:#ae81ff">6.7.2</span>
-      <span style="color:#66d9ef">alias</span>: elasticsearch
-  <span style="color:#66d9ef">before_script</span>:
-    - apt-get update <span style="color:#75715e">&amp;&amp;</span> apt-get upgrade -y
-    - apt-get install -y some componets
-  <span style="color:#66d9ef">script</span>:
-    - bundle install
-    - bundle exec rake test
-  <span style="color:#66d9ef">variables</span>:
-    <span style="color:#66d9ef">ELASTICSEARCH_HOST</span>: <span style="color:#e6db74">&#34;elasticsearch&#34;</span>
-    <span style="color:#66d9ef">ELASTICSEARCH_PORT</span>: <span style="color:#ae81ff">9200</span>
+<span style="color:#f92672">test</span>:
+  <span style="color:#f92672">stage</span>: <span style="color:#ae81ff">test</span>
+  <span style="color:#f92672">image</span>: <span style="color:#ae81ff">ruby:2.5.5</span>
+  <span style="color:#f92672">services</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">docker.elastic.co/elasticsearch/elasticsearch:6.7.2</span>
+      <span style="color:#f92672">alias</span>: <span style="color:#ae81ff">elasticsearch</span>
+  <span style="color:#f92672">before_script</span>:
+    - <span style="color:#ae81ff">apt-get update &amp;&amp; apt-get upgrade -y</span>
+    - <span style="color:#ae81ff">apt-get install -y some componets</span>
+  <span style="color:#f92672">script</span>:
+    - <span style="color:#ae81ff">bundle install</span>
+    - <span style="color:#ae81ff">bundle exec rake test</span>
+  <span style="color:#f92672">variables</span>:
+    <span style="color:#f92672">ELASTICSEARCH_HOST</span>: <span style="color:#e6db74">&#34;elasticsearch&#34;</span>
+    <span style="color:#f92672">ELASTICSEARCH_PORT</span>: <span style="color:#ae81ff">9200</span>
 </code></pre></div>
     </div>
     <div class="entry-sub-content request-for-entry">

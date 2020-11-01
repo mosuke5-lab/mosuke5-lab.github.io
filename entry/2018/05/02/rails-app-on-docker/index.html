@@ -156,30 +156,30 @@ CMD [&#34;bundle&#34;, &#34;exec&#34;, &#34;rails&#34;, &#34;server&#34;, &#34;-
 <p>以下の<code>gitlab-ci.yml</code>は、ほぼGitlabのドキュメントに載っているとおりです。<br>
 <code>Master</code>ブランチにコミットがあった場合のみビルドするようにだけ変更しました。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#75715e"># gitlab-ci.yml</span>
-<span style="color:#66d9ef">image</span>: docker:stable
+<span style="color:#f92672">image</span>: <span style="color:#ae81ff">docker:stable</span>
 
-<span style="color:#66d9ef">services</span>:
-  - docker:dind
+<span style="color:#f92672">services</span>:
+  - <span style="color:#ae81ff">docker:dind</span>
 
-<span style="color:#66d9ef">stages</span>:
-  - release
+<span style="color:#f92672">stages</span>:
+  - <span style="color:#ae81ff">release</span>
 
-<span style="color:#66d9ef">variables</span>:
-  <span style="color:#66d9ef">CONTAINER_IMAGE</span>: registry.gitlab.com/$CI_PROJECT_PATH
-  <span style="color:#66d9ef">DOCKER_DRIVER</span>: overlay2
+<span style="color:#f92672">variables</span>:
+  <span style="color:#f92672">CONTAINER_IMAGE</span>: <span style="color:#ae81ff">registry.gitlab.com/$CI_PROJECT_PATH</span>
+  <span style="color:#f92672">DOCKER_DRIVER</span>: <span style="color:#ae81ff">overlay2</span>
 
-<span style="color:#66d9ef">before_script</span>:
-  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+<span style="color:#f92672">before_script</span>:
+  - <span style="color:#ae81ff">docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com</span>
 
-<span style="color:#66d9ef">release-image</span>:
-  <span style="color:#66d9ef">stage</span>: release
-  <span style="color:#66d9ef">script</span>:
-    - docker pull $CONTAINER_IMAGE:latest || <span style="color:#66d9ef">true</span>
-    - docker build --cache-from $CONTAINER_IMAGE:latest --tag $CONTAINER_IMAGE:$CI_BUILD_REF --tag $CONTAINER_IMAGE:latest .
-    - docker push $CONTAINER_IMAGE:$CI_BUILD_REF
-    - docker push $CONTAINER_IMAGE:latest
-  <span style="color:#66d9ef">only</span>: 
-    - master
+<span style="color:#f92672">release-image</span>:
+  <span style="color:#f92672">stage</span>: <span style="color:#ae81ff">release</span>
+  <span style="color:#f92672">script</span>:
+    - <span style="color:#ae81ff">docker pull $CONTAINER_IMAGE:latest || true</span>
+    - <span style="color:#ae81ff">docker build --cache-from $CONTAINER_IMAGE:latest --tag $CONTAINER_IMAGE:$CI_BUILD_REF --tag $CONTAINER_IMAGE:latest .</span>
+    - <span style="color:#ae81ff">docker push $CONTAINER_IMAGE:$CI_BUILD_REF</span>
+    - <span style="color:#ae81ff">docker push $CONTAINER_IMAGE:latest</span>
+  <span style="color:#f92672">only</span>: 
+    - <span style="color:#ae81ff">master</span>
 </code></pre></div><h2 id="dockerイメージに適切にタグを付ける">Dockerイメージに適切にタグを付ける</h2>
 <p>Gitlab-ciを使った自動ビルドで重要な点は、自動化だけではありません。<br>
 DockerイメージにGitのコミットのハッシュ値をイメージのタグとしてつけているのですが、これがとても重要です。<br>

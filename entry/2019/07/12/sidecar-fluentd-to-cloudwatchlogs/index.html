@@ -143,82 +143,82 @@ DockerHubで公開されているfluentdのコンテナイメージには当然�
 <li>AWSのAPI KeyなどをSecretとして環境変数で渡しています。</li>
 </ol>
 <p>その他下記コメントをまぜました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: apps/v1
-<span style="color:#66d9ef">kind</span>: Deployment
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: nginx-deployment
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">replicas</span>: <span style="color:#ae81ff">2</span>
-  <span style="color:#66d9ef">selector</span>:
-    <span style="color:#66d9ef">matchLabels</span>:
-      <span style="color:#66d9ef">app</span>: nginx
-  <span style="color:#66d9ef">template</span>:
-    <span style="color:#66d9ef">metadata</span>:
-      <span style="color:#66d9ef">labels</span>:
-        <span style="color:#66d9ef">app</span>: nginx
-    <span style="color:#66d9ef">spec</span>:
-      <span style="color:#66d9ef">containers</span>:
-      - <span style="color:#66d9ef">name</span>: nginx
-        <span style="color:#66d9ef">image</span>: nginx:latest
-        <span style="color:#66d9ef">ports</span>:
-        - <span style="color:#66d9ef">containerPort</span>: <span style="color:#ae81ff">80</span>
-        <span style="color:#66d9ef">volumeMounts</span>:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-deployment</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">2</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx</span>
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
+        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:latest</span>
+        <span style="color:#f92672">ports</span>:
+        - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">80</span>
+        <span style="color:#f92672">volumeMounts</span>:
         <span style="color:#75715e"># Nginxのconfgiをconfigmapでマウント</span>
-        - <span style="color:#66d9ef">name</span>: config-volume
-          <span style="color:#66d9ef">mountPath</span>: /etc/nginx/conf.d
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">config-volume</span>
+          <span style="color:#f92672">mountPath</span>: <span style="color:#ae81ff">/etc/nginx/conf.d</span>
         <span style="color:#75715e"># fluentdコンテナと共有するためのボリューム</span>
-        - <span style="color:#66d9ef">name</span>: log-volume
-          <span style="color:#66d9ef">mountPath</span>: /var/log/nginx
-        <span style="color:#66d9ef">livenessProbe</span>:
-          <span style="color:#66d9ef">httpGet</span>:
-            <span style="color:#66d9ef">path</span>: /healthcheck
-            <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">80</span>
-      - <span style="color:#66d9ef">name</span>: fluentd
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">log-volume</span>
+          <span style="color:#f92672">mountPath</span>: <span style="color:#ae81ff">/var/log/nginx</span>
+        <span style="color:#f92672">livenessProbe</span>:
+          <span style="color:#f92672">httpGet</span>:
+            <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/healthcheck</span>
+            <span style="color:#f92672">port</span>: <span style="color:#ae81ff">80</span>
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluentd</span>
         <span style="color:#75715e"># プラグインをインストールした独自イメージをプライベートレジストリから取得</span>
-        <span style="color:#66d9ef">image</span>: registry.gitlab.com/private-group/fluentd:latest
-        <span style="color:#66d9ef">volumeMounts</span>:
+        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">registry.gitlab.com/private-group/fluentd:latest</span>
+        <span style="color:#f92672">volumeMounts</span>:
         <span style="color:#75715e"># Nginxコンテナと共有するためのボリューム</span>
-        - <span style="color:#66d9ef">name</span>: log-volume
-          <span style="color:#66d9ef">mountPath</span>: /var/log/nginx
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">log-volume</span>
+          <span style="color:#f92672">mountPath</span>: <span style="color:#ae81ff">/var/log/nginx</span>
         <span style="color:#75715e"># fluentdのconfgiをconfigmapでマウント</span>
-        - <span style="color:#66d9ef">name</span>: fluentd-config-volume
-          <span style="color:#66d9ef">mountPath</span>: /fluentd/etc/
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluentd-config-volume</span>
+          <span style="color:#f92672">mountPath</span>: <span style="color:#ae81ff">/fluentd/etc/</span>
         <span style="color:#75715e"># AWSのAPI Keyなどを環境変数でセット</span>
-        <span style="color:#66d9ef">env</span>:
-        - <span style="color:#66d9ef">name</span>: AWS_ACCESS_KEY_ID
-          <span style="color:#66d9ef">valueFrom</span>:
-            <span style="color:#66d9ef">secretKeyRef</span>:
-              <span style="color:#66d9ef">name</span>: beeglobal-app
-              <span style="color:#66d9ef">key</span>: aws_access_key_id
-        - <span style="color:#66d9ef">name</span>: AWS_SECRET_ACCESS_KEY
-          <span style="color:#66d9ef">valueFrom</span>:
-            <span style="color:#66d9ef">secretKeyRef</span>:
-              <span style="color:#66d9ef">name</span>: beeglobal-app
-              <span style="color:#66d9ef">key</span>: aws_access_key_secret
-        - <span style="color:#66d9ef">name</span>: AWS_REGION
-          <span style="color:#66d9ef">valueFrom</span>:
-            <span style="color:#66d9ef">secretKeyRef</span>:
-              <span style="color:#66d9ef">name</span>: beeglobal-app
-              <span style="color:#66d9ef">key</span>: aws_region
+        <span style="color:#f92672">env</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">AWS_ACCESS_KEY_ID</span>
+          <span style="color:#f92672">valueFrom</span>:
+            <span style="color:#f92672">secretKeyRef</span>:
+              <span style="color:#f92672">name</span>: <span style="color:#ae81ff">beeglobal-app</span>
+              <span style="color:#f92672">key</span>: <span style="color:#ae81ff">aws_access_key_id</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">AWS_SECRET_ACCESS_KEY</span>
+          <span style="color:#f92672">valueFrom</span>:
+            <span style="color:#f92672">secretKeyRef</span>:
+              <span style="color:#f92672">name</span>: <span style="color:#ae81ff">beeglobal-app</span>
+              <span style="color:#f92672">key</span>: <span style="color:#ae81ff">aws_access_key_secret</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">AWS_REGION</span>
+          <span style="color:#f92672">valueFrom</span>:
+            <span style="color:#f92672">secretKeyRef</span>:
+              <span style="color:#f92672">name</span>: <span style="color:#ae81ff">beeglobal-app</span>
+              <span style="color:#f92672">key</span>: <span style="color:#ae81ff">aws_region</span>
       <span style="color:#75715e"># プライベートレジストリへのアクセスシークレット</span>
-      <span style="color:#66d9ef">imagePullSecrets</span>:
-      - <span style="color:#66d9ef">name</span>: gitlab-docker-registry
-      <span style="color:#66d9ef">volumes</span>:
-      - <span style="color:#66d9ef">name</span>: config-volume
-        <span style="color:#66d9ef">configMap</span>:
-          <span style="color:#66d9ef">name</span>: nginx-conf
-          <span style="color:#66d9ef">items</span>:
-          - <span style="color:#66d9ef">key</span>: proxy.conf
-            <span style="color:#66d9ef">path</span>: proxy.conf
-      - <span style="color:#66d9ef">name</span>: fluentd-config-volume
-        <span style="color:#66d9ef">configMap</span>:
-          <span style="color:#66d9ef">name</span>: fluentd-conf
-          <span style="color:#66d9ef">items</span>:
-          - <span style="color:#66d9ef">key</span>: fluent.conf
-            <span style="color:#66d9ef">path</span>: fluent.conf
+      <span style="color:#f92672">imagePullSecrets</span>:
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">gitlab-docker-registry</span>
+      <span style="color:#f92672">volumes</span>:
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">config-volume</span>
+        <span style="color:#f92672">configMap</span>:
+          <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-conf</span>
+          <span style="color:#f92672">items</span>:
+          - <span style="color:#f92672">key</span>: <span style="color:#ae81ff">proxy.conf</span>
+            <span style="color:#f92672">path</span>: <span style="color:#ae81ff">proxy.conf</span>
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluentd-config-volume</span>
+        <span style="color:#f92672">configMap</span>:
+          <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluentd-conf</span>
+          <span style="color:#f92672">items</span>:
+          - <span style="color:#f92672">key</span>: <span style="color:#ae81ff">fluent.conf</span>
+            <span style="color:#f92672">path</span>: <span style="color:#ae81ff">fluent.conf</span>
       <span style="color:#75715e"># コンテナ間でシェアするボリューム</span>
-      - <span style="color:#66d9ef">name</span>: log-volume
-        <span style="color:#66d9ef">emptyDir</span>: {}
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">log-volume</span>
+        <span style="color:#f92672">emptyDir</span>: {}
 </code></pre></div><h2 id="動作確認">動作確認</h2>
 <p>podを確認すると、2/2とふたつのコンテナが起動していることがきちんと確認できる。
 今回のようなサイドカー方式にすると、Nginxコンテナは標準出力でログを吐き出さなくなるので、<code>kubectl logs</code>でログは確認できないことは要注意しておきましょう。</p>

@@ -116,19 +116,19 @@ MySQL-shared-compatは「過去のMySQLバージョン向けの共有クライ�
 Ansibleでも「ダウンロード」→「インストール」の流れを踏む人が多いが、以下のようにするとシンプルになる。<br>
 varsでインストールしたいrpmやその取得先を記述しておいて、task側ではyumでnameにvarsで定義した変数を読むだけでできる。</p>
 <p><code>role/mysql/vars/main.yml</code></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">mysql_url</span>: http://ftp.jaist.ac.jp/pub/mysql/Downloads/MySQL<span style="color:#ae81ff">-5.6</span>
-<span style="color:#66d9ef">mysql_ver</span>: <span style="color:#e6db74">&#34;5.6.24-1&#34;</span>
-<span style="color:#66d9ef">mysql_rpms</span>:
-  - MySQL-client-{{ mysql_ver }}.el6.x86_64.rpm
-  - MySQL-shared-compat-{{ mysql_ver }}.el6.x86_64.rpm
-  - MySQL-shared-{{ mysql_ver }}.el6.x86_64.rpm
-  - MySQL-devel-{{ mysql_ver }}.el6.x86_64.rpm
-  - MySQL-server-{{ mysql_ver }}.el6.x86_64.rpm
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">mysql_url</span>: <span style="color:#ae81ff">http://ftp.jaist.ac.jp/pub/mysql/Downloads/MySQL-5.6</span>
+<span style="color:#f92672">mysql_ver</span>: <span style="color:#e6db74">&#34;5.6.24-1&#34;</span>
+<span style="color:#f92672">mysql_rpms</span>:
+  - <span style="color:#ae81ff">MySQL-client-{{ mysql_ver }}.el6.x86_64.rpm</span>
+  - <span style="color:#ae81ff">MySQL-shared-compat-{{ mysql_ver }}.el6.x86_64.rpm</span>
+  - <span style="color:#ae81ff">MySQL-shared-{{ mysql_ver }}.el6.x86_64.rpm</span>
+  - <span style="color:#ae81ff">MySQL-devel-{{ mysql_ver }}.el6.x86_64.rpm</span>
+  - <span style="color:#ae81ff">MySQL-server-{{ mysql_ver }}.el6.x86_64.rpm</span>
  
 </code></pre></div><p><code>role/mysql/tasks/main.yml</code></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">- <span style="color:#66d9ef">name</span>: Install MySQL without MySQL-shared
-  <span style="color:#66d9ef">yum</span>: name={{ mysql_url}}/{{ item }}
-  <span style="color:#66d9ef">with_items</span>: mysql_rpms
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">- <span style="color:#f92672">name</span>: <span style="color:#ae81ff">Install MySQL without MySQL-shared</span>
+  <span style="color:#f92672">yum</span>: <span style="color:#ae81ff">name={{ mysql_url}}/{{ item }}</span>
+  <span style="color:#f92672">with_items</span>: <span style="color:#ae81ff">mysql_rpms</span>
 </code></pre></div><h2 id="4-まとめ">(4) まとめ</h2>
 <p>パッケージ管理のデッドロックにハマってしまい、どうしようかと悩んでいたが、
 よくしらべると解決策をきちんと用意してくれていた。

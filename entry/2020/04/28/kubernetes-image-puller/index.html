@@ -216,62 +216,62 @@ pod/puller-tzd6n                              2/2     Running   0          35m
 <code>spec.template.spec.containers</code>には、ConfigMapで指定したcentosとnginxの2つのイメージを利用したコンテナが起動しているのがわかります。
 実行コマンドは<code>sleep 30d</code>となっています。<code>ImagePullPolicy: Always</code>となっていることから、30日後にこのPodは終了し、その際に最新となっているイメージをまたプルすることになります。
 あまり好ましくないですがlatestタグで運用していても定期的にイメージをプルすることができるわけです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: extensions/v1beta1
-<span style="color:#66d9ef">kind</span>: DaemonSet
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: puller
-  <span style="color:#66d9ef">namespace</span>: k8s-image-puller
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">revisionHistoryLimit</span>: <span style="color:#ae81ff">10</span>
-  <span style="color:#66d9ef">selector</span>:
-    <span style="color:#66d9ef">matchLabels</span>:
-      <span style="color:#66d9ef">test</span>: daemonset-test
-  <span style="color:#66d9ef">template</span>:
-    <span style="color:#66d9ef">metadata</span>:
-      <span style="color:#66d9ef">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
-      <span style="color:#66d9ef">labels</span>:
-        <span style="color:#66d9ef">test</span>: daemonset-test
-      <span style="color:#66d9ef">name</span>: test-po
-    <span style="color:#66d9ef">spec</span>:
-      <span style="color:#66d9ef">containers</span>:
-      - <span style="color:#66d9ef">args</span>:
-        - 30d
-        <span style="color:#66d9ef">command</span>:
-        - sleep
-        <span style="color:#66d9ef">image</span>: centos:<span style="color:#ae81ff">8</span>
-        <span style="color:#66d9ef">imagePullPolicy</span>: Always
-        <span style="color:#66d9ef">name</span>: centos
-        <span style="color:#66d9ef">resources</span>:
-          <span style="color:#66d9ef">limits</span>:
-            <span style="color:#66d9ef">memory</span>: 20Mi
-          <span style="color:#66d9ef">requests</span>:
-            <span style="color:#66d9ef">memory</span>: 10Mi
-        <span style="color:#66d9ef">terminationMessagePath</span>: /dev/termination-log
-        <span style="color:#66d9ef">terminationMessagePolicy</span>: File
-      - <span style="color:#66d9ef">args</span>:
-        - 30d
-        <span style="color:#66d9ef">command</span>:
-        - sleep
-        <span style="color:#66d9ef">image</span>: nginxinc/nginx-unprivileged:<span style="color:#ae81ff">1.18</span>
-        <span style="color:#66d9ef">imagePullPolicy</span>: Always
-        <span style="color:#66d9ef">name</span>: nginx
-        <span style="color:#66d9ef">resources</span>:
-          <span style="color:#66d9ef">limits</span>:
-            <span style="color:#66d9ef">memory</span>: 20Mi
-          <span style="color:#66d9ef">requests</span>:
-            <span style="color:#66d9ef">memory</span>: 10Mi
-        <span style="color:#66d9ef">terminationMessagePath</span>: /dev/termination-log
-        <span style="color:#66d9ef">terminationMessagePolicy</span>: File
-      <span style="color:#66d9ef">dnsPolicy</span>: ClusterFirst
-      <span style="color:#66d9ef">restartPolicy</span>: Always
-      <span style="color:#66d9ef">schedulerName</span>: default-scheduler
-      <span style="color:#66d9ef">securityContext</span>: {}
-      <span style="color:#66d9ef">terminationGracePeriodSeconds</span>: <span style="color:#ae81ff">1</span>
-  <span style="color:#66d9ef">templateGeneration</span>: <span style="color:#ae81ff">1</span>
-  <span style="color:#66d9ef">updateStrategy</span>:
-    <span style="color:#66d9ef">rollingUpdate</span>:
-      <span style="color:#66d9ef">maxUnavailable</span>: <span style="color:#ae81ff">1</span>
-    <span style="color:#66d9ef">type</span>: RollingUpdate
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">extensions/v1beta1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">DaemonSet</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">puller</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">k8s-image-puller</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">revisionHistoryLimit</span>: <span style="color:#ae81ff">10</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">test</span>: <span style="color:#ae81ff">daemonset-test</span>
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">test</span>: <span style="color:#ae81ff">daemonset-test</span>
+      <span style="color:#f92672">name</span>: <span style="color:#ae81ff">test-po</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+      - <span style="color:#f92672">args</span>:
+        - <span style="color:#ae81ff">30d</span>
+        <span style="color:#f92672">command</span>:
+        - <span style="color:#ae81ff">sleep</span>
+        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">centos:8</span>
+        <span style="color:#f92672">imagePullPolicy</span>: <span style="color:#ae81ff">Always</span>
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">centos</span>
+        <span style="color:#f92672">resources</span>:
+          <span style="color:#f92672">limits</span>:
+            <span style="color:#f92672">memory</span>: <span style="color:#ae81ff">20Mi</span>
+          <span style="color:#f92672">requests</span>:
+            <span style="color:#f92672">memory</span>: <span style="color:#ae81ff">10Mi</span>
+        <span style="color:#f92672">terminationMessagePath</span>: <span style="color:#ae81ff">/dev/termination-log</span>
+        <span style="color:#f92672">terminationMessagePolicy</span>: <span style="color:#ae81ff">File</span>
+      - <span style="color:#f92672">args</span>:
+        - <span style="color:#ae81ff">30d</span>
+        <span style="color:#f92672">command</span>:
+        - <span style="color:#ae81ff">sleep</span>
+        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginxinc/nginx-unprivileged:1.18</span>
+        <span style="color:#f92672">imagePullPolicy</span>: <span style="color:#ae81ff">Always</span>
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
+        <span style="color:#f92672">resources</span>:
+          <span style="color:#f92672">limits</span>:
+            <span style="color:#f92672">memory</span>: <span style="color:#ae81ff">20Mi</span>
+          <span style="color:#f92672">requests</span>:
+            <span style="color:#f92672">memory</span>: <span style="color:#ae81ff">10Mi</span>
+        <span style="color:#f92672">terminationMessagePath</span>: <span style="color:#ae81ff">/dev/termination-log</span>
+        <span style="color:#f92672">terminationMessagePolicy</span>: <span style="color:#ae81ff">File</span>
+      <span style="color:#f92672">dnsPolicy</span>: <span style="color:#ae81ff">ClusterFirst</span>
+      <span style="color:#f92672">restartPolicy</span>: <span style="color:#ae81ff">Always</span>
+      <span style="color:#f92672">schedulerName</span>: <span style="color:#ae81ff">default-scheduler</span>
+      <span style="color:#f92672">securityContext</span>: {}
+      <span style="color:#f92672">terminationGracePeriodSeconds</span>: <span style="color:#ae81ff">1</span>
+  <span style="color:#f92672">templateGeneration</span>: <span style="color:#ae81ff">1</span>
+  <span style="color:#f92672">updateStrategy</span>:
+    <span style="color:#f92672">rollingUpdate</span>:
+      <span style="color:#f92672">maxUnavailable</span>: <span style="color:#ae81ff">1</span>
+    <span style="color:#f92672">type</span>: <span style="color:#ae81ff">RollingUpdate</span>
 </code></pre></div><h2 id="まとめ">まとめ</h2>
 <p>kubernetes-image-pullerを参考に、Kubernetes環境におけるイメージの効率化について考えてみました。<br>
 このソフトウェアをそのまま利用するかどうかは別にしても、DaemonSetを活用してイメージの事前のプルなどが実現でき活用できる場面もありそうです。</p>

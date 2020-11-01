@@ -150,98 +150,98 @@ overlayは名前の通り「覆う」的な意味なので、Baseのマニュフ
         └── kustomization.yml
 </code></pre></div><p>baseには共通のマニフェストです。出力すると下記のとおりです。
 見ておいてほしいのは<code>nginx-servce</code>のTypeです。baseマニフェストでは<code>ClusterIP</code>を指定しています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">$ kubectl kustomize base
-<span style="color:#66d9ef">apiVersion</span>: v1
-<span style="color:#66d9ef">kind</span>: Service
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: nginx-service
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">ports</span>:
-  - <span style="color:#66d9ef">name</span>: http-port
-    <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">80</span>
-    <span style="color:#66d9ef">protocol</span>: TCP
-    <span style="color:#66d9ef">targetPort</span>: <span style="color:#ae81ff">80</span>
-  <span style="color:#66d9ef">selector</span>:
-    <span style="color:#66d9ef">app</span>: nginx
-  <span style="color:#66d9ef">type</span>: ClusterIP    <span style="color:#75715e"># baseではClusterIPを指定</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#ae81ff">$ kubectl kustomize base</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Service</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-service</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">ports</span>:
+  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">http-port</span>
+    <span style="color:#f92672">port</span>: <span style="color:#ae81ff">80</span>
+    <span style="color:#f92672">protocol</span>: <span style="color:#ae81ff">TCP</span>
+    <span style="color:#f92672">targetPort</span>: <span style="color:#ae81ff">80</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx</span>
+  <span style="color:#f92672">type</span>: <span style="color:#ae81ff">ClusterIP   </span> <span style="color:#75715e"># baseではClusterIPを指定</span>
 ---
-<span style="color:#66d9ef">apiVersion</span>: apps/v1
-<span style="color:#66d9ef">kind</span>: Deployment
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: nginx-deployment
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">replicas</span>: <span style="color:#ae81ff">1</span>
-  <span style="color:#66d9ef">selector</span>:
-    <span style="color:#66d9ef">matchLabels</span>:
-      <span style="color:#66d9ef">app</span>: nginx
-  <span style="color:#66d9ef">template</span>:
-    <span style="color:#66d9ef">metadata</span>:
-      <span style="color:#66d9ef">labels</span>:
-        <span style="color:#66d9ef">app</span>: nginx
-    <span style="color:#66d9ef">spec</span>:
-      <span style="color:#66d9ef">containers</span>:
-      - <span style="color:#66d9ef">image</span>: nginx:<span style="color:#ae81ff">1.17.0</span>
-        <span style="color:#66d9ef">name</span>: nginx
-        <span style="color:#66d9ef">ports</span>:
-        - <span style="color:#66d9ef">containerPort</span>: <span style="color:#ae81ff">80</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-deployment</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx</span>
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+      - <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:1.17.0</span>
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
+        <span style="color:#f92672">ports</span>:
+        - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">80</span>
 </code></pre></div><p>しかし、本番環境ではNamespaceを指定して、Typeを<code>LoadBalancer</code>で公開したかったとします。
 以下は本番環境用にパッチ当てするためのkustomization.ymlなのですが、baseのマニフェストを指定し、namespaceとパッチを当てるマニフェストを指定しました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">$ cat overlays/production/kustomization.yml
-<span style="color:#66d9ef">bases</span>:
-- ../../base
-<span style="color:#66d9ef">namespace</span>: <span style="color:#e6db74">&#34;production&#34;</span>
-<span style="color:#66d9ef">patchesStrategicMerge</span>:
-- change-nginx-service-to-loadbalancer.yml   <span style="color:#75715e"># serviceのtypeを変えるパッチを当てる</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#ae81ff">$ cat overlays/production/kustomization.yml</span>
+<span style="color:#f92672">bases</span>:
+- <span style="color:#ae81ff">../../base</span>
+<span style="color:#f92672">namespace</span>: <span style="color:#e6db74">&#34;production&#34;</span>
+<span style="color:#f92672">patchesStrategicMerge</span>:
+- <span style="color:#ae81ff">change-nginx-service-to-loadbalancer.yml  </span> <span style="color:#75715e"># serviceのtypeを変えるパッチを当てる</span>
 
-$ cat overlays/production/change-nginx-service-to-loadbalancer.yml
-<span style="color:#66d9ef">apiVersion</span>: v1
-<span style="color:#66d9ef">kind</span>: Service
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: nginx-service
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">type</span>: LoadBalancer   <span style="color:#75715e"># typeをLoadBalancerへ</span>
-  <span style="color:#66d9ef">ports</span>:
-    - <span style="color:#66d9ef">name</span>: <span style="color:#e6db74">&#34;http-port&#34;</span>
-      <span style="color:#66d9ef">protocol</span>: <span style="color:#e6db74">&#34;TCP&#34;</span>
-      <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">80</span>
-      <span style="color:#66d9ef">targetPort</span>: <span style="color:#ae81ff">80</span>
+<span style="color:#ae81ff">$ cat overlays/production/change-nginx-service-to-loadbalancer.yml</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Service</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-service</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">type</span>: <span style="color:#ae81ff">LoadBalancer  </span> <span style="color:#75715e"># typeをLoadBalancerへ</span>
+  <span style="color:#f92672">ports</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#e6db74">&#34;http-port&#34;</span>
+      <span style="color:#f92672">protocol</span>: <span style="color:#e6db74">&#34;TCP&#34;</span>
+      <span style="color:#f92672">port</span>: <span style="color:#ae81ff">80</span>
+      <span style="color:#f92672">targetPort</span>: <span style="color:#ae81ff">80</span>
 </code></pre></div><p>このようにして、本番環境用のパッチを当てて出力すると、typeがLoadBalancerに変わっていることがわかります。これで、1つのマニフェストを使って環境ごとにパラメータや一部のリソースを変更してデプロイできそうです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">$ kubectl kustomize overlays/production
-<span style="color:#66d9ef">apiVersion</span>: v1
-<span style="color:#66d9ef">kind</span>: Service
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: nginx-service
-  <span style="color:#66d9ef">namespace</span>: production
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">ports</span>:
-  - <span style="color:#66d9ef">name</span>: http-port
-    <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">80</span>
-    <span style="color:#66d9ef">protocol</span>: TCP
-    <span style="color:#66d9ef">targetPort</span>: <span style="color:#ae81ff">80</span>
-  <span style="color:#66d9ef">selector</span>:
-    <span style="color:#66d9ef">app</span>: nginx
-  <span style="color:#66d9ef">type</span>: LoadBalancer   <span style="color:#75715e"># typleがLoadBalancerに変更されている</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#ae81ff">$ kubectl kustomize overlays/production</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Service</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-service</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">production</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">ports</span>:
+  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">http-port</span>
+    <span style="color:#f92672">port</span>: <span style="color:#ae81ff">80</span>
+    <span style="color:#f92672">protocol</span>: <span style="color:#ae81ff">TCP</span>
+    <span style="color:#f92672">targetPort</span>: <span style="color:#ae81ff">80</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx</span>
+  <span style="color:#f92672">type</span>: <span style="color:#ae81ff">LoadBalancer  </span> <span style="color:#75715e"># typleがLoadBalancerに変更されている</span>
 ---
-<span style="color:#66d9ef">apiVersion</span>: apps/v1
-<span style="color:#66d9ef">kind</span>: Deployment
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: nginx-deployment
-  <span style="color:#66d9ef">namespace</span>: production
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">replicas</span>: <span style="color:#ae81ff">1</span>
-  <span style="color:#66d9ef">selector</span>:
-    <span style="color:#66d9ef">matchLabels</span>:
-      <span style="color:#66d9ef">app</span>: nginx
-  <span style="color:#66d9ef">template</span>:
-    <span style="color:#66d9ef">metadata</span>:
-      <span style="color:#66d9ef">labels</span>:
-        <span style="color:#66d9ef">app</span>: nginx
-    <span style="color:#66d9ef">spec</span>:
-      <span style="color:#66d9ef">containers</span>:
-      - <span style="color:#66d9ef">image</span>: nginx:<span style="color:#ae81ff">1.17.0</span>
-        <span style="color:#66d9ef">name</span>: nginx
-        <span style="color:#66d9ef">ports</span>:
-        - <span style="color:#66d9ef">containerPort</span>: <span style="color:#ae81ff">80</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-deployment</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">production</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx</span>
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+      - <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:1.17.0</span>
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
+        <span style="color:#f92672">ports</span>:
+        - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">80</span>
 </code></pre></div><h2 id="まとめ">まとめ</h2>
 <p>Kubernetesの初歩の勉強をしているうちはあまり必要性を感じないのですが、それなりに「運用」をみすえると、マニフェストを自動で生成する必要性がでてきます。
 その１つの方法としてKustomizeというツールを触りました。kubectlにも統合されているので比較的簡単にはじめることができますし、自分がやりたいと思っていたことは問題なく実現できることがわかりました。</p>

@@ -86,21 +86,21 @@
 例えばPodマニフェストに次のように<code>spec.containers[].resources</code>に<code>requests</code>と<code>limits</code>を指定することでコンテナへのリソース割り当てが可能です。
 <code>requests</code>と<code>limits</code>が意味することを理解しておくことが重要です。
 <code>requests</code>は使用するリソースの「下限値」を指し、<code>limits</code>は使用するリソースの「上限値」を指します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
-<span style="color:#66d9ef">kind</span>: Pod
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: frontend
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">containers</span>:
-  - <span style="color:#66d9ef">name</span>: wp
-    <span style="color:#66d9ef">image</span>: wordpress
-    <span style="color:#66d9ef">resources</span>:
-      <span style="color:#66d9ef">requests</span>:
-        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;64Mi&#34;</span>
-        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;250m&#34;</span>
-      <span style="color:#66d9ef">limits</span>:
-        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;128Mi&#34;</span>
-        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;500m&#34;</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pod</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">frontend</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">containers</span>:
+  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">wp</span>
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">wordpress</span>
+    <span style="color:#f92672">resources</span>:
+      <span style="color:#f92672">requests</span>:
+        <span style="color:#f92672">memory</span>: <span style="color:#e6db74">&#34;64Mi&#34;</span>
+        <span style="color:#f92672">cpu</span>: <span style="color:#e6db74">&#34;250m&#34;</span>
+      <span style="color:#f92672">limits</span>:
+        <span style="color:#f92672">memory</span>: <span style="color:#e6db74">&#34;128Mi&#34;</span>
+        <span style="color:#f92672">cpu</span>: <span style="color:#e6db74">&#34;500m&#34;</span>
 </code></pre></div><table>
 <thead>
 <tr>
@@ -219,35 +219,35 @@ Webサーバのように複数台で分散可能で、一部のPodが停止し�
 <p>LimitRangeはnamespace毎に設定できるものです。
 また、PodとContainerに対して設定が可能です。<br>
 設定方法は極めて簡単で、以下のようなマニフェストを適応するのみです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: <span style="color:#e6db74">&#34;v1&#34;</span>
-<span style="color:#66d9ef">kind</span>: <span style="color:#e6db74">&#34;LimitRange&#34;</span>
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: <span style="color:#e6db74">&#34;core-resource-limits&#34;</span>
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">limits</span>:
-    - <span style="color:#66d9ef">type</span>: <span style="color:#e6db74">&#34;Pod&#34;</span>
-      <span style="color:#66d9ef">max</span>:
-        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;2&#34;</span>
-        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;1Gi&#34;</span>
-      <span style="color:#66d9ef">min</span>:
-        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;200m&#34;</span>
-        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;6Mi&#34;</span>
-    - <span style="color:#66d9ef">type</span>: <span style="color:#e6db74">&#34;Container&#34;</span>
-      <span style="color:#66d9ef">max</span>:
-        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;2&#34;</span>
-        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;1Gi&#34;</span>
-      <span style="color:#66d9ef">min</span>:
-        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;100m&#34;</span>
-        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;4Mi&#34;</span>
-      <span style="color:#66d9ef">default</span>:
-        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;300m&#34;</span>
-        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;200Mi&#34;</span>
-      <span style="color:#66d9ef">defaultRequest</span>:
-        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;200m&#34;</span>
-        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;100Mi&#34;</span>
-      <span style="color:#66d9ef">maxLimitRequestRatio</span>:
-        <span style="color:#66d9ef">cpu</span>: <span style="color:#e6db74">&#34;2&#34;</span>
-        <span style="color:#66d9ef">memory</span>: <span style="color:#e6db74">&#34;2&#34;</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#e6db74">&#34;v1&#34;</span>
+<span style="color:#f92672">kind</span>: <span style="color:#e6db74">&#34;LimitRange&#34;</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#e6db74">&#34;core-resource-limits&#34;</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">limits</span>:
+    - <span style="color:#f92672">type</span>: <span style="color:#e6db74">&#34;Pod&#34;</span>
+      <span style="color:#f92672">max</span>:
+        <span style="color:#f92672">cpu</span>: <span style="color:#e6db74">&#34;2&#34;</span>
+        <span style="color:#f92672">memory</span>: <span style="color:#e6db74">&#34;1Gi&#34;</span>
+      <span style="color:#f92672">min</span>:
+        <span style="color:#f92672">cpu</span>: <span style="color:#e6db74">&#34;200m&#34;</span>
+        <span style="color:#f92672">memory</span>: <span style="color:#e6db74">&#34;6Mi&#34;</span>
+    - <span style="color:#f92672">type</span>: <span style="color:#e6db74">&#34;Container&#34;</span>
+      <span style="color:#f92672">max</span>:
+        <span style="color:#f92672">cpu</span>: <span style="color:#e6db74">&#34;2&#34;</span>
+        <span style="color:#f92672">memory</span>: <span style="color:#e6db74">&#34;1Gi&#34;</span>
+      <span style="color:#f92672">min</span>:
+        <span style="color:#f92672">cpu</span>: <span style="color:#e6db74">&#34;100m&#34;</span>
+        <span style="color:#f92672">memory</span>: <span style="color:#e6db74">&#34;4Mi&#34;</span>
+      <span style="color:#f92672">default</span>:
+        <span style="color:#f92672">cpu</span>: <span style="color:#e6db74">&#34;300m&#34;</span>
+        <span style="color:#f92672">memory</span>: <span style="color:#e6db74">&#34;200Mi&#34;</span>
+      <span style="color:#f92672">defaultRequest</span>:
+        <span style="color:#f92672">cpu</span>: <span style="color:#e6db74">&#34;200m&#34;</span>
+        <span style="color:#f92672">memory</span>: <span style="color:#e6db74">&#34;100Mi&#34;</span>
+      <span style="color:#f92672">maxLimitRequestRatio</span>:
+        <span style="color:#f92672">cpu</span>: <span style="color:#e6db74">&#34;2&#34;</span>
+        <span style="color:#f92672">memory</span>: <span style="color:#e6db74">&#34;2&#34;</span>
 </code></pre></div><p>例えば、この場合<code>maxLimitRequestRatio.memory</code>が &ldquo;2&rdquo; に設定されており、メモリーのrequestsとlimitsの比率が２倍までとしています。この状態で、2倍以上の差のあるDeploymentをデプロイしてみます。</p>
 <p>deploymentはできていますが、Podが起動してきません。
 この場合、deploymentではなく、replicasetのeventを見ると良いです。

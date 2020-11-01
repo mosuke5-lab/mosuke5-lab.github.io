@@ -107,54 +107,54 @@ yumやapt-getで管理されていれば上記を心配することはないの�
 <p>以下playbookの例です。重要なのは、何を判断してインストール済みとするかです。<br>
 ※本記事は2014年にかかれたもので、Ansibleのバージョンが古いです。最新の書き方にそぐわない可能性があるので注意してください。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">---
-- <span style="color:#66d9ef">hosts</span>: <span style="color:#ae81ff">192.168.33.100</span>
-  <span style="color:#66d9ef">user</span>: vagrant
-  <span style="color:#66d9ef">sudo</span>: yes
+- <span style="color:#f92672">hosts</span>: <span style="color:#ae81ff">192.168.33.100</span>
+  <span style="color:#f92672">user</span>: <span style="color:#ae81ff">vagrant</span>
+  <span style="color:#f92672">sudo</span>: <span style="color:#66d9ef">yes</span>
 
-  <span style="color:#66d9ef">vars</span>:
-    <span style="color:#66d9ef">src_dir</span>: /usr/local/src
-    <span style="color:#66d9ef">emacs_ver</span>: emacs<span style="color:#ae81ff">-23.4</span>
+  <span style="color:#f92672">vars</span>:
+    <span style="color:#f92672">src_dir</span>: <span style="color:#ae81ff">/usr/local/src</span>
+    <span style="color:#f92672">emacs_ver</span>: <span style="color:#ae81ff">emacs-23.4</span>
 
-  <span style="color:#66d9ef">tasks</span>:
+  <span style="color:#f92672">tasks</span>:
    <span style="color:#75715e">## emacsのソースファイルを取得済みか確認</span>
-   - <span style="color:#66d9ef">name</span>: check exist emacs source file
-     <span style="color:#66d9ef">command</span>: ls -l {{src_dir}}/{{emacs_ver}}.tar.gz
-     <span style="color:#66d9ef">ignore_errors</span>: True
-     <span style="color:#66d9ef">register</span>: result1
+   - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">check exist emacs source file</span>
+     <span style="color:#f92672">command</span>: <span style="color:#ae81ff">ls -l {{src_dir}}/{{emacs_ver}}.tar.gz</span>
+     <span style="color:#f92672">ignore_errors</span>: <span style="color:#66d9ef">True</span>
+     <span style="color:#f92672">register</span>: <span style="color:#ae81ff">result1</span>
 
    <span style="color:#75715e">## emacsのソースファイル取得。ただし、すでに取得済みならスキップ</span>
-   - <span style="color:#66d9ef">name</span>: get emacs source file
-     <span style="color:#66d9ef">command</span>: chdir={{src_dir}} wget http://mirror.jre655.com/GNU/emacs/{{emacs_ver}}.tar.gz
-     <span style="color:#66d9ef">when</span>: result1|failed
+   - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">get emacs source file</span>
+     <span style="color:#f92672">command</span>: <span style="color:#ae81ff">chdir={{src_dir}} wget http://mirror.jre655.com/GNU/emacs/{{emacs_ver}}.tar.gz</span>
+     <span style="color:#f92672">when</span>: <span style="color:#ae81ff">result1|failed</span>
 
    <span style="color:#75715e">## emacsのソースインストールを解凍</span>
-   - <span style="color:#66d9ef">name</span>: get emacs source file
-     <span style="color:#66d9ef">command</span>: chdir={{src_dir}} tar xvf {{emacs_ver}}.tar.gz
-     <span style="color:#66d9ef">when</span>: result1|failed
+   - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">get emacs source file</span>
+     <span style="color:#f92672">command</span>: <span style="color:#ae81ff">chdir={{src_dir}} tar xvf {{emacs_ver}}.tar.gz</span>
+     <span style="color:#f92672">when</span>: <span style="color:#ae81ff">result1|failed</span>
 
    <span style="color:#75715e">## emacsがインストールされているか確認</span>
    <span style="color:#75715e">#  確認基準はemacsコマンドのpathが通っているかで判断した</span>
-   - <span style="color:#66d9ef">name</span>: check emacs install
-     <span style="color:#66d9ef">command</span>: which emacs
-     <span style="color:#66d9ef">ignore_errors</span>: True
-     <span style="color:#66d9ef">register</span>: result2
+   - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">check emacs install</span>
+     <span style="color:#f92672">command</span>: <span style="color:#ae81ff">which emacs</span>
+     <span style="color:#f92672">ignore_errors</span>: <span style="color:#66d9ef">True</span>
+     <span style="color:#f92672">register</span>: <span style="color:#ae81ff">result2</span>
 
    <span style="color:#75715e">## emacsのインストール。ただしすでにemacsがインストールされいたらスキップ</span>
-   - <span style="color:#66d9ef">name</span>: expand emacs src
-     <span style="color:#66d9ef">command</span>: chdir={{src_dir}} tar xvf {{emacs_ver}}.tar.gz
-     <span style="color:#66d9ef">when</span>: result2|failed
+   - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">expand emacs src</span>
+     <span style="color:#f92672">command</span>: <span style="color:#ae81ff">chdir={{src_dir}} tar xvf {{emacs_ver}}.tar.gz</span>
+     <span style="color:#f92672">when</span>: <span style="color:#ae81ff">result2|failed</span>
 
-   - <span style="color:#66d9ef">name</span>: comfigure emacs
-     <span style="color:#66d9ef">command</span>: chdir={{src_dir}}/{{emacs_ver}} ./configure
-     <span style="color:#66d9ef">when</span>: result2|failed
+   - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">comfigure emacs</span>
+     <span style="color:#f92672">command</span>: <span style="color:#ae81ff">chdir={{src_dir}}/{{emacs_ver}} ./configure</span>
+     <span style="color:#f92672">when</span>: <span style="color:#ae81ff">result2|failed</span>
 
-   - <span style="color:#66d9ef">name</span>: make emacs
-     <span style="color:#66d9ef">command</span>: chdir={{src_dir}}/{{emacs_ver}} make
-     <span style="color:#66d9ef">when</span>: result2|failed
+   - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">make emacs</span>
+     <span style="color:#f92672">command</span>: <span style="color:#ae81ff">chdir={{src_dir}}/{{emacs_ver}} make</span>
+     <span style="color:#f92672">when</span>: <span style="color:#ae81ff">result2|failed</span>
 
-   - <span style="color:#66d9ef">name</span>: install emacs
-     <span style="color:#66d9ef">command</span>: chdir={{src_dir}}/{{emacs_ver}} make install
-     <span style="color:#66d9ef">when</span>: result2|failed
+   - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">install emacs</span>
+     <span style="color:#f92672">command</span>: <span style="color:#ae81ff">chdir={{src_dir}}/{{emacs_ver}} make install</span>
+     <span style="color:#f92672">when</span>: <span style="color:#ae81ff">result2|failed</span>
  
 </code></pre></div><h2 id="まとめ">まとめ</h2>
 <p>考えてほしいところは、2回目以降の実行時にエラーにならないようにどうすればいいかということです。
