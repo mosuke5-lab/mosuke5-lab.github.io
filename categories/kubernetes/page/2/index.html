@@ -63,6 +63,30 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/" class="entry-title">Jenkins pipelineで複数のOpenShiftクラスタを扱う</a></h1>
+    <div class="entry-sub-title">
+        <span class="">14 Apr 2020, 17:05</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>もーすけです。今日はJenkinsを使ったKubernetes(OpenShift)環境でのデプロイ関連についてです。<br>
+Jenkins pipelineで複数クラスタ（マルチクラスタ）を扱いたい場合の設定方法について確認したので共有します。</p>
+<h2 id="背景">背景</h2>
+<p>以前にskopeoを用いたコンテナイメージの別レジストリへのコピーする方法について書きました。
+イメージを別レジストリへコピーする目的は、イメージをビルドしたクラスタと本番環境が別クラスタの場合などがあります。
+複数のクラスタを利用する環境では、１つのJenkins pipelineから複数のOpenShiftのクラスタに対して操作するケースがでてきます。
+やることは単純で、複数のクラスタの認証情報を用意して操作することになるわけですが、JenkinsのOpenShift Client Pluginを用いた方法についてメモしていきます。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/04/05/skopeo/" data-iframely-url="//cdn.iframe.ly/SsqYHwS"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+        <a href="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2020/04/09/kubernetes-namespace/" class="entry-title">Kubernetes、namespaceの分け方に迷った場合に考えること</a></h1>
     <div class="entry-sub-title">
         <span class="">09 Apr 2020, 17:59</span>
@@ -253,26 +277,6 @@ Kubernetes上でのアプリケーションのロギングについてFluentdを
         <a href="https://blog.mosuke.tech/entry/2019/07/08/ckad/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2019/06/21/kustomize/" class="entry-title">Kustomizeで環境ごとに異なるマニフェストを作る</a></h1>
-    <div class="entry-sub-title">
-        <span class="">21 Jun 2019, 10:57</span>
-        <span class="">By mosuke5</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-            
-                <a class="badge badge-inf post-category post-category-コンテナ" href="/categories/%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A">コンテナ</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <p>ブログの更新頻度が落ちていますが、サボっているわけではないです。。
-はい。mosuke5です。</p>
-<p>やはりKubernetesマニフェストのテンプレートエンジンは必要だ、と気づいてしまったので、マニフェストを生成できるツールを探していました。
-そこで、Kustomizeを試しみたのでアウトプットとして残しておきます。使ってみた上でハマったポイントや注意すべき点なども含めて書きたいと思います。</p>
-        <a href="https://blog.mosuke.tech/entry/2019/06/21/kustomize/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
@@ -293,6 +297,8 @@ Kubernetes上でのアプリケーションのロギングについてFluentdを
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/" onClick="ga('send','event','link','click','latest-posts');">【翻訳】Kubernetes as a serviceの謎を解く。Alibaba Cloudが1万個のKubernetesクラスタを管理する方法</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/10/17/site-design-for-adsense/" onClick="ga('send','event','link','click','latest-posts');">Googleアドセンス合格に必要なサイトのレイアウトについて</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/kubernetes/" onClick="ga('send','event','link','click','latest-posts');">Kubernetesを学ぶ</a></li>
@@ -301,8 +307,6 @@ Kubernetes上でのアプリケーションのロギングについてFluentdを
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/09/09/kuubernetes-dns-test/" onClick="ga('send','event','link','click','latest-posts');">KubernetesのPod内からの名前解決を検証する</a></li>
       
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/" onClick="ga('send','event','link','click','latest-posts');">ZabbixでKubernetesの監視を検討する（Prometheus exporter, Kubernetes API）</a></li>
-      
     </ul>
   </div>
   <div class="sidebar-content related-post">
@@ -310,7 +314,7 @@ Kubernetes上でのアプリケーションのロギングについてFluentdを
     <ul class="list-group">
       
       <li class="list-group-item">
-        <a href="/categories/alibaba-cloud" onClick="ga('send','event','link','click','categories');">alibaba-cloud (9)</a>
+        <a href="/categories/alibaba-cloud" onClick="ga('send','event','link','click','categories');">alibaba-cloud (10)</a>
       </li>
       
       <li class="list-group-item">
@@ -322,7 +326,7 @@ Kubernetes上でのアプリケーションのロギングについてFluentdを
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="ga('send','event','link','click','categories');">kubernetes (22)</a>
+        <a href="/categories/kubernetes" onClick="ga('send','event','link','click','categories');">kubernetes (23)</a>
       </li>
       
       <li class="list-group-item">
@@ -392,7 +396,7 @@ Kubernetes上でのアプリケーションのロギングについてFluentdを
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2020" onClick="ga('send','event','link','click','archive');">2020年 Archive (19)</a>
+        <a href="/archive/2020" onClick="ga('send','event','link','click','archive');">2020年 Archive (20)</a>
       </li>
       
     </ul>
