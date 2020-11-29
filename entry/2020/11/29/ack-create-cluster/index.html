@@ -8,22 +8,22 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 <link rel="stylesheet" href="/css/main.css">
 
-<title>DatadogのAlibaba Cloud integrationでできること</title>
-<link rel="canonical" href="https://blog.mosuke.tech/entry/2019/08/28/datadog-for-alibaba-cloud/">
-<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/08/28/datadog-for-alibaba-cloud/" />
+<title>[Alibaba Cloud] KubernetesのProfessional managed clustersは何が違うのか？</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2020/11/29/ack-create-cluster/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/11/29/ack-create-cluster/" />
 <meta name="twitter:card" content="summary">
 
 <meta name="twitter:site" content="@mosuke5" />
 <meta name="twitter:creator" content="@mosuke5" />
 
-<meta name="twitter:title" content="DatadogのAlibaba Cloud integrationでできること &middot; Goldstine研究所">
-<meta name="twitter:description" content="DatadogのAlibaba Cloud integrationを試してみました。できることできないこと、注意点などまとめました。待望のDatadog連携なので期待です。">
+<meta name="twitter:title" content="[Alibaba Cloud] KubernetesのProfessional managed clustersは何が違うのか？ &middot; Goldstine研究所">
+<meta name="twitter:description" content="Alibaba CloudのKubernetesサービスであるACKに、新しくサービスレベルの高いモードが追加されました。このクラスタの特徴やポイントを解説します。より成熟していくACKを理解するのに使ってください。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="DatadogのAlibaba Cloud integrationでできること &middot; Goldstine研究所">
-<meta property="og:description" content="DatadogのAlibaba Cloud integrationを試してみました。できることできないこと、注意点などまとめました。待望のDatadog連携なので期待です。">
+<meta property="og:title" content="[Alibaba Cloud] KubernetesのProfessional managed clustersは何が違うのか？ &middot; Goldstine研究所">
+<meta property="og:description" content="Alibaba CloudのKubernetesサービスであるACKに、新しくサービスレベルの高いモードが追加されました。このクラスタの特徴やポイントを解説します。より成熟していくACKを理解するのに使ってください。">
 <meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
-<meta property="og:url" content="https://blog.mosuke.tech/entry/2019/08/28/datadog-for-alibaba-cloud/" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2020/11/29/ack-create-cluster/" />
 <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
 <link rel="icon" href="/image/favicon.ico" />
 
@@ -61,76 +61,85 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
-    <h1>DatadogのAlibaba Cloud integrationでできること</h1>
+    <h1>[Alibaba Cloud] KubernetesのProfessional managed clustersは何が違うのか？</h1>
     <div class="entry-sub-title">
-        <span class="">28 Aug 2019, 00:11</span>
+        <span class="">29 Nov 2020, 20:46</span>
         <span class="">By mosuke5</span>
         
             
                 <a class="badge badge-inf post-category post-category-Alibaba Cloud" href="/categories/alibaba-cloud">Alibaba Cloud</a>
             
-                <a class="badge badge-inf post-category post-category-クラウド技術" href="/categories/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89%E6%8A%80%E8%A1%93">クラウド技術</a>
-            
-                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
             
         
     </div>
     <div class="entry-content">
-        <p>仕事でDatadogを触る機会があり、フリートライアルのアカウントを作りました。<br>
-ちょうどいい機会だったので、前々から試したいと思っていたAlibaba Cloudとの連携について試してみました。
-この連携は2019年の3月くらいに開始したものです。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.datadoghq.com/blog/monitor-alibaba-cloud-datadog/" data-iframely-url="//cdn.iframe.ly/bkZv6KL?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-<h2 id="datadogでの監視の仕組み">Datadogでの監視の仕組み</h2>
-<p>Alibaba Cloudに限らずではあるのですが、Datadogにはクラウドとの連携の機能があります。<br>
-こちらと通常のサーバの監視とでなにが違うかみていきます。
-基本的なことですが、非常に重要なことなので本ブログでも紹介します。</p>
-<p><img src="/image/datadog-alibaba-integration.png" alt="datadog-integration"></p>
-<p>Datadogではデータの取得方法が2つあります。<br>
-1つ目は、図の上にあわらした、サーバにagentをインストールする方法です。いままでの監視システムでも同じようなことを行っていたかと思います。APMメトリックを取得する場合もagentのインストールが必要です。
-メトリック情報とログ収集を同じagentでできて一括管理できるのは非常に良いと思います。また、対応しているデータの種類も豊富です。</p>
-<p>2つ目は、integrationという機能を使った方法です。<br>
-Datadogではagentをサーバにインストールする方法に加えて、integrationという外部サービスやミドルウェアと連携するための機能をもっています。この機能では、現在350以上の連携を用意していて、その中にはAWSなどをはじめとしたパブリッククラウドとの連携があります。Alibaba Cloudとの連携が今年の3月にリリースしました。<br>
-この機能では、必要な認証情報をDatadogに登録すると、DatadogがAlibaba CloudのAPIを代わりに実行しメトリックをDatadog内に取り込んでくれます。</p>
-<h2 id="alibaba-cloud-integrationでできること">Alibaba Cloud integrationでできること</h2>
-<h3 id="取得できるデータ">取得できるデータ</h3>
-<p>取得できる情報はたくさんあるので、公式ドキュメントのリンクを貼っておきます。<br>
-現在以下に記載のメトリックを収集することができます。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://docs.datadoghq.com/ja/integrations/alibaba_cloud/" data-iframely-url="//cdn.iframe.ly/zQmVRgo"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-<p>Alibaba Cloudのマネージドサービス、例えばRDSやSLBといったサービスはこの機能で収集するのがいいです。マネージドサービスではユーザ自信でagentなどを導入することができないので、Alibaba CloudのAPIからデータを取得する必要があります。<br>
-ECSインスタンスの情報も取得できますが、あくまでクラウドとしてサーバの外から取得できる情報しか連携できないので、より詳細な情報をとりたい場合はagentのインストールが必要です。</p>
-<h3 id="ホストの監視登録追加">ホストの監視登録追加</h3>
-<p>agentを入れなくても、動いているホストは判定してdatadog側に連携してくれます。<br>
-リージョンやAZ、アカウントIDなどいくつかのタグをつけてくれます。
-このタグがあることによってメトリックの絞り込みなどに非常に便利です。</p>
-<p><img src="/image/datadog-ecs-instance-info.png" alt="ecs-instance"></p>
-<h3 id="プリセットのダッシュボード">プリセットのダッシュボード</h3>
-<p>いくつかのプリセットのダッシュボードも用意されています。<br>
-integrationを有効にさえすれば以下のようなダッシュボードの閲覧が可能です。</p>
-<p><img src="/image/datadog-alibaba-dashboard.png" alt="datadog-dashboard"></p>
-<h2 id="alibaba-cloud-integrationでできないこと">Alibaba Cloud integrationでできないこと</h2>
-<h3 id="料金の表示">料金の表示</h3>
-<p>もしAWSでDatadogをお使いの方なら料金もダッシュボードに表示したいと思われるでしょう。<br>
-現在は対応していません。原理的にはたしかAlibaba Cloudもbilling apiを公開していたはずなので実装は可能です。
-待つしかないです。</p>
-<h3 id="cloudmonitorからの連携">CloudMonitorからの連携</h3>
-<p>一番個人的にはやりたかったことなのですが、Alibaba CloudにはCloudMonitorと呼ばれる監視サービスがあり、
-そちらにもCloudMonitor agetnがあります。
-CloudMonitor agentは無料で利用できるもので、こちらを使って取得したデータをCloudMonitor API経由でdatadogへ連携させたかったのですがこれがいまはできないようです。</p>
-<p>Datadog Agentを入れることがベストではあるのですが、いろいろな事情で全台のサーバにインストールできないこともあるかなと思うので、これができるといろいろと便利です。もしかして、datadogが売れなくなっちゃうからそういうことはできない？笑</p>
-<p><img src="/image/datadog-cloudmonitor-integration.png" alt="cloudmonitor"></p>
-<h2 id="注意点">注意点</h2>
-<p>注意点としては、注意というほどでもないのですが、
-Datadogはクラウド連携すると、稼働しているホストをタグをつけて登録してくれます。
-AWSのインスタンスと同時に管理していると、AZ名がかぶることがあるので、AZのみでフィルターをかけると一緒にカウントされてしまうので注意しましょう。&ldquo;ap-northeast-1a&quot;が完全にかぶります。</p>
+        <p>こんにちは、もーすけです。<br>
+<a href="https://www.alibabacloud.com/product/kubernetes">Container Service for Kubernetes (ACK)</a> では、新しくマネージドクラスタの中でサービスレベルを選べるようになりました。
+<a href="https://www.alibabacloud.com/help/doc-detail/173290.htm">Professional managed clusters</a>というものです。
+このクラスターは通常のマネージドクラスタと比べて何が違うのでしょうか？
+調べてみたのでまとめました。</p>
+<h2 id="料金">料金</h2>
+<p>クラスタあたり、<code>$0.09/時間</code>の料金がかかります。<br>
+ざっくり計算すると、一ヶ月あたり <code>0.09ドル * 24時間 * 30日 * 110円 = 7,128円</code> となります。
+AWSのEKSとくらべても少し安いくらいでしょうか？（サービスレベルでは比べていない）</p>
+<p>この他、サーバーリソース代が別途かかるので注意してください。</p>
+<h2 id="通常クラスタとの違い">通常クラスタとの違い</h2>
+<p>通常のクラスタとの違いをまとめます。<br>
+<a href="https://www.alibabacloud.com/help/doc-detail/173290.htm">ドキュメント(ACK Pro clusters)</a>に比較表があるのですが、正直情報が不足しているのでそのあたりを補って解説していきたいと思います。</p>
+<h3 id="cluster-size">Cluster size</h3>
+<p>Professionalは、Worker Nodeを<strong>5,000ノードまで</strong>追加できるようになります。<br>
+Standardでは100ノードまでです。</p>
+<p>とはいえ、相当な規模のクラスタでないと100ノード以上追加することはないでしょう。
+アプリケーションなどの用途によってクラスタ自体を分離してしまうことがも多いと思います。正直この点の恩恵をうけるのはまれでしょう。</p>
+<h3 id="sla">SLA</h3>
+<p>Professionalでは99.95%となり、補償付きです。<br>
+補償付きというのは、SLAを満たさなかった場合に返金が行われるということです。
+ただの目標値としてではなく、お客さんの期待にコミットしていくという意思表示に見えます。</p>
+<h3 id="api-server">API Server</h3>
+<p>Professionalでは、可用性の監視があり、そして自動的なスケールもされるとのことです。
+KubernetesのMaster Nodeについては、マネージドになっているためユーザでは状況を確認することや対策をすることができない領域です。
+この領域について、自動でスケーリングすることや可用性の監視が行われる点は非常におおきいと考えます。
+KubernetesのAPI Serverのパフォーマンスが劣化するのはかなりの規模の場合にのみとも考えられますが、別の要因で遅くなる可能性もあるので安心ポイントです。</p>
+<p>どのように監視してスケーリングをしているかのヒントは下記のブログに隠されています。
+合わせて読んでみてください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/" data-iframely-url="//cdn.iframe.ly/vJTSNCL"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h3 id="etcd">etcd</h3>
+<p>etcd自身のバックアップを行ってくれるようです。<br>
+Master Nodeがマネージドの環境では、etcdのバックアップもユーザサイドでは実施できません。
+Kubernetes内の情報は、すべて別にマニフェストとして外出しする必要がありました。
+もちろんProfessionalでもKubernetesの魅力を発揮するためにマニフェスト管理は必要なのですが、有事の際の対応としては嬉しいです。</p>
+<h3 id="kube-scheduler">Kube-scheduler</h3>
+<p><code>Topology-aware CPU scheduling</code> という機能が使えるようになります。<br>
+詳しい実装などについては記述がないのですが、CPU集中型のワークロードの場合に効率的にPodのスケジューリングを行うもののようです。
+Podの<code>requests.cpu</code>と<code>limits.cpu</code>の値を同値にすることで、スケジューリング時に最大のCPU利用量も考慮します。
+その分、CPUを使わないときでもリソースを確保するため、Podの集約率は落ちます。その点を考慮できる仕組みとみてとれます。</p>
+<p>Topology-aware CPU schedulingに関するドキュメント<br>
+<a href="https://www.alibabacloud.com/help/doc-detail/178168.htm">https://www.alibabacloud.com/help/doc-detail/178168.htm</a></p>
+<p>もうひとつは<code>Gang scheduling</code>です。<br>
+これは、バッチジョブなどで、複数のPodを動かす必要があった場合に、all or nothing（全部同時にスケジュールされるか。しないか）の状態である必要があります。
+こういったスケジュールを提供するGang schedulingが有効にできるとのことです。
+この考え方は、KubernetsのSIGの中でも<a href="https://github.com/kubernetes-sigs/kube-batch">kubernetes-sigs/kube-batch</a>などで実装されたりしています。</p>
+<p>Gang Schedulingに関するドキュメント<br>
+<a href="https://www.alibabacloud.com/help/doc-detail/178169.htm">https://www.alibabacloud.com/help/doc-detail/178169.htm</a></p>
+<h3 id="data-encryption">Data encryption</h3>
+<p>kms-pluginによるデータの暗号化を提供、と書いてあるのですが、これはコントロールプレーンのetcdの暗号化のことです。
+ユーザサイドの運用上はなにも影響がありません。
+仮に第三者にIaaSレイヤーの管理に問題があっても、中のデータを閲覧できないようにするというものです。
+暗号化・復号化にCPUを使いますが、パフォーマンス劣化になるほどではないと考えています。</p>
+<p><a href="https://www.alibabacloud.com/help/doc-detail/177372.htm">https://www.alibabacloud.com/help/doc-detail/177372.htm</a></p>
+<h3 id="security-management">Security management</h3>
+<p>不明です。分かり次第追記します。</p>
 <h2 id="まとめ">まとめ</h2>
-<p>というわけで、Datadog for Alibaba Cloudを見てきました。<br>
-Alibaba Cloudはグルーバル基準で連携できるいい監視サービスが今までなく、Datadogは待望でした。
-まだやれることはすくないのですが、これでも十分にAlibaba CloudユーザがDatadogを採用するメリットは大きいと考えています。</p>
-<p>これからの進化にも期待しましょう。</p>
+<p>新しく高いサービスレベルを求めるユーザ向けにProfessional managed clusterなるものがでました。
+その違いを見ていきました。不明な部分もありますが、全貌が見えてきました。
+また、これらの内容をより深く理解するためには、先日翻訳した下記記事が役に立ちそうです。
+ACKの開発メンバーがなにを考えて作っているか理解していくことができます。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/" data-iframely-url="//cdn.iframe.ly/vJTSNCL"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
     </div>
     <div class="entry-sub-content request-for-entry">
         <h5>フィードバック・相談(β)</h5>
-        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Datadog%e3%81%aeAlibaba%20Cloud%20integration%e3%81%a7%e3%81%a7%e3%81%8d%e3%82%8b%e3%81%93%e3%81%a8" target="_blank" onClick="ga('send','event','link','click','request-for-entry');">執筆者に問い合わせてみる</a></p>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=%5bAlibaba%20Cloud%5d%20Kubernetes%e3%81%aeProfessional%20managed%20clusters%e3%81%af%e4%bd%95%e3%81%8c%e9%81%95%e3%81%86%e3%81%ae%e3%81%8b%ef%bc%9f" target="_blank" onClick="ga('send','event','link','click','request-for-entry');">執筆者に問い合わせてみる</a></p>
     </div>
     <div class="entry-sub-content post-share">
         <div class="post-share-links">
@@ -282,13 +291,13 @@ Alibaba Cloudはグルーバル基準で連携できるいい監視サービス�
       <h3>関連する記事</h3>
       <ul class="list-group">
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2018/06/08/terraform_multi_provider/" onClick="ga('send','event','link','click','related-posts');">Terraformで複数リージョンをまたいだリソース制御する</a> (2018/06/08)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/" onClick="ga('send','event','link','click','related-posts');">【翻訳】Kubernetes as a serviceの謎を解く。Alibaba Cloudが1万個のKubernetesクラスタを管理する方法</a> (2020/11/17)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/" onClick="ga('send','event','link','click','related-posts');">Datadog APMとトレーシングの仕組みについて</a> (2019/11/21)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/" onClick="ga('send','event','link','click','related-posts');">Docker Hubのダウンロード回数制限の対策を考える</a> (2020/11/18)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2018/09/24/dedicated/" onClick="ga('send','event','link','click','related-posts');">AWSとAlibaba Cloudの「Dedicated」インスタンスを整理する</a> (2018/09/24)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/10/10/develop-ansible-operator/" onClick="ga('send','event','link','click','related-posts');">OperatorSDK for Ansible の開発。チュートリアルの次の一歩</a> (2020/10/10)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2018/06/20/terraform_import/" onClick="ga('send','event','link','click','related-posts');">Terraformのimportの使い方と注意ポイント</a> (2018/06/20)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/09/09/kuubernetes-dns-test/" onClick="ga('send','event','link','click','related-posts');">KubernetesのPod内からの名前解決を検証する</a> (2020/09/09)</li>
         
       </ul>
     </div>
