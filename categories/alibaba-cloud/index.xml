@@ -46,7 +46,9 @@
       <pubDate>Tue, 17 Nov 2020 17:24:47 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/</guid>
-      <description>&lt;p&gt;※本記事は、著者であるZhimin Tangの許可をとって翻訳した記事となります。(&lt;a href=&#34;https://www.cncf.io/blog/2019/12/12/demystifying-kubernetes-as-a-service-how-does-alibaba-cloud-manage-10000s-of-kubernetes-clusters/&#34;&gt;原文&lt;/a&gt;)&lt;/p&gt;
+      <description>&lt;p&gt;※本記事は、著者であるZhimin Tangの許可をとって翻訳した記事となります。(&lt;a href=&#34;https://www.cncf.io/blog/2019/12/12/demystifying-kubernetes-as-a-service-how-does-alibaba-cloud-manage-10000s-of-kubernetes-clusters/&#34;&gt;原文&lt;/a&gt;)&lt;br&gt;
+また本記事の内容は、2020/12/11のAliEaters Tokyo #16にて発表しており、スライドは以下です。&lt;/p&gt;
+&lt;iframe src=&#34;//www.slideshare.net/slideshow/embed_code/key/ajzBW1pq1pgkpj&#34; width=&#34;595&#34; height=&#34;485&#34; frameborder=&#34;0&#34; marginwidth=&#34;0&#34; marginheight=&#34;0&#34; scrolling=&#34;no&#34; style=&#34;border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;&#34; allowfullscreen&gt; &lt;/iframe&gt; &lt;div style=&#34;margin-bottom:5px&#34;&gt; &lt;strong&gt; &lt;a href=&#34;//www.slideshare.net/mosuke5/alibaba-cloud1kubernetes&#34; title=&#34;Alibaba Cloudが1万個のKubernetesクラスタを管理する方法&#34; target=&#34;_blank&#34;&gt;Alibaba Cloudが1万個のKubernetesクラスタを管理する方法&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href=&#34;https://www.slideshare.net/mosuke5&#34; target=&#34;_blank&#34;&gt;Shinya Mori (@mosuke5)&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;
 &lt;h2 id=&#34;概要&#34;&gt;概要&lt;/h2&gt;
 &lt;p&gt;2015年以来、Alibaba Cloud Container Service for Kubernetes（ACK）は、Alibaba Cloud上でもっとも急速に成長しているクラウドサービスの1つです。今日では、ACKは多数のAlibaba Cloudの顧客にサービスを提供しているだけでなく、Alibabaの社内インフラストラクチャやその他多くのAlibaba Cloudサービスをサポートしています。&lt;/p&gt;
 &lt;p&gt;世界的なクラウドベンダーが提供する他の多くのコンテナサービスと同様に、ACKでは信頼性と可用性が最優先事項となっています。これらの目標を達成するために、セルベースでグローバルに利用可能なプラットフォームを構築し、数万個のKubernetesクラスタを稼働させています。&lt;/p&gt;
