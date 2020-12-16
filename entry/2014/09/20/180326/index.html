@@ -72,20 +72,19 @@
         
     </div>
     <div class="entry-content">
-        <p>最近<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>のOSをcentos7にしたのだが、なかなか手付かずで<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>の設定も放置していた。<br>
-（<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>の最低限の設定はしていたが、ほんとうに良くない。みなさんはこういうことがないように。）</p>
-<p>久しぶりに手が空いたので設定しようとするが、<br>
-まず`/etc/sysconfig/iptables`がない。</p>
-<p>Cent7からのsystemctlで<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>のサービスを確認してもでてこない。</p>
+        <p>こんにちは、@mosuke5です。<br>
+最近、VPSのOSをCentOS7にしましたが、なかなか手付かずでiptablesの設定を放置していました。
+sshの最低限の設定はしていたましたが、ほんとうに良くないですので、みなさんはこういうことがないように気をつけてください。<br>
+久しぶりに手が空いたので設定しようとしましたが、そもそも <code>/etc/sysconfig/iptables</code> がない。
+CentOS7からのsystemctlでiptablesのサービスを確認してもでてこない。さてどうやって設定したらいいのかCentOS6の脳みそで困ってしまいました。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># systemctl status iptables
 iptables.service
    Loaded: not-found (Reason: No such file or directory)
    Active: inactive (dead)
-</code></pre></div><p>というわけで、調べてみると、そもそもCentOS7からはfirewalldが標準になっており、iptablesは入っていない。なので、iptables.serviceをインスールしないといけないとのこと。<br>
-そして、firewalldがデフォルトでオンになっているからオフにしないといけない。<br>
-（いけないわけではないけど両方使う意味が無いので。）</p>
-<p>本当は、firewalldの設定方法を覚えなければいけないが、今までのやり方をそのままやりたいひとむけにCentOS7でのiptablesの設定方法を残す。</p>
-<p>まずは<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>-serviceをインスールし、firewalldをオフ、<a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>をオンとした。</p>
+</code></pre></div><p>というわけで、調べてみると、そもそもCentOS7からは<a href="https://access.redhat.com/documentation/ja-jp/red_hat_enterprise_linux/7/html/security_guide/sec-using_firewalls">firewalld</a>が標準になっており、iptablesは入っていないとのことです。そのため、iptablesを利用する場合には、iptables.serviceをインスールしないといけません。
+さらに、firewalldがデフォルトでオンになっているからオフにしないと競合してしまいます。</p>
+<p>本当は、firewalldの設定方法を覚えたほうがいいですが、今までのやり方をそのままやりたい人むけにCentOS7でのiptablesの設定方法を残します。</p>
+<p>まずは、iptables-serviceをインスールして、firewalldを停止、iptablesを起動します。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># yum install iptables-services
 # systemctl status firewalld
    Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled)
@@ -94,19 +93,15 @@ iptables.service
    CGroup: /system.slice/firewalld.service
            └─11162 /usr/bin/python -Es /usr/sbin/firewalld --nofork --nopid
 
-#
+
 # systemctl stop firewalld
-#
 # systemctl status firewalld
    Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled)
    Active: inactive (dead)
 
-#
 #systemctl disable firewalld
-#
 #systemctl enable iptables
 #systemctl start iptables
-#
 #systemctl status iptables
    Loaded: loaded (/usr/lib/systemd/system/iptables.service; enabled)
    Active: inactive (dead) since Sat 2014-09-20 17:47:10 JST; 2min 48s ago
@@ -115,12 +110,11 @@ iptables.service
  Main PID: 10096 (code=exited, status=0/SUCCESS)
 ....
 
-# 
-</code></pre></div><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/iptables">iptables</a>の設定はいつもどおり。<br>
-CentOS7の新しいコマンドに戸惑ったので一部メモ。</p>
-<h2>service, chkconfigコマンドはsystemctlコマンドへ</h2>
-service, chkconfigコマンドは推奨されずsystemctlコマンドへ切り替わった。<br>
-試しにchkconfigコマンドを利用すると…
+</code></pre></div><p>iptablesの設定はいつもどおり。<br>
+CentOS7の新しいコマンドに戸惑ったので一部メモを以下に残します。</p>
+<h2 id="service-chkconfigコマンドはsystemctlコマンドへ">service, chkconfigコマンドはsystemctlコマンドへ</h2>
+<p>service, chkconfigコマンドは推奨されずsystemctlコマンドへ切り替わった。<br>
+試しにchkconfigコマンドを利用すると…</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># chkconfig --list
 Note: This output shows SysV services only and does not include native
       systemd services. SysV configuration data might be overridden by native
@@ -141,10 +135,9 @@ pmlogger       	0:off	1:off	2:off	3:off	4:off	5:off	6:off
 pmmgr          	0:off	1:off	2:off	3:off	4:off	5:off	6:off
 pmproxy        	0:off	1:off	2:off	3:off	4:off	5:off	6:off
 pmwebd         	0:off	1:off	2:off	3:off	4:off	5:off	6:off
-</code></pre></div><blockquote>
-    <p>"If you want to list systemd services use 'systemctl list-unit-files'."</p>
-</blockquote>
-<p>systemdのサービスを表示したければ、systemctl list-unit-filesを利用せよとのこと。<br>
+</code></pre></div><p>次のようなメッセージが出力されます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">If you want to list systemd services use &#39;systemctl list-unit-files&#39;.
+</code></pre></div><p>systemdのサービスを表示したければ、systemctl list-unit-filesを利用せよとのこと。
 試しに打つと以下のように表示される</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># systemctl list-unit-files
 UNIT FILE                                   STATE
@@ -161,16 +154,20 @@ var-lib-nfs-rpc_pipefs.mount                static
 brandbot.path                               disabled
 ....
  
-</code></pre></div><p>また、サービスの起動・停止・状態確認などは</p>
+</code></pre></div><p>サービスの起動・停止・状態確認などはこちらでできます。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># service &lt;service name&gt; &lt;start/stop/restart/status&gt;
 　↓
 # systemctl &lt;start/stop/restart/status&gt; &lt;service name&gt;
-</code></pre></div><p>そして、サービスの起動オプションの設定は</p>
+</code></pre></div><p>そして、サービスの起動オプションの設定はこちらです。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># chkconfig &lt;service name&gt; &lt;on/off&gt;
    ↓
 # systemctl &lt;enable/disable&gt; &lt;service name&gt;
 </code></pre></div><p>慣れてしまえば、CentOS７の新しいコマンド体系、systemdも怖くないです。<br>
 これからのことを考えて、いちはやく覚えてしまいましょう。</p>
+<h3 id="追記20201216">追記（2020/12/16）</h3>
+<p>先日、2020年12月8日に、CentOSプロジェクトの方針変更が発表されました。今までのRHELのリビルドとして活躍してきたCentOSは近く終わりを告げ、Red Hat Enterprise Linuxの出荷前のパッケージを共有するCentOS Streamに注力することが表明されました。こちらについては、さまざまな誤解が流れていたり、不安に思っている方も多いかと思います。
+CentOS Streamとはなんなのか、以下が非常にわかりやすいので、正しい知識をつけて向き合っていってください。</p>
+<iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Frheb.hatenablog.com%2Fentry%2F202007-fedora-distribution" style="border: 0; width: 100%; height: 190px;" allowfullscreen scrolling="no"></iframe>
     </div>
     <div class="entry-sub-content request-for-entry">
         <h5>フィードバック・相談(β)</h5>
