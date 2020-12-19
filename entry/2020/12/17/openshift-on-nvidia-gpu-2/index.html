@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+
+<title>OpenShift on NVIDIA GPU（導入編）</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/" />
+<meta name="twitter:card" content="summary">
+
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+
+<meta name="twitter:title" content="OpenShift on NVIDIA GPU（導入編） &middot; Goldstine研究所">
+<meta name="twitter:description" content="OpenShiftにGPUのノードを追加して利用する方法（導入編）です。インストールして運用する上での知っておくと良いポイントなどを解説します。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenShift on NVIDIA GPU（導入編） &middot; Goldstine研究所">
+<meta property="og:description" content="OpenShiftにGPUのノードを追加して利用する方法（導入編）です。インストールして運用する上での知っておくと良いポイントなどを解説します。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+
+
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetes</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://docs.google.com/forms/d/e/1FAIpQLSd6N53H7zfF8EBrvyezRizU1mQx-CP3vc_jG-WvxfRmCjHTpg/viewform" target="_blank" onClick="ga('send','event','link','click','contact');">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>OpenShift on NVIDIA GPU（導入編）</h1>
+    <div class="entry-sub-title">
+        <span class="">17 Dec 2020, 22:01</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。<br>
+今回は前回に続き、OpenShiftにGPUのノードを追加して利用する方法（導入編）として書いていきます。
+インストールの細かな方法については英語ですが公式ドキュメントに譲るとして、実行していくにあたってのポイントなどを経験者としてまとめておきます。
+概要編につきましては以下をご覧ください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/12/16/openshift-on-nvidia-gpu/" data-iframely-url="//cdn.iframe.ly/PbejT6X"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h2 id="環境">環境</h2>
+<p>本記事の検証環境は下記です。</p>
+<ul>
+<li>OpenShift 4.6.8 on AWS</li>
+<li>GPU Node: ec2 g4dn.xlarge ×2台</li>
+<li>NVIDIA GPU Operator 1.3.1 provided by NVIDIA Corporation</li>
+<li>Node Feature Discovery 4.6.0-202012050130.p0 provided by Red Hat</li>
+</ul>
+<h2 id="インストール">インストール</h2>
+<p>インストールについてはNVIDIAの出している公式ドキュメントを参照ください。
+本記事ではドキュメントに書かれていない部分やハマリポイントなどを補足します。</p>
+<p>公式ドキュメント: <a href="https://docs.nvidia.com/datacenter/kubernetes/openshift-on-gpu-install-guide/index.html">OpenShift on NVIDIA GPU Accelerated Clusters</a></p>
+<h3 id="gpuノードの追加">GPUノードの追加</h3>
+<p>まずはじめにGPUノードをOpenShiftクラスタへ追加する必要があります。
+ノードの追加時点ではとくに通常のノードの手順とかわりがありません。お使いの環境のインストール方法に合わせてGPUノードを追加してください。
+筆者環境はOpenShift on AWSのため、GPUノード用の<a href="https://access.redhat.com/documentation/ja-jp/openshift_container_platform/4.6/html/machine_management/creating-machinesets#creating-machineset-aws">MachineSetを用意してノードの追加</a>をしました。</p>
+<h3 id="cluster-wide-entitlement">cluster-wide entitlement</h3>
+<p>概要編でご紹介した、Node Feature DiscoveryやNVIDIA GPU Operatorをインストールする前にやっておくことがあります。
+OpenShiftクラスタにcluster-wide entitlementの設定をしておくことです。
+本手順は、Helmでのインストール時には書いてあるのですが、<strong>OperatorHubからインストールする手順には書かれていませんが、同様に必要な作業</strong>です。改善のリクエストをNVIDIAにお送りはしたのですが、2020/12/17現在は修正されていませんので注意してください。
+&ldquo;<a href="https://docs.nvidia.com/datacenter/kubernetes/openshift-on-gpu-install-guide/index.html#openshift-gpu-install-gpu-operator-via-helmv3">4.3. Installing GPU Operator via Helm</a>&rdquo; の1,2の手順をこなしてください。</p>
+<p>なぜcluster-wide entitlementの設定作業が必要か説明します。<br>
+nvidia-driverは、起動時にelfutils-libelfなどのパッケージをインストールしてビルドを行います。（コンテナ起動時にビルドするのがいいかどうかは。。？）ベースイメージにUBI(Universal Base Image)を利用しており、Red Hatのレポジトリを参照しにいきます。そのため、コンテナが対象のレポジトリを参照できるように、エンタイトルメントの設定が必要になります。
+この設定がないとnvidia-driver podの起動時にのエラーが発生します。<br>
+OpenShiftをご利用であればサブスクリプションをお持ちかと思いますが、
+検証用で個人のサブスクリプションを使いたい場合には、1年間無料で利用できる <a href="https://developers.redhat.com/articles/getting-red-hat-developer-subscription-what-rhel-users-need-know#">Red Hat Developer Subscription</a>の利用でも可能です。</p>
+<p>cluster-wide entitlementを設定すると（実態は<code>MachineConfig</code>）、Machine Config Operator（MCO）は各ノードに設定内容を反映しに行きます。ノードへの設定変更時は、ノードのスケジューリングを無効化した上で順次ローリングアップデートするため、でノード台数が多い場合は時間がかかります。MachineConfigPoolの設定で、Workerノードが同時に何台までアップデート作業を実行していいかも決めることができます。お使いのクラスタの状況に応じて、ノード更新のスピードを上げたい場合は<code>MachineConfigPool</code>の<code>spec.maxUnavailable</code>の値の変更を検討できます（<a href="https://docs.openshift.com/container-platform/4.6/scalability_and_performance/recommended-host-practices.html#create-a-kubeletconfig-crd-to-edit-kubelet-parameters_">ドキュメント</a>）。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc apply -f 0003-cluster-wide-machineconfigs.yaml
+machineconfig.machineconfiguration.openshift.io/50-rhsm-conf created
+machineconfig.machineconfiguration.openshift.io/50-entitlement-pem created
+machineconfig.machineconfiguration.openshift.io/50-entitlement-key-pem created
+
+$ oc get node
+NAME                                              STATUS                        ROLES    AGE    VERSION
+ip-10-0-140-40.ap-southeast-1.compute.internal    Ready                         master   4d7h   v1.19.0+7070803
+ip-10-0-150-64.ap-southeast-1.compute.internal    Ready                         worker   4d7h   v1.19.0+7070803
+ip-10-0-168-154.ap-southeast-1.compute.internal   Ready                         master   4d7h   v1.19.0+7070803
+ip-10-0-174-241.ap-southeast-1.compute.internal   Ready                         worker   4d7h   v1.19.0+7070803
+ip-10-0-214-88.ap-southeast-1.compute.internal    Ready                         master   4d7h   v1.19.0+7070803
+ip-10-0-217-247.ap-southeast-1.compute.internal   Ready                         worker   25h    v1.19.0+7070803
+ip-10-0-220-29.ap-southeast-1.compute.internal    NotReady,SchedulingDisabled   worker   25h    v1.19.0+7070803
+</code></pre></div><p>作業ミスなどで、cluster-wide entitlementを何度も変更するのは大変手間がかかります。
+OpenShiftのcluster-wide entitlementとして導入する前に、手元のPCのDockerかPodmanを用いてエンタイトルメントの状態を確認しておくことをオススメします。以下の記事の「Entitled Builds on non-RHEL hosts」を参照してください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.openshift.com/blog/how-to-use-entitled-image-builds-to-build-drivercontainers-with-ubi-on-openshift" data-iframely-url="//cdn.iframe.ly/Z5fvQVI?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h3 id="node-feature-discovery">Node Feature Discovery</h3>
+<p>Node Feature Discovery(以下、nfd)は、OpertorHubからインストールが可能です。
+Red HatがOpenShift向けに管理している<a href="https://chouseisan.com/s?h=68ca005319dc4bd0a26c5afcdcdf7ff1">nfdのレポジトリ</a>はこちらから確認できます。</p>
+<p>OpenShift 4.6でインストールできるnfdは、まだnfd-master, nfd-workerともにDaemonSetで動作します。
+実際にWorkerノードのラベルを見てみるとたくさんのハードウェア情報が付与されていることが確認できます。
+今回のケースで言うと<code>feature.node.kubernetes.io/pci-10de.present: &quot;true&quot;</code>のラベルが付いているノードがNVIDIAのGPU搭載の証となります。
+PCIではベンダーIDというのがふられており、<code>10de</code>が<a href="https://devicehunt.com/view/type/pci/vendor/10DE">NVIDIAのベンダーID</a>となるようです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get pod | grep nfd
+nfd-master-frnxf                           1/1     Running     0          26h
+nfd-master-hmzb6                           1/1     Running     0          26h
+nfd-master-nk8mj                           1/1     Running     0          26h
+nfd-operator-94db9c6b7-j6qrz               1/1     Running     0          26h
+nfd-worker-7bx2f                           1/1     Running     0          25h
+nfd-worker-fkvjc                           1/1     Running     0          26h
+nfd-worker-tvhnl                           1/1     Running     0          25h
+nfd-worker-wxcgn                           1/1     Running     0          26h
+
+$ oc get node xxxxx -o yaml | grep feature.node.kubernetes.io
+    feature.node.kubernetes.io/cpu-cpuid.ADX: &#34;true&#34;
+    feature.node.kubernetes.io/cpu-cpuid.AESNI: &#34;true&#34;
+    feature.node.kubernetes.io/cpu-cpuid.AVX: &#34;true&#34;
+    feature.node.kubernetes.io/cpu-cpuid.AVX2: &#34;true&#34;
+    feature.node.kubernetes.io/cpu-cpuid.AVX512BW: &#34;true&#34;
+    feature.node.kubernetes.io/cpu-cpuid.AVX512CD: &#34;true&#34;
+    feature.node.kubernetes.io/cpu-cpuid.AVX512DQ: &#34;true&#34;
+    feature.node.kubernetes.io/cpu-cpuid.AVX512F: &#34;true&#34;
+    feature.node.kubernetes.io/cpu-cpuid.AVX512VL: &#34;true&#34;
+    feature.node.kubernetes.io/cpu-cpuid.AVX512VNNI: &#34;true&#34;
+    feature.node.kubernetes.io/cpu-cpuid.FMA3: &#34;true&#34;
+    feature.node.kubernetes.io/cpu-cpuid.MPX: &#34;true&#34;
+    feature.node.kubernetes.io/cpu-hardware_multithreading: &#34;true&#34;
+    feature.node.kubernetes.io/custom-rdma.available: &#34;true&#34;
+    feature.node.kubernetes.io/kernel-selinux.enabled: &#34;true&#34;
+    feature.node.kubernetes.io/kernel-version.full: 4.18.0-193.29.1.el8_2.x86_64
+    feature.node.kubernetes.io/kernel-version.major: &#34;4&#34;
+    feature.node.kubernetes.io/kernel-version.minor: &#34;18&#34;
+    feature.node.kubernetes.io/kernel-version.revision: &#34;0&#34;
+    feature.node.kubernetes.io/pci-10de.present: &#34;true&#34;
+    feature.node.kubernetes.io/pci-1d0f.present: &#34;true&#34;
+    feature.node.kubernetes.io/storage-nonrotationaldisk: &#34;true&#34;
+    feature.node.kubernetes.io/system-os_release.ID: rhcos
+    feature.node.kubernetes.io/system-os_release.VERSION_ID: &#34;4.6&#34;
+    feature.node.kubernetes.io/system-os_release.VERSION_ID.major: &#34;4&#34;
+    feature.node.kubernetes.io/system-os_release.VERSION_ID.minor: &#34;6&#34;
+
+$ oc get node xxxxx -o yaml | grep feature.node.kubernetes.io
+    feature.node.kubernetes.io/pci-10de.present: &#34;true&#34;
+</code></pre></div><h3 id="nvidia-gpu-operator">NVIDIA GPU Operator</h3>
+<p>NVIDIA GPU Operatorのインストールは、cluster-wide entitlementのインストールさえ適切にできていればそれほど詰まる部分はないと思います。
+すべてが起動するまで少し時間がかかるので見守りましょう。
+実際にインストールしてみると、たくさんのコンポーネントが動いているのがわかるかと思います。概要編のGPU Operatorにて紹介したとおりです。
+また、NVIDIA GPU Operatorの起動後はGPU Feature DiscoveryがGPUのより詳細な情報をラベルとして付与します。
+次の例だと、<code>Tesla-T4</code>であることがわかります。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get pod | grep -e nvidia -e gpu
+gpu-feature-discovery-95vpr                1/1     Running     0          24h
+gpu-feature-discovery-wzz7r                1/1     Running     0          24h
+nvidia-container-toolkit-daemonset-5jdhn   1/1     Running     0          25h
+nvidia-container-toolkit-daemonset-6zfl4   1/1     Running     0          25h
+nvidia-dcgm-exporter-5rl4f                 1/1     Running     0          24h
+nvidia-dcgm-exporter-kjvnh                 1/1     Running     0          24h
+nvidia-device-plugin-daemonset-bpdzs       1/1     Running     0          24h
+nvidia-device-plugin-daemonset-pqztf       1/1     Running     0          24h
+nvidia-device-plugin-validation            0/1     Completed   0          22h
+nvidia-driver-daemonset-fwbj7              1/1     Running     1          25h
+nvidia-driver-daemonset-zj65h              1/1     Running     0          25h
+nvidia-driver-validation                   0/1     Completed   0          33m
+
+$ oc get node xxxxx -o yaml | grep nvidia.com
+...
+    nvidia.com/cuda.driver.major: &#34;450&#34;
+    nvidia.com/cuda.driver.minor: &#34;80&#34;
+    nvidia.com/cuda.driver.rev: &#34;02&#34;
+    nvidia.com/cuda.runtime.major: &#34;11&#34;
+    nvidia.com/cuda.runtime.minor: &#34;0&#34;
+    nvidia.com/gfd.timestamp: &#34;1608307957&#34;
+    nvidia.com/gpu.compute.major: &#34;7&#34;
+    nvidia.com/gpu.compute.minor: &#34;5&#34;
+    nvidia.com/gpu.count: &#34;1&#34;
+    nvidia.com/gpu.family: turing
+    nvidia.com/gpu.machine: g4dn.xlarge
+    nvidia.com/gpu.memory: &#34;15109&#34;
+    nvidia.com/gpu.present: &#34;true&#34;
+    nvidia.com/gpu.product: Tesla-T4
+</code></pre></div><p>最終的に、ノードの<code>status.capacity</code>にて<code>nvidia.com/gpu</code>の状態が管理できるようになっていれば成功です。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get node ip-10-0-220-29.ap-southeast-1.compute.internal -o yaml | grep -A 8 capacity
+  capacity:
+    attachable-volumes-aws-ebs: &#34;39&#34;
+    cpu: &#34;4&#34;
+    ephemeral-storage: 125277164Ki
+    hugepages-1Gi: &#34;0&#34;
+    hugepages-2Mi: &#34;0&#34;
+    memory: 16116152Ki
+    nvidia.com/gpu: &#34;1&#34;
+    pods: &#34;250&#34;
+</code></pre></div><h2 id="運用">運用</h2>
+<h3 id="スケジューリング">スケジューリング</h3>
+<p>GPUノードが利用できるような状態になったらさっそく利用してみましょう。
+GPU Operatorにて、<code>nvidia-device-plugin</code>がデプロイされました。これによって、PodのResource定義に<code>nvidia.com/gpu</code>を指定すると、GPUリソースの利用できるノードにスケジュールされます。具体例としては以下のとおりです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">resources</span>:
+  <span style="color:#f92672">limits</span>:
+    <span style="color:#f92672">nvidia.com/gpu</span>: <span style="color:#ae81ff">1</span>
+</code></pre></div><p>また、ほとんどのケースにおいて、OpenShiftクラスタのノードすべてがGPU搭載というわけではないはずです。
+GPUを利用したいアプリケーションのみが、GPUノードにスケジューリングされるよう調整したいはずです。
+そこででてくるのが、<a href="https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/">TaintsとTolerations</a>です。
+GPUノードにtaintを付与し、tolerationを持たない通常のPodはスケジュールできないようにできます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc adm taint node xxxxx nodetype=gpu:NoSchedule
+node/xxxxx tainted
+</code></pre></div><p>PodをデプロイするときはTolerationを追加します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">labels</span>:
+    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">debug-app</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">debug-pp</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">debug-app</span>
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">debug-app</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+      - <span style="color:#f92672">image</span>: <span style="color:#ae81ff">your-app-image:tag</span>
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">debug-app</span>
+        <span style="color:#f92672">resources</span>:
+          <span style="color:#f92672">limits</span>:
+            <span style="color:#f92672">nvidia.com/gpu</span>: <span style="color:#ae81ff">1</span>
+      <span style="color:#f92672">tolerations</span>:
+      - <span style="color:#f92672">key</span>: <span style="color:#e6db74">&#34;nodetype&#34;</span>
+        <span style="color:#f92672">operator</span>: <span style="color:#e6db74">&#34;Equal&#34;</span>
+        <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;gpu&#34;</span>
+        <span style="color:#f92672">effect</span>: <span style="color:#e6db74">&#34;NoSchedule&#34;</span>
+</code></pre></div><h3 id="監視">監視</h3>
+<p>NVIDIA GPU Operatorの中には、nvidia-dcgm-exporter が含まれておりPrometheusにて簡単に監視が可能です。
+以下は、exporterのPodとServiceを出力したものですが、各GPUノード上<code>pod/nvidia-dcgm-exporter-xxxx</code>が展開され、ポート9400のServiceで待ち受けていることがわかります。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get pod,service | grep exporter
+pod/nvidia-dcgm-exporter-5rl4f                 1/1     Running     0          43h
+pod/nvidia-dcgm-exporter-kjvnh                 1/1     Running     0          43h
+service/nvidia-dcgm-exporter   ClusterIP   172.30.79.53    &lt;none&gt;        9400/TCP    43h
+</code></pre></div><p>実際に、このサービスに向けてリクエストを投げてみましょう。
+出力は一部省略しています。
+（Kubernetes内部のServiceの名前解決について知りたい方はこちらのブログ「<a href="https://blog.mosuke.tech/entry/2020/09/09/kuubernetes-dns-test/">KubernetesのPod内からの名前解決を検証する</a>」を参照ください）</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc exec nvidia-dcgm-exporter-5rl4f -- curl nvidia-dcgm-exporter:9400/metrics
+...
+DCGM_FI_DEV_SM_CLOCK{gpu=&#34;0&#34;, UUID=&#34;GPU-4063626d-f712-3d69-7469-1f17e7a1027d&#34;, device=&#34;nvidia0&#34;} 300
+DCGM_FI_DEV_MEM_CLOCK{gpu=&#34;0&#34;, UUID=&#34;GPU-4063626d-f712-3d69-7469-1f17e7a1027d&#34;, device=&#34;nvidia0&#34;} 405
+DCGM_FI_DEV_GPU_TEMP{gpu=&#34;0&#34;, UUID=&#34;GPU-4063626d-f712-3d69-7469-1f17e7a1027d&#34;, device=&#34;nvidia0&#34;} 32
+DCGM_FI_DEV_POWER_USAGE{gpu=&#34;0&#34;, UUID=&#34;GPU-4063626d-f712-3d69-7469-1f17e7a1027d&#34;, device=&#34;nvidia0&#34;} 15.539000
+...
+</code></pre></div><p>以上のように、NVIDIA GPU OperatorのなかではPrometheus向けのexporterも内包しているので、Prometheusでの監視はすぐにはじめることができます。ご自身のPrometheusにServiceの監視設定を追加してみてください。少し余談ですが、ZabbixでこれらのGPU情報を監視したい場合はZabbixのPrometheus Checkを利用してください。詳しくは「<a href="https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/">ZabbixでKubernetesの監視を検討する（Prometheus exporter, Kubernetes API）</a>」をご参照ください。<br>
+Grafanaでの可視化ですが、この点についてはNVIDIA公式ではダッシュボードテンプレートを提供していません。
+わたしが確認した限りでは、こちらの<a href="https://grafana.com/grafana/dashboards/12219">NVIDIA DCGM Exporter Dashboard</a>が活用できそうでした。</p>
+<p><img src="/image/nvidia-dcgm-exporter-dashboard.png" alt="nvidia-dcgm-exporter-dashboard"></p>
+<h2 id="reference">reference</h2>
+<ul>
+<li><a href="https://docs.nvidia.com/datacenter/kubernetes/openshift-on-gpu-install-guide/index.html">NVIDIA GPU Operatorインストール方法公式ドキュメント</a></li>
+<li><a href="https://www.openshift.com/blog/how-to-use-entitled-image-builds-to-build-drivercontainers-with-ubi-on-openshift">cluster-wide entitlementに関する有益なブログ</a></li>
+<li><a href="https://gitlab.com/nvidia/container-images/driver/">NVIDIA Driverのコンテナイメージ</a></li>
+</ul>
+<h2 id="まとめ">まとめ</h2>
+<p>ふたつの記事に分けてOpenShiftでNVIDIAのGPUノードを利用していく方法について解説してきました。Kubernetesは、いまや単純なステートレスなアプリケーションのみならず、AIワークロードなどその用途は拡大しています。皆さんの環境でもGPUを活用していく場面はより多くなっていくと思いますので、ぜひトライしてみてください。</p>
+    </div>
+    <div class="entry-sub-content request-for-entry">
+        <h5>フィードバック・相談(β)</h5>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=OpenShift%20on%20NVIDIA%20GPU%ef%bc%88%e5%b0%8e%e5%85%a5%e7%b7%a8%ef%bc%89" target="_blank" onClick="ga('send','event','link','click','request-for-entry');">執筆者に問い合わせてみる</a></p>
+    </div>
+    <div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+    <div class="entry-sub-content disqus">
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/" onClick="ga('send','event','link','click','latest-posts');">OpenShift on NVIDIA GPU（導入編）</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/12/16/openshift-on-nvidia-gpu/" onClick="ga('send','event','link','click','latest-posts');">OpenShift on NVIDIA GPU（概要編）</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/12/02/dragonfly/" onClick="ga('send','event','link','click','latest-posts');">P2Pでコンテナイメージを配信できるDragonflyとAlibaba Cloudのなぞ</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/11/29/ack-professional/" onClick="ga('send','event','link','click','latest-posts');">[Alibaba Cloud] KubernetesのProfessional managed clustersは何が違うのか？</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/" onClick="ga('send','event','link','click','latest-posts');">Docker Hubのダウンロード回数制限の対策を考える</a></li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="ga('send','event','link','click','categories');">alibaba-cloud (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="ga('send','event','link','click','categories');">aws (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="ga('send','event','link','click','categories');">devops (28)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="ga('send','event','link','click','categories');">kubernetes (28)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="ga('send','event','link','click','categories');">アプリケーション開発 (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="ga('send','event','link','click','categories');">イベント (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="ga('send','event','link','click','categories');">インフラ構築 (25)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="ga('send','event','link','click','categories');">キャリア (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="ga('send','event','link','click','categories');">クラウド技術 (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="ga('send','event','link','click','categories');">コンテナ (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="ga('send','event','link','click','categories');">ブログ運用 (10)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="ga('send','event','link','click','categories');">資格試験 (7)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="ga('send','event','link','click','archive');">2014年 Archive (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="ga('send','event','link','click','archive');">2015年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="ga('send','event','link','click','archive');">2016年 Archive (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="ga('send','event','link','click','archive');">2017年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="ga('send','event','link','click','archive');">2018年 Archive (17)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="ga('send','event','link','click','archive');">2019年 Archive (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="ga('send','event','link','click','archive');">2020年 Archive (25)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/12/16/openshift-on-nvidia-gpu/" onClick="ga('send','event','link','click','related-posts');">OpenShift on NVIDIA GPU（概要編）</a> (2020/12/16)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/12/02/dragonfly/" onClick="ga('send','event','link','click','related-posts');">P2Pでコンテナイメージを配信できるDragonflyとAlibaba Cloudのなぞ</a> (2020/12/02)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/11/29/ack-professional/" onClick="ga('send','event','link','click','related-posts');">[Alibaba Cloud] KubernetesのProfessional managed clustersは何が違うのか？</a> (2020/11/29)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/" onClick="ga('send','event','link','click','related-posts');">Docker Hubのダウンロード回数制限の対策を考える</a> (2020/11/18)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>
