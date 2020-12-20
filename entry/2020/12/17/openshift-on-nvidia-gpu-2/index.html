@@ -91,16 +91,16 @@
 <p>公式ドキュメント: <a href="https://docs.nvidia.com/datacenter/kubernetes/openshift-on-gpu-install-guide/index.html">OpenShift on NVIDIA GPU Accelerated Clusters</a></p>
 <h3 id="gpuノードの追加">GPUノードの追加</h3>
 <p>まずはじめにGPUノードをOpenShiftクラスタへ追加する必要があります。
-ノードの追加時点ではとくに通常のノードの手順とかわりがありません。お使いの環境のインストール方法に合わせてGPUノードを追加してください。
+ノードの追加時点ではとくに通常のノードの手順と変わりがありません。お使いの環境のインストール方法に合わせてGPUノードを追加してください。
 筆者環境はOpenShift on AWSのため、GPUノード用の<a href="https://access.redhat.com/documentation/ja-jp/openshift_container_platform/4.6/html/machine_management/creating-machinesets#creating-machineset-aws">MachineSetを用意してノードの追加</a>をしました。</p>
 <h3 id="cluster-wide-entitlement">cluster-wide entitlement</h3>
 <p>概要編でご紹介した、Node Feature DiscoveryやNVIDIA GPU Operatorをインストールする前にやっておくことがあります。
 OpenShiftクラスタにcluster-wide entitlementの設定をしておくことです。
-本手順は、Helmでのインストール時には書いてあるのですが、<strong>OperatorHubからインストールする手順には書かれていませんが、同様に必要な作業</strong>です。改善のリクエストをNVIDIAにお送りはしたのですが、2020/12/17現在は修正されていませんので注意してください。
+本手順は、公式ドキュメントのHelmでのインストール時には書いてあるのですが、<strong>OperatorHubからインストールする手順には書かれていませんが、同様に必要な作業</strong>です。改善のリクエストをNVIDIAにお送りはしたのですが、2020/12/17現在は修正されていませんので注意してください。
 &ldquo;<a href="https://docs.nvidia.com/datacenter/kubernetes/openshift-on-gpu-install-guide/index.html#openshift-gpu-install-gpu-operator-via-helmv3">4.3. Installing GPU Operator via Helm</a>&rdquo; の1,2の手順をこなしてください。</p>
 <p>なぜcluster-wide entitlementの設定作業が必要か説明します。<br>
 nvidia-driverは、起動時にelfutils-libelfなどのパッケージをインストールしてビルドを行います。（コンテナ起動時にビルドするのがいいかどうかは。。？）ベースイメージにUBI(Universal Base Image)を利用しており、Red Hatのレポジトリを参照しにいきます。そのため、コンテナが対象のレポジトリを参照できるように、エンタイトルメントの設定が必要になります。
-この設定がないとnvidia-driver podの起動時にのエラーが発生します。<br>
+この設定がないとnvidia-driver podの起動時にエラーが発生し起動に失敗します。<br>
 OpenShiftをご利用であればサブスクリプションをお持ちかと思いますが、
 検証用で個人のサブスクリプションを使いたい場合には、1年間無料で利用できる <a href="https://developers.redhat.com/articles/getting-red-hat-developer-subscription-what-rhel-users-need-know#">Red Hat Developer Subscription</a>の利用でも可能です。</p>
 <p>cluster-wide entitlementを設定すると（実態は<code>MachineConfig</code>）、Machine Config Operator（MCO）は各ノードに設定内容を反映しに行きます。ノードへの設定変更時は、ノードのスケジューリングを無効化した上で順次ローリングアップデートするため、でノード台数が多い場合は時間がかかります。MachineConfigPoolの設定で、Workerノードが同時に何台までアップデート作業を実行していいかも決めることができます。お使いのクラスタの状況に応じて、ノード更新のスピードを上げたい場合は<code>MachineConfigPool</code>の<code>spec.maxUnavailable</code>の値の変更を検討できます（<a href="https://docs.openshift.com/container-platform/4.6/scalability_and_performance/recommended-host-practices.html#create-a-kubeletconfig-crd-to-edit-kubelet-parameters_">ドキュメント</a>）。</p>
