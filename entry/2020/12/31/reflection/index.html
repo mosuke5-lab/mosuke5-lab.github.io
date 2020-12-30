@@ -8,22 +8,22 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 <link rel="stylesheet" href="/css/main.css">
 
-<title>Terraformのimportの使い方と注意ポイント</title>
-<link rel="canonical" href="https://blog.mosuke.tech/entry/2018/06/20/terraform_import/">
-<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2018/06/20/terraform_import/" />
+<title>「絆」2020年振り返り</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2020/12/31/reflection/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/12/31/reflection/" />
 <meta name="twitter:card" content="summary">
 
 <meta name="twitter:site" content="@mosuke5" />
 <meta name="twitter:creator" content="@mosuke5" />
 
-<meta name="twitter:title" content="Terraformのimportの使い方と注意ポイント &middot; Goldstine研究所">
-<meta name="twitter:description" content="Terraformのimport機能の使い方と使う際の注意ポイントについてまとめました。import機能を利用したあとの運用を見据えた対応などについてです。">
+<meta name="twitter:title" content="「絆」2020年振り返り &middot; Goldstine研究所">
+<meta name="twitter:description" content="あっという間の2020年でしたが、やってきたことや変わったことなどをふりかえってみます。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Terraformのimportの使い方と注意ポイント &middot; Goldstine研究所">
-<meta property="og:description" content="Terraformのimport機能の使い方と使う際の注意ポイントについてまとめました。import機能を利用したあとの運用を見据えた対応などについてです。">
+<meta property="og:title" content="「絆」2020年振り返り &middot; Goldstine研究所">
+<meta property="og:description" content="あっという間の2020年でしたが、やってきたことや変わったことなどをふりかえってみます。">
 <meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
-<meta property="og:url" content="https://blog.mosuke.tech/entry/2018/06/20/terraform_import/" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2020/12/31/reflection/" />
 <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
 <link rel="icon" href="/image/favicon.ico" />
 
@@ -61,70 +61,75 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
-    <h1>Terraformのimportの使い方と注意ポイント</h1>
+    <h1>「絆」2020年振り返り</h1>
     <div class="entry-sub-title">
-        <span class="">20 Jun 2018, 11:08</span>
+        <span class="">31 Dec 2020, 00:00</span>
         <span class="">By mosuke5</span>
         
             
-                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
-            
-                <a class="badge badge-inf post-category post-category-クラウド技術" href="/categories/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89%E6%8A%80%E8%A1%93">クラウド技術</a>
+                <a class="badge badge-inf post-category post-category-キャリア" href="/categories/%E3%82%AD%E3%83%A3%E3%83%AA%E3%82%A2">キャリア</a>
             
         
     </div>
     <div class="entry-content">
-        <p>ここずっとTerraformの基本的な部分の投稿がつづいている@mosuke5です。<br>
-理由は、Terraformを最近結構触ることが多いのもあるが、今まであんまり使ってこなかった機能をきちんとキャッチアップして、より効率的にTerraformを活用できるようにしようと思っているからです。<br>
-と、まあ余談はおいておき、import機能をやっていきます。</p>
-<p>import機能についてはできることもなんとなくしっていたが、自分の手でやったことがなかったのでやってみようと思っています。</p>
-<h2 id="使い所">使い所</h2>
-<p>importは、Terraformで現状管理されていない既存のクラウド上のリソースをTerraform管理できるように取り込むことのできる機能です。<br>
-今まで、手動で管理していたクラウドリソースをTerraformでの管理にに変更していきたい、あるいは、Terraformに非対応だったリソースは手動で作っていたが、対応したのでTerraformに取り込んでいきたい、こういったユースケースがよくあります。</p>
-<h2 id="使い方と注意ポイント">使い方と注意ポイント</h2>
-<p>今回は、既存のAlibaba Cloud上のVPCリソースをTerraformにimportしていきたいと思います。(AWSでも同様です。)<br>
-まずはじめに、importしたいリソースについて、空の定義をしておく必要があります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># terraform.tf
-resource &#34;alicloud_vpc&#34; &#34;vpc&#34; {
-}
-</code></pre></div><p>つぎにリソースをimportしていきます。リソースをimportするには、対象のリソースを特定する必要があるため、リソースのIDが必要になります。既存でリソースを作っている場合には、コンソールやAPIなどを使って確認する必要があります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform import alicloud_vpc.vpc vpc-6webta8bkuhm33t4aax0j
-alicloud_vpc.vpc: Import complete!
-  Imported alicloud_vpc (ID: vpc-6webta8bkuhm33t4aax0j)
-alicloud_vpc.vpc: Refreshing state... (ID: vpc-6webta8bkuhm33t4aax0j)
-
-Import successful!
-
-The resources that were imported are shown above. These resources are now in
-your Terraform state and will henceforth be managed by Terraform.
-</code></pre></div><p>そうすると、Terraformにおいて一番重要とも言えるstateファイルに、<br>
-importしたリソースが書き込まれていることが確認できます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform state show
-terraform state show
-id              = vpc-6webta8bkuhm33t4aax0j
-cidr_block      = 192.168.0.0/16
-description     = This is test_vpc.
-name            = test_vpc
-route_table_id  = vtb-6wehepczi546xvuboemxx
-router_id       = vrt-6we56st0wcuucpiglodk4
-router_table_id = vtb-6wehepczi546xvuboemxx
-</code></pre></div><p>しかし、importを利用には注意点があります。<br>
-現状(version 0.11.7 現在)では、importしたリソースについて、stateファイルにそのリソースを書き込んでくれるのみとなっています。<br>
-つまりどういうことかというと、現状terraformの定義ファイルにはVPCは空の定義のため、Stateファイルとの差がでてしまっています。現状とコードに差分がある状態です。
-この状態で、実行しても必須項目の定義もされていないためエラーになってしまいます。</p>
-<p>importしたあと、実際に取り込んだリソースと定義を合わせていく必要があります。<br>
-以下のように設定を足していく必要があります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># terraform.tf
-resource &#34;alicloud_vpc&#34; &#34;vpc&#34; {
-  name        = &#34;test_vpc&#34;
-  description = &#34;This is test_vpc.&#34;
-  cidr_block  = &#34;192.168.0.0/16&#34;
-}
-</code></pre></div><p>以上、注意点含めてぜひ活用していってください。</p>
+        <p>@mosuke5です。2020年もあっという間に終わりを迎えてしまいました。<br>
+毎年恒例の振り返りブログも7回目となります。今年はコロナで3月からずっと在宅勤務だったので、どこかに行ったという思い出は当然ながら少ないですが、こういう状況だからこそできたことや心の変化などもありました。
+そのあたりを振り返りながらまとめてみたいと思います。</p>
+<h2 id="過去の振り返りブログ">過去の振り返りブログ</h2>
+<p>気になる過去の振り返りはこちらです。</p>
+<ul>
+<li>2014年: <a href="https://blog.mosuke.tech/entry/2015/01/01/161826/">2014年を思い返して</a></li>
+<li>2015年: <a href="https://blog.mosuke.tech/entry/2015/12/28/150042/">2015年振り返り</a></li>
+<li>2016年: <a href="https://blog.mosuke.tech/entry/2016/12/25/142744/">「嵐」2016年振り返り</a></li>
+<li>2017年: <a href="https://blog.mosuke.tech/entry/2017/12/29/reflection/">「進」2017年振り返り</a></li>
+<li>2018年: <a href="https://blog.mosuke.tech/entry/2018/12/31/reflection/">「策」2018年振り返り</a></li>
+<li>2019年: <a href="https://blog.mosuke.tech/entry/2019/12/31/reflection/">「捉」2019年振り返り</a></li>
+</ul>
+<h2 id="要領をつかめてきた仕事">要領をつかめてきた仕事</h2>
+<p>昨年の4月に転職しました。正直、去年はまだ社内での信頼も少なく、貢献度の高い仕事をした感じはありませんでした。
+当時はこれからどうやってたち振る舞っていこうか悩んでいた・もがいていたのを覚えています。
+2019年末くらいから、Kubernetes関連の仕事を皮切りに少しずつ信頼も得られ、いい仕事ができるようになってきたなと感じています。<br>
+わたしは、ソフトウェアベンダーのプロフェッショナルサービス（コンサルティングサービス）の仕事をしているのですが、この仕事は顧客が自社のソフトウェア・プラットフォームを活用する上での支援がメイン業務です。こういう職種では、わたしの「稼働時間を売る」というビジネスモデルのため、社内で個人として信頼をされるということが仕事に直結します。「mosuke5さんは、〇〇が得意で△△なプロジェクトで活躍できそう」と認知されることが重要というわけです。そこがようやく今年に理解されてきたかなということです。そこが理解されると、非常に動きやすく心地よさを感じます。</p>
+<p>昨年までは、アジャイル開発やスクラムなども学んでみました。社内にはアジャイルコーチというロールの人たちもいて、彼らのようになることも考えたりもしました。しかし、かなり組織開発よりのロールで、もっとKubernetesに触ってみたいという思いから（正確にはKubernetesもだけど、システムの開発に関するテクニカルな領域に携わりたい）、今年はKubernetesやその上でのアプリケーション開発の支援を中心に行っていました。
+もちろん、Kubernetesを活用していく上で、アジャイルやスクラムの観点も必要になってくるので本職ではないにせよとても役に立っているとも感じています。</p>
+<p>Kubernetes上でのDevOpsの実装支援から、AIサービス向けのContainer as a Serviceの開発支援、Kubernetes Operator開発支援、大規模組織にKubernetesを導入するためのアセスメント・ワークショップなどなど、Kubernetesを軸としたさまざまなことを経験できました。2019年の<a href="/entry/2019/03/29/thank-you-alibaba/">退職ブログ</a>のときに書いた「次にやりたいこと」をうまく体現できていて幸せな限りと思います。</p>
+<h2 id="コロナで変わったこと">コロナで変わったこと</h2>
+<p>コロナウィルス感染対策の都合で、3月からずっと在宅勤務をしています。
+例外的に2日間だけ顧客のオフィスに行きました。自社のオフィスは、社員証の入館権限すら剥奪されていて入ることができません（笑）また、在宅勤務は、最低でも2021年の6月末までは続きます。おそらく、アフターコロナ後も、多くは在宅勤務になるのではないかと予想しています。
+そんな状況だからこそ挑戦したことや変化したこともありました。</p>
+<h3 id="自作家系ラーメン">自作家系ラーメン</h3>
+<p>詳しくはブログを読んでいただきたいですが、自作家系ラーメンにも挑戦しました。
+非常に楽しかったし、料理の製法もいろいろ覚えて勉強になりました。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://note.com/morisan_life/n/n2f855f8e5a46" data-iframely-url="//cdn.iframe.ly/ksd9plu?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h3 id="珈琲">珈琲</h3>
+<p>お家でのハンドドリップコーヒーをはじめました。<br>
+今までもよくカフェで仕事をしてきました。しかし、珈琲を楽しむというよりは、仕事場の空間としてのカフェを楽しんでいました。在宅勤務でなかなかカフェにもいけないこともあり、おいしい珈琲をいれようと思い始めたのですが、おもったよりはまってしまいました。
+珈琲豆はもちろん、挽きたてが一番美味しいのでミルも、温度調節できるケトルも用意して毎日楽しくドリップしています。
+下手に安い珈琲が飲めなくなってしまったことがデメリットではありますが、とてもいい趣味となっています。</p>
+<h3 id="ブログの収益化">ブログの収益化</h3>
+<p>今年からブログの収益化もはじめました。家にいることが多いとブログ書く時間も前よりとれるためやってみました。
+みなさんのおかげで見てくださる人も増えてきたため、自分の良質な記事を書くモチベーションになるのではと収益化に挑戦してみました。Googleアドセンスも無事に承認され、ささやかながらお小遣いがもらえるほどになりました。
+見てくださっているみなさんに感謝申し上げます。</p>
+<h2 id="家族">家族</h2>
+<p>今年の後半は、家族や生き方について考えさせられることがありました。
+詳しくは書けないのですが、とある出来事で家族との絆の大事さや生き方そのものについて多くを考えました。
+アタリマエのこと過ぎて、つい忘れてしまったり感謝を怠ってしまう類のものですが、なによりも大事であると再認識しました。なにかずっと忘れていたものを、家族が取り戻したように感じます。
+タイトルに「絆」とつけたのはそれゆえです。
+お金や地位・仕事・趣味、、どれも大事ですが、仕事を楽しめるのもお金を使う楽しみを得られるのも、すべては精神が安定しているからなわけで。われわれにとってなにがいちばん大事なことなのか本当に再確認した一年でした。</p>
+<h2 id="2021年にむけて">2021年にむけて</h2>
+<h3 id="kubernetesを軸とした新たな領域への挑戦">Kubernetesを軸とした新たな領域への挑戦</h3>
+<p>2020年は、Kubernetesの導入支援そのなかでもDevOpsやCI/CDといったところを中心に知見を深めたり、経験を積むことができたなと感じています。その軸は大事にしつつも、いくつかの異なる領域を強くしたいと思っていることがあります。
+ひとつは、システムアーキテクチャに関すること、もうひとつはビジネス目線でKubernetesのビジネス拡大に貢献することです。システムアーキテクチャに関するところだと、11月ごろから輪読会に参加している「<a href="https://amzn.to/2WTbcm3">データ指向アプリケーションデザイン</a>」の書籍がすばらしすぎて、まずはこの書籍を読み進めて強くなりたいと思ってます。Kubernetesビジネスの拡大の点では、より顧客が望むソフトウェア開発組織やアーキテクチャのあり方を伝えられるように挑戦したいと思ってます。これは現時点で思っていることで変わる可能性がありますが、そんなところを考えています。<br>
+あと、まだ言えないですが、すこし大きな発表ができる見込みで、その計画も練っているところです。</p>
+<h3 id="仕事以外の余裕をもっとつくる">仕事以外の余裕をもっとつくる</h3>
+<p>仕事を頑張ることは大事だし、なにも悪いことはありません。
+しかし、上にも書いたように本当に大事なものはなんでしょうか？ということがわかってきた一年でもありました。家族と向き合ったりすることは今後もっと増えてくると思います。仕事以外のことをやる「余裕」を常に持っておきたいと同時に思ってきました。
+具体的にどうするというのはまだ決めていないですが、もっと家のことや家族のこと、仕事以外の自分のことに目を向けていくことを心がけたいと思っています。</p>
+<p>来年もよろしくお願いいたします。</p>
     </div>
     <div class="entry-sub-content request-for-entry">
         <h5>フィードバック・相談(β)</h5>
-        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Terraform%e3%81%aeimport%e3%81%ae%e4%bd%bf%e3%81%84%e6%96%b9%e3%81%a8%e6%b3%a8%e6%84%8f%e3%83%9d%e3%82%a4%e3%83%b3%e3%83%88" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Terraformのimportの使い方と注意ポイント'});">執筆者に問い合わせてみる</a></p>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=%e3%80%8c%e7%b5%86%e3%80%8d2020%e5%b9%b4%e6%8c%af%e3%82%8a%e8%bf%94%e3%82%8a" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': '「絆」2020年振り返り'});">執筆者に問い合わせてみる</a></p>
     </div>
     <div class="entry-sub-content post-share">
         <div class="post-share-links">
@@ -275,13 +280,13 @@ resource &#34;alicloud_vpc&#34; &#34;vpc&#34; {
       <h3>関連する記事</h3>
       <ul class="list-group">
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Datadog APMとトレーシングの仕組みについて'});">Datadog APMとトレーシングの仕組みについて</a> (2019/11/21)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/03/28/strengths-finder/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'ITエンジニアこそ「強み」を活かそう。ストレングスファインダーの活用'});">ITエンジニアこそ「強み」を活かそう。ストレングスファインダーの活用</a> (2020/03/28)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/08/28/datadog-for-alibaba-cloud/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'DatadogのAlibaba Cloud integrationでできること'});">DatadogのAlibaba Cloud integrationでできること</a> (2019/08/28)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/12/31/reflection/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '「捉」2019年振り返り'});">「捉」2019年振り返り</a> (2019/12/30)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2018/06/17/terraform-backend/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Terraformのbackend機能を利用してstateファイルを共有する'});">Terraformのbackend機能を利用してstateファイルを共有する</a> (2018/06/17)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/11/12/wedding/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '結婚式を楽に円満に行う！やって本当によかった７つのこと'});">結婚式を楽に円満に行う！やって本当によかった７つのこと</a> (2019/11/12)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2018/06/16/terraform-workspaces/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Terraform workspaceを利用して環境毎のリソース名の変更を行う'});">Terraform workspaceを利用して環境毎のリソース名の変更を行う</a> (2018/06/16)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/03/29/thank-you-alibaba/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Alibaba Cloudの中の人を卒業。Alibabaと僕の物語'});">Alibaba Cloudの中の人を卒業。Alibabaと僕の物語</a> (2019/03/29)</li>
         
       </ul>
     </div>
