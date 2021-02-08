@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+
+<title>Jaegerを使った分散トレーシングの検証 on Kubernetes (1)</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/" />
+<meta name="twitter:card" content="summary">
+
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+
+<meta name="twitter:title" content="Jaegerを使った分散トレーシングの検証 on Kubernetes (1) &middot; Goldstine研究所">
+<meta name="twitter:description" content="jaegerを使った分散トレーシングをKubernetes上で検証していきます。Jaeger Operatorの利用、本番環境を見据えた設定、サイドカーでのagent注入あたりやります。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jaegerを使った分散トレーシングの検証 on Kubernetes (1) &middot; Goldstine研究所">
+<meta property="og:description" content="jaegerを使った分散トレーシングをKubernetes上で検証していきます。Jaeger Operatorの利用、本番環境を見据えた設定、サイドカーでのagent注入あたりやります。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+
+
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetes</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://docs.google.com/forms/d/e/1FAIpQLSd6N53H7zfF8EBrvyezRizU1mQx-CP3vc_jG-WvxfRmCjHTpg/viewform" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-site','event_label': 'from-header'});">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Jaegerを使った分散トレーシングの検証 on Kubernetes (1)</h1>
+    <div class="entry-sub-title">
+        <span class="">08 Feb 2021, 17:04</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-アプリケーション開発" href="/categories/%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E9%96%8B%E7%99%BA">アプリケーション開発</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>もーすけです。<br>
+過去にDatadogでAPMを少し検証したり、トレーニングの中でJaegerを触ったりしましたが、正直ちゃんとわかっていなかったので、改めてJaegerというか分散トレーシングについて検証してみたいと思います。</p>
+<p>今回はKubernetes上にJaegerを構築するので、<a href="https://www.jaegertracing.io/docs/1.21/operator/">Jaeger Operatorをインストール</a>して利用します。
+今回はOpenShiftにて検証していますが、他のKubernetesディストリビューションでも同じように利用可能です。<code>oc</code> は <code>kubectl</code> と置き換えて読んでください。
+検証環境は下記のとおりです。</p>
+<ul>
+<li>OpenShift: 4.4</li>
+<li>Jaeger: 1.17</li>
+</ul>
+<h2 id="allinone-deployment">AllInOne deployment</h2>
+<p>まずは AllInOne というデプロイメントでJaegerのとっかかりを掴みます。
+名前の通りなのですが、1つのPodのなかにJaegerが必要とするコンポーネントを全部詰め込んだものです。
+データはインメモリに保存するので、揮発性であり永続性はありません。
+完全にテスト用でもちいるデプロイメント方式です。</p>
+<p>以下のJaeger CRでデプロイしてみます。<br>
+<code>.spec</code>は何も記載していないので、すべてデフォルト値で、AllInOneでインストールします。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">jaegertracing.io/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Jaeger</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">jaeger-all-in-one-inmemory</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">default</span>
+</code></pre></div><p>生成されたものを確認してみます。
+PodはAllInOneということだけあってひとつです。全部入り。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get pod
+NAME                                         READY   STATUS      RESTARTS   AGE
+jaeger-all-in-one-inmemory-5b8dd55fc-lv4kh   2/2     Running     0          172m
+</code></pre></div><p>Serviceは、大きくagent, collector, queryと作成されています。<br>
+AllInOneは検証用に特化しているので、agentも含めています。アプリケーションサイドでclientだけ用意できればすぐに利用できるようになっています。後述するproductionのデプロイメント方式だとagentは作成されないので注目してみていきましょう。
+それぞれがどんな役割を担っているかは、Jaegerのアーキテクチャ図と照らし合わせてみてみましょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get service
+NAME                                            TYPE           CLUSTER-IP       EXTERNAL-IP                            PORT(S)                                  AGE
+jaeger-all-in-one-inmemory-agent                ClusterIP      None             &lt;none&gt;                                 5775/UDP,5778/TCP,6831/UDP,6832/UDP      172m
+jaeger-all-in-one-inmemory-collector            ClusterIP      172.30.81.141    &lt;none&gt;                                 9411/TCP,14250/TCP,14267/TCP,14268/TCP   172m
+jaeger-all-in-one-inmemory-collector-headless   ClusterIP      None             &lt;none&gt;                                 9411/TCP,14250/TCP,14267/TCP,14268/TCP   172m
+jaeger-all-in-one-inmemory-query                ClusterIP      172.30.187.60    &lt;none&gt;                                 443/TCP                                  172m
+</code></pre></div><p>Jaegerの全体像<br>
+<img src="/image/jaeger-architecture.png" alt="jaeger-architecture"></p>
+<p>JaegerのUIにアクセスしてみます。OpenShiftではない環境の方はIngressなどからアクセスしてください。jaeger-queryのサービスにアクセスできればUI画面にたどり着けます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">oc get route -n default
+NAME                         HOST/PORT                                                                         PATH   SERVICES                           PORT    TERMINATION   WILDCARD
+jaeger-all-in-one-inmemory   jaeger-all-in-one-inmemory-default.apps.my-k8s-cluster.com          jaeger-all-in-one-inmemory-query   &lt;all&gt;   reencrypt     None
+</code></pre></div><p><img src="/image/jaeger-query.png" alt="jaeger-query"></p>
+<h3 id="production-deployment">Production deployment</h3>
+<p>AllInOneでは、とにかく簡単にJaegerを検証できることがわかりました。
+実際の運用を見据えて、production用のデプロイメントを確認してみます。
+まず、大きな違いとしては、データストアです。AllInOneでは、インメモリに保存していましたが、当然永続化、可用性の面から外出しされ、永続ボリュームを持ちます。
+Jaegerでは、DBにCassandraかElasticSearchをサポートしています。OpenShift環境では、ElasticSearchがサポートされています。
+その他の違いとしては、コンポーネントが分離されている点です。collector, query, databaseとPod毎に分離されています。</p>
+<p>Production用のデプロイをするために、はじめに<a href="https://operatorhub.io/operator/elastic-cloud-eck">ElasticSearch Operator</a>をインストールします。
+バックエンドのデータストアにElasticSearchを利用しますが、Jaeger OperatorがJaegerを構築する際にElasticSearch Operatorを利用するためです。</p>
+<p>この検証では以下のJaeger CRを使ってみました。
+ElasticSearchは3台でクラスタリング、各ElasticSearchに50GBのボリュームをつけて構築です。
+その他、ElasticSearchのデータ削除の設定などを付与。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">jaegertracing.io/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Jaeger</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">jaeger-production</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">strategy</span>: <span style="color:#ae81ff">production</span>
+  <span style="color:#f92672">ingress</span>:
+    <span style="color:#f92672">security</span>: <span style="color:#ae81ff">oauth-proxy</span>
+  <span style="color:#f92672">storage</span>:
+    <span style="color:#f92672">type</span>: <span style="color:#ae81ff">elasticsearch</span>
+    <span style="color:#f92672">elasticsearch</span>:
+      <span style="color:#f92672">nodeCount</span>: <span style="color:#ae81ff">3</span>
+      <span style="color:#f92672">redundancyPolicy</span>: <span style="color:#ae81ff">SingleRedundancy</span>
+      <span style="color:#f92672">storage</span>: 
+        <span style="color:#f92672">storageClassName</span>: <span style="color:#ae81ff">gp2</span>
+        <span style="color:#f92672">size</span>: <span style="color:#ae81ff">50Gi</span>
+    <span style="color:#f92672">esIndexCleaner</span>:
+      <span style="color:#f92672">enabled</span>: <span style="color:#66d9ef">true</span>
+      <span style="color:#f92672">numberOfDays</span>: <span style="color:#ae81ff">7</span>
+      <span style="color:#f92672">schedule</span>: <span style="color:#ae81ff">55</span> <span style="color:#ae81ff">23</span> * * *
+    <span style="color:#f92672">esRollover</span>:
+      <span style="color:#f92672">schedule</span>: <span style="color:#e6db74">&#39;*/30 * * * *&#39;</span>
+</code></pre></div><p>Podをみてみると、AllInOneのときと違ってコンポーネント毎にPodがあることを確認できます。
+また、上にもすこし書きましたがJager agentは含まれていません。Jaeger agentの準備は別で書きます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get pod
+NAME                                                              READY   STATUS    RESTARTS   AGE
+elasticsearch-cdm-jaegerproductionjaegerproduction-1-75d6cwghmg   2/2     Running   0          9m34s
+elasticsearch-cdm-jaegerproductionjaegerproduction-2-78958d46ml   2/2     Running   0          9m30s
+elasticsearch-cdm-jaegerproductionjaegerproduction-3-5fb4dr9k4l   2/2     Running   0          9m27s
+jaeger-production-collector-cff65bd5d-j4mfh                       1/1     Running   0          7m36s
+jaeger-production-query-5dcbb9b79f-kzqkb                          3/3     Running   0          7m36s
+</code></pre></div><p>参考程度ですが、PVもできていると。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get pvc
+NAME                                                                 STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+elasticsearch-elasticsearch-cdm-jaegerproductionjaegerproduction-1   Bound    pvc-b2e0b560-3b29-42a3-93a4-59adc6dca872   50Gi       RWO            gp2            15m
+elasticsearch-elasticsearch-cdm-jaegerproductionjaegerproduction-2   Bound    pvc-5b59197d-59b7-469a-800c-ecf7e9f70097   50Gi       RWO            gp2            15m
+elasticsearch-elasticsearch-cdm-jaegerproductionjaegerproduction-3   Bound    pvc-a59e50fb-4eb4-4c34-9320-4fbe37c034a9   50Gi       RWO            gp2            15m
+</code></pre></div><p>Serviceも同様です。jaeger agentのserviceは同様にありません。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get service
+NAME                                   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                                  AGE
+elasticsearch                          ClusterIP   172.30.141.84    &lt;none&gt;        9200/TCP                                 10m
+elasticsearch-cluster                  ClusterIP   172.30.251.197   &lt;none&gt;        9300/TCP                                 10m
+elasticsearch-metrics                  ClusterIP   172.30.221.210   &lt;none&gt;        60000/TCP                                10m
+jaeger-production-collector            ClusterIP   172.30.196.153   &lt;none&gt;        9411/TCP,14250/TCP,14267/TCP,14268/TCP   8m2s
+jaeger-production-collector-headless   ClusterIP   None             &lt;none&gt;        9411/TCP,14250/TCP,14267/TCP,14268/TCP   8m2s
+jaeger-production-query                ClusterIP   172.30.209.29    &lt;none&gt;        443/TCP                                  8m2s
+</code></pre></div><h2 id="jaeger-agentのサイドカーとしての起動">Jaeger agentのサイドカーとしての起動</h2>
+<p>Production deploymentで、Jaeger agentが含まれていないことを書きました。
+実運用では、スケーリングなどの観点からアプリケーションPodのサイドカーとしてJaeger agentを起動することが望ましいです。Jaeger Operatorには、サイドカーでJager agentを埋め込む仕組み（<a href="https://www.jaegertracing.io/docs/1.21/operator/#auto-injecting-jaeger-agent-sidecars">Auto-injecting Jaeger Agent Sidecars</a>）を持ちます。</p>
+<p>試しにやってみましょう。NginxのDeploymentに特定のannotationを追加します。
+Jaager Operatorは、このannotationを検知して、サイドカーを注入します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
+  <span style="color:#f92672">annotations</span>:
+    <span style="color:#f92672">sidecar.jaegertracing.io/inject</span>: <span style="color:#e6db74">&#34;jaeger-production&#34;</span> <span style="color:#75715e"># このannotationを追加。値はJagerの名前</span>
+  <span style="color:#f92672">labels</span>:
+    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx</span>
+  <span style="color:#f92672">strategy</span>: {}
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+      - <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginxinc/nginx-unprivileged</span>
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-unprivileged</span>
+        <span style="color:#f92672">resources</span>: {}
+</code></pre></div><p>Nginx podを確認するとコンテナがふたつ起動していることがわかります。
+また、Deploymentも書き換わっています。
+あとは、アプリケーション側で、Jaeger angetに向けてデータを出力すればJaeger本体に記録されるわけです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get pod | grep nginx
+nginx-557fc655c-zhprq      2/2     Running   0      28m
+
+% oc get deploy nginx -o yaml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: &#34;4&#34;
+    prometheus.io/port: &#34;14271&#34;
+    prometheus.io/scrape: &#34;true&#34;
+    sidecar.jaegertracing.io/inject: jaeger-production
+  creationTimestamp: &#34;2021-02-08T08:38:21Z&#34;
+  generation: 6
+  labels:
+    app: nginx
+    sidecar.jaegertracing.io/injected: jaeger-production
+  name: nginx
+  namespace: jaeger-production
+  resourceVersion: &#34;207651&#34;
+  selfLink: /apis/apps/v1/namespaces/jaeger-production/deployments/nginx
+  uid: 75c63e00-0396-4d63-a5db-183084e826a7
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: nginx
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - env:
+        - name: JAEGER_SERVICE_NAME
+          value: nginx.jaeger-production
+        - name: JAEGER_PROPAGATION
+          value: jaeger,b3
+        image: nginxinc/nginx-unprivileged
+        imagePullPolicy: Always
+        name: nginx-unprivileged
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      - args:
+        - --jaeger.tags=cluster=undefined,deployment.name=nginx,pod.namespace=jaeger-production,pod.name=${POD_NAME:},host.ip=${HOST_IP:},container.name=nginx-unprivileged
+        - --reporter.grpc.host-port=dns:///jaeger-production-collector-headless.jaeger-production.svc:14250
+        - --reporter.grpc.tls.ca=/etc/pki/ca-trust/source/service-ca/service-ca.crt
+        - --reporter.grpc.tls.enabled=true
+        - --reporter.type=grpc
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        image: registry.redhat.io/distributed-tracing/jaeger-agent-rhel8@sha256:ff3f61601ca4f799958f26be0525383339c1fa6ac29e16eec9d2c32dbe59407e
+        imagePullPolicy: IfNotPresent
+        name: jaeger-agent
+        ports:
+        - containerPort: 5775
+          name: zk-compact-trft
+          protocol: UDP
+        - containerPort: 5778
+          name: config-rest
+          protocol: TCP
+        - containerPort: 6831
+          name: jg-compact-trft
+          protocol: UDP
+        - containerPort: 6832
+          name: jg-binary-trft
+          protocol: UDP
+        - containerPort: 14271
+          name: admin-http
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/pki/ca-trust/extracted/pem
+          name: jaeger-production-trusted-ca
+          readOnly: true
+        - mountPath: /etc/pki/ca-trust/source/service-ca
+          name: jaeger-production-service-ca
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: ca-bundle.crt
+            path: tls-ca-bundle.pem
+          name: jaeger-production-trusted-ca
+        name: jaeger-production-trusted-ca
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: service-ca.crt
+            path: service-ca.crt
+          name: jaeger-production-service-ca
+        name: jaeger-production-service-ca
+...
+</code></pre></div><h2 id="サンプルアプリでトレーシング体験">サンプルアプリでトレーシング体験</h2>
+<p>JaegerのインストールはAllInOneを用いてテスト用であれば、正直なにも考える必要なくできます。
+トレーシングがどのようなものか理解するには、なにはともあれ確認してみないとですよね。
+<a href="https://github.com/jaegertracing/jaeger/tree/master/examples/hotrod">Hot R.O.D. - Rides on Demand</a>というちょうどいいサンプルがあるので取っ掛かりとしてはオススメです。</p>
+<p>こちらのREADMEには、Kubernetesへのデプロイは書かれていませんがコンテナイメージが用意されているので簡単にデプロイできます。以下サンプルです。
+せっかくなので、<code>sidecar.jaegertracing.io/inject: &quot;jaeger-production&quot;</code>のannotationをつかってJaeger agentを起動します。
+<code>env</code>の<code>JAEGER_AGENT_HOST</code>はこの場合、サイドカーで起動しているコンテナになるので<code>localhost</code>でOKです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
+  <span style="color:#f92672">labels</span>:
+    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">hotrod</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hotrod</span>
+  <span style="color:#f92672">annotations</span>:
+    <span style="color:#f92672">sidecar.jaegertracing.io/inject</span>: <span style="color:#e6db74">&#34;jaeger-production&#34;</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">hotrod</span>
+  <span style="color:#f92672">strategy</span>: {}
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">hotrod</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+      - <span style="color:#f92672">image</span>: <span style="color:#ae81ff">jaegertracing/example-hotrod:latest</span>
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">example-hotrod</span>
+        <span style="color:#f92672">env</span>:
+          - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">JAEGER_AGENT_HOST</span>
+            <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;localhost&#34;</span>
+          - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">JAEGER_AGENT_PORT</span>
+            <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;6831&#34;</span>
+        <span style="color:#f92672">ports</span>:
+          - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">8080</span>
+        <span style="color:#f92672">resources</span>: {}
+</code></pre></div><p>起動した、Podに対して接続し、アプリケーションを操作すれば、Jaegerにトレーシング情報が保存されていることを確認できました。今回はここまでとして、次回もう少し細かいところを見ていこうと思います。</p>
+<p><img src="/image/jaeger-hotrod.png" alt="jaeger-hotrod"></p>
+<h2 id="関連情報">関連情報</h2>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/" data-iframely-url="//cdn.iframe.ly/SQYbsuz"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/01/22/sockshop/" data-iframely-url="//cdn.iframe.ly/YDI2rVR"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+    </div>
+    <div class="entry-sub-content request-for-entry">
+        <h5>フィードバック・相談(β)</h5>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Jaeger%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%9f%e5%88%86%e6%95%a3%e3%83%88%e3%83%ac%e3%83%bc%e3%82%b7%e3%83%b3%e3%82%b0%e3%81%ae%e6%a4%9c%e8%a8%bc%20on%20Kubernetes%20%281%29" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Jaegerを使った分散トレーシングの検証 on Kubernetes (1)'});">執筆者に問い合わせてみる</a></p>
+    </div>
+    <div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+    <div class="entry-sub-content disqus">
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Jaegerを使った分散トレーシングの検証 on Kubernetes (1)'});">Jaegerを使った分散トレーシングの検証 on Kubernetes (1)</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/02/07/cka/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '新形式のCKAを受験し合格しました。受験の教訓紹介。'});">新形式のCKAを受験し合格しました。受験の教訓紹介。</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/01/31/network-debug-on-containers/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetes上のアプリケーションをtcpdumpでデバッグする'});">Kubernetes上のアプリケーションをtcpdumpでデバッグする</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/01/24/designing-data-intensive-applications/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '分散システム構築の良書「データ指向アプリケーションデザイン」を動画で解説する'});">分散システム構築の良書「データ指向アプリケーションデザイン」を動画で解説する</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/12/31/reflection/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「絆」2020年振り返り'});">「絆」2020年振り返り</a></li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    <a href="https://amzn.to/39YPLpA" target="_blank" onClick="gtag('event', 'ad', {'event_category': 'amazon-kindle-campaign'});"><img src="https://m.media-amazon.com/images/G/09/2020/Computers/others/AX55_300_300.jpg" class="img-fluid"></a>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (28)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (31)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (25)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (13)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (10)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (4)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/01/22/sockshop/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Sock Shopを使ったマイクロサービス体験のハンズオン'});">Sock Shopを使ったマイクロサービス体験のハンズオン</a> (2020/01/22)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/02/07/cka/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '新形式のCKAを受験し合格しました。受験の教訓紹介。'});">新形式のCKAを受験し合格しました。受験の教訓紹介。</a> (2021/02/07)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/01/24/designing-data-intensive-applications/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '分散システム構築の良書「データ指向アプリケーションデザイン」を動画で解説する'});">分散システム構築の良書「データ指向アプリケーションデザイン」を動画で解説する</a> (2021/01/24)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'OpenShift on NVIDIA GPU（導入編）'});">OpenShift on NVIDIA GPU（導入編）</a> (2020/12/17)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

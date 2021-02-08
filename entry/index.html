@@ -63,6 +63,31 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/" class="entry-title">Jaegerを使った分散トレーシングの検証 on Kubernetes (1)</a></h1>
+    <div class="entry-sub-title">
+        <span class="">08 Feb 2021, 17:04</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-アプリケーション開発" href="/categories/%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E9%96%8B%E7%99%BA">アプリケーション開発</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>もーすけです。<br>
+過去にDatadogでAPMを少し検証したり、トレーニングの中でJaegerを触ったりしましたが、正直ちゃんとわかっていなかったので、改めてJaegerというか分散トレーシングについて検証してみたいと思います。</p>
+<p>今回はKubernetes上にJaegerを構築するので、<a href="https://www.jaegertracing.io/docs/1.21/operator/">Jaeger Operatorをインストール</a>して利用します。
+今回はOpenShiftにて検証していますが、他のKubernetesディストリビューションでも同じように利用可能です。<code>oc</code> は <code>kubectl</code> と置き換えて読んでください。
+検証環境は下記のとおりです。</p>
+<ul>
+<li>OpenShift: 4.4</li>
+<li>Jaeger: 1.17</li>
+</ul>
+        <a href="https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2021/02/07/cka/" class="entry-title">新形式のCKAを受験し合格しました。受験の教訓紹介。</a></h1>
     <div class="entry-sub-title">
         <span class="">07 Feb 2021, 11:57</span>
@@ -275,33 +300,10 @@
         <a href="https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/" class="entry-title">【翻訳】Kubernetes as a serviceの謎を解く。Alibaba Cloudが1万個のKubernetesクラスタを管理する方法</a></h1>
-    <div class="entry-sub-title">
-        <span class="">17 Nov 2020, 17:24</span>
-        <span class="">By mosuke5</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-            
-                <a class="badge badge-inf post-category post-category-Alibaba Cloud" href="/categories/alibaba-cloud">Alibaba Cloud</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <p>※本記事は、著者であるZhimin Tangの許可をとって翻訳した記事となります。(<a href="https://www.cncf.io/blog/2019/12/12/demystifying-kubernetes-as-a-service-how-does-alibaba-cloud-manage-10000s-of-kubernetes-clusters/">原文</a>)<br>
-また本記事の内容は、2020/12/11のAliEaters Tokyo #16にて発表しており、スライドは以下です。</p>
-<iframe src="//www.slideshare.net/slideshow/embed_code/key/ajzBW1pq1pgkpj" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/mosuke5/alibaba-cloud1kubernetes" title="Alibaba Cloudが1万個のKubernetesクラスタを管理する方法" target="_blank">Alibaba Cloudが1万個のKubernetesクラスタを管理する方法</a> </strong> from <strong><a href="https://www.slideshare.net/mosuke5" target="_blank">Shinya Mori (@mosuke5)</a></strong> </div>
-<h2 id="概要">概要</h2>
-<p>2015年以来、Alibaba Cloud Container Service for Kubernetes（ACK）は、Alibaba Cloud上でもっとも急速に成長しているクラウドサービスの1つです。今日では、ACKは多数のAlibaba Cloudの顧客にサービスを提供しているだけでなく、Alibabaの社内インフラストラクチャやその他多くのAlibaba Cloudサービスをサポートしています。</p>
-<p>世界的なクラウドベンダーが提供する他の多くのコンテナサービスと同様に、ACKでは信頼性と可用性が最優先事項となっています。これらの目標を達成するために、セルベースでグローバルに利用可能なプラットフォームを構築し、数万個のKubernetesクラスタを稼働させています。</p>
-<p>今回のブログ記事では、クラウドインフラ上で大量のKubernetesクラスタを管理した経験と、その基盤となるプラットフォームの設計についてご紹介します。</p>
-        <a href="https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 1 of 13</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 1 of 14</span>
     
       <a href="/entry/page/2/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>
@@ -314,6 +316,8 @@
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Jaegerを使った分散トレーシングの検証 on Kubernetes (1)'});">Jaegerを使った分散トレーシングの検証 on Kubernetes (1)</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/02/07/cka/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '新形式のCKAを受験し合格しました。受験の教訓紹介。'});">新形式のCKAを受験し合格しました。受験の教訓紹介。</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/01/31/network-debug-on-containers/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetes上のアプリケーションをtcpdumpでデバッグする'});">Kubernetes上のアプリケーションをtcpdumpでデバッグする</a></li>
@@ -321,8 +325,6 @@
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/01/24/designing-data-intensive-applications/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '分散システム構築の良書「データ指向アプリケーションデザイン」を動画で解説する'});">分散システム構築の良書「データ指向アプリケーションデザイン」を動画で解説する</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/12/31/reflection/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「絆」2020年振り返り'});">「絆」2020年振り返り</a></li>
-      
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift on NVIDIA GPU（導入編）'});">OpenShift on NVIDIA GPU（導入編）</a></li>
       
     </ul>
   </div>
@@ -346,11 +348,11 @@
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (30)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (31)</a>
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (21)</a>
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
       </li>
       
       <li class="list-group-item">
@@ -416,7 +418,7 @@
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (3)</a>
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (4)</a>
       </li>
       
     </ul>
