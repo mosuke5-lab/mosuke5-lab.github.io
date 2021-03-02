@@ -6,7 +6,26 @@
     <description>Recent content in 2021 on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Mon, 08 Feb 2021 17:04:05 +0900</lastBuildDate><atom:link href="https://blog.mosuke.tech/archive/2021/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 01 Mar 2021 18:47:31 +0900</lastBuildDate><atom:link href="https://blog.mosuke.tech/archive/2021/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>OpenShiftでCA証明書を追加することについての検証</title>
+      <link>https://blog.mosuke.tech/entry/2021/03/01/openshift-add-user-ca/</link>
+      <pubDate>Mon, 01 Mar 2021 18:47:31 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2021/03/01/openshift-add-user-ca/</guid>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
+最近検証したOpenShiftへのCA証明書を追加することについてです。
+どういうケースでCA証明書の追加が必要かというと、自己証明書で運用されているレジストリとかプロキシに接続しなければいけないケースなどです。
+たとえば以下のようなケースでしょうか。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;非インターネット環境でのOpenShiftのインストールでミラーレジストリを構築した場合（ミラーレジストリの証明書が必要なケース）&lt;/li&gt;
+&lt;li&gt;OpenShift外にプライベートのコンテナレジストリを構築していて使っている場合（上とほぼ同義）&lt;/li&gt;
+&lt;li&gt;インターネットに出るのにプロキシを経由する必要があり、その証明書が必要な場合&lt;/li&gt;
+&lt;li&gt;社内のセキュリティでTLS復号化装置（SSL可視化ソリューションとかよばれるもの）を導入しており、その機器の証明書をインストールしなければならない場合&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;このときの証明書の追加の動きについて確認したので見ていきたいと思います。&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>Jaegerを使った分散トレーシングの検証 on Kubernetes (1)</title>
       <link>https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/</link>
