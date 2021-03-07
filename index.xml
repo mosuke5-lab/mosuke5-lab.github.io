@@ -6,7 +6,16 @@
     <description>Recent content on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sat, 06 Mar 2021 22:43:43 +0900</lastBuildDate><atom:link href="https://blog.mosuke.tech/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 07 Mar 2021 15:27:50 +0900</lastBuildDate><atom:link href="https://blog.mosuke.tech/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</title>
+      <link>https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/</link>
+      <pubDate>Sun, 07 Mar 2021 15:27:50 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/</guid>
+      <description>Tekton学習シリーズ 第1回: TektonのOperatorによるインストールとHello World 第2回: Tekton、TaskのStepの実行</description>
+    </item>
+    
     <item>
       <title>Tekton、Tasksにパラメータを設定する</title>
       <link>https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/</link>
@@ -17,7 +26,8 @@
 &lt;ul&gt;
 &lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;TektonのOperatorによるインストールとHello World&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
 今回はTektonのTaskにパラメータを引き渡す方法についてみていきます。
@@ -34,7 +44,8 @@
 &lt;ul&gt;
 &lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;TektonのOperatorによるインストールとHello World&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;前回、TektonのOperatorを使ったインストールについて解説しました。
 今回は、もうすこしTaskの動きを確認してみます。具体的には、Task内のStepの役割や、複数のStepがある場合の実行順序の制御方法などについて確認してみます。&lt;/p&gt;
@@ -382,7 +393,8 @@ GWはみなさんいかがお過ごしでしたか？&lt;br&gt;
 &lt;ul&gt;
 &lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;TektonのOperatorによるインストールとHello World&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;</description>
     </item>
     
