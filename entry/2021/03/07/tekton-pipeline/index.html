@@ -8,22 +8,22 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 <link rel="stylesheet" href="/css/main.css">
 
-<title>Tekton、Tasksにパラメータを設定する</title>
-<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/">
-<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/" />
+<title>Tekton、TaskをまとめてPipelineとして実行する</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/" />
 <meta name="twitter:card" content="summary">
 
 <meta name="twitter:site" content="@mosuke5" />
 <meta name="twitter:creator" content="@mosuke5" />
 
-<meta name="twitter:title" content="Tekton、Tasksにパラメータを設定する &middot; Goldstine研究所">
-<meta name="twitter:description" content="Tekton学習シリーズで、Taskにパラメータを指定する方法について紹介します。文字列、配列の指定方法などを確認します。">
+<meta name="twitter:title" content="Tekton、TaskをまとめてPipelineとして実行する &middot; Goldstine研究所">
+<meta name="twitter:description" content="Tekton学習シリーズ第5回は、いよいよTaskをまとめてPipelineという形で実行する方法について解説します。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Tekton、Tasksにパラメータを設定する &middot; Goldstine研究所">
-<meta property="og:description" content="Tekton学習シリーズで、Taskにパラメータを指定する方法について紹介します。文字列、配列の指定方法などを確認します。">
+<meta property="og:title" content="Tekton、TaskをまとめてPipelineとして実行する &middot; Goldstine研究所">
+<meta property="og:description" content="Tekton学習シリーズ第5回は、いよいよTaskをまとめてPipelineという形で実行する方法について解説します。">
 <meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
-<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/" />
 <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
 <link rel="icon" href="/image/favicon.ico" />
 
@@ -61,9 +61,9 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
-    <h1>Tekton、Tasksにパラメータを設定する</h1>
+    <h1>Tekton、TaskをまとめてPipelineとして実行する</h1>
     <div class="entry-sub-title">
-        <span class="">06 Mar 2021, 22:43</span>
+        <span class="">07 Mar 2021, 23:13</span>
         <span class="">By mosuke5</span>
         
             
@@ -80,13 +80,13 @@
 <li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
 <li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
 </ul>
-<p>こんにちは、もーすけです。<br>
-今回はTektonのTaskにパラメータを引き渡す方法についてみていきます。
-前回までは、Taskにべた書きしたコマンドを実行しましたが、パラメータ指定し変数化する方法を確認します。</p>
+<p>はい、もーすけです。<br>
+Tekton学習シリーズ第5回をやっていきます。
+本日はいよいよTaskをまとめPipelineをやっていきます。Taskの仕様を理解できていればおそらくそこまで難しくないと思います。</p>
 <h2 id="tektonにでてくる基本概念">Tektonにでてくる基本概念</h2>
 <p>まず、Tektonででてくる基本的かつ重要な概念についてあらためて整理しておきます。
 前回と同様のものを掲載していますが、基礎概念の回ではのせておこうと思います。
-本日もTaskとTaskRunについて扱います。</p>
+本日は、PipelineとPipelineRunについておもに扱います。</p>
 
 
   
@@ -131,14 +131,12 @@
 </table>
 
 
-<h2 id="taskにパラメータを設定する">Taskにパラメータを設定する</h2>
-<p>Taskにパラメータを設定するには、まずTaskになんのパラメータが必要かを記述する必要があります。
-以下は例ですが、<code>my-name</code>というパラメータを必要とします。型はStringとしていますが、のちほどでArrayの指定も見ていきます。
-デフォルト値は、<code>mosuke5</code>で設定しています。
-また変数展開は、<code>$(params.param-name)</code>で可能です。<br>
-詳細は公式ドキュメント&quot;<a href="https://tekton.dev/docs/pipelines/tasks/#specifying-parameters">Specifying Parameters</a>&ldquo;を確認しましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># hello-my-name-task.yaml</span>
-<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
+<h2 id="pipeline-hello-world">Pipeline Hello World</h2>
+<p>Tekton学習シリーズの第2,3回で利用したTaskを活用して、こんどはPipelineを作っていきます。
+Pipelineは、Taskの集合体であり、Tektonのなかでは一番大きい単位の実行リソースとなります。いままで見てきたTaskをラッピングして実行するため、Taskをきちんと理解していればそれほど難しいものではないと思います。</p>
+<p>改めて、以下のTaskを使います。<br>
+本シリーズの第2回 <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a> を実施した方は、<code>multi-steps-task</code>の3番目のStepをsleepに書き換えてしまったのでもとに戻しておいてください。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Task</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-my-name-task</span>
@@ -153,56 +151,7 @@
       <span style="color:#f92672">image</span>: <span style="color:#ae81ff">ubuntu</span>
       <span style="color:#f92672">command</span>: [<span style="color:#e6db74">&#34;echo&#34;</span>]
       <span style="color:#f92672">args</span>: [<span style="color:#e6db74">&#34;hello $(params.my-name)&#34;</span>]
-</code></pre></div><p>TaskRunで、実際にTaskを実行するときのパラメータを指定できます。
-<code>my-name</code>のデフォルト値は<code>mosuke5</code>ですが、パラメータ指定をわかりやすくするために、<code>momosuke5</code>で上書きします。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># hello-my-neme-task-run.yaml</span>
-<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">TaskRun</span>
-<span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-my-name-task-run</span>
-<span style="color:#f92672">spec</span>:
-  <span style="color:#f92672">params</span>:
-    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-name</span>
-      <span style="color:#f92672">value</span>: <span style="color:#ae81ff">momosuke5</span>
-  <span style="color:#f92672">taskRef</span>:
-    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-my-name-task</span>
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f hello-my-name-task.yaml
-task.tekton.dev/hello-my-name-task created
-
-$ kubectl apply -f hello-my-name-task-run.yaml
-taskrun.tekton.dev/hello-my-name-task-run created
-
-$ kubectl get pod
-kc get pod
-NAME                                             READY   STATUS      RESTARTS   AGE
-hello-my-name-task-run-pod-lgfbg                 0/1     Completed   0          2m52s
-
-$ kubectl logs hello-my-name-task-run-pod-lgfbg
-hello momosuke5
-</code></pre></div><p>ちなみに、実行されたPodのマニフェストを確認すると、Pod作成時点では変数は展開されており、以下のように<code>args</code>内で<code>hello momosuke5</code>となっています。
-Tektonが、Podを作成するときにパラメータは処理されています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod hello-my-name-task-run-pod-lgfbg -o yaml | less
-...
-spec:
-  containers:
-  - args:
-    - -wait_file
-    - /tekton/downward/ready
-    - -wait_file_content
-    - -post_file
-    - /tekton/tools/0
-    - -termination_path
-    - /tekton/termination
-    - -entrypoint
-    - echo
-    - --
-    - hello momosuke5
-</code></pre></div><h2 id="array型のパラメータ">array型のパラメータ</h2>
-<p>パラメータにはarray（配列）も扱えるということでやっていきます。
-<code>my-friends</code>というパラメータが必要であることをTaskに記述します。
-詳細は公式ドキュメント&rdquo;<a href="https://tekton.dev/docs/pipelines/tasks/#substituting-array-parameters">Substituting Array parameters
-</a>&ldquo;を確認しましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># hello-my-friends-task.yaml</span>
+---
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Task</span>
 <span style="color:#f92672">metadata</span>:
@@ -216,34 +165,166 @@ spec:
       <span style="color:#f92672">image</span>: <span style="color:#ae81ff">ubuntu</span>
       <span style="color:#f92672">command</span>: [<span style="color:#e6db74">&#34;echo&#34;</span>]
       <span style="color:#f92672">args</span>: [<span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#e6db74">&#34;$(params.my-friends[*])&#34;</span>]
-</code></pre></div><p>TaskRunで、配列で<code>my-friends</code>の値を渡します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># hello-my-friends-task-run.yaml</span>
+---
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">TaskRun</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Task</span>
 <span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-my-friends-task-run</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">multi-steps-task</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">steps</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">first-output</span>
+      <span style="color:#f92672">image</span>: <span style="color:#ae81ff">ubuntu</span>
+      <span style="color:#f92672">command</span>: [<span style="color:#e6db74">&#34;echo&#34;</span>]
+      <span style="color:#f92672">args</span>: [<span style="color:#e6db74">&#34;hello first step&#34;</span>]
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">second-output</span>
+      <span style="color:#f92672">image</span>: <span style="color:#ae81ff">ubuntu</span>
+      <span style="color:#f92672">command</span>: [<span style="color:#e6db74">&#34;echo&#34;</span>]
+      <span style="color:#f92672">args</span>: [<span style="color:#e6db74">&#34;hello second step&#34;</span>]
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">third-output</span>
+      <span style="color:#f92672">image</span>: <span style="color:#ae81ff">ubuntu</span>
+      <span style="color:#f92672">command</span>: [<span style="color:#e6db74">&#34;echo&#34;</span>]
+      <span style="color:#f92672">args</span>: [<span style="color:#e6db74">&#34;hello third step&#34;</span>]
+</code></pre></div><p>続いて、初登場のPipelineですが下記のとおりです。
+上で定義した3つのTaskをまとめてパイプラインとしています。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># my-first-pipeline.yaml</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pipeline</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-first-pipeline</span>
 <span style="color:#f92672">spec</span>:
   <span style="color:#f92672">params</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-name</span>
+      <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
     - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-friends</span>
-      <span style="color:#f92672">value</span>:
-        - <span style="color:#ae81ff">renge</span>
-        - <span style="color:#ae81ff">hikage</span>
-        - <span style="color:#ae81ff">komari</span>
-        - <span style="color:#ae81ff">natsumi</span>
-  <span style="color:#f92672">taskRef</span>:
-    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-my-friends-task</span>
-</code></pre></div><p>実行結果は以下のとおり、予想通りです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f hello-my-friends-task.yaml
-task.tekton.dev/hello-my-friends-task created
+      <span style="color:#f92672">type</span>: <span style="color:#ae81ff">array</span>
+  <span style="color:#f92672">tasks</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-my-name</span>
+      <span style="color:#f92672">taskRef</span>:
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-my-name-task</span>
+      <span style="color:#f92672">params</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-name</span>
+          <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;$(params.my-name)&#34;</span>
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-my-friends</span>
+      <span style="color:#f92672">taskRef</span>:
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-my-friends-task</span>
+      <span style="color:#f92672">params</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-friends</span>
+          <span style="color:#f92672">value</span>: [<span style="color:#e6db74">&#34;$(params.my-friends[*])&#34;</span>]
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">multi-steps</span>
+      <span style="color:#f92672">taskRef</span>:
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">multi-steps-task</span>
+</code></pre></div><p>では実行してみます。<br>
+最後の<code>kubectl get pod -w</code>のところで注目してほしい点があります。
+それは、上のパイプラインでは、Taskはすべて並列で実行されているということです。
+次のセクションで順序制御については触れますが、なにも設定しない限りデフォルトでは並列実行となります。</p>
+<p>イメージで言うとこんなかんじです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">                  (hello-my-name-task)
+                / 
+(Pipeline start) -(hello-my-friends-task) 
+                \
+                  (multi-steps-task)
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f my-first-pipeline.yaml
+pipeline.tekton.dev/my-first-pipeline created
 
-$ kubectl apply -f hello-my-friends-task-run.yaml
-taskrun.tekton.dev/hello-my-friends-task-run created
+% kubectl apply -f my-first-pipeline-run.yaml
+pipelinerun.tekton.dev/my-first-pipeline-run created
 
-$ kubectl logs hello-my-friends-task-run-pod-ps744
-hello renge hikage komari natsumi
-</code></pre></div><h2 id="さいごに">さいごに</h2>
-<p>今回は、Taskに対するパラメータの設定方法についか確認しました。
-Tektonの学習状況についてどんどん更新していきますので次回もよろしくお願いいたします。</p>
+$ kubectl get pod -w
+my-first-pipeline-run-hello-my-friends-9jf49-pod-wh2dg   0/1     Init:0/1    0          3s
+my-first-pipeline-run-hello-my-name-qlmfz-pod-hf25l      0/1     Init:0/1    0          3s
+my-first-pipeline-run-multi-steps-swftw-pod-4b2hq        0/3     Init:0/1    0          3s
+my-first-pipeline-run-hello-my-name-qlmfz-pod-hf25l      0/1     PodInitializing   0          7s
+my-first-pipeline-run-hello-my-friends-9jf49-pod-wh2dg   0/1     PodInitializing   0          7s
+my-first-pipeline-run-multi-steps-swftw-pod-4b2hq        0/3     PodInitializing   0          8s
+my-first-pipeline-run-hello-my-name-qlmfz-pod-hf25l      1/1     Running           0          11s
+my-first-pipeline-run-hello-my-name-qlmfz-pod-hf25l      1/1     Running           0          11s
+my-first-pipeline-run-hello-my-friends-9jf49-pod-wh2dg   1/1     Running           0          12s
+my-first-pipeline-run-hello-my-friends-9jf49-pod-wh2dg   1/1     Running           0          12s
+my-first-pipeline-run-hello-my-name-qlmfz-pod-hf25l      0/1     Completed         0          12s
+my-first-pipeline-run-hello-my-friends-9jf49-pod-wh2dg   0/1     Completed         0          13s
+my-first-pipeline-run-multi-steps-swftw-pod-4b2hq        3/3     Running           0          15s
+my-first-pipeline-run-multi-steps-swftw-pod-4b2hq        3/3     Running           0          15s
+my-first-pipeline-run-multi-steps-swftw-pod-4b2hq        2/3     Running           0          17s
+my-first-pipeline-run-multi-steps-swftw-pod-4b2hq        1/3     Running           0          18s
+my-first-pipeline-run-multi-steps-swftw-pod-4b2hq        0/3     Completed         0          19s
+</code></pre></div><h2 id="実行するtaskの順番を指定する">実行するTaskの順番を指定する</h2>
+<p>なんとなくPipelineについてわかってきましたよね？<br>
+上で、Taskはすべて並列に動くという話をしましたが、ここで順序制御をしてみましょう。
+<code>hello-my-friends</code>は<code>hello-my-name</code>の終わったあとに実行する、ということとします。<br>
+イメージはこんな感じです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">                  (hello-my-name-task) - (hello-my-friends-task)
+                / 
+(Pipeline start)  
+                \
+                  (multi-steps-task)
+</code></pre></div><p>次のようにPipelineを書き換えてみましょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pipeline</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-second-pipeline</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">params</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-name</span>
+      <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-friends</span>
+      <span style="color:#f92672">type</span>: <span style="color:#ae81ff">array</span>
+  <span style="color:#f92672">tasks</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-my-name</span>
+      <span style="color:#f92672">taskRef</span>:
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-my-name-task</span>
+      <span style="color:#f92672">params</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-name</span>
+          <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;$(params.my-name)&#34;</span>
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-my-friends</span>
+      <span style="color:#f92672">taskRef</span>:
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-my-friends-task</span>
+      <span style="color:#f92672">params</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-friends</span>
+          <span style="color:#f92672">value</span>: [<span style="color:#e6db74">&#34;$(params.my-friends[*])&#34;</span>]
+      <span style="color:#75715e"># my-first-pipelineから追加</span>
+      <span style="color:#f92672">runAfter</span>:
+        - <span style="color:#ae81ff">hello-my-name</span>
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">multi-steps</span>
+      <span style="color:#f92672">taskRef</span>:
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">multi-steps-task</span>
+</code></pre></div><p><code>kubectl get pod -w</code>の出力結果をよく見てみましょう。<br>
+はじめにPodができたのは、<code>hello-my-name</code>と<code>multi-steps</code>のふたつです。
+<code>hello-my-name</code>が<code>Completed</code>になった後 <code>hello-my-friends</code>のPodが起動しているのがわかります。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kc apply -f my-second-pipeline.yaml
+pipeline.tekton.dev/my-second-pipeline created
+
+$ kc apply -f my-second-pipeline-run.yaml
+pipelinerun.tekton.dev/my-second-pipeline-run created
+
+$ kubectl get pod -w
+my-second-pipeline-run-hello-my-name-g77b9-pod-lktbh     0/1     Init:0/1    0          2s
+my-second-pipeline-run-multi-steps-vpwf4-pod-9xgw7       0/3     Init:0/1    0          2s
+my-second-pipeline-run-multi-steps-vpwf4-pod-9xgw7       0/3     PodInitializing   0          2s
+my-second-pipeline-run-hello-my-name-g77b9-pod-lktbh     0/1     PodInitializing   0          2s
+my-second-pipeline-run-hello-my-name-g77b9-pod-lktbh     1/1     Running           0          4s
+my-second-pipeline-run-hello-my-name-g77b9-pod-lktbh     1/1     Running           0          4s
+my-second-pipeline-run-hello-my-name-g77b9-pod-lktbh     0/1     Completed         0          5s
+my-second-pipeline-run-hello-my-friends-tfp44-pod-m5xjr   0/1     Pending           0          1s
+my-second-pipeline-run-hello-my-friends-tfp44-pod-m5xjr   0/1     Pending           0          1s
+my-second-pipeline-run-hello-my-friends-tfp44-pod-m5xjr   0/1     Init:0/1          0          1s
+my-second-pipeline-run-hello-my-friends-tfp44-pod-m5xjr   0/1     PodInitializing   0          2s
+my-second-pipeline-run-multi-steps-vpwf4-pod-9xgw7        3/3     Running           0          7s
+my-second-pipeline-run-multi-steps-vpwf4-pod-9xgw7        3/3     Running           0          7s
+my-second-pipeline-run-hello-my-friends-tfp44-pod-m5xjr   1/1     Running           0          3s
+my-second-pipeline-run-hello-my-friends-tfp44-pod-m5xjr   1/1     Running           0          3s
+my-second-pipeline-run-multi-steps-vpwf4-pod-9xgw7        1/3     Running           0          9s
+my-second-pipeline-run-multi-steps-vpwf4-pod-9xgw7        0/3     Completed         0          10s
+my-second-pipeline-run-hello-my-friends-tfp44-pod-m5xjr   0/1     Completed         0          5s
+</code></pre></div><h2 id="conditionsを使ったguard-taskの実行">Conditionsを使ったGuard Taskの実行</h2>
+<p><code>runAfter</code>と似た概念にGuard Taskがあります。
+こちらは、<a href="https://tekton.dev/docs/pipelines/pipelines/#guard-task-execution-using-conditions">ドキュメント</a>にもあるとおりですが、Guard Taskが失敗した場合後続のタスクは実行されません。
+しかし、それ以外の並列で動いているタスクには影響を与えないという特徴があります。
+パイプラインの特性に合わせて組み合わせて使ってみてください。<br>
+本シリーズでも機会があれば別途取り上げたいと思います。</p>
+<h2 id="さいごに">さいごに</h2>
+<p>今回は、簡単ではありますがTaskをまとめてPipelineとして実行しました。<br>
+Pipelineも前回の第4回で行ったPipelineResourceをもちろん組み合わせて利用できます。
+次回は、出力結果の扱いやPipelineのより実践的な使い方などを見ていこうと思います。</p>
 <p>Tekton学習シリーズ</p>
 <ul>
 <li>第1回: <a href="/entry/2020/05/10/tekton-operator/">TektonのOperatorによるインストールとHello World</a></li>
@@ -252,10 +333,11 @@ Tektonの学習状況についてどんどん更新していきますので次�
 <li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
 <li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
 </ul>
+
     </div>
     <div class="entry-sub-content request-for-entry">
         <h5>フィードバック・相談(β)</h5>
-        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Tekton%e3%80%81Tasks%e3%81%ab%e3%83%91%e3%83%a9%e3%83%a1%e3%83%bc%e3%82%bf%e3%82%92%e8%a8%ad%e5%ae%9a%e3%81%99%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Tekton、Tasksにパラメータを設定する'});">執筆者に問い合わせてみる</a></p>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Tekton%e3%80%81Task%e3%82%92%e3%81%be%e3%81%a8%e3%82%81%e3%81%a6Pipeline%e3%81%a8%e3%81%97%e3%81%a6%e5%ae%9f%e8%a1%8c%e3%81%99%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Tekton、TaskをまとめてPipelineとして実行する'});">執筆者に問い合わせてみる</a></p>
     </div>
     <div class="entry-sub-content post-share">
         <div class="post-share-links">
@@ -424,9 +506,9 @@ Tektonの学習状況についてどんどん更新していきますので次�
       <h3>関連する記事</h3>
       <ul class="list-group">
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、TaskをまとめてPipelineとして実行する'});">Tekton、TaskをまとめてPipelineとして実行する</a> (2021/03/07)</li>
-        
         <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、TaskでPipelineResouceを利用したときの挙動を確認する'});">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a> (2021/03/07)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、Tasksにパラメータを設定する'});">Tekton、Tasksにパラメータを設定する</a> (2021/03/06)</li>
         
         <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、TaskのStepの実行順序について確認する'});">Tekton、TaskのStepの実行順序について確認する</a> (2021/03/06)</li>
         

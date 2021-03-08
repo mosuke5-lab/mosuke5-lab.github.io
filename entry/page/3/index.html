@@ -63,6 +63,24 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/" class="entry-title">ZabbixでKubernetesの監視を検討する（Prometheus exporter, Kubernetes API）</a></h1>
+    <div class="entry-sub-title">
+        <span class="">13 Aug 2020, 18:40</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、<a href="https://twitter.com/mosuke5" target="_blank">mosuke5</a> です。
+本日は、ZabbixでKubernetesの監視をどこまで頑張れるか考えてみたいと思います。
+クラウドネイティブな環境ならPrometheusとそう単純に思うところですが、使い慣れたツールに統合したいことも当然ありますし、選択肢はいろいろあるべきですね。
+どんな方法で実現できるのかみていきましょう。</p>
+        <a href="https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/" class="entry-title">コンテナイメージを軽くする方法と、その原理原則を考える</a></h1>
     <div class="entry-sub-title">
         <span class="">09 Jul 2020, 18:50</span>
@@ -172,6 +190,7 @@ GWはみなさんいかがお過ごしでしたか？<br>
 <li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
 <li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
 <li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
 </ul>
         <a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/">続きを読む</a>
     </div>
@@ -257,27 +276,6 @@ Kubernetes Lifeは順調でしょうか？<br>
         <a href="https://blog.mosuke.tech/entry/2020/04/05/skopeo/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2020/03/31/kubernetes-resource/" class="entry-title">Kubernetesのリソースの基本を今度こそ理解する</a></h1>
-    <div class="entry-sub-title">
-        <span class="">31 Mar 2020, 09:56</span>
-        <span class="">By mosuke5</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <p>こんにちは。<a href="https://twitter.com/mosuke5">もーすけ</a>です。<br>
-コロナによる在宅勤務を行っている人も多いと思いますが、在宅は捗っていますか？
-テレビからYouTubeなどを使って、カフェの雑音などを流しておくと家の中でも雰囲気はがらっと変わって集中できたりします。
-イヤホンなどで流すよりも部屋全体に流れるようにテレビなどでやるとおすすめです。ぜひトライしてみてください。</p>
-<p>今日は、Kubernetesのリソースの基本についてまとめました。<br>
-なんとなくでマニフェストのリソースを設定してアプリケーションがエラーになってしまってトラブルシュートに困ったことのある方もおそらくおおいのではないでしょうか。
-今回は最低限ここだけは抑えておいたほうがいいだろう、と個人的に感じているリソースの４点（コンテナのへのリソース割り当て, QoS Class, LimitRange、ResourceQuota）についてまとめました。機会あれば別の観点もご紹介したいともいます。</p>
-        <a href="https://blog.mosuke.tech/entry/2020/03/31/kubernetes-resource/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
@@ -298,6 +296,8 @@ Kubernetes Lifeは順調でしょうか？<br>
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、TaskをまとめてPipelineとして実行する'});">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、TaskでPipelineResouceを利用したときの挙動を確認する'});">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、Tasksにパラメータを設定する'});">Tekton、Tasksにパラメータを設定する</a></li>
@@ -305,8 +305,6 @@ Kubernetes Lifeは順調でしょうか？<br>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、TaskのStepの実行順序について確認する'});">Tekton、TaskのStepの実行順序について確認する</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/03/redis-on-kubernetes/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Redis on Kubernetesの検討ポイントとredis-ha Helm chart'});">Redis on Kubernetesの検討ポイントとredis-ha Helm chart</a></li>
-      
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/01/openshift-add-user-ca/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShiftでCA証明書を追加することについての検証'});">OpenShiftでCA証明書を追加することについての検証</a></li>
       
     </ul>
   </div>
@@ -340,7 +338,7 @@ Kubernetes Lifeは順調でしょうか？<br>
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (36)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (37)</a>
       </li>
       
       <li class="list-group-item">
@@ -414,7 +412,7 @@ Kubernetes Lifeは順調でしょうか？<br>
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (9)</a>
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (10)</a>
       </li>
       
     </ul>

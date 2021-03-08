@@ -6,7 +6,16 @@
     <description>Recent content in Kubernetes on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sun, 07 Mar 2021 15:27:50 +0900</lastBuildDate><atom:link href="https://blog.mosuke.tech/categories/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 07 Mar 2021 23:13:07 +0900</lastBuildDate><atom:link href="https://blog.mosuke.tech/categories/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Tekton、TaskをまとめてPipelineとして実行する</title>
+      <link>https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/</link>
+      <pubDate>Sun, 07 Mar 2021 23:13:07 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/</guid>
+      <description>Tekton学習シリーズ 第1回: TektonのOperatorによるインストールとHello World 第2回: Tekton、TaskのStepの実行</description>
+    </item>
+    
     <item>
       <title>Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</title>
       <link>https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/</link>
@@ -19,6 +28,7 @@
 &lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
 本日もTekton学習シリーズやっていきます。第4回は、TaskにPipelineResourceを追加してみます。
@@ -37,6 +47,7 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
 &lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
 今回はTektonのTaskにパラメータを引き渡す方法についてみていきます。
@@ -55,6 +66,7 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
 &lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;前回、TektonのOperatorを使ったインストールについて解説しました。
 今回は、もうすこしTaskの動きを確認してみます。具体的には、Task内のStepの役割や、複数のStepがある場合の実行順序の制御方法などについて確認してみます。&lt;/p&gt;
@@ -348,6 +360,7 @@ GWはみなさんいかがお過ごしでしたか？&lt;br&gt;
 &lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;</description>
     </item>
     

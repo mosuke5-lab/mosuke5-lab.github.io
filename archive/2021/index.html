@@ -63,6 +63,21 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/" class="entry-title">Tekton、TaskをまとめてPipelineとして実行する</a></h1>
+    <div class="entry-sub-title">
+        <span class="">07 Mar 2021, 23:13</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        Tekton学習シリーズ 第1回: TektonのOperatorによるインストールとHello World 第2回: Tekton、TaskのStepの実行
+        <a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/" class="entry-title">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></h1>
     <div class="entry-sub-title">
         <span class="">07 Mar 2021, 15:27</span>
@@ -80,6 +95,7 @@
 <li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
 <li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
 <li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
 </ul>
 <p>こんにちは、もーすけです。<br>
 本日もTekton学習シリーズやっていきます。第4回は、TaskにPipelineResourceを追加してみます。
@@ -104,6 +120,7 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
 <li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
 <li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
 <li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
 </ul>
 <p>こんにちは、もーすけです。<br>
 今回はTektonのTaskにパラメータを引き渡す方法についてみていきます。
@@ -128,6 +145,7 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
 <li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
 <li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
 <li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
 </ul>
 <p>前回、TektonのOperatorを使ったインストールについて解説しました。
 今回は、もうすこしTaskの動きを確認してみます。具体的には、Task内のStepの役割や、複数のStepがある場合の実行順序の制御方法などについて確認してみます。</p>
@@ -277,6 +295,8 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、TaskをまとめてPipelineとして実行する'});">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、TaskでPipelineResouceを利用したときの挙動を確認する'});">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、Tasksにパラメータを設定する'});">Tekton、Tasksにパラメータを設定する</a></li>
@@ -284,8 +304,6 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、TaskのStepの実行順序について確認する'});">Tekton、TaskのStepの実行順序について確認する</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/03/redis-on-kubernetes/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Redis on Kubernetesの検討ポイントとredis-ha Helm chart'});">Redis on Kubernetesの検討ポイントとredis-ha Helm chart</a></li>
-      
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/01/openshift-add-user-ca/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShiftでCA証明書を追加することについての検証'});">OpenShiftでCA証明書を追加することについての検証</a></li>
       
     </ul>
   </div>
@@ -319,7 +337,7 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (36)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (37)</a>
       </li>
       
       <li class="list-group-item">
@@ -393,7 +411,7 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (9)</a>
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (10)</a>
       </li>
       
     </ul>
