@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+
+<title>Kubernetesのノード障害時のPodの動きについての検証</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/03/11/kubernetes-node-down/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/03/11/kubernetes-node-down/" />
+<meta name="twitter:card" content="summary">
+
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+
+<meta name="twitter:title" content="Kubernetesのノード障害時のPodの動きについての検証 &middot; Goldstine研究所">
+<meta name="twitter:description" content="Kubernetesのノードに障害が起きたときのPodの動きについて理解していますか？別のノードにPodがスケジュールされるよね、と思いたいところですがそれほど単純な話でもありません。事象となぜそれが起こるのかを解説します。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetesのノード障害時のPodの動きについての検証 &middot; Goldstine研究所">
+<meta property="og:description" content="Kubernetesのノードに障害が起きたときのPodの動きについて理解していますか？別のノードにPodがスケジュールされるよね、と思いたいところですがそれほど単純な話でもありません。事象となぜそれが起こるのかを解説します。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/03/11/kubernetes-node-down/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+
+
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetes</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://docs.google.com/forms/d/e/1FAIpQLSd6N53H7zfF8EBrvyezRizU1mQx-CP3vc_jG-WvxfRmCjHTpg/viewform" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-site','event_label': 'from-header'});">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Kubernetesのノード障害時のPodの動きについての検証</h1>
+    <div class="entry-sub-title">
+        <span class="">11 Mar 2021, 00:13</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。<br>
+本日はKubernetesのノード障害が起きたときのPodの挙動について確認します。
+いままで、ノード障害が起きたときのPodの挙動、スケジューリングについて誤った認識をしていました。
+お恥ずかしい限りなのですが、同じような誤った認識をしているかたに向けて確認したことを解説します。</p>
+<h2 id="概要">概要</h2>
+<p>まずはじめに、状況を説明します。Workerノード3台があって、アプリケーションが動作しているとします。
+Worker#1がシャットダウンした、kubeletが停止した、ネットワーク的に疎通ができなくなったなどが起きたときに、その上で動いていてPodはどうなるの？という話です。
+感覚的にいうと、レプリカ数を維持するために他のノードに移って起動するんでしょ！、と思いたいところなのですが、実際はそれほど単純でもありません。
+どのような動きをしていくのか、Deploymentを使ったケース、StatefulSetを利用したケースなどで確認します。</p>
+<p><img src="/image/kubernetes-node-down-overview.png" alt="node-down-overview"></p>
+<h2 id="ノードをシャットダウンしたときに起きること事象">ノードをシャットダウンしたときに起きること（事象）</h2>
+<p>※このセクションでは事象を説明します。事象の解説については後述します。<br>
+ノードをシャットダウンしたり、kubeletを停止するとNodeのStatusは<code>NotReady</code>となります。
+現在、Master x3, Worker x3で稼働しているクラスタですが。本ブログではMsterノードは気にしなくていいので、<code>kubectl get node</code>実行時にはWorkerのみ取り出すこととします。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get node --selector=&#39;node-role.kubernetes.io/worker&#39;
+NAME                                              STATUS   ROLES    AGE     VERSION
+ip-10-0-163-234.ap-southeast-1.compute.internal   Ready    worker   9m6s    v1.19.0+8d12420
+ip-10-0-168-85.ap-southeast-1.compute.internal    Ready    worker   18h     v1.19.0+8d12420
+ip-10-0-184-189.ap-southeast-1.compute.internal   Ready    worker   9m28s   v1.19.0+8d12420
+</code></pre></div><p>また、Nginx DeploymentをReplicas=3で起動しておきます。Podが起動しているノードが重要です。よく確認しておきましょう。
+<code>ip-10-0-184-189.ap-southeast-1.compute.internal</code>（以後、<code>ip-10-0-184-189</code>と記載）にひとつのPodが、<code>ip-10-0-163-234.ap-southeast-1.compute.internal</code>（以後、<code>ip-10-0-163-234</code>と記載）にふたつのPodが起動しています。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl create deployment nginx --image=nginxinc/nginx-unprivileged:1.19 --replicas=3
+deployment.apps/nginx created
+
+$ kubectl get pod -o wide
+NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE                                              NOMINATED NODE   READINESS GATES
+nginx-5998485d44-44bsh   1/1     Running   0          32s   10.131.0.7    ip-10-0-184-189.ap-southeast-1.compute.internal   &lt;none&gt;           &lt;none&gt;
+nginx-5998485d44-gg8h9   1/1     Running   0          32s   10.128.2.12   ip-10-0-163-234.ap-southeast-1.compute.internal   &lt;none&gt;           &lt;none&gt;
+nginx-5998485d44-xcxpl   1/1     Running   0          32s   10.128.2.13   ip-10-0-163-234.ap-southeast-1.compute.internal   &lt;none&gt;           &lt;none&gt;
+
+$ kubectl get deploy
+NAME    READY   UP-TO-DATE   AVAILABLE   AGE
+nginx   3/3     3            3           73s
+</code></pre></div><p>それでは、Podがひとつ起動している<code>ip-10-0-184-189</code>のノードをシャットダウンします。
+その後に、NodeのステータスおよびPodの動きに注目です。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ssh ip-10-0-184-189.ap-southeast-1.compute.internal
+node# shutdown -h now
+
+// 1分くらいたって ip-10-0-184-189 が NotReady になった
+$ kubectl get node --selector=&#39;node-role.kubernetes.io/worker&#39; -w
+NAME                                              STATUS   ROLES    AGE   VERSION
+ip-10-0-163-234.ap-southeast-1.compute.internal   Ready     worker   22m   v1.19.0+8d12420
+ip-10-0-168-85.ap-southeast-1.compute.internal    Ready     worker   18h   v1.19.0+8d12420
+ip-10-0-184-189.ap-southeast-1.compute.internal   NotReady  worker   23m   v1.19.0+8d12420
+</code></pre></div><p>このときのPodの状態を確認してみます。<br>
+実は、Pod（nginx-5998485d44-44bsh）は変わらず<code>Running</code>のままです。
+試しにこのPodへcurlでアクセスしてみますが当然応答は返しません。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod -o wide
+NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE                                              NOMINATED NODE   READINESS GATES
+nginx-5998485d44-44bsh   1/1     Running   0          10m   10.131.0.7    ip-10-0-184-189.ap-southeast-1.compute.internal   &lt;none&gt;           &lt;none&gt;
+nginx-5998485d44-gg8h9   1/1     Running   0          10m   10.128.2.12   ip-10-0-163-234.ap-southeast-1.compute.internal   &lt;none&gt;           &lt;none&gt;
+nginx-5998485d44-xcxpl   1/1     Running   0          10m   10.128.2.13   ip-10-0-163-234.ap-southeast-1.compute.internal   &lt;none&gt;           &lt;none&gt;
+
+// IPで接続しているが、これはシャットダウンしたノードの上に稼働していたNginx
+$ kubectl exec nginx-5998485d44-gg8h9 -- curl -I http://10.131.0.7:8080/
+curl: (7) Failed to connect to 10.131.0.7 port 8080: No route to host
+command terminated with exit code 7
+
+// 他のPodへは疎通できることを確認
+$ kubectl exec nginx-5998485d44-gg8h9 -- curl -I http://10.128.2.13:8080/
+HTTP/1.1 200
+Server: nginx/1.19.8
+Date: Sat, 13 Mar 2021 05:29:51 GMT
+Content-Type: text/html
+Content-Length: 612
+Last-Modified: Tue, 09 Mar 2021 15:27:51 GMT
+Connection: keep-alive
+ETag: &#34;604793f7-264&#34;
+Accept-Ranges: bytes
+</code></pre></div><p>詳しい説明はあとでするとして、先に進みます。<br>
+5分経過後に変化がおきました。<code>ip-10-0-184-189</code>の上で動いていた<code>nginx-5998485d44-44bsh</code>が<code>Terminating</code>となり、あらたに<code>nginx-5998485d44-84zkg</code>が起動しました。<br>
+ちなみに、この<code>Terminating</code>のPod(nginx-5998485d44-44bsh) はこのままになってしまいました。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get node -o wide
+NAME                     READY   STATUS        RESTARTS   AGE   IP            NODE                                              NOMINATED NODE   READINESS GATES
+nginx-5998485d44-44bsh   1/1     Terminating   0          14m   10.131.0.7    ip-10-0-184-189.ap-southeast-1.compute.internal   &lt;none&gt;      &lt;none&gt;
+nginx-5998485d44-84zkg   1/1     Running       0          8s    10.128.2.24   ip-10-0-163-234.ap-southeast-1.compute.internal   &lt;none&gt;      &lt;none&gt;
+nginx-5998485d44-gg8h9   1/1     Running       0          14m   10.128.2.12   ip-10-0-163-234.ap-southeast-1.compute.internal   &lt;none&gt;      &lt;none&gt;
+nginx-5998485d44-xcxpl   1/1     Running       0          14m   10.128.2.13   ip-10-0-163-234.ap-southeast-1.compute.internal   &lt;none&gt;      &lt;none&gt;
+</code></pre></div><h2 id="起きたことの解説">起きたことの解説</h2>
+<p>そろそろ解説していきます。出来事としては理解できましたでしょうか。<br>
+事象的には、ノードをシャットダウンしてもすぐに、ノード上のPodは再スケジューリングされないということです。</p>
+<p>ノードをシャットダウンした後、node_lifecycle_controller(Kubernetesのコントロールプレーンの機能のひとつ)は、KubeletがNode情報を更新しなくなったことを検知して、NodeのStatusを変更します。<a href="https://github.com/kubernetes/kubernetes/blob/release-1.19/pkg/controller/nodelifecycle/node_lifecycle_controller.go#L759">node_licecycle_controller.go の monitorNodeHealth()</a> あたりが担当しています。
+このときに、ノードに対して同時に <code>key: node.kubernetes.io/unreachable</code> のTaintを付与します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl describe node ip-10-0-184-189.ap-southeast-1.compute.internal
+...
+Taints:             node.kubernetes.io/unreachable:NoExecute
+                    node.kubernetes.io/unreachable:NoSchedule
+...
+</code></pre></div><p>Podは作成時に、自動的にあるtolerationsが付与されています。
+Kubernetesでは、<a href="https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#defaulttolerationseconds">DefaultTolerationSeconds</a>というAdmission Controllerがデフォルトで動作しています。Podの作成時に、下に紹介するtolerationsを付与します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod -o yaml anypod
+...
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+</code></pre></div><p>この<code>tolerationSeconds</code>はデフォルトでは300秒に設定されており、300秒経ってもノードが復旧しない場合（Taintが外れない場合）、PodがEviction（強制退去）され別のノードにスケジュールされるという仕組みです。
+そのため、ノードのシャットダウン後5分間（300秒）Podが再スケジューリングされなかったのはそのためです。
+公式ドキュメントの「<a href="https://kubernetes.io/ja/docs/concepts/scheduling-eviction/taint-and-toleration/">TaintとToleration</a>」を改めて確認しておきましょう。
+ちなみに、<code>tolerationSeconds</code>はkube-apiserverの起動時にオプションとして指定することが可能です。<code>--default-not-ready-toleration-seconds</code>, <code>--default-unreachable-toleration-seconds</code> で設定できます。詳しくは<a href="https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/">こちらのドキュメント</a>をも確認しましょう。</p>
+<h2 id="しばらくpodがrunningであった理由">しばらくPodがRunningであった理由</h2>
+<p>5分後に別のノードへと移りましたが、その間Podは<code>Running</code>のままでした。
+PodにCurlでアクセスをしても応答が返ってきませんでしたが、なぜRunningだったのでしょうか。
+これは、Kubeletが停止しているからかと思います。PodのステータスはKubeletが更新しますが、そもそもノードのシャットダウンによってKubeletが停止しているのでPodのステータスの更新もできずにスタックしてしまっていると思っています。もし間違えていたらご指摘ください。</p>
+<h2 id="podがterminatingのままの理由">PodがTerminatingのままの理由</h2>
+<p>5分経過後、Podは<code>Terminating</code>に変移し、別のPodが起動しました。
+しかし、Podは<code>Terminating</code>のままです。時間が経ってもPodが消えずに残ったままになります。
+これもKubeletが起動していないからかと思います。Podの削除後、Kubeletがプロセスとして終了させますが、起動していないのでKubeletの確認待ちというステータスで止まっているということです。
+解消する方法としては、Podの強制削除やNodeオブジェクトの削除することなどがあります。</p>
+<h2 id="nodeが一定時間で復旧する場合">Nodeが一定時間で復旧する場合</h2>
+<p>Nodeが一定時間で復旧する場合はどうでしょうか？
+たとえば、シャットダウンではなく再起動です。<code>#shutdown -r now</code> と再起動させたときの動作について考えます。5分以内（<code>tolerationSeconds</code>以内）にノードが復旧すれば、<code>key: node.kubernetes.io/unreachable</code> のTaintが外れ、Podが強制退去されることなく再開します。同じノードで起動し続けるということですね。<br>
+仮にですが、<code>tolerationSeconds</code>が極端に短かったとします。ノードの再起動や一時的なノード障害であっても、Podは別のノードに移動します。一方で、Podが一部のノードに偏ってしまう可能性が高まってしまうのでトレードオフです。十分に注意して起きましょう。</p>
+<h2 id="statefulsetを利用する場合の考慮">StatefulSetを利用する場合の考慮</h2>
+<p>今までの例ではNginx Deploymentを使っていましたが、StatefulSetを利用している場合は、また別の考慮ポイントがあります。Deploymentは、StatefulSetと異なり、Podのレプリカ数について厳密性を求めていません。
+あるPodがTerminatingになれば他のPodの起動が可能ですが、StatefulSetは公式ドキュメント（「<a href="https://kubernetes.io/ja/docs/tasks/run-application/force-delete-stateful-set-pod/">StatefulSet Podの強制削除</a>」）に記載がある通り、<code>クラスター内で実行されている特定のIDを持つ最大1つのPodがいつでも存在することを保証します</code>。つまり、Terminatingステータスになっても、完全に削除されたことを確認できるまでは、Podを作成することはできません。</p>
+<blockquote>
+<p>StatefulSetコントローラーは、StatefulSetのメンバーの作成、スケール、削除を行います。それは序数0からN-1までの指定された数のPodが生きていて準備ができていることを保証しようとします。StatefulSetは、クラスター内で実行されている特定のIDを持つ最大1つのPodがいつでも存在することを保証します。これは、StatefulSetによって提供される最大1つのセマンティクスと呼ばれます。</p>
+</blockquote>
+<p>StatefulSetでPodがTerminatingでスタックした場合の解消方法として下記が公式ドキュメントにも書かれています。
+例としては、<code>kubectl delete pod xxxx --force</code>で強制削除すれば、ノードが復旧できない状況でも最悪リスケジュールできます。</p>
+<ul>
+<li>(ユーザーまたはNode Controllerによって)Nodeオブジェクトが削除されるとき</li>
+<li>応答していないNodeのkubeletが応答を開始し、Podを終了してapiserverからエントリーを削除するとき</li>
+<li>ユーザーによりPodを強制削除するとき</li>
+</ul>
+<h2 id="tolerationseconds前にpodを削除した場合">tolerationSeconds前にPodを削除した場合</h2>
+<p>ここまで見てきたように、NodeをシャットダウンしてもPodがリスケジュールされないのは、KubeletによってPodのステータスが変更されないことにありました。
+もし、StatefulSetではなくDeploymentを利用していてステートレスなアプリケーションであれば、tolerationSecondsを待つ前にPodを削除してしまって対処することも選択としてとれます。</p>
+<h2 id="ノードオブジェクトの削除した場合">ノードオブジェクトの削除した場合</h2>
+<p>ノードをシャットダウンではなくて、Kubernetesからノードオブジェクトを削除したらどうなるでしょうか？<br>
+<code>kubectl delete node worker-xxxx</code>などでノードオブジェクトを削除した場合は、前に見てきたようなノードの復旧・Kubeletの復旧を待つことがないので、比較的すばやくPodは再スケジューリングされます。</p>
+<h2 id="まとめ">まとめ</h2>
+<p>はい、以上に見てきたように、KubernetesのWorkerノードが停止した際、障害が発生した際の挙動を見てきました。
+Kubernetesでは、Podの偏りを回避するなどの目的もあり、ノードが停止したからといってすぐに別のノードに再スケジューリングされるわけではありません。Podを削除したときの挙動とは異なるので十分に注意しましょう。
+本番環境での運用を見据えると、ノードが停止したときの対応策についても十分に検討しておく必要がありそうです。その際もDeploymentなのかStatefulSetなのか、利用しているワークロードの種類によってもアプローチが異なります。動きを正しく理解しておくことで、より適切な対策が打てるようになるのではないかと思います。</p>
+    </div>
+    <div class="entry-sub-content request-for-entry">
+        <h5>フィードバック・相談(β)</h5>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Kubernetes%e3%81%ae%e3%83%8e%e3%83%bc%e3%83%89%e9%9a%9c%e5%ae%b3%e6%99%82%e3%81%aePod%e3%81%ae%e5%8b%95%e3%81%8d%e3%81%ab%e3%81%a4%e3%81%84%e3%81%a6%e3%81%ae%e6%a4%9c%e8%a8%bc" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Kubernetesのノード障害時のPodの動きについての検証'});">執筆者に問い合わせてみる</a></p>
+    </div>
+    <div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+    <div class="entry-sub-content disqus">
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/11/kubernetes-node-down/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetesのノード障害時のPodの動きについての検証'});">Kubernetesのノード障害時のPodの動きについての検証</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、TaskをまとめてPipelineとして実行する'});">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、TaskでPipelineResouceを利用したときの挙動を確認する'});">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、Tasksにパラメータを設定する'});">Tekton、Tasksにパラメータを設定する</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、TaskのStepの実行順序について確認する'});">Tekton、TaskのStepの実行順序について確認する</a></li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (28)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (38)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (1)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (25)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (13)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (10)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (11)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、TaskをまとめてPipelineとして実行する'});">Tekton、TaskをまとめてPipelineとして実行する</a> (2021/03/07)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、TaskでPipelineResouceを利用したときの挙動を確認する'});">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a> (2021/03/07)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、Tasksにパラメータを設定する'});">Tekton、Tasksにパラメータを設定する</a> (2021/03/06)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、TaskのStepの実行順序について確認する'});">Tekton、TaskのStepの実行順序について確認する</a> (2021/03/06)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>
