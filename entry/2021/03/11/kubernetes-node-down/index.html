@@ -85,7 +85,7 @@ Worker#1がシャットダウンした、kubeletが停止した、ネットワ�
 <h2 id="ノードをシャットダウンしたときに起きること事象">ノードをシャットダウンしたときに起きること（事象）</h2>
 <p>※このセクションでは事象を説明します。事象の解説については後述します。<br>
 ノードをシャットダウンしたり、kubeletを停止するとNodeのStatusは<code>NotReady</code>となります。
-現在、Master x3, Worker x3で稼働しているクラスタですが。本ブログではMsterノードは気にしなくていいので、<code>kubectl get node</code>実行時にはWorkerのみ取り出すこととします。</p>
+現在、Master x3, Worker x3で稼働しているクラスタですが。本ブログではMasterノードは気にしなくていいので、<code>kubectl get node</code>実行時にはWorkerのみ取り出すこととします。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get node --selector=&#39;node-role.kubernetes.io/worker&#39;
 NAME                                              STATUS   ROLES    AGE     VERSION
 ip-10-0-163-234.ap-southeast-1.compute.internal   Ready    worker   9m6s    v1.19.0+8d12420
