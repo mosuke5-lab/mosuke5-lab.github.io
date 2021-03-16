@@ -8,22 +8,22 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 <link rel="stylesheet" href="/css/main.css">
 
-<title>「進」2017年振り返り。</title>
-<link rel="canonical" href="https://blog.mosuke.tech/entry/2017/12/29/reflection/">
-<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2017/12/29/reflection/" />
+<title>squidを使ってプロキシ環境の再現検証に活用する</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/03/16/squid/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/03/16/squid/" />
 <meta name="twitter:card" content="summary">
 
 <meta name="twitter:site" content="@mosuke5" />
 <meta name="twitter:creator" content="@mosuke5" />
 
-<meta name="twitter:title" content="「進」2017年振り返り。 &middot; Goldstine研究所">
-<meta name="twitter:description" content="2017年を振り返ってみます。Alibaba Cloudの日本展開のはじめの１年。そしてエンジニアコミュニティへの貢献。なかなか楽しい１年でした。">
+<meta name="twitter:title" content="squidを使ってプロキシ環境の再現検証に活用する &middot; Goldstine研究所">
+<meta name="twitter:description" content="プロキシソフトウェアで有名なsquidのインストール方法と簡単な設定について説明します。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="「進」2017年振り返り。 &middot; Goldstine研究所">
-<meta property="og:description" content="2017年を振り返ってみます。Alibaba Cloudの日本展開のはじめの１年。そしてエンジニアコミュニティへの貢献。なかなか楽しい１年でした。">
+<meta property="og:title" content="squidを使ってプロキシ環境の再現検証に活用する &middot; Goldstine研究所">
+<meta property="og:description" content="プロキシソフトウェアで有名なsquidのインストール方法と簡単な設定について説明します。">
 <meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
-<meta property="og:url" content="https://blog.mosuke.tech/entry/2017/12/29/reflection/" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/03/16/squid/" />
 <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
 <link rel="icon" href="/image/favicon.ico" />
 
@@ -61,67 +61,125 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
-    <h1>「進」2017年振り返り。</h1>
+    <h1>squidを使ってプロキシ環境の再現検証に活用する</h1>
     <div class="entry-sub-title">
-        <span class="">29 Dec 2017, 06:44</span>
+        <span class="">16 Mar 2021, 19:05</span>
         <span class="">By mosuke5</span>
         
             
-                <a class="badge badge-inf post-category post-category-キャリア" href="/categories/%E3%82%AD%E3%83%A3%E3%83%AA%E3%82%A2">キャリア</a>
+                <a class="badge badge-inf post-category post-category-インフラ構築" href="/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E6%A7%8B%E7%AF%89">インフラ構築</a>
             
         
     </div>
     <div class="entry-content">
-        <p>もうはやいもので2017年も終わりです。<br>
-毎年恒例の振り返りブログを書いていきたいと思います。</p>
-<p>今年を一言で表すなら「進」とかそんな感じでしょうか。<br>
-新しい事業のサービスを開始し推し進めたことや、積極的にイベントなどで表に出ていったことからです。<br>
-１年前には想像していなかった動き方ができて、なかなか楽しい１年だったかなと思います。</p>
-<h2 id="過去の振り返りブログ">過去の振り返りブログ</h2>
-<p>気になる過去の振り返りはこちらです。</p>
-<ul>
-<li>2014年: 「<a href="https://blog.mosuke.tech/entry/2015/01/01/161826/">2014年を思い返して</a>」</li>
-<li>2015年: 「<a href="https://blog.mosuke.tech/entry/2015/12/28/150042/">2015年振り返り</a>」</li>
-<li>2016年: 「<a href="https://blog.mosuke.tech/entry/2016/12/25/142744/">「嵐」2016年振り返り</a>」</li>
-</ul>
-<h2 id="社外とのコミュニティ">社外との「コミュニティ」</h2>
-<p>まず仕事的なところからみていきます。ぼくはAlibaba Cloud日本展開の仕事をしていますが、
-2016年12月15日にサービスを開始し2017年はまさに「はじめの１年」ということで活動してきました。
-簡単にソリューションアーキテクトの仕事をご紹介すると、Alibaba Cloudを利用、導入、活用していただくためのあらゆる活動をするのが我々のソリューションアーキテクトです。
-主なところだと、法人のお客さんへのビジネス課題をヒアリングしてクラウドでの解決策の提案だったり、導入フェーズの支援などといったエンタープライズITの層へのアプローチがあります。更には、もっとエンジニア、デベロッパー層へのアプローチとしてテックイベントに自分自身がいちエンジニアとして登壇してアピールしたりしてきました。</p>
-<p>ビジネスパートナーをはじめ、エンジニアコミュニティなど様々なリレーションシップを築けたのは今年の大きな成果だと思っています。そのなかでも一番大きなつながりをもてたのがMasterCloudだったかなと思ってます。MasterCloudはモビンギという会社がリードスポンサーを行っている、クラウドテクノロジーに関するコミュニティ（イベント、勉強会）です。そこで、はじめはいち参加者として出席したり登壇していたのですが、気がついたらオーガナイザーのひとりになっていて、12月12日にはAlibaba Cloud特集のMasterCloudを開催したりと、コミュニティ運営活動にも関われました。Alibaba Cloudうんぬんではなく、純粋にクラウド技術の発展にコミュニティという側面で関われたことはとても刺激でした。なんといって、このイベントには業界の著名人もよく来てくださり、いろんなコミュニケーションがとれたことはとても感謝しています。</p>
-<p>まだ公式にアナウンスされていませんが、Alibaba Cloud MVPを獲得できたようで、まさに１年の活動を表す形となって嬉しいです。正式にアナウンスがでたら追って報告します。</p>
-<h2 id="技術的なところ">技術的なところ</h2>
-<p>当たり前ではあるが、クラウドプロバイダーで働いているので、クラウドに関する知見は多く得たし、よく勉強したかなと思います。自社のAlibaba CloudはもちろんAWSの研修や資格もとれたことはとても自信になっています。詳しくはしたのブログを読んでほしいが、Alibaba Cloudの認定試験はまだ英語のため、びびってAWSの模擬試験を英語で受けて必死に練習したりしていたのは今でもいい思い出ですね。</p>
-<ul>
-<li><a href="https://www.sbcloud.co.jp/entry/2017/11/06/acp/">Alibaba Cloud Professionalの認定取ってきた！</a></li>
-<li><a href="https://blog.mosuke.tech/entry/2017/08/04/aws_certificate_practice_exam/">英語でAWSソリューションアーキテクト認定の模擬試験を受けてみた</a></li>
-<li><a href="https://blog.mosuke.tech/entry/2017/09/18/aws_solution_architect/">【合格】AWSソリューションアーキテクト Associate認定試験</a></li>
-</ul>
-<p>オープンな技術なところだと、Terraform, Rancherあたりはよく触って、Infrastructures as CodeそしてDockerまわりは引き続き興味ある分野として追いかけていました。特にTerraformについては、手に馴染むほど書きました。ServerlessConfにいって、今後のサーバレスな開発でよりTerraformは重要性が増してくるなと考えています。この分野は引き続き注目していきたい。</p>
-<p>このブログ関連も進捗がありました。去年の振り返りブログのときはまだはてなブログを使っていたが、Hugoを使ったStatic Webに切り替えました。ブログを書くだけでなくブログの仕組み作りも楽しめてなかなかおもしろいです。いまや、Cloud9で記事を書いて、GithubへPushすれば、Werckerが動作して自動的にデプロイされるようになっています。<br>
-検索エンジン部分はElasticSearchで自作しています。インフラはTerraformで管理して、アプリはDockerベースで動していて、自分の学習材料に使っています。</p>
-<p>最後に、テクニカル技術じゃないけど、スキルとしての英語。ここは今年はまずまず頑張ったんじゃないかなと思っています。
-上で書いた認定試験が英語だったからというのもあるが、英会話も含め全体的に英語の基礎力向上は意識していました。
-語学は使わないとのびないし、時間がかかるので、辛抱強く勉強して機会あればどんどんしゃべりにいきます。</p>
-<h2 id="その他">その他</h2>
-<p>その他プライベート的なことを雑にまとめておくと、たくさんゲームを買った年だったと思う。
-任天堂Switchではゼルダ、Splatoon、マリオオデッセイ、3DSではポケモンサンムーン、ウルトラサンムーンとたくさんゲームを楽しみました。中でもゼルダでの久々のゲームでの感動、そしてポケモン対戦のおもしろさ、ここにどっぷりハマってしまってしまいました。
-料理もある程度しました。このブログの最後に今年のベスト料理を貼っておきます。</p>
-<h2 id="2018年について">2018年について</h2>
-<p>来年の豊富とか、やりたいことについて。<br>
-まず１つ目が、「副業」です。会社的に副業が認められるようになったのもあり、副業を本格的に検討しています。
-もうすでに、とある仕事のめどがあっていま条件を調整中なので、来年早々には現実的になると思うが楽しみにしています。
-今の時代、１つの会社、１つの仕事、１つの働き方に縛られる必要はないと思っているので、「新しい働き方」としてここは積極的に実績をだしていきたいと思っています。</p>
-<p>２つ目は「もっと技術に触れる」です。<br>
-今年は技術に触れる時間はすこし少なかったかなと思います。
-だから悪いとかそういうことではなくて、ソリューションアーキテクトという仕事、お客さんに技術を伝えたり、イベントスピーカをやることも多いのですが、エンジニアの肌感覚がなくなってくると話のおもしろみも説得力も減ってくるのを感じているのもあります。長い目でこの世界でエンジニアとして生きていくにはいまのままでは行けないとも思っていて、どうしようかはいろいろ考えています。上の副業もその１つとして行動したものです。
-また、クラウドベンダーのサービスじゃなくて、純粋にオープンな技術に対してもっと触れていきたいと思っています。</p>
-<p>では、来年もよろしくお願いします。</p>
+        <p>こんにちは、もーすけです。<br>
+squidを使った検証は年に1回くらいは出てくるのですが、やるたびに忘れるのでメモします。
+ちなみに、squidを使う理由としてはいろいろなのですが、だいたい以下のような理由です。</p>
+<ol>
+<li>顧客のシステムを使う際にIPアドレス制限がかかっており、特定のサーバからアクセスさせたい</li>
+<li>顧客のネットワーク環境ではプロキシを利用しており、それゆえに環境を再現するためにプロキシを立てたい</li>
+<li>システムにアクセスするのにクラウドのリージョン間専用線を通して接続したい</li>
+</ol>
+<h2 id="squidのインストールと動作確認">squidのインストールと動作確認</h2>
+<p>まず、本検証環境はAWS EC2上のRHEL8です。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat /etc/redhat-release
+Red Hat Enterprise Linux release 8.3 (Ootpa)
+</code></pre></div><p>インストールして起動します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo dnf install -y squid
+...
+Complete!
+
+$ sudo systemctl start squid
+$ sudo systemctl enable squid
+$ sudo systemctl status squid
+● squid.service - Squid caching proxy
+   Loaded: loaded (/usr/lib/systemd/system/squid.service; enabled; vendor preset: disabled)
+   Active: active (running) since Tue 2021-03-16 10:02:08 UTC; 10min ago
+     Docs: man:squid(8)
+  Process: 15518 ExecStartPre=/usr/libexec/squid/cache_swap.sh (code=exited, status=0/SUCCESS)
+ Main PID: 15525 (squid)
+    Tasks: 3 (limit: 4836)
+   Memory: 16.0M
+   CGroup: /system.slice/squid.service
+           ├─15525 /usr/sbin/squid --foreground -f /etc/squid/squid.conf
+           ├─15528 (squid-1) --kid squid-1 --foreground -f /etc/squid/squid.conf
+           └─15529 (logfile-daemon) /var/log/squid/access.log
+...
+</code></pre></div><p>squidのバージョンは4.11です。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ squid -v
+Squid Cache: Version 4.11
+Service Name: squid
+
+This binary uses OpenSSL 1.1.1g FIPS  21 Apr 2020. For legal restrictions on distribution see https://www.openssl.org/source/license.html
+</code></pre></div><p>起動後、squidを使ってプロキシできるか簡単に確認します。<br>
+まずは、ポートの利用確認です。lsofを利用して、対象ポートを利用しているか確認します。
+デフォルトでは <code>3128</code> ポートを使います。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo dnf install -y lsof
+$ sudo lsof -i:3128
+COMMAND   PID  USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+squid   15528 squid   13u  IPv6  46287      0t0  TCP *:squid (LISTEN)
+</code></pre></div><p>squidのサーバ内から、プロキシ経由でサイトにアクセスできるか確認します。
+<code>curl -I https://blog.mosuke.tech -x http://localhost:3128</code>のレスポンスが返ってきており、ログで<code>TCP_TUNNEL/200</code>と出ているので問題なさそうです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -I https://blog.mosuke.tech -x http://localhost:3128
+HTTP/1.1 200 Connection established
+
+HTTP/2 200
+date: Tue, 16 Mar 2021 10:15:34 GMT
+content-type: text/html; charset=utf-8
+set-cookie: __cfduid=dd67f1a3e156c6fd95e6d4d5c661341a21615889734; expires=Thu, 15-Apr-21 10:15:34 GMT; path=/; domain=.mosuke.tech; HttpOnly; SameSite=Lax; Secure
+last-modified: Sun, 14 Mar 2021 04:39:32 GMT
+vary: Accept-Encoding
+access-control-allow-origin: *
+expires: Sun, 14 Mar 2021 04:54:54 GMT
+...
+
+$ sudo tail -f /var/log/squid/access.log
+...
+1615889656.008    155 ::1 TCP_TUNNEL/200 35651 CONNECT blog.mosuke.tech:443 - HIER_DIRECT/172.67.165.72 -
+</code></pre></div><h2 id="外部からのプロキシ利用">外部からのプロキシ利用</h2>
+<p>ひとつ前のセクションでは、squidサーバから自身のプロキシポートを指定してcurlを実行しました。<br>
+たとえば、おつかいのPCなどsquidサーバ以外から実施してみてください。おそらく以下のようなエラーになるのではないかと思います。
+※そもそもナニもレスポンスが返ってこない人は、AWSのセキュリティグループなどFWの設定を見直しましょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">local-pc $ curl -I https://blog.mosuke/tech -x http://&lt;squid-global-ip&gt;:3128
+HTTP/1.1 403 Forbidden
+Server: squid/4.11
+Mime-Version: 1.0
+Date: Tue, 16 Mar 2021 12:43:31 GMT
+Content-Type: text/html;charset=utf-8
+Content-Length: 3588
+X-Squid-Error: ERR_ACCESS_DENIED 0
+Vary: Accept-Language
+Content-Language: en
+X-Cache: MISS from ip-192-168-1-54.ap-northeast-1.compute.internal
+X-Cache-Lookup: NONE from ip-192-168-1-54.ap-northeast-1.compute.internal:3128
+Via: 1.1 ip-192-168-1-54.ap-northeast-1.compute.internal (squid/4.11)
+Connection: keep-alive
+</code></pre></div><p>これは、squidのデフォルトの設定が、プライベートネットワークなど一部のIPからのみプロキシするように設定されているからです。
+以下はデフォルト設定の一部を切り出したものですが、<code>0.0.0.1-0.255.255.255</code>や<code>10.0.0.0/8</code>などが<code>localnet</code>というグルーピングがされており、<code>localnet</code>のみが<code>http_access allow</code>に記述されているからです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">acl localnet src 0.0.0.1-0.255.255.255  # RFC 1122 &#34;this&#34; network (LAN)
+acl localnet src 10.0.0.0/8             # RFC 1918 local private network (LAN)
+acl localnet src 100.64.0.0/10          # RFC 6598 shared address space (CGN)
+acl localnet src 169.254.0.0/16         # RFC 3927 link-local (directly plugged) machines
+acl localnet src 172.16.0.0/12          # RFC 1918 local private network (LAN)
+acl localnet src 192.168.0.0/16         # RFC 1918 local private network (LAN)
+acl localnet src fc00::/7               # RFC 4193 local private network range
+acl localnet src fe80::/10              # RFC 4291 link-local (directly plugged) machines
+...
+...
+http_access allow localnet
+</code></pre></div><p>もし外部ネットワークからのプロキシを許可したい場合は以下のように追加して、squidを再起動しましょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># /etc/squid/squid.conf
+acl myhome src xx.xx.xx.xx/24
+
+http_access allow myhome
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo systemctl restart squid
+</code></pre></div><h2 id="まとめ">まとめ</h2>
+<p>簡単ですが、squidのインストール方法と簡単な設定方法を見てきました。いつも忘れてしまうため未来の自分および同じような境遇のひとの役に立てばと思います。プロキシ環境をさっと建てられるように準備しておくと、再現検証などに非常に役に立ちます。
+いちどは自分の手で構築して感覚を掴んでおくと良いでしょう。</p>
     </div>
     <div class="entry-sub-content request-for-entry">
         <h5>フィードバック・相談(β)</h5>
-        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=%e3%80%8c%e9%80%b2%e3%80%8d2017%e5%b9%b4%e6%8c%af%e3%82%8a%e8%bf%94%e3%82%8a%e3%80%82" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': '「進」2017年振り返り。'});">執筆者に問い合わせてみる</a></p>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=squid%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%a6%e3%83%97%e3%83%ad%e3%82%ad%e3%82%b7%e7%92%b0%e5%a2%83%e3%81%ae%e5%86%8d%e7%8f%be%e6%a4%9c%e8%a8%bc%e3%81%ab%e6%b4%bb%e7%94%a8%e3%81%99%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'squidを使ってプロキシ環境の再現検証に活用する'});">執筆者に問い合わせてみる</a></p>
     </div>
     <div class="entry-sub-content post-share">
         <div class="post-share-links">
@@ -290,13 +348,13 @@
       <h3>関連する記事</h3>
       <ul class="list-group">
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/12/31/reflection/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '「絆」2020年振り返り'});">「絆」2020年振り返り</a> (2020/12/31)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2018/04/21/basic-mysql-on-docker/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'DockerでのMySQLのセットアップ方法とその仕組みを理解する'});">DockerでのMySQLのセットアップ方法とその仕組みを理解する</a> (2018/04/21)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/03/28/strengths-finder/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'ITエンジニアこそ「強み」を活かそう。ストレングスファインダーの活用'});">ITエンジニアこそ「強み」を活かそう。ストレングスファインダーの活用</a> (2020/03/28)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2018/01/14/elasticsearch-api/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '[随時更新] ElasticSearchの基本APIのまとめ'});">[随時更新] ElasticSearchの基本APIのまとめ</a> (2018/01/14)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/12/31/reflection/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '「捉」2019年振り返り'});">「捉」2019年振り返り</a> (2019/12/30)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2017/08/13/elasticsearch_basic/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'ElasticSearch入門 インストールから検索、そしてKibanaまで'});">ElasticSearch入門 インストールから検索、そしてKibanaまで</a> (2017/08/13)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/11/12/wedding/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '結婚式を楽に円満に行う！やって本当によかった７つのこと'});">結婚式を楽に円満に行う！やって本当によかった７つのこと</a> (2019/11/12)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2017/01/04/223544/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'クラウド上でのWordPressのスケールアウトを考える'});">クラウド上でのWordPressのスケールアウトを考える</a> (2017/01/04)</li>
         
       </ul>
     </div>
