@@ -63,6 +63,29 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2021/01/31/network-debug-on-containers/" class="entry-title">Kubernetes上のアプリケーションをtcpdumpでデバッグする</a></h1>
+    <div class="entry-sub-title">
+        <span class="">31 Jan 2021, 12:10</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-kubernetes" href="/categories/kubernetes">kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。休日はもっぱら住宅購入の検討で忙しいマンです。<br>
+さて、本日は、Kubernetesのアプリケーションのデバッグに関して書きます。</p>
+<p>Kubernetesで運用中のアプリケーションの障害対応で、ネットワーク関連のデバッグをしたいことはよくあります。
+このブログでは具体的にtcpdumpを取得したいという場面を想定して書きます。
+コンテナアプリケーションの開発・運用をしていると、<strong>イメージのサイズを小さく保っておきたい</strong>と思うはずです。
+その理由についてはいろいろとありますが、イメージの展開のスピードを高めることで、デプロイや障害時の復旧を早めるなどが代表的なところです。（関連するトピックとして「<a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/">コンテナイメージを軽くする方法と、その原理原則を考える</a>」も読んでみてください。）</p>
+<p>それゆえに、アプリケーションの動作に必要なライブラリ以外は入れないことが多く、デバッグツールを除外しておくことが多いでしょう。
+しかし、障害発生時にいざtcpdumpやstrace, ping ,digなどを打ちたいと思ってもインストールされておらず困ることがあります。
+そんな場面に遭遇しても焦らないようにあらかじめ対応策を頭に入れて練習しておきましょう。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/01/31/network-debug-on-containers/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/" class="entry-title">OpenShift on NVIDIA GPU（導入編）</a></h1>
     <div class="entry-sub-title">
         <span class="">17 Dec 2020, 22:01</span>
@@ -261,30 +284,6 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
         <a href="https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/" class="entry-title">コンテナイメージを軽くする方法と、その原理原則を考える</a></h1>
-    <div class="entry-sub-title">
-        <span class="">09 Jul 2020, 18:50</span>
-        <span class="">By mosuke5</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-コンテナ" href="/categories/%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A">コンテナ</a>
-            
-                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <p>こんにちは。もーすけです。<br>
-先日、はじめてラーメン作りに挑戦しました。非常に美味しくできました。
-ラーメン作りにも興味ある方はこちらのブログ（<a href="https://note.com/morisan_life/n/n2f855f8e5a46">初心者のための、家系ラーメン自作 徹底ガイド！</a>）をご参照ください（笑）</p>
-<p>さて本題ですが、はじめてコンテナアプリケーションの開発に挑戦していると覚えることがたくさんあり、楽しさ反面大変さもおそらく感じるかと思います。
-そんな覚えることがたくさんの中には、コンテナイメージは軽くしたほうがいいというものも含まれるかもしれません。
-軽くしないと動かないわけではないので、はじめてコンテナ環境に挑戦している人はどうしても忘れがち、見落としがちなことかもしれません。
-しかし、実際の運用を見据えると、軽量であるほうが断然よいです。<br>
-その理由を理解すると、みなさんが「なぜコンテナに挑戦しているのか」思い出してくるのではないかと思います。</p>
-        <a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
@@ -305,6 +304,8 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する'});">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/16/squid/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'squidを使ってプロキシ環境の再現検証に活用する'});">squidを使ってプロキシ環境の再現検証に活用する</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/11/kubernetes-node-down/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetesのノード障害時のPodの動きについての検証'});">Kubernetesのノード障害時のPodの動きについての検証</a></li>
@@ -312,8 +313,6 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、TaskをまとめてPipelineとして実行する'});">Tekton、TaskをまとめてPipelineとして実行する</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、TaskでPipelineResouceを利用したときの挙動を確認する'});">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
-      
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、Tasksにパラメータを設定する'});">Tekton、Tasksにパラメータを設定する</a></li>
       
     </ul>
   </div>
@@ -347,7 +346,7 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (38)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (39)</a>
       </li>
       
       <li class="list-group-item">
@@ -421,7 +420,7 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (12)</a>
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (13)</a>
       </li>
       
     </ul>

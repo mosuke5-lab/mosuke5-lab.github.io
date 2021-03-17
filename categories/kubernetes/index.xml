@@ -6,7 +6,27 @@
     <description>Recent content in Kubernetes on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Thu, 11 Mar 2021 00:13:19 +0900</lastBuildDate><atom:link href="https://blog.mosuke.tech/categories/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 17 Mar 2021 17:17:12 +0900</lastBuildDate><atom:link href="https://blog.mosuke.tech/categories/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</title>
+      <link>https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/</link>
+      <pubDate>Wed, 17 Mar 2021 17:17:12 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/</guid>
+      <description>&lt;p&gt;Tekton学習シリーズ&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;TektonのOperatorによるインストールとHello World&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
+本日もTekton学習シリーズやっていきましょう。第6回はPipelineでWorkspaceを利用してTask間でデータを連携する方法についてです。
+あるTaskで作ったデータを別のTaskで利用することはパイプラインを作っていく上で非常に重要です。&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>Kubernetesのノード障害時のPodの動きについての検証</title>
       <link>https://blog.mosuke.tech/entry/2021/03/11/kubernetes-node-down/</link>
@@ -32,6 +52,7 @@
 &lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;はい、もーすけです。&lt;br&gt;
 Tekton学習シリーズ第5回をやっていきます。
@@ -51,6 +72,7 @@ Tekton学習シリーズ第5回をやっていきます。
 &lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
 本日もTekton学習シリーズやっていきます。第4回は、TaskにPipelineResourceを追加してみます。
@@ -70,6 +92,7 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
 &lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
 今回はTektonのTaskにパラメータを引き渡す方法についてみていきます。
@@ -89,6 +112,7 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
 &lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;前回、TektonのOperatorを使ったインストールについて解説しました。
 今回は、もうすこしTaskの動きを確認してみます。具体的には、Task内のStepの役割や、複数のStepがある場合の実行順序の制御方法などについて確認してみます。&lt;/p&gt;
@@ -383,6 +407,7 @@ GWはみなさんいかがお過ごしでしたか？&lt;br&gt;
 &lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;</description>
     </item>
     

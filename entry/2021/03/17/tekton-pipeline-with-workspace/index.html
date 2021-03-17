@@ -8,22 +8,22 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 <link rel="stylesheet" href="/css/main.css">
 
-<title>Tekton、TaskのStepの実行順序について確認する</title>
-<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/">
-<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/" />
+<title>Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/" />
 <meta name="twitter:card" content="summary">
 
 <meta name="twitter:site" content="@mosuke5" />
 <meta name="twitter:creator" content="@mosuke5" />
 
-<meta name="twitter:title" content="Tekton、TaskのStepの実行順序について確認する &middot; Goldstine研究所">
-<meta name="twitter:description" content="TektonのTaskは複数のStepからなりたちます。複数Stepにした際の実行順序やその実現方法などについて確認しました。">
+<meta name="twitter:title" content="Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する &middot; Goldstine研究所">
+<meta name="twitter:description" content="Tekton学習シリーズ第6回でWorkspaceを確認します。Task間のデータ連携する方法を練習します。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Tekton、TaskのStepの実行順序について確認する &middot; Goldstine研究所">
-<meta property="og:description" content="TektonのTaskは複数のStepからなりたちます。複数Stepにした際の実行順序やその実現方法などについて確認しました。">
+<meta property="og:title" content="Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する &middot; Goldstine研究所">
+<meta property="og:description" content="Tekton学習シリーズ第6回でWorkspaceを確認します。Task間のデータ連携する方法を練習します。">
 <meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
-<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/" />
 <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
 <link rel="icon" href="/image/favicon.ico" />
 
@@ -61,9 +61,9 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
-    <h1>Tekton、TaskのStepの実行順序について確認する</h1>
+    <h1>Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</h1>
     <div class="entry-sub-title">
-        <span class="">06 Mar 2021, 16:34</span>
+        <span class="">17 Mar 2021, 17:17</span>
         <span class="">By mosuke5</span>
         
             
@@ -81,181 +81,177 @@
 <li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
 <li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
 </ul>
-<p>前回、TektonのOperatorを使ったインストールについて解説しました。
-今回は、もうすこしTaskの動きを確認してみます。具体的には、Task内のStepの役割や、複数のStepがある場合の実行順序の制御方法などについて確認してみます。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" data-iframely-url="//cdn.iframe.ly/aQ48OK3"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-<h2 id="tektonにでてくる基本概念">Tektonにでてくる基本概念</h2>
-<p>まず、Tektonででてくる基本的かつ重要な概念についてあらためて整理しようと思います。
-こちらを念頭にいれて、本日はTaskとTaskRunについて扱います。</p>
-
-
-  
-
-
-
-<table  class="table">
-<thead>
-<tr>
-<th>エンティティ</th>
-<th>説明</th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Task</td>
-<td>Tektonで表現できる最小の実行単位。ひとつ以上のStepから成り立つ。</td>
-<td></td>
-</tr>
-<tr>
-<td>TaskRun</td>
-<td>定義したTaskを実行するために利用。実行する際はTaskにわたす、入力や出力、パラメータなどを指定できる。単体で利用することも、Pipelineを実行したときに呼び出されて利用もされる。</td>
-<td></td>
-</tr>
-<tr>
-<td>Pipeline</td>
-<td>定義したTaskの集合体。</td>
-<td></td>
-</tr>
-<tr>
-<td>PipelineRun</td>
-<td>定義したPipelineを実行するために利用。パイプラインを実行するために、入力や出力、パラメータを指定できる。</td>
-<td></td>
-</tr>
-<tr>
-<td>PipelineResource</td>
-<td>Task内のStepで利用する入力や出力の場所を定義する。PipelineRunやTaskRunを作成する際に指定される。</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-
-
-<h2 id="複数stepをもつtaskの実行">複数StepをもつTaskの実行</h2>
-<p>前回のブログでは、ひとつのStepのみをもつTaskを実行しました。複数のStepをもつ場合どうなるか確認してみます。ちなみに、Task内のStepは特定の順序で実行可能です。<br>
-次のTaskとTaskRunで試してみます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># multi-steps-task.yaml</span>
+<p>こんにちは、もーすけです。<br>
+本日もTekton学習シリーズやっていきましょう。第6回はPipelineでWorkspaceを利用してTask間でデータを連携する方法についてです。
+あるTaskで作ったデータを別のTaskで利用することはパイプラインを作っていく上で非常に重要です。</p>
+<h2 id="task間のデータ連携">Task間のデータ連携</h2>
+<p>そもそもTask間でデータを連携するとはどういうことか考えてみましょう。<br>
+このTekton学習シリーズを読んでいただいている人はわかるかと思いますが、Tektonにおいて各Taskはそれぞれの独立したPodとして動きます。つまりTaskが異なれば、Podも異なるということです。
+Kubernetesでアプリケーションの設計を行ったことのある人ならいつもどおりのことではありますが、Pod間でデータを連携するには、DBやオブジェクトストレージなどの外部ストレージに保存するか、NFSなどRWXなストレージをPod間にマウントするなどの方法があります。
+Tetonパイプラインにおいても同じようにTask間でデータを連携するにはストレージ戦略を考えていく必要があるということです。<br>
+ちなみに、Task内のStepは同一Podのため、<code>emptyDir</code>を用いてデータを連携することは容易です。</p>
+<h2 id="workspaceを用いたpipelineの練習">Workspaceを用いたPipelineの練習</h2>
+<p>それでは、TektonのWorkspaceを用いて、Task間でデータを連携する方法を確認して見ていきましょう。
+本環境はGCP上で動かしており、PersistentVolumeをDynamic Provisioningとして払い出せる環境になっていることを先に断っておきます。<br>
+イメージは以下のようなパイプラインです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">(Pipeline start) - (task A) - (task B)
+                         \     /
+                          \   /
+                   (Persistent Volume)
+</code></pre></div><p>まず以下2つのTaskを利用します。<br>
+<code>workspace-test-task-curl</code>は、パラメータで指定したURLに対してcurlでアクセスして、その結果をworkspace内に保存するものです。
+<code>workspace-test-task-output</code>は、<code>workspace-test-task-curl</code>が保存した結果をアウトプットするというものです。とくに実用性があるパイプラインではないですが、練習台として捉えてください。
+（実用的なパイプラインは、この学習シリーズの後半で行っていくようです。）</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># workspace-test-task.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Task</span>
 <span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">multi-steps-task</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">workspace-test-task-curl</span>
 <span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">params</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">url</span>
+      <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
+  <span style="color:#f92672">workspaces</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-workspace</span>
   <span style="color:#f92672">steps</span>:
-    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">first-output</span>
-      <span style="color:#f92672">image</span>: <span style="color:#ae81ff">ubuntu</span>
-      <span style="color:#f92672">command</span>: [<span style="color:#e6db74">&#34;echo&#34;</span>]
-      <span style="color:#f92672">args</span>: [<span style="color:#e6db74">&#34;hello first step&#34;</span>]
-    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">second-output</span>
-      <span style="color:#f92672">image</span>: <span style="color:#ae81ff">ubuntu</span>
-      <span style="color:#f92672">command</span>: [<span style="color:#e6db74">&#34;echo&#34;</span>]
-      <span style="color:#f92672">args</span>: [<span style="color:#e6db74">&#34;hello second step&#34;</span>]
-    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">third-output</span>
-      <span style="color:#f92672">image</span>: <span style="color:#ae81ff">ubuntu</span>
-      <span style="color:#f92672">command</span>: [<span style="color:#e6db74">&#34;echo&#34;</span>]
-      <span style="color:#f92672">args</span>: [<span style="color:#e6db74">&#34;hello third step&#34;</span>]
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># multi-steps-task-run.yaml</span>
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">curl</span>
+      <span style="color:#f92672">image</span>: <span style="color:#ae81ff">fedora:latest</span>
+      <span style="color:#f92672">command</span>:
+        - <span style="color:#ae81ff">curl</span>
+      <span style="color:#f92672">args</span>:
+        - <span style="color:#e6db74">&#34;-I&#34;</span>
+        - <span style="color:#e6db74">&#34;$(params.url)&#34;</span>
+        - <span style="color:#e6db74">&#34;-o&#34;</span>
+        - <span style="color:#e6db74">&#34;$(workspaces.my-workspace.path)/output.txt&#34;</span>
+---
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">TaskRun</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Task</span>
 <span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">multi-steps-task-run</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">workspace-test-task-output</span>
 <span style="color:#f92672">spec</span>:
-  <span style="color:#f92672">taskRef</span>:
-    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">multi-steps-task</span>
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f multi-steps-task.yaml
-task.tekton.dev/multi-steps-task created
+  <span style="color:#f92672">workspaces</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-workspace</span>
+  <span style="color:#f92672">steps</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">output</span>
+      <span style="color:#f92672">image</span>: <span style="color:#ae81ff">fedora</span>
+      <span style="color:#f92672">command</span>:
+        - <span style="color:#ae81ff">cat</span>
+      <span style="color:#f92672">args</span>:
+        - <span style="color:#e6db74">&#34;$(workspaces.my-workspace.path)/output.txt&#34;</span>
+</code></pre></div><p>続いてPipelineをみていきます。
+必要なパラメータやWorkspaceの設定を行います。あとは、今回のTaskは直列の関係性にあるので<code>runAfter</code>を活用します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># workspace-test-pipeline.yaml</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pipeline</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">workspace-test-pipeline</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">params</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">url</span>
+      <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
+  <span style="color:#f92672">workspaces</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">pipeline-workspace</span>
+  <span style="color:#f92672">tasks</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">curl-site</span>
+      <span style="color:#f92672">taskRef</span>:
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">workspace-test-task-curl</span>
+      <span style="color:#f92672">params</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">url</span>
+          <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;$(params.url)&#34;</span>
+      <span style="color:#f92672">workspaces</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-workspace</span>
+          <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">pipeline-workspace</span>
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">data-output</span>
+      <span style="color:#f92672">taskRef</span>:
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">workspace-test-task-output</span>
+      <span style="color:#f92672">workspaces</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-workspace</span>
+          <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">pipeline-workspace</span>
+      <span style="color:#f92672">runAfter</span>:
+        - <span style="color:#ae81ff">curl-site</span>
+</code></pre></div><p>では、実行していきましょう。<br>
+PipelineRunは下記のとおりです。今までととなるのは、<code>workspaces</code>の設定です。PVCを発行してPVを準備します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># workspace-test-pipeline-run.yaml</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PipelineRun</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">workspace-test-pipeline-run</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">pipelineRef</span>:
+    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">workspace-test-pipeline</span>
+  <span style="color:#f92672">params</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">url</span>
+      <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;https://blog.mosuke.tech&#34;</span>
+  <span style="color:#f92672">workspaces</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">pipeline-workspace</span>
+      <span style="color:#f92672">volumeClaimTemplate</span>:
+        <span style="color:#f92672">spec</span>:
+          <span style="color:#f92672">accessModes</span>:
+            - <span style="color:#ae81ff">ReadWriteOnce</span>
+          <span style="color:#f92672">resources</span>:
+            <span style="color:#f92672">requests</span>:
+              <span style="color:#f92672">storage</span>: <span style="color:#ae81ff">1Gi</span>
+</code></pre></div><p>各リソースをデプロイして、パイプラインを実行します。<br>
+実行後Podの状態を確認すると、サイトへのcurlをするTaskが動き、その後にその結果を出力するPodが起動しています。
+PVの状態も一緒に見てみましょう。<code>workspace-test-pipeline-run-curl-site-2x8tt-pod-rvz9t</code>と<code>workspace-test-pipeline-run-data-output-57xb6-pod-f8srp</code>の両方ともにPVCがマウントされています。また、PVCが作成され、自動的にPVも作成されています。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f workspace-test-task.yaml
+task.tekton.dev/workspace-test-task-curl created
+task.tekton.dev/workspace-test-task-output created
 
-$ kubectl apply -f multi-steps-task-run.yaml
-taskrun.tekton.dev/multi-steps-task-run created
+$ kubectl apply -f workspace-test-pipeline.yaml
+pipeline.tekton.dev/workspace-test-pipeline created
 
-## Pod内のコンテナ数に注目。3Stepあるので3つのコンテナで起動。
-$ kubectl get pod -w
-NAME                             READY   STATUS     RESTARTS   AGE
-multi-steps-task-run-pod-92s4v   0/3     Init:0/1   0          3s
-multi-steps-task-run-pod-92s4v   0/3     PodInitializing   0          6s
-multi-steps-task-run-pod-92s4v   3/3     Running           0          12s
-multi-steps-task-run-pod-92s4v   3/3     Running           0          12s
-multi-steps-task-run-pod-92s4v   2/3     Running           0          13s
-multi-steps-task-run-pod-92s4v   1/3     Running           0          14s
-multi-steps-task-run-pod-92s4v   0/3     Completed         0          15s
-</code></pre></div><h2 id="stepの実行順序の確認">Stepの実行順序の確認</h2>
-<p>どのように順番制御をしているのか気になったので確認してみます。TaskRunで作成されたTask Podの中身をのぞいてみます。そうすると、Pod内のコンテナが、前のコンテナの修了を待っていることがわかります。<code>-wait_file /tekton/tools/0</code> が<code>/tekton/tools/0</code>が作成されるのをまち、<code>-post_file /tekton/tools/1</code>はStepの処理終了後に<code>/tekton/tools/1</code>のファイルを作成するということを意味します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">## 2番目のStepのコンテナは、/tekton/tools/0ができるまでまっている（前のStepが終わるのを待つ）
-$ kubectl get pod multi-steps-task-run-pod-92s4v -o yaml | less
-...
-  - args:
-    - -wait_file
-    - /tekton/tools/0
-    - -post_file
-    - /tekton/tools/1
-    - -termination_path
-    - /tekton/termination
-    - -entrypoint
-    - echo
-    - --
-    - hello second step
-    command:
-    - /tekton/tools/entrypoint
-    env:
-    - name: HOME
-      value: /tekton/home
-    image: ubuntu
-    imagePullPolicy: Always
-    name: step-second-output
-...
-</code></pre></div><p>この <code>/tekton/tools/0</code>の実態を確認するべく、Taskを以下のように変更しました。
-3番目のStepをSleepに変更して、Task実行中とすることでその間にコンテナ内部を確認してみます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: tekton.dev/v1beta1
-kind: Task
-metadata:
-  name: multi-steps-task
-spec:
-  steps:
-    - name: first-output
-      image: ubuntu
-      command: [&#34;echo&#34;]
-      args: [&#34;hello first step&#34;]
-    - name: second-output
-      image: ubuntu
-      command: [&#34;echo&#34;]
-      args: [&#34;hello second step&#34;]
-    - name: third-output
-      image: ubuntu
-      command: [&#34;sleep&#34;]
-      args: [&#34;600&#34;]
-</code></pre></div><p>では、もう一度multi-steps-task-runを実行します。同じ名前のTaskRunは作れないため、TaskRunの名前を変更してapplyするか、tknコマンド・ダッシュボードから実行してください。
-実行中のTask Podに対して<code>kubectl exec</code>でコンテナ内を確認します。<code>/tekton/tools/0</code>, <code>tekton/tools/1</code>という空ファイルが作成されています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod
-NAME                                           READY   STATUS      RESTARTS   AGE
-multi-steps-task-run-1615020642552-pod-rldm6   1/3     Running     0          10s
-multi-steps-task-run-pod-92s4v                 0/3     Completed   0          21m
+$ kubectl apply -f workspace-test-pipeline-run.yaml
+pipelinerun.tekton.dev/workspace-test-pipeline-run created
 
-## コンテナ内の/tekton/tools内を確認
-$ kubectl exec -it multi-steps-task-run-1615020642552-pod-rldm6 -c step-third-output -- ls -l /tekton/tools
-total 39452
--rw-r--r-- 1 root  root         0 Mar  6 08:50 0
--rw-r--r-- 1 root  root         0 Mar  6 08:50 1
--r-xr-xr-x 1 65532 65532 40397757 Mar  6 08:50 entrypoint
-</code></pre></div><p>ちなみに、TaskないのStepはEmptyDirを用いて<code>/tekton/tools</code>を共有しています。
-これによってStepの終了を別のコンテナに通知している形となります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod multi-steps-task-run-1615020642552-pod-rldm6 -o yaml | less
-spec:
-  containers:
+$ kubectl get pod
+workspace-test-pipeline-run-curl-site-2x8tt-pod-rvz9t     0/1     PodInitializing     0          15s
+workspace-test-pipeline-run-curl-site-2x8tt-pod-rvz9t     1/1     Running             0          16s
+workspace-test-pipeline-run-curl-site-2x8tt-pod-rvz9t     1/1     Running             0          16s
+workspace-test-pipeline-run-curl-site-2x8tt-pod-rvz9t     0/1     Completed           0          18s
+workspace-test-pipeline-run-data-output-57xb6-pod-f8srp   0/1     Pending             0          0s
+workspace-test-pipeline-run-data-output-57xb6-pod-f8srp   0/1     Pending             0          0s
+workspace-test-pipeline-run-data-output-57xb6-pod-f8srp   0/1     Init:0/1            0          0s
+workspace-test-pipeline-run-data-output-57xb6-pod-f8srp   0/1     PodInitializing     0          3s
+workspace-test-pipeline-run-data-output-57xb6-pod-f8srp   1/1     Running             0          4s
+workspace-test-pipeline-run-data-output-57xb6-pod-f8srp   1/1     Running             0          4s
+workspace-test-pipeline-run-data-output-57xb6-pod-f8srp   0/1     Completed           0          5s
+
+$ kubectl get pvc
+NAME             STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+pvc-8673f66e55   Bound    pvc-ad8e8a76-0048-4ebf-b80d-9f5e011173eb   1Gi        RWO            standard       59s
+
+$ kubectl get pv
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                                      STORAGECLASS   REASON   AGE
+pvc-ad8e8a76-0048-4ebf-b80d-9f5e011173eb   1Gi        RWO            Delete           Bound    goldstine-lab/pvc-8673f66e55               standard                67s
+
+$ kubectl get pod workspace-test-pipeline-run-data-output-57xb6-pod-f8srp -o yaml | less
 ...
     volumeMounts:
-    - mountPath: /tekton/tools
-      name: tekton-internal-tools
+    - mountPath: /workspace/my-workspace
+      name: ws-kt8k4
 ...
   volumes:
-  - emptyDir: {}
-    name: tekton-internal-workspace
-  - emptyDir: {}
-    name: tekton-internal-home
-  - emptyDir: {}
-    name: tekton-internal-results
-  - emptyDir: {}
-    name: tekton-internal-tools
+  - name: ws-kt8k4
+    persistentVolumeClaim:
+      claimName: pvc-8673f66e55
+</code></pre></div><p>PVCの中身をみると<code>ownerReferences</code>に<code>PipelineRun</code>が紐付いており、<code>PipelineRun</code>を削除すれば同時にPVCも削除され、PVも削除されるという動きをします。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pvc pvc-8673f66e55 -o yaml | less
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  ...
+  ownerReferences:
+  - apiVersion: tekton.dev/v1beta1
+    blockOwnerDeletion: true
+    controller: true
+    kind: PipelineRun
+    name: workspace-test-pipeline-run
+    uid: 11acadb7-7fda-47e2-a47b-59c58892dd3f
 </code></pre></div><h2 id="さいごに">さいごに</h2>
-<p>前回から間が空いてしまいましたが、Tektonについて学んだこと、確認したことを継続してポストしますので次回もお楽しみにしてください。</p>
+<p>はい、本日はworkspaceを使ったTask間のデータ連携をみてきました。
+そろそろ、実践的なパイプライン構成などをやっていこうと思います。
+ぜひ他のTekton学習シリーズも参照ください。</p>
 <p>Tekton学習シリーズ</p>
 <ul>
 <li>第1回: <a href="/entry/2020/05/10/tekton-operator/">TektonのOperatorによるインストールとHello World</a></li>
@@ -268,7 +264,7 @@ spec:
     </div>
     <div class="entry-sub-content request-for-entry">
         <h5>フィードバック・相談(β)</h5>
-        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Tekton%e3%80%81Task%e3%81%aeStep%e3%81%ae%e5%ae%9f%e8%a1%8c%e9%a0%86%e5%ba%8f%e3%81%ab%e3%81%a4%e3%81%84%e3%81%a6%e7%a2%ba%e8%aa%8d%e3%81%99%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Tekton、TaskのStepの実行順序について確認する'});">執筆者に問い合わせてみる</a></p>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Tekton%e3%80%81Pipeline%e3%81%a7Workspace%e3%82%92%e5%88%a9%e7%94%a8%e3%81%97%e3%81%a6Task%e9%96%93%e3%81%a7%e3%83%87%e3%83%bc%e3%82%bf%e3%82%92%e9%80%a3%e6%90%ba%e3%81%99%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する'});">執筆者に問い合わせてみる</a></p>
     </div>
     <div class="entry-sub-content post-share">
         <div class="post-share-links">
@@ -437,13 +433,13 @@ spec:
       <h3>関連する記事</h3>
       <ul class="list-group">
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する'});">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a> (2021/03/17)</li>
-        
         <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/11/kubernetes-node-down/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Kubernetesのノード障害時のPodの動きについての検証'});">Kubernetesのノード障害時のPodの動きについての検証</a> (2021/03/11)</li>
         
         <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、TaskをまとめてPipelineとして実行する'});">Tekton、TaskをまとめてPipelineとして実行する</a> (2021/03/07)</li>
         
         <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、TaskでPipelineResouceを利用したときの挙動を確認する'});">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a> (2021/03/07)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、Tasksにパラメータを設定する'});">Tekton、Tasksにパラメータを設定する</a> (2021/03/06)</li>
         
       </ul>
     </div>
