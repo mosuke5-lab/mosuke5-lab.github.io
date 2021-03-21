@@ -6,14 +6,15 @@
     <description>Recent content in 2021 on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Wed, 17 Mar 2021 17:17:12 +0900</lastBuildDate><atom:link href="https://blog.mosuke.tech/archive/2021/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 20 Mar 2021 00:36:10 +0900</lastBuildDate><atom:link href="https://blog.mosuke.tech/archive/2021/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</title>
-      <link>https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/</link>
-      <pubDate>Wed, 17 Mar 2021 17:17:12 +0900</pubDate>
+      <title>Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</title>
+      <link>https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/</link>
+      <pubDate>Sat, 20 Mar 2021 00:36:10 +0900</pubDate>
       
-      <guid>https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/</guid>
-      <description>&lt;p&gt;Tekton学習シリーズ&lt;/p&gt;
+      <guid>https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/</guid>
+      <description>&lt;hr&gt;
+&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
 &lt;ul&gt;
 &lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;TektonのOperatorによるインストールとHello World&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
@@ -21,7 +22,32 @@
 &lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
+本日もTekton学習フェーズやっていきます。第7回では、カタログの活用とTektonを使っていく上で必ず通るであろうイメージビルドについてあわせてやっていきたいと思います。
+本日のゴールは、Tektonが公開しているカタログ（公開Task）を用いて、任意のGitレポジトリにあるDockerfileをビルドしてレジストリにPushするまです。ではよろしくおねがいします。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</title>
+      <link>https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/</link>
+      <pubDate>Wed, 17 Mar 2021 17:17:12 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/</guid>
+      <description>&lt;hr&gt;
+&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;TektonのOperatorによるインストールとHello World&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
 &lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
 本日もTekton学習シリーズやっていきましょう。第6回はPipelineでWorkspaceを利用してTask間でデータを連携する方法についてです。
 あるTaskで作ったデータを別のTaskで利用することはパイプラインを作っていく上で非常に重要です。&lt;/p&gt;</description>
@@ -60,7 +86,8 @@
       <pubDate>Sun, 07 Mar 2021 23:13:07 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/</guid>
-      <description>&lt;p&gt;Tekton学習シリーズ&lt;/p&gt;
+      <description>&lt;hr&gt;
+&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
 &lt;ul&gt;
 &lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;TektonのOperatorによるインストールとHello World&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
@@ -68,7 +95,9 @@
 &lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
+&lt;hr&gt;
 &lt;p&gt;はい、もーすけです。&lt;br&gt;
 Tekton学習シリーズ第5回をやっていきます。
 本日はいよいよTaskをまとめPipelineをやっていきます。Taskの仕様を理解できていればおそらくそこまで難しくないと思います。&lt;/p&gt;</description>
@@ -80,7 +109,8 @@ Tekton学習シリーズ第5回をやっていきます。
       <pubDate>Sun, 07 Mar 2021 15:27:50 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/</guid>
-      <description>&lt;p&gt;Tekton学習シリーズ&lt;/p&gt;
+      <description>&lt;hr&gt;
+&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
 &lt;ul&gt;
 &lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;TektonのOperatorによるインストールとHello World&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
@@ -88,7 +118,9 @@ Tekton学習シリーズ第5回をやっていきます。
 &lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
+&lt;hr&gt;
 &lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
 本日もTekton学習シリーズやっていきます。第4回は、TaskにPipelineResourceを追加してみます。
 CIパイプライン内でGitレポジトリのソースコードを扱うことは一般的です。その方法や、設定するとなにが起きるのか見ていきましょう。&lt;/p&gt;</description>
@@ -100,7 +132,8 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
       <pubDate>Sat, 06 Mar 2021 22:43:43 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/</guid>
-      <description>&lt;p&gt;Tekton学習シリーズ&lt;/p&gt;
+      <description>&lt;hr&gt;
+&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
 &lt;ul&gt;
 &lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;TektonのOperatorによるインストールとHello World&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
@@ -108,7 +141,9 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
 &lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
+&lt;hr&gt;
 &lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
 今回はTektonのTaskにパラメータを引き渡す方法についてみていきます。
 前回までは、Taskにべた書きしたコマンドを実行しましたが、パラメータ指定し変数化する方法を確認します。&lt;/p&gt;</description>
@@ -120,7 +155,8 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
       <pubDate>Sat, 06 Mar 2021 16:34:41 +0900</pubDate>
       
       <guid>https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/</guid>
-      <description>&lt;p&gt;Tekton学習シリーズ&lt;/p&gt;
+      <description>&lt;hr&gt;
+&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
 &lt;ul&gt;
 &lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;TektonのOperatorによるインストールとHello World&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
@@ -128,7 +164,9 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
 &lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
+&lt;hr&gt;
 &lt;p&gt;前回、TektonのOperatorを使ったインストールについて解説しました。
 今回は、もうすこしTaskの動きを確認してみます。具体的には、Task内のStepの役割や、複数のStepがある場合の実行順序の制御方法などについて確認してみます。&lt;/p&gt;
 &lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34; data-iframely-url=&#34;//cdn.iframe.ly/aQ48OK3&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>

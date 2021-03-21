@@ -178,13 +178,8 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
         
     </div>
     <div class="entry-content">
-        <p><a href="https://twitter.com/mosuke5" target="_blank">もーすけ</a>です。
-GWはみなさんいかがお過ごしでしたか？<br>
-外に出れないGWという一生でもそんなことが2度あるかわかりませんが非常に大変な日々を過ごされたのではないかと思います。自分は、GWを使ってKubernetes Operatorの開発などに挑戦してみていました。
-このあたりの話は別で書きたいと思いますが、Kubernetesのよさについてさらに理解を深めた気がします。</p>
-<p>さて、今日はCloud NativeなCI/CDツールと言われているTektonについて。<br>
-何回かに分けて書こうと思いますが、Operatorによるインストール編です（随時更新します）。</p>
-<p>Tekton学習シリーズ</p>
+        <hr>
+<h5>Tekton学習シリーズ</h5>
 <ul>
 <li>第1回: <a href="/entry/2020/05/10/tekton-operator/">TektonのOperatorによるインストールとHello World</a></li>
 <li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
@@ -192,7 +187,15 @@ GWはみなさんいかがお過ごしでしたか？<br>
 <li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
 <li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
 <li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
 </ul>
+<hr>
+<p><a href="https://twitter.com/mosuke5" target="_blank">もーすけ</a>です。
+GWはみなさんいかがお過ごしでしたか？<br>
+外に出れないGWという一生でもそんなことが2度あるかわかりませんが非常に大変な日々を過ごされたのではないかと思います。自分は、GWを使ってKubernetes Operatorの開発などに挑戦してみていました。
+このあたりの話は別で書きたいと思いますが、Kubernetesのよさについてさらに理解を深めた気がします。</p>
+<p>さて、今日はCloud NativeなCI/CDツールと言われているTektonについて。<br>
+何回かに分けて書こうと思いますが、Operatorによるインストール編です（随時更新します）。</p>
         <a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/">続きを読む</a>
     </div>
     
@@ -297,6 +300,8 @@ Kubernetes Lifeは順調でしょうか？<br>
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）'});">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する'});">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/16/squid/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'squidを使ってプロキシ環境の再現検証に活用する'});">squidを使ってプロキシ環境の再現検証に活用する</a></li>
@@ -304,8 +309,6 @@ Kubernetes Lifeは順調でしょうか？<br>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/11/kubernetes-node-down/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetesのノード障害時のPodの動きについての検証'});">Kubernetesのノード障害時のPodの動きについての検証</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、TaskをまとめてPipelineとして実行する'});">Tekton、TaskをまとめてPipelineとして実行する</a></li>
-      
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、TaskでPipelineResouceを利用したときの挙動を確認する'});">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
       
     </ul>
   </div>
@@ -339,7 +342,7 @@ Kubernetes Lifeは順調でしょうか？<br>
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (39)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (40)</a>
       </li>
       
       <li class="list-group-item">
@@ -413,7 +416,7 @@ Kubernetes Lifeは順調でしょうか？<br>
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (13)</a>
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (14)</a>
       </li>
       
     </ul>
