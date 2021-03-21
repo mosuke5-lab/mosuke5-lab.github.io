@@ -63,6 +63,35 @@
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
   
+  <h1><a href="https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/" class="entry-title">Docker Hubのダウンロード回数制限の対策を考える</a></h1>
+  <div class="entry-sub-title">
+      <span class="">18 Nov 2020, 17:32</span>
+      <span class="">By mosuke5</span>
+      
+          
+              <a class="badge badge-inf post-category post-category-コンテナ" href="/categories/%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A">コンテナ</a>
+          
+              <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+          
+              <a class="badge badge-inf post-category post-category-ブログ運用" href="/categories/%E3%83%96%E3%83%AD%E3%82%B0%E9%81%8B%E7%94%A8">ブログ運用</a>
+          
+      
+  </div>
+  <div class="entry-content">
+      <p>こんにちは。もーすけです。<br>
+今日は最近開始されたDocker Hubのイメージダウンロードの回数制限について書きたいと思います。
+動向だけはなんとなく追っていたのですが、先日に自分がこの問題に向き合わなければいけないケースに遭遇したため、残しておこうと思い立ちました。</p>
+<h2 id="きっかけ">きっかけ</h2>
+<p>本ブログの記事のビルドやデプロイには<a href="https://app.wercker.com/">Wecker</a>というサービスを利用しています。
+ある日、記事を投稿しようとしたところCIのビルドがコケて記事を投稿できませんでした。
+エラーは以下のとおりで、調べるとDocker Hubのイメージダウンロードの回数制限に引っかかっていることがわかりました。</p>
+<blockquote>
+<p><code>fetch failed to pull image debian: API error (500): {&quot;message&quot;:&quot;toomanyrequests: You have reached your pull rate limit. You may increase the limit by authenticating and upgrading: https://www.docker.com/increase-rate-limit&quot;}</code></p>
+</blockquote>
+<p><img src="/image/wercker-docker-rate-limit-error.png" alt="docker-rate-limit-error"></p>
+      <a href="https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/">続きを読む</a>
+  </div>
+  
   <h1><a href="https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/" class="entry-title">【翻訳】Kubernetes as a serviceの謎を解く。Alibaba Cloudが1万個のKubernetesクラスタを管理する方法</a></h1>
   <div class="entry-sub-title">
       <span class="">17 Nov 2020, 17:24</span>
@@ -237,25 +266,6 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
       <a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/">続きを読む</a>
   </div>
   
-  <h1><a href="https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/" class="entry-title">Sock Shopを使ったサービスメッシュ体験のハンズオン</a></h1>
-  <div class="entry-sub-title">
-      <span class="">01 Jul 2020, 23:00</span>
-      <span class="">By mosuke5</span>
-      
-          
-              <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-          
-      
-  </div>
-  <div class="entry-content">
-      <p>おひさしぶりです。もーすけです。<br>
-あっという間に６月が終わってしまい、６月はブログが書けませんでしたが、ブログで書きたいなと思うネタはいくつかありますので、時間のすきをみつけて書いていきたいと思います。</p>
-<p>以前に、Sock Shopを使ったマイクロサービスのハンズオン体験についてのブログを書きました。
-このネタに、Istioを使ったサービスメッシュを適応するハンズオンを追加したのでお知らせします。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/01/22/sockshop/" data-iframely-url="//cdn.iframe.ly/YDI2rVR"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-      <a href="https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/">続きを読む</a>
-  </div>
-  
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
@@ -276,6 +286,8 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、ClusterTaskとTekton Hubを理解する'});">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）'});">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する'});">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
@@ -283,8 +295,6 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/16/squid/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'squidを使ってプロキシ環境の再現検証に活用する'});">squidを使ってプロキシ環境の再現検証に活用する</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/11/kubernetes-node-down/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetesのノード障害時のPodの動きについての検証'});">Kubernetesのノード障害時のPodの動きについての検証</a></li>
-      
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、TaskをまとめてPipelineとして実行する'});">Tekton、TaskをまとめてPipelineとして実行する</a></li>
       
     </ul>
   </div>
@@ -318,7 +328,7 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (40)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (41)</a>
       </li>
       
       <li class="list-group-item">
@@ -392,7 +402,7 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (14)</a>
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (15)</a>
       </li>
       
     </ul>
