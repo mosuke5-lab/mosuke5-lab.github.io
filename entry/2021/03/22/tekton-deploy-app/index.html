@@ -8,22 +8,22 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 <link rel="stylesheet" href="/css/main.css">
 
-<title>Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</title>
-<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/">
-<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/" />
+<title>Tekton、アプリケーションをKubernetesクラスタへデプロイする</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" />
 <meta name="twitter:card" content="summary">
 
 <meta name="twitter:site" content="@mosuke5" />
 <meta name="twitter:creator" content="@mosuke5" />
 
-<meta name="twitter:title" content="Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド） &middot; Goldstine研究所">
-<meta name="twitter:description" content="Tekton学習シリーズ第7回では、カタログを利用してパイプラインを作ることをやります。GitHubからソースコードをダウンロードして、コンテナイメージをビルドした結果をレジストリにPushします。">
+<meta name="twitter:title" content="Tekton、アプリケーションをKubernetesクラスタへデプロイする &middot; Goldstine研究所">
+<meta name="twitter:description" content="Tekton学習シリーズの第9回は、ついにコンテナイメージのビルドからデプロイまで実施します。TektonからKubernetesリソースを扱う方法を学んでいきます。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド） &middot; Goldstine研究所">
-<meta property="og:description" content="Tekton学習シリーズ第7回では、カタログを利用してパイプラインを作ることをやります。GitHubからソースコードをダウンロードして、コンテナイメージをビルドした結果をレジストリにPushします。">
+<meta property="og:title" content="Tekton、アプリケーションをKubernetesクラスタへデプロイする &middot; Goldstine研究所">
+<meta property="og:description" content="Tekton学習シリーズの第9回は、ついにコンテナイメージのビルドからデプロイまで実施します。TektonからKubernetesリソースを扱う方法を学んでいきます。">
 <meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
-<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" />
 <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
 <link rel="icon" href="/image/favicon.ico" />
 
@@ -61,9 +61,9 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
-    <h1>Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</h1>
+    <h1>Tekton、アプリケーションをKubernetesクラスタへデプロイする</h1>
     <div class="entry-sub-title">
-        <span class="">20 Mar 2021, 00:36</span>
+        <span class="">22 Mar 2021, 21:38</span>
         <span class="">By mosuke5</span>
         
             
@@ -86,110 +86,101 @@
 <li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
 </ul>
 <hr>
-<p>こんにちは、もーすけです。<br>
-本日もTekton学習フェーズやっていきます。第7回では、カタログの活用とTektonを使っていく上で必ず通るであろうイメージビルドについてあわせてやっていきたいと思います。
-本日のゴールは、Tektonが公開しているカタログ（公開Task）を用いて、任意のGitレポジトリにあるDockerfileをビルドしてレジストリにPushするまです。ではよろしくおねがいします。</p>
-<h2 id="カタログを活用する">カタログを活用する</h2>
-<p>カタログについて紹介します。今までの学習ではTaskは全部自分で作成してきました。
-一方で、パイプライン内で実行したいTaskは共通化されてきます。たとえば、GitHubからソースコードをダウンロードしたい、コンテナイメージをビルドしたい、ビルドしたイメージをレジストリにプッシュしたい、などなど数え切れないほどありますよね。
-そこで、Tektonではカタログという形で、Taskを公開してくれています。これを使わない手はありません。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0; margin-bottom: 30px;"><a href="https://github.com/tektoncd/catalog" data-iframely-url="//cdn.iframe.ly/XxCD6ka"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-<p>例として、本日使うTaskのひとつである<code>git-clone</code>を見てみましょう。
-catalogをまずはダウンロードしてきて中身を確認します。<code>0.1</code>, <code>0.2</code>, <code>0.3</code>とバージョニングされているのは、Task自体のバージョンです。利用しているTektonのバージョンに合わせて利用するものを決定しましょう。本環境では、まだ<code>0.15.2</code>を使っているので<code>0.2</code>が該当します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/tektoncd/catalog
-$ cd catalog/task/git-clone
-$ tree
-.
-├── 0.1
-│   ├── README.md
-│   ├── git-clone.yaml
-│   ├── samples
-│   │   ├── git-clone-checking-out-a-branch.yaml
-│   │   ├── git-clone-checking-out-a-commit.yaml
-│   │   └── using-git-clone-result.yaml
-│   └── tests
-│       └── run.yaml
-├── 0.2
-│   ├── README.md
-│   ├── git-clone.yaml
-│   ├── samples
-│   │   ├── git-clone-checking-out-a-branch.yaml
-│   │   ├── git-clone-checking-out-a-commit.yaml
-│   │   └── using-git-clone-result.yaml
-│   └── tests
-│       └── run.yaml
-└── 0.3
-    ├── README.md
-    ├── git-clone.yaml
-    ├── samples
-    │   ├── git-clone-checking-out-a-branch.yaml
-    │   ├── git-clone-checking-out-a-commit.yaml
-    │   ├── git-clone-sparse-checkout.yaml
-    │   └── using-git-clone-result.yaml
-    └── tests
-        └── run.yaml
+<p>こんにちは、もーすけです。本日もTekton学習シリーズやっていきます。<br>
+第9回目は、ついにアプリケーションをKubernetesクラスタにデプロイします。
+今回は第8回の続きになりますので、まだ第8回を実施していない人は先にみておいてください。
+前回は、GitHubのレポジトリからソースコードをダウンロードしてきて、コンテナイメージをビルドし、イメージレジストリに格納するところまでやりました。
+今回は、そのビルドしたイメージをKubernetesクラスタにデプロイします。</p>
+<h2 id="kubernetes-actions-taskのインストール">kubernetes-actions taskのインストール</h2>
+<p>前回は、<code>git-clone</code>と<code>buildah</code>のTaskをカタログからインストールしました。
+今回はさらに、<code>kubernetes-actions</code>というTaskをインストールします（Tekton Hub: <a href="https://hub.tekton.dev/tekton/task/kubernetes-actions">kubernetes-actions</a>）。目的は、<code>kubectl apply -f manifests</code>を実行するためです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f catalog/task/kubernetes-actions/0.1/kubernetes-actions.yaml
+task.tekton.dev/kubernetes-actions created
 
-// 対象のバージョンはREADME.mdを読めばわかる
-$ cat 0.2/README.md
-# `git-clone`
-
-**Please Note: this Task is only compatible with Tekton Pipelines versions 0.14.0 and greater!**
-...
-</code></pre></div><p>長いのでブログには記載しませんが、<a href="https://github.com/tektoncd/catalog/blob/main/task/git-clone/0.2/git-clone.yaml">catalog/task/git-clone/0.2/git-clone.yaml</a> を確認してみてください。
-Taskが記載されていており、すぐ利用できるようになっています。かなり汎用的に利用できるようパラメータ化も進んでいます。
-利用するときには、Taskの中身を確認し必要なパラメータを確認しTaskRunやPipelineRunから指定して利用します。
-実践はこのあと見ていきましょう。</p>
-<h2 id="ビルドパイプラインを構成する">ビルドパイプラインを構成する</h2>
-<h3 id="全体構成">全体構成</h3>
-<p>では、作成するパイプラインの形を決めていきましょう。<br>
-あるレポジトリからソースコードをダウンロードしてきて、その中にあるDockerfileをビルドして、DockerHubにPushするまでを実現することとします。次のようなイメージでしょうか？</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">(Pipeline start) - (git-clone) - (builah[build &amp; push])
-                         \     /
-                          \   /
-                   (Persistent Volume [for workspace])
-</code></pre></div><p>今回はイメージのビルドとレジストリへのPushに <a href="https://github.com/tektoncd/catalog/tree/main/task/buildah/0.1">buildah</a> というTaskを使います。
-buildahは、OCIに準拠したデーモンレスのコンテナビルドツールのひとつです。TektonのTask自身がKubernetes上のコンテナとして動作することもあり、Dockerのようなデーモンプロセスを利用するより、デーモンレスのBuildahやkanikoといったツールを用いたほうが容易に実装できます。</p>
-<h3 id="下準備レジストリ認証">下準備（レジストリ認証）</h3>
-<p>カタログにある <a href="https://github.com/tektoncd/catalog/tree/main/task/buildah/0.1">buildah</a> は、イメージのビルドとレジストリへのプッシュをあわせて行います。レジストリへのプッシュには当然レジストリへの認証が必要になります。
-コンテナレジストリへの認証を簡単に実現する仕組みもTektonでは用意されています。
-Taskを実行するPodの利用するServiceAccountを指定できるのですが、そのServiceAccountにレジストリの認証情報をリンクさせておけばできます。<br>
-詳しくは、公式ドキュメントの <a href="https://tekton.dev/vault/pipelines-v0.15.2/auth/#kubernetes-s-docker-registry-s-secret">Authentication</a> を参照しましょう。</p>
-<p>今回は、レジストリにDockerHubを利用するので次のような設定ファイルを用意しておきます。
-Dockerなどで利用する認証用の<code>config.json</code>です。<code>xxxxx</code>には、認証に必要なトークンをいれてください。簡単に取得する方法としては、レジストリのIDとパスワードをコロンでつなげてbase64でエンコードすることですかね。<code>echo -n &quot;id:password&quot; | base64</code> このような感じです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">//</span> <span style="color:#960050;background-color:#1e0010">config.json</span>
-{
-	<span style="color:#f92672">&#34;auths&#34;</span>: {
-		<span style="color:#f92672">&#34;https://index.docker.io/v1/&#34;</span>: {
-			<span style="color:#f92672">&#34;auth&#34;</span>: <span style="color:#e6db74">&#34;xxxxx&#34;</span>
-		}
-	}
-}
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl create secret generic dockerhub-cred \
-    --from-file=.dockerconfigjson=/path/to/config.json \
-    --type=kubernetes.io/dockerconfigjson
-secret/dockerhub-cred created
-</code></pre></div><p>次にServiceAccountです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+$ kubectl get task kubernetes-actions
+NAME                 AGE
+kubernetes-actions   10s
+</code></pre></div><h2 id="kubernetes-actionsの使い方">kubernetes-actionsの使い方</h2>
+<p>かんたんに使い方と注意事項を説明しておきます。
+<code>kubectl</code> がインストールされたイメージを用いて任意の処理を実行できます。
+最低限の設定としては以下のサンプルのとおりです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">deploy-application</span>
+      <span style="color:#f92672">taskRef</span>:
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kubernetes-actions</span>
+      <span style="color:#f92672">params</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">image  </span> <span style="color:#75715e"># 利用するイメージ</span>
+          <span style="color:#f92672">value</span>: <span style="color:#ae81ff">bitnami/kubectl:1.20</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">script </span> <span style="color:#75715e"># 実行したい処理</span>
+          <span style="color:#f92672">value</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">            </span>            <span style="color:#ae81ff">kubectl apply -f xxxx.yaml</span>
+      <span style="color:#f92672">workspaces</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">manifest-dir </span> <span style="color:#75715e"># マニフェストが保存されたworkspace</span>
+          <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">shared-workspace</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kubeconfig-dir </span> <span style="color:#75715e"># kubeconfigが保存されたworkspace。不要の場合はemptyDirでいける</span>
+          <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">kubeconfig-dir</span>
+</code></pre></div><p>注意点として、利用するイメージがあります。このカタログに記載されているデフォルトのイメージ <code>gcr.io/cloud-builders/kubectl@sha256:8ab94be8b2b4f3d117f02d868b39540fddd225447abf4014f7ba4765cb39f753</code> はコメントにも書かれているのですが、非常にイメージサイズが大きいです（<code>image is huge</code>というコメントがTaskにかかれている）。はっきりいって利用を推奨しません。
+このTaskは基本的にkubectlがインストールされていれば、ほかのイメージでも代用可能なので、<a href="https://hub.docker.com/layers/bitnami/kubectl/1.20/images/sha256-8dcf02cf4f9c8f8004c911c29731a2f0992aec8f9e2d5608452ab006f1db1c32?context=explore">bitnami/kubectl:1.20</a>を利用しました。パラメータで利用できるイメージを指定できます。</p>
+<p><code>kubeconfig-dir</code>ですが、利用したいコンフィグがある場合はマウントして利用できます。
+しかし、TektonではTask自体がPodとして動いており、自身のKubernetesクラスタへの操作であれば、ServiceAccountのTokenを使うことが一番簡単です。
+そのため、とくに外部のコンフィグを利用しない場合は、<code>kubeconfig-dir</code>はemptyDirを指定しておけば大丈夫です。後ほどで実践例を見ます。</p>
+<h2 id="serviceaccountへの権限付与">ServiceAccountへの権限付与</h2>
+<p>ひとつ前のセクションで<code>kubeconfig-dir</code>について解説しました。
+TektonのTaskからKubernetesを操作するには、ServiceAccountに利用したい権限を付与する必要があります。
+ServiceAccountは、前回同様の<code>my-kekton-pipeline</code>を利用しますが、<code>Role</code>と<code>RoleBinding</code>を追加しました。
+今回はシンプルにDeploymentとPodのみ操作できる権限を付けました。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># my-tekton-pipeline-sa.yaml</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceAccount</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-tekton-pipeline</span>
 <span style="color:#f92672">secrets</span>:
   - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">dockerhub-cred</span>
+---
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Role</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-tekton-pipeline-role</span>
+<span style="color:#f92672">rules</span>:
+- <span style="color:#f92672">apiGroups</span>: [<span style="color:#e6db74">&#34;&#34;</span>]
+  <span style="color:#f92672">resources</span>: [<span style="color:#e6db74">&#34;pods&#34;</span>]
+  <span style="color:#f92672">verbs</span>: [<span style="color:#e6db74">&#34;get&#34;</span>, <span style="color:#e6db74">&#34;list&#34;</span>, <span style="color:#e6db74">&#34;watch&#34;</span>, <span style="color:#e6db74">&#34;create&#34;</span>, <span style="color:#e6db74">&#34;update&#34;</span>, <span style="color:#e6db74">&#34;patch&#34;</span>, <span style="color:#e6db74">&#34;delete&#34;</span>]
+- <span style="color:#f92672">apiGroups</span>: [<span style="color:#e6db74">&#34;apps&#34;</span>]
+  <span style="color:#f92672">resources</span>: [<span style="color:#e6db74">&#34;deployments&#34;</span>]
+  <span style="color:#f92672">verbs</span>: [<span style="color:#e6db74">&#34;get&#34;</span>, <span style="color:#e6db74">&#34;list&#34;</span>, <span style="color:#e6db74">&#34;watch&#34;</span>, <span style="color:#e6db74">&#34;create&#34;</span>, <span style="color:#e6db74">&#34;update&#34;</span>, <span style="color:#e6db74">&#34;patch&#34;</span>, <span style="color:#e6db74">&#34;delete&#34;</span>]
+---
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">RoleBinding</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-tekton-pipeline-rolebinding</span>
+<span style="color:#f92672">subjects</span>:
+- <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceAccount</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-tekton-pipeline</span>
+  <span style="color:#f92672">apiGroup</span>: <span style="color:#e6db74">&#34;&#34;</span>
+<span style="color:#f92672">roleRef</span>:
+  <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Role</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-tekton-pipeline-role</span>
+  <span style="color:#f92672">apiGroup</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io</span>
 </code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f my-tekton-pipeline-sa.yaml
-serviceaccount/my-tekton-pipeline created
-</code></pre></div><p>SecretとSecretを紐付けたServiceAccountの作成ができたら下準備は終了です。</p>
-<h3 id="パイプライン">パイプライン</h3>
-<p>いよいよパイプラインの作成です。<br>
-以下のようなパイプラインを作成しました。Taskを独自に作る必要がなかったので、指定するパラメータさえ把握できていればシンプルに書くことができました。Task内に定義されているパラメータをすべてパイプラインで定義する必要はありません。多くのパラメータはデフォルト値が設定されているので、変更したい部分だけパラメータ設定してください。
-前回の<a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">第6回</a>でやりましたが、Task間はデータを引き継ぎできません。Workspaceが必要になります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># build-image-pipeline.yaml</span>
+serviceaccount/my-tekton-pipeline configured
+role.rbac.authorization.k8s.io/my-tekton-pipeline-role created
+rolebinding.rbac.authorization.k8s.io/my-tekton-pipeline-rolebinding created
+</code></pre></div><p>この権限付与がないと以下のようなエラーになります。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">Error from server (Forbidden): error when retrieving current configuration of:
+Resource: &#34;apps/v1, Resource=deployments&#34;, GroupVersionKind: &#34;apps/v1, Kind=Deployment&#34;
+Name: &#34;myapp&#34;, Namespace: &#34;goldstine-lab&#34;
+from server for: &#34;/tmp/new-deployment.yaml&#34;: deployments.apps &#34;myapp&#34; is forbidden: User &#34;system:serviceaccount:goldstine-lab:my-tekton-pipeline&#34; cannot get resource &#34;deployments&#34; in API group &#34;apps&#34; in the namespace &#34;goldstine-lab&#34;
+</code></pre></div><h2 id="パイプラインの作成">パイプラインの作成</h2>
+<p>では、パイプラインを作ります。7割は前回と同様です。Pipelineの名前は一応変えておきました。
+サンプルのPipelineマニフェストは以下のとおりです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># build-deploy-pipeline.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pipeline</span>
 <span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-image-pipeline</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-deploy-pipeline</span>
 <span style="color:#f92672">spec</span>:
   <span style="color:#f92672">workspaces</span>: 
     - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">shared-workspace</span>
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kubeconfig-dir</span>
   <span style="color:#f92672">params</span>:
     - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">git-url</span>
       <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
@@ -227,16 +218,51 @@ serviceaccount/my-tekton-pipeline created
           <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">shared-workspace</span>
       <span style="color:#f92672">runAfter</span>:
         - <span style="color:#ae81ff">fetch-repository</span>
-</code></pre></div><p>では、実行してみましょう。
-次のようにPipelineRunを準備しました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># build-image-pipeline-run.yaml</span>
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">deploy-application</span>
+      <span style="color:#f92672">taskRef</span>:
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kubernetes-actions</span>
+      <span style="color:#f92672">params</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">image</span>
+          <span style="color:#f92672">value</span>: <span style="color:#ae81ff">bitnami/kubectl:1.20</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">script</span>
+          <span style="color:#f92672">value</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">            IMAGE=$(echo &#34;$(params.image)&#34; | sed -e &#39;s/\//\\\//g&#39;)
+</span><span style="color:#e6db74">            cat ./config/deployment.yaml | sed -e &#34;s/myapp:latest/$IMAGE/g&#34; -e &#34;s/Never/IfNotPresent/g&#34; &gt; /tmp/new-deployment.yaml
+</span><span style="color:#e6db74">            cat /tmp/new-deployment.yaml
+</span><span style="color:#e6db74">            echo &#34;-----------&#34;
+</span><span style="color:#e6db74">            kubectl apply -f /tmp/new-deployment.yaml
+</span><span style="color:#e6db74">            echo &#34;-----------&#34;
+</span><span style="color:#e6db74">            kubectl get deploy
+</span><span style="color:#e6db74">            kubectl get pods </span>            
+      <span style="color:#f92672">workspaces</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">manifest-dir</span>
+          <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">shared-workspace</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kubeconfig-dir</span>
+          <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">kubeconfig-dir</span>
+      <span style="color:#f92672">runAfter</span>:
+        - <span style="color:#ae81ff">build-push-image</span>
+</code></pre></div><p>説明が必要なポイントとしては、<code>kubernetes-actions</code>の<code>script</code>部分でしょうか。
+<code>sed</code>などを実行していますが、なにをしているかというと、今回利用したレポジトリの中にマニフェストファイルが含まれているのですが、HelmやKustomizeではなくプレーンなマニフェストです。そのため、コンテナイメージが固定です。それを<code>sed</code>で書き換えていますということです。あとは、<code>apply</code>後に確認用でPodやDeploymentを確認しているということです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">script</span>
+          <span style="color:#f92672">value</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">            IMAGE=$(echo &#34;$(params.image)&#34; | sed -e &#39;s/\//\\\//g&#39;)
+</span><span style="color:#e6db74">            cat ./config/deployment.yaml | sed -e &#34;s/myapp:latest/$IMAGE/g&#34; -e &#34;s/Never/IfNotPresent/g&#34; &gt; /tmp/new-deployment.yaml
+</span><span style="color:#e6db74">            cat /tmp/new-deployment.yaml
+</span><span style="color:#e6db74">            echo &#34;-----------&#34;
+</span><span style="color:#e6db74">            kubectl apply -f /tmp/new-deployment.yaml
+</span><span style="color:#e6db74">            echo &#34;-----------&#34;
+</span><span style="color:#e6db74">            kubectl get deploy
+</span><span style="color:#e6db74">            kubectl get pods </span>            
+</code></pre></div><h2 id="パイプラインの実行">パイプラインの実行</h2>
+<p>最後に実行します。ここはいつもどおり<code>PipelineRun</code>を作成して実行するのみです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># build-deploy-pipeline-run.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PipelineRun</span>
 <span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-image-pipeline-run</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-deploy-pipeline-run</span>
 <span style="color:#f92672">spec</span>:
   <span style="color:#f92672">pipelineRef</span>:
-    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-image-pipeline</span>
+    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-deploy-pipeline</span>
   <span style="color:#f92672">params</span>: 
     - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">git-url</span>
       <span style="color:#f92672">value</span>: <span style="color:#ae81ff">https://github.com/ncskier/myapp</span>
@@ -252,101 +278,27 @@ serviceaccount/my-tekton-pipeline created
           <span style="color:#f92672">resources</span>:
             <span style="color:#f92672">requests</span>:
               <span style="color:#f92672">storage</span>: <span style="color:#ae81ff">1Gi</span>
-</code></pre></div><h4 id="pipelineresourceはどこにいった">PipelineResourceはどこにいった？</h4>
-<p>第4回 <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a> では、Gitレポジトリ上にあるソースコードをPipelineResourceという機能を利用してTaskと連携しました。今回はPipelineResourceを使わずにカタログの <code>git-clone task</code> を利用したわけですが、どちらを利用したほうがいいのでしょうか？と疑問がわくと思います。
-今回やってみてわかったのですが、PipelineResourceは忘れていただいて、Taskで操作したほうが使い勝手がいいと考えました。理由として、<code>buildah task</code> もworkspaceでソースコードが引き渡されることが前提となっておりPipelineResourceを使う場合、Task自身を修正しなければなりませんでした。
-また、余計なKubernetesリソースを作成することなくPipeline内で完結できるので、PipelineResourceは不要かな。。？と現時点では思っています。</p>
-<h3 id="パイプラインの実行">パイプラインの実行</h3>
-<p>パイプラインを実行して、実行結果を見てみます。<br>
-確認ポイントとしては、各Taskの実行結果や最終的なアウトプットとしてのコンテナレジストリです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f build-image-pipeline.yaml
-pipeline.tekton.dev/build-image-pipeline created
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kubeconfig-dir</span>
+      <span style="color:#f92672">emptyDir</span>: {}
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f build-deploy-pipeline.yaml
+pipeline.tekton.dev/build-deploy-pipeline created
 
-$ kubectl apply -f build-image-pipeline-run.yaml
-pipelinerun.tekton.dev/build-image-pipeline-run created
+$ kubectl apply -f build-deploy-pipeline-run.yaml
+pipelinerun.tekton.dev/build-deploy-pipeline-run created
 
-// build-image-pipeline-run-fetch-repository-s588m-pod-dc5h9 が完了後に
-// build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7 が実行
-$ kubectl get pod -w
-affinity-assistant-38b60e39a8-0                             0/1     Pending     0          5s
-affinity-assistant-38b60e39a8-0                             0/1     ContainerCreating   0          5s
-build-image-pipeline-run-fetch-repository-s588m-pod-dc5h9   0/1     Pending             0          5s
-build-image-pipeline-run-fetch-repository-s588m-pod-dc5h9   0/1     Init:0/2            0          5s
-affinity-assistant-38b60e39a8-0                             1/1     Running             0          7s
-build-image-pipeline-run-fetch-repository-s588m-pod-dc5h9   0/1     Init:1/2            0          15s
-build-image-pipeline-run-fetch-repository-s588m-pod-dc5h9   0/1     PodInitializing     0          16s
-build-image-pipeline-run-fetch-repository-s588m-pod-dc5h9   1/1     Running             0          17s
-build-image-pipeline-run-fetch-repository-s588m-pod-dc5h9   1/1     Running             0          17s
-build-image-pipeline-run-fetch-repository-s588m-pod-dc5h9   0/1     Completed           0          19s
-build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   0/3     Pending             0          1s
-build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   0/3     Pending             0          1s
-build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   0/3     Init:0/3            0          1s
-build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   0/3     Init:1/3            0          18s
-build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   0/3     Init:2/3            0          19s
-build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   0/3     PodInitializing     0          21s
-build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   3/3     Running             0          22s
-build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   3/3     Running             0          22s
-build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   2/3     Running             0          47s
-build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   0/3     Completed           0          62s
-affinity-assistant-38b60e39a8-0                             1/1     Terminating         0          83s
-affinity-assistant-38b60e39a8-0                             0/1     Terminating         0          83s
-affinity-assistant-38b60e39a8-0                             0/1     Terminating         0          84s
-affinity-assistant-38b60e39a8-0                             0/1     Terminating         0          84s
-</code></pre></div><p>buildah taskは3 Stepになっているのでそれぞれのログ結果を確認します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">$ kubectl logs build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7 -c step-build
-+ buildah --storage-driver=overlay bud --format=oci --tls-verify=true --no-cache -f Dockerfile -t mosuke5/tekton-practice:from-pipeline /workspace/source
-STEP 1: FROM node:10-alpine
-Getting image source signatures
-Copying blob sha256:d9692e56401d84fa6b0165d088b435621acc6be27d969b047d62413658094b78
-Copying blob sha256:299bbe2100ab5b3ff39aeba08c0335acd76659a5cefd364d351a0b93695bfd77
-Copying blob sha256:e95f33c60a645d6d31f52fdc334aecec0d79a1b410789eae37fbf69efcd587ab
-Copying blob sha256:bc3b38a692a9ec24681521bbae19ba05bd8d8cf3c24120351c1aed643142ea6c
-Copying config sha256:8dd791b3335fdda7c9214afcb2942ade98881493a3d9a2172c2a6f3001ef0268
-Writing manifest to image destination
-Storing signatures
-STEP 2: WORKDIR /myapp
-STEP 3: COPY package*.json ./
-STEP 4: RUN npm install
-
-&gt; node@12.15.0 preinstall /myapp/node_modules/node
-&gt; node installArchSpecificPackage
-
-+ node-linux-x64@12.15.0
-added 1 package in 3.109s
-found 0 vulnerabilities
-
-added 52 packages from 38 contributors and audited 52 packages in 5.773s
-found 0 vulnerabilities
-
-STEP 5: COPY . .
-STEP 6: EXPOSE 3000
-STEP 7: CMD [&#34;node&#34;, &#34;app.js&#34;]
-STEP 8: COMMIT mosuke5/tekton-practice:from-pipeline
---&gt; d849f62cbdd
-d849f62cbdde81bc3732c8c77ac8f757a9b129a7b8d20d2966c03dcbb3e40943
-
-$ kubectl logs build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7 -c step-push
-+ buildah --storage-driver=overlay push --tls-verify=true --digestfile /workspace/source/image-digest mosuke5/tekton-practice:from-pipeline docker://mosuke5/tekton-practice:from-pipeline
-Getting image source signatures
-Copying blob sha256:1200582c7aaeec2befa0416b9425b2dd7cf904750c6e2b37ae6b95c18b0e91cc
-Copying blob sha256:9120c3c4dc211acf21a892c913e3410cc5c217504941307a821e9259bc662132
-Copying blob sha256:796f68ff5eda2be2c081ac8276373cf0d61b7aedebc846909069cffeb85f3d9d
-Copying blob sha256:af4e4e5799facf73eff4d722502aedc093c2bdfaf1eefce793347ab6e611387d
-Copying blob sha256:6169bf830ae69f192382cfe9a6fe96e7f28a21c0c5e5045b85871b510de58435
-Copying config sha256:d849f62cbdde81bc3732c8c77ac8f757a9b129a7b8d20d2966c03dcbb3e40943
-Writing manifest to image destination
-Storing signatures
-
-$ kubectl logs build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7 -c step-digest-to-results
-+ tee /tekton/results/IMAGE_DIGEST
-+ cat /workspace/source/image-digest
-sha256:b25636094be442def8fb922a6b8a0893eba3ddc258f8042a76008af4ad3a92cc
-</code></pre></div><p>DockerHubにも無事にイメージがプッシュされているのを確認しました。</p>
-<p><img src="/image/tekton-dockerhub-after-buildah-task.png" alt="tekton-dockerhub"></p>
-<h2 id="まとめ">まとめ</h2>
-<p>本日は、カタログを使用した、イメージのビルド方法について学びました。<br>
-だいぶ実践的なパイプラインになってきましたね。これからはKubernetesクラスタにアプリケーションをデプロイするなど、より実践的な内容へと発展していきます。
-内容が難しかったよという人は、ぜひ前の学習シリーズの復習などしてみてください。</p>
+$ kubectl get pod
+kc get pod -w
+NAME                                                           READY   STATUS      RESTARTS   AGE
+build-deploy-pipeline-run-build-push-image-ddzpc-pod-zg2lv     0/3     Completed   0          89s
+build-deploy-pipeline-run-deploy-application-m6rhm-pod-2fqjb   0/1     Completed   0          34s
+build-deploy-pipeline-run-fetch-repository-zljww-pod-tpfds     0/1     Completed   0          117s
+myapp-656b6c9b99-hv58j                                         1/1     Running     0          24s
+</code></pre></div><p>ダッシュボードからの見え方。</p>
+<p><img src="/image/tekton-dashboard-build-deploy-pipeline.png" alt="dashboard"></p>
+<h2 id="さいごに">さいごに</h2>
+<p>第9回では、ついにイメージのビルドからデプロイまで実施しました。
+できるひとは、レポジトリを独自のものに変更するなどして遊んでみてください。
+次回からは、TektonのEventに着目していく予定です。</p>
 <hr>
 <h5>Tekton学習シリーズ</h5>
 <ul>
@@ -364,7 +316,7 @@ sha256:b25636094be442def8fb922a6b8a0893eba3ddc258f8042a76008af4ad3a92cc
     </div>
     <div class="entry-sub-content request-for-entry">
         <h5>フィードバック・相談(β)</h5>
-        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Tekton%e3%80%81%e3%82%ab%e3%82%bf%e3%83%ad%e3%82%b0%e3%82%92%e3%81%86%e3%81%be%e3%81%8f%e6%b4%bb%e7%94%a8%e3%81%97%e3%81%a6%e3%83%91%e3%82%a4%e3%83%97%e3%83%a9%e3%82%a4%e3%83%b3%e3%82%92%e4%bd%9c%e3%82%8b%ef%bc%88%e3%82%a4%e3%83%a1%e3%83%bc%e3%82%b8%e3%83%93%e3%83%ab%e3%83%89%ef%bc%89" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）'});">執筆者に問い合わせてみる</a></p>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Tekton%e3%80%81%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e3%82%92Kubernetes%e3%82%af%e3%83%a9%e3%82%b9%e3%82%bf%e3%81%b8%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4%e3%81%99%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Tekton、アプリケーションをKubernetesクラスタへデプロイする'});">執筆者に問い合わせてみる</a></p>
     </div>
     <div class="entry-sub-content post-share">
         <div class="post-share-links">
@@ -533,9 +485,9 @@ sha256:b25636094be442def8fb922a6b8a0893eba3ddc258f8042a76008af4ad3a92cc
       <h3>関連する記事</h3>
       <ul class="list-group">
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、アプリケーションをKubernetesクラスタへデプロイする'});">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a> (2021/03/22)</li>
-        
         <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ClusterTaskとTekton Hubを理解する'});">Tekton、ClusterTaskとTekton Hubを理解する</a> (2021/03/21)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）'});">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a> (2021/03/20)</li>
         
         <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する'});">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a> (2021/03/17)</li>
         
