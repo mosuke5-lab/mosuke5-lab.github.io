@@ -84,12 +84,12 @@
 <p>詳しくは公式サイトや書籍などを参考にして欲しいですが、<br>
 「サーバの状態をコードで自動的にテスト・確認するためのツール」です。</p>
 <p><a href="http://serverspec.org">Serverspec - Home</a></p>
-<p>例えば、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>でWebサーバを組んでいるサーバがあったとして、下記の要件で動いているとします。</p>
+<p>例えば、ApacheでWebサーバを組んでいるサーバがあったとして、下記の要件で動いているとします。</p>
 <ul>
 <li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/apache">apache</a>がインス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%EB">トール</a>されていること</li>
+apacheがインストールされていること</li>
 <li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/apache">apache</a>が起動していること、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BC%AB%C6%B0%B5%AF%C6%B0">自動起動</a>する設定であること</li>
+apacheが起動していること、自動起動する設定であること</li>
 <li>ポート80があいていること</li>
 </ul>
 <p>この要件をサーバが満たしているかコードでテストします。<br>
@@ -118,9 +118,9 @@ describe port(<span style="color:#ae81ff">80</span>) <span style="color:#66d9ef"
 <h2>2. なんで導入したのか</h2>
 <p>serverspecを導入したのには大きく2つの理由があります。</p>
 <h3>(その１) インフラのテスト駆動開発を支えるため</h3>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryは趣味で開発・運用しているサービスで、まだ作りたての発展途上のサービスです。<br>
+<p>Vim::Factoryは趣味で開発・運用しているサービスで、まだ作りたての発展途上のサービスです。<br>
 そのため、今後もインフラコードをガンガン修正していくことを想定しています。<br>
-その開発、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%D5%A5%A1%A5%AF%A5%BF%A5%EA%A5%F3%A5%B0">リファクタリング</a>を支えるべく、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C6%A5%B9%A5%C8%B6%EE%C6%B0%B3%AB%C8%AF">テスト駆動開発</a>で行えるようにするためです。</p>
+その開発、リファクタリングを支えるべく、テスト駆動開発で行えるようにするためです。</p>
 <h3>(その２) インフラテストの必要性を深く理解するため</h3>
 <p>「インフラテストの必要性を深く理解するため」です。<br>
 必要性があるから導入したんじゃにないの？と思われるかもしれませんが、<br>
@@ -133,7 +133,7 @@ describe port(<span style="color:#ae81ff">80</span>) <span style="color:#66d9ef"
 <p>実際に試してみないと、その本質が見えてこないと思っているので、<br>
 導入してみて自分の肌で感じようと思っています。</p>
 <p>個人的なお話なのでみなさんには関係のない話ではありますが、<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::Factoryの開発は企業でもなければ営利目的でもありません。<br>
+Vim::Factoryの開発は企業でもなければ営利目的でもありません。<br>
 「週末にインフラ技術のインプット勉強をしていたが、それだけでは飽きてきて、<br>
 サービスを開発・運用していくなかでインフラ技術を磨いていきたい」
 というものだったので、こういった実験も大歓迎だったのです。</p>
@@ -147,26 +147,9 @@ describe port(<span style="color:#ae81ff">80</span>) <span style="color:#66d9ef"
 こうすることで、「なぜインフラテストコードを書くのか」の目的意識を統一しています。</p>
 <p>この指針には、下記の本をかなり参考にしました。（serverspec作者の本です）
 </p>
-<div class="hatena-asin-detail">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4873117097/hatena-blog-22/"><img src="https://images-fe.ssl-images-amazon.com/images/I/51P6qVOPALL._SL160_.jpg" class="hatena-asin-detail-image" alt="Serverspec" title="Serverspec"></a><div class="hatena-asin-detail-info">
-<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/4873117097/hatena-blog-22/">Serverspec</a></p>
-<ul>
-<li>
-<span class="hatena-asin-detail-label">作者:</span> 宮下剛輔</li>
-<li>
-<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AA%A5%E9%A5%A4%A5%EA%A1%BC%A5%B8%A5%E3%A5%D1%A5%F3">オライリージャパン</a>
-</li>
-<li>
-<span class="hatena-asin-detail-label">発売日:</span> 2015/01/17</li>
-<li>
-<span class="hatena-asin-detail-label">メディア:</span> 単行本（ソフトカバー）</li>
-<li><a href="http://d.hatena.ne.jp/asin/4873117097/hatena-blog-22" target="_blank">この商品を含むブログ (6件) を見る</a></li>
-</ul>
-</div>
-<div class="hatena-asin-detail-foot"></div>
-</div>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.amazon.co.jp/Serverspec-%25E5%25AE%25AE%25E4%25B8%258B-%25E5%2589%259B%25E8%25BC%2594/dp/4873117097?__mk_ja_JP=%25E3%2582%25AB%25E3%2582%25BF%25E3%2582%25AB%25E3%2583%258A&amp;dchild=1&amp;keywords=serverspec&amp;qid=1616501028&amp;sr=8-1&amp;linkCode=sl1&amp;tag=mosuke5-22&amp;linkId=6860341d1d83fcda3da3d2a932f554e8&amp;language=ja_JP&amp;ref_=as_li_ss_tl" data-iframely-url="//cdn.iframe.ly/QosTVsL?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
 <h3>テストをサーバの役割毎にまとめる</h3>
-<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%A3%A5%EC%A5%AF%A5%C8">ディレクト</a>リの主な構成は下記のようになっています。<br>
+<p>ディレクトリの主な構成は下記のようになっています。<br>
 （実際にはもっとファイルやホストが多いですがイメージです。）</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">├ Rakefile
 ├ spec/
@@ -179,8 +162,8 @@ describe port(<span style="color:#ae81ff">80</span>) <span style="color:#66d9ef"
 │ └ app/
 │     └ vimfactory-app_spec.rb
 └ sshconfig 
-</code></pre></div><p>nginxなどを搭載するプロキシサーバと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3%A5%B5%A1%BC%A5%D0">アプリケーションサーバ</a>があり、それぞれにロールを割り振ります。<br>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rakefile">Rakefile</a>内に書いてます。もし記述が増えるようだと別ファイルに切り出すと思います。</p>
+</code></pre></div><p>nginxなどを搭載するプロキシサーバとアプリケーションサーバがあり、それぞれにロールを割り振ります。<br>
+Rakefile内に書いてます。もし記述が増えるようだと別ファイルに切り出すと思います。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">hosts <span style="color:#f92672">=</span> <span style="color:#f92672">[</span>
   {
     <span style="color:#e6db74">:name</span>   <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;proxy.vimfactory&#34;</span>,
@@ -195,14 +178,14 @@ describe port(<span style="color:#ae81ff">80</span>) <span style="color:#66d9ef"
 </code></pre></div><p>このようにすることで、役割の違うサーバでも共有するテスト項目はコードの重複なくテストできます。<br>
 また拡張性もそこそこいい感じなんじゃないかと思っています。</p>
 <h3>sshの設定ファイルを任意で指定する</h3>
-<p>serverspecを使っていると<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>のクライアント側の設定ファイルを利用することがでてきます。<br>
+<p>serverspecを使っているとsshのクライアント側の設定ファイルを利用することがでてきます。<br>
 <code>serverspec-init</code>コマンドで生成されるspec_helper.rbでは<code>~/.ssh/config</code>をデフォルトで読むようになっています。</p>
 <p>ですが個人的には<code>~/.ssh/config</code>にプロジェクトの設定を書くのがあまり好きではないし、効果的でないことがあると考えています。<br>
 <code>~/.ssh/config</code>は個人のPCなどの設定によって各々違うものです。<br>
 そこにプロジェクト固有の設定を書くと、設定が衝突したり、管理が難しくなります。</p>
-<p>ですので、プロジェクトで使う<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>のクライアントの設定ファイルもgit管理しておいて、<br>
+<p>ですので、プロジェクトで使うsshのクライアントの設定ファイルもgit管理しておいて、<br>
 それを使うようにすることが望ましいと思っています。</p>
-<p>そこで、spec_helper.rbの<code>Net::SSH::Config</code>部分を修正し、<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>の設定ファイルを任意で指定できるようにしています。</p>
+<p>そこで、spec_helper.rbの<code>Net::SSH::Config</code>部分を修正し、sshの設定ファイルを任意で指定できるようにしています。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">config  <span style="color:#f92672">=</span> <span style="color:#66d9ef">ENV</span><span style="color:#f92672">[</span><span style="color:#e6db74">&#39;SSH_CONFIG&#39;</span><span style="color:#f92672">]</span>
 options <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">SSH</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Config</span><span style="color:#f92672">.</span>for(host, <span style="color:#f92672">[</span>config<span style="color:#f92672">]</span>)
  
@@ -223,7 +206,7 @@ options <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</sp
 <ul>
 <li>どうやってCIをやるのが効率的か？</li>
 <li>
-<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vim">Vim</a>::FactoryはAnsibleでアプリケーションのデプロイまで行っているのだけど、</li>
+Vim::FactoryはAnsibleでアプリケーションのデプロイまで行っているのだけど、</li>
 <li>インフラテストとアプリのテスト同時にやってほうがよくないだろうか？</li>
 <li>でも、アプリのテストをするごとにAnsibleで環境構築すると時間がかかってしまう。</li>
 <li>上記を解決するためにCI用にDockerイメージを作るという案もあるけど、そこまでするべきか？？</li>
@@ -238,8 +221,8 @@ options <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</sp
 正直、趣味でやってる範囲にしては、ここを突破するモチベーションがなかった。</p>
 <ul>
 <li>実行に膨大な時間がかかる</li>
-<li>それゆえにたまに<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8">タイムアウト</a>で死ぬ</li>
-<li>DigitalOcean<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>の停止に失敗した場合が面倒（笑）</li>
+<li>それゆえにたまにタイムアウトで死ぬ</li>
+<li>DigitalOceanインスタンスの停止に失敗した場合が面倒（笑）</li>
 </ul>
 </body>
 
