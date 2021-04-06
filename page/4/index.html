@@ -63,6 +63,25 @@
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
   
+  <h1><a href="https://blog.mosuke.tech/entry/2020/07/08/container-image-security/" class="entry-title">コンテナイメージの脆弱性のリスクと対策についてNIST SP 800-190に沿って考える</a></h1>
+  <div class="entry-sub-title">
+      <span class="">08 Jul 2020, 21:10</span>
+      <span class="">By mosuke5</span>
+      
+          
+              <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+          
+      
+  </div>
+  <div class="entry-content">
+      <p>少なくとも年内まで在宅勤務が確定しいるもーすけです。<br>
+さすがに、出社方法などすべて忘れました（笑）</p>
+<p>はい、本日はコンテナイメージのセキュリティに関する考え方について書きます。<br>
+新しくコンテナ環境を導入してみたいけど、セキュリティに対してどう考えたらいいかわからないといった声や、
+実際にKubernetes使い始めたけど本当にこれで安全なの？といった不安の声が聞こえてきているのでまとめてみました。</p>
+      <a href="https://blog.mosuke.tech/entry/2020/07/08/container-image-security/">続きを読む</a>
+  </div>
+  
   <h1><a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" class="entry-title">カスタマイズしたJenkinsを作成する方法 on OpenShift</a></h1>
   <div class="entry-sub-title">
       <span class="">05 Jul 2020, 23:00</span>
@@ -129,6 +148,7 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
 <li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
 <li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
 <li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
 </ul>
 <hr>
 <p><a href="https://twitter.com/mosuke5" target="_blank">もーすけ</a>です。
@@ -258,29 +278,6 @@ Kubernetes Lifeは順調でしょうか？<br>
       <a href="https://blog.mosuke.tech/entry/2020/03/28/strengths-finder/">続きを読む</a>
   </div>
   
-  <h1><a href="https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/" class="entry-title">KubernetesにおけるCI/CD実践の勘所まとめ</a></h1>
-  <div class="entry-sub-title">
-      <span class="">04 Mar 2020, 18:14</span>
-      <span class="">By mosuke5</span>
-      
-          
-              <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-          
-              <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
-          
-      
-  </div>
-  <div class="entry-content">
-      <p>こんにちは、<a href="https://twitter.com/mosuke5" target="_blank">もーすけ</a>です。<br>
-前回のブログで「<a href="https://amzn.to/2PraGZ8" target="_blank" onClick="ga('send','event','link','click','to-amz-cloudnativedevops');">Kubernetesで実践するクラウドネイティブDevOps</a>」の書籍を紹介しました。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/02/26/cloud-native-devops/" data-iframely-url="//cdn.iframe.ly/0pYInqQ"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-<p>こちらの反響もよかったこともあり、KubernetesにおけるCI/CD（継続的インテグレーションと継続的デリバリー）に焦点を絞って、いままでの経験も含めて大事なポイントをいくつかの切り口でまとめることにしました。
-一部は書籍の内容とかぶる部分もあるのですが、わたしが普段Kubernetesでのアプリケーション運用に携わる中で大事だと思うことなど含めてご紹介していきます。
-KubernetesにおけるCI/CDとしていますが、項目は必ずしもKubernetesに限った話ではありませんのでご了承ください。</p>
-<p>また、もっといろんなトピックを書きたいのですが、すべてのトピックを揃えると記事自体のボリュームも大きくなり公開も遅くなりそうだったので、基本的な内容のみ選んでみました。随時追加されていく（あるいは別記事？）可能性があります。</p>
-      <a href="https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/">続きを読む</a>
-  </div>
-  
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
@@ -301,6 +298,8 @@ KubernetesにおけるCI/CDとしていますが、項目は必ずしもKubernet
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、トリガーを使って外部イベントでパイプラインを実行する'});">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、アプリケーションをKubernetesクラスタへデプロイする'});">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、ClusterTaskとTekton Hubを理解する'});">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
@@ -308,8 +307,6 @@ KubernetesにおけるCI/CDとしていますが、項目は必ずしもKubernet
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）'});">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する'});">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
-      
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/16/squid/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'squidを使ってプロキシ環境の再現検証に活用する'});">squidを使ってプロキシ環境の再現検証に活用する</a></li>
       
     </ul>
   </div>
@@ -343,7 +340,7 @@ KubernetesにおけるCI/CDとしていますが、項目は必ずしもKubernet
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (42)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (43)</a>
       </li>
       
       <li class="list-group-item">
@@ -417,7 +414,7 @@ KubernetesにおけるCI/CDとしていますが、項目は必ずしもKubernet
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (16)</a>
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (17)</a>
       </li>
       
     </ul>

@@ -63,6 +63,29 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/" class="entry-title">【翻訳】Kubernetes as a serviceの謎を解く。Alibaba Cloudが1万個のKubernetesクラスタを管理する方法</a></h1>
+    <div class="entry-sub-title">
+        <span class="">17 Nov 2020, 17:24</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-Alibaba Cloud" href="/categories/alibaba-cloud">Alibaba Cloud</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>※本記事は、著者であるZhimin Tangの許可をとって翻訳した記事となります。(<a href="https://www.cncf.io/blog/2019/12/12/demystifying-kubernetes-as-a-service-how-does-alibaba-cloud-manage-10000s-of-kubernetes-clusters/">原文</a>)<br>
+また本記事の内容は、2020/12/11のAliEaters Tokyo #16にて発表しており、スライドは以下です。</p>
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/ajzBW1pq1pgkpj" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/mosuke5/alibaba-cloud1kubernetes" title="Alibaba Cloudが1万個のKubernetesクラスタを管理する方法" target="_blank">Alibaba Cloudが1万個のKubernetesクラスタを管理する方法</a> </strong> from <strong><a href="https://www.slideshare.net/mosuke5" target="_blank">Shinya Mori (@mosuke5)</a></strong> </div>
+<h2 id="概要">概要</h2>
+<p>2015年以来、Alibaba Cloud Container Service for Kubernetes（ACK）は、Alibaba Cloud上でもっとも急速に成長しているクラウドサービスの1つです。今日では、ACKは多数のAlibaba Cloudの顧客にサービスを提供しているだけでなく、Alibabaの社内インフラストラクチャやその他多くのAlibaba Cloudサービスをサポートしています。</p>
+<p>世界的なクラウドベンダーが提供する他の多くのコンテナサービスと同様に、ACKでは信頼性と可用性が最優先事項となっています。これらの目標を達成するために、セルベースでグローバルに利用可能なプラットフォームを構築し、数万個のKubernetesクラスタを稼働させています。</p>
+<p>今回のブログ記事では、クラウドインフラ上で大量のKubernetesクラスタを管理した経験と、その基盤となるプラットフォームの設計についてご紹介します。</p>
+        <a href="https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2020/10/10/develop-ansible-operator/" class="entry-title">OperatorSDK for Ansible の開発。チュートリアルの次の一歩</a></h1>
     <div class="entry-sub-title">
         <span class="">10 Oct 2020, 14:06</span>
@@ -230,6 +253,7 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
 <li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
 <li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
 <li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
 </ul>
 <hr>
 <p><a href="https://twitter.com/mosuke5" target="_blank">もーすけ</a>です。
@@ -260,30 +284,6 @@ GWはみなさんいかがお過ごしでしたか？<br>
         <a href="https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/" class="entry-title">Jenkins pipelineで複数のOpenShiftクラスタを扱う</a></h1>
-    <div class="entry-sub-title">
-        <span class="">14 Apr 2020, 17:05</span>
-        <span class="">By mosuke5</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-            
-                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <p>もーすけです。今日はJenkinsを使ったKubernetes(OpenShift)環境でのデプロイ関連についてです。<br>
-Jenkins pipelineで複数クラスタ（マルチクラスタ）を扱いたい場合の設定方法について確認したので共有します。</p>
-<h2 id="背景">背景</h2>
-<p>以前にskopeoを用いたコンテナイメージの別レジストリへのコピーする方法について書きました。
-イメージを別レジストリへコピーする目的は、イメージをビルドしたクラスタと本番環境が別クラスタの場合などがあります。
-複数のクラスタを利用する環境では、１つのJenkins pipelineから複数のOpenShiftのクラスタに対して操作するケースがでてきます。
-やることは単純で、複数のクラスタの認証情報を用意して操作することになるわけですが、JenkinsのOpenShift Client Pluginを用いた方法についてメモしていきます。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/04/05/skopeo/" data-iframely-url="//cdn.iframe.ly/SsqYHwS"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-        <a href="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
@@ -304,6 +304,8 @@ Jenkins pipelineで複数クラスタ（マルチクラスタ）を扱いたい�
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、トリガーを使って外部イベントでパイプラインを実行する'});">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、アプリケーションをKubernetesクラスタへデプロイする'});">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、ClusterTaskとTekton Hubを理解する'});">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
@@ -311,8 +313,6 @@ Jenkins pipelineで複数クラスタ（マルチクラスタ）を扱いたい�
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）'});">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する'});">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
-      
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/16/squid/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'squidを使ってプロキシ環境の再現検証に活用する'});">squidを使ってプロキシ環境の再現検証に活用する</a></li>
       
     </ul>
   </div>
@@ -346,7 +346,7 @@ Jenkins pipelineで複数クラスタ（マルチクラスタ）を扱いたい�
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (42)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (43)</a>
       </li>
       
       <li class="list-group-item">
@@ -420,7 +420,7 @@ Jenkins pipelineで複数クラスタ（マルチクラスタ）を扱いたい�
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (16)</a>
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (17)</a>
       </li>
       
     </ul>
