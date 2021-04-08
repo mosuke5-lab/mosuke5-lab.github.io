@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 <link rel="stylesheet" href="/css/main.css">
 
-<title>TektonのOperatorによるインストールとHello World</title>
+<title>Tekton 徹底解説、Operatorによるインストールとはじめの一歩（学習シリーズ01）</title>
 <link rel="canonical" href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/">
 <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" />
 <meta name="twitter:card" content="summary">
@@ -16,11 +16,11 @@
 <meta name="twitter:site" content="@mosuke5" />
 <meta name="twitter:creator" content="@mosuke5" />
 
-<meta name="twitter:title" content="TektonのOperatorによるインストールとHello World &middot; Goldstine研究所">
-<meta name="twitter:description" content="Tekton Operatorを用いて、Tektonのインストールをしていきます。OperatorとTekton本体、パイプラインタスクの関係性などを整理しながら説明します。最後に簡単なタスク実行も行っていきます。">
+<meta name="twitter:title" content="Tekton 徹底解説、Operatorによるインストールとはじめの一歩（学習シリーズ01） &middot; Goldstine研究所">
+<meta name="twitter:description" content="Tekton学習シリーズの第1回目。Operatorを用いたTektonのインストール編です。OperatorとTekton本体、パイプラインタスクの関係性などを整理しながら説明します。最後に簡単なタスク実行も行っていきます。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="TektonのOperatorによるインストールとHello World &middot; Goldstine研究所">
-<meta property="og:description" content="Tekton Operatorを用いて、Tektonのインストールをしていきます。OperatorとTekton本体、パイプラインタスクの関係性などを整理しながら説明します。最後に簡単なタスク実行も行っていきます。">
+<meta property="og:title" content="Tekton 徹底解説、Operatorによるインストールとはじめの一歩（学習シリーズ01） &middot; Goldstine研究所">
+<meta property="og:description" content="Tekton学習シリーズの第1回目。Operatorを用いたTektonのインストール編です。OperatorとTekton本体、パイプラインタスクの関係性などを整理しながら説明します。最後に簡単なタスク実行も行っていきます。">
 <meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
 <meta property="og:url" content="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" />
@@ -61,7 +61,7 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
-    <h1>TektonのOperatorによるインストールとHello World</h1>
+    <h1>Tekton 徹底解説、Operatorによるインストールとはじめの一歩（学習シリーズ01）</h1>
     <div class="entry-sub-title">
         <span class="">10 May 2020, 15:15</span>
         <span class="">By mosuke5</span>
@@ -77,7 +77,7 @@
         <hr>
 <h5>Tekton学習シリーズ</h5>
 <ul>
-<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">TektonのOperatorによるインストールとHello World</a></li>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
 <li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
 <li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
 <li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
@@ -94,7 +94,7 @@ GWはみなさんいかがお過ごしでしたか？<br>
 外に出れないGWという一生でもそんなことが2度あるかわかりませんが非常に大変な日々を過ごされたのではないかと思います。自分は、GWを使ってKubernetes Operatorの開発などに挑戦してみていました。
 このあたりの話は別で書きたいと思いますが、Kubernetesのよさについてさらに理解を深めた気がします。</p>
 <p>さて、今日はCloud NativeなCI/CDツールと言われているTektonについて。<br>
-何回かに分けて書こうと思いますが、Operatorによるインストール編です（随時更新します）。</p>
+Tekton学習シリーズということで入門者向けの連載企画をおこないました。第1回目は、Operatorによるインストール編です。</p>
 <h2 id="tekton">Tekton</h2>
 <p>みなさんは現在どんなCIツールを利用していますでしょうか？<br>
 <a href="https://tekton.dev/" target="_blank">Tekton</a>はKubernetes時代にKubernetes-nativeなCI/CDツールとして生まれました。
@@ -308,12 +308,12 @@ NAME                         SUCCEEDED   REASON      STARTTIME   COMPLETIONTIME
 hello-world-task-run         True        Succeeded   2m30s       2m16s
 hello-world-task-run-w82p6   True        Succeeded   62s         58s
 </code></pre></div><h2 id="まとめ">まとめ</h2>
-<p>Kubernetes-nativeなCI/CDツールのTektonのOperatorによるインストールとHello Worldを見てきました。<br>
-Tektonの実践的な情報はあまり本記事には出せなかったので、続記事を出し次第、本記事にリンクを貼っていきたいと思います。もうしばらくお待ちいただければと思います。</p>
+<p>Kubernetes-nativeなCI/CDツールのTektonのOperatorによるインストールとTektonの最小実行単位であるTaskについてみてきました。
+Tekton学習シリーズの目標は、Tektonパイプラインでアプリケーションをビルド・デプロイできるようになることですが、それに必要な各要素を順を追って解説します。</p>
 <hr>
 <h5>Tekton学習シリーズ</h5>
 <ul>
-<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">TektonのOperatorによるインストールとHello World</a></li>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
 <li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
 <li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
 <li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
@@ -328,7 +328,7 @@ Tektonの実践的な情報はあまり本記事には出せなかったので�
     </div>
     <div class="entry-sub-content request-for-entry">
         <h5>フィードバック・相談(β)</h5>
-        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Tekton%e3%81%aeOperator%e3%81%ab%e3%82%88%e3%82%8b%e3%82%a4%e3%83%b3%e3%82%b9%e3%83%88%e3%83%bc%e3%83%ab%e3%81%a8Hello%20World" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'TektonのOperatorによるインストールとHello World'});">執筆者に問い合わせてみる</a></p>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Tekton%20%e5%be%b9%e5%ba%95%e8%a7%a3%e8%aa%ac%e3%80%81Operator%e3%81%ab%e3%82%88%e3%82%8b%e3%82%a4%e3%83%b3%e3%82%b9%e3%83%88%e3%83%bc%e3%83%ab%e3%81%a8%e3%81%af%e3%81%98%e3%82%81%e3%81%ae%e4%b8%80%e6%ad%a9%ef%bc%88%e5%ad%a6%e7%bf%92%e3%82%b7%e3%83%aa%e3%83%bc%e3%82%ba01%ef%bc%89" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Tekton 徹底解説、Operatorによるインストールとはじめの一歩（学習シリーズ01）'});">執筆者に問い合わせてみる</a></p>
     </div>
     <div class="entry-sub-content post-share">
         <div class="post-share-links">
