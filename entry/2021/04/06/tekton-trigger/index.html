@@ -85,6 +85,7 @@
 <li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
 <li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
 <li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
 </ul>
 <hr>
 <p>こんにちは、もーすけです。<br>
@@ -94,7 +95,8 @@
 <p>ここまでの学習シリーズで扱ってきたTektonは、<a href="https://github.com/tektoncd/pipeline">Tekton Pipelines</a>というソフトウェアです。
 本日利用するのは、<a href="https://github.com/tektoncd/triggers">Tekton Triggers</a>です。別のソフトウェアになっており、Tekton Pipelinesと連携して利用できます。
 さっそくインストールします。
-インストール方法は、<a href="https://tekton.dev/docs/triggers/install/">公式ドキュメント</a>どおりに行います。</p>
+インストール方法は、<a href="https://tekton.dev/docs/triggers/install/">公式ドキュメント</a>どおりに行います。
+今回使用したバージョンは、Tekton Triggers v0.12.1　となります。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply --filename https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml
 podsecuritypolicy.policy/tekton-triggers created
 clusterrole.rbac.authorization.k8s.io/tekton-triggers-admin created
@@ -190,14 +192,14 @@ triggertemplates.triggers.tekton.dev             2021-03-24T08:13:28Z
 <p><img src="/image/tekton-triggers-overview.png" alt="tekton-triggers-overview"></p>
 <p>ポイントをいくつかしぼって解説します。</p>
 <ol>
-<li>EventListersリソースを生成すると、httpを受け付けるEventLister PodとそのServiceが生成される</li>
-<li>端末やGitレポジトリなどから上記で生成されたEventLister Podへhttpリクエストを送れればよい。生成されるのはServiceなので、外部からアクセスする場合はIngressなどで外部公開する必要がある。</li>
-<li>EventLister Podはhttpリクエストを受け付けると、Trigger Templates, Trigger Bindingsの設定にしたがってPipelineRunを生成しパイプラインを実行する。PipelineRunが生成された以降は前回までの学習で行ったとおり、PipelineRunがPipelineを生成し、PipelineがTaskRunをTaskRunがTaskを生成する流れとなる。</li>
-<li>EventLister Podは、Trigger TemplatesやTrigger Bindingsの参照、PipelineRunの生成などいくつかのKubernetes内の操作が必要なため、Kubernetes APIを扱うための権限が必要。EventLister Podに利用するService Accountの指定が可能なため、事前にService Accountとそれに対する適切なRBAC権限付与が必要。</li>
+<li>EventListenersリソースを生成すると、httpを受け付けるEventListener PodとそのServiceが生成される</li>
+<li>端末やGitレポジトリなどから上記で生成されたEventListener Podへhttpリクエストを送れればよい。生成されるのはServiceなので、外部からアクセスする場合はIngressなどで外部公開する必要がある。</li>
+<li>EventListener Podはhttpリクエストを受け付けると、Trigger Templates, Trigger Bindingsの設定にしたがってPipelineRunを生成しパイプラインを実行する。PipelineRunが生成された以降は前回までの学習で行ったとおり、PipelineRunがPipelineを生成し、PipelineがTaskRunをTaskRunがTaskを生成する流れとなる。</li>
+<li>EventListener Podは、Trigger TemplatesやTrigger Bindingsの参照、PipelineRunの生成などいくつかのKubernetes内の操作が必要なため、Kubernetes APIを扱うための権限が必要。EventListener Podに利用するService Accountの指定が可能なため、事前にService Accountとそれに対する適切なRBAC権限付与が必要。</li>
 </ol>
 <h2 id="実装">実装</h2>
 <p>それでは実際に実装していきましょう。<br>
-まずは下準備として、EventLister Podが利用するService Accountの作成と適切なRole付与を行います。
+まずは下準備として、EventListener Podが利用するService Accountの作成と適切なRole付与を行います。
 以下が利用したマニフェストです。
 それほど難しくないですね？こちらが難しい人はぜひ、KubernetesのService AccountとRole, RoleBindingを復習しましょう。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># trigger-sa.yaml</span>
@@ -250,7 +252,7 @@ triggertemplates.triggers.tekton.dev             2021-03-24T08:13:28Z
   <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Role</span>
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">trigger-role</span>
 </code></pre></div><p>続いて、今回の主題の部分に行きます。
-作成するのは3つで、<code>TriggerTemplate</code>, <code>TriggerBinding</code>, <code>EventLister</code>の3つです。
+作成するのは3つで、<code>TriggerTemplate</code>, <code>TriggerBinding</code>, <code>EventListener</code>の3つです。
 慣れるまで、関係性や設定項目が煩わしいです。上で紹介した概要図と照らし合わせながらゆっくり理解していきましょう。
 いくつかコメントアウトで補足解説を入れました。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># my-trigger.yaml</span>
@@ -313,13 +315,13 @@ triggertemplates.triggers.tekton.dev             2021-03-24T08:13:28Z
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-deploy-pipeline-listener</span>
 <span style="color:#f92672">spec</span>:
-  <span style="color:#f92672">serviceAccountName</span>: <span style="color:#ae81ff">trigger-sa </span> <span style="color:#75715e"># EventLister Podが利用するService Account</span>
+  <span style="color:#f92672">serviceAccountName</span>: <span style="color:#ae81ff">trigger-sa </span> <span style="color:#75715e"># EventListener Podが利用するService Account</span>
   <span style="color:#f92672">triggers</span>:
     - <span style="color:#f92672">bindings</span>:
         - <span style="color:#f92672">ref</span>: <span style="color:#ae81ff">build-deploy-pipeline-binding</span>
       <span style="color:#f92672">template</span>:
         <span style="color:#f92672">ref</span>: <span style="color:#ae81ff">build-deploy-pipeline-template</span>
-</code></pre></div><p>マニフェストをapplyし、EventLister Podを確認しておきます。</p>
+</code></pre></div><p>マニフェストをapplyし、EventListener Podを確認しておきます。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f trigger-sa.yaml
 serviceaccount/trigger-sa created
 role.rbac.authorization.k8s.io/trigger-role created
@@ -338,7 +340,7 @@ $ kubectl get service
 NAME                                TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
 el-build-deploy-pipeline-listener   ClusterIP   10.7.250.67   &lt;none&gt;        8080/TCP   14h
 </code></pre></div><p>実運用では、Webhookでやるところですが今回はcurlで行います。
-EventLister Podへのネットワークは外部公開していないので、port-fowardを活用します。
+EventListener Podへのネットワークは外部公開していないので、port-fowardを活用します。
 Trigger Bindingsは、curlの<code>-d</code>で送信しているJSONデータをTektonのパラメータに変換しているというわけです。
 Webhookを利用する場合はどのようなデータでWebhookを飛ばしているか確認できれば設定が容易です。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl port-forward service/el-build-deploy-pipeline-listener 8080:8080
@@ -377,6 +379,7 @@ build-deploy-pipeline-run-7hn8p-fetch-repository-szbzr-po-kn8bt   0/1     Comple
 <li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
 <li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
 <li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
 </ul>
 <hr>
     </div>
@@ -418,6 +421,8 @@ build-deploy-pipeline-run-7hn8p-fetch-repository-szbzr-po-kn8bt   0/1     Comple
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、interceptorを使ってイベントトリガーを進化させる'});">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、トリガーを使って外部イベントでパイプラインを実行する'});">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、アプリケーションをKubernetesクラスタへデプロイする'});">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
@@ -425,8 +430,6 @@ build-deploy-pipeline-run-7hn8p-fetch-repository-szbzr-po-kn8bt   0/1     Comple
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、ClusterTaskとTekton Hubを理解する'});">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）'});">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
-      
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する'});">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
       
     </ul>
   </div>
@@ -460,7 +463,7 @@ build-deploy-pipeline-run-7hn8p-fetch-repository-szbzr-po-kn8bt   0/1     Comple
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (43)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (44)</a>
       </li>
       
       <li class="list-group-item">
@@ -534,7 +537,7 @@ build-deploy-pipeline-run-7hn8p-fetch-repository-szbzr-po-kn8bt   0/1     Comple
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (17)</a>
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (18)</a>
       </li>
       
     </ul>
@@ -551,13 +554,13 @@ build-deploy-pipeline-run-7hn8p-fetch-repository-szbzr-po-kn8bt   0/1     Comple
       <h3>関連する記事</h3>
       <ul class="list-group">
         
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、interceptorを使ってイベントトリガーを進化させる'});">Tekton、interceptorを使ってイベントトリガーを進化させる</a> (2021/04/08)</li>
+        
         <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、アプリケーションをKubernetesクラスタへデプロイする'});">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a> (2021/03/22)</li>
         
         <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ClusterTaskとTekton Hubを理解する'});">Tekton、ClusterTaskとTekton Hubを理解する</a> (2021/03/21)</li>
         
         <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）'});">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a> (2021/03/20)</li>
-        
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する'});">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a> (2021/03/17)</li>
         
       </ul>
     </div>

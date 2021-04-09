@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+
+<title>Tekton、interceptorを使ってイベントトリガーを進化させる</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/" />
+<meta name="twitter:card" content="summary">
+
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+
+<meta name="twitter:title" content="Tekton、interceptorを使ってイベントトリガーを進化させる &middot; Goldstine研究所">
+<meta name="twitter:description" content="Tekton Triggersのinterceptor機能を利用してみます。GitレポジトリからWebhook対応や認証の対応について説明します。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tekton、interceptorを使ってイベントトリガーを進化させる &middot; Goldstine研究所">
+<meta property="og:description" content="Tekton Triggersのinterceptor機能を利用してみます。GitレポジトリからWebhook対応や認証の対応について説明します。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+
+
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetes</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://docs.google.com/forms/d/e/1FAIpQLSd6N53H7zfF8EBrvyezRizU1mQx-CP3vc_jG-WvxfRmCjHTpg/viewform" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-site','event_label': 'from-header'});">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Tekton、interceptorを使ってイベントトリガーを進化させる</h1>
+    <div class="entry-sub-title">
+        <span class="">08 Apr 2021, 21:47</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。<br>
+本日もTekton学習シリーズをやっていきます。今回も前回の内容の続きになるので、はじめてTekton Triggersをさわるよという方は第10回の記事をやっておくとよいです。</p>
+<p>前回、クラスタの外部からcurlを用いてHTTPリクエストを発行して、そのイベントをトリガーにパイプラインを実行しました。実運用では、GitレポジトリからのWebhookでパイプラインを動かしたいですよね？<br>
+しかし、前回のままでは認証も実装しておらず、そのまま外部公開してしまうのは危険な状態です。というわけで、interceptorという機能を使って、認証や特定のイベントのみにパイプラインを実行する方法などをみていきます。</p>
+<h2 id="interceptorとは">interceptorとは</h2>
+<p>interceptorの英単語の意味から確認しておきましょう。「横取りする人」「さえぎる人」といったような意味になります。
+このTekton Triggersにおいてなにを「さえぎる」のでしょうか。図にしてみました。
+前回利用した図にinterceptorを追加しました。</p>
+<p><img src="/image/tekton-triggers-interceptor.png" alt="tekton-triggers-interceptor"></p>
+<p>EventListener Podは、Webhookイベントを受け取るとパラメータとTriggerTemplateを使ってPipelineRunを作ります。
+PipelineRunを作る前に、別の処理を挟む（さえぎる）ことができるということです。
+interceptorには、現時点で以下が用意されています。</p>
+<ul>
+<li>Webhook Interceptors
+<ul>
+<li>任意のInteriortorサービスを用意して、そのサービスに処理を任せる。拡張性は高そう。</li>
+</ul>
+</li>
+<li>GitHub Interceptors
+<ul>
+<li>GitHubからのWebhookを処理できる。</li>
+</ul>
+</li>
+<li>GitLab Interceptors
+<ul>
+<li>GitlabからのWebhookを処理できる。</li>
+</ul>
+</li>
+<li>Bitbucket Interceptors
+<ul>
+<li>BitbucketからのWebhookを処理できる。</li>
+</ul>
+</li>
+<li>CEL Interceptors
+<ul>
+<li>CEL expression language を用いて、任意のフィルターやデータの整形などを設定できる。</li>
+</ul>
+</li>
+</ul>
+<p>interceptorに何をさせたいかによるかと思いますが、Github/Gitlab InterceptorsとCEL Interceptorsがあれば、多くのニーズを満たせるのではないかと個人的に考えています。
+本ブログでは、GitHub interceptorを利用して、認証やイベントのフィルタリングを行ってみます。</p>
+<h2 id="実装">実装</h2>
+<p>本ブログで実現することを以下の図に示しました。<br>
+GitHub interceptorを用いて、特定の認証キーを持たないリクエストをはじくこと、そしてpushイベント以外のリクエストをはじくこと、この2つを実現していきたいと思います。</p>
+<p><img src="/image/tekton-triggers-github-interceptor.png" alt="github-interceptor"></p>
+<h3 id="認証キーの作成">認証キーの作成</h3>
+<p><code>aiueokakikukeko</code>という認証キーをKubernetes内にSecretとして作成します。
+キーの値は任意に変更してください。
+GitHub interceptorにこのキーをもたせます。後ほど、この認証キーはGitHubのWebhookの設定にもいれるので覚えておきましょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl create secret generic github-webhook --from-literal=secretkey=aiueokakikukeko
+secret/github-webhook created
+</code></pre></div><h3 id="eventlistener-podのrbacを見直し">EventListener PodのRBACを見直し</h3>
+<p>EventListener PodのService Accountの権限が重要であることは前回にお伝えしました。EventListener Podが、TriggerTemplateやTrigger Bindings、ConfigMapなどのKubernetesリソースを操作するからです。前回の設定では、Secretsの参照を入れていませんでしたが、GitHub interceptorがSecrets（上で作成した認証キー）の参照を行うため、RBACの見直しが必要です。<br>
+最低条件としては、Secretsの参照権限を付けてください。</p>
+<p>そのほか、<code>clustertriggerbindings</code>の参照権限もつけました。実装する上で必要ではないのですが、ログを見る際にエラーがでてきになるためです。
+以下が、該当のエラーメッセージです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">E0408 13:58:27.831618       1 reflector.go:127] k8s.io/client-go@v0.19.7/tools/cache/reflector.go:156: Failed to watch *v1alpha1.ClusterTriggerBinding: failed to list *v1alpha1.ClusterTriggerBinding: clustertriggerbindings.triggers.tekton.dev is forbidden: User &#34;system:serviceaccount:goldstine-lab:trigger-sa&#34; cannot list resource &#34;clustertriggerbindings&#34; in API group &#34;triggers.tekton.dev&#34; at the cluster scope
+</code></pre></div><p>最終的に利用した設定は下記のとおりです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># trigger-sa.yaml</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceAccount</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">trigger-sa</span>
+---
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Role</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">trigger-role</span>
+<span style="color:#f92672">rules</span>:
+- <span style="color:#f92672">apiGroups</span>:
+  - <span style="color:#ae81ff">triggers.tekton.dev</span>
+  <span style="color:#f92672">resources</span>:
+  - <span style="color:#ae81ff">eventlisteners</span>
+  - <span style="color:#ae81ff">triggers</span>
+  - <span style="color:#ae81ff">triggerbindings</span>
+  - <span style="color:#ae81ff">triggertemplates</span>
+  <span style="color:#f92672">verbs</span>:
+  - <span style="color:#ae81ff">get</span>
+  - <span style="color:#ae81ff">list</span>
+  - <span style="color:#ae81ff">watch</span>
+- <span style="color:#f92672">apiGroups</span>:
+  - <span style="color:#ae81ff">tekton.dev</span>
+  <span style="color:#f92672">resources</span>:
+  - <span style="color:#ae81ff">pipelineruns</span>
+  - <span style="color:#ae81ff">pipelineresources</span>
+  <span style="color:#f92672">verbs</span>:
+  - <span style="color:#ae81ff">create</span>
+- <span style="color:#f92672">apiGroups</span>:
+  - <span style="color:#e6db74">&#34;&#34;</span>
+  <span style="color:#f92672">resources</span>:
+  - <span style="color:#ae81ff">configmaps</span>
+  - <span style="color:#ae81ff">secrets  </span> <span style="color:#75715e">## 追加！</span>
+  <span style="color:#f92672">verbs</span>:
+  - <span style="color:#ae81ff">get</span>
+  - <span style="color:#ae81ff">list</span>
+  - <span style="color:#ae81ff">watch</span>
+---
+<span style="color:#75715e">## 追加：今回はなくても問題ないが、エラーがでると気になるので権限付与</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRole</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">tekton-clustertriggerbindings-view</span>
+<span style="color:#f92672">rules</span>:
+- <span style="color:#f92672">apiGroups</span>:
+  - <span style="color:#ae81ff">triggers.tekton.dev</span>
+  <span style="color:#f92672">resources</span>:
+  - <span style="color:#ae81ff">clustertriggerbindings</span>
+  <span style="color:#f92672">verbs</span>:
+  - <span style="color:#ae81ff">get</span>
+  - <span style="color:#ae81ff">list</span>
+  - <span style="color:#ae81ff">watch</span>
+---
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">RoleBinding</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">triggers-role-binding</span>
+<span style="color:#f92672">subjects</span>:
+  - <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceAccount</span>
+    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">trigger-sa</span>
+<span style="color:#f92672">roleRef</span>:
+  <span style="color:#f92672">apiGroup</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io</span>
+  <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Role</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">trigger-role</span>
+---
+<span style="color:#75715e">## 追加</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRoleBinding</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">triggers-clusterrole-binding</span>
+<span style="color:#f92672">subjects</span>:
+  - <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceAccount</span>
+    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">trigger-sa</span>
+    <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">goldstine-lab</span>
+<span style="color:#f92672">roleRef</span>:
+  <span style="color:#f92672">apiGroup</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io</span>
+  <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRole</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">tekton-clustertriggerbindings-view</span>
+</code></pre></div><h3 id="interceptorの追加">interceptorの追加</h3>
+<p>EventListenerにinterceptorを追加します。
+EventListenerを次のように変更しました。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">triggers.tekton.dev/v1alpha1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">EventListener</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-deploy-pipeline-listener</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">serviceAccountName</span>: <span style="color:#ae81ff">trigger-sa</span>
+  <span style="color:#f92672">triggers</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">github-trigger</span>
+      <span style="color:#f92672">bindings</span>:
+        - <span style="color:#f92672">ref</span>: <span style="color:#ae81ff">build-deploy-pipeline-binding</span>
+      <span style="color:#f92672">template</span>:
+        <span style="color:#f92672">ref</span>: <span style="color:#ae81ff">build-deploy-pipeline-template</span>
+      <span style="color:#75715e"># 追加</span>
+      <span style="color:#f92672">interceptors</span>:
+        - <span style="color:#f92672">github</span>:
+            <span style="color:#75715e"># 認証に利用するキー。KubernetesのSecretsを参照する</span>
+            <span style="color:#f92672">secretRef</span>:
+              <span style="color:#f92672">secretName</span>: <span style="color:#ae81ff">github-webhook</span>
+              <span style="color:#f92672">secretKey</span>: <span style="color:#ae81ff">secretkey</span>
+            <span style="color:#75715e"># 許可するイベント</span>
+            <span style="color:#f92672">eventTypes</span>:
+              - <span style="color:#ae81ff">push</span>
+</code></pre></div><h3 id="ingressでeventlistener-podを外部公開">IngressでEventListener Podを外部公開</h3>
+<p>前回までは、EventListener Podは、port-forwardを用いてローカルの端末から接続しました。
+今回は、GitHubからWebhookのイベントを受け取る必要があるため、EventListener Podの外部公開が必要です。
+Ingressを用いて公開します。皆さんの環境に合わせて公開方法は選択してください。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">extensions/v1beta1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Ingress</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">ingress-resource</span>
+  <span style="color:#f92672">annotations</span>:
+    <span style="color:#f92672">kubernetes.io/ingress.class</span>: <span style="color:#ae81ff">nginx</span>
+    <span style="color:#f92672">nginx.ingress.kubernetes.io/ssl-redirect</span>: <span style="color:#e6db74">&#34;false&#34;</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">rules</span>:
+    - <span style="color:#f92672">http</span>:
+        <span style="color:#f92672">paths</span>:
+          - <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/</span>
+            <span style="color:#f92672">backend</span>:
+              <span style="color:#f92672">serviceName</span>: <span style="color:#ae81ff">el-build-deploy-pipeline-listener</span>
+              <span style="color:#f92672">servicePort</span>: <span style="color:#ae81ff">8080</span>
+</code></pre></div><h3 id="設定の反映">設定の反映</h3>
+<p>上で修正した内容をKubernetesに反映させます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f trigger-sa.yaml
+serviceaccount/trigger-sa unchanged
+role.rbac.authorization.k8s.io/trigger-role configured
+clusterrole.rbac.authorization.k8s.io/tekton-clustertriggerbindings-view created
+rolebinding.rbac.authorization.k8s.io/triggers-role-binding unchanged
+clusterrolebinding.rbac.authorization.k8s.io/triggers-clusterrole-binding created
+
+$ kubectl apply -f my-trigger.yaml
+triggertemplate.triggers.tekton.dev/build-deploy-pipeline-template unchanged
+triggerbinding.triggers.tekton.dev/build-deploy-pipeline-binding unchanged
+eventlistener.triggers.tekton.dev/build-deploy-pipeline-listener configured
+ingress.extensions/ingress-resource configured
+</code></pre></div><h3 id="githubへのwebhook設定">GitHubへのWebhook設定</h3>
+<p>ここまでの演習でずっと、<a href="https://github.com/ncskier/myapp">nckier/myapp</a> を利用させていただきました。
+今回は独自設定が必要なのでForkします。わたしの場合なら、<a href="https://github.com/mosuke5/myapp">mosuke5/myapp</a> ですね。
+Webhookの設定画面で、以下の通り設定します。</p>
+<ul>
+<li>Payload URL
+<ul>
+<li>EventListener Podへ到達できるIPあるいはホスト名。自分の場合、IngressのグローバルIP。</li>
+</ul>
+</li>
+<li>Content type
+<ul>
+<li><code>application/json</code>に変更してください。</li>
+<li><code>&quot;msg&quot;:&quot;Invalid event body format format: invalid character 'p' looking for beginning of value&quot;</code>のようなエラーが、EventListener Podからでていてうまくいかない場合は見直してください。</li>
+</ul>
+</li>
+<li>Secret
+<ul>
+<li>前に作成した認証キーのSecretの値です。</li>
+</ul>
+</li>
+</ul>
+<p><img src="/image/tekton-triggers-github-webhook.png" alt="github-webhook"></p>
+<p>設定を反映すると、GitHubは確認のためにWebhookをping eventとして発行します。
+EventListenerの設定でEventTypeになにも指定しない場合、これだけでパイプラインが動きます。（うまくいっていれば）
+ですが、今回は、pushイベントのみ許可するようにしているため、EventListener Podのログ(<code>event type ping is not allowed</code>)をみると以下のように弾いていることを確認できます。
+一発ではうまく行かないこともあるので、ぜひ、いろいろ試してみてください。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{&#34;level&#34;:&#34;info&#34;,&#34;ts&#34;:&#34;2021-04-08T14:15:28.695Z&#34;,&#34;logger&#34;:&#34;eventlistener&#34;,&#34;caller&#34;:&#34;sink/sink.go:213&#34;,&#34;msg&#34;:&#34;interceptor stopped trigger processing: rpc error: code = FailedPrecondition desc = event type ping is not allowed&#34;,&#34;knative.dev/controller&#34;:&#34;eventlistener&#34;,&#34;/triggers-eventid&#34;:&#34;032d3da8-7a76-489c-99ff-316fb9b35ccc&#34;,&#34;/trigger&#34;:&#34;github-trigger&#34;}
+</code></pre></div><h3 id="githubの内容を更新">GitHubの内容を更新</h3>
+<p>あとは、いろいろ試すのみです。GitHubレポジトリ内のファイルを修正などしてみてください。
+修正のイベントをトリガーにしてパイプラインの実行が確認できるはずです。
+デバッグとしては、EventListener Podのログを見ることが非常に有益です。</p>
+<h3 id="curlで実行してみる">curlで実行してみる</h3>
+<p>ローカルの端末から認証キーを持たずにHTTPのリクエストを送ってみます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XPOST -H &#39;Content-Type: application/json&#39; \
+http://34.84.159.22 \
+-d &#39;{&#34;head_commit&#34;:{&#34;id&#34;: &#34;master&#34;},&#34;repository&#34;:{&#34;url&#34;: &#34;https://github.com/ncskier/myapp&#34;}}&#39;
+{&#34;eventListener&#34;:&#34;build-deploy-pipeline-listener&#34;,&#34;namespace&#34;:&#34;goldstine-lab&#34;,&#34;eventID&#34;:&#34;fd6b7fa8-2b1d-4e66-8319-9a1fe3caa6af&#34;}
+</code></pre></div><p>リクエストは受け付けてくれたみたいですが、EventListener Podの方で、<code>no X-Hub-Signature header set</code> ということでしっかり弾いてくれています。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{&#34;level&#34;:&#34;info&#34;,&#34;ts&#34;:&#34;2021-04-09T02:06:45.789Z&#34;,&#34;logger&#34;:&#34;eventlistener&#34;,&#34;caller&#34;:&#34;sink/sink.go:213&#34;,&#34;msg&#34;:&#34;interceptor stopped trigger processing: rpc error: code = FailedPrecondition desc = no X-Hub-Signature header set&#34;,&#34;knative.dev/controller&#34;:&#34;eventlistener&#34;,&#34;/triggers-eventid&#34;:&#34;fd6b7fa8-2b1d-4e66-8319-9a1fe3caa6af&#34;,&#34;/trigger&#34;:&#34;github-trigger&#34;}
+</code></pre></div><h2 id="さいごに">さいごに</h2>
+<p>Tekton Triggersのinterceptorの機能について確認してきました。
+これで、Tekton Triggersの認証やGitレポジトリからの利用などもできるようになりました。かなり実運用をみすえた機能確認ができてきました。
+まだまだTektonは、発展中のプロダクトで今後も大きく変わるかもしれませんが、この先が楽しみですね。</p>
+<hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+</ul>
+<hr>
+    </div>
+    <div class="entry-sub-content request-for-entry">
+        <h5>フィードバック・相談(β)</h5>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Tekton%e3%80%81interceptor%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%a6%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88%e3%83%88%e3%83%aa%e3%82%ac%e3%83%bc%e3%82%92%e9%80%b2%e5%8c%96%e3%81%95%e3%81%9b%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Tekton、interceptorを使ってイベントトリガーを進化させる'});">執筆者に問い合わせてみる</a></p>
+    </div>
+    <div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+    <div class="entry-sub-content disqus">
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、interceptorを使ってイベントトリガーを進化させる'});">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、トリガーを使って外部イベントでパイプラインを実行する'});">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、アプリケーションをKubernetesクラスタへデプロイする'});">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、ClusterTaskとTekton Hubを理解する'});">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）'});">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (28)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (44)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (1)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (13)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (10)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (18)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、トリガーを使って外部イベントでパイプラインを実行する'});">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a> (2021/04/06)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、アプリケーションをKubernetesクラスタへデプロイする'});">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a> (2021/03/22)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ClusterTaskとTekton Hubを理解する'});">Tekton、ClusterTaskとTekton Hubを理解する</a> (2021/03/21)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）'});">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a> (2021/03/20)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>
