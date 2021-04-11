@@ -112,22 +112,22 @@
 <tbody>
 <tr>
 <td>Task</td>
-<td>Tektonで表現できる最小の実行単位。ひとつ以上のStepから成り立つ。</td>
+<td>Tektonで表現できる最小の実行単位。ひとつ以上のStepから成り立つ。Taskが必要とするパラメータなどを定義できる。</td>
 <td></td>
 </tr>
 <tr>
 <td>TaskRun</td>
-<td>定義したTaskを実行するために利用。実行する際はTaskにわたす、入力や出力、パラメータなどを指定できる。単体で利用することも、Pipelineを実行したときに呼び出されて利用もされる。</td>
+<td>定義したTaskを実行するために利用。Taskの実行に必要な、入力や出力・パラメータなどを指定する。TaskRun単体として利用することもできるが、Pipelineを実行したときにTaskRunが作成される。</td>
 <td></td>
 </tr>
 <tr>
 <td>Pipeline</td>
-<td>定義したTaskの集合体。</td>
+<td>パイプライン。定義したTaskの集合体。パイプラインを実行するのに必要なパラメータなども定義できる。</td>
 <td></td>
 </tr>
 <tr>
 <td>PipelineRun</td>
-<td>定義したPipelineを実行するために利用。パイプラインを実行するために、入力や出力、パラメータを指定できる。</td>
+<td>定義したPipelineを実行するために利用。パイプラインを実行するために、入力や出力、パラメータを指定する。</td>
 <td></td>
 </tr>
 <tr>
@@ -135,10 +135,17 @@
 <td>Task内のStepで利用する入力や出力の場所を定義する。PipelineRunやTaskRunを作成する際に指定される。</td>
 <td></td>
 </tr>
+<tr>
+<td>ClusterTask</td>
+<td>Taskは、特定のNamespace内に作成されるが、ClusterTaskはすべてのNamespaceで共有されるTask。汎用的なTaskを管理するのに向いている。（詳細は<a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">第8回</a>を参照。）</td>
+<td></td>
+</tr>
 </tbody>
 </table>
 
 
+<p>Task, TaskRun, Pipeline, PipelineRunの関係性については、以下のとおりです。</p>
+<p><img src="/image/tekton-crds-relation.png" alt="tekton-crds-relation"></p>
 <h2 id="taskにパラメータを設定する">Taskにパラメータを設定する</h2>
 <p>Taskにパラメータを設定するには、まずTaskになんのパラメータが必要かを記述する必要があります。
 以下は例ですが、<code>my-name</code>というパラメータを必要とします。型はStringとしていますが、のちほどでArrayの指定も見ていきます。
