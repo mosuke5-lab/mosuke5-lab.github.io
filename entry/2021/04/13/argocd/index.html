@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+
+<title>Argo CD、Operatorでのインストールと主要コンポーネントの解説（学習シリーズ）</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/04/13/argocd/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/04/13/argocd/" />
+<meta name="twitter:card" content="summary">
+
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+
+<meta name="twitter:title" content="Argo CD、Operatorでのインストールと主要コンポーネントの解説（学習シリーズ） &middot; Goldstine研究所">
+<meta name="twitter:description" content="Argo CD学習シリーズをはじめます。第1回は、インストールと主要コンポーネントの解説やその仕組などについてみていきます。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Argo CD、Operatorでのインストールと主要コンポーネントの解説（学習シリーズ） &middot; Goldstine研究所">
+<meta property="og:description" content="Argo CD学習シリーズをはじめます。第1回は、インストールと主要コンポーネントの解説やその仕組などについてみていきます。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/04/13/argocd/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+
+
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetes</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://docs.google.com/forms/d/e/1FAIpQLSd6N53H7zfF8EBrvyezRizU1mQx-CP3vc_jG-WvxfRmCjHTpg/viewform" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-site','event_label': 'from-header'});">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Argo CD、Operatorでのインストールと主要コンポーネントの解説（学習シリーズ）</h1>
+    <div class="entry-sub-title">
+        <span class="">13 Apr 2021, 10:21</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <hr>
+<h5>Argo CD学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2021/04/13/argocd/">Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。<br>
+前回の「Tekton学習シリーズ」に続きArgo CD学習シリーズをやっていきます。
+わたしは、Argo CDを何年か前に検証で確認はしていたのですが、だいぶ忘れてしまったい、改めてまとめなおしたいと思っています。
+初回は、インストールと概念編です。</p>
+<h2 id="gitopsという考え方">GitOpsという考え方</h2>
+<p>Argo CDのはなしをする前に、GitOpsという考え方について理解しておく必要があります。
+GitOpsとは、<strong>Kubernetesクラスタの管理やアプリケーションデプロイの手法のひとつで、Gitレポジトリを唯一信頼できる情報源（Single source of truth）と考え、クラスタ上の状態とGitレポジトリ上の差分を埋めるやりかた</strong>と認識すると良さそうです。</p>
+<p>Kubernetesのコントローラの発想と非常に近しいかなと思います。
+Kubernetesでは、API Serverの管理する期待する状態（マニフェスト）と、クラスタ上の実際の状態との差分をReconciliation loopが解消する、というのが大きなコンセプトです。そう考えると、Gitレポジトリを期待する状態とし、クラスタ上の実態との差分をGitOpsツール（Reconciliation loop）が解消すると置き換えて読むこともできますよね。</p>
+<p><img src="/image/gitops-overview.png" alt="gitops"></p>
+<p>また、Kubernetesにおいてこの考え方が重要な理由は、ソースコードとそれが動く状態としたコンテナイメージ、そしてオーケストレーションとしてKubernetesマニフェストこれらの関係性にあると考えます。
+コンテナイメージは、ソースコードとDockerfileから作ることができます。Kubernetesのマニフェストは、コンテナイメージとその他の設定記述で表すことができます。つまり、アプリケーション成果物としてのコンテナイメージと、それをどうコンフィギュレーションして動かすか（オーケストレーションするか）は切り離して考えることができるということです。</p>
+<p>そして、Argo CDというツールはまさにGitOpsのためのツールであり、GitレポジトリのKubernetesマニフェストを監視し、定期的に（あるいは任意のタイミングで）クラスタに反映することをします。Kubernetesのコントローラみたいなもんですね。</p>
+<h2 id="argo-cdのインストール">Argo CDのインストール</h2>
+<p>では、インストールします。
+最新版のArgo CDを利用したい場合は、公式ドキュメントの&quot;<a href="https://argo-cd.readthedocs.io/en/stable/#getting-started">Getting Started</a>&ldquo;でマニフェストをapplyしてください。非常に簡単です。</p>
+<p>今回は、Argo CD Operatorを用いてインストールします。
+理由としては、可能な限りツール類はOperatorで管理したほうがやっぱり楽かな？と試行錯誤している状態のため検証です。
+みなさんは好きな方法でインストールしてください。
+以下は、Argo CD Operatorに関する関連リンクです。</p>
+<ul>
+<li><a href="https://argocd-operator.readthedocs.io/en/latest/">Argo CD Operatorの公式ドキュメント</a></li>
+<li><a href="https://github.com/argoproj-labs/argocd-operator/">Argo CD Operator GitHub</a></li>
+<li><a href="https://operatorhub.io/operator/argocd-operator">OperatorHub Argo CD</a></li>
+</ul>
+<p>Argo CDを以下のマニフェストで起動しました。Web UIをIngress経由で公開したかったためIngressの設定を追加しています。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># argocd.yaml</span>
+---
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">argoproj.io/v1alpha1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ArgoCD</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-argocd</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#75715e"># 今回はIngress経由でArgo CDを外部から接続したいので以下設定を追加しているがなくてもよい</span>
+  <span style="color:#f92672">server</span>:
+    <span style="color:#f92672">host</span>: <span style="color:#ae81ff">argocd.mosuke.tech</span>
+    <span style="color:#f92672">ingress</span>:
+      <span style="color:#f92672">enabled</span>: <span style="color:#66d9ef">true</span>
+    <span style="color:#f92672">insecure</span>: <span style="color:#66d9ef">true</span>
+</code></pre></div><p>上記のマニフェストを適応して、作成されたリソースを確認します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f argocd.yaml
+argocd.argoproj.io/my-argocd created
+
+$ kubectl get pod,sa,configmap,secret,service,ingress -n my-argocd-operator
+NAME                                                    READY   STATUS    RESTARTS   AGE
+pod/argocd-operator-cdb84b944-vxwln                     1/1     Running   0          24h
+pod/my-argocd-application-controller-69dd7dcb84-ppfr7   1/1     Running   0          21h
+pod/my-argocd-dex-server-5bfb9ccf95-sv4tr               1/1     Running   0          21h
+pod/my-argocd-redis-55cc975d48-8vxsx                    1/1     Running   0          21h
+pod/my-argocd-repo-server-65f45dd8c4-g88xv              1/1     Running   0          21h
+pod/my-argocd-server-868d56f649-sgkqt                   1/1     Running   0          21h
+
+NAME                                           SECRETS   AGE
+serviceaccount/argocd-application-controller   1         24h
+serviceaccount/argocd-dex-server               1         24h
+serviceaccount/argocd-operator                 1         24h
+serviceaccount/argocd-redis-ha                 1         24h
+serviceaccount/argocd-server                   1         24h
+serviceaccount/default                         1         24h
+
+NAME                                  DATA   AGE
+configmap/argocd-cm                   15     21h
+configmap/argocd-operator-lock        0      24h
+configmap/argocd-rbac-cm              3      21h
+configmap/argocd-ssh-known-hosts-cm   1      21h
+configmap/argocd-tls-certs-cm         0      21h
+configmap/kube-root-ca.crt            1      24h
+configmap/my-argocd-ca                1      21h
+
+NAME                                               TYPE                                  DATA   AGE
+secret/argocd-application-controller-token-t5scx   kubernetes.io/service-account-token   3      24h
+secret/argocd-dex-server-token-z9rtk               kubernetes.io/service-account-token   3      24h
+secret/argocd-operator-token-zmbdx                 kubernetes.io/service-account-token   3      24h
+secret/argocd-redis-ha-token-fgzw8                 kubernetes.io/service-account-token   3      24h
+secret/argocd-secret                               Opaque                                5      21h
+secret/argocd-server-token-xrcpc                   kubernetes.io/service-account-token   3      24h
+secret/default-token-7vtbf                         kubernetes.io/service-account-token   3      24h
+secret/my-argocd-ca                                kubernetes.io/tls                     3      21h
+secret/my-argocd-cluster                           Opaque                                1      21h
+secret/my-argocd-tls                               kubernetes.io/tls                     2      21h
+
+NAME                               TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)             AGE
+service/argocd-operator-metrics    ClusterIP   10.7.255.82    &lt;none&gt;        8383/TCP,8686/TCP   24h
+service/my-argocd-dex-server       ClusterIP   10.7.251.243   &lt;none&gt;        5556/TCP,5557/TCP   21h
+service/my-argocd-metrics          ClusterIP   10.7.241.124   &lt;none&gt;        8082/TCP            21h
+service/my-argocd-redis            ClusterIP   10.7.252.82    &lt;none&gt;        6379/TCP            21h
+service/my-argocd-repo-server      ClusterIP   10.7.242.29    &lt;none&gt;        8081/TCP,8084/TCP   21h
+service/my-argocd-server           ClusterIP   10.7.242.255   &lt;none&gt;        80/TCP,443/TCP      21h
+service/my-argocd-server-metrics   ClusterIP   10.7.255.83    &lt;none&gt;        8083/TCP            21h
+
+NAME                                  CLASS    HOSTS                ADDRESS        PORTS     AGE
+ingress.extensions/my-argocd-server   &lt;none&gt;   argocd.mosuke.tech   34.84.159.22   80, 443   21h
+</code></pre></div><h2 id="argo-cdの主要コンポーネント">Argo CDの主要コンポーネント</h2>
+<p>Argo CDをインストールすると、以下の6種類のPodが起動していました。
+それぞれどんな役割をになっているか説明します。</p>
+
+
+  
+
+
+
+<table  class="table">
+<thead>
+<tr>
+<th>コンポーネント</th>
+<th>説明</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>argocd-operator</td>
+<td>OperatorHubからインストールした場合のみ作成されます。Argo CD自身を構築するためのリソースを管理するカスタムコントローラ。</td>
+<td></td>
+</tr>
+<tr>
+<td>application-controller</td>
+<td>Argo CDに登録するアプリケーションを管理するコントローラ。Gitレポジトリ内のあるべき状態とクラスタ上のアプリケーションの状態を定期的に確認し差分を埋める役割。Argo CDのコアと理解しても良い存在。</td>
+<td></td>
+</tr>
+<tr>
+<td>dex-server</td>
+<td><a href="https://github.com/dexidp/dex">dex</a>は、OpenID Connectのプロバイダを提供するソフトウェアのこと。Argo CDでの認証部分の役割をになう。</td>
+<td></td>
+</tr>
+<tr>
+<td>redis</td>
+<td>データのキャッシュとして利用。データはロストしても問題なし。</td>
+<td></td>
+</tr>
+<tr>
+<td>repo-server</td>
+<td>Gitレポジトリのキャッシュを管理する役割。こちらもデータを失っても問題ない。</td>
+<td></td>
+</tr>
+<tr>
+<td>server</td>
+<td>Web UIやCLIなどから利用するgRPC/REST APIを提供するAPI Server。</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+
+<h2 id="web-uiへの接続">Web UIへの接続</h2>
+<p>管理者の初期パスワードは、Secret内に保存されているのでとりだしましょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl -n my-argocd-operator get secret my-argocd-cluster -o jsonpath=&#39;{.data.admin\.password}&#39; | base64 -d
+&lt;your-admin-password&gt;
+</code></pre></div><p>Ingress経由でアクセスすると以下のような画面にたどりつけます。<br>
+もし、Ingress等で公開しない人は、port-forwardを利用してください。うえの例でいうと<code>service/my-argocd-server</code>にアクセスできればWeb UIにたどり着けます。
+<code>kubectl port-foward service/my-argocd-server 8080:80</code> と実行すればローカルPCの8080ポートから接続できます。</p>
+<p><img src="/image/argocd-login.png" alt="argocd-login"></p>
+<h2 id="アプリケーションの登録">アプリケーションの登録</h2>
+<p>Argo CDで<a href="https://github.com/argoproj/argocd-example-apps">サンプルのレポジトリ</a>も用意されているので、それを活用してアプリケーションをデプロイしてみます。やり方自体は、公式ドキュメントの &ldquo;<a href="https://argo-cd.readthedocs.io/en/stable/getting_started/">Getting Started</a>&ldquo;とおりなのでそちらを参照いただくとして、それぞれの設定項目などを解説します。</p>
+<ul>
+<li>GENERAL
+<ul>
+<li>Application Name
+<ul>
+<li>任意の名前です。<code>hello-world</code>とします</li>
+</ul>
+</li>
+<li>Project
+<ul>
+<li>Argo CD内のプロジェクトです。はじめは <code>default</code> しかないはずなのでこちらを選択します。</li>
+</ul>
+</li>
+<li>SYNC POLICY
+<ul>
+<li><code>Manual</code>か<code>Automatic</code>を選択できます。</li>
+<li>「SYNC」とは、Gitレポジトリのマニフェストの内容をクラスタに反映する動作のことを指します。</li>
+<li><code>Automatic</code> を選択すると180秒に一度SYNCを行います。</li>
+</ul>
+</li>
+<li>SYNC OPTIONS
+<ul>
+<li><code>USE A SCHEMA TO VALIDATE RESOURCE MANIFESTS</code> は<a href="https://argo-cd.readthedocs.io/en/stable/user-guide/sync-options/">こちらを参照</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>SOURCE
+<ul>
+<li>Repository URL
+<ul>
+<li>名前の通り、マニフェストファイルがおいてあるレポジトリを指定する</li>
+<li>プライベートのレポジトリを利用する場合は、別でレポジトリ登録が必要（<a href="https://argo-cd.readthedocs.io/en/stable/user-guide/private-repositories/">ドキュメント</a>）</li>
+</ul>
+</li>
+<li>Revision
+<ul>
+<li>利用するGitレポジトリのリビジョン。ブランチなどを指定可能。</li>
+<li>本番環境、テスト環境など分けるときなどに有効</li>
+</ul>
+</li>
+<li>Path
+<ul>
+<li>利用するマニフェストへのパス</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>DESTINATION
+<ul>
+<li>Cluster URL
+<ul>
+<li>どこのKubernetesクラスタへデプロイするの設定。</li>
+<li>Argo CDが起動していない外部のクラスタも指定可能。</li>
+<li>内部クラスタを指定する場合は、<code>NAME=in-cluster</code>とするといい</li>
+<li>クラスタ設定は別に可能</li>
+</ul>
+</li>
+<li>Namepace
+<ul>
+<li>デプロイしたいNamespace</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Directory, Helm, Kustomize&hellip;
+<ul>
+<li>最後の項目はデプロイするマニフェストに何を利用しているかによって変わる。</li>
+<li>プレーンのマニフェストも利用できるが、テンプレートエンジンであるHelmやKustomizeを使ったマニフェストもデプロイ可能</li>
+</ul>
+</li>
+</ul>
+<p>こちらのアプリケーションの登録をすると、そのデータはKubernetesのリソースとして登録されています。
+つまり、Argo CD自身は、<strong>永続的なボリュームをもっておらず、永続ボリュームとしてKubernetesのetcdを使っている</strong>ということです。まさに、Kubernetes Nativeなアプリケーションを代表していますね。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get application -n my-argocd-operator
+NAME          AGE
+hello-world   44s
+
+$ kubectl get application -n my-argocd-operator hello-world -o yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  creationTimestamp: &#34;2021-04-14T09:05:14Z&#34;
+  generation: 2
+  managedFields:
+  - apiVersion: argoproj.io/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+...
+</code></pre></div><h2 id="さいごに">さいごに</h2>
+<p>うまくArgo CDを使って、アプリケーションをデプロイできましたでしょうか。
+触ってみるとわかるかもしれませんが、意外とシンプルなソフトウェアですよね。Gitレポジトリの状態をKubernetesのコントローラ的に監視をして反映するということです。
+Argo CDがうまく組み込まれた環境では、「デプロイ作業」というのをそれほど気にしなくていいとも言えますね。もちろん、デプロイ後のテストをどうするの？とかいろいろ疑問が湧いてくると思いますが、そのあたりは、また別の回で解説していきたいと思います。</p>
+<hr>
+<h5>Argo CD学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2021/04/13/argocd/">Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></li>
+</ul>
+<hr>
+    </div>
+    <div class="entry-sub-content request-for-entry">
+        <h5>フィードバック・相談(β)</h5>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Argo%20CD%e3%80%81Operator%e3%81%a7%e3%81%ae%e3%82%a4%e3%83%b3%e3%82%b9%e3%83%88%e3%83%bc%e3%83%ab%e3%81%a8%e4%b8%bb%e8%a6%81%e3%82%b3%e3%83%b3%e3%83%9d%e3%83%bc%e3%83%8d%e3%83%b3%e3%83%88%e3%81%ae%e8%a7%a3%e8%aa%ac%ef%bc%88%e5%ad%a6%e7%bf%92%e3%82%b7%e3%83%aa%e3%83%bc%e3%82%ba%ef%bc%89" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Argo CD、Operatorでのインストールと主要コンポーネントの解説（学習シリーズ）'});">執筆者に問い合わせてみる</a></p>
+    </div>
+    <div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+    <div class="entry-sub-content disqus">
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/13/argocd/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Argo CD、Operatorでのインストールと主要コンポーネントの解説（学習シリーズ）'});">Argo CD、Operatorでのインストールと主要コンポーネントの解説（学習シリーズ）</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、interceptorを使ってイベントトリガーを進化させる'});">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、トリガーを使って外部イベントでパイプラインを実行する'});">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、アプリケーションをKubernetesクラスタへデプロイする'});">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、ClusterTaskとTekton Hubを理解する'});">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (28)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (45)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (13)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (10)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (19)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、interceptorを使ってイベントトリガーを進化させる'});">Tekton、interceptorを使ってイベントトリガーを進化させる</a> (2021/04/08)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、トリガーを使って外部イベントでパイプラインを実行する'});">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a> (2021/04/06)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、アプリケーションをKubernetesクラスタへデプロイする'});">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a> (2021/03/22)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ClusterTaskとTekton Hubを理解する'});">Tekton、ClusterTaskとTekton Hubを理解する</a> (2021/03/21)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>
