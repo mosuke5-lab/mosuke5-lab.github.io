@@ -8,22 +8,22 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 <link rel="stylesheet" href="/css/main.css">
 
-<title>ポッドキャストでAlibaba Cloudについて語る</title>
-<link rel="canonical" href="https://blog.mosuke.tech/entry/2017/10/06/nobolycloud/">
-<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2017/10/06/nobolycloud/" />
+<title>Kubernetesのロギングパターンは結局どれを採用したらいいの？</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/" />
 <meta name="twitter:card" content="summary">
 
 <meta name="twitter:site" content="@mosuke5" />
 <meta name="twitter:creator" content="@mosuke5" />
 
-<meta name="twitter:title" content="ポッドキャストでAlibaba Cloudについて語る &middot; Goldstine研究所">
-<meta name="twitter:description" content="nobolycloudのポッドキャストでAlibaba Cloudについて話してきました。Alibaba Cloudの「今」を素直にお伝えしました。">
+<meta name="twitter:title" content="Kubernetesのロギングパターンは結局どれを採用したらいいの？ &middot; Goldstine研究所">
+<meta name="twitter:description" content="Kubernetes上で運用するアプリケーションのロギングをどのように行うか悩むポイントです。それぞれの特徴と採用すべき点を理解しておくことでよりスムーズな意思決定ができるかと思います。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ポッドキャストでAlibaba Cloudについて語る &middot; Goldstine研究所">
-<meta property="og:description" content="nobolycloudのポッドキャストでAlibaba Cloudについて話してきました。Alibaba Cloudの「今」を素直にお伝えしました。">
+<meta property="og:title" content="Kubernetesのロギングパターンは結局どれを採用したらいいの？ &middot; Goldstine研究所">
+<meta property="og:description" content="Kubernetes上で運用するアプリケーションのロギングをどのように行うか悩むポイントです。それぞれの特徴と採用すべき点を理解しておくことでよりスムーズな意思決定ができるかと思います。">
 <meta property="og:image" content="https://blog.mosuke.tech/image/goldstine-lab-logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
-<meta property="og:url" content="https://blog.mosuke.tech/entry/2017/10/06/nobolycloud/" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/" />
 <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
 <link rel="icon" href="/image/favicon.ico" />
 
@@ -61,69 +61,121 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
-    <h1>ポッドキャストでAlibaba Cloudについて語る</h1>
+    <h1>Kubernetesのロギングパターンは結局どれを採用したらいいの？</h1>
     <div class="entry-sub-title">
-        <span class="">06 Oct 2017, 09:10</span>
+        <span class="">18 Apr 2021, 14:44</span>
         <span class="">By mosuke5</span>
         
             
-                <a class="badge badge-inf post-category post-category-Alibaba Cloud" href="/categories/alibaba-cloud">Alibaba Cloud</a>
-            
-                <a class="badge badge-inf post-category post-category-イベント" href="/categories/%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88">イベント</a>
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
             
         
     </div>
     <div class="entry-content">
         <p>こんにちは、もーすけです。<br>
-なんと、ポッドキャストでAlibaba Cloudについて話してきました！もちろんポッドキャスト出演経験ははじめてです。
-<a href="https://twitter.com/sawanoboly">@sawanoboly</a>さんが運営している<a href="https://cloudinfra.audio/">nobolycloud</a>（のぼりーさんのクラウドインフラ Podcast）というポッドキャストです。そもそもAlibaba Cloudとはなにか、現状について、これからどうなっていくのか、素直にお伝えしました。</p>
-<h2 id="配信">配信</h2>
-<p>ポッドキャストはこちらから聞くことができます。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://cloudinfra.audio/track19-74e652f5afcb" data-iframely-url="//cdn.iframe.ly/Rjh1Czn"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-<h2 id="内容">内容</h2>
-<p>主に下記のようなことについて話しました。</p>
+本日は、Kubernetes上で動くアプリケーションのロギングについて考えていきたいと思います。
+以前に<a href="/entry/2019/07/12/sidecar-fluentd-to-cloudwatchlogs/">「Sidecar方式のFluentdでCloudWatch logsへログを集約することについての検討」</a>という記事を書いたのですが、この記事では、ロギングパターンのひとつであるSidecar方式（サイドカー方式）の検討についてのみ触れており、「で、結局どうしたらいいの？」という部分がたりなかったためです。<br>
+本記事では、その他の方式も含めて、どれを採用したらいいのか？という考え方についてまとめていきたいとおもいます。</p>
+<h2 id="考えるステップ">考えるステップ</h2>
+<p>まず前提として、Kubernetesの公式ガイドにも<a href="https://kubernetes.io/docs/concepts/cluster-administration/logging/">ロギングパターンがいくつか紹介</a>されています。
+アプリケーションのロギングの観点だと3つの方式が紹介されています。英語では分かりづらいので、日本語でパターンに名称をつけておきます。</p>
+<ol>
+<li>Using a node logging agent
 <ul>
-<li>Alibaba Cloudとはなにか</li>
-<li>SBクラウド株式会社とはなにものか</li>
-<li>Alibaba Cloudの特徴やいまの課題点</li>
-<li>中国のクラウド事情</li>
-<li>Alibaba Cloudのこれから。グローバル展開やオリンピックのはなし</li>
+<li>本記事内での名称：<strong>ノードロギング方式</strong></li>
+<li>DaemonSetで各ノードにログコレクタを配置し、各Podが標準出力したログを収集する方式。</li>
 </ul>
-<p>その他、B-trackでは次のような話をしました。</p>
+</li>
+<li>Using a sidecar container with the logging agent
 <ul>
-<li>プレゼンツールのSpotlight</li>
-<li>MacからThinkPadに変えた話</li>
-<li>ソフトバンクのエンジニアについて</li>
+<li>本記事内での名称：<strong>サイドカー方式</strong></li>
+<li>アプリケーションのPodのサイドカーコンテナとしてログコレクタを配置してログを収集する方式。</li>
 </ul>
-<h2 id="出演の経緯">出演の経緯</h2>
-<p>もちろん、ポッドキャストにでるなんて初めてでした。<br>
-もともと、ぼくはnobolycloudのリスナーでした。出演することなど全く考えたことなかったです（笑）
-どうして出演することになったか振り返ってみます。</p>
-<p>きっかけはMaster Cloudというイベントでした。
-Master Cloudというイベントで、Alibaba Cloudについて登壇し喋った際に、そこにたまたま<a href="https://twitter.com/sawanoboly">@sawanoboly</a>さんがいらっしゃって、「ポッドキャストでなんかしゃべらない？」と声をかけていただいたのがきっかけです。
-コミュニティ活動のおかげで本当にいろんなつながりをもてましたが、その1つが間違いなくポッドキャスト出演です。</p>
-<h2 id="ポッドキャストに出てみて">ポッドキャストに出てみて</h2>
-<p>このポッドキャストに出るにあたって１つ目標を立てていました。<br>
-それは、「今のAlibaba Cloud、そしてこれからについて正直ベースで話す」ということでした。<br>
-このポッドキャストでは、それなりのエンジニア層が聞いていると想定していたので、セールストークというよりは、中の人として何を思い、どう考えて携わっているのか生の感覚をお届けしたいと思ったからです。</p>
-<p>実際にしゃべってみてですが、率直な感想は「難しい！いったいどんなポッドキャストになるんだろう？？」というところでした。
-いうなればポッドキャストって普通の会話を録音されて流れるわけです。なのでもっとナチュラルな感じで話せばいいとも思うのですが、毒舌はできないなど、いろんな意識が働くのでどうしても固くなってしまう感じはありました。
-リスナーも不特定多数の人なので、なるべくコンテキストを排除して話す必要があります。
-一体、Alibaba Cloudや私のことを全く知らない人がこの「会話」を聞いて、なにを感じるのだろうか？と想像がまったくできません。是非感想を教えてください（笑）</p>
-<p>ポッドキャストやるときは、ある程度お酒を飲みながらやることをおすすめします。<br>
-ちなみにぼくは、日本酒飲みながら話してましたが、もう少し酔っ払った状態で話せばよかったとも思ってます。泥酔で毒舌しないようにだけ気をつけましょう。</p>
-<p>Alibaba Cloudのについて少し書いておくと、Alibaba Cloudの進化は驚くほど早いです。<br>
-いまAWSなど使っているみなさんも、少し横目に「Alibaba Cloudいまどうなってるかな？」って気にしていくと今後おもしろいことが起きてくると思います。<br>
-また、各社クラウドサービスは似たようなプロダクトを出していますが、それぞれ背景にある考え方や目指していく方向そこには違いがあるはずです。そのあたり気にしながらプロダクトをみていくとおもしろいことに気づくかもしれません。</p>
+</li>
+<li>Exposing logs directly from the application
+<ul>
+<li>本記事内での名称：<strong>直接送付方式</strong></li>
+<li>アプリケーションから直接ロギングバックエンドに送付する方式・</li>
+</ul>
+</li>
+</ol>
+<p>個人的な意見になるのですが、以下のステップで採用を決めるといいのかなと考えています。
+2をすっとばして、3を検討するのは可能な限りやめといたほうがいいと考えています。
+また、<strong>「どれかひとつをだけを選択するものでもない」</strong> という点は理解しておきましょう。もちろん、ひとつのPod単位でみたらどれにするか？という判断が必要ですが、全体で見るとノードロギング方式は採用しつつ、一部のアプリケーションのみサイドカー方式を採用する、となります。</p>
+<ol>
+<li>まずはノードロギング方式の実現を確立する。</li>
+<li>アプリケーションは、ノードロギング方式を採用できないかを最優先で検討する。</li>
+<li>アプリケーションがノードロギング方式の要件に合わなかった際、サイドカー方式か直接送付方式を検討する。（アプリケーションの特性次第でもあるが、サイドカー方式が優先かな）</li>
+</ol>
+<h2 id="方式の特徴の比較">方式の特徴の比較</h2>
+
+
+  
+
+
+
+<table  class="table">
+<thead>
+<tr>
+<th>方式</th>
+<th>主な責任 (*1)</th>
+<th>リソース消費 (*2)</th>
+<th>出力先</th>
+<th>備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ノードロギング方式</td>
+<td>プラットフォーム</td>
+<td>少ない</td>
+<td>ひとつ（標準出力）</td>
+<td>*3参照</td>
+</tr>
+<tr>
+<td>サイドカー方式</td>
+<td>アプリケーション</td>
+<td>多い</td>
+<td>複数可能</td>
+<td>*4参照</td>
+</tr>
+<tr>
+<td>直接送付方式</td>
+<td>アプリケーション</td>
+<td>とても少ない</td>
+<td>複数可能</td>
+<td>*5参照</td>
+</tr>
+</tbody>
+</table>
+
+
+<h5 id="1-主な責任について">*1 主な責任について</h5>
+<p>なにを示しているかというと、ロギングの仕組みの責任が主にどこにあるのか？ということです。
+前提として、Kubernetesクラスタを提供するプラットフォームチームと、その上でアプリケーションを運用するアプリケーションチーム、このふたつのチームがあるとしています。
+ノードロギング方式の場合、プラットフォームチームが特定のアプリケーションやNamespaceによらずロギング手法を確立します。アプリケーションチームの視点では、独自にロギングの仕組みを作ることなく、プラットフォームの提供する機能にのっかることができる、そんなふうに考えることができます。</p>
+<h5 id="2-リソース消費">*2 リソース消費</h5>
+<p>実現するのにひつようなリソース消費についてです。ノードロギング方式について「少ない」と書きましたが、サイドカー方式と比べて相対的に少ないと捉えてください。各ノードに対してログコレクタを配置する必要があるので、絶対値として少ないかといわれるとそんなことはないです。
+サイドカー方式では、アプリケーションごとにログコレクタが必要なのでそれと比べると明らかでしょう。
+直接送付方式では、極端な話、ログコレクタをデプロイする必要なくログを転送できるので、この3つでは一番リソース消費が少ないとも考えられます。</p>
+<h5 id="3-ノードロギング方式について補足">*3 ノードロギング方式について補足</h5>
+<p>多くの場合、サイドカー方式と直接送付方式のみ採用する、ということはないはずです。ノードロギング方式を採用しつつ、特定のアプリケーションにおいて他の方式を採用することを考える、となります。</p>
+<h5 id="4-サイドカー方式について補足">*4 サイドカー方式について補足</h5>
+<p>サイドカー方式の細かな話は、以下のブログにまとめているのでこちらを参照ください。
+採用を検討する場面としては、アプリケーションが複数のファイルを出力しなければならないケースが多いと考えます。単一の標準出力のみではどうしても運用できない場合です。ログごとに転送先が異なる場合なども該当すると考えられます。<br>
+また、サイドカー方式の場合、kubeletがコンテナのログを管理しないため、<code>kubectl logs</code>でログを確認できないのでその点も要注意です。</p>
+<p>ログローテーションについても検討しておく必要がありそうです。<br>
+サイドカー方式の場合、emptyDirないしはPersistentVolumeにログを保管しておくので、ボリュームの使用率については注意を払っておく必要がありますね。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2019/07/12/sidecar-fluentd-to-cloudwatchlogs/" data-iframely-url="//cdn.iframe.ly/0OoUJRq"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h5 id="5-直接送付方式について補足">*5 直接送付方式について補足</h5>
+<p>実は、わたしはこの方式を採用したことがないです。<br>
+プログラム内の処理とログを送付する処理が同期的になるので、あまり採用する場面はないかなと考えます。小さなプログラムで、特定のイベントのみを通知したい、そんなときに使えそうと考えています。</p>
 <h2 id="さいごに">さいごに</h2>
-<p>ポッドキャストにお誘いいただきまことにありがとうございました。<br>
-また、視聴していただいたみなさんにも感謝いたします。</p>
-<p>コミュニティ活動を通じてこういった機会をいただくことができました。
-もし、勉強会やミートアップでいつも聞いているだけだなあ、と思う方は5分のLTでいいので勇気をもって申し込んでみると、良い出会いがあるかもしれません。これからポッドキャストにでるかもしれない人の少しでもの参考になればと思います。</p>
+<p>それぞれの方式で実際に試してみるまでは、体感が湧きづらいトピックですが、ロギング方式を決めるひとつの参考になればと思います。</p>
     </div>
     <div class="entry-sub-content request-for-entry">
         <h5>フィードバック・相談(β)</h5>
-        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=%e3%83%9d%e3%83%83%e3%83%89%e3%82%ad%e3%83%a3%e3%82%b9%e3%83%88%e3%81%a7Alibaba%20Cloud%e3%81%ab%e3%81%a4%e3%81%84%e3%81%a6%e8%aa%9e%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'ポッドキャストでAlibaba Cloudについて語る'});">執筆者に問い合わせてみる</a></p>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Kubernetes%e3%81%ae%e3%83%ad%e3%82%ae%e3%83%b3%e3%82%b0%e3%83%91%e3%82%bf%e3%83%bc%e3%83%b3%e3%81%af%e7%b5%90%e5%b1%80%e3%81%a9%e3%82%8c%e3%82%92%e6%8e%a1%e7%94%a8%e3%81%97%e3%81%9f%e3%82%89%e3%81%84%e3%81%84%e3%81%ae%ef%bc%9f" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Kubernetesのロギングパターンは結局どれを採用したらいいの？'});">執筆者に問い合わせてみる</a></p>
     </div>
     <div class="entry-sub-content post-share">
         <div class="post-share-links">
@@ -292,13 +344,13 @@ Master Cloudというイベントで、Alibaba Cloudについて登壇し喋っ�
       <h3>関連する記事</h3>
       <ul class="list-group">
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/09/23/apsara-conference-trip/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Apsara Conference 杭州に上海経由でいくために必要なこと'});">Apsara Conference 杭州に上海経由でいくために必要なこと</a> (2019/09/23)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/13/argocd/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Argo CD、Operatorでのインストールと主要コンポーネントの解説（学習シリーズ）'});">Argo CD、Operatorでのインストールと主要コンポーネントの解説（学習シリーズ）</a> (2021/04/13)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2017/07/14/master_cloud_malticloud/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Terraform×Rancherでマルチクラウドを一歩すすめる'});">Terraform×Rancherでマルチクラウドを一歩すすめる</a> (2017/07/14)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、interceptorを使ってイベントトリガーを進化させる'});">Tekton、interceptorを使ってイベントトリガーを進化させる</a> (2021/04/08)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/12/02/dragonfly/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'P2Pでコンテナイメージを配信できるDragonflyとAlibaba Cloudのなぞ'});">P2Pでコンテナイメージを配信できるDragonflyとAlibaba Cloudのなぞ</a> (2020/12/02)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、トリガーを使って外部イベントでパイプラインを実行する'});">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a> (2021/04/06)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/11/29/ack-professional/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '[Alibaba Cloud] KubernetesのProfessional managed clustersは何が違うのか？'});">[Alibaba Cloud] KubernetesのProfessional managed clustersは何が違うのか？</a> (2020/11/29)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、アプリケーションをKubernetesクラスタへデプロイする'});">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a> (2021/03/22)</li>
         
       </ul>
     </div>

@@ -63,6 +63,39 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/" class="entry-title">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></h1>
+    <div class="entry-sub-title">
+        <span class="">07 Mar 2021, 15:27</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。<br>
+本日もTekton学習シリーズやっていきます。第4回は、TaskにPipelineResourceを追加してみます。
+CIパイプライン内でGitレポジトリのソースコードを扱うことは一般的です。その方法や、設定するとなにが起きるのか見ていきましょう。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/" class="entry-title">Tekton、Tasksにパラメータを設定する</a></h1>
     <div class="entry-sub-title">
         <span class="">06 Mar 2021, 22:43</span>
@@ -289,34 +322,6 @@
         <a href="https://blog.mosuke.tech/entry/2020/12/16/openshift-on-nvidia-gpu/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2020/12/02/dragonfly/" class="entry-title">P2Pでコンテナイメージを配信できるDragonflyとAlibaba Cloudのなぞ</a></h1>
-    <div class="entry-sub-title">
-        <span class="">02 Dec 2020, 00:00</span>
-        <span class="">By mosuke5</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-Alibaba Cloud" href="/categories/alibaba-cloud">Alibaba Cloud</a>
-            
-                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <p>こんにちは、もーすけです。<br>
-ここ最近、ワケアッて少しAlibaba Cloud関連のKubernetesについて調べています。
-ちなみにこちらの記事は<a href="https://qiita.com/advent-calendar/2020/alibabacloud">Alibaba Cloud Adovent Calender 2020</a>の2日目の投稿です。</p>
-<p>Alibaba Cloudの中の人をやめて、もう1年半以上たちますが、まだこうやって調べるとは思わなかったです。いまになっていろいろAlibaba Cloudが取り組んでいるコンテナ関連のことがよく理解できるようになってきました（笑）
-本日はアリババ/Alibaba Cloudが開発するP2Pのファイル配信ソフトウェアのDragonflyについて少し書いてみたいと思います。（まだ調べ中のところもあるので許してください）</p>
-<h2 id="dragonflyとは">Dragonflyとは</h2>
-<p>Dragonflyは、アリババおよびAlibaba Cloudがメインとなって開発している、オープンソースのP2Pファイル配信の仕組みです。<br>
-よくコンテナイメージの配信のためのソフトウェアといわれることもありますが、実態はコンテナイメージだけでなく、どんなファイルにも活用できるものです。
-コンテナ時代より前からアリババが研究していた効率的なアプリケーションの配布、キャッシュの配布、ログの配布、画像の配布がもとになっています。
-現代のクラウドネイティブの環境になってコンテナイメージの配布にも活用されてきているということです。
-その目標は、クラウドネイティブのシナリオにおけるすべての配布問題に取り組むことです。現在、Dragonflyは以下の点に焦点を当てています。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/dragonflyoss/Dragonfly" data-iframely-url="//cdn.iframe.ly/VOFvh8T"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-        <a href="https://blog.mosuke.tech/entry/2020/12/02/dragonfly/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
@@ -337,6 +342,8 @@
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetesのロギングパターンは結局どれを採用したらいいの？'});">Kubernetesのロギングパターンは結局どれを採用したらいいの？</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/13/argocd/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Argo CD、Operatorでのインストールと主要コンポーネントの解説（学習シリーズ）'});">Argo CD、Operatorでのインストールと主要コンポーネントの解説（学習シリーズ）</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、interceptorを使ってイベントトリガーを進化させる'});">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
@@ -344,8 +351,6 @@
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、トリガーを使って外部イベントでパイプラインを実行する'});">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、アプリケーションをKubernetesクラスタへデプロイする'});">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
-      
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、ClusterTaskとTekton Hubを理解する'});">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
       
     </ul>
   </div>
@@ -379,7 +384,7 @@
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (45)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (46)</a>
       </li>
       
       <li class="list-group-item">
@@ -453,7 +458,7 @@
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (19)</a>
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (20)</a>
       </li>
       
     </ul>
