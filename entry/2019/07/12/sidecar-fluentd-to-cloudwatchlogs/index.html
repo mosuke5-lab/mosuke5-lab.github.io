@@ -76,9 +76,10 @@
     <div class="entry-content">
         <p><a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br>
 Kubernetes上でのアプリケーションのロギングについてFluentdを使ってどうできるか考えていきます。
-今回はサイドカー方式という方法を使ってFluentdでAWS CloudWatch logsへ集約することについてやってみました。</p>
-<p>FluentdとAWSの連携については、以前にそういえばこんなものもかきましたので、参考にしてください。自分も復習で見返しました。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2017/09/03/fluentd_to_dynamodb/" data-iframely-url="//cdn.iframe.ly/fUX8Gqb"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+今回はサイドカー方式という方法を使ってFluentdでAWS CloudWatch logsへ集約することについてやってみました。CloudWatch logsを例に取っていますが、それ以外でも考え方は応用できますので読んでみてください。
+また、サイドカー方式以外の方式については、こちらの「<a href="/entry/2021/04/18/kubernetes-application-logging/">Kubernetesのロギングパターンは結局どれを採用したらいいの？</a>」を参照してください。</p>
+<p>FluentdとAWSの連携については、以前に「<a href="/entry/2017/09/03/fluentd_to_dynamodb/">NginxのログをFluentdでDynamoDBへ送る</a>」もかきましたので、参考にしてください。自分も復習で見返しました。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/" data-iframely-url="//cdn.iframe.ly/qKFqn1a"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
 <h2 id="実現すること">実現すること</h2>
 <p>今回やりたいことは、Kubernetes上で動かしているアプリケーションに対して、サイドカーとしてFluentdを動かしてログをCloudWatch logsに送ることです。アプリケーションは、ブログでの例ではNginxにしました。実際にはNginxや独自のアプリケーションだったり様々かなと思います。</p>
 <p>まず、背景としては、ロギングの方法についてはいくつかあるが、それぞれを実際に行うとどんな印象か・使い勝手かといったところが知りたいので行いました。
@@ -90,7 +91,7 @@ Kubernetesでのロギングについての考え方は英語ですが<a href="h
 <p>先にこちらをやってみた結果を書くと、やってみた感じアプリケーションのログをサイドカーのFluentdで収集するのは場面によりますがあまり得ではないと現時点で考えました。<br>
 理由は、サイドカーのデメリットはPod毎にサイドカーコンテナが必要だということです。Fluentdもまあまあメモリを食うので、ロギングというほぼどんなアプリケーションにも必要なものについてサイドカーで載せる必要はないと思っています。
 サイドカーではなくDaemonSetとしてFluentdを動かすのが一番よさそうです。</p>
-<p>Twitterで聞いてみたところ、標準出力以外に複数のファイルにログを吐く場合にサイドカーでのFluetndを使うという意見もありました。</p>
+<p>標準出力以外に複数のファイルにログを吐く場合にサイドカーでのFluetndを使うのが有力な使いかと考えます。ロギングのコントロールがアプリケーション側にあるため、たとえばログの種類ごとに転送先が異なる場合も柔軟に対応ができます。</p>
 <h2 id="fluentdの設定について">fluentdの設定について</h2>
 <p>コンテナ化する場合はまずは通常のサーバなりローカルで設定や概念を理解することをおすすめします。自分もこちらを実施するに当たり、一度テスト用のEC2の上で動作など確認しました。</p>
 <h3 id="fluentconf">fluent.conf</h3>
@@ -244,6 +245,8 @@ nginx-deployment-58b86c84bb-6mggw   2/2     Running   0          22h
 <p>Kubernetes上のアプリケーションについて、Sidecar方式でのロギングをやってみました。
 冒頭の結果のところにも書きましたが、ロギングという観点でいうとSidecarではない方法でのアプローチのほうが便利そうでした。
 一方でこういったアプローチが必要な場面もあることがわかり、１つの選択肢として重要かなと考えています。</p>
+<p>また、Sidecar方式以外の方式との比較などについては、以下のブログにまとめています。あわせてご覧ください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/" data-iframely-url="//cdn.iframe.ly/qKFqn1a"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
     </div>
     <div class="entry-sub-content request-for-entry">
         <h5>フィードバック・相談(β)</h5>
