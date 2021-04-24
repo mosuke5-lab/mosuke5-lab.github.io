@@ -63,6 +63,33 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2019/05/26/elasticsearch-test/" class="entry-title">[基礎] ElasticSerachなどの外部コンポーネントがあるときのテスト</a></h1>
+    <div class="entry-sub-title">
+        <span class="">26 May 2019, 17:30</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-アプリケーション開発" href="/categories/%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E9%96%8B%E7%99%BA">アプリケーション開発</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>お久しぶりです。@mosuke5です。<br>
+新しい会社に入って１ヶ月ほど経ちましたが生きています。
+今回は、ElasticSearchを題材にしますが外部コンポーネントを利用しているアプリケーションのテストについてです。
+すごく初歩的なところですが、いくつか考えなければいけないポイントもあったのでまとめました。</p>
+<h2 id="はじめに">はじめに</h2>
+<p>今回の題材は非常にシンプルな検索機能をもったアプリケーションです。
+構成はアプリケーションはRailsで、検索エンジンを担うのがElastiCsearchという前提です。</p>
+<p>アプリケーションがもつmethodは３つで以下としています。</p>
+<ol>
+<li>GET &lsquo;/&rsquo;  =&gt; &lsquo;Hello&rsquo;を返す</li>
+<li>GET &lsquo;/search&rsquo; =&gt; GETパラメータ&rsquo;q&rsquo;のキーワードで検索した結果をjsonで返す</li>
+<li>POST &lsquo;/update&rsquo; =&gt; 所定のjsonファイルをPOSTするとbulkでinsertされ、その結果をjsonで返す</li>
+</ol>
+        <a href="https://blog.mosuke.tech/entry/2019/05/26/elasticsearch-test/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2019/04/13/aws-ecs-deploy/" class="entry-title">Amazon ECSを使った際のFargateの仕組みとそのデプロイフローを学ぶ</a></h1>
     <div class="entry-sub-title">
         <span class="">14 Apr 2019, 13:40</span>
@@ -243,26 +270,6 @@ SlideShare APIってあるのか？そしてGoogleAppsScriptもほとんどや�
         <a href="https://blog.mosuke.tech/entry/2018/12/03/softbank-sysdev/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2018/11/08/aws-sa-pro/" class="entry-title">サンプル問題集付き！AWSソリューションアーキテクトプロフェッショナル勉強方法</a></h1>
-    <div class="entry-sub-title">
-        <span class="">08 Nov 2018, 16:44</span>
-        <span class="">By mosuke5</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-AWS" href="/categories/aws">AWS</a>
-            
-                <a class="badge badge-inf post-category post-category-資格試験" href="/categories/%E8%B3%87%E6%A0%BC%E8%A9%A6%E9%A8%93">資格試験</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <p>自分は、この執筆時点では、Alibaba Cloudの日本リージョンの運営側の人間です。
-ですが、いろんなモチベーションがあり、AWSソリューションアーキテクトプロフェッショナルを先日取得してきました。
-AWSの認定試験は業界でも取得したい人は多いと思うので、自分なりの勉強方法をまとめておきました。参考になれば幸いです。</p>
-<p>すでに多くの人が勉強方法などをブログ投稿しているので、差別化が難しいところではあるのですが、自分がまとめた試験問題サンプル集などもあるので、ぜひ参考にしてください。</p>
-        <a href="https://blog.mosuke.tech/entry/2018/11/08/aws-sa-pro/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
@@ -283,6 +290,8 @@ AWSの認定試験は業界でも取得したい人は多いと思うので、�
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？'});">OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetesのロギングパターンは結局どれを採用したらいいの？'});">Kubernetesのロギングパターンは結局どれを採用したらいいの？</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/13/argocd/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Argo CD、Operatorでのインストールと主要コンポーネントの解説（学習シリーズ）'});">Argo CD、Operatorでのインストールと主要コンポーネントの解説（学習シリーズ）</a></li>
@@ -290,8 +299,6 @@ AWSの認定試験は業界でも取得したい人は多いと思うので、�
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、interceptorを使ってイベントトリガーを進化させる'});">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、トリガーを使って外部イベントでパイプラインを実行する'});">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
-      
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、アプリケーションをKubernetesクラスタへデプロイする'});">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
       
     </ul>
   </div>
@@ -329,7 +336,7 @@ AWSの認定試験は業界でも取得したい人は多いと思うので、�
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (8)</a>
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (9)</a>
       </li>
       
       <li class="list-group-item">
@@ -399,7 +406,7 @@ AWSの認定試験は業界でも取得したい人は多いと思うので、�
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (20)</a>
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (21)</a>
       </li>
       
     </ul>

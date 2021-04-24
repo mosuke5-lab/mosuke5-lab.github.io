@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+
+<title>OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/" />
+<meta name="twitter:card" content="summary">
+
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+
+<meta name="twitter:title" content="OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？ &middot; Goldstine研究所">
+<meta name="twitter:description" content="OpenShift 4.6から正式に追加されたユーザ定義プロジェクトの監視機能について、どこまで使えるのか？実戦投入できそうかなどの観点で検証していきます。Prometheusを独自で構築することなく監視できる新機能を紹介します。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？ &middot; Goldstine研究所">
+<meta property="og:description" content="OpenShift 4.6から正式に追加されたユーザ定義プロジェクトの監視機能について、どこまで使えるのか？実戦投入できそうかなどの観点で検証していきます。Prometheusを独自で構築することなく監視できる新機能を紹介します。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+
+
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetes</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://docs.google.com/forms/d/e/1FAIpQLSd6N53H7zfF8EBrvyezRizU1mQx-CP3vc_jG-WvxfRmCjHTpg/viewform" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-site','event_label': 'from-header'});">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？</h1>
+    <div class="entry-sub-title">
+        <span class="">24 Apr 2021, 14:05</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。<br>
+本日は、OpenShift 4.6から新規に追加された「ユーザ定義プロジェクトの監視機能 (Monitoring for user-defined project)」ってなんなのか？どこまでできるのか？と気になってので検証してみます。正式な機能名があるわけではなさそうなので、本ブログでは「ユーザ定義プロジェクトの監視」ということにしておきます。</p>
+<p>ちなみに本ブログを読みすすめる上で、<code>$ コマンド</code> はクラスタ管理者の操作、<code>% コマンド</code> はユーザ（開発者）の操作として記述しているので注意してください。</p>
+<h2 id="cluster-monitoringとは">Cluster Monitoringとは</h2>
+<p>OpenShiftは、インストール時点にデフォルトでCluster MonitoringというPrometheusやGrafanaで構成された機能が起動します。実態としては、<a href="https://github.com/openshift/cluster-monitoring-operator">Cluster Monitoring Operator</a> というOperatorがインストールされており、OpenShiftクラスタを監視するのに必要な、以下のようなソフトウェアを起動しています。</p>
+<ul>
+<li>Prometheus Operator</li>
+<li>Prometheus</li>
+<li>Alertmanager cluster for cluster and application level alerting</li>
+<li>kube-state-metrics</li>
+<li>node_exporter</li>
+<li>prometheus-adapter</li>
+</ul>
+<p>4.5以前では、このCluster Monitoringは名前の通り「クラスタのためのモニタリング」機能の提供であり、OpenShift上でアプリケーションを動かすユーザ側の監視はスコープ外でした。
+4.6にて、ユーザ定義プロジェクトの監視機能が追加されたことで、<u>ユーザ側の監視もできるようになった</u>というわけです。（<a href="https://access.redhat.com/documentation/ja-jp/openshift_container_platform/4.6/html/release_notes/ocp-4-6-new-features-and-enhancements#ocp-4-6-monitoring">リリースノート</a>はこちら）</p>
+<p>OpenShiftを触っている人は、「Cluster Monitoringでもユーザ定義プロジェクトの監視できるのでは！？」と思うはずなので、現時点の状況を説明します。
+従来のCluster Monitoringでも、たしかにユーザが作ったプロジェクト内のPodのメトリクスなどを確認することはできます。しかし、いくつかの課題がありました。</p>
+<p>ひとつめは、Cluster Monitoringに搭載のPrometheus/Grafanaには権限分離する機能がなく、Cluster Monitoringにアクセスできる人は、<strong>すべてのNamespace</strong>の状況が見えてしまいます。
+ひとつのシステムのためだけにOpenShiftを利用していれば問題ないかもしれませんが、マルチテナントとして利用する場合は不適切です。</p>
+<p>ふたつめは、カスタマイズができないということです。OpenShiftのプリセットの設定が入っており、こちらを編集してカスタマイズすることができないということです。そのため、ユーザがデプロイしたアプリケーションの監視設定・アラート設定を追加することはできません。</p>
+<p>という背景があり、この新機能の「ユーザ定義プロジェクトの監視」に注目していたというわけです！
+どのくらい現時点で使えるのか？制限事項は何なのか？そのあたりを確認していきたいと思います。</p>
+<h2 id="設定と検証">設定と検証</h2>
+<p>本ブログの検証で利用しているOpenShiftは<code>version 4.6.20</code>となります</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc version
+Client Version: 4.6.18
+Server Version: 4.6.20
+Kubernetes Version: v1.19.0+2f3101c
+</code></pre></div><h3 id="ユーザー定義プロジェクトの監視の有効化">ユーザー定義プロジェクトの監視の有効化</h3>
+<p>デフォルトでは無効化されているため、有効化が必要です。<br>
+有効化の公式ドキュメントの手順は<a href="https://access.redhat.com/documentation/ja-jp/openshift_container_platform/4.7/html/monitoring/enabling-monitoring-for-user-defined-projects#enabling-monitoring-for-user-defined-projects_enabling-monitoring-for-user-defined-projects">こちら</a>です。
+ちなみに、この有効化作業は<strong>クラスタ管理者の作業</strong>です。cluster-admin権限がないとできない操作で、ユーザ（開発者側）はこの作業について気にする必要はないです。</p>
+<p>また、このユーザ定義プロジェクトの監視もCluster Monitoring Operatorの拡張機能として備わっているものになります。</p>
+<p>公式ドキュメントの手順にしたがって行うのですが、デフォルトの設定のままだとしょっぱなからつまづきます。<code>cluster-monitoring-config</code> というConfigMapはデフォルトで存在しないため、ない人は作成する必要があります。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc -n openshift-monitoring edit configmap cluster-monitoring-config
+Error from server (NotFound): configmaps &#34;cluster-monitoring-config&#34; not found
+</code></pre></div><p>気を取り直して設定を追加します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc -n openshift-monitoring create configmap cluster-monitoring-config
+configmap/cluster-monitoring-config created
+
+$ oc -n openshift-monitoring edit configmap cluster-monitoring-config
+# 以下を追加
+data:
+  config.yaml: |
+    enableUserWorkload: true
+</code></pre></div><p><code>openshift-user-workload-monitoring</code> namespaceにて、ユーザ定義プロジェクトの監視向けのPrometheusが作成されていることを確認できます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get pod -n openshift-user-workload-monitoring
+NAME                                   READY   STATUS    RESTARTS   AGE
+prometheus-operator-6957669954-qq82t   2/2     Running   0          100s
+prometheus-user-workload-0             4/4     Running   1          95s
+prometheus-user-workload-1             4/4     Running   1          95s
+thanos-ruler-user-workload-0           3/3     Running   0          93s
+thanos-ruler-user-workload-1           3/3     Running   0          93s
+
+$ oc get prometheus -n openshift-user-workload-monitoring
+NAME            VERSION   REPLICAS   AGE
+user-workload   v2.20.0   2          2m22s
+</code></pre></div><h3 id="ユーザへの権限付与">ユーザへの権限付与</h3>
+<p>この機能をユーザに利用してもらうためには、ユーザ側への権限付与が必要です。
+具体例でいうと、ユーザが監視設定を追加するためには <code>ServiceMonitor</code> や <code>PromtheusRule</code> といったリソースの作成が必要です。OpenShiftでは、いくつかのRoleを用意しているので、適切なものをユーザに付与しましょう。詳しくはこちらの<a href="https://access.redhat.com/documentation/ja-jp/openshift_container_platform/4.7/html/monitoring/granting-users-permission-to-monitor-user-defined-projects_enabling-monitoring-for-user-defined-projects#granting-user-permissions-using-the-cli_enabling-monitoring-for-user-defined-projects">ドキュメント</a>を参照ください。
+監視設定もユーザ側で操作することが多いかと思うので、<code>monitoring-edit</code>の利用頻度が高そうですね。</p>
+<p>本ブログでは<code>user1</code>をユーザ（開発サイド）とみなして権限付与をしてみます。
+<code>my-app</code>は、user1が利用しているnamespace名です。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc policy add-role-to-user monitoring-edit user1 -n my-app
+clusterrole.rbac.authorization.k8s.io/monitoring-edit added: &#34;user1&#34;
+</code></pre></div><h3 id="prometheus-operatorとの関係">Prometheus Operatorとの関係</h3>
+<p>さきにお伝えしておくと、これからでてくる<code>ServiceMonitor</code>や<code>PrometheusRule</code>といったリソースは<a href="https://github.com/prometheus-operator/prometheus-operator">Prometheus Operator</a>のカスタムリソースです。
+Prometheus Operatorであることをユーザ側にあまり意識させない作りにはなっていますが、ユーザ側はPrometheus Operatorを一度さわっておくといいでしょう。</p>
+<p>本記事では、Prometheus Operatorについては解説しませんが、別記事でまた紹介していきたいと思います。</p>
+<h3 id="アプリケーションのデプロイ">アプリケーションのデプロイ</h3>
+<p>ここからは<strong>ユーザ側の作業</strong>になります。
+ユーザは任意のアプリケーションをデプロイしますが、そのアプリケーションはPrometheus形式のメトリクスを出力できる必要があります。
+Prometheusのメトリクスを出力する方法にPrometheus exporterを用いることができます。</p>
+<p>Prometheus exporterとは、簡易なHTTPサーバで、HTTPのリクエストがきたときにPrometheus形式のメトリクスを出力するツールです。オープンソースで、さまざまな種類のexporterがすでに開発されています。Kubernetesの世界で言えば、ノードのメトリクスを監視するために<a href="https://github.com/prometheus/node_exporter">node exporter</a>はよく使われます。実際、OpenShift内でも利用されています。その他、<a href="https://github.com/nginxinc/nginx-prometheus-exporter">Nginx exporter</a>や<a href="https://github.com/prometheus/jmx_exporter">JMX exporter</a>などさまざまです。</p>
+<p><img src="/image/prometheus-exporter.png" alt="prometheus-exporter"></p>
+<p>本検証では、Nginx exporterを搭載したNginxを使って挙動を確認してみます。
+ドキュメント通りではつまらないので、ここは違うアプローチで解説していきたいと思います。
+つぎのマニフェスト（<code>nginx.yaml</code>）を用います。コメントをいれました。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">---
+<span style="color:#75715e"># NginxのDeployment</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">test-nginx</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">3</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">test-nginx</span>
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">test-nginx</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+        <span style="color:#75715e"># Nginx本体</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
+          <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginxinc/nginx-unprivileged:1.20.0</span>
+          <span style="color:#f92672">ports</span>:
+            - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">8080</span>
+          <span style="color:#f92672">volumeMounts</span>:
+            - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">config-volume</span>
+              <span style="color:#f92672">mountPath</span>: <span style="color:#ae81ff">/etc/nginx/conf.d</span>
+        <span style="color:#75715e"># Nginx exporter</span>
+        <span style="color:#75715e"># 9113ポートでリッスンし、Nginx本体の/stub_statusの情報をみて</span>
+        <span style="color:#75715e"># Prometheus形式のメトリクスを出力する</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-exporter</span>
+          <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx/nginx-prometheus-exporter:0.9.0</span>
+          <span style="color:#f92672">ports</span>:
+            - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">9113</span>
+          <span style="color:#f92672">args</span>:
+            - -<span style="color:#ae81ff">nginx.scrape-uri=http://localhost:8080/stub_status</span>
+      <span style="color:#f92672">volumes</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">config-volume</span>
+          <span style="color:#f92672">configMap</span>:
+            <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-conf</span>
+            <span style="color:#f92672">items</span>:
+              - <span style="color:#f92672">key</span>: <span style="color:#ae81ff">default.conf</span>
+                <span style="color:#f92672">path</span>: <span style="color:#ae81ff">default.conf</span>
+---
+<span style="color:#75715e"># Nginx本体のService</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Service</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-service</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">type</span>: <span style="color:#ae81ff">ClusterIP</span>
+  <span style="color:#f92672">ports</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#e6db74">&#34;http-port&#34;</span>
+      <span style="color:#f92672">protocol</span>: <span style="color:#e6db74">&#34;TCP&#34;</span>
+      <span style="color:#f92672">port</span>: <span style="color:#ae81ff">8080</span>
+      <span style="color:#f92672">targetPort</span>: <span style="color:#ae81ff">8080</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">test-nginx</span>
+---
+<span style="color:#75715e"># Nginx exporterのService</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Service</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-exporter-service</span>
+  <span style="color:#f92672">labels</span>:
+    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">test-nginx</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">type</span>: <span style="color:#ae81ff">ClusterIP</span>
+  <span style="color:#f92672">ports</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#e6db74">&#34;exporter&#34;</span>
+      <span style="color:#f92672">protocol</span>: <span style="color:#e6db74">&#34;TCP&#34;</span>
+      <span style="color:#f92672">port</span>: <span style="color:#ae81ff">9113</span>
+      <span style="color:#f92672">targetPort</span>: <span style="color:#ae81ff">9113</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">test-nginx</span>
+---
+<span style="color:#75715e"># Nginxのコンフィグ</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ConfigMap</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-conf</span>
+<span style="color:#f92672">data</span>:
+  <span style="color:#f92672">default.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    server {
+</span><span style="color:#e6db74">        listen  8080;
+</span><span style="color:#e6db74">        root    /usr/share/nginx/html;
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">        location /stub_status {
+</span><span style="color:#e6db74">            stub_status;
+</span><span style="color:#e6db74">        }
+</span><span style="color:#e6db74">    }</span>    
+</code></pre></div><p>Nginxを起動します。<br>
+ポイントとしては、Pod内に2つのコンテナが存在していること、そしてexporter用のService(<code>nginx-exporter-service</code>)をあわせて作成したことです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc apply -f nginx.yaml
+deployment.apps/test-nginx created
+service/nginx-service created
+service/nginx-exporter-service created
+configmap/nginx-conf created
+
+% oc get pod,service,configmap
+NAME                              READY   STATUS    RESTARTS   AGE
+pod/test-nginx-6c46668b79-6d8b8   2/2     Running   0          8s
+pod/test-nginx-6c46668b79-fhc44   2/2     Running   0          8s
+pod/test-nginx-6c46668b79-r4wzn   2/2     Running   0          8s
+
+NAME                             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+service/nginx-exporter-service   ClusterIP   172.30.255.65   &lt;none&gt;        9113/TCP   7s
+service/nginx-service            ClusterIP   172.30.151.21   &lt;none&gt;        8080/TCP   7s
+
+NAME                   DATA   AGE
+configmap/nginx-conf   1      6s
+</code></pre></div><h3 id="メトリクスの収集">メトリクスの収集</h3>
+<p>これから、exporterが公開したメトリクスを収集しますが、その前に生のメトリクス情報を確認しておきましょう。
+<code>fedora:33</code>イメージでデバッグ用のコンテナを起動します。
+コンテナ内から、<code>service/nginx-exporter-service</code>に接続してメトリクス情報を肉眼でも確認しておきましょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// デバッグ用コンテナの起動
+% oc run debug -it --image=fedora:33 -- /bin/bash
+If you don&#39;t see a command prompt, try pressing enter.
+bash-5.0$
+bash-5.0$ # まずはNginx本体へcurlしてレスポンスが返ってくることを確認
+bash-5.0$ curl http://nginx-service:8080
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+&lt;style&gt;
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+...
+
+bash-5.0$ # 次にexporter側へcurlしてメトリクスを確認
+bash-5.0$ curl http://nginx-exporter-service:9113/metrics
+# HELP nginx_connections_accepted Accepted client connections
+# TYPE nginx_connections_accepted counter
+nginx_connections_accepted 3
+# HELP nginx_connections_active Active client connections
+# TYPE nginx_connections_active gauge
+nginx_connections_active 1
+# HELP nginx_connections_handled Handled client connections
+# TYPE nginx_connections_handled counter
+nginx_connections_handled 3
+...
+</code></pre></div><p>いよいよ、メトリクス収集するために、Prometheusに対して監視設定を投入します。
+通常のPrometheusを利用している場合、Prometheusの監視設定は専用の設定ファイルに記述を行い読み込ませる必要があります（<a href="https://prometheus.io/docs/prometheus/latest/configuration/configuration/">公式ドキュメント</a>）。今回は、Prometheus Operatorを内部的に利用しているため、Prometheusの専用の設定ファイルを書く必要はなく、<code>ServiceMonitor</code>というKubernetesリソースを作成すると、Prometheus Operatorが設定をPrometheusに反映してくれます。</p>
+<p>非常にシンプルですが、指定した条件に合うServiceを検出し監視を開始してくれます。
+<code>ServiceMonitor</code>の設定内容について詳しく知りたい方は、<a href="https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#servicemonitorspec">Prometheus OperatorのAPIドキュメント</a>がオススメです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># servicemonitor.yaml</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">monitoring.coreos.com/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceMonitor</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-monitor</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#75715e"># メトリクスのエンドポイントの設定</span>
+  <span style="color:#75715e"># &#34;exporter&#34;という名前のService portを選択</span>
+  <span style="color:#f92672">endpoints</span>:
+    - <span style="color:#f92672">interval</span>: <span style="color:#ae81ff">30s</span>
+      <span style="color:#f92672">port</span>: <span style="color:#ae81ff">exporter</span>
+      <span style="color:#f92672">scheme</span>: <span style="color:#ae81ff">http</span>
+  <span style="color:#75715e"># 検出するServiceの条件設定</span>
+  <span style="color:#75715e"># &#34;app: test-nignx&#34;のラベルを持つServiceを検出</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">test-nginx</span>
+</code></pre></div><p>ServiceMonitorをデプロイ後に、OpenShiftのWebコンソールから、&ldquo;Monitoring&rdquo; -&gt; &ldquo;Metrics&rdquo; -&gt; &ldquo;Custom Query&quot;にて、<code>nginx</code>などと入力するとNginx exporterから取得したメトリクスを確認できます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc apply -f servicemonitor.yaml
+servicemonitor.monitoring.coreos.com/nginx-monitor created
+
+% oc get servicemonitor
+NAME            AGE
+nginx-monitor   9s
+</code></pre></div><p><img src="/image/openshift-user-defined-prometheus-metrics.png" alt="openshift-user-defined-prometheus-metrics"></p>
+<p><img src="/image/openshift-user-defined-prometheus-metrics-zoom.png" alt="openshift-user-defined-prometheus-metrics-zoom"></p>
+<h3 id="アラート設定">アラート設定</h3>
+<p>続いてアラート設定です。
+取得したメトリクスに対して条件を指定してアラートできます。
+アラート設定は<code>PrometheusRule</code>というリソースで設定できます。
+<code>PrometheusRule</code>の設定項目は<a href="https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#prometheusrulespec">こちら</a>を参照ください。</p>
+<p>試しに、次のマニフェストを使ってみます。
+<code>nginx_up</code>は、名前のとりNginxが起動しているかどうかのメトリクスです。
+今回、Nginxはレプリカを3で起動していますから、何もなければ<code>sum(nginx_up) = 3</code> となるはずです。
+ひとつ以上がダウンしていれば <code>NginxPartiallyDown</code> のアラートを、全部ダウンしていれば <code>NginxTotallyDown</code> のアラートを出すこととします。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># alert.yaml</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">monitoring.coreos.com/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PrometheusRule</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-alert</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">groups</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-down</span>
+      <span style="color:#f92672">rules</span>:
+        - <span style="color:#f92672">alert</span>: <span style="color:#ae81ff">NginxPartiallyDown</span>
+          <span style="color:#f92672">expr</span>: <span style="color:#ae81ff">sum(nginx_up) &lt; 3</span>
+          <span style="color:#f92672">for</span>: <span style="color:#ae81ff">0m</span>
+          <span style="color:#f92672">labels</span>:
+            <span style="color:#f92672">severity</span>: <span style="color:#ae81ff">warning</span>
+        - <span style="color:#f92672">alert</span>: <span style="color:#ae81ff">NginxTotallyDown</span>
+          <span style="color:#f92672">expr</span>: <span style="color:#ae81ff">sum(nginx_up) &lt; 1</span>
+          <span style="color:#f92672">for</span>: <span style="color:#ae81ff">0m</span>
+          <span style="color:#f92672">labels</span>:
+            <span style="color:#f92672">severity</span>: <span style="color:#ae81ff">critical</span>
+</code></pre></div><p>アラート設定をデプロイし、Webコンソールにアラートが反映したことを確認。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc apply -f alert.yaml
+prometheusrule.monitoring.coreos.com/nginx-alert created
+
+% oc get prometheusrole
+NAME          AGE
+nginx-alert   6h12m
+</code></pre></div><p><img src="/image/openshift-user-defined-prometheus-alert-normal.png" alt="openshift-user-defined-prometheus-alert-normal"></p>
+<p>Nginxのレプリカ数を2にして、わざとアラート発報させてみます。
+Webコンソール上でもアラートが<code>Firing</code>になっていることを確認しましょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc scale deploy test-nginx --replicas=2
+deployment.apps/test-nginx scaled
+</code></pre></div><p><img src="/image/openshift-user-defined-prometheus-alert-error.png" alt="openshift-user-defined-prometheus-alert-error"></p>
+<h2 id="通知設定">通知設定</h2>
+<p>最後に通知設定についてみていきます。<br>
+ひとつまえの項目ではアラート設定を行いましたが、とくに通知の設定は行っていませんでした。
+Prometheusでは <code>Alertmanager</code> というコンポーネントがアラートを管理します。
+このユーザ定義プロジェクトの監視では、アラート設定はユーザ側に権限はなく<strong>クラスタ管理者側</strong>となります。
+理由は、利用しているAlertManagerは、クラスタ管理用のものと併用しているためです。</p>
+<p>OpenShiftのWebコンソールの&quot;Administration&rdquo; -&gt; &ldquo;Cluster Settings&rdquo; -&gt; &ldquo;Global Configuration&rdquo; -&gt; &ldquo;Alertmanager&rdquo; -&gt; &ldquo;Create Receiver&quot;から設定できます。公式ドキュメントの設定手順は<a href="https://access.redhat.com/documentation/ja-jp/openshift_container_platform/4.6/html/monitoring/sending-notifications-to-external-systems_managing-alerts#configuring-alert-receivers_managing-alerts">こちら</a>です。</p>
+<p>今回はSlackを通知先に選びました。<br>
+設定で重要になるのは、<code>Routing Labels</code>です。
+これは、発報したアラートと通知設定を紐付けるための設定です。いちばん簡易なのはNamespaceを指定することでしょう。
+以下のスクリーンショットのように <code>namespace = my-app</code> とすることで、my-app namespace内で作成された<code>PrometheusRule</code>と紐づきNamespace毎に通知先を選べます。複数のチームがOpenShiftを利用していても通知先をある程度固定できます。
+ただし、Namespaceごとではクラスタ管理者の管理も難しいので、チームごとに利用できるよう <code>team = &lt;任意のID&gt;</code> としてIDをチーム側に知らせることなど運用の工夫が考えられそうです。</p>
+<p><img src="/image/openshift-user-defined-prometheus-alertmanager.png" alt="openshift-user-defined-prometheus-alertmanager"></p>
+<h2 id="アーキテクチャ図">アーキテクチャ図</h2>
+<p>ここまでいろいろ検証してきて、ドキュメントに記載してあったアーキテクチャ図が理解できるようになってきました。
+簡単ですが、ポイントを書き込んだので理解の深堀りに使ってください。</p>
+<p><img src="/image/openshift-user-defined-prometheus-architecture.png" alt="openshift-user-defined-prometheus-architecture"></p>
+<h2 id="さいごに">さいごに</h2>
+<p>長いブログでしたがお疲れさまでした。<br>
+OpenShiftのCluster Monitoringの拡張機能を使ったユーザ定義プロジェクトの監視いかがでしたでしょうか。
+個人的には非常に良い仕組みだなと思っています。
+いままで、ユーザ側で監視のの仕組みを作るのにPrometheus Operator/Grafana Operatorを使って独自に立ててきました。
+Operator化されているので簡単ではあるのですが、それでもある程度の運用の大変さがあったのは事実です。
+もちろん、いくつかの制約はあるもののカスタムのメトリクスの収集とアラート・通知ができるので使える場面も多いのではないかなと思っています。</p>
+<p>以下の点が制約として考えられるので注意して使っていきましょう。</p>
+<ol>
+<li>ダッシュボードは作れない。Grafanaダッシュボードは含まない。OpenShiftのWebコンソール内で完結。</li>
+<li>アラートの通知先管理がクラスタ管理側権限となる。</li>
+<li>大量のユーザで利用したときのスケーラビリティ（ここは未確認で解消の余地あり）</li>
+</ol>
+<p>では、これからもOpenShift Lifeを楽しんでください！</p>
+    </div>
+    <div class="entry-sub-content request-for-entry">
+        <h5>フィードバック・相談(β)</h5>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=OpenShift%e3%81%ae%e6%96%b0%e6%a9%9f%e8%83%bd%e3%80%81%e3%83%a6%e3%83%bc%e3%82%b6%e5%ae%9a%e7%be%a9%e3%83%97%e3%83%ad%e3%82%b8%e3%82%a7%e3%82%af%e3%83%88%e3%81%ae%e7%9b%a3%e8%a6%96%e3%81%a3%e3%81%a6%e3%81%a9%e3%81%93%e3%81%be%e3%81%a7%e3%81%a7%e3%81%8d%e3%82%8b%ef%bc%9f" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？'});">執筆者に問い合わせてみる</a></p>
+    </div>
+    <div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+    <div class="entry-sub-content disqus">
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mosuke5-techblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？'});">OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetesのロギングパターンは結局どれを採用したらいいの？'});">Kubernetesのロギングパターンは結局どれを採用したらいいの？</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/13/argocd/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Argo CD、Operatorでのインストールと主要コンポーネントの解説（学習シリーズ）'});">Argo CD、Operatorでのインストールと主要コンポーネントの解説（学習シリーズ）</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、interceptorを使ってイベントトリガーを進化させる'});">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+      
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、トリガーを使って外部イベントでパイプラインを実行する'});">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (28)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (46)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (9)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (13)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (10)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (21)</a>
+      </li>
+      
+    </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/01/openshift-add-user-ca/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'OpenShiftでCA証明書を追加することについての検証'});">OpenShiftでCA証明書を追加することについての検証</a> (2021/03/01)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Jaegerを使った分散トレーシングの検証 on Kubernetes (1)'});">Jaegerを使った分散トレーシングの検証 on Kubernetes (1)</a> (2021/02/08)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'OpenShift on NVIDIA GPU（導入編）'});">OpenShift on NVIDIA GPU（導入編）</a> (2020/12/17)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/12/16/openshift-on-nvidia-gpu/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'OpenShift on NVIDIA GPU（概要編）'});">OpenShift on NVIDIA GPU（概要編）</a> (2020/12/16)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>
