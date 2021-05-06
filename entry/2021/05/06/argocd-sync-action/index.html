@@ -8,22 +8,22 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 <link rel="stylesheet" href="/css/main.css">
 
-<title>Serverlessconf Tokyo(2017)に参加。サーバレスの進化</title>
-<link rel="canonical" href="https://blog.mosuke.tech/entry/2017/11/03/serverlessconf_tokyo/">
-<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2017/11/03/serverlessconf_tokyo/" />
+<title>第3回: Argo CD、Syncの実行方法やタイミングについての検討</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/" />
 <meta name="twitter:card" content="summary">
 
 <meta name="twitter:site" content="@mosuke5" />
 <meta name="twitter:creator" content="@mosuke5" />
 
-<meta name="twitter:title" content="Serverlessconf Tokyo(2017)に参加。サーバレスの進化 &middot; Goldstine研究所">
-<meta name="twitter:description" content="Serverlessconf Tokyo2017に参加してきたのでレポート。2016年との違いを多く感じたし、Terraformのようなツールの重要性増しそうなど個人的な見解も広がった素晴らしいイベントでした。">
+<meta name="twitter:title" content="第3回: Argo CD、Syncの実行方法やタイミングについての検討 &middot; Goldstine研究所">
+<meta name="twitter:description" content="Argo CDのSyncの実行方法やそのタイミングについて検討します。CIツールからの実装が便利なケースもあるので考え方をまとめました。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Serverlessconf Tokyo(2017)に参加。サーバレスの進化 &middot; Goldstine研究所">
-<meta property="og:description" content="Serverlessconf Tokyo2017に参加してきたのでレポート。2016年との違いを多く感じたし、Terraformのようなツールの重要性増しそうなど個人的な見解も広がった素晴らしいイベントでした。">
+<meta property="og:title" content="第3回: Argo CD、Syncの実行方法やタイミングについての検討 &middot; Goldstine研究所">
+<meta property="og:description" content="Argo CDのSyncの実行方法やそのタイミングについて検討します。CIツールからの実装が便利なケースもあるので考え方をまとめました。">
 <meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
-<meta property="og:url" content="https://blog.mosuke.tech/entry/2017/11/03/serverlessconf_tokyo/" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/" />
 <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
 <link rel="icon" href="/image/favicon.ico" />
 
@@ -61,60 +61,87 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
-    <h1>Serverlessconf Tokyo(2017)に参加。サーバレスの進化</h1>
+    <h1>第3回: Argo CD、Syncの実行方法やタイミングについての検討</h1>
     <div class="entry-sub-title">
-        <span class="">03 Nov 2017, 11:01</span>
+        <span class="">06 May 2021, 13:11</span>
         <span class="">By mosuke5</span>
         
             
-                <a class="badge badge-inf post-category post-category-イベント" href="/categories/%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88">イベント</a>
-            
-                <a class="badge badge-inf post-category post-category-クラウド技術" href="/categories/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89%E6%8A%80%E8%A1%93">クラウド技術</a>
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
             
         
     </div>
     <div class="entry-content">
-        <p>去年に引き続き、<a href="http://tokyo.serverlessconf.io/">Serverlessconf Tokyo</a>に参加してきたので簡単ですが報告です。<br>
-予定があって途中までしかいられずちょっとした感想です。</p>
-<p>サーバレスってなんだっけという復習はぜひ去年のブログをみてください。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2016/10/02/212420/" data-iframely-url="//cdn.iframe.ly/DG0cPl4"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-<h2 id="serverlessconf-tokyo-2017">ServerlessConf Tokyo 2017</h2>
-<p>Serverlessconf Tokyoですが、<br>
-コーヒー飲めて、ドーナツも食べれて、Tシャツもたくさんゲットできて最高です笑</p>
-<blockquote class="twitter-tweet" data-lang="ja"><p lang="ja" dir="ltr">去年に続き <a href="https://twitter.com/hashtag/serverlessconf?src=hash&amp;ref_src=twsrc%5Etfw">#serverlessconf</a> に参加。コーヒーもドーナツもあって最高 (@ ベルサール飯田橋ファースト in 文京区, 東京都) <a href="https://t.co/ZNjzhkEb4W">https://t.co/ZNjzhkEb4W</a> <a href="https://t.co/SE2VGr7Znp">pic.twitter.com/SE2VGr7Znp</a></p>&mdash; もーすけ (@mosuke5) <a href="https://twitter.com/mosuke5/status/926267082735538177?ref_src=twsrc%5Etfw">2017年11月3日</a></blockquote>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<blockquote class="twitter-tweet" data-lang="ja"><p lang="en" dir="ltr">nice to meet you for a consecutive year! <a href="https://t.co/KQTSMqzGWX">pic.twitter.com/KQTSMqzGWX</a></p>&mdash; Wayland Zhang (@WaylandZhang) <a href="https://twitter.com/WaylandZhang/status/926320073416908801?ref_src=twsrc%5Etfw">2017年11月3日</a></blockquote>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<h2 id="サーバレスに関する認識の変化">サーバレスに関する認識の変化</h2>
-<p>去年はおもしろくって、そもそもサーバレスの定義的なところでの話題（Twitter上でのやりとり）が多かったです。
-サーバレスとはFaaSのことなのか、SaaSはサーバレスなのか？という割とどうでもいいのだがそういうところも認識があっていなくて論争していました。<br>
-ここ1年でクラウドプロバイダーは例えばAmazon S3のようなサーバを意識しないサービスもサーバレスコンポーネントの１つとして押し出しているし、FaaSはサーバレスな「コンピューティング」というあくまでその一部としての位置づけです。
-とはいえ、FaaS的なところが真新しいのでここにフォーカスされるのがこのServerlessconfといったところで落ち着いていたようにみえました。</p>
-<h2 id="圧倒的に事例が増えた">圧倒的に事例が増えた</h2>
-<p>なによりも今年は「事例」がとても多くなってきていました。1年経ったのであたりまえではあるのですが、去年の時点では目立った事例としては日経新聞社さんの事例くらいでした。しかし、日経新聞社の例のバッチ処理の代替としての事例はもちろん、それ以外の部分での適応についても多く出てきていたのが特徴的だった。</p>
-<p>FaaSの特徴は何と言っても「イベントドリブン」で実行されるということです。
-その特徴を活かして、突然のピークにも対応する例があった。もちろんクラウドにはAutoScalingという考え方でピークトラフィックに対応することが一般的です。
-しかし、AutoScalingは一般的にサーバ負荷のアラートをトリガーに仮想サーバを増やして対応します。
-そのため、突発的な負荷への対応には向いていなかったりします。
-そこでFaaSの出番というわけです。FaaSの起動から実行までの時間はとても短く、並列性が強いです。なので、突発的な負荷への対応も可能です。さらにデータベース側でもそのようなスケールに耐えられるようにAzureの例で言えばCosmosDBのような製品がでてきたというはなしもありました。</p>
-<h2 id="terraformの重要性が増す">Terraformの重要性が増す</h2>
-<p>個人的な意見なのですが、今回のいくつかのセッションを聞いて、色んな人と話して思ったことがあります。
-それは、Terraformのようなクラウドプラットフォーム上の構成管理ツールの重要性が今まで以上に増してくるかなってことです。
-もちろん、いままでも十分Terraform的な存在は重要でしたが、FaaSはクラウドプラットフォームとの結びつきがとても強く、いろんなサービスと連携する必要があります。そのあたりの価値はますます高くなるかもしれません。</p>
-<h2 id="コミュニティとして">コミュニティとして</h2>
-<p>Serverlessとかどうとか関係ない部分で。<br>
-昨年から開催されたServerlessconfですが、去年参加したときはまだぼくはクラウドプロバイダーへ移ったばかりで話題のサーバレスがどんなふうに捉えられ、どんなふうに利用されているか興味あってたまたま行きました。<br>
-それから、このクラウド界隈で仕事やイベントに参加していくその中で出会った人たちが、このServerlessConfの主催者であったり、ブースにいたり、登壇したりしたいた。特に、去年ブースであったMobingiというスタートアップの人たちはいまも一緒に仕事したりしている。<br>
-去年、飛び込んだこの界隈ですが、1年経つと人脈面でも大きく変化していてイベントに行くことそのものが楽しみになっている自分がいて不思議です。</p>
-<p>MSの牛尾さんの発表も聞きました。今年からマイクロソフトのエバンジェリストの評価基準が変わったと聞いています。プレゼンやデモによる顧客満足の向上ではなく、エバンジェリスト自身もコードをお客様と書いたりして問題解決していくようになったと。とくにアメリカではそのように変わりつつ有るようです。MSの牛尾さんもいまはソフトウェアエンジニアとして活動しながら仕事しているようですが、自らの経験を自らのことはで語っている感じはとてもよかったです。エバンジェリストではありませんが、似たようなポジションの人間としてこれは心揺さぶられる感覚がありました。</p>
-<h2 id="最後に">最後に</h2>
-<p>Serverlessconf Tokyoを主催してくれた吉田さん、スタッフ、スポンサーなどにまず感謝です。
-また来年も開催されるならば参加したいし、発表やブースの立場で参加できたらなんていう思いもあります。</p>
-<p>では、みんなも来年はでようね！</p>
+        <hr>
+<h5>Argo CD学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2021/04/13/argocd/">Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></li>
+<li>第2回: <a href="/entry/2021/05/06/argocd-application/">Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。<br>
+Argo CD学習シリーズどんどんやっていきます。
+今回は、Argo CDがアプリケーションをSync（同期）するタイミングに関する検討です。
+軽めの話題ですが、実運用を検討する上で重要になるのでしっかりおさえておきましょう。</p>
+<h2 id="手動syncか自動syncか">手動Syncか自動Syncか</h2>
+<p>前回まで、とくにSyncの設定については触れてこず、手動で「Sync」ボタンをおすことで処理を行ってきました。
+Argo CDでは、Syncを手動で行うか自動で行うかを選択することが可能です。</p>
+<p>以下は、Argo CDのWebコンソールでのアプリケーション作成画面です。
+<code>SYNC POLICY</code>にて、<code>Manual</code>か<code>Automatic</code>を選択できます。</p>
+<p><img src="/image/argocd-sync-option.png" alt="argocd-sync-option"></p>
+<p>マニフェストで書く場合は、<code>.spec.syncPolicy.automated</code>を記述すればOKです。
+自動Syncの中でもさらなるオプションがあるので、<code>.spec.syncPolicy.automated = {}</code>で自動Syncは有効化されます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">argoproj.io/v1alpha1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Application</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-development</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">my-argocd-operator</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">destination</span>:
+    <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">development</span>
+    <span style="color:#f92672">server</span>: <span style="color:#ae81ff">https://kubernetes.default.svc</span>
+  <span style="color:#f92672">project</span>: <span style="color:#ae81ff">default</span>
+  <span style="color:#f92672">source</span>:
+    <span style="color:#f92672">path</span>: <span style="color:#ae81ff">overlay-example/overlays/development</span>
+    <span style="color:#f92672">repoURL</span>: <span style="color:#ae81ff">https://github.com/mosuke5/kustomize-examples</span>
+    <span style="color:#f92672">targetRevision</span>: <span style="color:#ae81ff">HEAD</span>
+  <span style="color:#f92672">syncPolicy</span>:
+    <span style="color:#75715e"># 自動Syncにする場合</span>
+    <span style="color:#f92672">automated</span>: {}
+</code></pre></div><h2 id="syncタイミングのコントロール">Syncタイミングのコントロール</h2>
+<p>自動Syncの場合、Argo CDは「3分毎」にポーリングしてSyncします（<a href="https://argoproj.github.io/argo-cd/user-guide/ci_automation/#synchronize-the-app-optional">公式ドキュメント</a>）。
+Gitレポジトリを修正してから3分以内で、Kubernetesクラスタへデプロイされるということです。</p>
+<p>この3分が要件的に遅い場合や、自らの任意のタイミングで実行したい場合は、次の大きく2つの方法で対応できます。</p>
+<ol>
+<li>Webhookを用いて、Gitレポジトリの変更をトリガーに実行する</li>
+<li>Gitレポジトリの変更に対して、CIパイプラインを実行させ、CIパイプライン内からSync処理を実行する</li>
+</ol>
+<p><img src="/image/argocd-sync-from-ci.png" alt="argocd-sync-from-ci"></p>
+<p>それぞれの特徴を考えてみましょう。<br>
+まずは、1.のWebhookで直接Argo CDのSync処理をトリガーさせる場合です。
+なんといっても、余計なCIパイプラインを作る必要がなくなるのでシンプルに構成がまとまるでしょう。
+一方で、Sync以外の処理をさせたい場合の考え方がことなってきます。Argo CDには、<a href="https://argoproj.github.io/argo-cd/user-guide/sync-waves/">Sync Phases and Waves</a>という機能があって、Syncの前後で任意の処理を挟んだり、Syncの順番をある程度コントロールできます。
+つまり、WebhookでArgo CDに通知してしまった以上、<strong>それ以降の処理はArgo CD側で頑張る</strong>ことが必要です。</p>
+<p>もし、2.のCIパイプラインを用いた場合は、もっと柔軟にSync前後の処理を行うことができると考えます。
+結合テストだったり、負荷テスト、任意の業務処理それらを<strong>Argo CDと切り離して実装できる</strong>ので効率がいいと思います。</p>
+<p>とはいえ、CD専用のツールを導入したのにCIツールからのトリガーが必要というのもどうなんだろう？と思うところもあるかなと思います。これについては、業務用件次第ですが、どのツールになんの責任をもたせるか？という検討が重要かと思います。</p>
+<h2 id="argo-cd-apiの実行">Argo CD APIの実行</h2>
+<p>CIパイプラインからArgo CDのSyncを実行する場合、どのように実行するのよいでしょうか？
+おそらく一番簡単な方法がArgo CDのCLIを使うことでしょう。Syncはもちろん、Syncが終わるまで待つWait機能も持つため、CIツールには比較的組み込みやすいでしょう。
+もちろん、APIを直接実行する方法もありますが、ドキュメントもほぼなく自分でSwagger documentを読むことになります。CIツールからの利用という観点なら、CLIで十分でしょう。</p>
+<h2 id="さいごに">さいごに</h2>
+<p>今回は、Argo CDのSyncに関して、実行方法や運用上で考えなければならないことについてまとめました。 引き続き、まだまだArgo CD学習シリーズをやっていきますので、みなさんも頑張りましょう。</p>
+<hr>
+<h5>Argo CD学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2021/04/13/argocd/">Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></li>
+<li>第2回: <a href="/entry/2021/05/06/argocd-application/">Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
+</ul>
+<hr>
     </div>
     <div class="entry-sub-content request-for-entry">
         <h5>フィードバック・相談(β)</h5>
-        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Serverlessconf%20Tokyo%282017%29%e3%81%ab%e5%8f%82%e5%8a%a0%e3%80%82%e3%82%b5%e3%83%bc%e3%83%90%e3%83%ac%e3%82%b9%e3%81%ae%e9%80%b2%e5%8c%96" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Serverlessconf Tokyo(2017)に参加。サーバレスの進化'});">執筆者に問い合わせてみる</a></p>
+        <p>本記事に対して、執筆者にフィードバックや聞きたいことがあればこちらのフォームからご記入ください。<a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=%e7%ac%ac3%e5%9b%9e%3a%20Argo%20CD%e3%80%81Sync%e3%81%ae%e5%ae%9f%e8%a1%8c%e6%96%b9%e6%b3%95%e3%82%84%e3%82%bf%e3%82%a4%e3%83%9f%e3%83%b3%e3%82%b0%e3%81%ab%e3%81%a4%e3%81%84%e3%81%a6%e3%81%ae%e6%a4%9c%e8%a8%8e" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': '第3回: Argo CD、Syncの実行方法やタイミングについての検討'});">執筆者に問い合わせてみる</a></p>
     </div>
     <div class="entry-sub-content post-share">
         <div class="post-share-links">
@@ -261,13 +288,13 @@
       <h3>関連する記事</h3>
       <ul class="list-group">
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2017/05/31/aws_summit_network/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'AWS Summit2017 Day2 ネットワーク設計入門のセッション'});">AWS Summit2017 Day2 ネットワーク設計入門のセッション</a> (2017/05/31)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/06/argocd-application/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ'});">第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ</a> (2021/05/06)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2017/02/20/184220/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'MSPJマイグレーションコンペ 2017に参加。勝つために必要なこと段取り。'});">MSPJマイグレーションコンペ 2017に参加。勝つために必要なこと段取り。</a> (2017/02/20)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Kubernetesのロギングパターンは結局どれを採用したらいいの？'});">Kubernetesのロギングパターンは結局どれを採用したらいいの？</a> (2021/04/18)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2016/10/02/212420/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'サーバーレスとはなにか。クラウドロックインを加速させる一手'});">サーバーレスとはなにか。クラウドロックインを加速させる一手</a> (2016/10/02)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/13/argocd/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '第1回: Argo CD、Operatorでのインストールと主要コンポーネントの解説'});">第1回: Argo CD、Operatorでのインストールと主要コンポーネントの解説</a> (2021/04/13)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/01/24/designing-data-intensive-applications/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '分散システム構築の良書「データ指向アプリケーションデザイン」を動画で解説する'});">分散システム構築の良書「データ指向アプリケーションデザイン」を動画で解説する</a> (2021/01/24)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、interceptorを使ってイベントトリガーを進化させる'});">Tekton、interceptorを使ってイベントトリガーを進化させる</a> (2021/04/08)</li>
         
       </ul>
     </div>
