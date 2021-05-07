@@ -63,6 +63,30 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/" class="entry-title">コンテナイメージを軽くする方法と、その原理原則を考える</a></h1>
+    <div class="entry-sub-title">
+        <span class="">09 Jul 2020, 18:50</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-コンテナ" href="/categories/%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A">コンテナ</a>
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは。もーすけです。<br>
+先日、はじめてラーメン作りに挑戦しました。非常に美味しくできました。
+ラーメン作りにも興味ある方はこちらのブログ（<a href="https://note.com/morisan_life/n/n2f855f8e5a46">初心者のための、家系ラーメン自作 徹底ガイド！</a>）をご参照ください（笑）</p>
+<p>さて本題ですが、はじめてコンテナアプリケーションの開発に挑戦していると覚えることがたくさんあり、楽しさ反面大変さもおそらく感じるかと思います。
+そんな覚えることがたくさんの中には、コンテナイメージは軽くしたほうがいいというものも含まれるかもしれません。
+軽くしないと動かないわけではないので、はじめてコンテナ環境に挑戦している人はどうしても忘れがち、見落としがちなことかもしれません。
+しかし、実際の運用を見据えると、軽量であるほうが断然よいです。<br>
+その理由を理解すると、みなさんが「なぜコンテナに挑戦しているのか」思い出してくるのではないかと思います。</p>
+        <a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2020/07/08/container-image-security/" class="entry-title">コンテナイメージの脆弱性のリスクと対策についてNIST SP 800-190に沿って考える</a></h1>
     <div class="entry-sub-title">
         <span class="">08 Jul 2020, 21:10</span>
@@ -154,6 +178,7 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
 <li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
 <li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
 <li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
 </ul>
 <hr>
 <p><a href="https://twitter.com/mosuke5" target="_blank">もーすけ</a>です。
@@ -271,29 +296,6 @@ Kubernetes Lifeは順調でしょうか？<br>
         <a href="https://blog.mosuke.tech/entry/2020/03/31/kubernetes-resource/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/" class="entry-title">KubernetesにおけるCI/CD実践の勘所まとめ</a></h1>
-    <div class="entry-sub-title">
-        <span class="">04 Mar 2020, 18:14</span>
-        <span class="">By mosuke5</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-            
-                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <p>こんにちは、<a href="https://twitter.com/mosuke5" target="_blank">もーすけ</a>です。<br>
-前回のブログでは「<a href="https://amzn.to/2PraGZ8" target="_blank" onClick="ga('send','event','link','click','to-amz-cloudnativedevops');">Kubernetesで実践するクラウドネイティブDevOps</a>」の書籍を紹介しました。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/02/26/cloud-native-devops/" data-iframely-url="//cdn.iframe.ly/0pYInqQ"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-<p>こちらの反響もよかったこともあり、KubernetesにおけるCI/CD（継続的インテグレーションと継続的デリバリー）に焦点を絞って、いままでの経験も含めて大事なポイントをいくつかの切り口でまとめることにしました。
-一部は書籍の内容とかぶる部分もあるのですが、わたしが普段Kubernetesでのアプリケーション運用に携わる中で大事だと思うことなど含めてご紹介します。
-KubernetesにおけるCI/CDとしていますが、項目は必ずしもKubernetesに限った話ではありませんのでご了承ください。</p>
-<p>また、もっといろんなトピックを書きたいのですが、すべてのトピックを揃えると記事自体のボリュームも大きくなり公開も遅くなりそうだったので、基本的な内容のみ選んでみました。随時追加されていく（あるいは別記事？）可能性があります。</p>
-        <a href="https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
@@ -314,6 +316,8 @@ KubernetesにおけるCI/CDとしていますが、項目は必ずしもKubernet
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討'});">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '第3回: Argo CD、Syncの実行方法やタイミングについての検討'});">第3回: Argo CD、Syncの実行方法やタイミングについての検討</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/06/argocd-application/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ'});">第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
@@ -321,8 +325,6 @@ KubernetesにおけるCI/CDとしていますが、項目は必ずしもKubernet
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？'});">OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetesのロギングパターンは結局どれを採用したらいいの？'});">Kubernetesのロギングパターンは結局どれを採用したらいいの？</a></li>
-      
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/13/argocd/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '第1回: Argo CD、Operatorでのインストールと主要コンポーネントの解説'});">第1回: Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></li>
       
     </ul>
   </div>
@@ -356,7 +358,7 @@ KubernetesにおけるCI/CDとしていますが、項目は必ずしもKubernet
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (48)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (49)</a>
       </li>
       
       <li class="list-group-item">
@@ -430,7 +432,7 @@ KubernetesにおけるCI/CDとしていますが、項目は必ずしもKubernet
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (23)</a>
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (24)</a>
       </li>
       
     </ul>
