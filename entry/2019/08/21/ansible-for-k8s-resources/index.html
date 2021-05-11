@@ -74,6 +74,27 @@
         
     </div>
     <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#kubernetesモジュール">Kubernetesモジュール</a></li>
+    <li><a href="#ansibleでkubernetes上のリソースを管理する">AnsibleでKubernetes上のリソースを管理する</a>
+      <ul>
+        <li><a href="#まずは試す">まずは試す</a></li>
+        <li><a href="#既存のmanifestファイルを利用する">既存のmanifestファイルを利用する</a></li>
+        <li><a href="#templateを使ってmanifestを生成して利用する">Templateを使ってmanifestを生成して利用する</a></li>
+      </ul>
+    </li>
+    <li><a href="#ansibleで管理するメリットについて考える">Ansibleで管理するメリットについて考える</a>
+      <ul>
+        <li><a href="#1-template機能を利用できる">1. Template機能を利用できる</a></li>
+        <li><a href="#2-ansible-vaultを利用してシークレット情報の管理ができる">2. ansible-vaultを利用してシークレット情報の管理ができる</a></li>
+        <li><a href="#3-他の作業の流れに組み込みやすい">3. 他の作業の流れに組み込みやすい</a></li>
+      </ul>
+    </li>
+    <li><a href="#まとめ">まとめ</a></li>
+    <li><a href="#関連情報">関連情報</a></li>
+  </ul>
+</nav>
         <p>お久しぶりです。@mosuke5です。<br>
 Kubernetes上のリソースをどのように管理していますか？
 <code>kubectl apply -f manifest-file.yml</code> のようにkubectlを使うことがまず多いのかなと思います。

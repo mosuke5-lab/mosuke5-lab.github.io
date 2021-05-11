@@ -72,6 +72,20 @@
         
     </div>
     <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#はじめに">はじめに</a></li>
+    <li><a href="#sidecarでデバッグコンテナを起動する">Sidecarでデバッグコンテナを起動する</a>
+      <ul>
+        <li><a href="#pod内のコンテナはnetwork-namespaceを共有する">Pod内のコンテナはNetwork Namespaceを共有する</a></li>
+        <li><a href="#sidecarを起動して実行する">Sidecarを起動して実行する</a></li>
+        <li><a href="#ephemeral-containersエフェメラルコンテナを使う">Ephemeral containers(エフェメラルコンテナ)を使う</a></li>
+        <li><a href="#runasuserを確認しておく">runAsUserを確認しておく</a></li>
+        <li><a href="#デバッグ用コンテナイメージの準備しておく">デバッグ用コンテナイメージの準備しておく</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
         <p>こんにちは、もーすけです。休日はもっぱら住宅購入の検討で忙しいマンです。<br>
 さて、本日は、Kubernetesのアプリケーションのデバッグに関して書きます。</p>
 <p>Kubernetesで運用中のアプリケーションの障害対応で、ネットワーク関連のデバッグをしたいことはよくあります。
