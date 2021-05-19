@@ -63,6 +63,26 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2016/07/26/215939/" class="entry-title">PHPでHTTPヘッダー、x-forwarded-forを受け取る方法</a></h1>
+    <div class="entry-sub-title">
+        <span class="">26 Jul 2016, 21:59</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-アプリケーション開発" href="/categories/%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E9%96%8B%E7%99%BA">アプリケーション開発</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは@mosuke5です。<br>
+もともとApach+PHPで動作していたシステムに、リバースプロキシ（Nginx）を前段に挟むことになりました。理由は、もともと社内ネットワークでのみ利用するシステムだったのですが、インターネットの外からも利用することになり、インターネットからの入り口にリバースプロキシを導入したからです。<br>
+つまり、Nginx-&gt;Apache-&gt;PHPという構成になりました。<br>
+リバースプロキシを導入した際によく問題となることだが、Apacheからみるとすべてリバースプロキシから通信がきているようにみえます。
+接続元のIPアドレスがすべてリバースプロキシのもの変わってしまいます。</p>
+<p>そこで、HTTPヘッダーに接続元のIPアドレス追加しアプリ側（PHP）で受け取る方法とその際の注意点を書きます。</p>
+        <a href="https://blog.mosuke.tech/entry/2016/07/26/215939/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2016/06/04/180122/" class="entry-title">Nginxの仕組みについて入門</a></h1>
     <div class="entry-sub-title">
         <span class="">04 Jun 2016, 18:01</span>
@@ -198,26 +218,6 @@
         <a href="https://blog.mosuke.tech/entry/2015/12/28/150042/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2015/12/17/192554/" class="entry-title">AnsibleとServerspecの実行をRakeタスクにまとめる</a></h1>
-    <div class="entry-sub-title">
-        <span class="">17 Dec 2015, 19:25</span>
-        <span class="">By mosuke5</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-インフラ構築" href="/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E6%A7%8B%E7%AF%89">インフラ構築</a>
-            
-                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <p>こんにちは<a href="https://twitter.com/mosuke5">もーすけ</a>です。<br>
-私が趣味で開発しているシステムでは、Ansibleを使って、サーバ構築からアプリケーションのデプロイまで実行できるように管理しています。
-そして、serverspecを使って、そのサーバに対するインフラテストも行っています。しかし、その運用にいくつか課題点がありました。</p>
-<p>その課題点についてと、課題点へ対策したことについて書きます。</p>
-        <a href="https://blog.mosuke.tech/entry/2015/12/17/192554/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
@@ -238,6 +238,8 @@
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/18/support-brave-bat/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '本ブログが暗号通貨BATの支援受付をサポートしました'});">本ブログが暗号通貨BATの支援受付をサポートしました</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討'});">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '第3回: Argo CD、Syncの実行方法やタイミングについての検討'});">第3回: Argo CD、Syncの実行方法やタイミングについての検討</a></li>
@@ -245,8 +247,6 @@
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/06/argocd-application/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ'});">第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？'});">OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？</a></li>
-      
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetesのロギングパターンは結局どれを採用したらいいの？'});">Kubernetesのロギングパターンは結局どれを採用したらいいの？</a></li>
       
     </ul>
   </div>
@@ -312,7 +312,7 @@
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (10)</a>
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
       </li>
       
       <li class="list-group-item">
@@ -354,7 +354,7 @@
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (24)</a>
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (25)</a>
       </li>
       
     </ul>

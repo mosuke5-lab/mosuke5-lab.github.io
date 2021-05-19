@@ -63,6 +63,35 @@
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
   
+  <h1><a href="https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/" class="entry-title">Docker Hubのダウンロード回数制限の対策を考える</a></h1>
+  <div class="entry-sub-title">
+      <span class="">18 Nov 2020, 17:32</span>
+      <span class="">By mosuke5</span>
+      
+          
+              <a class="badge badge-inf post-category post-category-コンテナ" href="/categories/%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A">コンテナ</a>
+          
+              <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+          
+              <a class="badge badge-inf post-category post-category-ブログ運用" href="/categories/%E3%83%96%E3%83%AD%E3%82%B0%E9%81%8B%E7%94%A8">ブログ運用</a>
+          
+      
+  </div>
+  <div class="entry-content">
+      <p>こんにちは。もーすけです。<br>
+今日は最近開始されたDocker Hubのイメージダウンロードの回数制限について書きたいと思います。
+動向だけはなんとなく追っていたのですが、先日に自分がこの問題に向き合わなければいけないケースに遭遇したため、残しておこうと思い立ちました。</p>
+<h2 id="きっかけ">きっかけ</h2>
+<p>本ブログの記事のビルドやデプロイには<a href="https://app.wercker.com/">Wecker</a>というサービスを利用しています。
+ある日、記事を投稿しようとしたところCIのビルドがコケて記事を投稿できませんでした。
+エラーは以下のとおりで、調べるとDocker Hubのイメージダウンロードの回数制限に引っかかっていることがわかりました。</p>
+<blockquote>
+<p><code>fetch failed to pull image debian: API error (500): {&quot;message&quot;:&quot;toomanyrequests: You have reached your pull rate limit. You may increase the limit by authenticating and upgrading: https://www.docker.com/increase-rate-limit&quot;}</code></p>
+</blockquote>
+<p><img src="/image/wercker-docker-rate-limit-error.png" alt="docker-rate-limit-error"></p>
+      <a href="https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/">続きを読む</a>
+  </div>
+  
   <h1><a href="https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/" class="entry-title">【翻訳】Kubernetes as a serviceの謎を解く。Alibaba Cloudが1万個のKubernetesクラスタを管理する方法</a></h1>
   <div class="entry-sub-title">
       <span class="">17 Nov 2020, 17:24</span>
@@ -239,27 +268,6 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
       <a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/">続きを読む</a>
   </div>
   
-  <h1><a href="https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/" class="entry-title">Sock Shopを使ったサービスメッシュ体験のハンズオン</a></h1>
-  <div class="entry-sub-title">
-      <span class="">01 Jul 2020, 23:00</span>
-      <span class="">By mosuke5</span>
-      
-          
-              <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-          
-              <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
-          
-      
-  </div>
-  <div class="entry-content">
-      <p>おひさしぶりです。もーすけです。<br>
-あっという間に６月が終わってしまい、６月はブログが書けませんでしたが、ブログで書きたいなと思うネタはいくつかありますので、時間のすきをみつけて書いていきたいと思います。</p>
-<p>以前に、Sock Shopを使ったマイクロサービスのハンズオン体験についてのブログを書きました。
-このネタに、Istioを使ったサービスメッシュを適応するハンズオンを追加したのでお知らせします。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/01/22/sockshop/" data-iframely-url="//cdn.iframe.ly/YDI2rVR"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-      <a href="https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/">続きを読む</a>
-  </div>
-  
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
@@ -280,6 +288,8 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/18/support-brave-bat/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '本ブログが暗号通貨BATの支援受付をサポートしました'});">本ブログが暗号通貨BATの支援受付をサポートしました</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討'});">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '第3回: Argo CD、Syncの実行方法やタイミングについての検討'});">第3回: Argo CD、Syncの実行方法やタイミングについての検討</a></li>
@@ -287,8 +297,6 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/06/argocd-application/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ'});">第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？'});">OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？</a></li>
-      
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetesのロギングパターンは結局どれを採用したらいいの？'});">Kubernetesのロギングパターンは結局どれを採用したらいいの？</a></li>
       
     </ul>
   </div>
@@ -354,7 +362,7 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (10)</a>
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
       </li>
       
       <li class="list-group-item">
@@ -396,7 +404,7 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (24)</a>
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (25)</a>
       </li>
       
     </ul>
