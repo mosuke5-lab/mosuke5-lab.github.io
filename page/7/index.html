@@ -63,6 +63,27 @@
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
   
+  <h1><a href="https://blog.mosuke.tech/entry/2019/07/19/alibaba-private-zone/" class="entry-title">Alibaba CloudでのPrivate DNS(PrivateZone)の仕様と用途の解説</a></h1>
+  <div class="entry-sub-title">
+      <span class="">19 Jul 2019, 18:24</span>
+      <span class="">By mosuke5</span>
+      
+          
+              <a class="badge badge-inf post-category post-category-Alibaba Cloud" href="/categories/alibaba-cloud">Alibaba Cloud</a>
+          
+      
+  </div>
+  <div class="entry-content">
+      <p>お疲れ様です。mosuke5です。<br>
+Alibaba Cloudのプライベートの名前解決機能である、<a href="https://www.alibabacloud.com/products/private-zone" target="_bkank">PrivateZone</a>の仕様とその用途について解説していきます。</p>
+<h2 id="privatezoneとは">PrivateZoneとは</h2>
+<p>Alibaba CloudにはDNSのサービスがあり、インターネットからのアクセスに対しては昔から名前解決をすることができました。
+しかし、VPC内部でだけ使うプライベートアドレスに対しての名前解決については今までできませんでした。
+PrivateZoneは、VPC内部だけで使えるDNSです。
+この機能により、VPC内部でのシステム間の連携やサーバ管理などが楽になります。</p>
+      <a href="https://blog.mosuke.tech/entry/2019/07/19/alibaba-private-zone/">続きを読む</a>
+  </div>
+  
   <h1><a href="https://blog.mosuke.tech/entry/2019/07/12/sidecar-fluentd-to-cloudwatchlogs/" class="entry-title">Sidecar方式のFluentdでCloudWatch logsへログを集約することについての検討</a></h1>
   <div class="entry-sub-title">
       <span class="">12 Jul 2019, 12:57</span>
@@ -258,32 +279,6 @@ Kubernetes上でのアプリケーションのロギングについてFluentdを
       <a href="https://blog.mosuke.tech/entry/2019/03/26/terraform-integrated-with-ansible/">続きを読む</a>
   </div>
   
-  <h1><a href="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/" class="entry-title">Kubernetes上のリソースをTerraformで管理するメリットとデメリット</a></h1>
-  <div class="entry-sub-title">
-      <span class="">07 Mar 2019, 01:06</span>
-      <span class="">By mosuke5</span>
-      
-          
-              <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-          
-              <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
-          
-      
-  </div>
-  <div class="entry-content">
-      <p>@mosuke5です。早くも3月になってしまいました。<br>
-しかし、個人的にはこの2か月は非常に動きがあった2か月でしたのでいろいろ楽しかったです。</p>
-<p>さて、本題ですが、、<br>
-わたしの好きなTerraformを使ってKubernetesクラスタ上のリソースを管理するのをやってみたいと思います。<br>
-そもそもKubernetesをTeraformで管理するとなると2つのレイヤーの話があります。
-今回は、後者のほうに重きを置いてお伝えします。</p>
-<ol>
-<li>KubernetesクラスターそのものをTerraformで管理する</li>
-<li>Kubernetesクラスター上のリソースをTerraformで管理する</li>
-</ol>
-      <a href="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/">続きを読む</a>
-  </div>
-  
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
@@ -304,6 +299,8 @@ Kubernetes上でのアプリケーションのロギングについてFluentdを
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/06/06/competing-with-unicorns/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「ユニコーン企業のひみつ」を読んで、我々はなにをすればいいのだろうか？'});">「ユニコーン企業のひみつ」を読んで、我々はなにをすればいいのだろうか？</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/18/support-brave-bat/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '本ブログが暗号通貨BATの支援受付をサポートしました'});">本ブログが暗号通貨BATの支援受付をサポートしました</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討'});">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討</a></li>
@@ -311,8 +308,6 @@ Kubernetes上でのアプリケーションのロギングについてFluentdを
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '第3回: Argo CD、Syncの実行方法やタイミングについての検討'});">第3回: Argo CD、Syncの実行方法やタイミングについての検討</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/06/argocd-application/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ'});">第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
-      
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？'});">OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？</a></li>
       
     </ul>
   </div>
@@ -342,7 +337,7 @@ Kubernetes上でのアプリケーションのロギングについてFluentdを
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (28)</a>
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (29)</a>
       </li>
       
       <li class="list-group-item">
@@ -420,7 +415,7 @@ Kubernetes上でのアプリケーションのロギングについてFluentdを
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (25)</a>
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (26)</a>
       </li>
       
     </ul>
