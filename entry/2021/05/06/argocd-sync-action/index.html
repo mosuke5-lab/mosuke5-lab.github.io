@@ -130,7 +130,7 @@ Gitレポジトリを修正してから3分以内で、Kubernetesクラスタへ
 <p>それぞれの特徴を考えてみましょう。<br>
 まずは、1.のWebhookで直接Argo CDのSync処理をトリガーさせる場合です。
 なんといっても、余計なCIパイプラインを作る必要がなくなるのでシンプルに構成がまとまるでしょう。
-一方で、Sync以外の処理をさせたい場合の考え方がことなってきます。Argo CDには、<a href="https://argoproj.github.io/argo-cd/user-guide/sync-waves/">Sync Phases and Waves</a>という機能があって、Syncの前後で任意の処理を挟んだり、Syncの順番をある程度コントロールできます。
+一方で、Sync以外の処理をさせたい場合の考え方がことなってきます。Argo CDには、<a href="https://argoproj.github.io/argo-cd/user-guide/resource_hooks/">Resource Hooks</a>や<a href="https://argoproj.github.io/argo-cd/user-guide/sync-waves/">Sync Phases and Waves</a>という機能があって、Syncの前後で任意の処理を挟んだり、Syncの順番をある程度コントロールできます。
 つまり、WebhookでArgo CDに通知してしまった以上、<strong>それ以降の処理はArgo CD側で頑張る</strong>ことが必要です。</p>
 <p>もし、2.のCIパイプラインを用いた場合は、もっと柔軟にSync前後の処理を行うことができると考えます。
 結合テストだったり、負荷テスト、任意の業務処理それらを<strong>Argo CDと切り離して実装できる</strong>ので効率がいいと思います。</p>
