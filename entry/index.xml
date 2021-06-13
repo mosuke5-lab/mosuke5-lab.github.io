@@ -6,7 +6,31 @@
     <description>Recent content in Entries on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sun, 06 Jun 2021 18:40:35 +0900</lastBuildDate><atom:link href="https://blog.mosuke.tech/entry/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 12 Jun 2021 18:24:10 +0900</lastBuildDate><atom:link href="https://blog.mosuke.tech/entry/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Argo CD、Resource Hooksを使ってデプロイを高度化する</title>
+      <link>https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/</link>
+      <pubDate>Sat, 12 Jun 2021 18:24:10 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/</guid>
+      <description>&lt;hr&gt;
+&lt;h5&gt;Argo CD学習シリーズ&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
+Argo CD学習シリーズをやっていきます。
+今回は、Argo CDのResource Hooksという仕組みについて解説します。
+前回にやったArgo CDのSyncと密接に関連するトピックです。
+運用レベルでArgo CDを使っていく場合、避けて通れない内容になってきます。
+Argo CDを使った本格運用に向けて学んでいきましょう。&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>「ユニコーン企業のひみつ」を読んで、我々はなにをすればいいのだろうか？</title>
       <link>https://blog.mosuke.tech/entry/2021/06/06/competing-with-unicorns/</link>
@@ -72,6 +96,7 @@
 &lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
@@ -93,6 +118,7 @@ Argo CD学習シリーズどんどんやっていきます。
 &lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
@@ -136,6 +162,7 @@ Argo CD学習シリーズの続きを行っていきたいと思います。
 &lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
