@@ -398,7 +398,24 @@ Prometheusでは <code>Alertmanager</code> というコンポーネントがア�
 以下のスクリーンショットのように <code>namespace = my-app</code> とすることで、my-app namespace内で作成された<code>PrometheusRule</code>と紐づきNamespace毎に通知先を選べます。複数のチームがOpenShiftを利用していても通知先をある程度固定できます。
 ただし、Namespaceごとではクラスタ管理者の管理も難しいので、チームごとに利用できるよう <code>team = &lt;任意のID&gt;</code> としてIDをチーム側に知らせることなど運用の工夫が考えられそうです。</p>
 <p><img src="/image/openshift-user-defined-prometheus-alertmanager.png" alt="openshift-user-defined-prometheus-alertmanager"></p>
-<h2 id="アーキテクチャ図">アーキテクチャ図</h2>
+<p><code>Routing Labels</code>に使用できるラベルは、<code>PrometheusRule</code>を記述したときに設定した<code>labels</code>と対応します。以下であれば、<code>severity=warning</code>, <code>type=hoge</code>, <code>foo=bar</code>のラベルと、<code>namespace=xxxx</code>が付きます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># alert.yaml</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">monitoring.coreos.com/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PrometheusRule</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-alert</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">groups</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-down</span>
+      <span style="color:#f92672">rules</span>:
+        - <span style="color:#f92672">alert</span>: <span style="color:#ae81ff">NginxPartiallyDown</span>
+          <span style="color:#f92672">expr</span>: <span style="color:#ae81ff">sum(nginx_up) &lt; 3</span>
+          <span style="color:#f92672">for</span>: <span style="color:#ae81ff">0m</span>
+          <span style="color:#f92672">labels</span>:
+            <span style="color:#f92672">severity</span>: <span style="color:#ae81ff">warning</span>
+            <span style="color:#f92672">type</span>: <span style="color:#ae81ff">hoge</span>
+            <span style="color:#f92672">foo</span>: <span style="color:#ae81ff">bar</span>
+</code></pre></div><h2 id="アーキテクチャ図">アーキテクチャ図</h2>
 <p>ここまでいろいろ検証してきて、ドキュメントに記載してあったアーキテクチャ図が理解できるようになってきました。
 簡単ですが、ポイントを書き込んだので理解の深堀りに使ってください。</p>
 <p><img src="/image/openshift-user-defined-prometheus-architecture.png" alt="openshift-user-defined-prometheus-architecture"></p>
