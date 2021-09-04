@@ -66,6 +66,33 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2021/03/01/openshift-add-user-ca/" class="entry-title">OpenShiftでCA証明書を追加することについての検証</a></h1>
+    <div class="entry-sub-title">
+        <span class="">01 Mar 2021, 18:47</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。<br>
+最近検証したOpenShiftへのCA証明書を追加することについてです。
+どういうケースでCA証明書の追加が必要かというと、自己証明書で運用されているレジストリとかプロキシに接続しなければいけないケースなどです。
+たとえば以下のようなケースでしょうか。</p>
+<ol>
+<li>非インターネット環境でのOpenShiftのインストールでミラーレジストリを構築した場合（ミラーレジストリの証明書が必要なケース）</li>
+<li>OpenShift外にプライベートのコンテナレジストリを構築していて使っている場合（上とほぼ同義）</li>
+<li>インターネットに出るのにプロキシを経由する必要があり、その証明書が必要な場合</li>
+<li>社内のセキュリティでTLS復号化装置（SSL可視化ソリューションとかよばれるもの）を導入しており、その機器の証明書をインストールしなければならない場合</li>
+</ol>
+<p>このときの証明書の追加の動きについて確認したので見ていきたいと思います。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/03/01/openshift-add-user-ca/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/" class="entry-title">Jaegerを使った分散トレーシングの検証 on Kubernetes (1)</a></h1>
     <div class="entry-sub-title">
         <span class="">08 Feb 2021, 17:04</span>
@@ -282,28 +309,6 @@
         <a href="https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2020/10/10/develop-ansible-operator/" class="entry-title">OperatorSDK for Ansible の開発。チュートリアルの次の一歩</a></h1>
-    <div class="entry-sub-title">
-        <span class="">10 Oct 2020, 14:06</span>
-        <span class="">By mosuke5</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <p>こんにちは、もーすけです。<br>
-本日は、Kubernetes Operatorの開発に関する情報提供をしたいと思います。
-Operatorってなに？ってかたやより内部実装を学びたい方はぜひこちらの書籍（<a href="https://amzn.to/34SwsvS">実践入門 Kubernetesカスタムコントローラーへの道</a>）を参考にしてください。</p>
-<p>Operator開発にはOperatorSDKを利用するのが非常に便利です。Go, Ansible, Helmなどを用いて開発できるのですが、今回はAnsibleを使ったOperatorについて書きます。
-OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメントのチュートリアルを実施したあとに何をすればいいのか？とっつきにくいさもあります。
-というわけで、このブログでは、チュートリアル後に何をすればいいか？どんなことを確認していけばいいのか？という観点でまとめてみましたので、ぜひ参考にしてOperator開発を楽しんでください。</p>
-<p>まだチュートリアルをやっていないよ、というかたはこちらから済ましてみましょう。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://sdk.operatorframework.io/docs/building-operators/ansible/tutorial/" data-iframely-url="//cdn.iframe.ly/2QAR3qE"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-        <a href="https://blog.mosuke.tech/entry/2020/10/10/develop-ansible-operator/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
@@ -324,6 +329,8 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
     <h3>最近の記事</h3>
     <ul class="list-group">
       
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/09/04/alibabacloud-image-cache/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Alibaba Cloud, Kubernetesのイメージキャッシュ機能を検証する'});">Alibaba Cloud, Kubernetesのイメージキャッシュ機能を検証する</a></li>
+      
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/08/31/openshift-add-static-route/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、スタティックルートの追加方法と確認事項について'});">OpenShift、スタティックルートの追加方法と確認事項について</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/08/26/kubernetes-externalname-service/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetes、ExternalName Serviceの検証と利用時の注意事項'});">Kubernetes、ExternalName Serviceの検証と利用時の注意事項</a></li>
@@ -331,8 +338,6 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
       <li class="list-group-item"><a href="https://blog.mosuke.tech/work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '仕事依頼、相談について'});">仕事依頼、相談について</a></li>
       
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/07/21/sre/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'SREは何を目指せばいいか？Google流から大事なことを学ぼう。'});">SREは何を目指せばいいか？Google流から大事なことを学ぼう。</a></li>
-      
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/07/03/ali-alb/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Alibaba CloudのALBとは？AWSのALBとの違い'});">Alibaba CloudのALBとは？AWSのALBとの違い</a></li>
       
     </ul>
   </div>
@@ -354,7 +359,7 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
     <ul class="list-group">
       
       <li class="list-group-item">
-        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (13)</a>
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (14)</a>
       </li>
       
       <li class="list-group-item">
@@ -366,7 +371,7 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
       </li>
       
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (51)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (52)</a>
       </li>
       
       <li class="list-group-item">
@@ -440,7 +445,7 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
       </li>
       
       <li class="list-group-item">
-        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (31)</a>
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (32)</a>
       </li>
       
     </ul>
