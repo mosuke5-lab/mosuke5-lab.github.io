@@ -85,7 +85,7 @@
         <li><a href="#サポートプロトコル">サポートプロトコル</a></li>
         <li><a href="#高度なルーティング">高度なルーティング</a></li>
         <li><a href="#課金体系">課金体系</a></li>
-        <li><a href="#kubernetes連携はこれから">Kubernetes連携はこれから</a></li>
+        <li><a href="#kubernetes連携">Kubernetes連携</a></li>
       </ul>
     </li>
     <li><a href="#まとめ">まとめ</a></li>
@@ -314,9 +314,12 @@ ALBとCLBの違いはドキュメントにまとまっていませんが、以�
 <p>ALBでは、主にCU料金と帯域幅料金が追加されていることがわかります。
 帯域幅料金はインターネットに対するものなので、Private NetworkのALBであればかかりません。</p>
 <p>このCU料金がなにものかというと、「新規コネクション数」「同時接続数」「処理トラフィック量」「ルール数」といった複数の指標をもとに計算されるものです。CLBでは、パフォーマンス確保型インスタンスと、ある程度トラフィック需要見込んだインスタンスの準備が必要でした。このあたりが、より現代のビジネスシナリオに対応してきたという感じです。</p>
-<h3 id="kubernetes連携はこれから">Kubernetes連携はこれから</h3>
+<h3 id="kubernetes連携">Kubernetes連携</h3>
 <p>ちなみに、Container Service for Kubernetesでは、SLB Ingress Controllerが用意されており、IngressにSLBを利用できます。しかし、現時点で国際版では、このIngress ControllerにはCLBが利用されます。前に述べたとおり、CLBはドメインやパスベースルーティングが可能であり、コンテナの世界でも十分使えてしまうということです。</p>
-<p>おそらく、今後Ingress ControllerはALBに移行していくとは思います。</p>
+<p><strike>おそらく、今後Ingress ControllerはALBに移行していくとは思います。</strike></p>
+<p>【2021/9/6追記】<br>
+2021年8月よりALB Ingress Controllerが追加されました（<a href="https://www.alibabacloud.com/help/doc-detail/283329.htm">ドキュメント</a>）。
+Serverless Kubernetesを用いて検証しました。Serverless Kubernetesの所属するvswitchを自動で検出することはなく、Ingressリソースにvswitch idsを記載しなければならない点が少し使いづらくもありますが、期待通りにALB対応もしておきました。</p>
 <h2 id="まとめ">まとめ</h2>
 <p>今回は、Alibaba CloudがリリースしたALBをAWSのものと比較しながら確認してきました。
 個人的には、Container Service for Kubernetesでの、SLB Ingress Controllerでの対応を楽しみにしています。
