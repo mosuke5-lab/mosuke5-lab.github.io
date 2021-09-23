@@ -120,7 +120,7 @@ Kubernetesにおけるログ管理については以前もブログを書いて�
 <h3 id="実験">実験</h3>
 <p>実験用に、ログを大量に出力するコンテナを準備します。<br>
 今回は以下を用いました。ループで&quot;RandomString&quot;を出力するだけのコンテナです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e">#logtest.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e">#logtest.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
 <span style="color:#f92672">metadata</span>:
@@ -143,7 +143,7 @@ Kubernetesにおけるログ管理については以前もブログを書いて�
           <span style="color:#f92672">args</span>: [<span style="color:#e6db74">&#34;sh&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;i=1; while [ $i -le 10000 ]; do j=1; while [ $j -le 2000 ]; do echo RandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomString; j=$(( j+1 )); done; sleep 1; i=$(( i+1 )); done&#34;</span>]
 </code></pre></div><p>デプロイし、Podがスケジュールされたノード名を確認します。
 <code>ip-10-0-166-31.ap-southeast-1.compute.internal</code>でPodが動作していることが確認できました。後ほどノードにアクセスしてログファイルを確認します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% kubectl apply -f logtest.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% kubectl apply -f logtest.yaml
 deployment.apps/debug created
 
 % kubectl get pod -w -o wide
@@ -156,7 +156,7 @@ RandomStringRandomStringRandomStringRandomString...
 </code></pre></div><p>では、ノードにアクセスしてファイルを確認します。<br>
 Podのログは<code>/var/log/pods/xxx</code>に配置されています。
 <code>ls -lh</code>を何度か打って、状況を確認しましょう。後ほど動画も掲載します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">以下ノード内
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">以下ノード内
 sh-4.4# cd /var/log/pods/default_debug-5cf4c8b545-jxx65_eef7dd8e-5df1-4861-920c-90fd8788b8f9/debug
 sh-4.4# pwd
 /var/log/pods/default_debug-5cf4c8b545-jxx65_eef7dd8e-5df1-4861-920c-90fd8788b8f9/debug
@@ -206,7 +206,7 @@ total 17M
 ソースコードは、難しくなく概ね予想通りでありました。</p>
 <p>まず、Kubeletのログ管理ですが、10秒間隔（<code>logMonitorPeriod = 10 * time.Second</code>）で動作していることを確認できます。ファイルに付けられたタイムスタンプがきれいに10秒おきになっているのが理解できます。（<a href="https://github.com/kubernetes/kubernetes/blob/release-1.21/pkg/kubelet/logs/container_log_manager.go#L178-L186">該当ソースコード</a>）<br>
 ループで実行しているのは<code>rotateLogs()</code>になります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">const</span> (
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">const</span> (
 	<span style="color:#75715e">// logMonitorPeriod is the period container log manager monitors
 </span><span style="color:#75715e"></span>	<span style="color:#75715e">// container logs and performs log rotation.
 </span><span style="color:#75715e"></span>	<span style="color:#a6e22e">logMonitorPeriod</span> = <span style="color:#ae81ff">10</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>
@@ -232,7 +232,7 @@ total 17M
 }
 </code></pre></div><p><code>rotateLogs()</code>を見てみましょう。<br>
 <code>c.policy.MaxSize</code> が <code>containerLogMaxSize</code> の値になりますが、ログファイルのサイズがそれ以上だった場合に <code>rotateLog()</code> を実行しているようです。（<a href="https://github.com/kubernetes/kubernetes/blob/release-1.21/pkg/kubelet/logs/container_log_manager.go#L254-L261">該当ソースコード</a>）</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">containerLogManager</span>) <span style="color:#a6e22e">rotateLogs</span>() <span style="color:#66d9ef">error</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">containerLogManager</span>) <span style="color:#a6e22e">rotateLogs</span>() <span style="color:#66d9ef">error</span> {
 
     <span style="color:#75715e">//...
 </span><span style="color:#75715e"></span>
@@ -267,7 +267,7 @@ total 17M
 </ul>
 </li>
 </ol>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">containerLogManager</span>) <span style="color:#a6e22e">rotateLog</span>(<span style="color:#a6e22e">id</span>, <span style="color:#a6e22e">log</span> <span style="color:#66d9ef">string</span>) <span style="color:#66d9ef">error</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">containerLogManager</span>) <span style="color:#a6e22e">rotateLog</span>(<span style="color:#a6e22e">id</span>, <span style="color:#a6e22e">log</span> <span style="color:#66d9ef">string</span>) <span style="color:#66d9ef">error</span> {
 	<span style="color:#75715e">// pattern is used to match all rotated files.
 </span><span style="color:#75715e"></span>	<span style="color:#a6e22e">pattern</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;%s.*&#34;</span>, <span style="color:#a6e22e">log</span>)
 	<span style="color:#a6e22e">logs</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">filepath</span>.<span style="color:#a6e22e">Glob</span>(<span style="color:#a6e22e">pattern</span>)
@@ -303,7 +303,7 @@ total 17M
 }
 </code></pre></div><h2 id="openshiftユーザ向け">OpenShiftユーザ向け</h2>
 <p>OpenShiftを使っている人は、Kubeletの設定は<code>KubeletConfig</code>リソースを用いてKubeletの設定を書き変えられます。今回は次の設定を投入しました。KubeletConfigを追加すると、MachineConfigOperatorが各ノードに設定を配置してくれます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">machineconfiguration.openshift.io/v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">machineconfiguration.openshift.io/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">KubeletConfig</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">set-my-conf</span>

@@ -86,13 +86,13 @@ SSHとかhttpdは利用される頻度が非常に高いので、今回はFTPd�
 その他の候補だと、<a class="keyword" href="http://d.hatena.ne.jp/keyword/telnet">telnet</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/POP3">POP3</a>などのサービスも検討していた。</p>
 <p>※本来論でいうと複数のサービスをxinetdで管理対象とするからこそ意味があるので注意。</p>
 <p>まずはxinetdとvsftpをインストール</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo yum install xinetd vsftpd 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo yum install xinetd vsftpd 
 </code></pre></div><p><br>
 xinetdどうこうの前に、<a class="keyword" href="http://d.hatena.ne.jp/keyword/ftp">ftp</a>接続がきちんとできるか確認するのでサービスを起動。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo service vsftpd start 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo service vsftpd start 
 </code></pre></div><p><br>
 ローカルPCから接続できることを確認。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ftp 192.168.33.10
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ftp 192.168.33.10
 Connected to 192.168.33.10.
 220 (vsFTPd 2.2.2)
 Name (192.168.33.10:username): 
@@ -102,7 +102,7 @@ xinetdで管理する各サービスの設定は/etc/xinetd.d/配下に書く。
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/ftp">ftp</a>の設定を以下の通りにした。<br>
 "service"のあとに書くサービス名称は/etc/servicesに定義されているものを記載する。<br>
 vsftpとか書いても動かないので注意。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo vim /etc/xinetd.d/ftp
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo vim /etc/xinetd.d/ftp
 service ftp
 {
         disable         = no
@@ -116,7 +116,7 @@ service ftp
 </code></pre></div><p>設定項目については以下参照。<br>
 <a href="https://www.express.nec.co.jp/linux/distributions/knowledge/network/xinetd.html">xinetd の設定</a></p>
 <p>これでxinetdを起動</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo service xinetd start 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo service xinetd start 
 </code></pre></div><h3>(補足) /etc/servicesってなにもの？</h3>
 <p>/etc/servicesがなにか気になったので一応調べると。</p>
 <blockquote><p>サービス名とそこで使われるポート番号、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB">プロトコル</a>(<a class="keyword" href="http://d.hatena.ne.jp/keyword/tcp">tcp</a>/<a class="keyword" href="http://d.hatena.ne.jp/keyword/udp">udp</a>)との 対応関係を記述したファイルが /etc/services です。
@@ -124,23 +124,23 @@ service ftp
 (<a href="http://www.wakhok.ac.jp/~kanayama/summer/02/site/node43.html">http://www.wakhok.ac.jp/~kanayama/summer/02/site/node43.html</a>)</p></blockquote>
 <h2>3. xinetdを使ってFTPで接続してみる</h2>
 <p>xinetdが<b>"起動している"</b>ことと、vsftpdが<b>"起動していない"</b>ことを確認しておく。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo service xinetd status
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo service xinetd status
 xinetd (pid  3521) is running...
 
 $ sudo service vsftpd status
 vsftpd is stopped 
 </code></pre></div><p><br>
 ローカルPCから<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>接続をしてみるが、すぐにコネクションが切られた。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ftp 192.168.33.10
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ftp 192.168.33.10
 Connected to 192.168.33.10.
 421 Service not available, remote server has closed connection. 
 </code></pre></div><p>syslogを確認してみると接続できているようだがその後すぐに切断されているようにみえる。vsftpd側の設定を疑ってみることにした。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo tail /var/log/message
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo tail /var/log/message
 Jan  1 15:07:25 server xinetd[3335]: START: ftp pid=3337 from=::ffff:192.168.33.1
 Jan  1 15:07:28 server xinetd[3335]: EXIT: ftp status=1 pid=3337 duration=3(sec) 
 </code></pre></div><h2>4. vsftpdの設定</h2>
 <p>vsftpd側で以下の設定をいじる必要があった。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo vim /etc/vsftpd/vsftpd.conf
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo vim /etc/vsftpd/vsftpd.conf
 listen=NO
  
 </code></pre></div><p>vsftpdのlistenの設定は以下のとおり。</p>
@@ -150,14 +150,14 @@ inetd や後述の <a class="keyword" href="http://d.hatena.ne.jp/keyword/tcpser
 (<a href="http://www.asahi-net.or.jp/~aa4t-nngk/ftpd.html">http://www.asahi-net.or.jp/~aa4t-nngk/ftpd.html</a>)</p></blockquote>
 <h2>5. <a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>接続の再チャレンジ</h2>
 <p>ローカルPCから再度<a class="keyword" href="http://d.hatena.ne.jp/keyword/FTP">FTP</a>接続を試みる。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ftp 192.168.33.10
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ftp 192.168.33.10
 Connected to 192.168.33.10.
 220 (vsFTPd 2.2.2)
 Name (192.168.33.10:username): 
 </code></pre></div><p>無事につながった！<br>
 <span style="font-size: 150%"><b>vsftpdサービスを停止しているのに<a class="keyword" href="http://d.hatena.ne.jp/keyword/ftp">ftp</a>接続ができる！</b></span></p>
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/ftp">ftp</a>接続前と接続中、接続後でプロセスを確認してみる。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&gt; 接続前
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&gt; 接続前
 $ ps -ef | grep ftp
 vagrant   3552  2742  0 16:17 pts/0    00:00:00 grep ftp
 
@@ -173,7 +173,7 @@ $ ps -ef | grep ftp
 vagrant   3552  2742  0 16:17 pts/0    00:00:00 grep ftp 
 </code></pre></div><p><br>
 プロセスツリーを見てみると、xinetdプロセスがvsftpdを起動していることがわかる。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&gt; 接続前
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&gt; 接続前
 $ pstree -p
 init(1)-+-VBoxService(1003)-+-{VBoxService}(1004)
         |

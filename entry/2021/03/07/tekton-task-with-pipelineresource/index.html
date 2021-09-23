@@ -160,7 +160,7 @@ PipelineResourceは、Task内のStepで利用する入力や出力の場所を�
 今回は、GitタイプのPipelineResourceを利用するとどのような挙動するのか確認してみます。</p>
 <p>用意したマニフェストは以下の通りです。
 Taskは、内部の挙動を確認するため、わざと<code>sleep 3600</code>するwait stepを置きました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># my-git-resource.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># my-git-resource.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1alpha1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PipelineResource</span>
 <span style="color:#f92672">metadata</span>:
@@ -172,7 +172,7 @@ Taskは、内部の挙動を確認するため、わざと<code>sleep 3600</code
       <span style="color:#f92672">value</span>: <span style="color:#ae81ff">https://github.com/mosuke5/hugo-blog.mosuke.tech</span>
     - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">revision</span>
       <span style="color:#f92672">value</span>: <span style="color:#ae81ff">master</span>
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># my-task-with-pipelineresource.yaml</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># my-task-with-pipelineresource.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Task</span>
 <span style="color:#f92672">metadata</span>:
@@ -187,7 +187,7 @@ Taskは、内部の挙動を確認するため、わざと<code>sleep 3600</code
       <span style="color:#f92672">image</span>: <span style="color:#ae81ff">ubuntu</span>
       <span style="color:#f92672">command</span>: [<span style="color:#e6db74">&#34;sleep&#34;</span>]
       <span style="color:#f92672">args</span>: [<span style="color:#e6db74">&#34;3600&#34;</span>]
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># my-task-with-pipelineresource-run.yaml</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># my-task-with-pipelineresource-run.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">TaskRun</span>
 <span style="color:#f92672">metadata</span>:
@@ -201,7 +201,7 @@ Taskは、内部の挙動を確認するため、わざと<code>sleep 3600</code
   <span style="color:#f92672">taskRef</span>:
     <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-task-with-pipelineresource</span>
 </code></pre></div><p>準備ができたら、実行して中身を確認します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f my-git-resource.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f my-git-resource.yaml
 pipelineresource.tekton.dev/my-git-resource created
 
 $ kubectl apply -f my-task-with-pipelineresource.yaml
@@ -219,7 +219,7 @@ my-task-with-pipelineresource-run-pod-jfkrl         2/2     Running           0 
 確認するとわかるのですが、Task内に書いたStepの他に、<code>name: step-git-source-src-shnpk</code>というコンテナが追加されています。
 こちらは、Tektonが追加したコンテナで、PipelineResourceで指定したリソースをGitレポジトリからダウンロードしてくる処理（<code>/workspace/src</code>にダウンロード）を行っています。
 Step間は、EmptyDirで共有されているので、後続の処理で同じソースコードを活用していくことができます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod my-task-with-pipelineresource-run-pod-jfkrl -o yaml | less
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod my-task-with-pipelineresource-run-pod-jfkrl -o yaml | less
 ...
 spec:
   containers:
@@ -249,7 +249,7 @@ spec:
 ...
 </code></pre></div><p>コンテナ内部を軽く確認してみましょう。<br>
 PipelineResourceで指定したGitレポジトリ（今回の場合は本ブログのGitレポジトリ）がダウンロードされていることが確認できます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% kc exec -it my-task-with-pipelineresource-run-pod-jfkrl -c step-wait -- /bin/bash
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% kc exec -it my-task-with-pipelineresource-run-pod-jfkrl -c step-wait -- /bin/bash
 root@my-task-with-pipelineresource-run-pod-jfkrl:/workspace# ls -l
 total 4
 drwxr-xr-x 8 root root 4096 Mar  7 06:47 src

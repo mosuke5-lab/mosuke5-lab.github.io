@@ -112,7 +112,7 @@ ClusterTaskに登録したTaskは、全Namespaceから参照して利用する�
 もう少し具体的に言うと、第7回でカタログからgit-cloneのTaskを使いましたが、このTaskは別のNamespaceでも利用し得るのでClusterTaskに切り替えて登録が可能ということです。実際にやってみましょう。</p>
 <p>カタログではTaskとして登録されています。
 しかし、ClusterTaskに書き換えてすぐに利用できるということです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/tektoncd/catalog
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/tektoncd/catalog
 $ cd catalog/task/git-clone/0.2/
 $ ls -l 
 total 24
@@ -135,7 +135,7 @@ metadata:
 spec:
   ...
 </code></pre></div><p><code>kind: Task</code>から<code>kind: ClusterTask</code>に切り替えて、クラスタに登録します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ vim git-clone.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ vim git-clone.yaml
 apiVersion: tekton.dev/v1beta1
 #kind: Task
 kind: ClusterTask  # &lt;-ClusterTaskに変更した
@@ -157,7 +157,7 @@ $ kubectl get clustertask
 NAME        AGE
 git-clone   4s
 </code></pre></div><p>利用するときには、<code>spec.tasks[].taskRef.kind = ClusterTask</code>とする必要があります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pipeline</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-image-pipeline</span>

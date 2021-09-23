@@ -145,7 +145,7 @@ Kubernetesには、Pod Lifecycle Event Generator(PLEG)を使用したKubernetes 
 <p>アプリケーションのテストに、外部コンポーネント（RDBなど）が必要になる場合は、テスト用に常時稼働のDBを用意するのではなく、パイプライン毎に個別のDBを起動できるようにしておくといいでしょう。<br>
 Jenkinsを使う場合、テストを実行するJenkins SlaveのPodのサイドカーとしてMySQLなどのDBを起動することなどができます。
 テストを実行するPod内にMySQLなどのDBを起動することで、アプリケーションからはローカルホストへの接続でDBを利用できるようになります。(下記はJenkinsfileの例)</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">podTemplate(
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">podTemplate(
   cloud: &#39;kubernetes&#39;,
   label: &#39;jenkins-slave-ruby&#39;,
   serviceAccount: &#39;jenkins&#39;,

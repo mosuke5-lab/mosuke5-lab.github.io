@@ -136,7 +136,7 @@
 <h3>(実装案１) SQL側で頑張る</h3>
 <p>まず、データを取り出す際に<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>で頑張ることを思いつくはずだ。<br>
 例えば以下みたいに。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">select</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">select</span>
   id,
   name,
   <span style="color:#66d9ef">case</span>
@@ -148,7 +148,7 @@
  
 </code></pre></div><p>これが悪いとはいわない。<br>
 だが、例えば同じような表示方法で他の条件式で取得したい時があるだろう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">select</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">select</span>
   id,
   name,
   <span style="color:#66d9ef">case</span>
@@ -167,9 +167,9 @@ case文などを利用し始めた時点で、生<a class="keyword" href="http:/
 <h2>(実装案２) アプリケーションのview側で頑張る</h2>
 <p>SQLが複雑になるのがいやなら、アプリケーションのview側で頑張ることもできる。ここで言っているviewはDBのview機能ではなく、アプリケーションのHTMLを生成するview機能のことだ。<br>
 とりあえずデータは全部生でもらっておいて</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> request;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> request;
 </code></pre></div><p>HTML出力の時に頑張る。(下記は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>のERB想定で記述)</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#f92672">&lt;</span><span style="color:#e6db74">% if(request.check_a.nil? </span> <span style="color:#f92672">and</span> request<span style="color:#f92672">.</span>check_b<span style="color:#f92672">.</span>nil?) <span style="color:#e6db74">%&gt;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#f92672">&lt;</span><span style="color:#e6db74">% if(request.check_a.nil? </span> <span style="color:#f92672">and</span> request<span style="color:#f92672">.</span>check_b<span style="color:#f92672">.</span>nil?) <span style="color:#e6db74">%&gt;
 </span><span style="color:#e6db74">  &lt;span&gt;</span><span style="color:#960050;background-color:#1e0010">検査完了</span><span style="color:#f92672">&lt;</span><span style="color:#e6db74">/span&gt; 
 </span><span style="color:#e6db74">&lt;% elsif(!request.check_a.nil? and !request.check_b.nil?) %&gt;
 </span><span style="color:#e6db74">  &lt;span&gt;検査未実施&lt;/s</span>pan<span style="color:#f92672">&gt;</span> 
@@ -196,7 +196,7 @@ case文などを利用し始めた時点で、生<a class="keyword" href="http:/
 <p>上３つで見てきたように、いろいろ考えたけどどれもイケてなかった。<br>
 そこで思いついたのがデータベースの機能の「View」だ。</p>
 <p>Veiwを使ってよく利用する形を事前に作っておくことでいろいろ解決することがわかった。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">create</span> <span style="color:#66d9ef">view</span> view_request <span style="color:#66d9ef">as</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">create</span> <span style="color:#66d9ef">view</span> view_request <span style="color:#66d9ef">as</span>
 <span style="color:#66d9ef">select</span>
   id,
   name,

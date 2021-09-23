@@ -131,11 +131,11 @@ RDS（データベース）をプライベートネットワークに配置し�
 実現したいことは、VPSのサーバ上に立ち上がっている仮想マシンのWebサーバに、ローカルのPCのブラウザからアクセスするというものです。</p>
 <p><img src="/image/20141231162958.png" alt="ssh-portforward-example"></p>
 <p>ローカルPCからexample.jp(VPSのサーバ)へはSSHできる状態です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[local pc] $ ssh username@example.jp 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[local pc] $ ssh username@example.jp 
 ログイン可能
 </code></pre></div><p>また、仮想サーバ上のWebサーバのポート番号は80でVPSのホストサーバからはWebサーバへ接続できる状態です。<br>
 VPSのホストからcurlを使って仮想サーバの80番ポートにリクエストを投げると、Hello Worldが返ってきます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[example.jp] $ curl 192.168.33.10
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[example.jp] $ curl 192.168.33.10
 &lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello World! Virtual Web Server&lt;/h1&gt;
 &lt;/body&gt;&lt;/html&gt; 
 </code></pre></div><h2 id="ローカルポートフォワードの実行">ローカルポートフォワードの実行</h2>
@@ -144,7 +144,7 @@ VPSのホストからcurlを使って仮想サーバの80番ポートにリク�
 以下のコマンドは、<br>
 <strong>ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす</strong><br>
 と解釈するとわかりやすいです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp 
 </code></pre></div><p>上を実行すると、いつもどおりSSHでログインした状態になります。
 「セッションを切らずに」、ブラウザから<code>http://localhost:8888</code>にアクセスするとなんと、ローカルホストにつないだはずが、example.jp上の仮想Webサーバのhtmlが帰ってくるのがわかります。</p>
 <p><img src="/image/20141231163932.png" alt="ssh-portforward-access"></p>
@@ -154,9 +154,9 @@ VPSのホストからcurlを使って仮想サーバの80番ポートにリク�
 <p><img src="/image/ssh-portforward-rds-2.png" alt="ssh-portforward-rds-2"></p>
 <p>次のようにSSH接続していきます。こう解釈するとわかりやすいです。<br>
 <strong>ローカルPCのポート8888での接続はfumidai.example.jpからみて「xxxx.rds.amazonaws.comのポート3306」に飛ばす</strong></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[local pc] $ ssh -L8888:xxxx.rds.amazonaws.com:3306 username@fumidai.example.jp 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[local pc] $ ssh -L8888:xxxx.rds.amazonaws.com:3306 username@fumidai.example.jp 
 </code></pre></div><p>SSHセッションは維持したまま、別ターミナルでmysql接続していきます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[local pc] $ mysql -u user -p -H 127.0.0.1:8888
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[local pc] $ mysql -u user -p -H 127.0.0.1:8888
 </code></pre></div><h3 id="セキュリティはどうなの">セキュリティはどうなの？</h3>
 <p>ローカルポートフォワーディングのSSHコマンドで、ローカルPCからリモートホスト(example.jp)までトンネルをはっています。そのトンネルの中をhttp通信やmysqlの通信を流しています。そのため、セキュリティ的にも安心できます。</p>
 <h2 id="最後に">最後に</h2>
@@ -174,7 +174,7 @@ SSHは他にもたくさんのことができ、ポートフォワードだけ�
 以下の図で言うと、web10, web11(192.168.33.10/11)に一発でSSHできるようになるわけです。</p>
 <p><img src="/image/20141109170337.png" alt="ssh"></p>
 <p>設定のサンプルは下記のとおりです。クライアントPC側に以下の設定をすることで完了します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ vim ~/.ssh/config
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ vim ~/.ssh/config
 host gateway
     HostName xxxxx.xxx
     User username

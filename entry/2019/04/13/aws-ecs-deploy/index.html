@@ -124,7 +124,7 @@ ECSへのデプロイは、<a href="https://github.com/silinternational/ecs-depl
 <a href="https://sandragon.hatenablog.com/entry/2019/04/14/211209">ecs-deployを使ったAmazon ECSへのデプロイの裏側</a></p>
 <p>アプリの変更から自動的にコンテナイメージを生成してデプロイするまでをGitlabを活用しました。
 下記のような<code>.gitlab-ci.yml</code>をアプリのレポジトリに配置して、Masterブランチへのコミットをトリガーに、Dockerイメージの生成とAWS ECSへのデプロイを行いました。Dockerイメージにはgitのコミット番号を振り、切り戻しなどしやすいようにしています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-YAML" data-lang="YAML"><span style="color:#f92672">image</span>: <span style="color:#ae81ff">docker:stable</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-YAML" data-lang="YAML"><span style="color:#f92672">image</span>: <span style="color:#ae81ff">docker:stable</span>
 
 <span style="color:#f92672">services</span>:
   - <span style="color:#ae81ff">docker:dind</span>
@@ -166,9 +166,9 @@ ECSへのデプロイは、<a href="https://github.com/silinternational/ecs-depl
 プライベートレポジトリから取得するためには認証がいるのですが、ここでしょうもないことにハマりました。
 設定自体は<a href="https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/private-auth.html">こちらのドキュメント</a>をみながらやっていたのですが、うまくいかない状況でした。<br>
 下記は出ていたエラーメッセージです。IAMのポリシーがおかしいというのは分かっていたのですが、はじめなにがおかしいかわかりませんでした。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">Asm fetching secret from the service for arn:aws:secretsmanager:ap-northeast-1:xxxxxxxxxx:secret:gitlab-sample-registry-y54JnU: AccessDeniedException: User: arn:aws:sts::xxxxxxxxxx:assumed-role/ecsTaskExecutionRole/14edf050-3d47-4c90-8e13-cb4a6d0e67a1 is not authorized to perform: secretsmanager:GetSecretValue on resource: arn:aws:secretsmanager:ap-northeast-1:xxxxxxxxxx:secret:gitlab-sample-registry-y54JnU status code: 400, request id: 83b3a590-db73-43d8-a0cb-abf894994173
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">Asm fetching secret from the service for arn:aws:secretsmanager:ap-northeast-1:xxxxxxxxxx:secret:gitlab-sample-registry-y54JnU: AccessDeniedException: User: arn:aws:sts::xxxxxxxxxx:assumed-role/ecsTaskExecutionRole/14edf050-3d47-4c90-8e13-cb4a6d0e67a1 is not authorized to perform: secretsmanager:GetSecretValue on resource: arn:aws:secretsmanager:ap-northeast-1:xxxxxxxxxx:secret:gitlab-sample-registry-y54JnU status code: 400, request id: 83b3a590-db73-43d8-a0cb-abf894994173
 </code></pre></div><p>IAMのロールのポリシーの設定で下記を設定する必要があるのですが、<code>Resource</code>ででてくる<code>secret_name</code>に少し罠がありました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
   <span style="color:#f92672">&#34;Version&#34;</span>: <span style="color:#e6db74">&#34;2012-10-17&#34;</span>,
   <span style="color:#f92672">&#34;Statement&#34;</span>: 
     {

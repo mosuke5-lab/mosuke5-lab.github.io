@@ -111,7 +111,7 @@
 <h3 id="レイヤーを意識してイメージを作成する">レイヤーを意識してイメージを作成する</h3>
 <p>コンテナイメージはレイヤー構造で構成されています。<br>
 簡単な例でいうと<code>docker pull</code>したときに表示されるハッシュ値のリストですが、これがレイヤーです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% docker pull nginxinc/nginx-unprivileged:1.18
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% docker pull nginxinc/nginx-unprivileged:1.18
 1.18: Pulling from nginxinc/nginx-unprivileged
 54fec2fa59d0: Already exists
 3a4d0e4b78ef: Downloading [=============&gt;                                     ]  7.153MB/26.2MB
@@ -123,7 +123,7 @@ e575c5ee613a: Download complete
 よくある例としては、アプリケーションのコードに変更があった場合です。
 以下はRailsを例にしていますが、アプリケーションを実行するために必要な依存関係のライブラリのインストール(<code>RUN bundle install部分</code>)をアプリケーションのコードを置く前に実施しています。
 アプリケーションの変更の多くはソースコードであるため、変わらない部分を前に持ってくることで、そこまでのイメージレイヤーを使い回すことができるためです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># Dockerfile
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># Dockerfile
 FROM ruby:2.6
 RUN gem install bundler -v &#34;1.15.4&#34;
 RUN mkdir /usr/local/src/app
@@ -183,7 +183,7 @@ Eclipse CheはKubernetes上で動作するオンラインのエディタです�
 以下、デプロイ部分以外は<code>oc xxxx</code>は<code>kubectl xxxx</code>と読み替えてもらってよいです。</p>
 <h4 id="環境">環境</h4>
 <p>本環境ではWorkerノードが3台ある状態です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get node | grep worker
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get node | grep worker
 ip-10-0-129-134.ap-southeast-1.compute.internal   Ready    worker   75m   v1.16.2
 ip-10-0-158-129.ap-southeast-1.compute.internal   Ready    worker   75m   v1.16.2
 ip-10-0-175-177.ap-southeast-1.compute.internal   Ready    worker   50m   v1.16.2
@@ -191,7 +191,7 @@ ip-10-0-175-177.ap-southeast-1.compute.internal   Ready    worker   50m   v1.16.
 <p>OpenShift Templateを使ってデプロイします。OpenShift以外の環境の人はHelmをお使いください。
 デプロイ方法は異なりますが、デプロイされるリソースや仕組み自体は変わりません。<br>
 今回、各ノードに<code>centos:8</code>と<code>nginxinc/nginx-unprivileged:1.18</code>の2つを事前にプルしておきたいと考えた想定とします。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc process -f deploy/openshift/serviceaccount.yaml | oc apply -f -
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc process -f deploy/openshift/serviceaccount.yaml | oc apply -f -
 $ oc process -f deploy/openshift/configmap.yaml \
 -p IMAGES=&#34;centos=centos:8;nginx=nginxinc/nginx-unprivileged:1.18&#34; \
 -p DAEMONSET_NAME=&#34;puller&#34; \
@@ -218,7 +218,7 @@ $ oc process -f deploy/openshift/app.yaml | oc apply -f -
 </ul>
 </li>
 </ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get ds,deployment,pod
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get ds,deployment,pod
 NAME                          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
 daemonset.extensions/puller   3         3         3       3            3           &lt;none&gt;          35m
 
@@ -235,7 +235,7 @@ pod/puller-tzd6n                              2/2     Running   0          35m
 <code>spec.template.spec.containers</code>には、ConfigMapで指定したcentosとnginxの2つのイメージを利用したコンテナが起動しているのがわかります。
 実行コマンドは<code>sleep 30d</code>となっています。<code>ImagePullPolicy: Always</code>となっていることから、30日後にこのPodは終了し、その際に最新となっているイメージをまたプルすることになります。
 あまり好ましくないですがlatestタグで運用していても定期的にイメージをプルすることができるわけです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">extensions/v1beta1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">extensions/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">DaemonSet</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">puller</span>

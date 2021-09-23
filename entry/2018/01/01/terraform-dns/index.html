@@ -85,7 +85,7 @@
 <p>まずはAWS側の設定を見ておく。<br>
 今回はELB使うわけではなかったので、EC2インスタンスにElasticIPをバインドした。
 aws側のTerraformのコードでいつも通りEIPを購入する。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># aws.tf
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># aws.tf
 resource &#34;aws_eip&#34; &#34;main&#34; {
   instance = &#34;${aws_instance.main.id}&#34;
   vpc      = true
@@ -93,7 +93,7 @@ resource &#34;aws_eip&#34; &#34;main&#34; {
 </code></pre></div><p>次に、CloudFlare側のコードをみる。<br>
 CloudFlareをTerraformで扱うには３つの情報が必要なのでここは変数化しておくとよい。<br>
 providerを指定し、あとはresouceを書いていく。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># cloudflare.tf
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># cloudflare.tf
 variable &#34;cloudflare_email&#34; {}
 variable &#34;cloudflare_token&#34; {}
 variable &#34;cloudflare_domain&#34; {}

@@ -160,7 +160,7 @@ CIツールから実行することで、Sync以外の処理をCIツール側か
 
 
 <p>参考として、ジョブをSync前に実行したい場合は、Jobリソースを用意して、JobのAnnotationsに<code>argocd.argoproj.io/hook: PreSync</code>を付与するとなります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">batch/v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">batch/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Job</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">presync-job</span>
@@ -183,7 +183,7 @@ CIツールから実行することで、Sync以外の処理をCIツール側か
 </code></pre></div><h3 id="リソースの削除タイミング">リソースの削除タイミング</h3>
 <p>Resource Hooksで利用したリソースの削除のタイミングは、Annotationに<code>argocd.argoproj.io/hook-delete-policy</code>をつけることで設定可能です。
 もし、なにも設定しなかった場合、以下のように実行したJobがPodとして残りますが（<code>presync-job-gj4bd</code>が処理に利用したJobのPod）、任意のタイミングで削除できるというわけです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get pod
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get pod
 NAME                                READY   STATUS      RESTARTS   AGE
 nginx-deployment-64b6fc996b-94ttg   1/1     Running     0          4m33s
 presync-job-gj4bd                   0/1     Completed   0          86s
@@ -222,7 +222,7 @@ presync-job-gj4bd                   0/1     Completed   0          86s
 多くの場合、Sync前後の「処理」が主なユースケースのため、処理を実行するJobがサンプルとなっています。しかしJob以外にもこの機能を使えることは実は重要です。</p>
 <p>たとえば、<strong>Syncする前に特定のリソースを作っておきたい</strong>というニーズです。
 Sync前に、アプリケーションが利用するSecretやConfigMapをデプロイしておきたいといったものです。この場合であれば、SecretやConfigMapのリソースに対して、上で紹介したAnnotationsをつければよいということです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ConfigMap</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">pre-cm</span>

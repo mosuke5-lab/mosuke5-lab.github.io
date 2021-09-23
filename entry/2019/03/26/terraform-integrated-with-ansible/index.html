@@ -97,7 +97,7 @@
 TerraformとAnsibleはカバーする領域が異なりますが、もちろんかぶる領域もあり、今回はその組み合わせ方の１つのあり方かなと思っています。</p>
 <p>まずは最小限で試したかったのでこんな感じで用意しました。<br>
 <code>terraform_module_test.yml</code>がAnsibleの実行Taskが記載されたファイルで、<code>terraform/</code>以下がTerraformの実行ファイルを置いています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% tree
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% tree
 .
 ├── terraform_module_test.yml
 └── terraform
@@ -105,7 +105,7 @@ TerraformとAnsibleはカバーする領域が異なりますが、もちろん�
     ├── terraform.tf
     └── terraform.tfvars
 </code></pre></div><p>以下はAnsibleのコードです。Terraformを実行するのは今回はローカル環境なので、実行の対象ホストはこのPCで、接続方式もlocalで問題ないです。Terraform moduleは機能自体も多くなく、Terraformを実行(apply)するだけなら下記だけで十分です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># terraform_module_test.yml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># terraform_module_test.yml</span>
 ---
 - <span style="color:#f92672">hosts</span>: <span style="color:#ae81ff">127.0.0.1</span>
   <span style="color:#f92672">connection</span>: <span style="color:#ae81ff">local</span>
@@ -115,7 +115,7 @@ TerraformとAnsibleはカバーする領域が異なりますが、もちろん�
       <span style="color:#f92672">project_path</span>: <span style="color:#e6db74">&#39;terraform/&#39;</span>
       <span style="color:#f92672">state</span>: <span style="color:#ae81ff">present</span>
 </code></pre></div><p>さて、実行してみます。まああっさり。これだけじゃつまらんって感じです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ansible-playbook terraform_module_test.yml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ansible-playbook terraform_module_test.yml
 PLAY [127.0.0.1] ******************************************************************
 
 TASK [Gathering Facts] ************************************************************
@@ -132,7 +132,7 @@ Terraformでサーバなどのインフラ作って、Ansibleで作ったサー�
 こちら実際にやってみたのですが、いくつか実装上の工夫点が必要だったのでお伝えします。</p>
 <p>※以下、試行錯誤の過程を書いてますのでご了承ください。</p>
 <p>一番はじめに考えたのは、Ansibleベストプラクティスに則って、以下のような<code>site.yml</code>作ればそれで終わりや。ということでした。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># site.yml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># site.yml</span>
 ---
 - <span style="color:#f92672">import_playbook</span>: <span style="color:#ae81ff">setup_cloud.yml         </span> <span style="color:#75715e"># クラウドインフラ構築</span>
 - <span style="color:#f92672">import_playbook</span>: <span style="color:#ae81ff">provisioning_config.yml </span> <span style="color:#75715e"># 構築したインフラにプロビジョニング</span>
@@ -143,21 +143,21 @@ Terraformでサーバなどのインフラ作って、Ansibleで作ったサー�
 Dynamic Inventryの作り方はいろいろありますが、ここでは簡易的にシェルスクリプトで、
 Terraformのstateファイルから生成することにしておきます。
 <code>inventry.sh</code>というのを次のように雑に書きまして。。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e">#!/bin/sh
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e">#!/bin/sh
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> -e terraform/terraform.tfstate <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
     ip<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>cat terraform/terraform.tfstate | jq <span style="color:#e6db74">&#39;.modules[].outputs[].value&#39;</span> | cut -d <span style="color:#e6db74">&#39;&#34;&#39;</span> -f 2<span style="color:#e6db74">`</span>
     cat &lt;&lt; EOS
 <span style="color:#f92672">{</span>
     <span style="color:#e6db74">&#34;cloud_servers&#34;</span>  : <span style="color:#f92672">[</span> $ip <span style="color:#f92672">]</span>
 <span style="color:#f92672">}</span>
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># 実行するとこんな感じにと
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># 実行するとこんな感じにと
 $ ./inventry.sh
 {
     &#34;cloud_servers&#34;  : [ 47.74.155.39,47.88.168.127,47.88.169.94 ]
 }
 </code></pre></div><p>Dynamic Inventryもできるようになったので、今度こそこれでいけると思って実行して見るわけですが、<code>skipping: no hosts matched</code>と。
 実はもう一つ考慮しなければいけないことに気づきました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ansible-playbook -i ./inventry.sh site.yml -u sshuser
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ansible-playbook -i ./inventry.sh site.yml -u sshuser
 ...
 PLAY [Provisioning to instances] *************************************************
 skipping: no hosts matched
@@ -166,7 +166,7 @@ skipping: no hosts matched
 そうなると、Terraformの実行とその後のサーバプロビジョニングがこのままでは一気通貫にできないということになります。</p>
 <p>なんかいい方法はないのかと調べると、<code>refresh_inventry</code>というのがありました。(<a href="https://docs.ansible.com/ansible/latest/modules/meta_module.html">公式ドキュメント</a>)
 こちらを使って、Ansibleの実行中にTaskとしてinventryの更新が可能になります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">- <span style="color:#f92672">name</span>: <span style="color:#ae81ff">Refresh inventory because of creating cloud servers</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">- <span style="color:#f92672">name</span>: <span style="color:#ae81ff">Refresh inventory because of creating cloud servers</span>
   <span style="color:#f92672">meta</span>: <span style="color:#ae81ff">refresh_inventory</span>
 </code></pre></div><p>その他、サーバ起動した直後だとSSHのプロセスが上がっておらず、接続できないこともあったので、
 サーバの起動を待つというのも大事な要素になりました。</p>

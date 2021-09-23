@@ -107,7 +107,7 @@ Tetonパイプラインにおいても同じようにTask間でデータを連�
 <p>それでは、TektonのWorkspaceを用いて、Task間でデータを連携する方法を確認して見ていきましょう。
 本環境はGCP上で動かしており、PersistentVolumeをDynamic Provisioningとして払い出せる環境になっていることを先に断っておきます。<br>
 イメージは以下のようなパイプラインです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">(Pipeline start) - (task A) - (task B)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">(Pipeline start) - (task A) - (task B)
                          \     /
                           \   /
                    (Persistent Volume)
@@ -115,7 +115,7 @@ Tetonパイプラインにおいても同じようにTask間でデータを連�
 <code>workspace-test-task-curl</code>は、パラメータで指定したURLに対してcurlでアクセスして、その結果をworkspace内に保存するものです。
 <code>workspace-test-task-output</code>は、<code>workspace-test-task-curl</code>が保存した結果をアウトプットするというものです。とくに実用性があるパイプラインではないですが、練習台として捉えてください。
 （実用的なパイプラインは、この学習シリーズの後半で行っていくようです。）</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># workspace-test-task.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># workspace-test-task.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Task</span>
 <span style="color:#f92672">metadata</span>:
@@ -153,7 +153,7 @@ Tetonパイプラインにおいても同じようにTask間でデータを連�
         - <span style="color:#e6db74">&#34;$(workspaces.my-workspace.path)/output.txt&#34;</span>
 </code></pre></div><p>続いてPipelineをみていきます。
 必要なパラメータやWorkspaceの設定を行います。あとは、今回のTaskは直列の関係性にあるので<code>runAfter</code>を活用します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># workspace-test-pipeline.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># workspace-test-pipeline.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pipeline</span>
 <span style="color:#f92672">metadata</span>:
@@ -184,7 +184,7 @@ Tetonパイプラインにおいても同じようにTask間でデータを連�
         - <span style="color:#ae81ff">curl-site</span>
 </code></pre></div><p>では、実行していきましょう。<br>
 PipelineRunは下記のとおりです。今までととなるのは、<code>workspaces</code>の設定です。PVCを発行してPVを準備します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># workspace-test-pipeline-run.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># workspace-test-pipeline-run.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PipelineRun</span>
 <span style="color:#f92672">metadata</span>:
@@ -207,7 +207,7 @@ PipelineRunは下記のとおりです。今までととなるのは、<code>wor
 </code></pre></div><p>各リソースをデプロイして、パイプラインを実行します。<br>
 実行後Podの状態を確認すると、サイトへのcurlをするTaskが動き、その後にその結果を出力するPodが起動しています。
 PVの状態も一緒に見てみましょう。<code>workspace-test-pipeline-run-curl-site-2x8tt-pod-rvz9t</code>と<code>workspace-test-pipeline-run-data-output-57xb6-pod-f8srp</code>の両方ともにPVCがマウントされています。また、PVCが作成され、自動的にPVも作成されています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f workspace-test-task.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f workspace-test-task.yaml
 task.tekton.dev/workspace-test-task-curl created
 task.tekton.dev/workspace-test-task-output created
 
@@ -249,7 +249,7 @@ $ kubectl get pod workspace-test-pipeline-run-data-output-57xb6-pod-f8srp -o yam
     persistentVolumeClaim:
       claimName: pvc-8673f66e55
 </code></pre></div><p>PVCの中身をみると<code>ownerReferences</code>に<code>PipelineRun</code>が紐付いており、<code>PipelineRun</code>を削除すれば同時にPVCも削除され、PVも削除されるという動きをします。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pvc pvc-8673f66e55 -o yaml | less
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pvc pvc-8673f66e55 -o yaml | less
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

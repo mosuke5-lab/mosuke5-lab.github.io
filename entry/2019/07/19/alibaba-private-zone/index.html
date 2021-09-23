@@ -103,11 +103,11 @@ PrivateZoneは、VPC内部だけで使えるDNSです。
 そのECSのプライベートIPアドレスをAレコードとして登録します。
 設定は以上です。<br>
 AWSのRoute53のプライベートDNSとは違って、VPC側の設定などは特に必要ありません。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">aaaa.mosuke.local  A 192.168.1.205 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">aaaa.mosuke.local  A 192.168.1.205 
 </code></pre></div><p>作成したECSにログインして、確認してみます。
 ECS側もとくに設定はいじる必要はありません。<br>
 しっかりプライベートアドレスで名前解決ができていることが確認できました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># dig aaaa.mosuke.local
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># dig aaaa.mosuke.local
 
 ; &lt;&lt;&gt;&gt; DiG 9.9.4-RedHat-9.9.4-74.1.al7.1 &lt;&lt;&gt;&gt; test.mosuke.local
 ;; global options: +cmd
@@ -130,10 +130,10 @@ test.mosuke.local.	60	IN	A	192.168.1.205
 </code></pre></div><h3 id="ワイルドカードでの名前解決">ワイルドカードでの名前解決</h3>
 <p>わけあってワイルドカードでの名前解決も確認しました。
 下記のとおり、レコードを登録。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">*.apps.mosuke.local A 192.168.1.205 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">*.apps.mosuke.local A 192.168.1.205 
 </code></pre></div><p>*の部分がなんであっても<code>192.168.1.205</code>を返す想定です。
 <code>a.apps.mosuke.local</code>と<code>ab.apps.mosuke.local</code>を試してみますが、期待通りでした。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># dig a.apps.mosuke.local
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># dig a.apps.mosuke.local
 
 ; &lt;&lt;&gt;&gt; DiG 9.9.4-RedHat-9.9.4-74.1.al7.1 &lt;&lt;&gt;&gt; a.apps.mosuke.local
 ;; global options: +cmd
@@ -179,10 +179,10 @@ ab.apps.mosuke.local.	60	IN	A	192.168.1.205
 </code></pre></div><h3 id="rdsなどのマネージドサービスの名前解決">RDSなどのマネージドサービスの名前解決</h3>
 <p>ECSだけではなく、RDSなどのマネージドサービスでエンドポイントを持つものにも役に立ちます。
 RDSを１つ構築して、そのエンドポイントをCNAMEとして登録しました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">db.mosuke.local  CNAME  rm-0iwmm56ph2qe2v9n6.mysql.japan.rds.aliyuncs.com
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">db.mosuke.local  CNAME  rm-0iwmm56ph2qe2v9n6.mysql.japan.rds.aliyuncs.com
 </code></pre></div><p>接続するときに、<code>db.mosuke.local</code>と任意のものを指定できるようになったのはいいですね。<br>
 DBの入れ替えなど発生してもアプリケーション側で変更がいらないです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># dig db.mosuke.local
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># dig db.mosuke.local
 
 ; &lt;&lt;&gt;&gt; DiG 9.9.4-RedHat-9.9.4-74.1.al7.1 &lt;&lt;&gt;&gt; db.mosuke.local
 ;; global options: +cmd
@@ -226,7 +226,7 @@ Alibaba CloudではCENといったプロダクトで日本と中国のリージ�
 <h4 id="結果">結果</h4>
 <p>VPC BのインスタンスからVPC AのインスタンスとVPC A内のRDSに対して疎通確認を行いました。
 期待通りの結果です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># ping aaaa.mosuke.local
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># ping aaaa.mosuke.local
 PING aaaa.mosuke.local (192.168.1.205) 56(84) bytes of data.
 64 bytes from 192.168.1.205 (192.168.1.205): icmp_seq=1 ttl=64 time=0.367 ms
 64 bytes from 192.168.1.205 (192.168.1.205): icmp_seq=2 ttl=64 time=0.282 ms

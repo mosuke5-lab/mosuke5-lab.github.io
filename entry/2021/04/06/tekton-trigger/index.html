@@ -104,7 +104,7 @@
 さっそくインストールします。
 インストール方法は、<a href="https://tekton.dev/docs/triggers/install/">公式ドキュメント</a>どおりに行います。
 今回使用したバージョンは、Tekton Triggers v0.12.1　となります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply --filename https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply --filename https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml
 podsecuritypolicy.policy/tekton-triggers created
 clusterrole.rbac.authorization.k8s.io/tekton-triggers-admin created
 clusterrole.rbac.authorization.k8s.io/tekton-triggers-core-interceptors created
@@ -209,7 +209,7 @@ triggertemplates.triggers.tekton.dev             2021-03-24T08:13:28Z
 まずは下準備として、EventListener Podが利用するService Accountの作成と適切なRole付与を行います。
 以下が利用したマニフェストです。
 それほど難しくないですね？こちらが難しい人はぜひ、KubernetesのService AccountとRole, RoleBindingを復習しましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># trigger-sa.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># trigger-sa.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceAccount</span>
 <span style="color:#f92672">metadata</span>:
@@ -262,7 +262,7 @@ triggertemplates.triggers.tekton.dev             2021-03-24T08:13:28Z
 作成するのは3つで、<code>TriggerTemplate</code>, <code>TriggerBinding</code>, <code>EventListener</code>の3つです。
 慣れるまで、関係性や設定項目が煩わしいです。上で紹介した概要図と照らし合わせながらゆっくり理解していきましょう。
 いくつかコメントアウトで補足解説を入れました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># my-trigger.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># my-trigger.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">triggers.tekton.dev/v1alpha1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">TriggerTemplate</span>
 <span style="color:#f92672">metadata</span>:
@@ -329,7 +329,7 @@ triggertemplates.triggers.tekton.dev             2021-03-24T08:13:28Z
       <span style="color:#f92672">template</span>:
         <span style="color:#f92672">ref</span>: <span style="color:#ae81ff">build-deploy-pipeline-template</span>
 </code></pre></div><p>マニフェストをapplyし、EventListener Podを確認しておきます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f trigger-sa.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f trigger-sa.yaml
 serviceaccount/trigger-sa created
 role.rbac.authorization.k8s.io/trigger-role created
 rolebinding.rbac.authorization.k8s.io/triggers-role-binding created
@@ -350,7 +350,7 @@ el-build-deploy-pipeline-listener   ClusterIP   10.7.250.67   &lt;none&gt;      
 EventListener Podへのネットワークは外部公開していないので、port-fowardを活用します。
 Trigger Bindingsは、curlの<code>-d</code>で送信しているJSONデータをTektonのパラメータに変換しているというわけです。
 Webhookを利用する場合はどのようなデータでWebhookを飛ばしているか確認できれば設定が容易です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl port-forward service/el-build-deploy-pipeline-listener 8080:8080
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl port-forward service/el-build-deploy-pipeline-listener 8080:8080
 Forwarding from 127.0.0.1:8080 -&gt; 8000
 Forwarding from [::1]:8080 -&gt; 8000
 
@@ -362,7 +362,7 @@ http://localhost:8080 \
 
 {&#34;eventListener&#34;:&#34;build-deploy-pipeline-listener&#34;,&#34;namespace&#34;:&#34;goldstine-lab&#34;,&#34;eventID&#34;:&#34;0815c36d-2cd0-4a76-9ee2-cd6a93b98c1d&#34;}
 </code></pre></div><p>podを確認すればパイプライン実行されたことがわかるのではないかとおもいます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod -w
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod -w
 build-deploy-pipeline-run-7hn8p-fetch-repository-szbzr-po-kn8bt   0/1     Init:1/2    0          14s
 build-deploy-pipeline-run-7hn8p-fetch-repository-szbzr-po-kn8bt   0/1     PodInitializing   0          15s
 build-deploy-pipeline-run-7hn8p-fetch-repository-szbzr-po-kn8bt   1/1     Running           0          16s

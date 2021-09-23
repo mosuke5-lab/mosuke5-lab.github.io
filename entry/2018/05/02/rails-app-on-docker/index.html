@@ -139,7 +139,7 @@ Railsアプリケーションはローカルですが、そこにDocker Compose�
 これは、Dockerはイメージをビルドするときにレイヤーごとにキャッシュを行うのですが、それを利用したものです。
 頻繁に変更が行われるのはアプリケーションのソースコード部分であり、依存パッケージは頻繁には変更されないのでキャッシュをうまく使いましょうということです。<br>
 (Ruby2.3.1なのはきにしないで&hellip;)</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># Dockerfile
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># Dockerfile
 FROM ruby:2.3.1
 RUN apt-get update &amp;&amp; apt-get upgrade -y
 RUN gem install bundler -v &#34;1.15.4&#34;
@@ -163,7 +163,7 @@ CMD [&#34;bundle&#34;, &#34;exec&#34;, &#34;rails&#34;, &#34;server&#34;, &#34;-
 正直な話、GitlabはCI/CDのインテグレーションあたりが気に入っていて、今回もそれが理由で採用しました。</p>
 <p>以下の<code>gitlab-ci.yml</code>は、ほぼGitlabのドキュメントに載っているとおりです。<br>
 <code>Master</code>ブランチにコミットがあった場合のみビルドするようにだけ変更しました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#75715e"># gitlab-ci.yml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#75715e"># gitlab-ci.yml</span>
 <span style="color:#f92672">image</span>: <span style="color:#ae81ff">docker:stable</span>
 
 <span style="color:#f92672">services</span>:

@@ -137,7 +137,7 @@ Tekton本体が、パイプラインの実態であるTaskなどを作成し管�
 <p>解説のコメントを入れながらインストールをしていきます。</p>
 <h3 id="crdの作成">CRDの作成</h3>
 <p>まずは、Githubレポジトリのクローンと、Tekton本体を管理するためのCRDsのデプロイを行っていきます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/tektoncd/operator
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/tektoncd/operator
 $ cd operator
 
 // tekton operatorが動作するためのNamespaceの作成
@@ -156,7 +156,7 @@ config.operator.tekton.dev                  2020-05-08T14:51:10Z
 そのため、このレポジトリから自分で作成する必要があります。<br>
 TektonのOperatorは<a href="https://github.com/operator-framework/operator-sdk" target="_blank">operator-sdk</a>と呼ばれるOperator開発のためのフレームワークで作成されていて、簡単にコンテナイメージをビルドできます。
 最終的に、ビルドしたイメージをDocker hub等で公開し、ダウンロードできるようにしておきましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// Go moduleの有効化。Go開発でのパッケージ管理に使うものです
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// Go moduleの有効化。Go開発でのパッケージ管理に使うものです
 $ export GO111MODULE=on
 
 // イメージビルド
@@ -182,7 +182,7 @@ abdc4db: digest: sha256:683976ac37b1b83e031b8eb73327dd7fa233fbf1e2cca0199ab49744
 <h3 id="コントローラのデプロイ">コントローラのデプロイ</h3>
 <p>いよいよ、Operatorの本体であるコントローラをデプロイします。<br>
 レポジトリの中にOperatorのコントローラをデプロイするためのマニフェストファイルが用意されていますが、<code>image</code>部分を上で作成したイメージに差し替える必要がありますので注意してください。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// imageを上で作成したものに変更する
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// imageを上で作成したものに変更する
 $ vim deploy/operator.yaml
       containers:
         - name: tekton-operator
@@ -237,7 +237,7 @@ Tekton Operatorのデプロイ時にService AccountやRoleも同時にデプロ�
 <h3 id="マニフェスト">マニフェスト</h3>
 <p>Tektonはパイプラインやそのタスク自身もKubernetesのリソースとして扱えることが１つの特徴です。<br>
 まずは、マニフェストベースで実行してみます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// タスク定義を作成する
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// タスク定義を作成する
 // Ubuntuイメージで`hello world`と出力するだけの簡単なタスク
 $ vim hello-world-task.yaml
 apiVersion: tekton.dev/v1beta1
@@ -259,7 +259,7 @@ NAME               AGE
 hello-world-task   3s
 </code></pre></div><p>上で作成した<code>hello-world-task</code>はタスクの定義だけであり、これだけでは実行されることはありません。<br>
 <code>TaskRun</code>リソースを用いて実際にタスクを実行できます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// TaskRunの定義を作成
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// TaskRunの定義を作成
 $ vim hello-world-task-run.yaml
 apiVersion: tekton.dev/v1beta1
 kind: TaskRun
@@ -295,7 +295,7 @@ CLIのインストールはこちらを確認しましょう。</p>
 <div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://tekton.dev/docs/cli/" data-iframely-url="//cdn.iframe.ly/oNbQMrC"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
 <p>インストールすると<code>tkn</code>コマンドが利用できるようになります。
 <code>tkn</code>コマンドは、<code>kubectl</code>と同じ認証情報を用いるので、<code>kubectl</code>が打てている環境ならばおそらくそのまま実行できるのではないかと思います。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// タスクの一覧をみる。上で作成したタスクが確認できる
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// タスクの一覧をみる。上で作成したタスクが確認できる
 $ tkn task list
 NAME               DESCRIPTION   AGE
 hello-world-task                 2 minutes ago
@@ -304,7 +304,7 @@ hello-world-task                 2 minutes ago
 $ tkn task logs
 [output-helloworld] hello world
 </code></pre></div><p>CLI経由で今度はタスクを実行してみましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// Taskの実行
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// Taskの実行
 $ tkn task start hello-world-task
 Taskrun started: hello-world-task-run-w82p6
 
@@ -320,7 +320,7 @@ hello-world-task-run         2 minutes ago    14 seconds   Succeeded
 </code></pre></div><p>上ではCLIでの実行やログの確認を行いましたが、当然ながら動きはマニフェストで行ったときと同じです。
 試しに<code>kubectl</code>でPodやTaskRunなどを覗いてみましょう。
 Kubernetesのリソースとして作成され、実行されていることが確認できるはずです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod
 NAME                                   READY   STATUS      RESTARTS   AGE
 hello-world-task-run-pod-mjnmv         0/1     Completed   0          93s
 hello-world-task-run-w82p6-pod-8rjsf   0/1     Completed   0          6s

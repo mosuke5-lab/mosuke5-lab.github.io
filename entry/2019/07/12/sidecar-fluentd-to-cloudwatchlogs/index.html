@@ -111,7 +111,7 @@ Kubernetesでのロギングについての考え方は英語ですが<a href="h
 <p>コンテナ化する場合はまずは通常のサーバなりローカルで設定や概念を理解することをおすすめします。自分もこちらを実施するに当たり、一度テスト用のEC2の上で動作など確認しました。</p>
 <h3 id="fluentconf">fluent.conf</h3>
 <p>利用するfluent.confは次のようなものとします。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&lt;source&gt;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&lt;source&gt;
   @type tail
   path /var/log/nginx/access.log
   format /^(?&lt;remote&gt;[^ ]*) (?&lt;host&gt;[^ ]*) (?&lt;user&gt;[^ ]*) \[(?&lt;time&gt;[^\]]*)\] &#34;(?&lt;method&gt;\S+)(?: +(?&lt;path&gt;[^ ]*) +\S*)?&#34; (?&lt;code&gt;[^ ]*) (?&lt;size&gt;[^ ]*)(?: &#34;(?&lt;referer&gt;[^\&#34;]*)&#34; &#34;(?&lt;agent&gt;[^\&#34;]*)&#34; &#34;(?&lt;forwarder&gt;[^\&#34;]*)&#34;)?/
@@ -146,7 +146,7 @@ Kubernetesでのロギングについての考え方は英語ですが<a href="h
 <p>利用するには、下記のようにgemでインストールします。
 DockerHubで公開されているfluentdのコンテナイメージには当然インストールされておらず、都度インストールするのはめんどくさいので、プラグインがインストールされた状態のコンテナイメージを作っておきました。
 （個人で遊びで使うときはいつもGitlabのイメージレジストリを使っています。Gitlabを使ったコンテナイメージの自動ビルドについては過去に<a href="https://blog.mosuke.tech/entry/2018/05/02/rails-app-on-docker/">こちらの記事の一部</a>として書いています。）</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">gem install fluent-plugin-cloudwatch-logs
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">gem install fluent-plugin-cloudwatch-logs
 </code></pre></div><p>Fluentdは、AWSに送付するので、AWSへのアクセス権限が必要です。<br>
 コンテナ上でIAMロールを使うのはちょっと大変なので(コンテナ環境におけるIAMロールの扱いについてはどこかで別途書きたいですね)、専用のユーザとポリシーを作成し、API Keyを環境変数で渡すことにしました。こちらは次のDeploymentの部分で説明します。</p>
 <h2 id="deploymentに組み込む">Deploymentに組み込む</h2>
@@ -159,7 +159,7 @@ DockerHubで公開されているfluentdのコンテナイメージには当然�
 <li>AWSのAPI KeyなどをSecretとして環境変数で渡しています。</li>
 </ol>
 <p>その他下記コメントをまぜました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-deployment</span>
@@ -238,12 +238,12 @@ DockerHubで公開されているfluentdのコンテナイメージには当然�
 </code></pre></div><h2 id="動作確認">動作確認</h2>
 <p>podを確認すると、2/2とふたつのコンテナが起動していることがきちんと確認できる。
 今回のようなサイドカー方式にすると、Nginxコンテナは標準出力でログを吐き出さなくなるので、<code>kubectl logs</code>でログは確認できないことは要注意しておきましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod
 NAME                                           READY   STATUS    RESTARTS   AGE
 nginx-deployment-58b86c84bb-6mggw   2/2     Running   0          22h
 </code></pre></div><p>またAWSコンソール側にも少しラグはあるものの、送付されていることが確認できました。
 もし、AWS側に来ない場合には、fluentdコンテナのログを確認してエラーが出てないかなど確認してみましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl logs nginx-deployment-58b86c84bb-6mggw -c fluentd
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl logs nginx-deployment-58b86c84bb-6mggw -c fluentd
 2019-07-11 08:20:09 +0000 [info]: starting fluentd-1.6.0 pid=6 ruby=&#34;2.5.5&#34;
 2019-07-11 08:20:09 +0000 [info]: spawn command to main:  cmdline=[&#34;/usr/bin/ruby&#34;, &#34;-Eascii-8bit:ascii-8bit&#34;, &#34;/usr/bin/fluentd&#34;, &#34;-c&#34;, &#34;/fluentd/etc/fluent.conf&#34;, &#34;-p&#34;, &#34;/fluentd/plugins&#34;, &#34;--under-supervisor&#34;]
 2019-07-11 08:20:09 +0000 [info]: gem &#39;fluent-plugin-cloudwatch-logs&#39; version &#39;0.7.3&#39;

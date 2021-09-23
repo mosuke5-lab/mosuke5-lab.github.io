@@ -111,7 +111,7 @@
 <div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0; margin-bottom: 30px;"><a href="https://github.com/tektoncd/catalog" data-iframely-url="//cdn.iframe.ly/XxCD6ka"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
 <p>例として、本日使うTaskのひとつである<code>git-clone</code>を見てみましょう。
 catalogをまずはダウンロードしてきて中身を確認します。<code>0.1</code>, <code>0.2</code>, <code>0.3</code>とバージョニングされているのは、Task自体のバージョンです。利用しているTektonのバージョンに合わせて利用するものを決定しましょう。本環境では、まだ<code>0.15.2</code>を使っているので<code>0.2</code>が該当します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/tektoncd/catalog
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/tektoncd/catalog
 $ cd catalog/task/git-clone
 $ tree
 .
@@ -158,7 +158,7 @@ Taskが記載されていており、すぐ利用できるようになってい�
 <h3 id="全体構成">全体構成</h3>
 <p>では、作成するパイプラインの形を決めていきましょう。<br>
 あるレポジトリからソースコードをダウンロードしてきて、その中にあるDockerfileをビルドして、DockerHubにPushするまでを実現することとします。次のようなイメージでしょうか？</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">(Pipeline start) - (git-clone) - (builah[build &amp; push])
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">(Pipeline start) - (git-clone) - (builah[build &amp; push])
                          \     /
                           \   /
                    (Persistent Volume [for workspace])
@@ -171,7 +171,7 @@ Taskを実行するPodの利用するServiceAccountを指定できるのです�
 詳しくは、公式ドキュメントの <a href="https://tekton.dev/vault/pipelines-v0.15.2/auth/#kubernetes-s-docker-registry-s-secret">Authentication</a> を参照しましょう。</p>
 <p>今回は、レジストリにDockerHubを利用するので次のような設定ファイルを用意しておきます。
 Dockerなどで利用する認証用の<code>config.json</code>です。<code>xxxxx</code>には、認証に必要なトークンをいれてください。簡単に取得する方法としては、レジストリのIDとパスワードをコロンでつなげてbase64でエンコードすることですかね。<code>echo -n &quot;id:password&quot; | base64</code> このような感じです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">//</span> <span style="color:#960050;background-color:#1e0010">config.json</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">//</span> <span style="color:#960050;background-color:#1e0010">config.json</span>
 {
 	<span style="color:#f92672">&#34;auths&#34;</span>: {
 		<span style="color:#f92672">&#34;https://index.docker.io/v1/&#34;</span>: {
@@ -179,25 +179,25 @@ Dockerなどで利用する認証用の<code>config.json</code>です。<code>xx
 		}
 	}
 }
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl create secret generic dockerhub-cred \
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl create secret generic dockerhub-cred \
     --from-file=.dockerconfigjson=/path/to/config.json \
     --type=kubernetes.io/dockerconfigjson
 secret/dockerhub-cred created
 </code></pre></div><p>次にServiceAccountです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceAccount</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-tekton-pipeline</span>
 <span style="color:#f92672">secrets</span>:
   - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">dockerhub-cred</span>
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f my-tekton-pipeline-sa.yaml
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f my-tekton-pipeline-sa.yaml
 serviceaccount/my-tekton-pipeline created
 </code></pre></div><p>SecretとSecretを紐付けたServiceAccountの作成ができたら下準備は終了です。</p>
 <h3 id="パイプライン">パイプライン</h3>
 <p>いよいよパイプラインの作成です。<br>
 以下のようなパイプラインを作成しました。Taskを独自に作る必要がなかったので、指定するパラメータさえ把握できていればシンプルに書くことができました。Task内に定義されているパラメータをすべてパイプラインで定義する必要はありません。多くのパラメータはデフォルト値が設定されているので、変更したい部分だけパラメータ設定してください。
 前回の<a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">第6回</a>でやりましたが、Task間はデータを引き継ぎできません。Workspaceが必要になります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># build-image-pipeline.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># build-image-pipeline.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pipeline</span>
 <span style="color:#f92672">metadata</span>:
@@ -244,7 +244,7 @@ serviceaccount/my-tekton-pipeline created
         - <span style="color:#ae81ff">fetch-repository</span>
 </code></pre></div><p>では、実行してみましょう。
 次のようにPipelineRunを準備しました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># build-image-pipeline-run.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># build-image-pipeline-run.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PipelineRun</span>
 <span style="color:#f92672">metadata</span>:
@@ -274,7 +274,7 @@ serviceaccount/my-tekton-pipeline created
 <h3 id="パイプラインの実行">パイプラインの実行</h3>
 <p>パイプラインを実行して、実行結果を見てみます。<br>
 確認ポイントとしては、各Taskの実行結果や最終的なアウトプットとしてのコンテナレジストリです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f build-image-pipeline.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f build-image-pipeline.yaml
 pipeline.tekton.dev/build-image-pipeline created
 
 $ kubectl apply -f build-image-pipeline-run.yaml
@@ -308,7 +308,7 @@ affinity-assistant-38b60e39a8-0                             0/1     Terminating 
 affinity-assistant-38b60e39a8-0                             0/1     Terminating         0          84s
 affinity-assistant-38b60e39a8-0                             0/1     Terminating         0          84s
 </code></pre></div><p>buildah taskは3 Stepになっているのでそれぞれのログ結果を確認します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">$ kubectl logs build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7 -c step-build
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">$ kubectl logs build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7 -c step-build
 + buildah --storage-driver=overlay bud --format=oci --tls-verify=true --no-cache -f Dockerfile -t mosuke5/tekton-practice:from-pipeline /workspace/source
 STEP 1: FROM node:10-alpine
 Getting image source signatures

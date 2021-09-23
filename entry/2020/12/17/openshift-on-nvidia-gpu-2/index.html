@@ -125,7 +125,7 @@ nvidia-driverは、起動時にelfutils-libelfなどのパッケージをイン�
 OpenShiftをご利用であればサブスクリプションをお持ちかと思いますが、
 検証用で個人のサブスクリプションを使いたい場合には、1年間無料で利用できる <a href="https://developers.redhat.com/articles/getting-red-hat-developer-subscription-what-rhel-users-need-know#">Red Hat Developer Subscription</a>の利用でも可能です。</p>
 <p>cluster-wide entitlementを設定すると（実態は<code>MachineConfig</code>）、Machine Config Operator（MCO）は各ノードに設定内容を反映しに行きます。ノードへの設定変更時は、ノードのスケジューリングを無効化した上で順次ローリングアップデートするため、でノード台数が多い場合は時間がかかります。MachineConfigPoolの設定で、Workerノードが同時に何台までアップデート作業を実行していいかも決めることができます。お使いのクラスタの状況に応じて、ノード更新のスピードを上げたい場合は<code>MachineConfigPool</code>の<code>spec.maxUnavailable</code>の値の変更を検討できます（<a href="https://docs.openshift.com/container-platform/4.6/scalability_and_performance/recommended-host-practices.html#create-a-kubeletconfig-crd-to-edit-kubelet-parameters_">ドキュメント</a>）。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc apply -f 0003-cluster-wide-machineconfigs.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc apply -f 0003-cluster-wide-machineconfigs.yaml
 machineconfig.machineconfiguration.openshift.io/50-rhsm-conf created
 machineconfig.machineconfiguration.openshift.io/50-entitlement-pem created
 machineconfig.machineconfiguration.openshift.io/50-entitlement-key-pem created
@@ -149,7 +149,7 @@ Red HatがOpenShift向けに管理している<a href="https://catalog.redhat.co
 実際にWorkerノードのラベルを見てみるとたくさんのハードウェア情報が付与されていることが確認できます。
 今回のケースで言うと<code>feature.node.kubernetes.io/pci-10de.present: &quot;true&quot;</code>のラベルが付いているノードがNVIDIAのGPU搭載の証となります。
 PCIではベンダーIDというのがふられており、<code>10de</code>が<a href="https://devicehunt.com/view/type/pci/vendor/10DE">NVIDIAのベンダーID</a>となるようです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get pod | grep nfd
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get pod | grep nfd
 nfd-master-frnxf                           1/1     Running     0          26h
 nfd-master-hmzb6                           1/1     Running     0          26h
 nfd-master-nk8mj                           1/1     Running     0          26h
@@ -195,7 +195,7 @@ $ oc get node xxxxx -o yaml | grep feature.node.kubernetes.io
 実際にインストールしてみると、たくさんのコンポーネントが動いているのがわかるかと思います。概要編のGPU Operatorにて紹介したとおりです。
 また、NVIDIA GPU Operatorの起動後はGPU Feature DiscoveryがGPUのより詳細な情報をラベルとして付与します。
 次の例だと、<code>Tesla-T4</code>であることがわかります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get pod | grep -e nvidia -e gpu
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get pod | grep -e nvidia -e gpu
 gpu-feature-discovery-95vpr                1/1     Running     0          24h
 gpu-feature-discovery-wzz7r                1/1     Running     0          24h
 nvidia-container-toolkit-daemonset-5jdhn   1/1     Running     0          25h
@@ -226,7 +226,7 @@ $ oc get node xxxxx -o yaml | grep nvidia.com
     nvidia.com/gpu.present: &#34;true&#34;
     nvidia.com/gpu.product: Tesla-T4
 </code></pre></div><p>最終的に、ノードの<code>status.capacity</code>にて<code>nvidia.com/gpu</code>の状態が管理できるようになっていれば成功です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get node ip-10-0-220-29.ap-southeast-1.compute.internal -o yaml | grep -A 8 capacity
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get node ip-10-0-220-29.ap-southeast-1.compute.internal -o yaml | grep -A 8 capacity
   capacity:
     attachable-volumes-aws-ebs: &#34;39&#34;
     cpu: &#34;4&#34;
@@ -240,17 +240,17 @@ $ oc get node xxxxx -o yaml | grep nvidia.com
 <h3 id="スケジューリング">スケジューリング</h3>
 <p>GPUノードが利用できるような状態になったらさっそく利用してみましょう。
 GPU Operatorにて、<code>nvidia-device-plugin</code>がデプロイされました。これによって、PodのResource定義に<code>nvidia.com/gpu</code>を指定すると、GPUリソースの利用できるノードにスケジュールされます。具体例としては以下のとおりです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">resources</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">resources</span>:
   <span style="color:#f92672">limits</span>:
     <span style="color:#f92672">nvidia.com/gpu</span>: <span style="color:#ae81ff">1</span>
 </code></pre></div><p>また、ほとんどのケースにおいて、OpenShiftクラスタのノードすべてがGPU搭載というわけではないはずです。
 GPUを利用したいアプリケーションのみが、GPUノードにスケジューリングされるよう調整したいはずです。
 そこででてくるのが、<a href="https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/">TaintsとTolerations</a>です。
 GPUノードにtaintを付与し、tolerationを持たない通常のPodはスケジュールできないようにできます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc adm taint node xxxxx nodetype=gpu:NoSchedule
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc adm taint node xxxxx nodetype=gpu:NoSchedule
 node/xxxxx tainted
 </code></pre></div><p>PodをデプロイするときはTolerationを追加します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">labels</span>:
@@ -280,14 +280,14 @@ node/xxxxx tainted
 </code></pre></div><h3 id="監視">監視</h3>
 <p>NVIDIA GPU Operatorの中には、nvidia-dcgm-exporter が含まれておりPrometheusにて簡単に監視が可能です。
 以下は、exporterのPodとServiceを出力したものですが、各GPUノード上<code>pod/nvidia-dcgm-exporter-xxxx</code>が展開され、ポート9400のServiceで待ち受けていることがわかります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get pod,service | grep exporter
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get pod,service | grep exporter
 pod/nvidia-dcgm-exporter-5rl4f                 1/1     Running     0          43h
 pod/nvidia-dcgm-exporter-kjvnh                 1/1     Running     0          43h
 service/nvidia-dcgm-exporter   ClusterIP   172.30.79.53    &lt;none&gt;        9400/TCP    43h
 </code></pre></div><p>実際に、このサービスに向けてリクエストを投げてみましょう。
 出力は一部省略しています。
 （Kubernetes内部のServiceの名前解決について知りたい方はこちらのブログ「<a href="https://blog.mosuke.tech/entry/2020/09/09/kuubernetes-dns-test/">KubernetesのPod内からの名前解決を検証する</a>」を参照ください）</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc exec nvidia-dcgm-exporter-5rl4f -- curl nvidia-dcgm-exporter:9400/metrics
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc exec nvidia-dcgm-exporter-5rl4f -- curl nvidia-dcgm-exporter:9400/metrics
 ...
 DCGM_FI_DEV_SM_CLOCK{gpu=&#34;0&#34;, UUID=&#34;GPU-4063626d-f712-3d69-7469-1f17e7a1027d&#34;, device=&#34;nvidia0&#34;} 300
 DCGM_FI_DEV_MEM_CLOCK{gpu=&#34;0&#34;, UUID=&#34;GPU-4063626d-f712-3d69-7469-1f17e7a1027d&#34;, device=&#34;nvidia0&#34;} 405

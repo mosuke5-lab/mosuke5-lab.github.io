@@ -158,12 +158,12 @@
 <h3 id="バージョン">バージョン</h3>
 <p>利用バージョンは4.12.9です。Githubでいうと<a href="https://github.com/DandyDeveloper/charts/tree/9575536d1c16558ea97f635090c605f193cba052">このコミット</a>のものです。
 ちなみにKubernetesは1.17で検証しています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat Chart.yaml | grep version
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat Chart.yaml | grep version
 version: 4.12.9
 </code></pre></div><h3 id="設定">設定</h3>
 <p><code>values.yaml</code>をみていただければわかりますが、かなり多くの設定が可能です。
 今回は、このHelmの魅力を紹介するために下記3つの設定を変更してデプロイします。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">haproxy</span>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">haproxy</span>:
   <span style="color:#f92672">enabled</span>: <span style="color:#66d9ef">true</span>
 ...
   <span style="color:#f92672">metrics</span>:
@@ -173,7 +173,7 @@ version: 4.12.9
   <span style="color:#f92672">enabled</span>: <span style="color:#66d9ef">true</span>
 </code></pre></div><h3 id="デプロイ">デプロイ</h3>
 <p>対象のディレクトリを確認して、HelmでRedisをデプロイしてみます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ls -l
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ls -l
 ls -l
 total 152
 -rw-r--r--   1 shinyamori  staff    677  3  3 13:36 Chart.yaml
@@ -206,7 +206,7 @@ To connect to your Redis server:
 </code></pre></div><p>デプロイされた内容を確認するために、読者のために全体像をまず図示します。
 以下のような構成でデプロイされています。</p>
 <p><img src="/image/redis-ha-overview.png" alt="redis-ha-overview"></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">## ha-proxyがdeploymentで3台構成でデプロイ
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">## ha-proxyがdeploymentで3台構成でデプロイ
 $ kubectl get deploy
 NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
 my-redis-redis-ha-haproxy   3/3     3            3           18m
@@ -241,7 +241,7 @@ Sentinelは、どのRedisがPrimary(Master)かを判断しフェイルオーバ�
 では、アプリケーションサイドにフェイルオーバするごと、Redisの名前を教えるべきでしょうか？まずやめたほうがいいですよね。
 そこで活用されるのがha-proxyです。このha-proxyは、redisをバックエンドサーバとして、ヘルスチェックを通してどのRedisがPrimaryか判断してくれています。アプリケーションは、ha-proxyにさえ接続できればあとはha-proxyがPrimaryのRedisまでプロキシしてくれるというわけです。</p>
 <p>実際にha-proxyのconfigをみてみるとわかりやすいかもしれません。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl exec &lt;ha-proxy-pod&gt; -- cat /usr/local/etc/haproxy/haproxy.cfg
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl exec &lt;ha-proxy-pod&gt; -- cat /usr/local/etc/haproxy/haproxy.cfg
 ...
 # Check all redis servers to see if they think they are master
 backend bk_redis_master
@@ -264,7 +264,7 @@ backend bk_redis_master
 </code></pre></div><h3 id="モニタリング">モニタリング</h3>
 <p>また、Prometheusで監視できるように、Metricsを吐き出すことも可能です。デプロイ時にmetricsやexporterを<code>enabled: true</code>にしたのはそのためです。こちらの設定を有効にするとprometheus形式のメトリクスを吐き出せます。これで簡単に監視も設定できますね。</p>
 <p>実際にデバッグ用のコンテナをデプロイして、コンテナ内からcurlを用いてmetricsにアクセスしてみます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl run debug --image registry.gitlab.com/mosuke5/debug-container:latest -it /bin/bash
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl run debug --image registry.gitlab.com/mosuke5/debug-container:latest -it /bin/bash
 container # curl http://my-redis-redis-ha-haproxy:9101/metrics | head
 #TYPE haproxy_process_nbthread gauge
 haproxy_process_nbthread 8

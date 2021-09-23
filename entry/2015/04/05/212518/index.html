@@ -88,7 +88,7 @@
 ローカルのPCの鍵を他のサーバへ引き継ぐことでgit clone等を可能にするのだ。</p>
 <h1>2. <a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>エージェントフォワード利用時の挙動</h1>
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>のエージェントフォワードで利用される認証情報は、接続先サーバの/tmp以下に保存されます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[myuser@localpc ~]$ ssh -A vagrant@192.168.33.100
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[myuser@localpc ~]$ ssh -A vagrant@192.168.33.100
 Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
 [vagrant@testsv ~]$
 [vagrant@testsv ~]$ ls -l /tmp | grep ssh
@@ -97,7 +97,7 @@ drwx------. 2 vagrant    vagrant    23  4月  4 11:35 ssh-skQVHsUCHU
 また、接続ユーザには<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>_AUTH_SOCKという<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>ができ、どの認証情報を利用するか記述がされます。<br>
 実際に確認してみる。<br>
 確認方法は、envコマンドで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>一覧を表示し、そのなかで"<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>"を含むものを<a class="keyword" href="http://d.hatena.ne.jp/keyword/grep">grep</a>。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[vagrant@testsv ~]$ env | grep -i ssh
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[vagrant@testsv ~]$ env | grep -i ssh
 SSH_AUTH_SOCK=/tmp/ssh-skQVHsUCHU/agent.9034
 SSH_CLIENT=&#39;192.168.33.1 58017 22&#39;
 SSH_CONNECTION=&#39;192.168.33.1 58017 192.168.33.100 22&#39;
@@ -106,7 +106,7 @@ SSH_TTY=/dev/pts/0
 ちなみにエージェントフォワードは、認証エージェントに登録されている<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C8%EB%CC%A9%B8%B0">秘密鍵</a>を<br>
 ログイン先のサーバから利用できるようにする機能であり、接続元自体が変わるわけではない。<br>
 試しにエージェントフォワードで接続したサーバ先から、更に<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>をして、その接続状況をみてみる。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[myuser@localpc ~]$ ssh -A vagrant@192.168.33.100
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[myuser@localpc ~]$ ssh -A vagrant@192.168.33.100
 Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
 [vagrant@testsv ~]$ ssh -A vagrant@192.168.33.100
 Last login: Sat Apr  4 xx:xx:xx 2015 from 192.168.33.1
@@ -120,7 +120,7 @@ vagrant  pts/1    192.168.33.100   11:50    1.00s  0.01s  0.00s w
 <h1>3. <a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>エージェントフォワードで接続後にrootユーザでgit cloneする</h1>
 <p>例えば、rootでしかアクセスできないディレクトリにgit cloneしたいと思い、<br>
 以下のようにsudoをつけてgit cloneしてみる。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[vagrant@testsv ~]$ sudo git clone git@xxxxx.xxx:yyyy/zzzzzz.git /root/hoge
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[vagrant@testsv ~]$ sudo git clone git@xxxxx.xxx:yyyy/zzzzzz.git /root/hoge
 Permission denied (publickey).
 fatal: Could not read from remote repository.
 
@@ -130,20 +130,20 @@ and the repository exists.
 なぜエージェントフォワードしたのにgit cloneできないのだろうか？</p>
 <p>一般的な設定ではsudo実行すると、ユーザの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>はrootユーザへ引き継がれず、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>_AUTH_SOCKがないことがわかる。<br>
 sudo後に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>がどうなっているか確認してみる。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[vagrant@testsv ~]$ sudo env | grep -i ssh
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[vagrant@testsv ~]$ sudo env | grep -i ssh
 　(なにも表示されない) 
 </code></pre></div><p><br>
 sudo実行しても、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>_AUTH_SOCKを引き継ぎたい！<br>
 実はsudoで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>を引き継ぐ方法がある。-Eのオプションを付けると<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>を引き継ぐことが可能だ。<br>
 以下のように<code>sudo -E</code>とすると...</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[vagrant@testsv ~]$ sudo -E env | grep -i ssh
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[vagrant@testsv ~]$ sudo -E env | grep -i ssh
 SSH_CLIENT=192.168.33.100 60051 22
 SSH_TTY=/dev/pts/1
 SSH_AUTH_SOCK=/tmp/ssh-qhGLsXBURp/agent.9113
 SSH_CONNECTION=192.168.33.100 60051 192.168.33.100 22 
 </code></pre></div><p><br>
 <code>sudo -E</code>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>が引き継げ、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>_AUTH_SOCKが引き継げるので、-Eをつけてsudo git cloneをトライする。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[vagrant@testsv ~]$ sudo -E git clone git@xxxxx.xxx:yyyy/zzzzzz.git /root/hoge
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[vagrant@testsv ~]$ sudo -E git clone git@xxxxx.xxx:yyyy/zzzzzz.git /root/hoge
 Cloning into &#39;zzzzzz&#39;...
 remote: Counting objects: 27, done.
 remote: Compressing objects: 100% (26/26), done.
@@ -160,7 +160,7 @@ rootユーザへ切り替えるとき、よく<code>su -</code>とハイフン�
 <p>続いて、rootユーザではない別の一般ユーザでのgit cloneについて考える。<br>
 rootユーザの時と同じ要領で、sudoコマンドを利用しotheruserという別のユーザでgit cloneをしてみる。</p>
 <p>まずは、sudoコマンドでは-uでユーザの指定ができるので、otheruserに切り替えた際の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>をみてみる。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[vagrant@testsv ~]$ sudo -E -u otheruser env | grep -i ssh
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[vagrant@testsv ~]$ sudo -E -u otheruser env | grep -i ssh
 SSH_CLIENT=192.168.33.100 60051 22
 SSH_TTY=/dev/pts/1
 SSH_AUTH_SOCK=/tmp/ssh-qhGLsXBURp/agent.9113
@@ -168,7 +168,7 @@ SSH_CONNECTION=192.168.33.100 60051 192.168.33.100 22
 </code></pre></div><p><br>
 rootの時と同様で予想通りな感じ。
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>_AUTH_SOCKも引き継げているし、git clone可能だと思い以下を実行すると。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo -E -u otheruser git clone git@xxxxx.xxx:yyyy/zzzzzz.git /home/otheruser
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo -E -u otheruser git clone git@xxxxx.xxx:yyyy/zzzzzz.git /home/otheruser
 Permission denied (publickey).
 fatal: Could not read from remote repository.
 
@@ -179,11 +179,11 @@ rootユーザの時とは異なってgit cloneは不可…</p>
 <p>でも理由はいたって簡単。<br>
 /tmp以下に保存されている認証情報は、所有者は接続したユーザで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A1%BC%A5%DF%A5%C3%A5%B7%A5%E7%A5%F3">パーミッション</a>は600なのだ。<br>
 つまり、otheruserではこの認証情報は読みこめないのである。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[vagrant@testsv ~]$ ls -l /tmp | grep ssh
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[vagrant@testsv ~]$ ls -l /tmp | grep ssh
 drwx------. 2 vagrant    vagrant    23  4月  4 11:35 ssh-skQVHsUCHU 
 </code></pre></div><p>重要な情報なので、アクセス権は妥当ですよね。<br>
 試しにアクセス権を変えてみるとgit cloneは可能だ。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[vagrant@testsv ~]$ chmod -R 777 /tmp/ssh-skQVHsUCHU
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[vagrant@testsv ~]$ chmod -R 777 /tmp/ssh-skQVHsUCHU
 [vagrant@testsv ~]$ sudo -E -u otheruser git clone git@xxxxx.xxx:yyyy/zzzzzz.git /home/otheruser
 Cloning into &#39;zzzzzz&#39;...
 remote: Counting objects: 27, done.

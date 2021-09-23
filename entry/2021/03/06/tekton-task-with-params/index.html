@@ -159,7 +159,7 @@
 デフォルト値は、<code>mosuke5</code>で設定しています。
 また変数展開は、<code>$(params.param-name)</code>で可能です。<br>
 詳細は公式ドキュメント&quot;<a href="https://tekton.dev/docs/pipelines/tasks/#specifying-parameters">Specifying Parameters</a>&ldquo;を確認しましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># hello-my-name-task.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># hello-my-name-task.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Task</span>
 <span style="color:#f92672">metadata</span>:
@@ -177,7 +177,7 @@
       <span style="color:#f92672">args</span>: [<span style="color:#e6db74">&#34;hello $(params.my-name)&#34;</span>]
 </code></pre></div><p>TaskRunで、実際にTaskを実行するときのパラメータを指定できます。
 <code>my-name</code>のデフォルト値は<code>mosuke5</code>ですが、パラメータ指定をわかりやすくするために、<code>momosuke5</code>で上書きします。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># hello-my-neme-task-run.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># hello-my-neme-task-run.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">TaskRun</span>
 <span style="color:#f92672">metadata</span>:
@@ -188,7 +188,7 @@
       <span style="color:#f92672">value</span>: <span style="color:#ae81ff">momosuke5</span>
   <span style="color:#f92672">taskRef</span>:
     <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-my-name-task</span>
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f hello-my-name-task.yaml
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f hello-my-name-task.yaml
 task.tekton.dev/hello-my-name-task created
 
 $ kubectl apply -f hello-my-name-task-run.yaml
@@ -203,7 +203,7 @@ $ kubectl logs hello-my-name-task-run-pod-lgfbg
 hello momosuke5
 </code></pre></div><p>ちなみに、実行されたPodのマニフェストを確認すると、Pod作成時点では変数は展開されており、以下のように<code>args</code>内で<code>hello momosuke5</code>となっています。
 Tektonが、Podを作成するときにパラメータは処理されています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod hello-my-name-task-run-pod-lgfbg -o yaml | less
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod hello-my-name-task-run-pod-lgfbg -o yaml | less
 ...
 spec:
   containers:
@@ -224,7 +224,7 @@ spec:
 <code>my-friends</code>というパラメータが必要であることをTaskに記述します。
 詳細は公式ドキュメント&rdquo;<a href="https://tekton.dev/docs/pipelines/tasks/#substituting-array-parameters">Substituting Array parameters
 </a>&ldquo;を確認しましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># hello-my-friends-task.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># hello-my-friends-task.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Task</span>
 <span style="color:#f92672">metadata</span>:
@@ -239,7 +239,7 @@ spec:
       <span style="color:#f92672">command</span>: [<span style="color:#e6db74">&#34;echo&#34;</span>]
       <span style="color:#f92672">args</span>: [<span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#e6db74">&#34;$(params.my-friends[*])&#34;</span>]
 </code></pre></div><p>TaskRunで、配列で<code>my-friends</code>の値を渡します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># hello-my-friends-task-run.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># hello-my-friends-task-run.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">TaskRun</span>
 <span style="color:#f92672">metadata</span>:
@@ -255,7 +255,7 @@ spec:
   <span style="color:#f92672">taskRef</span>:
     <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-my-friends-task</span>
 </code></pre></div><p>実行結果は以下のとおり、予想通りです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f hello-my-friends-task.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f hello-my-friends-task.yaml
 task.tekton.dev/hello-my-friends-task created
 
 $ kubectl apply -f hello-my-friends-task-run.yaml

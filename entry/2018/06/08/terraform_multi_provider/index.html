@@ -92,7 +92,7 @@ Terraformではプロバイダーを指定する際に、リージョンを指�
 <p>こちらの方法は、シンプルでわかりやすい方法ではありますが、<br>
 デメリットとして、もし東京と上海でおなじリソースを作りたい場合には、コードがかなり冗長になってしまいます。<br>
 リージョンをまたいで同じような構成を作りたい場合には、次に紹介する方法をとったほうがよさそうです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">#</span> <span style="color:#960050;background-color:#1e0010">main.tf</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">#</span> <span style="color:#960050;background-color:#1e0010">main.tf</span>
 <span style="color:#960050;background-color:#1e0010">variable</span> <span style="color:#e6db74">&#34;access_key&#34;</span> {}
 <span style="color:#960050;background-color:#1e0010">variable</span> <span style="color:#e6db74">&#34;secret_key&#34;</span> {}
 
@@ -129,13 +129,13 @@ Terraformではプロバイダーを指定する際に、リージョンを指�
 <p>今度は<code>module</code>という機能を使って、もって効率的に、複数のリージョンにリソースを構築していく方法についてです。<br>
 この例では、<code>global</code>ディレクトリに東京と上海での共通で作りたいリソースの記述をしておくことで、上の方法より冗長なコードではなくすことができます。<br>
 もちろん、リージョン毎に異なる値などは変数で渡すことができます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># 階層構造
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># 階層構造
 ├── README.md
 ├── global
 │   └── main.tf
 ├── terraform.tf
 └── terraform.tfvars
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">#</span> <span style="color:#960050;background-color:#1e0010">terrafomr.tf</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">#</span> <span style="color:#960050;background-color:#1e0010">terrafomr.tf</span>
 <span style="color:#960050;background-color:#1e0010">variable</span> <span style="color:#e6db74">&#34;access_key&#34;</span> {}
 <span style="color:#960050;background-color:#1e0010">variable</span> <span style="color:#e6db74">&#34;secret_key&#34;</span> {}
 
@@ -170,7 +170,7 @@ Terraformではプロバイダーを指定する際に、リージョンを指�
     <span style="color:#960050;background-color:#1e0010">alicloud</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;alicloud.shanghai&#34;</span>
   }
 }
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">#</span> <span style="color:#960050;background-color:#1e0010">global/main.tf</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">#</span> <span style="color:#960050;background-color:#1e0010">global/main.tf</span>
 <span style="color:#960050;background-color:#1e0010">variable</span> <span style="color:#e6db74">&#34;vpc_cidr&#34;</span> {}
 
 <span style="color:#960050;background-color:#1e0010">resource</span> <span style="color:#e6db74">&#34;alicloud_vpc&#34;</span> <span style="color:#e6db74">&#34;vpc&#34;</span> {

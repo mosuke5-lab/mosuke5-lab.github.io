@@ -91,7 +91,7 @@ Docker上のMySQL利用ははじめてだったので、いろいろわからな
 そうなると、コンテナとして行ってほしいのは、そもそもMySQLの起動はもちろん、データベース作成と、それを操作するためのユーザの設定などだ。</p>
 <h2 id="起動と基本設定">起動と基本設定</h2>
 <p>MySQLのDockerイメージがあるので動かすだけならば特に難しいことはなにもない。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ docker run --name mysql -d -p 3306:3306 mysql
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ docker run --name mysql -d -p 3306:3306 mysql
 </code></pre></div><p>しかし、MySQLの基本設定や、そもそもrootユーザのパスワードなどどうすればいいのか。<br>
 データベースやユーザはどうやって作ることができるのか。このあたりは当然ながら一番はじめに気になる部分である。</p>
 <p>ドキュメント読むとすぐにわかるが、
@@ -104,17 +104,17 @@ MySQLのDockerコンテナを起動するときに環境変数を設定するこ
 <li><code>MYSQL_PASSWORD</code>: 上のユーザのパスワード</li>
 </ul>
 <p>例えば、rootパスワードを設定したい場合は以下のようにすればよい。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ docker run --name mysql -e MYSQL_ROOT_PASSWORD=mysecret -d -p 3306:3306 mysql
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ docker run --name mysql -e MYSQL_ROOT_PASSWORD=mysecret -d -p 3306:3306 mysql
 </code></pre></div><h2 id="dockerfileをのぞく">Dockerfileをのぞく</h2>
 <p>Dockerfileの中身を見ていくと、より仕組みが理解できる。
 MySQLのDockerイメージで立ち上げのときの実行される、<code>docker-entrypoint.sh</code>の中身をみるよいい。</p>
 <div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/docker-library/mariadb/blob/master/docker-entrypoint.sh" data-iframely-url="//cdn.iframe.ly/nNIVaxs"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
 <p>次のように、環境変数が設定されている場合に、それにそってデータベースの作成やユーザ設定を行ってくれることがわかる。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$MYSQL_DATABASE<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$MYSQL_DATABASE<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
 	echo <span style="color:#e6db74">&#34;CREATE DATABASE IF NOT EXISTS \`</span>$MYSQL_DATABASE<span style="color:#e6db74">\` ;&#34;</span> | <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>mysql[@]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
 	mysql<span style="color:#f92672">+=(</span> <span style="color:#e6db74">&#34;</span>$MYSQL_DATABASE<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">)</span>
 <span style="color:#66d9ef">fi</span>
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$MYSQL_USER<span style="color:#e6db74">&#34;</span> -a <span style="color:#e6db74">&#34;</span>$MYSQL_PASSWORD<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$MYSQL_USER<span style="color:#e6db74">&#34;</span> -a <span style="color:#e6db74">&#34;</span>$MYSQL_PASSWORD<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
 	echo <span style="color:#e6db74">&#34;CREATE USER &#39;</span>$MYSQL_USER<span style="color:#e6db74">&#39;@&#39;%&#39; IDENTIFIED BY &#39;</span>$MYSQL_PASSWORD<span style="color:#e6db74">&#39; ;&#34;</span> | <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>mysql[@]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
 
 	<span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$MYSQL_DATABASE<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
@@ -130,7 +130,7 @@ MySQLのDockerイメージで立ち上げのときの実行される、<code>doc
 このディレクトリにある、シェルスクリプトやsqlファイルが実行されるようになっている。
 もし、セットアップで独自の処理を実行したい場合には、コンテナ起動時にこのディレクトリにファイルを置けばいい。一番簡単なのはボリュームをマウントすることだ。
 例えば、テーブルの作成やテストデータのインポートなど任意の処理を実行させることができる。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#66d9ef">for</span> f in /docker-entrypoint-initdb.d/*; <span style="color:#66d9ef">do</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#66d9ef">for</span> f in /docker-entrypoint-initdb.d/*; <span style="color:#66d9ef">do</span>
 	<span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;</span>$f<span style="color:#e6db74">&#34;</span> in
 		*.sh<span style="color:#f92672">)</span>     echo <span style="color:#e6db74">&#34;</span>$0<span style="color:#e6db74">: running </span>$f<span style="color:#e6db74">&#34;</span>; . <span style="color:#e6db74">&#34;</span>$f<span style="color:#e6db74">&#34;</span> ;;
 		*.sql<span style="color:#f92672">)</span>    echo <span style="color:#e6db74">&#34;</span>$0<span style="color:#e6db74">: running </span>$f<span style="color:#e6db74">&#34;</span>; <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>mysql[@]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> &lt; <span style="color:#e6db74">&#34;</span>$f<span style="color:#e6db74">&#34;</span>; echo ;;
@@ -142,7 +142,7 @@ MySQLのDockerイメージで立ち上げのときの実行される、<code>doc
 </code></pre></div><p>起動のタイミングだけはおさえておくとよい。<br>
 これらの処理自体が下記IF文の中に記述されており、データベースのinitializeのタイミングに実行されることになっている。
 もし、initialize後に<code>/docker-entrypoint-initdb.d/</code>にファイルを置いても実行されないので注意だ。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> ! -d <span style="color:#e6db74">&#34;</span>$DATADIR<span style="color:#e6db74">/mysql&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> ! -d <span style="color:#e6db74">&#34;</span>$DATADIR<span style="color:#e6db74">/mysql&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
     ....
 <span style="color:#66d9ef">done</span>
 </code></pre></div><h2 id="さいごに">さいごに</h2>

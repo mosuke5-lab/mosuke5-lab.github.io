@@ -93,19 +93,19 @@ Ansibleを実行することがやりたかったこと。</p>
 Ansible実行の場合、<b><u>特定の端末に依存したくなかった</u></b>ので、<br>
 ansible-playbookのレポジトリに別途ファイルを作るって管理することにしました。<br>
 なぜ特定の端末に依存したくなかったかというと、一人で利用する場合には良いのですが、複数人での運用環境の場合、ことなる環境でAnsibleのplaybookを実行しなければいけないことがあったからです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">## sshconfigという名前のファイルにした
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">## sshconfigという名前のファイルにした
 Host ansible-target
     HostName 192.168.33.10
     User xxxxx
     ProxyCommand ssh -W %h:%p yyyyy@hostserver 
 </code></pre></div><p>上記のファイルを使って多段SSHできることを確認します。
 こちらで、問題なくターゲットのホストにSSH接続できれば問題なしです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ssh -F sshconfig ansible-target
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ssh -F sshconfig ansible-target
 </code></pre></div><h2>Ansible実行時にSSH設定ファイルを利用する</h2>
 <p>ここまで来たらとても簡単です。<br>
 Ansibleには、Ansible実行時の設定を管理する<a href="https://docs.ansible.com/ansible/latest/installation_guide/intro_configuration.html" target="_blank">ansible.cfgという設定ファイル</a>を利用することができます。非常に便利なので活用方法は覚えておくといいです。<br>
 そのansible.cfgに下記を追記し、ansible実行時に上記のsshconfigを読み込まれるようにすることで踏み台越しにAnsibleを実行することができます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># ansible.cfg
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># ansible.cfg
 [ssh_connection]
 ssh_args = -F sshconfig 
 </code></pre></div><h2>まとめ</h2>

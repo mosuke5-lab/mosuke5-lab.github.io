@@ -93,7 +93,7 @@ apacheが起動していること、自動起動する設定であること</li>
 </ul>
 <p>この要件をサーバが満たしているかコードでテストします。<br>
 上記の例だとこんなコードを書きます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">describe package(<span style="color:#e6db74">&#39;httpd&#39;</span>) <span style="color:#66d9ef">do</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">describe package(<span style="color:#e6db74">&#39;httpd&#39;</span>) <span style="color:#66d9ef">do</span>
   it { should be_installed }
 <span style="color:#66d9ef">end</span>
 
@@ -150,7 +150,7 @@ Vim::Factoryの開発は企業でもなければ営利目的でもありませ�
 <h3>テストをサーバの役割毎にまとめる</h3>
 <p>ディレクトリの主な構成は下記のようになっています。<br>
 （実際にはもっとファイルやホストが多いですがイメージです。）</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">├ Rakefile
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">├ Rakefile
 ├ spec/
 │ └ spec_helper.rb
 │ ├ base/
@@ -163,7 +163,7 @@ Vim::Factoryの開発は企業でもなければ営利目的でもありませ�
 └ sshconfig 
 </code></pre></div><p>nginxなどを搭載するプロキシサーバとアプリケーションサーバがあり、それぞれにロールを割り振ります。<br>
 Rakefile内に書いてます。もし記述が増えるようだと別ファイルに切り出すと思います。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">hosts <span style="color:#f92672">=</span> <span style="color:#f92672">[</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">hosts <span style="color:#f92672">=</span> <span style="color:#f92672">[</span>
   {
     <span style="color:#e6db74">:name</span>   <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;proxy.vimfactory&#34;</span>,
     <span style="color:#e6db74">:roles</span>  <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">%w( base proxy )</span>
@@ -185,11 +185,11 @@ Rakefile内に書いてます。もし記述が増えるようだと別ファイ
 <p>ですので、プロジェクトで使うsshのクライアントの設定ファイルもgit管理しておいて、<br>
 それを使うようにすることが望ましいと思っています。</p>
 <p>そこで、spec_helper.rbの<code>Net::SSH::Config</code>部分を修正し、sshの設定ファイルを任意で指定できるようにしています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">config  <span style="color:#f92672">=</span> <span style="color:#66d9ef">ENV</span><span style="color:#f92672">[</span><span style="color:#e6db74">&#39;SSH_CONFIG&#39;</span><span style="color:#f92672">]</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">config  <span style="color:#f92672">=</span> <span style="color:#66d9ef">ENV</span><span style="color:#f92672">[</span><span style="color:#e6db74">&#39;SSH_CONFIG&#39;</span><span style="color:#f92672">]</span>
 options <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">SSH</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Config</span><span style="color:#f92672">.</span>for(host, <span style="color:#f92672">[</span>config<span style="color:#f92672">]</span>)
  
 </code></pre></div><p>実行時に指定します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">bundle exec rake serverspec SSH_CONFIG=sshconfig 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">bundle exec rake serverspec SSH_CONFIG=sshconfig 
 </code></pre></div><h3>デプロイ作業での活用</h3>
 <p>serverspecは主に、インフラの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C6%A5%B9%A5%C8%B6%EE%C6%B0%B3%AB%C8%AF">テスト駆動開発</a>のために導入したのですが、
 本番環境でのデプロイ作業（インフラ設定の変更）にも大活躍しています。</p>

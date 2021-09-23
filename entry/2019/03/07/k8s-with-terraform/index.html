@@ -103,7 +103,7 @@
 <h2 id="kubernetesクラスターそのものをterraformで操る">KubernetesクラスターそのものをTerraformで操る</h2>
 <p>こちらは軽く流していきますが、Terraformでクラウドのサービスを操ることができるので、もしKubernetesのサービスを提供している場合は、下記のようにクラスターそのものを構築することが容易です。
 こちらは、Alibaba CloudのContainer Serviceを起動する例としていてます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">provider</span> <span style="color:#e6db74">&#34;alicloud&#34;</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">provider</span> <span style="color:#e6db74">&#34;alicloud&#34;</span> {
   <span style="color:#960050;background-color:#1e0010">access_key</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;${var.access_key}&#34;</span>
   <span style="color:#960050;background-color:#1e0010">secret_key</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;${var.secret_key}&#34;</span>
   <span style="color:#960050;background-color:#1e0010">region</span>     <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;${var.region}&#34;</span>
@@ -142,11 +142,11 @@ Terraformで管理するメリット/デメリットってどんなところに�
 <p>まずは試してみます。認証ですが、いろんな方法がありますが、もしすでに<code>~/.kube/config</code>にクライアント証明の入った設定ファイルがあるのならば、特に設定することなく利用できます。
 認証に、<code>servicea ccount</code>のtokenを利用している場合などは、既定の設定をいれる必要があります。
 ここでは、<code>~/.kube/config</code>があるので以下だけのProvider設定で行きます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">provider &#34;kubernetes&#34; {}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">provider &#34;kubernetes&#34; {}
 </code></pre></div><h3 id="deploymentを作ってみる">Deploymentを作ってみる</h3>
 <p>例えばすごく単純に、Nginxが3つ立ち上がるdeploymentを作ることとします。
 manifestなら以下のようになりますね。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-sample-deployment</span>
@@ -170,7 +170,7 @@ manifestなら以下のようになりますね。</p>
 一部のArgumentsの名前がmanifestで書くものと異なります。
 例えば、<code>matchLabels</code>を<code>match_labels</code>としなければいけなかったりします。
 このあたりが少し面倒という印象です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">resource</span> <span style="color:#e6db74">&#34;kubernetes_deployment&#34;</span> <span style="color:#e6db74">&#34;test&#34;</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">resource</span> <span style="color:#e6db74">&#34;kubernetes_deployment&#34;</span> <span style="color:#e6db74">&#34;test&#34;</span> {
   <span style="color:#960050;background-color:#1e0010">metadata</span> <span style="color:#960050;background-color:#1e0010">{</span>
     <span style="color:#960050;background-color:#1e0010">name</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;nginx-sample-deployment&#34;</span>
   }
@@ -202,7 +202,7 @@ manifestなら以下のようになりますね。</p>
 <span style="color:#960050;background-color:#1e0010">}</span>
 </code></pre></div><p>Terraform管理のいいところは、なんといっても、この<code>terraform plan</code>によるDry-runができることですね。
 やってみます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform plan
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform plan
 Refreshing Terraform state in-memory prior to plan...
 The refreshed state will be used to calculate this plan, but will not be
 persisted to local or remote state storage.
@@ -225,7 +225,7 @@ Terraform will perform the following actions:
 
 Plan: 1 to add, 0 to change, 0 to destroy.
 </code></pre></div><p>差分を確認してapplyしてデプロイしていきます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform apply
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform apply
 (中略)
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
@@ -241,7 +241,7 @@ nginx-sample-deployment-6c668d7f76-t9lfp    1/1       Running   0          49s
 </code></pre></div><p>変更があったと仮定して、Terraformの定義ファイルの中身を少し変えてみます。
 レプリカ数とコンテナ名を変更してみました。<br>
 変更の差分を確認できるのはやっぱりTerraformで管理する最大のメリットですね。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform plan
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform plan
 kubernetes_deployment.test: Refreshing state... (ID: default/nginx-sample-deployment)
 
 ------------------------------------------------------------------------

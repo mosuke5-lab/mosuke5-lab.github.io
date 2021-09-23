@@ -88,7 +88,7 @@
 <p>Serviceへは <code>service.namespace.svc.cluster.local</code> で名前解決ができ、アクセスできます。
 こちらは基礎的なことなので知っている方も多いかと思います。もし知らなかったという方は、デバッグに非常に役立ちますのでぜひ理解しておくといいです。
 (公式ドキュメント: <a href="https://kubernetes.io/ja/docs/concepts/services-networking/dns-pod-service/" target="_blank">ServiceとPodに対するDNS - Kubernetes</a>)</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># curl -I http://httpd-example.mosuke5.svc.cluster.local:8080
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># curl -I http://httpd-example.mosuke5.svc.cluster.local:8080
 HTTP/1.1 200 OK
 Date: Wed, 09 Sep 2020 08:59:19 GMT
 Server: Apache/2.4.34 (Red Hat) OpenSSL/1.0.2k-fips
@@ -101,19 +101,19 @@ Content-Type: text/html; charset=UTF-8
 <p>PodはどこのDNSサーバを利用して通信できているのでしょうか。
 Pod内の <code>/etc/resolv.conf</code> をのぞいてみます。
 (この時点ではPodの<code>spec.dnsPolicy</code>は何も記述しないものとしています。)</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># cat /etc/resolv.conf
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># cat /etc/resolv.conf
 search mosuke5.svc.cluster.local svc.cluster.local cluster.local ap-southeast-1.compute.internal
 nameserver 172.30.0.10
 options ndots:5
 </code></pre></div><p><code>nameserver 172.30.0.10</code> となっていますが、Kubernetes内に存在するcoreDNSのServiceのIPアドレスです。
 クラスタ内部のDNS問い合わせにいっていることがわかります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubeclt get service
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubeclt get service
 NAME          TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)                  AGE
 dns-default   ClusterIP   172.30.0.10   &lt;none&gt;        53/UDP,53/TCP,9153/TCP   26h
 </code></pre></div><p><code>search</code> をみると、<code>mosuke5.svc.cluster.local svc.cluster.local cluster.local ap-southeast-1.compute.internal</code> と複数ドメインが記述されています。クラスタの環境にもよると思いますが、この環境はAWSのEC2上のクラスタのためAWSのインターナルのドメインも含めて4つの記述があります。</p>
 <p>上の設定があることで、必ずしも <code>httpd-example.mosuke5.svc.cluster.local</code> のようにフルの名前でなくてもアクセスが可能ということになります。
 試しに<code>Service名</code>と<code>Service名.Namespace名</code>で接続を試みますが接続可能です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># curl -I httpd-example:8080
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># curl -I httpd-example:8080
 HTTP/1.1 200 OK
 Date: Wed, 09 Sep 2020 09:16:42 GMT
 Server: Apache/2.4.34 (Red Hat) OpenSSL/1.0.2k-fips
@@ -138,7 +138,7 @@ Content-Type: text/html; charset=UTF-8
 実際に、digやnslookupを使ってIPアドレスを引いてみたいと思います。</p>
 <p>しかし、digでなんのオプションもなしに実行してみましたがAレコードが返ってきません。
 ちなみにnslookupでは、アドレスは正しくひけています。これはなぜでしょうか？</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># dig httpd-example
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># dig httpd-example
 
 ; &lt;&lt;&gt;&gt; DiG 9.11.22-RedHat-9.11.22-1.fc32 &lt;&lt;&gt;&gt; httpd-example
 ;; global options: +cmd
@@ -159,7 +159,7 @@ Content-Type: text/html; charset=UTF-8
 ;; SERVER: 172.30.0.10#53(172.30.0.10)
 ;; WHEN: Wed Sep 09 09:18:18 UTC 2020
 ;; MSG SIZE  rcvd: 129
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># nslookup httpd-example
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># nslookup httpd-example
 Server:		172.30.0.10
 Address:	172.30.0.10#53
 
@@ -167,14 +167,14 @@ Name:	httpd-example.mosuke5.svc.cluster.local
 Address: 172.30.147.209
 </code></pre></div><p>こちらはKubernetesの話ではまったくありませんが、digはオプションをつけない状態では、<code>/etc/resolv.conf</code>のsearchは読んでいません。
 digを使ってアドレスをひくときは、<code>httpd-example.mosuke5.svc.cluster.local</code>とフルの名前を用いるか、<code>+search</code> オプションをつけて、<code>/etc/resolv.conf</code>から設定を使うようにするといいです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># dig httpd-example +search
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># dig httpd-example +search
 ...
 ;; ANSWER SECTION:
 httpd-example.mosuke5.svc.cluster.local. 5 IN A	172.30.147.209
 ...
 </code></pre></div><h2 id="tcpdumpで詳細をみてみる">tcpdumpで詳細をみてみる</h2>
 <p>pod内でtcpdumpを起動してみてみます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># tcpdump port 53
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># tcpdump port 53
 ...
 </code></pre></div><p>tcpdumpを起動した状態で、<code>dig google.com +search</code> を実行してみます。
 そうするとおもしろいことがおきます。
@@ -187,7 +187,7 @@ httpd-example.mosuke5.svc.cluster.local. 5 IN A	172.30.147.209
 <li><code>google.com.</code></li>
 </ol>
 <p>以下はdigを実行した際のtcpdumpのログです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">10:13:38.113836 IP debug.55582 &gt; dns-default.openshift-dns.svc.cluster.local.domain: 501+ [1au] A? google.com.mosuke5.svc.cluster.local. (77)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">10:13:38.113836 IP debug.55582 &gt; dns-default.openshift-dns.svc.cluster.local.domain: 501+ [1au] A? google.com.mosuke5.svc.cluster.local. (77)
 10:13:38.115079 IP dns-default.openshift-dns.svc.cluster.local.domain &gt; debug.55582: 501 NXDomain*- 0/1/1 (170)
 10:13:38.115350 IP debug.49587 &gt; dns-default.openshift-dns.svc.cluster.local.domain: 15110+ [1au] A? google.com.svc.cluster.local. (69)
 10:13:38.115815 IP dns-default.openshift-dns.svc.cluster.local.domain &gt; debug.49587: 15110 NXDomain*- 0/1/1 (162)

@@ -159,7 +159,7 @@ Tekton学習シリーズ第5回をやっていきます。
 Pipelineは、Taskの集合体であり、Tektonのなかでは一番大きい単位の実行リソースとなります。いままで見てきたTaskをラッピングして実行するため、Taskをきちんと理解していればそれほど難しいものではないと思います。</p>
 <p>改めて、以下のTaskを使います。<br>
 本シリーズの第2回 <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a> を実施した方は、<code>multi-steps-task</code>の3番目のStepをsleepに書き換えてしまったのでもとに戻しておいてください。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Task</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-my-name-task</span>
@@ -209,7 +209,7 @@ Pipelineは、Taskの集合体であり、Tektonのなかでは一番大きい�
       <span style="color:#f92672">args</span>: [<span style="color:#e6db74">&#34;hello third step&#34;</span>]
 </code></pre></div><p>続いて、初登場のPipelineですが下記のとおりです。
 上で定義した3つのTaskをまとめてパイプラインとしています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># my-first-pipeline.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># my-first-pipeline.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pipeline</span>
 <span style="color:#f92672">metadata</span>:
@@ -241,12 +241,12 @@ Pipelineは、Taskの集合体であり、Tektonのなかでは一番大きい�
 それは、上のパイプラインでは、Taskはすべて並列で実行されているということです。
 次のセクションで順序制御については触れますが、なにも設定しない限りデフォルトでは並列実行となります。</p>
 <p>イメージで言うとこんなかんじです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">                  (hello-my-name-task)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">                  (hello-my-name-task)
                 / 
 (Pipeline start) -(hello-my-friends-task) 
                 \
                   (multi-steps-task)
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f my-first-pipeline.yaml
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f my-first-pipeline.yaml
 pipeline.tekton.dev/my-first-pipeline created
 
 % kubectl apply -f my-first-pipeline-run.yaml
@@ -275,13 +275,13 @@ my-first-pipeline-run-multi-steps-swftw-pod-4b2hq        0/3     Completed      
 上で、Taskはすべて並列に動くという話をしましたが、ここで順序制御をしてみましょう。
 <code>hello-my-friends</code>は<code>hello-my-name</code>の終わったあとに実行する、ということとします。<br>
 イメージはこんな感じです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">                  (hello-my-name-task) - (hello-my-friends-task)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">                  (hello-my-name-task) - (hello-my-friends-task)
                 / 
 (Pipeline start)  
                 \
                   (multi-steps-task)
 </code></pre></div><p>次のようにPipelineを書き換えてみましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pipeline</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-second-pipeline</span>
@@ -313,7 +313,7 @@ my-first-pipeline-run-multi-steps-swftw-pod-4b2hq        0/3     Completed      
 </code></pre></div><p><code>kubectl get pod -w</code>の出力結果をよく見てみましょう。<br>
 はじめにPodができたのは、<code>hello-my-name</code>と<code>multi-steps</code>のふたつです。
 <code>hello-my-name</code>が<code>Completed</code>になった後 <code>hello-my-friends</code>のPodが起動しているのがわかります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kc apply -f my-second-pipeline.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kc apply -f my-second-pipeline.yaml
 pipeline.tekton.dev/my-second-pipeline created
 
 $ kc apply -f my-second-pipeline-run.yaml

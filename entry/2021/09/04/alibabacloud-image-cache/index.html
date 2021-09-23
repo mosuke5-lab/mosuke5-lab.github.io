@@ -127,7 +127,7 @@ Alibaba CloudがどのようにECIを実行しているかは定かではない�
 <p>イメージキャッシュを利用するには、ImageCacheのカスタムリソースを作成します。
 Serverless Kubernetesでは、クラスタ構築時点でCRD(Custom Resource Definition)が登録されていますが、通常のKubernetesサービスを利用している場合は、CRDの登録も必要になります。</p>
 <p>以下の設定を行った場合、<code>centos:latest</code>と<code>busybox:latest</code>のイメージを25GBのサイズのディスクに7日間保存してキャッシュするということになります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">eci.alibabacloud.com/v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">eci.alibabacloud.com/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ImageCache</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">imagecache-sample</span>
@@ -146,7 +146,7 @@ Serverless Kubernetesでは、クラスタ構築時点でCRD(Custom Resource Def
 <h3 id="イメージキャッシュの作成">イメージキャッシュの作成</h3>
 <p>まずは、イメージキャッシュを作成します。
 イメージキャッシュの作成に次のマニフェストを利用して検証しました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># imagecache-sample.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># imagecache-sample.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">eci.alibabacloud.com/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ImageCache</span>
 <span style="color:#f92672">metadata</span>:
@@ -157,7 +157,7 @@ Serverless Kubernetesでは、クラスタ構築時点でCRD(Custom Resource Def
     - <span style="color:#ae81ff">busybox:latest</span>
   <span style="color:#f92672">imageCacheSize</span>: <span style="color:#ae81ff">25</span>
   <span style="color:#f92672">retentionDays</span>: <span style="color:#ae81ff">7</span>
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f imagecache
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f imagecache
 imagecache.eci.alibabacloud.com/imagecache-sample created
 
 $ kubectl get imagecache -w
@@ -176,7 +176,7 @@ KubernetesのPodとして起動しているわけではないので、<code>kube
 <p><img src="/image/imagecache-eci-disk.png" alt="imagecache-eci-disk"></p>
 <p>イメージキャッシュの処理が完了するまで待ちます。<br>
 PROGRESSが100%になり、処理が完了したらスナップショットを確認しましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get imagecache -w
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get imagecache -w
 NAME                AGE    CACHEID                    PHASE      PROGRESS
 imagecache-sample   13m    imc-6we5ooph73mvgk9hnfdp   Ready      100%
 </code></pre></div><p>イメージキャッシュの処理が完了すると、ディスクは削除され、スナップショットが作成されています。
@@ -188,7 +188,7 @@ imagecache-sample   13m    imc-6we5ooph73mvgk9hnfdp   Ready      100%
 <h3 id="イメージキャッシュの利用">イメージキャッシュの利用</h3>
 <p>続いて、作成したイメージキャッシュを使ってPodを起動してみます。
 Podの起動は以下を使いました。キャッシュした <code>busybox:latest</code> を使うコンテナであることと、アノテーションでキャッシュを利用することを記述しています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># testpod.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># testpod.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
 <span style="color:#f92672">metadata</span>:
@@ -212,7 +212,7 @@ Podの起動は以下を使いました。キャッシュした <code>busybox:la
 </code></pre></div><p>Podを作成するとイメージダウンロード速度の速さがわかります。
 <code>kubectl describe pod</code> で表示されるEvents内の <code>Successfully pulled image &quot;busybox:latest&quot; in 1.544009294s</code> このログメッセージをみればイメージキャッシュの効果がわかるはずです。
 当然ながら、ECIインスタンスの起動までの時間がかかりますが、イメージダウンロードの時間が圧倒的に速いことがわかります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f testpod.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f testpod.yaml
 deployment.apps/say-hello created
 
 $ kubctl get pod -w

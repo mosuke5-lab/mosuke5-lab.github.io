@@ -112,7 +112,7 @@
 どのくらい現時点で使えるのか？制限事項は何なのか？そのあたりを確認していきたいと思います。</p>
 <h2 id="設定と検証">設定と検証</h2>
 <p>本ブログの検証で利用しているOpenShiftは<code>version 4.6.20</code>となります</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc version
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc version
 Client Version: 4.6.18
 Server Version: 4.6.20
 Kubernetes Version: v1.19.0+2f3101c
@@ -122,10 +122,10 @@ Kubernetes Version: v1.19.0+2f3101c
 ちなみに、この有効化作業は<strong>クラスタ管理者の作業</strong>です。cluster-admin権限がないとできない操作で、ユーザ（開発者側）はこの作業について気にする必要はないです。</p>
 <p>また、このユーザ定義プロジェクトの監視もCluster Monitoring Operatorの拡張機能として備わっているものになります。</p>
 <p>公式ドキュメントの手順にしたがって行うのですが、デフォルトの設定のままだとしょっぱなからつまづきます。<code>cluster-monitoring-config</code> というConfigMapはデフォルトで存在しないため、ない人は作成する必要があります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc -n openshift-monitoring edit configmap cluster-monitoring-config
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc -n openshift-monitoring edit configmap cluster-monitoring-config
 Error from server (NotFound): configmaps &#34;cluster-monitoring-config&#34; not found
 </code></pre></div><p>気を取り直して設定を追加します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc -n openshift-monitoring create configmap cluster-monitoring-config
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc -n openshift-monitoring create configmap cluster-monitoring-config
 configmap/cluster-monitoring-config created
 
 $ oc -n openshift-monitoring edit configmap cluster-monitoring-config
@@ -134,7 +134,7 @@ data:
   config.yaml: |
     enableUserWorkload: true
 </code></pre></div><p><code>openshift-user-workload-monitoring</code> namespaceにて、ユーザ定義プロジェクトの監視向けのPrometheusが作成されていることを確認できます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get pod -n openshift-user-workload-monitoring
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get pod -n openshift-user-workload-monitoring
 NAME                                   READY   STATUS    RESTARTS   AGE
 prometheus-operator-6957669954-qq82t   2/2     Running   0          100s
 prometheus-user-workload-0             4/4     Running   1          95s
@@ -151,7 +151,7 @@ user-workload   v2.20.0   2          2m22s
 監視設定もユーザ側で操作することが多いかと思うので、<code>monitoring-edit</code>の利用頻度が高そうですね。</p>
 <p>本ブログでは<code>user1</code>をユーザ（開発サイド）とみなして権限付与をしてみます。
 <code>my-app</code>は、user1が利用しているnamespace名です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc policy add-role-to-user monitoring-edit user1 -n my-app
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc policy add-role-to-user monitoring-edit user1 -n my-app
 clusterrole.rbac.authorization.k8s.io/monitoring-edit added: &#34;user1&#34;
 </code></pre></div><h3 id="prometheus-operatorとの関係">Prometheus Operatorとの関係</h3>
 <p>さきにお伝えしておくと、これからでてくる<code>ServiceMonitor</code>や<code>PrometheusRule</code>といったリソースは<a href="https://github.com/prometheus-operator/prometheus-operator">Prometheus Operator</a>のカスタムリソースです。
@@ -166,7 +166,7 @@ Prometheusのメトリクスを出力する方法にPrometheus exporterを用い
 <p>本検証では、Nginx exporterを搭載したNginxを使って挙動を確認してみます。
 ドキュメント通りではつまらないので、ここは違うアプローチで解説していきたいと思います。
 つぎのマニフェスト（<code>nginx.yaml</code>）を用います。コメントをいれました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">---
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">---
 <span style="color:#75715e"># NginxのDeployment</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
@@ -257,7 +257,7 @@ Prometheusのメトリクスを出力する方法にPrometheus exporterを用い
 </span><span style="color:#e6db74">    }</span>    
 </code></pre></div><p>Nginxを起動します。<br>
 ポイントとしては、Pod内に2つのコンテナが存在していること、そしてexporter用のService(<code>nginx-exporter-service</code>)をあわせて作成したことです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc apply -f nginx.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc apply -f nginx.yaml
 deployment.apps/test-nginx created
 service/nginx-service created
 service/nginx-exporter-service created
@@ -279,7 +279,7 @@ configmap/nginx-conf   1      6s
 <p>これから、exporterが公開したメトリクスを収集しますが、その前に生のメトリクス情報を確認しておきましょう。
 <code>fedora:33</code>イメージでデバッグ用のコンテナを起動します。
 コンテナ内から、<code>service/nginx-exporter-service</code>に接続してメトリクス情報を肉眼でも確認しておきましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// デバッグ用コンテナの起動
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// デバッグ用コンテナの起動
 % oc run debug -it --image=fedora:33 -- /bin/bash
 If you don&#39;t see a command prompt, try pressing enter.
 bash-5.0$
@@ -313,7 +313,7 @@ nginx_connections_handled 3
 通常のPrometheusを利用している場合、Prometheusの監視設定は専用の設定ファイルに記述を行い読み込ませる必要があります（<a href="https://prometheus.io/docs/prometheus/latest/configuration/configuration/">公式ドキュメント</a>）。今回は、Prometheus Operatorを内部的に利用しているため、Prometheusの専用の設定ファイルを書く必要はなく、<code>ServiceMonitor</code>というKubernetesリソースを作成すると、Prometheus Operatorが設定をPrometheusに反映してくれます。</p>
 <p>非常にシンプルですが、指定した条件に合うServiceを検出し監視を開始してくれます。
 <code>ServiceMonitor</code>の設定内容について詳しく知りたい方は、<a href="https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#servicemonitorspec">Prometheus OperatorのAPIドキュメント</a>がオススメです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># servicemonitor.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># servicemonitor.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">monitoring.coreos.com/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceMonitor</span>
 <span style="color:#f92672">metadata</span>:
@@ -331,7 +331,7 @@ nginx_connections_handled 3
     <span style="color:#f92672">matchLabels</span>:
       <span style="color:#f92672">app</span>: <span style="color:#ae81ff">test-nginx</span>
 </code></pre></div><p>ServiceMonitorをデプロイ後に、OpenShiftのWebコンソールから、&ldquo;Monitoring&rdquo; -&gt; &ldquo;Metrics&rdquo; -&gt; &ldquo;Custom Query&quot;にて、<code>nginx</code>などと入力するとNginx exporterから取得したメトリクスを確認できます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc apply -f servicemonitor.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc apply -f servicemonitor.yaml
 servicemonitor.monitoring.coreos.com/nginx-monitor created
 
 % oc get servicemonitor
@@ -348,7 +348,7 @@ nginx-monitor   9s
 <code>nginx_up</code>は、名前のとりNginxが起動しているかどうかのメトリクスです。
 今回、Nginxはレプリカを3で起動していますから、何もなければ<code>sum(nginx_up) = 3</code> となるはずです。
 ひとつ以上がダウンしていれば <code>NginxPartiallyDown</code> のアラートを、全部ダウンしていれば <code>NginxTotallyDown</code> のアラートを出すこととします。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># alert.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># alert.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">monitoring.coreos.com/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PrometheusRule</span>
 <span style="color:#f92672">metadata</span>:
@@ -368,7 +368,7 @@ nginx-monitor   9s
           <span style="color:#f92672">labels</span>:
             <span style="color:#f92672">severity</span>: <span style="color:#ae81ff">critical</span>
 </code></pre></div><p>アラート設定をデプロイし、Webコンソールにアラートが反映したことを確認。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc apply -f alert.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc apply -f alert.yaml
 prometheusrule.monitoring.coreos.com/nginx-alert created
 
 % oc get prometheusrole
@@ -377,7 +377,7 @@ nginx-alert   6h12m
 </code></pre></div><p><img src="/image/openshift-user-defined-prometheus-alert-normal.png" alt="openshift-user-defined-prometheus-alert-normal"></p>
 <p>Nginxのレプリカ数を2にして、わざとアラート発報させてみます。
 Webコンソール上でもアラートが<code>Firing</code>になっていることを確認しましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc scale deploy test-nginx --replicas=2
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc scale deploy test-nginx --replicas=2
 deployment.apps/test-nginx scaled
 </code></pre></div><p><img src="/image/openshift-user-defined-prometheus-alert-error.png" alt="openshift-user-defined-prometheus-alert-error"></p>
 <h2 id="通知設定">通知設定</h2>
@@ -394,7 +394,7 @@ Prometheusでは <code>Alertmanager</code> というコンポーネントがア�
 ただし、Namespaceごとではクラスタ管理者の管理も難しいので、チームごとに利用できるよう <code>team = &lt;任意のID&gt;</code> としてIDをチーム側に知らせることなど運用の工夫が考えられそうです。</p>
 <p><img src="/image/openshift-user-defined-prometheus-alertmanager.png" alt="openshift-user-defined-prometheus-alertmanager"></p>
 <p><code>Routing Labels</code>に使用できるラベルは、<code>PrometheusRule</code>を記述したときに設定した<code>labels</code>と対応します。以下であれば、<code>severity=warning</code>, <code>type=hoge</code>, <code>foo=bar</code>のラベルと、<code>namespace=xxxx</code>が付きます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># alert.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># alert.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">monitoring.coreos.com/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PrometheusRule</span>
 <span style="color:#f92672">metadata</span>:

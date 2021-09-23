@@ -110,7 +110,7 @@ node_exporterはKubernetesのノードの監視などでよく用いられるソ
 <p>それでは早速node_exporterで取得できるメトリクスをZabbixに取り込んでみます。<br>
 node_exporter自身は、<code>openshift-monitoring</code>というnamespace内に<code>9100</code>ポートで公開しています。
 また、node_exporterの本体はDaemonSetを用いて各ノードで動作しています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get service node-exporter -n openshift-monitoring
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get service node-exporter -n openshift-monitoring
 NAME            TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
 node-exporter   ClusterIP   None         &lt;none&gt;        9100/TCP   6d19h
 
@@ -123,7 +123,7 @@ node-exporter-9xhws                            2/2     Running   0          6d19
 node-exporter-cdxlt                            2/2     Running   0          5d18h
 node-exporter-mzk8r                            2/2     Running   0          6d19h
 </code></pre></div><p>同一クラスタ内のPodからcurlでメトリクスを取得できることを確認しておきます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl https://node-exporter.openshift-monitoring.svc.cluster.local:9100/metrics -k --header &#34;Authorization: Bearer $TOKEN&#34;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl https://node-exporter.openshift-monitoring.svc.cluster.local:9100/metrics -k --header &#34;Authorization: Bearer $TOKEN&#34;
 # HELP go_gc_duration_seconds A summary of the GC invocation durations.
 # TYPE go_gc_duration_seconds summary
 go_gc_duration_seconds{quantile=&#34;0&#34;} 7.871e-06
@@ -194,7 +194,7 @@ Prometheus exporterを利用する場合には保存前処理にPrometheusパタ
 <p>実際に、特定のPodのステータスを取得してみます。<br>
 <code>zabbix</code> namespace内にある<code>debug</code>Podの情報を取得します。</p>
 <p>まずは、通常通りcurlでAPI実行できるか確認します。ついでにJSONフォーマットも確認しておきます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl https://your-api-server-endpoint:6443/api/v1/namespaces/zabbix/pods/debug -k --header &#34;Authorization: Bearer $TOKEN&#34;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl https://your-api-server-endpoint:6443/api/v1/namespaces/zabbix/pods/debug -k --header &#34;Authorization: Bearer $TOKEN&#34;
 {
   &#34;kind&#34;: &#34;Pod&#34;,
   &#34;apiVersion&#34;: &#34;v1&#34;,

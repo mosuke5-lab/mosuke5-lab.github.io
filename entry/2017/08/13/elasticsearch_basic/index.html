@@ -104,9 +104,9 @@ Elastic社はいくつかのソフトウェアを提供しているのですが�
 推奨は、「1.8.0_131 or later」とのことです。詳しくは以下参照。<br>
 <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html</a></p>
 <p>CentOS7.4ではYumで条件を満たすJavaがインストールできますが、環境によってはインストールできないので、適宜ダウンロードしたりしてインストールしてください。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo yum install java
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo yum install java
 </code></pre></div><p>続いてElasticSearch本体のインストールですが、いろいろやり方はありますが、公式のYumレポジトリの登録をすると便利です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo vim /etc/yum.repos.d/elasticsearch.repo
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo vim /etc/yum.repos.d/elasticsearch.repo
 [elasticsearch-5.x]
 name=Elasticsearch repository for 5.x packages
 baseurl=https://artifacts.elastic.co/packages/5.x/yum
@@ -118,7 +118,7 @@ type=rpm-md
 
 $ sudo yum install elasticsearch
 </code></pre></div><p>あとは起動するだけで実は最低限は動きます。簡単ですね。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo systemctl enable elasticsearch
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo systemctl enable elasticsearch
 $ sudo systemctl start elasticsearch
 $ sudo systemctl status elasticsearch
 ● elasticsearch.service - Elasticsearch
@@ -133,7 +133,7 @@ $ sudo systemctl status elasticsearch
 Aug 13 07:07:34 ip-172-31-22-86.ap-northeast-1.compute.internal systemd[1]: Starting Elasticsearch...
 Aug 13 07:07:34 ip-172-31-22-86.ap-northeast-1.compute.internal systemd[1]: Started Elasticsearch.
 </code></pre></div><p>起動の確認をします。デフォルトでは9200番ポートでAPIを利用できます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl localhost:9200
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl localhost:9200
 {
   &#34;name&#34; : &#34;mJ6XIq1&#34;,
   &#34;cluster_name&#34; : &#34;elasticsearch&#34;,
@@ -157,7 +157,7 @@ java    13118 elasticsearch  133u  IPv6 140804      0t0  TCP *:wap-wsp (LISTEN)
 ぼくもそう思いました。</p>
 <p>検索するためのデータを投入していきましょう。<br>
 まずは、インデックスの作成を行います。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// blogというインデックスを作成
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// blogというインデックスを作成
 $ curl -XPUT localhost:9200/blog
 
 // インデックスの確認
@@ -168,7 +168,7 @@ yellow open   blog    rwvaOBVcRaSLqt3NDRFZ-w   5   1          0            0    
 <p>この段階では大丈夫です。サーバが1台のみだとレプリカを配置できないのでyellowとなりますが、動作上は問題ありません。</p>
 <p>データを投入していきます。
 下記のように1件ずつ投入することができます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XPUT &#39;localhost:9200/blog/entry/1&#39; -d &#39;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XPUT &#39;localhost:9200/blog/entry/1&#39; -d &#39;
 {
   &#34;date&#34;: &#34;2017-08-13T16:28:48+09:00&#34;,
   &#34;title&#34;: &#34;ElasticSearch入門&#34;,
@@ -179,7 +179,7 @@ yellow open   blog    rwvaOBVcRaSLqt3NDRFZ-w   5   1          0            0    
 {&#34;_index&#34;:&#34;blog&#34;,&#34;_type&#34;:&#34;entry&#34;,&#34;_id&#34;:&#34;1&#34;,&#34;_version&#34;:1,&#34;result&#34;:&#34;created&#34;,&#34;_shards&#34;:{&#34;total&#34;:2,&#34;successful&#34;:1,&#34;failed&#34;:0},&#34;created&#34;:true}
 </code></pre></div><p>が、今回はあらかじめ用意したデータでいくつかのデータをまとめて入れていきたいと思います。<br>
 サンプルデータ：<a href="/entry/2017/08/13/test.json">test.json</a></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -o https://blog.mosuke.tech/entry/2017/08/13/test.json
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -o https://blog.mosuke.tech/entry/2017/08/13/test.json
 $ curl -H &#34;Content-Type: application/json&#34; -XPOST &#39;localhost:9200/blog/entry/_bulk?pretty&amp;refresh&#39; --data-binary @test.json
 </code></pre></div><h5 id="qcurlするときにパラメータにprettyってつけているのはなんで">Q.curlするときにパラメータにprettyってつけているのはなんで？？</h5>
 <p>prettyパラメータを付けるとレスポンスのJsonを整形して出力してくれます。
@@ -187,7 +187,7 @@ jqなど利用してもいいと思いますが、prettyつけるだけでお手
 <h3 id="検索しよう">検索しよう</h3>
 <p>ではいよいよ、「検索」やっていきます。<br>
 細かい検索の方法はまずおいておいてキーワード検索を！</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">//&#34;ElasticSearch 入門&#34;というキーワードで検索
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">//&#34;ElasticSearch 入門&#34;というキーワードで検索
 $ curl &#39;localhost:9200/blog/_search?pretty&#39; -d &#39;
 {
   &#34;query&#34;: { &#34;match&#34;: { &#34;body&#34;: &#34;ElasticSearch 入門&#34; } }
@@ -243,7 +243,7 @@ $ curl &#39;localhost:9200/blog/_search?pretty&#39; -d &#39;
 </code></pre></div><p>検索結果はスコアリングまでしてくれていてとてもいい感じ。<br>
 「ElasticSearch」と「入門」の２つのワードで検索し、両方のワードを持つ記事のスコアが高くなっているのがわかります。</p>
 <p>その他、基本的な検索オプションもほぞぼそと紹介します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">//sizeは取り出すデータの量。SQLでいうLimit
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">//sizeは取り出すデータの量。SQLでいうLimit
 $ curl &#39;localhost:9200/blog/_search?pretty&#39; -d &#39;
 {
   &#34;query&#34;: { &#34;match_all&#34;: {} },
@@ -276,7 +276,7 @@ ElasticSearchの検索クエリーをGUI上から実行できたり、その結�
 <p>AWS上で動かしているので、<code>server.host</code>の設定を変更して、外部からアクセスできるようにしています。<br>
 外部に晒すのは危険なこともあるので、注意してください。
 また、AWS上のセキュリティグループの設定も見直してくださいね。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">//まずはインストール
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">//まずはインストール
 $ sudo yum install kibana
 
 //外部ネットワークからアクセスできるように

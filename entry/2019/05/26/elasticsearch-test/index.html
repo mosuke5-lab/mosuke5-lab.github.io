@@ -113,7 +113,7 @@
 可能な限りモックせず、きちんとテストできるものはする、とするほうがベターかなと思います。実際、ElasticSearchくらいであれば、起動にいくつかの制限がありますがDockerなどを使って比較的容易に起動させることが可能です。</p>
 <p>以下はサンプルのコードです。minitestを利用しています。
 いくつかコメントをいれてみました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">EsControllerTest</span> <span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">ActionDispatch</span><span style="color:#f92672">::</span><span style="color:#66d9ef">IntegrationTest</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">EsControllerTest</span> <span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">ActionDispatch</span><span style="color:#f92672">::</span><span style="color:#66d9ef">IntegrationTest</span>
   <span style="color:#75715e">## 今回は自分は利用しませんでしたが、setup/teardownでelasticsearchの起動を設定することも可能です。</span>
   <span style="color:#75715e">#def setup</span>
   <span style="color:#75715e">#  Elasticsearch::Extensions::Test::Cluster.start \</span>
@@ -172,7 +172,7 @@ gitlab-ciやcircleCIなどのよくあるCIサービスでは実行環境はDock
 servicesについてもdockerイメージを指定することで特定のサービスを簡単に起動できます。ElasticSearchも公式でDockerイメージを出しているので簡単に起動ができます。
 また、<code>alias</code>を設定すると、その名前でサービスにアクセスできます。
 <code>alias</code>に<code>elasticsearch</code>と指定し、Rails側のElasticSearchのホストを指定する環境変数に同じように<code>elasticsearch</code>と指定することで簡単に接続が可能です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#75715e"># .gitlab-ci.yml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#75715e"># .gitlab-ci.yml</span>
 <span style="color:#f92672">stages</span>:
   - <span style="color:#ae81ff">test</span>
 

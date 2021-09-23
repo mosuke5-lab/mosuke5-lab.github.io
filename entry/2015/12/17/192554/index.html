@@ -92,7 +92,7 @@
 <h2 id="課題だったこと">課題だったこと</h2>
 <h3 id="課題1-デプロイとテストをそれぞれ実行していた">(課題1) デプロイとテストをそれぞれ実行していた</h3>
 <p>Ansibleでのデプロイとserverspecのテストはそれぞれ別のコマンドで実行していました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ansible-playbook site.yml -i hosts
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ansible-playbook site.yml -i hosts
 $ bundle exec rake serverspec 
 </code></pre></div><p>2つ実行することが面倒であり、面倒であるがゆえにserverspecの実行を怠ったりしていました。
 これではテストの効果があまり発揮できませんね。
@@ -100,14 +100,14 @@ CIで自動実行すればいいのでは？というのがありますが、本
 このシステムは開発環境はローカルPCのVagrant上に構築しており、手元でのプロビジョニングには、手動でのAnsible実行を必要としている状況でした。</p>
 <h3 id="課題2-sudoパスワードをうまく管理できなかった">(課題2) sudoパスワードをうまく管理できなかった</h3>
 <p>上のような課題1について、真っ先に以下の様にコマンドを続けることを思いつきました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ansible -playbook site.yml -i hosts; bundle exec rake serverspec 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ansible -playbook site.yml -i hosts; bundle exec rake serverspec 
 </code></pre></div><p>しかし、この方法ではansible実行終了後にserverspecを実行する際にsudoパスワードが再度聞かれるため、
 コマンドを打ったまま「放置」ができませんでした。<br>
 <span style="font-size: 80%">※もちろん、sudoパスワードを要求しないようにユーザ設定をすればできますが、多くの場合ではセキュリティ上難しかったりすると思います。ssh接続は鍵認証、sudoには必ずパスワードを要求するようにしています。</span></p>
 <p>また、Ansibleもserverspecにもコマンド実行時にsudoパスワードを記述する方法があります。<br>
 Ansibleでは、<code>ansible.cfg</code>に<code>sudo_password</code>を記述、あるいはコマンド実行時に<code>--extra-args</code>でsudoパスワードを指定できます。
 serverspecでも環境変数で<code>SUDO_PASSWORD</code>が指定できます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">ansible -playbook site.yml -i --extra-args=&#39;ansible_sudo_pass=xxxxxxxx&#39;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">ansible -playbook site.yml -i --extra-args=&#39;ansible_sudo_pass=xxxxxxxx&#39;
 bundle exec rake serverspec SUDO_PASSWORD=xxxxxxxx 
 </code></pre></div><p>ですが、おわかりの通り、<b>コマンドの履歴にもパスワードが残ります</b>。
 あまり良い方法ではないと思っています。</p>
@@ -124,14 +124,14 @@ bundle exec rake serverspec SUDO_PASSWORD=xxxxxxxx
 </ul>
 <p>結論は、すべてRakeタスクで実行できるようにしました。
 タスク一覧を見ると以下の様な感じになりました。（※実行結果は例であり実際の内容とは少し異なる。）</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ bundle exec rake -T
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ bundle exec rake -T
 rake deploy:development    # Deploy to development server
 rake deploy:production     # Deploy to production server
 rake serverspec            # Run serverspec to all hosts
 rake serverspec:app        # Run serverspec to app server
 rake serverspec:db        # Run serverspec to db server 
 </code></pre></div><p>Rakefileの実装例（一部省略）</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">desc <span style="color:#e6db74">&#34;Deploy and Test&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">desc <span style="color:#e6db74">&#34;Deploy and Test&#34;</span>
 namespace <span style="color:#e6db74">:deploy</span> <span style="color:#66d9ef">do</span>
   require <span style="color:#e6db74">&#34;io/console&#34;</span>
   require <span style="color:#e6db74">&#34;open3&#34;</span>

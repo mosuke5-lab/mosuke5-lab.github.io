@@ -84,7 +84,7 @@
 sshの最低限の設定はしていたましたが、ほんとうに良くないですので、みなさんはこういうことがないように気をつけてください。<br>
 久しぶりに手が空いたので設定しようとしましたが、そもそも <code>/etc/sysconfig/iptables</code> がない。
 CentOS7からのsystemctlでiptablesのサービスを確認してもでてこない。さてどうやって設定したらいいのかCentOS6の脳みそで困ってしまいました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># systemctl status iptables
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># systemctl status iptables
 iptables.service
    Loaded: not-found (Reason: No such file or directory)
    Active: inactive (dead)
@@ -92,7 +92,7 @@ iptables.service
 さらに、firewalldがデフォルトでオンになっているからオフにしないと競合してしまいます。</p>
 <p>本当は、firewalldの設定方法を覚えたほうがいいですが、今までのやり方をそのままやりたい人むけにCentOS7でのiptablesの設定方法を残します。</p>
 <p>まずは、iptables-serviceをインスールして、firewalldを停止、iptablesを起動します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># yum install iptables-services
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># yum install iptables-services
 # systemctl status firewalld
    Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled)
    Active: active (running) since Sat 2014-09-20 17:47:11 JST; 4s ago
@@ -122,7 +122,7 @@ CentOS7の新しいコマンドに戸惑ったので一部メモを以下に残�
 <h2 id="service-chkconfigコマンドはsystemctlコマンドへ">service, chkconfigコマンドはsystemctlコマンドへ</h2>
 <p>service, chkconfigコマンドは推奨されずsystemctlコマンドへ切り替わった。<br>
 試しにchkconfigコマンドを利用すると…</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># chkconfig --list
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># chkconfig --list
 Note: This output shows SysV services only and does not include native
       systemd services. SysV configuration data might be overridden by native
       systemd configuration.
@@ -143,10 +143,10 @@ pmmgr          	0:off	1:off	2:off	3:off	4:off	5:off	6:off
 pmproxy        	0:off	1:off	2:off	3:off	4:off	5:off	6:off
 pmwebd         	0:off	1:off	2:off	3:off	4:off	5:off	6:off
 </code></pre></div><p>次のようなメッセージが出力されます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">If you want to list systemd services use &#39;systemctl list-unit-files&#39;.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">If you want to list systemd services use &#39;systemctl list-unit-files&#39;.
 </code></pre></div><p>systemdのサービスを表示したければ、systemctl list-unit-filesを利用せよとのこと。
 試しに打つと以下のように表示される</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># systemctl list-unit-files
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># systemctl list-unit-files
 UNIT FILE                                   STATE
 proc-sys-fs-binfmt_misc.automount           static
 dev-hugepages.mount                         static
@@ -162,11 +162,11 @@ brandbot.path                               disabled
 ....
  
 </code></pre></div><p>サービスの起動・停止・状態確認などはこちらでできます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># service &lt;service name&gt; &lt;start/stop/restart/status&gt;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># service &lt;service name&gt; &lt;start/stop/restart/status&gt;
 　↓
 # systemctl &lt;start/stop/restart/status&gt; &lt;service name&gt;
 </code></pre></div><p>そして、サービスの起動オプションの設定はこちらです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># chkconfig &lt;service name&gt; &lt;on/off&gt;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># chkconfig &lt;service name&gt; &lt;on/off&gt;
    ↓
 # systemctl &lt;enable/disable&gt; &lt;service name&gt;
 </code></pre></div><p>慣れてしまえば、CentOS７の新しいコマンド体系、systemdも怖くないです。<br>

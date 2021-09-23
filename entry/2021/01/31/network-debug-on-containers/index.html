@@ -107,7 +107,7 @@
 <p><img src="/image/share-network-namespace.png" alt="share-network-namespace"></p>
 <p>試しにfedoraとbusyboxを同一のPod内に起動した<code>my-pod</code>があります。
 それぞれのコンテナで<code>ifconfig -a</code>をうってインターフェイス情報を確認してみます。同じIPアドレスのeth0を保有しているのがわかります。ぜひためしてみてください。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod
 NAME                         READY   STATUS    RESTARTS   AGE
 my-pod   2/2     Running   0          4m22s
 
@@ -151,7 +151,7 @@ lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536
 </code></pre></div><h3 id="sidecarを起動して実行する">Sidecarを起動して実行する</h3>
 <p>実例でわかりやすくするため、Nginxを起動しておき、Nginxコンテナにたいしてtcpdumpを実行したいとします。
 まずは、以下のNginxコンテナを起動しておきます。また、起動したNginxのイメージにはtcpdumpがインストールされておらず、実行しても当然エラーで弾かれます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl create deployment my-nginx --image=nginxinc/nginx-unprivileged:latest
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl create deployment my-nginx --image=nginxinc/nginx-unprivileged:latest
 deployment.apps/my-nginx created
 
 $ kubectl get deploy,pod
@@ -169,7 +169,7 @@ command terminated with exit code 1
 この場で利用するのは、<a href="https://hub.docker.com/r/nicolaka/netshoot">nicolaka/netshoot</a> というパブリックのコンテナイメージです。
 ネットワークデバッグに必要なコマンドがあらかじめインストールされています。
 のちほど後述しますが、自分たちの運用のしやすいよう自作しておくのもいいでしょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl edit deploy my-nginx
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl edit deploy my-nginx
 spec:
   template:
     spec:
@@ -198,7 +198,7 @@ Ephemeral containersは、Kubernetes 1.20現在ではまだGAされていない�
 <h3 id="runasuserを確認しておく">runAsUserを確認しておく</h3>
 <p>tcpdumpのような実行にroot権限が必要なコマンドを使いたい場合は、コンテナの起動ユーザ（<code>runAsUser</code>）にも注意しましょう。
 サイドカーでデバッグコンテナを起動しても、デバッグコンテナ自身のプロセスがrootで動いていない場合、以下のように実行に失敗します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl exec -it my-nginx-664cc58c8c-k4vjp -c debug -- tcpdump
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl exec -it my-nginx-664cc58c8c-k4vjp -c debug -- tcpdump
 tcpdump: eth0: You don&#39;t have permission to capture on that device
 (socket: Operation not permitted)
 command terminated with exit code 1

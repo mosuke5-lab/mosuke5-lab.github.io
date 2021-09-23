@@ -105,7 +105,7 @@
 <h2 id="kubernetes-actions-taskのインストール">kubernetes-actions taskのインストール</h2>
 <p>前回は、<code>git-clone</code>と<code>buildah</code>のTaskをカタログからインストールしました。
 今回はさらに、<code>kubernetes-actions</code>というTaskをインストールします（Tekton Hub: <a href="https://hub.tekton.dev/tekton/task/kubernetes-actions">kubernetes-actions</a>）。目的は、<code>kubectl apply -f manifests</code>を実行するためです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f catalog/task/kubernetes-actions/0.1/kubernetes-actions.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f catalog/task/kubernetes-actions/0.1/kubernetes-actions.yaml
 task.tekton.dev/kubernetes-actions created
 
 $ kubectl get task kubernetes-actions
@@ -115,7 +115,7 @@ kubernetes-actions   10s
 <p>かんたんに使い方と注意事項を説明しておきます。
 <code>kubectl</code> がインストールされたイメージを用いて任意の処理を実行できます。
 最低限の設定としては以下のサンプルのとおりです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">deploy-application</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">deploy-application</span>
       <span style="color:#f92672">taskRef</span>:
         <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kubernetes-actions</span>
       <span style="color:#f92672">params</span>:
@@ -139,7 +139,7 @@ kubernetes-actions   10s
 TektonのTaskからKubernetesを操作するには、ServiceAccountに利用したい権限を付与する必要があります。
 ServiceAccountは、前回同様の<code>my-kekton-pipeline</code>を利用しますが、<code>Role</code>と<code>RoleBinding</code>を追加しました。
 今回はシンプルにDeploymentとPodのみ操作できる権限を付けました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># my-tekton-pipeline-sa.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># my-tekton-pipeline-sa.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceAccount</span>
 <span style="color:#f92672">metadata</span>:
@@ -171,19 +171,19 @@ ServiceAccountは、前回同様の<code>my-kekton-pipeline</code>を利用し�
   <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Role</span>
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-tekton-pipeline-role</span>
   <span style="color:#f92672">apiGroup</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io</span>
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f my-tekton-pipeline-sa.yaml
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f my-tekton-pipeline-sa.yaml
 serviceaccount/my-tekton-pipeline configured
 role.rbac.authorization.k8s.io/my-tekton-pipeline-role created
 rolebinding.rbac.authorization.k8s.io/my-tekton-pipeline-rolebinding created
 </code></pre></div><p>この権限付与がないと以下のようなエラーになります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">Error from server (Forbidden): error when retrieving current configuration of:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">Error from server (Forbidden): error when retrieving current configuration of:
 Resource: &#34;apps/v1, Resource=deployments&#34;, GroupVersionKind: &#34;apps/v1, Kind=Deployment&#34;
 Name: &#34;myapp&#34;, Namespace: &#34;goldstine-lab&#34;
 from server for: &#34;/tmp/new-deployment.yaml&#34;: deployments.apps &#34;myapp&#34; is forbidden: User &#34;system:serviceaccount:goldstine-lab:my-tekton-pipeline&#34; cannot get resource &#34;deployments&#34; in API group &#34;apps&#34; in the namespace &#34;goldstine-lab&#34;
 </code></pre></div><h2 id="パイプラインの作成">パイプラインの作成</h2>
 <p>では、パイプラインを作ります。7割は前回と同様です。Pipelineの名前は一応変えておきました。
 サンプルのPipelineマニフェストは以下のとおりです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># build-deploy-pipeline.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># build-deploy-pipeline.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pipeline</span>
 <span style="color:#f92672">metadata</span>:
@@ -254,7 +254,7 @@ from server for: &#34;/tmp/new-deployment.yaml&#34;: deployments.apps &#34;myapp
         - <span style="color:#ae81ff">build-push-image</span>
 </code></pre></div><p>説明が必要なポイントとしては、<code>kubernetes-actions</code>の<code>script</code>部分でしょうか。
 <code>sed</code>などを実行していますが、なにをしているかというと、今回利用したレポジトリの中にマニフェストファイルが含まれているのですが、HelmやKustomizeではなくプレーンなマニフェストです。そのため、コンテナイメージが固定です。それを<code>sed</code>で書き換えていますということです。あとは、<code>apply</code>後に確認用でPodやDeploymentを確認しているということです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">script</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">script</span>
           <span style="color:#f92672">value</span>: |<span style="color:#e6db74">
 </span><span style="color:#e6db74">            IMAGE=$(echo &#34;$(params.image)&#34; | sed -e &#39;s/\//\\\//g&#39;)
 </span><span style="color:#e6db74">            cat ./config/deployment.yaml | sed -e &#34;s/myapp:latest/$IMAGE/g&#34; -e &#34;s/Never/IfNotPresent/g&#34; &gt; /tmp/new-deployment.yaml
@@ -266,7 +266,7 @@ from server for: &#34;/tmp/new-deployment.yaml&#34;: deployments.apps &#34;myapp
 </span><span style="color:#e6db74">            kubectl get pods </span>            
 </code></pre></div><h2 id="パイプラインの実行">パイプラインの実行</h2>
 <p>最後に実行します。ここはいつもどおり<code>PipelineRun</code>を作成して実行するのみです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># build-deploy-pipeline-run.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># build-deploy-pipeline-run.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PipelineRun</span>
 <span style="color:#f92672">metadata</span>:
@@ -291,7 +291,7 @@ from server for: &#34;/tmp/new-deployment.yaml&#34;: deployments.apps &#34;myapp
               <span style="color:#f92672">storage</span>: <span style="color:#ae81ff">1Gi</span>
     - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kubeconfig-dir</span>
       <span style="color:#f92672">emptyDir</span>: {}
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f build-deploy-pipeline.yaml
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f build-deploy-pipeline.yaml
 pipeline.tekton.dev/build-deploy-pipeline created
 
 $ kubectl apply -f build-deploy-pipeline-run.yaml

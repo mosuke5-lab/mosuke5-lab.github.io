@@ -102,20 +102,20 @@
 完全にテスト用でもちいるデプロイメント方式です。</p>
 <p>以下のJaeger CRでデプロイしてみます。<br>
 <code>.spec</code>は何も記載していないので、すべてデフォルト値で、AllInOneでインストールします。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">jaegertracing.io/v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">jaegertracing.io/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Jaeger</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">jaeger-all-in-one-inmemory</span>
   <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">default</span>
 </code></pre></div><p>生成されたものを確認してみます。
 PodはAllInOneということだけあってひとつです。全部入り。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get pod
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get pod
 NAME                                         READY   STATUS      RESTARTS   AGE
 jaeger-all-in-one-inmemory-5b8dd55fc-lv4kh   2/2     Running     0          172m
 </code></pre></div><p>Serviceは、大きくagent, collector, queryと作成されています。<br>
 AllInOneは検証用に特化しているので、agentも含めています。アプリケーションサイドでclientだけ用意できればすぐに利用できるようになっています。後述するproductionのデプロイメント方式だとagentは作成されないので注目してみていきましょう。
 それぞれがどんな役割を担っているかは、Jaegerのアーキテクチャ図と照らし合わせてみてみましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get service
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get service
 NAME                                            TYPE           CLUSTER-IP       EXTERNAL-IP                            PORT(S)                                  AGE
 jaeger-all-in-one-inmemory-agent                ClusterIP      None             &lt;none&gt;                                 5775/UDP,5778/TCP,6831/UDP,6832/UDP      172m
 jaeger-all-in-one-inmemory-collector            ClusterIP      172.30.81.141    &lt;none&gt;                                 9411/TCP,14250/TCP,14267/TCP,14268/TCP   172m
@@ -124,7 +124,7 @@ jaeger-all-in-one-inmemory-query                ClusterIP      172.30.187.60    
 </code></pre></div><p>Jaegerの全体像<br>
 <img src="/image/jaeger-architecture.png" alt="jaeger-architecture"></p>
 <p>JaegerのUIにアクセスしてみます。OpenShiftではない環境の方はIngressなどからアクセスしてください。jaeger-queryのサービスにアクセスできればUI画面にたどり着けます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">oc get route -n default
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">oc get route -n default
 NAME                         HOST/PORT                                                                         PATH   SERVICES                           PORT    TERMINATION   WILDCARD
 jaeger-all-in-one-inmemory   jaeger-all-in-one-inmemory-default.apps.my-k8s-cluster.com          jaeger-all-in-one-inmemory-query   &lt;all&gt;   reencrypt     None
 </code></pre></div><p><img src="/image/jaeger-query.png" alt="jaeger-query"></p>
@@ -139,7 +139,7 @@ Jaegerでは、DBにCassandraかElasticSearchをサポートしています。Op
 <p>この検証では以下のJaeger CRを使ってみました。
 ElasticSearchは3台でクラスタリング、各ElasticSearchに50GBのボリュームをつけて構築です。
 その他、ElasticSearchのデータ削除の設定などを付与。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">jaegertracing.io/v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">jaegertracing.io/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Jaeger</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">jaeger-production</span>
@@ -163,7 +163,7 @@ ElasticSearchは3台でクラスタリング、各ElasticSearchに50GBのボリ�
       <span style="color:#f92672">schedule</span>: <span style="color:#e6db74">&#39;*/30 * * * *&#39;</span>
 </code></pre></div><p>Podをみてみると、AllInOneのときと違ってコンポーネント毎にPodがあることを確認できます。
 また、上にもすこし書きましたがJager agentは含まれていません。Jaeger agentの準備は別で書きます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get pod
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get pod
 NAME                                                              READY   STATUS    RESTARTS   AGE
 elasticsearch-cdm-jaegerproductionjaegerproduction-1-75d6cwghmg   2/2     Running   0          9m34s
 elasticsearch-cdm-jaegerproductionjaegerproduction-2-78958d46ml   2/2     Running   0          9m30s
@@ -171,13 +171,13 @@ elasticsearch-cdm-jaegerproductionjaegerproduction-3-5fb4dr9k4l   2/2     Runnin
 jaeger-production-collector-cff65bd5d-j4mfh                       1/1     Running   0          7m36s
 jaeger-production-query-5dcbb9b79f-kzqkb                          3/3     Running   0          7m36s
 </code></pre></div><p>参考程度ですが、PVもできていると。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get pvc
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get pvc
 NAME                                                                 STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
 elasticsearch-elasticsearch-cdm-jaegerproductionjaegerproduction-1   Bound    pvc-b2e0b560-3b29-42a3-93a4-59adc6dca872   50Gi       RWO            gp2            15m
 elasticsearch-elasticsearch-cdm-jaegerproductionjaegerproduction-2   Bound    pvc-5b59197d-59b7-469a-800c-ecf7e9f70097   50Gi       RWO            gp2            15m
 elasticsearch-elasticsearch-cdm-jaegerproductionjaegerproduction-3   Bound    pvc-a59e50fb-4eb4-4c34-9320-4fbe37c034a9   50Gi       RWO            gp2            15m
 </code></pre></div><p>Serviceも同様です。jaeger agentのserviceは同様にありません。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get service
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get service
 NAME                                   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                                  AGE
 elasticsearch                          ClusterIP   172.30.141.84    &lt;none&gt;        9200/TCP                                 10m
 elasticsearch-cluster                  ClusterIP   172.30.251.197   &lt;none&gt;        9300/TCP                                 10m
@@ -190,7 +190,7 @@ jaeger-production-query                ClusterIP   172.30.209.29    &lt;none&gt;
 実運用では、スケーリングなどの観点からアプリケーションPodのサイドカーとしてJaeger agentを起動することが望ましいです。Jaeger Operatorには、サイドカーでJager agentを埋め込む仕組み（<a href="https://www.jaegertracing.io/docs/1.21/operator/#auto-injecting-jaeger-agent-sidecars">Auto-injecting Jaeger Agent Sidecars</a>）を持ちます。</p>
 <p>試しにやってみましょう。NginxのDeploymentに特定のannotationを追加します。
 Jaager Operatorは、このannotationを検知して、サイドカーを注入します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
@@ -218,7 +218,7 @@ Jaager Operatorは、このannotationを検知して、サイドカーを注入�
 </code></pre></div><p>Nginx podを確認するとコンテナがふたつ起動していることがわかります。
 また、Deploymentも書き換わっています。
 あとは、アプリケーション側で、Jaeger angetに向けてデータを出力すればJaeger本体に記録されるわけです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get pod | grep nginx
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% oc get pod | grep nginx
 nginx-557fc655c-zhprq      2/2     Running   0      28m
 
 % oc get deploy nginx -o yaml 
@@ -344,7 +344,7 @@ spec:
 <p>こちらのREADMEには、Kubernetesへのデプロイは書かれていませんがコンテナイメージが用意されているので簡単にデプロイできます。以下サンプルです。
 せっかくなので、<code>sidecar.jaegertracing.io/inject: &quot;jaeger-production&quot;</code>のannotationをつかってJaeger agentを起動します。
 <code>env</code>の<code>JAEGER_AGENT_HOST</code>はこの場合、サイドカーで起動しているコンテナになるので<code>localhost</code>でOKです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">creationTimestamp</span>: <span style="color:#66d9ef">null</span>

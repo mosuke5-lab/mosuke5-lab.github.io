@@ -114,7 +114,7 @@
 例えばPodマニフェストに次のように<code>spec.containers[].resources</code>に<code>requests</code>と<code>limits</code>を指定することでコンテナへのリソース割り当てが可能です。
 <code>requests</code>と<code>limits</code>が意味することを理解しておくことが重要です。
 <code>requests</code>は使用するリソースの「下限値」を指し、<code>limits</code>は使用するリソースの「上限値」を指します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pod</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">frontend</span>
@@ -218,7 +218,7 @@ QoS Classは以下の条件によって決定します。</p>
 
 <p>例えば、ノードのメモリー上限に達すると（コンテナのlimitsの上限ではなく）、KubernetesはPodを強制的に退去(Evict)しリソースを確保します。その際に、QoS Classを参照します。BestEffortから順にPodを停止する動きを取ります。<br>
 実際に設定されているQoS Classを確認するには稼働しているPodをdescribeで見てみるとわかります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl describe pod pod-name
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl describe pod pod-name
 ...
 Volumes:
   default-token-xcrmt:
@@ -263,7 +263,7 @@ Webサーバのように複数台で分散可能で、一部のPodが停止し�
 <p>LimitRangeはnamespace毎に設定できるものです。
 また、PodとContainerに対して設定が可能です。<br>
 設定方法は極めて簡単で、以下のようなマニフェストを適応するのみです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#e6db74">&#34;v1&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#e6db74">&#34;v1&#34;</span>
 <span style="color:#f92672">kind</span>: <span style="color:#e6db74">&#34;LimitRange&#34;</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#e6db74">&#34;core-resource-limits&#34;</span>
@@ -296,7 +296,7 @@ Webサーバのように複数台で分散可能で、一部のPodが停止し�
 <p>deploymentはできていますが、Podが起動してきません。
 この場合、deploymentではなく、replicasetのeventを見ると良いです。
 実際に見るとメモリーのrequestsとlimitsの比率が2までの制限がかかっているが実際には4ほどある、という旨のエラーメッセージを確認できました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get deployment
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get deployment
 NAME          READY   UP-TO-DATE   AVAILABLE   AGE
 debug-nginx   0/1     0            0           2m11s
 

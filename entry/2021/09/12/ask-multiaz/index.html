@@ -94,7 +94,7 @@
 <p><img src="/image/ask-select-vswitch.png" alt="ask-select-vswitch"></p>
 <p>わたしは、Alibaba Cloudの構築はいつもTerrafromで行っています。<br>
 Terraformであれば、次のように<code>vswitch_ids</code>が配列で指定できるので、必要な数だけvswitchを設定しましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-hcl" data-lang="hcl"><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;alicloud_vswitch&#34; &#34;first&#34;</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-hcl" data-lang="hcl"><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;alicloud_vswitch&#34; &#34;first&#34;</span> {
   vswitch_name  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;vsw-first&#34;</span>
   vpc_id        <span style="color:#f92672">=</span> <span style="color:#66d9ef">alicloud_vpc</span>.<span style="color:#66d9ef">default</span>.<span style="color:#66d9ef">id</span>
   cidr_block    <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">vswitch_first_cidr</span>
@@ -128,7 +128,7 @@ Terraformであれば、次のように<code>vswitch_ids</code>が配列で指�
 }
 </code></pre></div><p>マルチAZで作成できたかどうかは、ノードを確認するのがよいでしょう。<br>
 Serverless Kubernetesは、virtual kubeletを使ってPodをECIで起動しますが、AZ毎にノードリソースが作成されます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get node
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get node
 NAME                              STATUS   ROLES   AGE     VERSION
 virtual-kubelet-ap-northeast-1a   Ready    agent   3h17m   v1.20.4-aliyun.1
 virtual-kubelet-ap-northeast-1b   Ready    agent   3h17m   v1.20.4-aliyun.1

@@ -82,7 +82,7 @@
 そこに今回、stagingという環境を追加した。<br>
 そして、herokuではデフォルトではproductionを利用するようになっているのでstagingに切り替えるだけ。</p>
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>側はstaging環境追加。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ vim config/database.yml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ vim config/database.yml
 # 下記を追加した
 staging:
   &lt;&lt;: *default
@@ -99,7 +99,7 @@ $ vim config/enviroments/staging.rb
 $ vim config/secrets.yml
 # 必要に応じてstagingを追加 
 </code></pre></div><p>heroku側はステージングへの切り替え。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ heroku config --app app-name    # デフォではproductionになってる
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ heroku config --app app-name    # デフォではproductionになってる
 RAILS_ENV:                production
 $ heroku config:set RAILS_ENV=staging --app app-name
 $ heroku config --app app-name
@@ -108,9 +108,9 @@ RAILS_ENV:                staging
 <p>ステージング環境なので、外部から簡単にアクセス出来ないように<a class="keyword" href="http://d.hatena.ne.jp/keyword/Basic%C7%A7%BE%DA">Basic認証</a>をかけた。<br>
 いくつかやり方があると思うが、<code>app/controllers/application_controller.rb</code>に設定を追加した。<br>
 ユーザ名とパスワードをベタ書きだと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>に上げてる場合は丸見えになってしまうので<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>でやりましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">http_basic_authenticate_with <span style="color:#e6db74">:name</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">ENV</span><span style="color:#f92672">[</span><span style="color:#e6db74">&#39;BASIC_AUTH_USERNAME&#39;</span><span style="color:#f92672">]</span>, <span style="color:#e6db74">:password</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">ENV</span><span style="color:#f92672">[</span><span style="color:#e6db74">&#39;BASIC_AUTH_PASSWORD&#39;</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">Rails</span><span style="color:#f92672">.</span>env <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;staging&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">http_basic_authenticate_with <span style="color:#e6db74">:name</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">ENV</span><span style="color:#f92672">[</span><span style="color:#e6db74">&#39;BASIC_AUTH_USERNAME&#39;</span><span style="color:#f92672">]</span>, <span style="color:#e6db74">:password</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">ENV</span><span style="color:#f92672">[</span><span style="color:#e6db74">&#39;BASIC_AUTH_PASSWORD&#39;</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">Rails</span><span style="color:#f92672">.</span>env <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;staging&#34;</span>
 </code></pre></div><p>heroku側では<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>を設定してあげる。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ heroku config:set BASIC_AUTH_USERNAME=&#34;xxxxx&#34; BASIC_AUTH_PASSWORD=&#34;xxxxx&#34; --app app-name
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ heroku config:set BASIC_AUTH_USERNAME=&#34;xxxxx&#34; BASIC_AUTH_PASSWORD=&#34;xxxxx&#34; --app app-name
 $ heroku config --app app-name
 BASIC_AUTH_PASSWORD:      xxxxx
 BASIC_AUTH_USERNAME:      xxxxx 

@@ -94,7 +94,7 @@ APIを利用して効率よく作業できる環境を整えた。</p>
 <h2 id="identifierの確認">identifierの確認</h2>
 <p><code>identifier</code>は下記APIで確認できる。<br>
 このAPIで返ってくるはじめの<code>id</code>が<code>idenitifer</code>だ。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">curl -X GET &#34;https://api.cloudflare.com/client/v4/zones \
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">curl -X GET &#34;https://api.cloudflare.com/client/v4/zones \
     ?name=&lt;your site&gt; \
     &amp;status=active \
     &amp;page=1 \
@@ -105,7 +105,7 @@ APIを利用して効率よく作業できる環境を整えた。</p>
     -H &#34;X-Auth-Email: &lt;your email&gt;&#34; \
     -H &#34;X-Auth-Key: &lt;your api key&gt;&#34; \
     -H &#34;Content-Type: application/json&#34; 
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{
   &#34;result&#34;: [
     {
       &#34;id&#34;: &#34;xxxxxxxxxxxxxxxxxxxxxxx&#34;,
@@ -127,7 +127,7 @@ APIを利用して効率よく作業できる環境を整えた。</p>
 </code></pre></div><h2 id="キャッシュの削除">キャッシュの削除</h2>
 <p>うえで手に入れた<code>identifier</code>を使って、ドキュメント通り<code>purge_cache</code>を実行するだけだ。<br>
 このAPIをデプロイの過程に組み込み効率よく運用できている。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">curl -X DELETE &#34;https://api.cloudflare.com/client/v4/zones/&lt;identifier&gt;/purge_cache&#34; \
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">curl -X DELETE &#34;https://api.cloudflare.com/client/v4/zones/&lt;identifier&gt;/purge_cache&#34; \
      -H &#34;X-Auth-Email: &lt;your email&gt;&#34; \
      -H &#34;X-Auth-Key: &lt;your api key&gt;&#34; \
      -H &#34;Content-Type: application/json&#34; \

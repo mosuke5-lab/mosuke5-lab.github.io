@@ -109,14 +109,14 @@ Kubernetes環境だと、dfclientはDaemonSetとして各ノードに配置さ�
 <h2 id="実践-on-kubernetes">実践 on Kubernetes</h2>
 <p>というわけで、さっそくKubernetesクラスタにインストールして使ってみたいと思います。<br>
 KubernetesクラスタへのインストールはHelmが利用できます。ほとんどドキュメントがなくて困りますが<a href="https://github.com/dragonflyoss/helm-chart">こちらのレポジトリ</a>からHelm Chartをダウンロードできます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/dragonflyoss/helm-chart
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/dragonflyoss/helm-chart
 $ cd helm-chart
 $ helm install dragonfly .
 $ helm ls
 NAME     	NAMESPACE	REVISION	UPDATED                             	STATUS  	CHART          	APP VERSION
 dragonfly	dragonfly	1       	2020-11-30 23:15:29.031824 +0900 JST	deployed	dragonfly-0.4.3	0.4.3
 </code></pre></div><p>Kubernetesクラスタ内で以下のように起動していれば問題ないです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod,daemonset,deployment,service
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get pod,daemonset,deployment,service
 NAME                                      READY   STATUS    RESTARTS   AGE
 pod/dragonfly-dfclient-2rpc4              1/1     Running   0          15h
 pod/dragonfly-dfclient-cwfdk              1/1     Running   0          15h
@@ -136,7 +136,7 @@ service/dragonfly-supernode   ClusterIP   172.30.112.149   &lt;none&gt;        8
 </code></pre></div><p><code>dragonfly-dfclient</code> はDaemonSetとして起動します。各ノードでイメージのプルを行う際に差し込めるように、HostNetworkを用いてHostのポートでサービスをListenします。
 HostNetworkが許可されたServiceAccountを用いて起動する必要があります。<br>
 また、Kubernetesの各ノードでKubeletがイメージをぷるするときに <code>localhost:65001</code> 経由でイメージを取得できるようにする必要があります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get daemonset dragonfly-dfclient -o yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get daemonset dragonfly-dfclient -o yaml
 ...
     spec:
       containers:
@@ -154,7 +154,7 @@ HostNetworkが許可されたServiceAccountを用いて起動する必要があ�
           hostPort: 65001
           name: http
           protocol: TCP
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">worker $ cat /etc/containers/registries.conf
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">worker $ cat /etc/containers/registries.conf
 unqualified-search-registries = [&#34;registry.access.redhat.com&#34;, &#34;docker.io&#34;]
 
 [[registry]]
@@ -167,7 +167,7 @@ unqualified-search-registries = [&#34;registry.access.redhat.com&#34;, &#34;dock
 </code></pre></div><p>ではとあるWorkerノードにアクセスし、<code>crictl</code>でイメージをプルします。
 KubernetesのランタイムにDockerを利用している人はDockerで代用してください。
 スピードが上がっていることはわかりましたが、おそらく規模が大きくならないと恩恵は受けなさそう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">worker # time crictl pull ruby@sha256:ba90dbc14a0407
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">worker # time crictl pull ruby@sha256:ba90dbc14a0407
 Image is up to date for docker.io/library/ruby@sha256:ba90dbc14a04073f6aa75951ce9c6bcf7715372d7b2e1d69e48593496951fd14
 
 real	0m41.458s
@@ -187,7 +187,7 @@ sys	0m5.823s
 </code></pre></div><p>ダウンロード後に、supernode側のキャッシュを見てみます。
 Rubyのイメージのレイヤーごとにキャッシュされていることが確認できました。
 おそらくコンテナイメージの場合はレイヤーごとに分散配信できるように実装されています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">df-supernode $ ls -l /home/admin/supernode/repo/download
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">df-supernode $ ls -l /home/admin/supernode/repo/download
 total 0
 drwxr-xr-x    2 root     root           231 Dec  1 08:54 1c1
 drwxr-xr-x    2 root     root           231 Dec  1 08:53 38c

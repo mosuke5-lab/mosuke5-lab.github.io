@@ -116,7 +116,7 @@ Kubernetesでは、API Serverの管理する期待する状態（マニフェス
 <li><a href="https://operatorhub.io/operator/argocd-operator">OperatorHub Argo CD</a></li>
 </ul>
 <p>Argo CDを以下のマニフェストで起動しました。Web UIをIngress経由で公開したかったためIngressの設定を追加しています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># argocd.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># argocd.yaml</span>
 ---
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">argoproj.io/v1alpha1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ArgoCD</span>
@@ -130,7 +130,7 @@ Kubernetesでは、API Serverの管理する期待する状態（マニフェス
       <span style="color:#f92672">enabled</span>: <span style="color:#66d9ef">true</span>
     <span style="color:#f92672">insecure</span>: <span style="color:#66d9ef">true</span>
 </code></pre></div><p>上記のマニフェストを適応して、作成されたリソースを確認します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f argocd.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f argocd.yaml
 argocd.argoproj.io/my-argocd created
 
 $ kubectl get pod,sa,configmap,secret,service,ingress -n my-argocd-operator
@@ -236,7 +236,7 @@ ingress.extensions/my-argocd-server   &lt;none&gt;   argocd.mosuke.tech   34.84.
 
 <h2 id="web-uiへの接続">Web UIへの接続</h2>
 <p>管理者の初期パスワードは、Secret内に保存されているのでとりだしましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl -n my-argocd-operator get secret my-argocd-cluster -o jsonpath=&#39;{.data.admin\.password}&#39; | base64 -d
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl -n my-argocd-operator get secret my-argocd-cluster -o jsonpath=&#39;{.data.admin\.password}&#39; | base64 -d
 &lt;your-admin-password&gt;
 </code></pre></div><p>Ingress経由でアクセスすると以下のような画面にたどりつけます。<br>
 もし、Ingress等で公開しない人は、port-forwardを利用してください。うえの例でいうと<code>service/my-argocd-server</code>にアクセスできればWeb UIにたどり着けます。
@@ -318,7 +318,7 @@ ingress.extensions/my-argocd-server   &lt;none&gt;   argocd.mosuke.tech   34.84.
 </ul>
 <p>こちらのアプリケーションの登録をすると、そのデータはKubernetesのリソースとして登録されています。
 つまり、Argo CD自身は、<strong>永続的なボリュームをもっておらず、永続ボリュームとしてKubernetesのetcdを使っている</strong>ということです。まさに、Kubernetes Nativeなアプリケーションを代表していますね。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get application -n my-argocd-operator
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get application -n my-argocd-operator
 NAME          AGE
 hello-world   44s
 

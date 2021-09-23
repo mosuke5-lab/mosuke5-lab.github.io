@@ -119,7 +119,7 @@ IoTデバイスから直接DynamoDBへログを送信することができれば
 <a href="https://www.fluentd.org/download">https://www.fluentd.org/download</a></p>
 <p>今回はUbuntu16.04環境で行いました。レポジトリからのインストールをします。
 インストールしたら起動と、起動できたかの確認を行ってみます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -L https://toolbelt.treasuredata.com/sh/install-ubuntu-xenial-td-agent2.sh | sh
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -L https://toolbelt.treasuredata.com/sh/install-ubuntu-xenial-td-agent2.sh | sh
 $ sudo systemctl start td-agent
 $ sudo systemctl status td-agent
 ● td-agent.service - LSB: data collector for Treasure Data
@@ -138,7 +138,7 @@ $ sudo systemctl status td-agent
            └─2171 /opt/td-agent/embedded/bin/ruby /usr/sbin/td-agent --log /var/log/td-agent/td-agent.log --daemon /var/run/td-agent/td-agent.pid
 </code></pre></div><p>デフォルトだとポート8888にてHTTP経由でログをPostできるようになっています。
 確認を兼ねて見てみます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo lsof -i:8888
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo lsof -i:8888
 COMMAND  PID     USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
 fluentd 3503 td-agent   15u  IPv4  27930      0t0  TCP *:ddi-tcp-1 (LISTEN)
 ruby    3508 td-agent   15u  IPv4  27930      0t0  TCP *:ddi-tcp-1 (LISTEN)
@@ -152,7 +152,7 @@ $ tail /var/log/td-agent/td-agent.log
 NignxのログをFluetndを使って別のファイルに書き出してみます。</p>
 <p>まずはNginxのインストールをします。<br>
 fluetndからNginxのログファイルが閲覧できるように権限の変更は忘れずに行ってください。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo apt-get install nginx
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo apt-get install nginx
 $ sudo systemctl start nginx
 $ curl localhost
   // ちゃんとHTMLが返ってくればOK
@@ -167,7 +167,7 @@ $ sudo chmod 644 /var/log/nginx/access.log
 <p>以下の設定ファイルで、<code>format</code>部分が少し難しそうに見えますが、アクセスログの内容をFluetnd側でJsonに変換できるように形式を指定しているだけです。以下参考にしています。<br>
 <a href="http://qiita.com/liubin/items/92a4e7e3917143ae4aaf">http://qiita.com/liubin/items/92a4e7e3917143ae4aaf</a></p>
 <p>アウトプットは<code>file</code>タイプを選択し、<code>/tmp</code>以下にファイルとして出力するようにします。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo vim /etc/td-agent/td-agent.conf
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo vim /etc/td-agent/td-agent.conf
 &lt;source&gt;
   type tail
   path /var/log/nginx/access.log
@@ -183,11 +183,11 @@ $ sudo chmod 644 /var/log/nginx/access.log
 &lt;/match&gt;
 </code></pre></div><p>設定が完了したらfluetndを再起動して、curlでNginxにアクセスします。<br>
 何回かアクセスするといいと思います。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo systemctl restart td-agent
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo systemctl restart td-agent
 $ curl localhost
 </code></pre></div><p>さて、<code>/tmp</code>以下に出力できているか確認します。<br>
 ついでに中身をのぞいてみると、Nginxのログの内容がJsonになって出力されていることが確認できます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ls -l /tmp/
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ls -l /tmp/
 -rw-r--r--  1 td-agent td-agent  552 Sep  3 06:14 output_nignx_access_log.20170903.b55842e6a17fff571
 
 $ cat /tmp/output_nignx_access_log.20170903.b55842e6a17fff571
@@ -207,7 +207,7 @@ $ cat /tmp/output_nignx_access_log.20170903.b55842e6a17fff571
 <a href="https://github.com/gonsuke/fluent-plugin-dynamodb">https://github.com/gonsuke/fluent-plugin-dynamodb</a></p>
 <p>インプットは先程と変えずに、アウトプットをDynamoDBに変更し使っていきます。<br>
 設定は以下のとおりです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo td-agent-gem install fluent-dynamodb-plugin
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo td-agent-gem install fluent-dynamodb-plugin
 $ sudo vim /etc/td-agent/td-agent.conf
 &lt;match nginx.access&gt;
   @type dynamodb

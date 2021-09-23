@@ -98,7 +98,7 @@ ATPの公式サイトにもいくつか統計情報が載っているが、自�
 <p>一例だが、どんなふうに利用できるかのせる。</p>
 <h3>シングルスのランキング取得</h3>
 <p>デフォルトだとトップ100のランキングを取得する。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">pry(main)<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">AtpScraper</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Get</span><span style="color:#f92672">.</span>singles_ranking
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">pry(main)<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">AtpScraper</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Get</span><span style="color:#f92672">.</span>singles_ranking
 <span style="color:#f92672">=&gt;</span> <span style="color:#f92672">[</span>{<span style="color:#e6db74">:ranking</span><span style="color:#f92672">=&gt;</span><span style="color:#e6db74">&#34;1&#34;</span>,
   <span style="color:#e6db74">:player_name</span><span style="color:#f92672">=&gt;</span><span style="color:#e6db74">&#34;Novak Djokovic&#34;</span>,
   <span style="color:#e6db74">:player_url_name</span><span style="color:#f92672">=&gt;</span><span style="color:#e6db74">&#34;novak-djokovic&#34;</span>,
@@ -118,7 +118,7 @@ ATPの公式サイトにもいくつか統計情報が載っているが、自�
 (<span style="color:#960050;background-color:#1e0010">略</span>)
 </code></pre></div><p>下記のようにすれば、50位から60位のランキングを取得できる。<br>
 （※引数の指定の仕方がアレなのは突っ込まないこと）</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">pry(main)<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">AtpScraper</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Get</span><span style="color:#f92672">.</span>singles_ranking(<span style="color:#e6db74">&#34;50-60&#34;</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">pry(main)<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">AtpScraper</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Get</span><span style="color:#f92672">.</span>singles_ranking(<span style="color:#e6db74">&#34;50-60&#34;</span>)
 <span style="color:#f92672">=&gt;</span> <span style="color:#f92672">[</span>{<span style="color:#e6db74">:ranking</span><span style="color:#f92672">=&gt;</span><span style="color:#e6db74">&#34;50&#34;</span>,
   <span style="color:#e6db74">:player_name</span><span style="color:#f92672">=&gt;</span><span style="color:#e6db74">&#34;Lukas Rosol&#34;</span>,
   <span style="color:#e6db74">:player_url_name</span><span style="color:#f92672">=&gt;</span><span style="color:#e6db74">&#34;lukas-rosol&#34;</span>,
@@ -135,7 +135,7 @@ ATPの公式サイトにもいくつか統計情報が載っているが、自�
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/%B6%D3%BF%A5%B7%BD">錦織圭</a>の対戦レコード取得</h3>
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%B6%D3%BF%A5%B7%BD">錦織圭</a>の2016年の対戦レコードを見たいと思えば下記のように取得できる。<br>
 （第一引数の<code>n552</code>は選手のIDのようなもので、これは上のランキングの取得時に手に入るのでそこで確認しなければいけない）</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">pry(main)<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">AtpScraper</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Get</span><span style="color:#f92672">.</span>player_activity(<span style="color:#e6db74">&#34;n552&#34;</span>, <span style="color:#ae81ff">2016</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">pry(main)<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">AtpScraper</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Get</span><span style="color:#f92672">.</span>player_activity(<span style="color:#e6db74">&#34;n552&#34;</span>, <span style="color:#ae81ff">2016</span>)
 <span style="color:#f92672">=&gt;</span> <span style="color:#f92672">[</span>{<span style="color:#e6db74">:year</span><span style="color:#f92672">=&gt;</span><span style="color:#e6db74">&#34;2016&#34;</span>,
   <span style="color:#e6db74">:player_name</span><span style="color:#f92672">=&gt;</span><span style="color:#e6db74">&#34;Kei Nishikori&#34;</span>,
   <span style="color:#e6db74">:player_rank</span><span style="color:#f92672">=&gt;</span><span style="color:#e6db74">&#34;6&#34;</span>,
@@ -169,7 +169,7 @@ ATPの公式サイトにもいくつか統計情報が載っているが、自�
 
 (<span style="color:#960050;background-color:#1e0010">略</span>)
 </code></pre></div><p>もし、過去のすべての<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B6%D3%BF%A5%B7%BD">錦織圭</a>の対戦レコードを取得したければ下記で取得できる。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">pry(main)<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">AtpScraper</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Get</span><span style="color:#f92672">.</span>player_activity(<span style="color:#e6db74">&#34;n552&#34;</span>, <span style="color:#e6db74">&#34;all&#34;</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">pry(main)<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">AtpScraper</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Get</span><span style="color:#f92672">.</span>player_activity(<span style="color:#e6db74">&#34;n552&#34;</span>, <span style="color:#e6db74">&#34;all&#34;</span>)
 </code></pre></div><p>対戦レコードは１対戦ごとのレコードになっている。<br>
 トーナメントごとにまとめたりはしていない。</p>
 <h1>これから</h1>

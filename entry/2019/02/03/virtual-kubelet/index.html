@@ -187,7 +187,7 @@ KubernetesからVirtual KubeletのノードにPodの配置を行うと、Virtual
 ここではAlibaba Cloudの新サービスである<a href="https://www.alibabacloud.com/products/elastic-container-instance">Elastic Container Instance</a>(略称ECI)をターゲットにして説明します。</p>
 <p>ECIは非常にシンプルなサービスです。
 CLIから実行できるAPIリストをみても、現在６つだけです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ aliyun eci help
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ aliyun eci help
 Available Api List:
   CreateContainerGroup
   DeleteContainerGroup
@@ -220,7 +220,7 @@ ECIは、実際のコンテナを実行するためのノードを持たなく�
 <p>まず、初心者の自分が勘違いしていたのは、このレポジトリをビルドしてできるバイナリーは、常駐プロセスになっており、手元のローカルで動かしてもいいのですが、Kubernetesクラスター上で動かすほうが合理的です。
 Virtual KubeletをKubernetes上で動かすためのサンプルのYAMLは中国語ですが<a href="https://help.aliyun.com/document_detail/97527.html">こちら</a>にありました。
 自分は最終的に以下で動かしました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># virtual-kubelet.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># virtual-kubelet.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceAccount</span>
 <span style="color:#f92672">metadata</span>:
@@ -288,7 +288,7 @@ Virtual KubeletをKubernetes上で動かすためのサンプルのYAMLは中国
 </code></pre></div><p>上のマニュフェストを実行後、ノードとPodを確認すると動いていることが確認できるはずです。
 ノードでは実在はしないが仮想ノードとして&quot;virtual-kubelet&quot;というのが追加されています。
 このノードを登録し、司令塔をだすのがpodで表示される&quot;alicloud-virtual-kubelet-xxxxx&quot;になります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f virtual-kubelet.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f virtual-kubelet.yaml
 $ kubectl get node
 NAME                                    STATUS    ROLES     AGE       VERSION
 ap-northeast-1.i-6we4hocj9kh3qr082fxq   Ready     &lt;none&gt;    12d       v1.11.5
@@ -305,7 +305,7 @@ alicloud-virtual-kubelet-55d7c8b89d-khjsh   1/1       Running          0        
 <p>それでは、次にさっそく、KubernetesからこのECIに対してPodを配置してみたいと思います。
 Virtual Kubeletのノードに対してnginxを実行させる簡単なマニュフェストを用意して実行します。<br>
 nodeSelectorでVirtual Kubeletのノードを指定し、そこに配置するようにマニュフェストを書きます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># vk_pod.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># vk_pod.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pod</span>
 <span style="color:#f92672">metadata</span>:
@@ -323,7 +323,7 @@ nodeSelectorでVirtual Kubeletのノードを指定し、そこに配置する�
   - <span style="color:#f92672">key</span>: <span style="color:#ae81ff">alibabacloud.com/eci</span>
     <span style="color:#f92672">operator</span>: <span style="color:#e6db74">&#34;Exists&#34;</span>
     <span style="color:#f92672">effect</span>: <span style="color:#ae81ff">NoSchedule</span>
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f vk_pod.yaml
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f vk_pod.yaml
 $ kubectl get pods
 NAME                                        READY     STATUS           RESTARTS   AGE
 alicloud-virtual-kubelet-55d7c8b89d-khjsh   1/1       Running          0          3d

@@ -104,10 +104,10 @@ ElasticSearchを使っているのですがいつもAPI操作を忘れてしま�
 <h2 id="全般">全般</h2>
 <h3 id="ユーザ名とパスワードをつけてapiを実行する">ユーザ名とパスワードをつけてAPIを実行する</h3>
 <p>curlでのベーシック認証です。デフォルトでは、ユーザ名<code>elastic</code>、パスワード<code>password</code>とついていて使うことが多い。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl  -u elastic:password -XGET &#39;localhost:9200/_cat/indices?v&#39;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl  -u elastic:password -XGET &#39;localhost:9200/_cat/indices?v&#39;
 </code></pre></div><h3 id="レスポンス結果を見やすくする">レスポンス結果を見やすくする</h3>
 <p>GETパラメータに<code>pretty</code>をつける。以下で違いを見てみる。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XPUT &#39;localhost:9200/blog&#39;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XPUT &#39;localhost:9200/blog&#39;
 {&#34;acknowledged&#34;:true,&#34;shards_acknowledged&#34;:true,&#34;index&#34;:&#34;blog&#34;
 
 $ curl -XPUT &#39;localhost:9200/blog?pretty&#39;
@@ -119,11 +119,11 @@ $ curl -XPUT &#39;localhost:9200/blog?pretty&#39;
 </code></pre></div><h2 id="インデックスドキュメント関連">インデックス、ドキュメント関連</h2>
 <h3 id="インデックスの一覧を確認する">インデックスの一覧を確認する</h3>
 <p>作成したインデックスを確認する。<code>index</code>は複数形になると<code>indices</code>になるので注意。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl &#39;localhost:9200/_cat/indices?v&#39;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl &#39;localhost:9200/_cat/indices?v&#39;
 status index   uuid                   pri rep docs.count docs.deleted store.size pri.store.size
 yellow open   blog    rwvaOBVcRaSLqt3NDRFZ-w   5   1          0            0       324b           324b
 </code></pre></div><p>ちなみに<code>_cat</code>で出力できるものはこちらで確認できる。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -X GET &#39;localhost:9200/_cat&#39;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -X GET &#39;localhost:9200/_cat&#39;
 =^.^=
 /_cat/allocation
 /_cat/shards
@@ -154,13 +154,13 @@ yellow open   blog    rwvaOBVcRaSLqt3NDRFZ-w   5   1          0            0    
 /_cat/templates
 </code></pre></div><h3 id="インデックスを作成する">インデックスを作成する</h3>
 <p><code>blog</code>という名前のインデックスを作成。Methodが<code>PUT</code>であることに注意。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XPUT &#39;localhost:9200/blog&#39;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XPUT &#39;localhost:9200/blog&#39;
 </code></pre></div><h3 id="インデックスの削除をする">インデックスの削除をする</h3>
 <p><code>blog</code>という名前のインデックスを削除する。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XDELETE localhost:9200/blog
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XDELETE localhost:9200/blog
 </code></pre></div><h3 id="インデックスのマッピングを確認する">インデックスのマッピングを確認する</h3>
 <p>インデックスのマッピングを確認する。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// インデックス全体
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// インデックス全体
 $ curl -XGET localhost:9200/blog/_mapping?pretty
 true
 {
@@ -181,11 +181,11 @@ true
               }
             },
 (略)
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// 特定のタイプのみ
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// 特定のタイプのみ
 $ curl -XGET localhost:9200/blog/user/_mapping?pretty
 </code></pre></div><h3 id="バルクインサート">バルクインサート</h3>
 <p>データをバルクインサートする。バルクインサートするデータのサンプルフォーマットはこちら。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat sample-data.json
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat sample-data.json
 { &#34;index&#34; : {} }
 {&#34;date&#34; : &#34;2017-08-13 10:00:00&#34;,&#34;title&#34; : &#34;ElasticSearch入門&#34;,&#34;body&#34; : &#34;ブログ記事の全文検索などをやりたくて、ElasticSearchはどんなもんじゃろか？と触ってみたのでメモ。ElasticSearchの入門についてはたくさんの記事がすでにでているので、ほぼ自分の理解のために残します。&#34;, &#34;tag&#34;: [&#34;ElasticSearch&#34;, &#34;入門&#34;]}
 { &#34;index&#34; : {} }
@@ -201,7 +201,7 @@ $ curl -XGET localhost:9200/blog/user/_mapping?pretty
 $ curl -H &#34;Content-Type: application/json&#34; -XPOST &#39;localhost:9200/blog/post/_bulk?pretty&amp;refresh&#39; --data-binary @sample-data.json
 </code></pre></div><h3 id="マッピング">マッピング</h3>
 <p>マッピングを定義ファイルから設定する。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat user.json
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat user.json
 {
   &#34;properties&#34; : {
     &#34;last_login_at&#34; : {
@@ -233,11 +233,11 @@ $ curl -H &#34;Content-Type: application/json&#34; -XPOST &#39;localhost:9200/bl
 
 $ curl -XPUT &#39;localhost:9200/blog/_mapping/user?pretty&#39; -d @user.json
 </code></pre></div><h3 id="ドキュメントを削除する">ドキュメントを削除する</h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XDELETE localhost:9200/blog/user/123456
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XDELETE localhost:9200/blog/user/123456
 ($ curl -XDELETE localhost:9200/:index/:type/:id)
 </code></pre></div><h2 id="検索関連">検索関連</h2>
 <h3 id="基本検索">基本検索</h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">//&#34;ElasticSearch 入門&#34;というキーワードで検索
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">//&#34;ElasticSearch 入門&#34;というキーワードで検索
 $ curl &#39;localhost:9200/blog/_search?pretty&#39; -d &#39;
 {
   &#34;query&#34;: { &#34;match&#34;: { &#34;body&#34;: &#34;ElasticSearch 入門&#34; } }

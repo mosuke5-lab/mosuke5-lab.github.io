@@ -112,11 +112,11 @@
 <h2 id="ドキュメント">ドキュメント</h2>
 <p>Kustomizeを実際に触っていく上でハマったポイントもあったのでご紹介します。<br>
 Kustomizeはkubernetes v1.14からkubectlに組み込まれることになりました。実際に、<code>kubectl -h</code>でヘルプを見てみてもわかります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">Advanced Commands:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">Advanced Commands:
   kustomize      Build a kustomization target from a directory or a remote url.
 </code></pre></div><p>kubectlに統合されているのはバージョンが最新のものではありません。また、Kustomizeも進化が早いので機能差分がでてくることもめずらくありません。</p>
 <p>自分も使っていく中で何度か下記のようなエラーメッセージに出くわしました。下記の例だと、<code>envs</code>というフィールドがありませんというエラーです。公式ドキュメントを見て記述していたのですが、kubectlに見込まれているバージョンではそのフィールドがなかったということです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl kustomize .
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl kustomize .
 Error: couldn&#39;t make target for ../../base: json: unknown field &#34;envs&#34;
 </code></pre></div><p>そのため、ドキュメントをみる場合は使っている方法に合わせて使い分けるといいです。</p>
 <ul>
@@ -127,7 +127,7 @@ Error: couldn&#39;t make target for ../../base: json: unknown field &#34;envs&#3
 <h3 id="hello-world">Hello World</h3>
 <p>Kustomizeはサンプルもいくつか用意してくれているので始めるのは簡単です。Hello World的には<a href="https://github.com/kubernetes-sigs/kustomize/tree/master/examples/helloWorld">こちら</a>が良いと思います。</p>
 <p><code>kustomization.yml</code>が下記の通り書いてありますが、resourcesに記載の３ファイルを対象に共通のlabelを付与するという意味になります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">commonLabels:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">commonLabels:
   app: hello
 
 resources:
@@ -150,7 +150,7 @@ overlayは名前の通り「覆う」的な意味なので、Baseのマニュフ
 <li>本番環境用のNginxのServiceはType=LoadBalancerにする</li>
 </ul>
 <p>ファイル構造はこのような形です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">.
 ├── base
 │   ├── kustomization.yml
 │   ├── nginx-deployment.yml
@@ -163,7 +163,7 @@ overlayは名前の通り「覆う」的な意味なので、Baseのマニュフ
         └── kustomization.yml
 </code></pre></div><p>baseには共通のマニフェストです。出力すると下記のとおりです。
 見ておいてほしいのは<code>nginx-servce</code>のTypeです。baseマニフェストでは<code>ClusterIP</code>を指定しています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#ae81ff">$ kubectl kustomize base</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#ae81ff">$ kubectl kustomize base</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Service</span>
 <span style="color:#f92672">metadata</span>:
@@ -199,7 +199,7 @@ overlayは名前の通り「覆う」的な意味なので、Baseのマニュフ
         - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">80</span>
 </code></pre></div><p>しかし、本番環境ではNamespaceを指定して、Typeを<code>LoadBalancer</code>で公開したかったとします。
 以下は本番環境用にパッチ当てするためのkustomization.ymlなのですが、baseのマニフェストを指定し、namespaceとパッチを当てるマニフェストを指定しました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#ae81ff">$ cat overlays/production/kustomization.yml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#ae81ff">$ cat overlays/production/kustomization.yml</span>
 <span style="color:#f92672">bases</span>:
 - <span style="color:#ae81ff">../../base</span>
 <span style="color:#f92672">namespace</span>: <span style="color:#e6db74">&#34;production&#34;</span>
@@ -219,7 +219,7 @@ overlayは名前の通り「覆う」的な意味なので、Baseのマニュフ
       <span style="color:#f92672">port</span>: <span style="color:#ae81ff">80</span>
       <span style="color:#f92672">targetPort</span>: <span style="color:#ae81ff">80</span>
 </code></pre></div><p>このようにして、本番環境用のパッチを当てて出力すると、typeがLoadBalancerに変わっていることがわかります。これで、1つのマニフェストを使って環境ごとにパラメータや一部のリソースを変更してデプロイできそうです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#ae81ff">$ kubectl kustomize overlays/production</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#ae81ff">$ kubectl kustomize overlays/production</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Service</span>
 <span style="color:#f92672">metadata</span>:

@@ -150,7 +150,7 @@ Podにつけたい名前が違う、Podの利用するリソース量が違う�
 <p>まずは、Kustomizeを使った環境ごとに異なるマニフェストを作るとはどういうことなのか復習しておきましょう。
 練習台にとても簡単なサンプルを使います。この<a href="https://github.com/mosuke5/kustomize-examples">サンプルコード</a>は、Nginxをデプロイする簡単なものですが、<code>development</code>と<code>production</code>でパラメータや設定を変えたいと思っているというシナリオです。
 <code>base/</code>が共通部で、<code>overlays/development</code>と<code>overlays/production</code>が異なる部分です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/mosuke5/kustomize-examples
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/mosuke5/kustomize-examples
 $ cd kustomize-examples/overlay-example
 $ tree
 .
@@ -171,7 +171,7 @@ $ tree
 <li>デプロイするnamespaceを分けたい</li>
 <li><code>production</code>では、ServiceのTypeをLoadBalancerにしたい</li>
 </ol>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -k overlays/development --dry-run=client -o yaml &gt; dev
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -k overlays/development --dry-run=client -o yaml &gt; dev
 $ kubectl apply -k overlays/production --dry-run=client -o yaml &gt; prod
 $ diff dev prod
 8c8
@@ -205,7 +205,7 @@ Argo CD内では、開発(development)と商用(production)のふたつのアプ
 <li><code>.spec.destination.namespace</code></li>
 <li><code>.spec.source.path</code></li>
 </ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e">## development.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e">## development.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">argoproj.io/v1alpha1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Application</span>
 <span style="color:#f92672">metadata</span>:
@@ -221,7 +221,7 @@ Argo CD内では、開発(development)と商用(production)のふたつのアプ
     <span style="color:#f92672">repoURL</span>: <span style="color:#ae81ff">https://github.com/mosuke5/kustomize-examples</span>
     <span style="color:#f92672">targetRevision</span>: <span style="color:#ae81ff">HEAD</span>
   <span style="color:#f92672">syncPolicy</span>: {}
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e">## production.yaml</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e">## production.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">argoproj.io/v1alpha1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Application</span>
 <span style="color:#f92672">metadata</span>:
@@ -238,7 +238,7 @@ Argo CD内では、開発(development)と商用(production)のふたつのアプ
     <span style="color:#f92672">targetRevision</span>: <span style="color:#ae81ff">HEAD</span>
   <span style="color:#f92672">syncPolicy</span>: {}
 </code></pre></div><p>上のマニフェストをapplyして、Argo CDでSyncしたあとに状況を確認してみます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get all -n development
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get all -n development
 NAME                                    READY   STATUS    RESTARTS   AGE
 pod/nginx-deployment-7465f86b8f-w8fbl   1/1     Running   0          4m28s
 
@@ -280,7 +280,7 @@ replicaset.apps/nginx-deployment-599969c8d9   1         1         1       2m18s
 </ul>
 <p>ためしに、イメージの差し替えをやってみます。
 <code>production.yaml</code>を次のように変更します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e">## production.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e">## production.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">argoproj.io/v1alpha1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Application</span>
 <span style="color:#f92672">metadata</span>:
@@ -301,7 +301,7 @@ replicaset.apps/nginx-deployment-599969c8d9   1         1         1       2m18s
         - <span style="color:#e6db74">&#34;nginx:1.20.0&#34;</span>
   <span style="color:#f92672">syncPolicy</span>: {}
 </code></pre></div><p>マニフェストを変更後、applyしてSyncすると、Deploymentのイメージが差し替わっていますね。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get deploy nginx-deployment -n production -o yaml | grep &#34;image: nginx:1.20.0&#34;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get deploy nginx-deployment -n production -o yaml | grep &#34;image: nginx:1.20.0&#34;
       - image: nginx:1.20.0
 </code></pre></div><p>アプリケーションの更新後に、Gitレポジトリに最新のタグを記述して保存する方法もよいですが、場合によってはイメージタグはArgo CD側で管理するのもひとつの手法として考えられると思います。
 <strong>Gitレポジトリを信頼できる唯一の情報源とするというコンセプトでいうとイメージタグもGitに保存したいところですが、スコープは柔軟に判断してよいと思います。</strong></p>

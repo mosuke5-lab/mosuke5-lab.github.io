@@ -108,7 +108,7 @@ VPS1台でインフラ勉強シリーズの第3回目でVPN構築を行ったの
 <p>・<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DD%A1%BC%A5%CD%A5%F3%A5%C8">コンポーネント</a>：<a class="keyword" href="http://d.hatena.ne.jp/keyword/SoftEther">SoftEther</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a> Server<br>
 ・プラットフォーム：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Linux">Linux</a><br>
 ・CPU：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Intel">Intel</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/x86">x86</a> / <a class="keyword" href="http://d.hatena.ne.jp/keyword/AMD64">AMD64</a>(64bit)</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">## ダウンロード</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">## ダウンロード</span>
 $ wget ttp://jp.softether-download.com/files/softether/v4.08-9449-rtm-2014.06.08-tree/Linux/SoftEther%20VPN%20Server/64bit%20-%20Intel%20x64%20or%20AMD64/softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz
 
 <span style="color:#75715e">## 解凍</span>
@@ -194,7 +194,7 @@ $ sudo /etc/init.d/vpnserver start
     <h2>4. 設定</h2>
 <div class="section">
     <h4>(1)管理者パスワードの設定</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">## vpnserverへ接続
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">## vpnserverへ接続
 $ sudo ./vpncmd localhost:443 /SERVER
 
 ## 管理者パスワード設定
@@ -208,7 +208,7 @@ VPN Server&gt; ServerPasswordSet
 VPN Server> HubCreate 
 ```
 <p>※HELPコマンドがだいぶ使えるので使おう。日本語で書かれているのでわかりやすいです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">VPN Server&gt;HELP
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">VPN Server&gt;HELP
 下記の 205 個のコマンドが使用できます:
  About                      - バージョン情報の表示
  AcAdd                      - 接続元 IP 制限リストにルールを追加 (IPv4)
@@ -250,7 +250,7 @@ UserCreate コマンド - ユーザーの作成
 コマンドは正常に終了しました。</p>
 <h2 id="ユーザを作っただけではパスワードが設定されないので">ユーザを作っただけではパスワードが設定されないので</h2>
 <p>VPN Server/DEFAULT&gt; UserPasswordSet</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&lt;/div&gt;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&lt;/div&gt;
 &lt;div class=&#34;section&#34;&gt;
     &lt;h4&gt;(5) ローカルブリッジの設定&lt;/h4&gt;
     &lt;p&gt;次にローカルブリッジの設定をする。&lt;br&gt;
@@ -260,7 +260,7 @@ UserCreate コマンド - ユーザーの作成
 BridgeCreate コマンド - ローカルブリッジ接続の作成
 ブリッジする仮想 HUB 名: Default
 ブリッジ先のデバイス名: vboxnet0</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&lt;/div&gt;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&lt;/div&gt;
 &lt;div class=&#34;section&#34;&gt;
     &lt;h4&gt;(6) &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/DHCP&#34;&gt;DHCP&lt;/a&gt;の設定&lt;/h4&gt;
     &lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPN&#34;&gt;VPN&lt;/a&gt;クライアント側に割り当てる&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&#34;&gt;IPアドレス&lt;/a&gt;のレンジを決めてあげます。&lt;br&gt;
@@ -280,7 +280,7 @@ DNS サーバー 1 (未設定可):
 DNS サーバー 2 (未設定可):
 ドメイン名:
 ログの保存 (yes / no): yes</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&lt;/div&gt;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&#34;section&#34;&gt;
     &lt;h2&gt;5. &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPN&#34;&gt;VPN&lt;/a&gt;接続試験&lt;/h2&gt;

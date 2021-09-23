@@ -113,7 +113,7 @@ Web上でのデータのグラフ化にどんな方法をとっていますか�
 <p>先に結論から書くと、今まで次の(2)(3)のようなやりかたをやっていたのだけれど、
 これが一番複雑にならずに良いと思いました。</p>
 <p>Sinatra側で/csvにアクセスするとcsvファイルをダウンロードできるようにします。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#75715e">#Sinatra側</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#75715e">#Sinatra側</span>
 get <span style="color:#e6db74">&#39;/csv&#39;</span> <span style="color:#66d9ef">do</span>
     content_type <span style="color:#e6db74">&#39;application/csv&#39;</span>
     attachment <span style="color:#e6db74">&#39;download.csv&#39;</span>
@@ -137,13 +137,13 @@ get <span style="color:#e6db74">&#39;/csv&#39;</span> <span style="color:#66d9ef
 また、今回はcsvにしているがjsonなどの他の形式でも同様のことがいえる。もっと複雑な構造のデータを扱うのであればjsonを利用すべきです。</p>
 <p>このエンドポイントを使って、D3.js側で以下のように読み込ませる。
 d3.jsのcsvを読み込ませる関数の引数にURLを指定してあげればそれで終了。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">d3</span>.<span style="color:#a6e22e">csv</span>(<span style="color:#e6db74">&#34;/csv&#34;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">error</span>, <span style="color:#a6e22e">data</span>) {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">d3</span>.<span style="color:#a6e22e">csv</span>(<span style="color:#e6db74">&#34;/csv&#34;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">error</span>, <span style="color:#a6e22e">data</span>) {
     (<span style="color:#a6e22e">中略</span>)
 }
 </code></pre></div><h3 id="2-javascriptコードの中でruby変数を展開させる">(2) javascriptコードの中でRuby変数を展開させる</h3>
 <p>d3.jsのdatasetの中でRuby変数を展開させる。ビューにJavascriptを書いているので、ビューの中で変数展開するのと同じ要領。
 しかし、jsコードにRubyコードも交じるのはアンチパターンと言えよう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataset</span> <span style="color:#f92672">=</span> [
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataset</span> <span style="color:#f92672">=</span> [
 <span style="color:#f92672">&lt;%</span> <span style="color:#960050;background-color:#1e0010">@</span><span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">each</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span><span style="color:#a6e22e">d</span><span style="color:#f92672">|</span> <span style="color:#f92672">%&gt;</span>
     {<span style="color:#a6e22e">date</span><span style="color:#f92672">:&lt;%=</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">date</span><span style="color:#f92672">%&gt;</span>, <span style="color:#a6e22e">value</span><span style="color:#f92672">:&lt;%=</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">value</span> <span style="color:#f92672">%&gt;</span>},
 <span style="color:#f92672">&lt;%</span> <span style="color:#a6e22e">end</span> <span style="color:#f92672">%&gt;</span>
@@ -151,7 +151,7 @@ d3.jsのcsvを読み込ませる関数の引数にURLを指定してあげれば
 </code></pre></div><h3 id="3-csvファイルをおいておく">(3) CSVファイルをおいておく</h3>
 <p>こちらはリアルタイムな更新でなれけばこれはこれでありかもしれない。
 publicのフォルダに予めcsvファイルを設置しておき、以下のようにd3.jsで読み込ませる。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">d3</span>.<span style="color:#a6e22e">csv</span>(<span style="color:#e6db74">&#34;test.csv&#34;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">error</span>, <span style="color:#a6e22e">data</span>) {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">d3</span>.<span style="color:#a6e22e">csv</span>(<span style="color:#e6db74">&#34;test.csv&#34;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">error</span>, <span style="color:#a6e22e">data</span>) {
     (<span style="color:#a6e22e">中略</span>)
 }
 </code></pre></div>

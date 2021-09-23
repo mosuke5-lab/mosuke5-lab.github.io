@@ -135,7 +135,7 @@
 <h3 id="認証する-docker">認証する (Docker)</h3>
 <p>Dockerを利用している多くの方は問題ないかと思いますが、<code>docker</code>コマンドを使ってDocker Hubへ認証を素振りしておきましょう。
 今までは、自分のレポジトリにコンテナイメージをアップロードしたり、プライベートレジストリを利用するときくらいしか認証しませんでしたが、Pullのみでも認証する必要がでてきます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% docker login
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% docker login
 Login with your Docker ID to push and pull images from Docker Hub. If you don&#39;t have a Docker ID, head over to https://hub.docker.com to create one.
 Username: mosuke5
 Password:
@@ -150,7 +150,7 @@ Kubernetesを利用した場合の、Docker Hubへの認証方法もきちんと
 これは、普段プライベートレジストリを使っている人はおなじみです。パブリックレジストリですが、プライベートレジストリと同様に認証の設定を行えば問題なしです。詳しくは<a href="https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/">こちらのドキュメント</a>をみてもらうとして、ここでは簡易的に情報をお伝えします。</p>
 <p>上で <code>docker login</code> を行いましたが、こちらに成功すると <code>~/.docker/config.json</code> にトークンが記述されます。（他のレジストリにログインしたことあれば、他のレジストリへのトークンも保存されているでしょう。）
 このトークンをKubernetesのSecretとして保存する必要があります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% cat ~/.docker/config.json
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% cat ~/.docker/config.json
 {
     &#34;auths&#34;: {
         &#34;https://index.docker.io/v1/&#34;: {
@@ -159,7 +159,7 @@ Kubernetesを利用した場合の、Docker Hubへの認証方法もきちんと
     }
 }
 </code></pre></div><p>下記のように登録し、状態を確認しておきます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% kubectl create secret generic regcred \
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% kubectl create secret generic regcred \
     --from-file=.dockerconfigjson=/Users/mosuke5/.docker/config.json \
     --type=kubernetes.io/dockerconfigjson
 secret/regcred created
@@ -183,7 +183,7 @@ metadata:
 type: kubernetes.io/dockerconfigjson
 </code></pre></div><p>あとは、Podをデプロイするときに、上で作成したSecretを<code>imagePullSecrets</code>に引き渡してあげれば問題なしです。
 パブリックレジストリなのにSecretを指定するのはややめんどくさいです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pod</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">from-docker-hub</span>

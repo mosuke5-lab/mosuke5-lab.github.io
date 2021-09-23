@@ -102,7 +102,7 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
 <h2 id="課題">課題</h2>
 <p>OpenShiftでは、Red Hatが作成したJenkinsイメージが内包されており、簡単にOpenShiftと連携したJenkinsをインストールすることが可能です。<br>
 一番手っ取り早く試す方法としては下記のように<code>oc new-app</code>で、すでに用意されているテンプレートを用いて起動することです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// OpenShift v4.4で用意されているイメージ
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">// OpenShift v4.4で用意されているイメージ
 $ oc get is -n openshift | grep jenkins
 jenkins                xxx.com/openshift/jenkins                2,latest       24 hours ago
 jenkins-agent-maven    xxx.com/openshift/jenkins-agent-maven    latest,v4.0    24 hours ago
@@ -151,7 +151,7 @@ Jenkinsのイメージのカスタマイズは非常に簡単です。環境変�
 <p>以下のプラグインはアップデートしておくことをおすすめします。（下の記述のバージョンは執筆時点のため確認の上修正してください）<br>
 JenkinsのKubernetesプラグインでDecralative記法を利用するのにバージョンが古くうまく動かないなどがあったためです。
 Gitも最新にしておくとパイプラインの記述でエラーに遭遇することが減ると思います。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">kubernetes:1.19.3
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">kubernetes:1.19.3
 pipeline-model-definition:1.6.0
 git:4.2.2
 git-client:3.2.1
@@ -162,7 +162,7 @@ OpenShiftでは、Jenkinsを起動するためのテンプレートが用意さ�
 しかし、実際にこのテンプレートを使ってJenkinsを起動していると、リソースの都合上Jenkinsが遅くてしょうがないというケースがただありました。
 用意されているJenkinsのテンプレートでは、メモリーのリミットは設定できるのですが、CPU・メモリーのリクエスト値を設定しておきたいことがただあったのでテンプレートをカスタマイズして使います。</p>
 <p>元のテンプレートは参考にしつつ、自分でカスタマイズできるようにしておくと良いでしょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get template jenkins-persistent -o yaml &gt; my-jenkins-template.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get template jenkins-persistent -o yaml &gt; my-jenkins-template.yaml
 
 // 任意に変更して管理する
 $ vim my-jenkins-template.yaml

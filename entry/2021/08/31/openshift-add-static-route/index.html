@@ -118,7 +118,7 @@ Kubernetesのようなコンテナの実行環境として考えると、コン�
 <p>詳細はこちらの「<a href="https://access.redhat.com/solutions/5876771">Create static routes post cluster installation for a specific worker pool</a>」を参照いただことにしますが、次のようなMachineConfigを作成することで対応できます。</p>
 <p>以下の例では、systemdのserviceをノード上に追加し、nmcliを用いてルーティング設定を追加するというものです。
 <code>192.168.1.0/24</code>向きの通信を<code>172.18.0.1</code>にルーティングする設定です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># staticroute.yaml</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># staticroute.yaml</span>
 <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">machineconfiguration.openshift.io/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">MachineConfig</span>
 <span style="color:#f92672">metadata</span>:
@@ -156,7 +156,7 @@ Kubernetesのようなコンテナの実行環境として考えると、コン�
 <h3 id="machineconfigを作成すると起こること">MachineConfigを作成すると起こること</h3>
 <p>OpenShiftには、MachineConfigPool（以下、mcp）というリソースがあり、WorkerノードやMasterノードが読み込むべきMachineConfigの設定が管理されます。
 以下はworkerノードのmcpですが、Machine Config Selectorで <code>machineconfiguration.openshift.io/role:  worker</code> のラベルが付いたMachineConfigを読み込むように記述されています。前項で作ってたMachineConfigに付与したラベルと一致させることで読み込ませることができます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc describe mcp worker
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc describe mcp worker
 ...
 Spec:
  Configuration:
@@ -170,7 +170,7 @@ Spec:
 こちらは、<code>rendered-xxx</code>と名前がついていることから推測ができるように自動生成されたものです。
 該当のMachineConfigの中身を見ると、作成したスタティックルート追加の設定なども含まれていることが確認できます。
 そのほか、Kubeletの設定やレジストリの設定などさまざまな設定が書かれます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get machineconfig rendered-worker-d09292d26d2a2e82ca510904af053627 -o yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ oc get machineconfig rendered-worker-d09292d26d2a2e82ca510904af053627 -o yaml
 ...
     - contents: |
           [Unit]
@@ -192,7 +192,7 @@ MachineConfigを作成・編集した後に <code>oc get node -w</code> でノ�
 <h3 id="ノード内の設定確認">ノード内の設定確認</h3>
 <p>設定の反映が完了後、ノードに入って設定を確認してみてください。<br>
 systemdのserviceファイルの確認と動作状況、およびルーティング設定を確認しましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># cat /etc/systemd/system/nmcli-dev-modify.service
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># cat /etc/systemd/system/nmcli-dev-modify.service
 [Unit]
 Description=nmcli-dev-modify
 After=network-online.target

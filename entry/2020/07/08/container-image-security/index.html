@@ -158,7 +158,7 @@ Kubernetesでは、メインのプロセスが落ちた際にはPodの終了を�
 <p>例えば、以下のようなDockerfileを利用してイメージのビルドした場合、最終的に出来上がるイメージではgit-repo-keyは削除され存在しませんが、イメージのレイヤーとしてgit-repo-keyは残っています。
 レイヤー内に残っているファイルは簡単に取り出すことができます。
 コンテナイメージのビルドプロセスでのシークレットの扱いも十分に気をつけましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">FROM centos:8
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">FROM centos:8
 ADD ./git-repo-key /tmp
 RUN rm /tmp/git-repo-key
 </code></pre></div><p>もし、ビルドプロセスでシークレットが必要な場合は、例えばDocker環境であれば、BuildKitを有効化して <code>docker build --secret</code> コマンドを使ってビルドするなどがあります。</p>
@@ -170,7 +170,7 @@ RUN rm /tmp/git-repo-key
 信頼のおける組織が出しているイメージであるかや、そのイメージをビルドするのに使っているDockerfileが公開されているか（必要に応じて中身を確認）などを総合的に見て判断しましょう。<br>
 また、仮に信頼のある組織のものだったとしても、コンテナイメージのタグは上書き可能で、安全とおもって利用していたイメージが書き換えられている可能性もあります。
 イメージの利用時にタグ名ではなくDigest値を用いることで、タグの上書きされたとしても、同じイメージを使い続けることができます。（当然、Digest値を取得した時点でマルウエアなど仕込まれていたら対策になりません）</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># Dockefile
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># Dockefile
 FROM centos@sha256:9e0c275e0bcb495773b10a18e499985d782810e47b4fce076422acb4bc3da3dd
 RUN xxxxx
 ...

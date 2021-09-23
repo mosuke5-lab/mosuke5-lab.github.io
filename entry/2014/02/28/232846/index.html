@@ -190,9 +190,9 @@
 
 <h3 id="inner-join型">INNER JOIN型</h3>
 <p>まずは、INNER JOIN型です。自分は一番見慣れた形式です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">order</span> <span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">ON</span> <span style="color:#66d9ef">order</span>.user_id<span style="color:#f92672">=</span><span style="color:#66d9ef">user</span>.user_id
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">order</span> <span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> <span style="color:#66d9ef">user</span> <span style="color:#66d9ef">ON</span> <span style="color:#66d9ef">order</span>.user_id<span style="color:#f92672">=</span><span style="color:#66d9ef">user</span>.user_id
 </code></pre></div><h3 id="where型">WHERE型</h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">user</span>,<span style="color:#66d9ef">order</span> <span style="color:#66d9ef">WHERE</span> <span style="color:#66d9ef">order</span>.user_id<span style="color:#f92672">=</span><span style="color:#66d9ef">user</span>.user_id
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">user</span>,<span style="color:#66d9ef">order</span> <span style="color:#66d9ef">WHERE</span> <span style="color:#66d9ef">order</span>.user_id<span style="color:#f92672">=</span><span style="color:#66d9ef">user</span>.user_id
 </code></pre></div><p>結果は一緒です。ですが記法的にすこし考え方が異なりそうです。その考え方がわかればたいしたことはないです。
 INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをくっつけます。と解釈できますね。</p>
 <p>一方、WHERE型は、まず<code>SELECT * FROM user,order</code>これの結果を考えるとわかりやすいです。
@@ -321,7 +321,7 @@ INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをく
 しかし、頭のなかの理解のしやすさや、その他SQLの運用のことをいろいろ考えてみると、やはりFROM句の後にテーブルを複数書いてWHEREで結合させるのはナンセンスだと自分は考えています。<br>
 例えば、内部結合に加え、外部結合もある場合を考えてみます。</p>
 <p>WHERE型</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> 
 <span style="color:#66d9ef">FROM</span> table1, table2 <span style="color:#75715e">#←結合させたいもの
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">LEFT</span> <span style="color:#66d9ef">OUTER</span> <span style="color:#66d9ef">JOIN</span> (
     <span style="color:#75715e"># 副問い合わせとか長いSQLが入ると想定
@@ -331,7 +331,7 @@ INNER JOIN型では、orderとuserのテーブルのuser_idが同じものをく
 </span><span style="color:#75715e"></span> 
 </code></pre></div><p>table1とtable2を内部結合させたいのに、肝心の何と何を結合させるかの部分の"WHERE table1.id=table2.id"が離れてしまい、SQL文全体として何をしたいかわかりずらいきがします。</p>
 <p>一方、INNER JOINなら</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> 
 <span style="color:#66d9ef">FROM</span> table1
 <span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> table2 <span style="color:#66d9ef">ON</span> table1.id<span style="color:#f92672">=</span>table2.id <span style="color:#75715e">#←結合させたいものと結合条件が一緒
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">LEFT</span> <span style="color:#66d9ef">OUTER</span> <span style="color:#66d9ef">JOIN</span> (

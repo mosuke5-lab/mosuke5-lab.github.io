@@ -86,10 +86,10 @@
 </ol>
 <h2 id="squidのインストールと動作確認">squidのインストールと動作確認</h2>
 <p>まず、本検証環境はAWS EC2上のRHEL8です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat /etc/redhat-release
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat /etc/redhat-release
 Red Hat Enterprise Linux release 8.3 (Ootpa)
 </code></pre></div><p>インストールして起動します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo dnf install -y squid
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo dnf install -y squid
 ...
 Complete!
 
@@ -110,7 +110,7 @@ $ sudo systemctl status squid
            └─15529 (logfile-daemon) /var/log/squid/access.log
 ...
 </code></pre></div><p>squidのバージョンは4.11です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ squid -v
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ squid -v
 Squid Cache: Version 4.11
 Service Name: squid
 
@@ -118,13 +118,13 @@ This binary uses OpenSSL 1.1.1g FIPS  21 Apr 2020. For legal restrictions on dis
 </code></pre></div><p>起動後、squidを使ってプロキシできるか簡単に確認します。<br>
 まずは、ポートの利用確認です。lsofを利用して、対象ポートを利用しているか確認します。
 デフォルトでは <code>3128</code> ポートを使います。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo dnf install -y lsof
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo dnf install -y lsof
 $ sudo lsof -i:3128
 COMMAND   PID  USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
 squid   15528 squid   13u  IPv6  46287      0t0  TCP *:squid (LISTEN)
 </code></pre></div><p>squidのサーバ内から、プロキシ経由でサイトにアクセスできるか確認します。
 <code>curl -I https://blog.mosuke.tech -x http://localhost:3128</code>のレスポンスが返ってきており、ログで<code>TCP_TUNNEL/200</code>と出ているので問題なさそうです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -I https://blog.mosuke.tech -x http://localhost:3128
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -I https://blog.mosuke.tech -x http://localhost:3128
 HTTP/1.1 200 Connection established
 
 HTTP/2 200
@@ -144,7 +144,7 @@ $ sudo tail -f /var/log/squid/access.log
 <p>ひとつ前のセクションでは、squidサーバから自身のプロキシポートを指定してcurlを実行しました。<br>
 たとえば、おつかいのPCなどsquidサーバ以外から実施してみてください。おそらく以下のようなエラーになるのではないかと思います。
 ※そもそもナニもレスポンスが返ってこない人は、AWSのセキュリティグループなどFWの設定を見直しましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">local-pc $ curl -I https://blog.mosuke/tech -x http://&lt;squid-global-ip&gt;:3128
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">local-pc $ curl -I https://blog.mosuke/tech -x http://&lt;squid-global-ip&gt;:3128
 HTTP/1.1 403 Forbidden
 Server: squid/4.11
 Mime-Version: 1.0
@@ -178,7 +178,7 @@ local-pc $ curl https://blog.mosuke/tech -x http://&lt;squid-global-ip&gt;:3128
 &lt;p&gt;Access control configuration prevents your request from being allowed at this time. Please contact your service provider if you feel this is incorrect.&lt;/p&gt;
 </code></pre></div><p>これは、squidのデフォルトの設定が、プライベートネットワークなど一部のIPからのみプロキシするように設定されているからです。
 以下はデフォルト設定の一部を切り出したものですが、<code>0.0.0.1-0.255.255.255</code>や<code>10.0.0.0/8</code>などが<code>localnet</code>というグルーピングがされており、<code>localnet</code>のみが<code>http_access allow</code>に記述されているからです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">acl localnet src 0.0.0.1-0.255.255.255  # RFC 1122 &#34;this&#34; network (LAN)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">acl localnet src 0.0.0.1-0.255.255.255  # RFC 1122 &#34;this&#34; network (LAN)
 acl localnet src 10.0.0.0/8             # RFC 1918 local private network (LAN)
 acl localnet src 100.64.0.0/10          # RFC 6598 shared address space (CGN)
 acl localnet src 169.254.0.0/16         # RFC 3927 link-local (directly plugged) machines
@@ -190,11 +190,11 @@ acl localnet src fe80::/10              # RFC 4291 link-local (directly plugged)
 ...
 http_access allow localnet
 </code></pre></div><p>もし外部ネットワークからのプロキシを許可したい場合は以下のように追加して、squidを再起動しましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># /etc/squid/squid.conf
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># /etc/squid/squid.conf
 acl myhome src xx.xx.xx.xx/24
 
 http_access allow myhome
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo systemctl restart squid
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo systemctl restart squid
 </code></pre></div><h2 id="まとめ">まとめ</h2>
 <p>簡単ですが、squidのインストール方法と簡単な設定方法を見てきました。いつも忘れてしまうため未来の自分および同じような境遇のひとの役に立てばと思います。プロキシ環境をさっと建てられるように準備しておくと、再現検証などに非常に役に立ちます。
 いちどは自分の手で構築して感覚を掴んでおくと良いでしょう。</p>

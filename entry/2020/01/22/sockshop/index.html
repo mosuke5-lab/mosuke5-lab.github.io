@@ -128,7 +128,7 @@ Sock Shopではデータベースを持つサービスが4つあります。
 <p>靴下の商品情報や、靴下のタグの情報を管理するcatalogueサービスのデータベース構造を示します。
 MySQLを利用しており、非常にわかりやすいデータ構造となっています。
 <code>sock</code>テーブルでは靴下の情報を<code>tag</code>テーブルでは靴下のタグ情報を管理しており、それらは1対nの関係性なので、<code>sock_tag</code>テーブルで中間テーブルとして機能させています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">mysql&gt; desc sock;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">mysql&gt; desc sock;
 +-------------+--------------+------+-----+---------+-------+
 | Field       | Type         | Null | Key | Default | Extra |
 +-------------+--------------+------+-----+---------+-------+
@@ -176,7 +176,7 @@ mysql&gt; select * from tag;
 </code></pre></div><h3 id="user">user</h3>
 <p>続いて、ユーザを管理するサービスです。
 mongodbのcollectionは3つ存在します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&gt; show collections;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&gt; show collections;
 addresses
 cards
 customers
@@ -213,7 +213,7 @@ customers
 }
 </code></pre></div><h3 id="cart">cart</h3>
 <p>次は、ショッピングカートです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&gt; show collections
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&gt; show collections
 cart
 item
 
@@ -240,7 +240,7 @@ item
 <p>最後は、注文履歴を管理するorderサービスです。<br>
 orderサービスの中では、注文した商品のIDのみ保有し、そのデータは持っていないことは少し頭の片隅に覚えておいてください。
 後ほど、サービスをまたいだデータの取得に関して考えていきます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&gt; show collections;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&gt; show collections;
 customerOrder
 
 &gt; db.customerOrder.find()
@@ -345,11 +345,11 @@ customerOrder
 残念ながら、認証の方法などについてドキュメントに書いていなかったので補足していきます。
 認証はクッキーを使います。<br>
 試しに、ログインセッションを持たないまま、オーダーAPIを実行してみるとログインしてくれとエラーが返ってきます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XGET $FRONTEND_ADDRESS/orders
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XGET $FRONTEND_ADDRESS/orders
 {&#34;message&#34;:&#34;User not logged in.&#34;,&#34;error&#34;:{}}
 </code></pre></div><p>ログインには&quot;username:password&quot;をbase64でエンコードしたものが必要です(<a href="https://github.com/microservices-demo/front-end/blob/5d9a4272fec3983250364917d8ea7a210cdbf58c/public/js/client.js#L23">該当コード</a>)。<br>
 コマンドラインで生成するか、こちらのような<a href="https://uic.jp/base64encode/">Base64エンコードをしてくれるWebサービス</a>で生成しましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ echo -n &#34;user:password&#34; | base64
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ echo -n &#34;user:password&#34; | base64
 dXNlcjpwYXNzd29yZA==
 
 $ curl -XGET -c cookie.txt -H &#34;Authorization: Basic dXNlcjpwYXNzd29yZA==&#34; -v $FRONTEND_ADDRESS/login
@@ -361,7 +361,7 @@ $ cat cookie.txt
 
 xxxxxxx
 </code></pre></div><p>ログインができているか確認します。オーダー情報が返ってきていれば成功です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XGET -b cookie.txt $FRONTEND_ADDRESS/orders
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -XGET -b cookie.txt $FRONTEND_ADDRESS/orders
 [
     {
         &#34;customerId&#34;: &#34;57a98d98e4b00679b4a830b2&#34;,
@@ -414,7 +414,7 @@ APIは<a href="https://microservices-demo.github.io/api/index.html">こちらを
 <h3 id="cartsサービスの停止">cartsサービスの停止</h3>
 <p>マイクロサービスの回復性について考えてみます。<br>
 cartsサービスを落としてみて、どんな影響があるか確認してみます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl scale --replicas=0 deployment/carts
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl scale --replicas=0 deployment/carts
 </code></pre></div><ul>
 <li>オーダーはできるか？</li>
 <li>他のコンポーネントへの影響は？</li>
@@ -435,10 +435,10 @@ cartsサービスを落としてみて、どんな影響があるか確認して
 以下、実行することは非常に簡単なわけですが、重要なのはそのサービスの独立性です。
 １サービスで１チームと仮に想定した場合、チームの動きやすさを想像することができると思います。</p>
 <p>ためしにフロントエンドサービスをスケールさせてみてみましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl scale --replicas=3 deployment/front-end 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl scale --replicas=3 deployment/front-end 
 </code></pre></div><p>フロントエンドのコンテナイメージを変更してデプロイしてみます。<br>
 サンプルで、背景色を変更したフロントエンドのイメージを用意しました。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">extensions/v1beta1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">extensions/v1beta1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">name</span>: <span style="color:#ae81ff">front-end</span>

@@ -109,9 +109,9 @@
 <h2 id="3-ロードバランサの構築">3. ロードバランサの構築</h2>
 <h3 id="ホストサーバ側の設定">■ホストサーバ側の設定</h3>
 <p>インストールはyumで入れることが可能です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">#HAProxyインストール
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">#HAProxyインストール
 $ sudo yum install haproxy
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">#設定はすごく簡単で以下のファイルのみ。実際に
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">#設定はすごく簡単で以下のファイルのみ。実際に
 $ sudo vim /etc/haproxy/haproxy.cfg
 
 #---------------------------------------------------------------------
@@ -183,11 +183,11 @@ backend hoge
     server      web11 192.168.33.11:80 check inter 3000 fall 2 rise 2 
 </code></pre></div><p>ロードバランサを80番ポートで待ち受けたい場合には、ApacheやNginxが起動していないことは確認しておきましょう。
 立ち上がっているとそもそも、HAProxyの起動に失敗するはずです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo systemctl stop nginx
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo systemctl stop nginx
 $ sudo systemctl stop httpd 
 </code></pre></div><p>HAProxyのログをsyslogに残すように設定します。<br>
 ただしメインのmessageではなく、独自のファイルに書くために以下の設定します。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">##ログの格納場所作成
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">##ログの格納場所作成
 $ sudo mkdir /var/log/haproxy
 
 ##syslogの設定変更
@@ -224,13 +224,13 @@ $ sudo systemctl start haproxy
 <a href="https://blog.mosuke.tech/entry/2014/10/09/230555">【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築</a></p>
 <p>ヘルスチェック用のhtml設置しておくとわかりやすいです。<br>
 負荷分散されていることを確認するために、内容の異なるヘルスチェック用のHTMLをおいておくと非常にわかりやすいです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">## /var/www/html配下にヘルスチェック用のhtml設置
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">## /var/www/html配下にヘルスチェック用のhtml設置
 $ sudo touch health_check.html 
 </code></pre></div><h2 id="4-動作試験">4. 動作試験</h2>
 <p>ブラウザよりホストサーバへアクセスします。
 きちんとロードバランスされていることを確認します。確認方法は、もしヘルスチェック用のHTMLの中身を変えていればそれでわかるとおもいます。あるいはログから確認する必要があります。<br>
 HAProxy側のログは以下のとおり。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo tail -f /var/log/haproxy/haproxy.conf
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo tail -f /var/log/haproxy/haproxy.conf
 
 ##起動した時。L7のhealt checkが走っている
 Proxy main started.
@@ -251,7 +251,7 @@ Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code:
 Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &#34;OK&#34;, check duration: 6ms, status: 2/2 UP.
 Server hoge/web11 is UP. 2 active and 0 backup servers online. 0 sessions requeued, 0 total in queue. 
 </code></pre></div><p>Webサーバ側の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>ログを見てみると。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo tail -f /var/log/apache2/access.log
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo tail -f /var/log/apache2/access.log
 
 ##ロードバランサからのヘルスチェックが来ていることがわかる。
 192.168.33.1 - - [09/Nov/2014:08:07:43 +0000] &#34;GET /health_check.html HTTP/1.0&#34; 200 276 &#34;-&#34; &#34;Proxy-Check&#34;

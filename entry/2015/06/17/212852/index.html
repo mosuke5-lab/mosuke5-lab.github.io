@@ -84,7 +84,7 @@
 <h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a></h1>
 <p>公式サイトのサンプルの通りはじめに<code>app/migrations/001_example.php</code>を作り、migrationを実行した。</p>
 <p><code>app/migrations/001_example.php</code>の作成</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
 <span style="color:#66d9ef">namespace</span> <span style="color:#a6e22e">Fuel\Migrations</span>;
 <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Example</span>
 {
@@ -103,7 +103,7 @@
     }
 }
 </code></pre></div><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>実行すると以下のエラーに襲われた。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ php oil refine migrate
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ php oil refine migrate
 Uncaught exception Fuel\Core\Database_Exception: SQLSTATE[42601]: Syntax error: 7 ERROR: syntax error at or near &#34;DEFAULT&#34;
 LINE 5: )DEFAULT CHARACTER SET utf8;
 ^ with query: &#34;CREATE TABLE IF NOT EXISTS &#34;migration&#34; (
@@ -115,24 +115,24 @@ LINE 5: )DEFAULT CHARACTER SET utf8;
 <p>しょっぱなから躓くわけだが…</p>
 <p>初めて<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を実行する際には<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>管理用のテーブルを作る。<br>
 そのテーブルを作る<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が下記の通り発行されている。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#66d9ef">IF</span> <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">EXISTS</span> <span style="color:#e6db74">&#34;migration&#34;</span> (
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#66d9ef">IF</span> <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">EXISTS</span> <span style="color:#e6db74">&#34;migration&#34;</span> (
 <span style="color:#e6db74">&#34;type&#34;</span> varchar(<span style="color:#ae81ff">25</span>) <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>,
 <span style="color:#e6db74">&#34;name&#34;</span> varchar(<span style="color:#ae81ff">50</span>) <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>,
 <span style="color:#e6db74">&#34;migration&#34;</span> varchar(<span style="color:#ae81ff">100</span>) <span style="color:#66d9ef">DEFAULT</span> <span style="color:#e6db74">&#39;&#39;</span> <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>
 )<span style="color:#66d9ef">DEFAULT</span> CHARACTER <span style="color:#66d9ef">SET</span> utf8;
 </code></pre></div><p>理由は単純で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>のcreate tableでは次のdefault構文は利用できないから。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">create</span> <span style="color:#66d9ef">table</span> xxxx ( ) <span style="color:#66d9ef">default</span> character <span style="color:#66d9ef">set</span> xxx;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">create</span> <span style="color:#66d9ef">table</span> xxxx ( ) <span style="color:#66d9ef">default</span> character <span style="color:#66d9ef">set</span> xxx;
 </code></pre></div><p>なぜ、利用できない構文の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>が発行されたのか？<br>
 それは単に<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>の問題です。次期バージョンでは解決されることを祈る。</p>
 <h1>解決方法</h1>
 <p>解決方法は下記の記事がわかりやすかった。
 <iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fqiita.com%2Fhirobow%2Fitems%2F8c2c379b33f0040480b7" title="FuelPHP で PDOによるPostgreSQL接続の罠 - Qiita" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://qiita.com/hirobow/items/8c2c379b33f0040480b7">FuelPHP で PDOによるPostgreSQL接続の罠 - Qiita</a></iframe><cite class="hatena-citation"><a href="http://qiita.com/hirobow/items/8c2c379b33f0040480b7">qiita.com</a></cite></p>
 <p>簡単に言うとdbのコンフィグで、charsetをnullにすると<code>DEFAULT CHARACTER SET xxx</code>部分が発行されない。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&#39;charset&#39; =&gt; NULL, 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&#39;charset&#39; =&gt; NULL, 
 </code></pre></div><h1>2. PRIMARY KEYの問題</h1>
 <h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F6%BE%DD">事象</a></h1>
 <p>1.の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%B8%BB%FA%A5%B3%A1%BC%A5%C9">文字コード</a>の問題は解決して、さあもう一度<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を！と思って実行するもさらなるエラーに阻まれる。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ php oil refine migrate
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ php oil refine migrate
 Uncaught exception Fuel\Core\Database_Exception: SQLSTATE[42601]: Syntax error: 7 ERROR: syntax error at or near &#34;(&#34;
 LINE 2: &#34;id&#34; int(5) NOT NULL,
 ^ with query: &#34;CREATE TABLE IF NOT EXISTS &#34;users&#34; (
@@ -142,7 +142,7 @@ PRIMARY KEY &#34;id&#34; (&#34;id&#34;)
 );&#34; 
 </code></pre></div><p>理由は1のときと一緒。<br>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>では以下の構文は使えないのだ…</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">PRIMARY KEY &#34;id&#34; (&#34;id&#34;) 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">PRIMARY KEY &#34;id&#34; (&#34;id&#34;) 
 </code></pre></div><h1>3. 結局</h1>
 <p>つまるところ<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>(すくなくとも1.7までは)では、<a class="keyword" href="http://d.hatena.ne.jp/keyword/postgresql">postgresql</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を行う環境がちゃんと整っていないということ。<br>
 しかたないので、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>は生<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を書くことにしました。</p>

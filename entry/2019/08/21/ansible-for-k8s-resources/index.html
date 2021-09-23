@@ -105,7 +105,7 @@ Kubernetes上のリソースをどのように管理していますか？
 <h2 id="ansibleでkubernetes上のリソースを管理する">AnsibleでKubernetes上のリソースを管理する</h2>
 <p>それでは早速<code>k8s</code>モジュールを使って行きたいと思います。まずは事前準備です。<br>
 このモジュールではいくつかrequirementがあります。内部ではopenshiftのpythonライブラリを利用しているようなので忘れずインストールしましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ pip install openshift
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ pip install openshift
 </code></pre></div><p>認証の方法も一通り用意されています。<br>
 基本的にAnsibleを実行する端末でkubeconfigなりtokenを使ってkubectlが使える環境であれば問題ないです。
 内部的にはkubectlを使うわけではないですが、認証の方法は同じです。</p>
@@ -113,7 +113,7 @@ Kubernetes上のリソースをどのように管理していますか？
 <p>まずはスタンダードにansibleのtaskに直接リソース情報を書いてみます。<br>
 基本的には<code>resource_definition</code>の部分にmanifestのyamlが入るイメージです。
 この程度の量なら問題ないですが、行数が増えてくるとだいぶ辛いですね。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">- <span style="color:#f92672">name</span>: <span style="color:#ae81ff">Create nginx deployment</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">- <span style="color:#f92672">name</span>: <span style="color:#ae81ff">Create nginx deployment</span>
   <span style="color:#f92672">k8s</span>:
     <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">gillsearch-development</span>
     <span style="color:#f92672">resource_definition</span>:
@@ -146,7 +146,7 @@ Kubernetes上のリソースをどのように管理していますか？
 また、すでに書いてあるmanifestもあることも多いと思いますので、既存のmanifestファイルから読みたいです。
 このようにファイルから読み出すことももちろん可能です。<br>
 <code>./templates/nginx-from-file.yml</code>は通常通りのmanifestファイルです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">- <span style="color:#f92672">name</span>: <span style="color:#ae81ff">Create nginx deployment</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">- <span style="color:#f92672">name</span>: <span style="color:#ae81ff">Create nginx deployment</span>
   <span style="color:#f92672">k8s</span>:
     <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">gillsearch-development</span>
     <span style="color:#f92672">state</span>: <span style="color:#ae81ff">present</span>
@@ -155,13 +155,13 @@ Kubernetes上のリソースをどのように管理していますか？
 <p>manifestファイルをそのまま利用するのであればAnsibleを使うメリットは少なくなってしまうかなと思います。<br>
 AnsibleではJinja2を使ったテンプレートの機能があるのでこれを活用しない手はありません。
 例えば、Nginxのデプロイメントのレプリカ数を変数にしてmanifestファイルをテンプレート化して使ってみます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">- name: Create nginx deployment
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">- name: Create nginx deployment
   k8s:
     namespace: gillsearch-development
     state: present
     resource_definition: &#34;{{ lookup(&#39;template&#39;, &#39;./templates/nginx-from-template.yml.j2&#39;) }}&#34;
 </code></pre></div><p><code>./templates/nginx-from-template.yml.j2</code>内で変数展開などが可能。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
 <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
 <span style="color:#f92672">metadata</span>:
   <span style="color:#f92672">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
@@ -198,7 +198,7 @@ AnsibleではJinja2のテンプレートエンジンを利用していますが�
 こちらを使うことで、Kubernetesのsecretリソースの管理にも活用できる点は良いポイントかもしれません。<br>
 例えば、credential情報をvar_fileとして記述しansible-vaultで暗号化して保存しておくとします。
 そうするとKubernetesのSecretを作る際に下記のように展開して作成することも可能です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: v1
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: v1
 data:
   password: {{ password | b64encode }}
 kind: Secret
