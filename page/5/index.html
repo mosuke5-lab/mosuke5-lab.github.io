@@ -60,6 +60,24 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
+  <h1><a href="https://blog.mosuke.tech/entry/2021/01/31/network-debug-on-containers/" class="entry-title">Kubernetes上のアプリケーションをtcpdumpでデバッグする</a></h1>
+  <div class="entry-sub-title">
+      <span class="">31 Jan 2021, 12:10</span>
+      <span class="">By mosuke5</span>
+      <a class="badge badge-inf post-category post-category-kubernetes" href="/categories/kubernetes">kubernetes</a>
+          </div>
+  <div class="entry-content">
+      <p>こんにちは、もーすけです。休日はもっぱら住宅購入の検討で忙しいマンです。<br>
+さて、本日は、Kubernetesのアプリケーションのデバッグに関して書きます。</p>
+<p>Kubernetesで運用中のアプリケーションの障害対応で、ネットワーク関連のデバッグをしたいことはよくあります。
+このブログでは具体的にtcpdumpを取得したいという場面を想定して書きます。
+コンテナアプリケーションの開発・運用をしていると、<strong>イメージのサイズを小さく保っておきたい</strong>と思うはずです。
+その理由についてはいろいろとありますが、イメージの展開のスピードを高めることで、デプロイや障害時の復旧を早めるなどが代表的なところです。（関連するトピックとして「<a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/">コンテナイメージを軽くする方法と、その原理原則を考える</a>」も読んでみてください。）</p>
+<p>それゆえに、アプリケーションの動作に必要なライブラリ以外は入れないことが多く、デバッグツールを除外しておくことが多いでしょう。
+しかし、障害発生時にいざtcpdumpやstrace, ping ,digなどを打ちたいと思ってもインストールされておらず困ることがあります。
+そんな場面に遭遇しても焦らないようにあらかじめ対応策を頭に入れて練習しておきましょう。</p>
+      <a href="https://blog.mosuke.tech/entry/2021/01/31/network-debug-on-containers/">続きを読む</a>
+  </div>
   <h1><a href="https://blog.mosuke.tech/entry/2021/01/24/designing-data-intensive-applications/" class="entry-title">分散システム構築の良書「データ指向アプリケーションデザイン」を動画で解説する</a></h1>
   <div class="entry-sub-title">
       <span class="">24 Jan 2021, 22:14</span>
@@ -218,15 +236,6 @@
 ずばり、Googleアドセンスの合格には実は「サイトのレイアウトが重要である」ということです。</p>
       <a href="https://blog.mosuke.tech/entry/2020/10/17/site-design-for-adsense/">続きを読む</a>
   </div>
-  <h1><a href="https://blog.mosuke.tech/kubernetes/" class="entry-title">Kubernetesを学ぶ</a></h1>
-  <div class="entry-sub-title">
-      <span class="">16 Oct 2020, 00:00</span>
-      <span class="">By mosuke5</span>
-      </div>
-  <div class="entry-content">
-      本ページは、Kubernetesを学びたい人向けにコンテンツを整備していくことを目的にしたものです。 随時更新しますので、ぜひご活用ください。
-      <a href="https://blog.mosuke.tech/kubernetes/">続きを読む</a>
-  </div>
   
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
@@ -244,11 +253,11 @@
   <div class="sidebar-content related-post">
     <h3>最近の記事</h3>
     <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/20/openshift-project-scoped-nodeselector/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、プロジェクトスコープのノードセレクターの挙動確認'});">OpenShift、プロジェクトスコープのノードセレクターの挙動確認</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/31/reflection/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「己」2021年振り返り'});">「己」2021年振り返り</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/28/openshift-router-sharding/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、Routerシャーディングを使って用途ごとにアクセス経路を分ける'});">OpenShift、Routerシャーディングを使って用途ごとにアクセス経路を分ける</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/22/openshift-ipi-limited-sourceip/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、送信元IPアドレスで制限がかかった環境でのIPIインストールの注意事項'});">OpenShift、送信元IPアドレスで制限がかかった環境でのIPIインストールの注意事項</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/20/openshift-tettei-nyumon/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「OpenShift徹底入門」という書籍を執筆しました'});">「OpenShift徹底入門」という書籍を執筆しました</a></li>
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/10/28/kubernetes-test-by-terratest/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetes環境についてTerratestでテストを書く'});">Kubernetes環境についてTerratestでテストを書く</a></li>
       </ul>
   </div>
   <div class="sidebar-content campaign-ad">
@@ -288,7 +297,7 @@
         <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (55)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (13)</a>
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (14)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
@@ -342,6 +351,9 @@
       </li>
       <li class="list-group-item">
         <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (1)</a>
       </li>
       </ul>
   </div>
