@@ -95,7 +95,7 @@ X-Forwarded-Forというヘッダー名にNginxでもっている変数$proxy_ad
 （略）RFCの標準的なヘッダフィールドではないが、IETFのネットワーク作業部会 (Network Working Group) は2011年10月より同種のHTTPヘッダForwardedの標準化作業を開始した[1]。</p>
 </blockquote>
 <h2 id="phpでx-forwarded-forを受け取る">PHPでX-Forwarded-Forを受け取る</h2>
-<p>リバースプロキシで&rsquo;X-forwarded-For&rsquo;という名前のHTTPヘッダーを追加したので、そのまま取得しようとするが、実はこのままだとうまくいきません。これはPHPのサーバ変数の仕様の問題です。PHPのサーバ変数に入れる際に、名前を規則に従って変更するからです。</p>
+<p>リバースプロキシで&rsquo;X-forwarded-For&rsquo;という名前のHTTPヘッダーを追加したので、そのまま取得しようとするが、実はこのままだとうまくいきません。PHPのサーバ変数に入れる際に、名前を規則に従って変更するからです。これは、&lt;a href=&ldquo;<a href="https://www.ietf.org/rfc/rfc3875%22">https://www.ietf.org/rfc/rfc3875&quot;</a> target=&quot;_blank&gt;&ldquo;RFC3875（CGIの仕様）</a> のProtocol-Specific Meta-Variablesに基づいて変換されているようです。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#66d9ef">echo</span> $_SERVER[<span style="color:#e6db74">&#39;X-Forwarded-For&#39;</span>];
 <span style="color:#75715e">// -&gt; 存在しない
 </span></code></pre></div><p>サーバ変数をvar_dumpを使って中身を確認してみると、HTTPが先頭についてて、すべて大文字になってて、ハイフンがアンスコに変わっていることが確認できます。</p>
