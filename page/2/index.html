@@ -60,6 +60,22 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
+  <h1><a href="https://blog.mosuke.tech/entry/2021/09/04/alibabacloud-image-cache/" class="entry-title">Alibaba Cloud, Kubernetesのイメージキャッシュ機能を検証する</a></h1>
+  <div class="entry-sub-title">
+      <span class="">04 Sep 2021, 16:11</span>
+      <span class="">By mosuke5</span>
+      <a class="badge badge-inf post-category post-category-Alibaba Cloud" href="/categories/alibaba-cloud">Alibaba Cloud</a>
+          <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+          </div>
+  <div class="entry-content">
+      <p>こんにちは。もーすけです。<br>
+Alibaba CloudのServerless Kubernetesを使ったシステム構築に取り組んでいて、Alibaba Cloud固有のKubernetesまわりの仕組みについて検証したことをまとめていきます。
+今回は、ImageCacheについてです。</p>
+<p>そもそも、Serverless Kubernetesって？という方は、少し古いですが以下を参照ください。（アップデートしたい…）
+一言でいうとノードレスのKubernetesで、EKS on Fargateなどに近い仕組みです。</p>
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/7YPxzJxZzDfOlL" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/mosuke5/alibaba-cloud-serverless-kubernetes" title="Alibaba Cloud Serverless Kubernetes 徹底解説" target="_blank">Alibaba Cloud Serverless Kubernetes 徹底解説</a> </strong> from <strong><a href="https://www.slideshare.net/mosuke5" target="_blank">Shinya Mori (@mosuke5)</a></strong> </div>
+      <a href="https://blog.mosuke.tech/entry/2021/09/04/alibabacloud-image-cache/">続きを読む</a>
+  </div>
   <h1><a href="https://blog.mosuke.tech/entry/2021/08/31/openshift-add-static-route/" class="entry-title">OpenShift、スタティックルートの追加方法と確認事項について</a></h1>
   <div class="entry-sub-title">
       <span class="">31 Aug 2021, 14:46</span>
@@ -211,6 +227,7 @@ Argo CDを使った本格運用に向けて学んでいきましょう。</p>
 <li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
 <li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
 <li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
 <li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
 </ul>
 <hr>
@@ -218,29 +235,6 @@ Argo CDを使った本格運用に向けて学んでいきましょう。</p>
 今回は、クラウドネイティブな環境でのCI/CDツールとして有名なTektonとArgo CD、これらの組み合わせした場合のパイプラインフローを検討してみます。どのように使い分けていくことができるのか考えていきたいと思います。
 本記事はTekton学習シリーズとして行ったわけではないですが、関連トピックとして番外編扱いにしておきます。</p>
       <a href="https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd/">続きを読む</a>
-  </div>
-  <h1><a href="https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/" class="entry-title">第3回: Argo CD、Syncの実行方法やタイミングについての検討</a></h1>
-  <div class="entry-sub-title">
-      <span class="">06 May 2021, 13:11</span>
-      <span class="">By mosuke5</span>
-      <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-          </div>
-  <div class="entry-content">
-      <hr>
-<h5>Argo CD学習シリーズ</h5>
-<ul>
-<li>第1回: <a href="/entry/2021/04/13/argocd/">Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></li>
-<li>第2回: <a href="/entry/2021/05/06/argocd-application/">Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
-<li>第3回: <a href="/entry/2021/05/06/argocd-sync-action/">Argo CD、Syncの実行方法やタイミングについての検討</a></li>
-<li>第4回: <a href="/entry/2021/06/12/argocd-resourcehooks/">Argo CD、Resource Hooksを使ってデプロイを高度化する</a></li>
-<li>関連記事: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
-</ul>
-<hr>
-<p>こんにちは、もーすけです。<br>
-Argo CD学習シリーズどんどんやっていきます。
-今回は、Argo CDがアプリケーションをSync（同期）するタイミングに関する検討です。
-軽めの話題ですが、実運用を検討する上で重要になるのでしっかりおさえておきましょう。</p>
-      <a href="https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/">続きを読む</a>
   </div>
   
 <div class="pagination">
@@ -259,11 +253,11 @@ Argo CD学習シリーズどんどんやっていきます。
   <div class="sidebar-content related-post">
     <h3>最近の記事</h3>
     <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて'});">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/20/openshift-project-scoped-nodeselector/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、プロジェクトスコープのノードセレクターの挙動確認'});">OpenShift、プロジェクトスコープのノードセレクターの挙動確認</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/31/reflection/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「己」2021年振り返り'});">「己」2021年振り返り</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/28/openshift-router-sharding/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、Routerシャーディングを使って用途ごとにアクセス経路を分ける'});">OpenShift、Routerシャーディングを使って用途ごとにアクセス経路を分ける</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/22/openshift-ipi-limited-sourceip/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、送信元IPアドレスで制限がかかった環境でのIPIインストールの注意事項'});">OpenShift、送信元IPアドレスで制限がかかった環境でのIPIインストールの注意事項</a></li>
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/20/openshift-tettei-nyumon/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「OpenShift徹底入門」という書籍を執筆しました'});">「OpenShift徹底入門」という書籍を執筆しました</a></li>
       </ul>
   </div>
   <div class="sidebar-content campaign-ad">
@@ -297,10 +291,10 @@ Argo CD学習シリーズどんどんやっていきます。
         <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (31)</a>
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (32)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (55)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (56)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (14)</a>
@@ -359,7 +353,7 @@ Argo CD学習シリーズどんどんやっていきます。
         <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
       </li>
       <li class="list-group-item">
-        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (1)</a>
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (2)</a>
       </li>
       </ul>
   </div>

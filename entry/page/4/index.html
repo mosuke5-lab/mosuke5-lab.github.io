@@ -61,6 +61,27 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2021/03/16/squid/" class="entry-title">squidを使ってプロキシ環境の再現検証に活用する</a></h1>
+    <div class="entry-sub-title">
+        <span class="">16 Mar 2021, 19:05</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-インフラ構築" href="/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E6%A7%8B%E7%AF%89">インフラ構築</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。  squidを使った検証は年に1回くらいは出てくるのですが、やるたびに忘れるのでメモします。
+ちなみに、squidを使う理由としてはいろいろなのですが、だいたい以下のような理由です。</p>
+<ol>
+<li>顧客のシステムを使う際にIPアドレス制限がかかっており、特定のサーバからアクセスさせたい</li>
+<li>顧客のネットワーク環境ではプロキシを利用しており、それゆえに環境を再現するためにプロキシを立てたい</li>
+<li>システムにアクセスするのにクラウドのリージョン間専用線を通して接続したい</li>
+</ol>
+        <a href="https://blog.mosuke.tech/entry/2021/03/16/squid/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2021/03/11/kubernetes-node-down/" class="entry-title">Kubernetesのノード障害時のPodの動きについての検証</a></h1>
     <div class="entry-sub-title">
         <span class="">11 Mar 2021, 00:13</span>
@@ -104,6 +125,7 @@
 <li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
 <li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
 <li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
 <li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
 </ul>
 <hr>
@@ -138,6 +160,7 @@ Tekton学習シリーズ第5回をやっていきます。
 <li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
 <li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
 <li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
 <li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
 </ul>
 <hr>
@@ -172,6 +195,7 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
 <li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
 <li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
 <li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
 <li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
 </ul>
 <hr>
@@ -206,6 +230,7 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
 <li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
 <li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
 <li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
 <li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
 </ul>
 <hr>
@@ -309,29 +334,6 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
         <a href="https://blog.mosuke.tech/entry/2021/02/07/cka/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2021/01/31/network-debug-on-containers/" class="entry-title">Kubernetes上のアプリケーションをtcpdumpでデバッグする</a></h1>
-    <div class="entry-sub-title">
-        <span class="">31 Jan 2021, 12:10</span>
-        <span class="">By mosuke5</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-kubernetes" href="/categories/kubernetes">kubernetes</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <p>こんにちは、もーすけです。休日はもっぱら住宅購入の検討で忙しいマンです。<br>
-さて、本日は、Kubernetesのアプリケーションのデバッグに関して書きます。</p>
-<p>Kubernetesで運用中のアプリケーションの障害対応で、ネットワーク関連のデバッグをしたいことはよくあります。
-このブログでは具体的にtcpdumpを取得したいという場面を想定して書きます。
-コンテナアプリケーションの開発・運用をしていると、<strong>イメージのサイズを小さく保っておきたい</strong>と思うはずです。
-その理由についてはいろいろとありますが、イメージの展開のスピードを高めることで、デプロイや障害時の復旧を早めるなどが代表的なところです。（関連するトピックとして「<a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/">コンテナイメージを軽くする方法と、その原理原則を考える</a>」も読んでみてください。）</p>
-<p>それゆえに、アプリケーションの動作に必要なライブラリ以外は入れないことが多く、デバッグツールを除外しておくことが多いでしょう。
-しかし、障害発生時にいざtcpdumpやstrace, ping ,digなどを打ちたいと思ってもインストールされておらず困ることがあります。
-そんな場面に遭遇しても焦らないようにあらかじめ対応策を頭に入れて練習しておきましょう。</p>
-        <a href="https://blog.mosuke.tech/entry/2021/01/31/network-debug-on-containers/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       <a href="/entry/page/3/" class="post-list-pagination-item pure-button post-list-pagination-item-prev">
@@ -348,11 +350,11 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
   <div class="sidebar-content related-post">
     <h3>最近の記事</h3>
     <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて'});">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/20/openshift-project-scoped-nodeselector/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、プロジェクトスコープのノードセレクターの挙動確認'});">OpenShift、プロジェクトスコープのノードセレクターの挙動確認</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/31/reflection/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「己」2021年振り返り'});">「己」2021年振り返り</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/28/openshift-router-sharding/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、Routerシャーディングを使って用途ごとにアクセス経路を分ける'});">OpenShift、Routerシャーディングを使って用途ごとにアクセス経路を分ける</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/22/openshift-ipi-limited-sourceip/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、送信元IPアドレスで制限がかかった環境でのIPIインストールの注意事項'});">OpenShift、送信元IPアドレスで制限がかかった環境でのIPIインストールの注意事項</a></li>
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/20/openshift-tettei-nyumon/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「OpenShift徹底入門」という書籍を執筆しました'});">「OpenShift徹底入門」という書籍を執筆しました</a></li>
       </ul>
   </div>
   <div class="sidebar-content campaign-ad">
@@ -386,10 +388,10 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
         <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (31)</a>
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (32)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (55)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (56)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (14)</a>
@@ -448,7 +450,7 @@ CIパイプライン内でGitレポジトリのソースコードを扱うこと
         <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
       </li>
       <li class="list-group-item">
-        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (1)</a>
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (2)</a>
       </li>
       </ul>
   </div>
