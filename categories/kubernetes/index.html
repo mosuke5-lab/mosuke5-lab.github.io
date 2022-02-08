@@ -61,6 +61,35 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/" class="entry-title">Argo CD、外部クラスタへのデプロイと認証の仕組み</a></h1>
+    <div class="entry-sub-title">
+        <span class="">08 Feb 2022, 14:16</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <hr>
+<h5>Argo CD学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2021/04/13/argocd/">Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></li>
+<li>第2回: <a href="/entry/2021/05/06/argocd-application/">Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
+<li>第3回: <a href="/entry/2021/05/06/argocd-sync-action/">Argo CD、Syncの実行方法やタイミングについての検討</a></li>
+<li>第4回: <a href="/entry/2021/06/12/argocd-resourcehooks/">Argo CD、Resource Hooksを使ってデプロイを高度化する</a></li>
+<li>第5回: <a href="/entry/2022/02/08/argocd-deploy-to-external-cluster/">Argo CD、外部クラスタへのデプロイ</a></li>
+<li>関連記事: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。<br>
+今回はArgo CDを用いて、外部のKubernetesクラスタへアプリケーションをデプロイすることについて動きを確認します。</p>
+        <a href="https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/" class="entry-title">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></h1>
     <div class="entry-sub-title">
         <span class="">24 Jan 2022, 10:52</span>
@@ -216,6 +245,7 @@ Alibaba CloudのServerless Kubernetesを使ったシステム構築に取り組�
 <li>第2回: <a href="/entry/2021/05/06/argocd-application/">Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
 <li>第3回: <a href="/entry/2021/05/06/argocd-sync-action/">Argo CD、Syncの実行方法やタイミングについての検討</a></li>
 <li>第4回: <a href="/entry/2021/06/12/argocd-resourcehooks/">Argo CD、Resource Hooksを使ってデプロイを高度化する</a></li>
+<li>第5回: <a href="/entry/2022/02/08/argocd-deploy-to-external-cluster/">Argo CD、外部クラスタへのデプロイ</a></li>
 <li>関連記事: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
 </ul>
 <hr>
@@ -281,6 +311,7 @@ Argo CDを使った本格運用に向けて学んでいきましょう。</p>
 <li>第2回: <a href="/entry/2021/05/06/argocd-application/">Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
 <li>第3回: <a href="/entry/2021/05/06/argocd-sync-action/">Argo CD、Syncの実行方法やタイミングについての検討</a></li>
 <li>第4回: <a href="/entry/2021/06/12/argocd-resourcehooks/">Argo CD、Resource Hooksを使ってデプロイを高度化する</a></li>
+<li>第5回: <a href="/entry/2022/02/08/argocd-deploy-to-external-cluster/">Argo CD、外部クラスタへのデプロイ</a></li>
 <li>関連記事: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
 </ul>
 <hr>
@@ -289,33 +320,6 @@ Argo CD学習シリーズどんどんやっていきます。
 今回は、Argo CDがアプリケーションをSync（同期）するタイミングに関する検討です。
 軽めの話題ですが、実運用を検討する上で重要になるのでしっかりおさえておきましょう。</p>
         <a href="https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/">続きを読む</a>
-    </div>
-    
-    <h1><a href="https://blog.mosuke.tech/entry/2021/05/06/argocd-application/" class="entry-title">第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ</a></h1>
-    <div class="entry-sub-title">
-        <span class="">06 May 2021, 09:46</span>
-        <span class="">By mosuke5</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <hr>
-<h5>Argo CD学習シリーズ</h5>
-<ul>
-<li>第1回: <a href="/entry/2021/04/13/argocd/">Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></li>
-<li>第2回: <a href="/entry/2021/05/06/argocd-application/">Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
-<li>第3回: <a href="/entry/2021/05/06/argocd-sync-action/">Argo CD、Syncの実行方法やタイミングについての検討</a></li>
-<li>第4回: <a href="/entry/2021/06/12/argocd-resourcehooks/">Argo CD、Resource Hooksを使ってデプロイを高度化する</a></li>
-<li>関連記事: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
-</ul>
-<hr>
-<p>こんにちは、もーすけです。
-Argo CD学習シリーズの続きを行っていきたいと思います。
-前回はチュートリアル的に動かしてみるところまで行いましたが、もう少し細かなアプリケーションの設定を見ていきます。</p>
-        <a href="https://blog.mosuke.tech/entry/2021/05/06/argocd-application/">続きを読む</a>
     </div>
     
 <div class="pagination">
@@ -331,11 +335,11 @@ Argo CD学習シリーズの続きを行っていきたいと思います。
   <div class="sidebar-content related-post">
     <h3>最近の記事</h3>
     <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Argo CD、外部クラスタへのデプロイと認証の仕組み'});">Argo CD、外部クラスタへのデプロイと認証の仕組み</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて'});">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/20/openshift-project-scoped-nodeselector/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、プロジェクトスコープのノードセレクターの挙動確認'});">OpenShift、プロジェクトスコープのノードセレクターの挙動確認</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/31/reflection/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「己」2021年振り返り'});">「己」2021年振り返り</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/28/openshift-router-sharding/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、Routerシャーディングを使って用途ごとにアクセス経路を分ける'});">OpenShift、Routerシャーディングを使って用途ごとにアクセス経路を分ける</a></li>
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/22/openshift-ipi-limited-sourceip/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、送信元IPアドレスで制限がかかった環境でのIPIインストールの注意事項'});">OpenShift、送信元IPアドレスで制限がかかった環境でのIPIインストールの注意事項</a></li>
       </ul>
   </div>
   <div class="sidebar-content campaign-ad">
@@ -372,10 +376,10 @@ Argo CD学習シリーズの続きを行っていきたいと思います。
         <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (32)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (56)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (57)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (14)</a>
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
@@ -431,7 +435,7 @@ Argo CD学習シリーズの続きを行っていきたいと思います。
         <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
       </li>
       <li class="list-group-item">
-        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (2)</a>
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (3)</a>
       </li>
       </ul>
   </div>
