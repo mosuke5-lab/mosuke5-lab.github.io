@@ -61,6 +61,29 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/" class="entry-title">【翻訳】Kubernetes as a serviceの謎を解く。Alibaba Cloudが1万個のKubernetesクラスタを管理する方法</a></h1>
+    <div class="entry-sub-title">
+        <span class="">17 Nov 2020, 17:24</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-Alibaba Cloud" href="/categories/alibaba-cloud">Alibaba Cloud</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>※本記事は、著者であるZhimin Tangの許可をとって翻訳した記事となります。(<a href="https://www.cncf.io/blog/2019/12/12/demystifying-kubernetes-as-a-service-how-does-alibaba-cloud-manage-10000s-of-kubernetes-clusters/">原文</a>)<br>
+また本記事の内容は、2020/12/11のAliEaters Tokyo #16にて発表しており、スライドは以下です。</p>
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/ajzBW1pq1pgkpj" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/mosuke5/alibaba-cloud1kubernetes" title="Alibaba Cloudが1万個のKubernetesクラスタを管理する方法" target="_blank">Alibaba Cloudが1万個のKubernetesクラスタを管理する方法</a> </strong> from <strong><a href="https://www.slideshare.net/mosuke5" target="_blank">Shinya Mori (@mosuke5)</a></strong> </div>
+<h2 id="概要">概要</h2>
+<p>2015年以来、Alibaba Cloud Container Service for Kubernetes（ACK）は、Alibaba Cloud上でもっとも急速に成長しているクラウドサービスの1つです。今日では、ACKは多数のAlibaba Cloudの顧客にサービスを提供しているだけでなく、Alibabaの社内インフラストラクチャやその他多くのAlibaba Cloudサービスをサポートしています。</p>
+<p>世界的なクラウドベンダーが提供する他の多くのコンテナサービスと同様に、ACKでは信頼性と可用性が最優先事項となっています。これらの目標を達成するために、セルベースでグローバルに利用可能なプラットフォームを構築し、数万個のKubernetesクラスタを稼働させています。</p>
+<p>今回のブログ記事では、クラウドインフラ上で大量のKubernetesクラスタを管理した経験と、その基盤となるプラットフォームの設計についてご紹介します。</p>
+        <a href="https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2020/10/17/site-design-for-adsense/" class="entry-title">Googleアドセンス合格に必要なサイトのレイアウトについて</a></h1>
     <div class="entry-sub-title">
         <span class="">17 Oct 2020, 16:52</span>
@@ -249,9 +272,10 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
 <li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
 <li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
 <li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
-<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
 <li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
 <li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
+<li>第13回: <a href="/entry/2022/03/01/tekton-lib-cache/">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
 <li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
 </ul>
 <hr>
@@ -264,33 +288,12 @@ Tekton学習シリーズということで入門者向けの連載企画をお�
         <a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/" class="entry-title">イメージのプルの効率化を考える。kubernetes-image-puller の紹介</a></h1>
-    <div class="entry-sub-title">
-        <span class="">28 Apr 2020, 17:17</span>
-        <span class="">By mosuke5</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-            
-                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
-            
-                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <p>FF7リメイク、クリアしました。いまSwitchで原作のFF7をやり直しています。もーすけです。<br>
-今日は<a href="https://github.com/che-incubator/kubernetes-image-puller" target="_blank">kubernetes-image-puller</a>というツールを発見し試してみたので、背景や課題感含めてご紹介していきます。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/che-incubator/kubernetes-image-puller" data-iframely-url="//cdn.iframe.ly/VbiFtNx"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-        <a href="https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       <a href="/entry/page/5/" class="post-list-pagination-item pure-button post-list-pagination-item-prev">
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
-      <span class="post-list-pagination-item post-list-pagination-item-current">Page 6 of 17</span>
+      <span class="post-list-pagination-item post-list-pagination-item-current">Page 6 of 18</span>
     <a href="/entry/page/7/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>
       </a>
@@ -301,11 +304,11 @@ Tekton学習シリーズということで入門者向けの連載企画をお�
   <div class="sidebar-content related-post">
     <h3>最近の記事</h3>
     <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Argo CD、外部クラスタへのデプロイと認証の仕組み'});">Argo CD、外部クラスタへのデプロイと認証の仕組み</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて'});">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/20/openshift-project-scoped-nodeselector/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、プロジェクトスコープのノードセレクターの挙動確認'});">OpenShift、プロジェクトスコープのノードセレクターの挙動確認</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/31/reflection/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「己」2021年振り返り'});">「己」2021年振り返り</a></li>
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/28/openshift-router-sharding/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、Routerシャーディングを使って用途ごとにアクセス経路を分ける'});">OpenShift、Routerシャーディングを使って用途ごとにアクセス経路を分ける</a></li>
       </ul>
   </div>
   <div class="sidebar-content campaign-ad">
@@ -339,10 +342,10 @@ Tekton学習シリーズということで入門者向けの連載企画をお�
         <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (32)</a>
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (57)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (58)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
@@ -401,7 +404,7 @@ Tekton学習シリーズということで入門者向けの連載企画をお�
         <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
       </li>
       <li class="list-group-item">
-        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (3)</a>
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (4)</a>
       </li>
       </ul>
   </div>

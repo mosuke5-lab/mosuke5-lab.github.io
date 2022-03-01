@@ -60,6 +60,28 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
+  <h1><a href="https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/" class="entry-title">Docker Hubのダウンロード回数制限の対策を考える</a></h1>
+  <div class="entry-sub-title">
+      <span class="">18 Nov 2020, 17:32</span>
+      <span class="">By mosuke5</span>
+      <a class="badge badge-inf post-category post-category-コンテナ" href="/categories/%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A">コンテナ</a>
+          <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+          <a class="badge badge-inf post-category post-category-ブログ運用" href="/categories/%E3%83%96%E3%83%AD%E3%82%B0%E9%81%8B%E7%94%A8">ブログ運用</a>
+          </div>
+  <div class="entry-content">
+      <p>こんにちは。もーすけです。<br>
+今日は最近開始されたDocker Hubのイメージダウンロードの回数制限について書きたいと思います。
+動向だけはなんとなく追っていたのですが、先日に自分がこの問題に向き合わなければいけないケースに遭遇したため、残しておこうと思い立ちました。</p>
+<h2 id="きっかけ">きっかけ</h2>
+<p>本ブログの記事のビルドやデプロイには<a href="https://app.wercker.com/">Wecker</a>というサービスを利用しています。
+ある日、記事を投稿しようとしたところCIのビルドがコケて記事を投稿できませんでした。
+エラーは以下のとおりで、調べるとDocker Hubのイメージダウンロードの回数制限に引っかかっていることがわかりました。</p>
+<blockquote>
+<p><code>fetch failed to pull image debian: API error (500): {&quot;message&quot;:&quot;toomanyrequests: You have reached your pull rate limit. You may increase the limit by authenticating and upgrading: https://www.docker.com/increase-rate-limit&quot;}</code></p>
+</blockquote>
+<p><img src="/image/wercker-docker-rate-limit-error.png" alt="docker-rate-limit-error"></p>
+      <a href="https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/">続きを読む</a>
+  </div>
   <h1><a href="https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/" class="entry-title">【翻訳】Kubernetes as a serviceの謎を解く。Alibaba Cloudが1万個のKubernetesクラスタを管理する方法</a></h1>
   <div class="entry-sub-title">
       <span class="">17 Nov 2020, 17:24</span>
@@ -190,21 +212,6 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
 <iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Frheb.hatenablog.com%2Fentry%2Fopenshift-custom-jenkins-agent" style="border: 0; width: 100%; height: 190px;" allowfullscreen scrolling="no"></iframe>
       <a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/">続きを読む</a>
   </div>
-  <h1><a href="https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/" class="entry-title">Sock Shopを使ったサービスメッシュ体験のハンズオン</a></h1>
-  <div class="entry-sub-title">
-      <span class="">01 Jul 2020, 23:00</span>
-      <span class="">By mosuke5</span>
-      <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-          <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
-          </div>
-  <div class="entry-content">
-      <p>おひさしぶりです。もーすけです。<br>
-あっという間に６月が終わってしまい、６月はブログが書けませんでしたが、ブログで書きたいなと思うネタはいくつかありますので、時間のすきをみつけて書いていきたいと思います。</p>
-<p>以前に、Sock Shopを使ったマイクロサービスのハンズオン体験についてのブログを書きました。
-このネタに、Istioを使ったサービスメッシュを適応するハンズオンを追加したのでお知らせします。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/01/22/sockshop/" data-iframely-url="//cdn.iframe.ly/YDI2rVR"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-      <a href="https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/">続きを読む</a>
-  </div>
   
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
@@ -222,11 +229,11 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
   <div class="sidebar-content related-post">
     <h3>最近の記事</h3>
     <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Argo CD、外部クラスタへのデプロイと認証の仕組み'});">Argo CD、外部クラスタへのデプロイと認証の仕組み</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて'});">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/20/openshift-project-scoped-nodeselector/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、プロジェクトスコープのノードセレクターの挙動確認'});">OpenShift、プロジェクトスコープのノードセレクターの挙動確認</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/31/reflection/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「己」2021年振り返り'});">「己」2021年振り返り</a></li>
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/28/openshift-router-sharding/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、Routerシャーディングを使って用途ごとにアクセス経路を分ける'});">OpenShift、Routerシャーディングを使って用途ごとにアクセス経路を分ける</a></li>
       </ul>
   </div>
   <div class="sidebar-content campaign-ad">
@@ -260,10 +267,10 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
         <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (32)</a>
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (57)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (58)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
@@ -322,7 +329,7 @@ OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカ�
         <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
       </li>
       <li class="list-group-item">
-        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (3)</a>
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (4)</a>
       </li>
       </ul>
   </div>
