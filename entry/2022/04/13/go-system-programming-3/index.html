@@ -9,20 +9,20 @@
 <link rel="stylesheet" href="/css/main.css">
 <link rel="stylesheet" href="/css/customization.css">
 
-<title>Goならわかるシステムプログラミング：第2章 io.Writer</title>
-<link rel="canonical" href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/">
-<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/" />
+<title>Goならわかるシステムプログラミング：第3章 io.Reader</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/" />
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@mosuke5" />
 <meta name="twitter:creator" content="@mosuke5" />
-<meta name="twitter:title" content="Goならわかるシステムプログラミング：第2章 io.Writer &middot; Goldstine研究所">
+<meta name="twitter:title" content="Goならわかるシステムプログラミング：第3章 io.Reader &middot; Goldstine研究所">
 <meta name="twitter:description" content="「Goならわかるシステムプログラミング」を読みすすめる中で独自に実験したことなどをまとめています。今回は第2章の io.Writerです。問題にもチャレンジしているのでサンプル解答としても使ってください。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Goならわかるシステムプログラミング：第2章 io.Writer &middot; Goldstine研究所">
+<meta property="og:title" content="Goならわかるシステムプログラミング：第3章 io.Reader &middot; Goldstine研究所">
 <meta property="og:description" content="「Goならわかるシステムプログラミング」を読みすすめる中で独自に実験したことなどをまとめています。今回は第2章の io.Writerです。問題にもチャレンジしているのでサンプル解答としても使ってください。">
 <meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
-<meta property="og:url" content="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/" />
 <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
 <link rel="icon" href="/image/favicon.ico" />
 <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
@@ -59,9 +59,9 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
-    <h1>Goならわかるシステムプログラミング：第2章 io.Writer</h1>
+    <h1>Goならわかるシステムプログラミング：第3章 io.Reader</h1>
     <div class="entry-sub-title">
-        <span class="">01 Mar 2022, 18:37</span>
+        <span class="">01 Mar 2022, 23:37</span>
         <span class="">By mosuke5</span>
         
             
@@ -72,14 +72,14 @@
     <div class="entry-content">
         <nav id="TableOfContents">
   <ul>
-    <li><a href="#iowriterでhttpリクエストする">io.WriterでHTTPリクエストする</a></li>
-    <li><a href="#curlの動きを観察する">curlの動きを観察する</a></li>
-    <li><a href="#ログの全貌">ログの全貌</a></li>
     <li><a href="#問題への挑戦">問題への挑戦</a>
       <ul>
-        <li><a href="#q21-ファイルに対するフォーマット出力">Q2.1 ファイルに対するフォーマット出力</a></li>
-        <li><a href="#q22-csv出力">Q2.2 CSV出力</a></li>
-        <li><a href="#q23-gzipされたjson出力をしながら標準出力にログを出力">Q2.3 gzipされたJSON出力をしながら、標準出力にログを出力</a></li>
+        <li><a href="#q31-ファイルのコピー">Q3.1 ファイルのコピー</a></li>
+        <li><a href="#q32-テスト用の適当なサイズのファイルを作成">Q3.2 テスト用の適当なサイズのファイルを作成</a></li>
+        <li><a href="#q33-zipファイルの書き込み">Q3.3 Zipファイルの書き込み</a></li>
+        <li><a href="#q34-zipファイルをwebサーバからダウンロード">Q3.4 ZipファイルをWebサーバからダウンロード</a></li>
+        <li><a href="#q35-copyn">Q3.5 CopyN</a></li>
+        <li><a href="#q36-ストリーム総集編">Q3.6 ストリーム総集編</a></li>
       </ul>
     </li>
   </ul>
@@ -87,7 +87,7 @@
         <p>こんにちは、もーすけです。<br>
 「Goならわかるシステムプログラミング」を読み進めています。とてもいい本です。
 読み進めながら実験していることを書いていきます。同じ本を読んでいる人の参考（寄り道？）になればと思います。
-今回は第2章の「低レベルアクセスへの入り口1：io.Writer」です。</p>
+今回は「低レベルアクセスへの入り口2：io.Reader」です。</p>
 <div class="belg-link row">
   <div class="belg-right col-md-12">
   <div class="belg-title">
@@ -107,209 +107,207 @@
 <li>Coming soon</a></li>
 </ul>
 <hr>
-<h2 id="iowriterでhttpリクエストする">io.WriterでHTTPリクエストする</h2>
-<p>第2章では、io.Writerを使った「出力の抽象化」について学びました。
-Linuxのシステムコール <code>Write()</code> は、ファイルのみならず、ソケットや標準出力などファイルではないものもファイルと同じように扱ええます。Write() は、第一引数にファイルディスクリプタをとり、ソケットや標準出力もファイルディスクリプタが割り当てられるため利用できる。</p>
-<p>Linuxの<a href="https://linuxjm.osdn.jp/html/LDP_man-pages/man2/write.2.html" target="_blank">writeシステムコールのmanページ</a>も確認しておくとよいです。Writeシステムコールの冒頭の説明にも、以下のように書かれています。</p>
-<blockquote>
-<p>write - ファイルディスクリプター (file descriptor) に書き込む</p>
-</blockquote>
-<p>また、本書の中では例として、io.WriteStringを使ってHTTPリクエストを送る実験を行いました。
-それを、straceを使って内部のシステムコールの呼び出しを確認してみます。</p>
-<p>使ったプログラムは以下で、単純に<code>blog.mosuke.tech</code>に対してHTTPのGETリクエストを送信します。
-レスポンスとしては、HTTPSにリダイレクトするように301が返ってきますが、レスポンスは重要でないのでよいでしょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// main.go
-</span><span style="color:#75715e"></span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+<h2 id="問題への挑戦">問題への挑戦</h2>
+<p>本章は、問題に挑戦した結果だけまとめます。</p>
+<h3 id="q31-ファイルのコピー">Q3.1 ファイルのコピー</h3>
+<p>これはシンプルですね。<code>os.Args</code>で引数とってCLI的に使えるようにしてみました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
 
 <span style="color:#f92672">import</span> (
 	<span style="color:#e6db74">&#34;io&#34;</span>
-	<span style="color:#e6db74">&#34;net&#34;</span>
 	<span style="color:#e6db74">&#34;os&#34;</span>
 )
 
 <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#a6e22e">conn</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">net</span>.<span style="color:#a6e22e">Dial</span>(<span style="color:#e6db74">&#34;tcp&#34;</span>, <span style="color:#e6db74">&#34;blog.mosuke.tech:80&#34;</span>)
+	<span style="color:#a6e22e">oldFile</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Open</span>(<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Args</span>[<span style="color:#ae81ff">1</span>])
 	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
 		panic(<span style="color:#a6e22e">err</span>)
 	}
-	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">WriteString</span>(<span style="color:#a6e22e">conn</span>, <span style="color:#e6db74">&#34;GET / HTTP/1.1\r\nHost: blog.mosuke.tech\r\n\r\n&#34;</span>)
-	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Copy</span>(<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stdout</span>, <span style="color:#a6e22e">conn</span>)
-}
-</code></pre></div><p>まず普通に動きをみます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ go build main.go
-$ ./main
-HTTP/1.1 301 Moved Permanently
-Date: Wed, 13 Apr 2022 03:36:17 GMT
-Transfer-Encoding: chunked
-Connection: keep-alive
-Cache-Control: max-age=3600
-Expires: Wed, 13 Apr 2022 04:36:17 GMT
-Location: https://blog.mosuke.tech/
-Report-To: {&#34;endpoints&#34;:[{&#34;url&#34;:&#34;https:\/\/a.nel.cloudflare.com\/report\/v3?s=s%2FAV4oq5Iwd5vBwL5CNvbVuEnigkDo8Ejf7Wk2zH5RqFrx6OgPSmSqFMqDhvMON0GcBLvo%2F9xgJvf9EZ5SKqBqB5uOlQDS90h9qV5R6sGKRog%2B6U5WnCf9a9C0RX9Ua3yTLZ&#34;}],&#34;group&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
-NEL: {&#34;success_fraction&#34;:0,&#34;report_to&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
-X-Content-Type-Options: nosniff
-Server: cloudflare
-CF-RAY: 6fb12813bede3445-NRT
-alt-svc: h3=&#34;:443&#34;; ma=86400, h3-29=&#34;:443&#34;; ma=86400
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">oldFile</span>.<span style="color:#a6e22e">Close</span>()
 
-0
-</code></pre></div><p>次にstraceでmainを観察します。<br>
-writeシステムコールを用いて、HTTPリクエストを送っていることをちゃんと確認できました。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ strace -f -e write=all -o output ./main
-$ cat output
-...
-714591 write(3, &#34;GET /foo HTTP/1.1\r\nHost: blog.mo&#34;..., 45 &lt;unfinished ...&gt;
-714588 nanosleep({tv_sec=0, tv_nsec=20000},  &lt;unfinished ...&gt;
-714591 &lt;... write resumed&gt;)             = 45
- | 00000  47 45 54 20 2f 66 6f 6f  20 48 54 54 50 2f 31 2e  GET /foo HTTP/1. |
- | 00010  31 0d 0a 48 6f 73 74 3a  20 62 6c 6f 67 2e 6d 6f  1..Host: blog.mo |
- | 00020  73 75 6b 65 2e 74 65 63  68 0d 0a 0d 0a           suke.tech....    |
-...
-</code></pre></div><h2 id="curlの動きを観察する">curlの動きを観察する</h2>
-<p>ということは、curlも同じように実装しているのかとstraceで観察してみました。
-結果からいうと、原理は一緒ですがwriteシステムコールは使っておらず、sendtoシステムコールを使っていることを確認できました。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ strace -f -e write=all curl http://blog.mosuke.tech
-...
-716742 sendto(3, &#34;GET / HTTP/1.1\r\nHost: blog.mosuk&#34;..., 80, MSG_NOSIGNAL, NULL, 0) = 80
- | 00000  47 45 54 20 2f 20 48 54  54 50 2f 31 2e 31 0d 0a  GET / HTTP/1.1.. |
- | 00010  48 6f 73 74 3a 20 62 6c  6f 67 2e 6d 6f 73 75 6b  Host: blog.mosuk |
- | 00020  65 2e 74 65 63 68 0d 0a  55 73 65 72 2d 41 67 65  e.tech..User-Age |
- | 00030  6e 74 3a 20 63 75 72 6c  2f 37 2e 36 31 2e 31 0d  nt: curl/7.61.1. |
- | 00040  0a 41 63 63 65 70 74 3a  20 2a 2f 2a 0d 0a 0d 0a  .Accept: */*.... |
-</code></pre></div><p><a href="https://linuxjm.osdn.jp/html/LDP_man-pages/man2/send.2.html" target="_blank">sendtoシステムコール</a> のmanpageを確認するとwriteと同等であることもわかります。</p>
-<blockquote>
-<p>システムコール send(), sendto(), sendmsg() は、もう一方のソケットへメッセージを転送するのに使用される。
-send() は、ソケットが 接続された (connected) 状態にある場合にのみ使用できる (つまり、どの相手に送信するかは既知である)。 send() と write(2) の違いは、引数に flags があるかどうかだけである。 引数 flags にフラグが指定されない場合、 send() は write(2) と等価である。</p>
-</blockquote>
-<h2 id="ログの全貌">ログの全貌</h2>
-<p>上で記載したログは、一部の抜粋です。全ログは以下Gistに記載しました。
-<a href="https://gist.github.com/mosuke5/8fbdfada7150f832a44248c16ed06a7a">https://gist.github.com/mosuke5/8fbdfada7150f832a44248c16ed06a7a</a></p>
-<h2 id="問題への挑戦">問題への挑戦</h2>
-<h3 id="q21-ファイルに対するフォーマット出力">Q2.1 ファイルに対するフォーマット出力</h3>
+	<span style="color:#a6e22e">newFile</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Create</span>(<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Args</span>[<span style="color:#ae81ff">2</span>])
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">newFile</span>.<span style="color:#a6e22e">Close</span>()
+
+	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Copy</span>(<span style="color:#a6e22e">newFile</span>, <span style="color:#a6e22e">oldFile</span>)
+}
+</code></pre></div><h3 id="q32-テスト用の適当なサイズのファイルを作成">Q3.2 テスト用の適当なサイズのファイルを作成</h3>
+<p><code>io.CopyN</code>など補助関数使うともっとシンプルにできると思います。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
 
 <span style="color:#f92672">import</span> (
-	<span style="color:#e6db74">&#34;fmt&#34;</span>
+	<span style="color:#e6db74">&#34;crypto/rand&#34;</span>
+	<span style="color:#e6db74">&#34;io&#34;</span>
 	<span style="color:#e6db74">&#34;os&#34;</span>
-	<span style="color:#e6db74">&#34;time&#34;</span>
 )
 
 <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Create</span>(<span style="color:#e6db74">&#34;tmp.txt&#34;</span>)
+	<span style="color:#a6e22e">buffer</span> <span style="color:#f92672">:=</span> make([]<span style="color:#66d9ef">byte</span>, <span style="color:#ae81ff">1024</span>)
+	<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">rand</span>.<span style="color:#a6e22e">Read</span>(<span style="color:#a6e22e">buffer</span>)
+
 	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
 		panic(<span style="color:#a6e22e">err</span>)
 	}
+
+	<span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Create</span>(<span style="color:#e6db74">&#34;tmp.txt&#34;</span>)
+
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+
 	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">Close</span>()
 
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintf</span>(<span style="color:#a6e22e">file</span>, <span style="color:#e6db74">&#34;write time %v\n&#34;</span>, <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>())
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintf</span>(<span style="color:#a6e22e">file</span>, <span style="color:#e6db74">&#34;write int %d\n&#34;</span>, <span style="color:#ae81ff">1</span>)
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintf</span>(<span style="color:#a6e22e">file</span>, <span style="color:#e6db74">&#34;write string %s\n&#34;</span>, <span style="color:#e6db74">&#34;hello&#34;</span>)
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintf</span>(<span style="color:#a6e22e">file</span>, <span style="color:#e6db74">&#34;write floot %f\n&#34;</span>, <span style="color:#ae81ff">1.234</span>)
+	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">WriteString</span>(<span style="color:#a6e22e">file</span>, string(<span style="color:#a6e22e">buffer</span>))
 }
-</code></pre></div><h3 id="q22-csv出力">Q2.2 CSV出力</h3>
-<p><code>csv.Write</code> は、1レコードを書き込むことができますが、<code>csv.WriteAll</code>は複数レコードを同時に書き込めるとともにFlushも内部的に実行してくれるため、こちらを使って実装するのも良さそうです。(<a href="https://pkg.go.dev/encoding/csv@go1.18.1#Writer.WriteAll" target="_blank"></a>)</p>
+</code></pre></div><p>でき上がったファイルのサイズもしっかり期待通りです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ go run main.go
+$ ls -l tmp.txt
+-rw-r--r--  1 mosuke5  staff  1024  4 13 17:31 tmp.txt
+</code></pre></div><h3 id="q33-zipファイルの書き込み">Q3.3 Zipファイルの書き込み</h3>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
 
 <span style="color:#f92672">import</span> (
-	<span style="color:#e6db74">&#34;encoding/csv&#34;</span>
+	<span style="color:#e6db74">&#34;archive/zip&#34;</span>
+	<span style="color:#e6db74">&#34;io&#34;</span>
 	<span style="color:#e6db74">&#34;os&#34;</span>
+	<span style="color:#e6db74">&#34;strings&#34;</span>
 )
 
 <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Create</span>(<span style="color:#e6db74">&#34;tmp.txt&#34;</span>)
+	<span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Create</span>(<span style="color:#e6db74">&#34;result.zip&#34;</span>)
 	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
 		panic(<span style="color:#a6e22e">err</span>)
 	}
-	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">Close</span>()
 
-	<span style="color:#a6e22e">w</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">csv</span>.<span style="color:#a6e22e">NewWriter</span>(<span style="color:#a6e22e">file</span>)
-	<span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Write</span>([]<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;foo&#34;</span>, <span style="color:#e6db74">&#34;bar&#34;</span>, <span style="color:#e6db74">&#34;hoge&#34;</span>})
-	<span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Write</span>([]<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;kuu&#34;</span>, <span style="color:#e6db74">&#34;kaa&#34;</span>, <span style="color:#e6db74">&#34;joe&#34;</span>})
-	<span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Flush</span>()
+	<span style="color:#a6e22e">zipWriter</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">zip</span>.<span style="color:#a6e22e">NewWriter</span>(<span style="color:#a6e22e">file</span>)
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">zipWriter</span>.<span style="color:#a6e22e">Close</span>()
+
+	<span style="color:#a6e22e">aWriter</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">zipWriter</span>.<span style="color:#a6e22e">Create</span>(<span style="color:#e6db74">&#34;a.txt&#34;</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Copy</span>(<span style="color:#a6e22e">aWriter</span>, <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">NewReader</span>(<span style="color:#e6db74">&#34;aaaaa&#34;</span>))
+
+	<span style="color:#a6e22e">bWriter</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">zipWriter</span>.<span style="color:#a6e22e">Create</span>(<span style="color:#e6db74">&#34;b.txt&#34;</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Copy</span>(<span style="color:#a6e22e">bWriter</span>, <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">NewReader</span>(<span style="color:#e6db74">&#34;bbbbb&#34;</span>))
 }
-</code></pre></div><h3 id="q23-gzipされたjson出力をしながら標準出力にログを出力">Q2.3 gzipされたJSON出力をしながら、標準出力にログを出力</h3>
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ go run main.go
+$ ls -l
+total 16
+-rw-r--r--  1 shinyamori  staff  457  4 13 21:33 main.go
+-rw-r--r--  1 shinyamori  staff  244  4 13 21:34 result.zip
+
+$ unzip result.zip 
+Archive:  result.zip
+  inflating: a.txt                   
+  inflating: b.txt                   
+
+$ ls -l
+total 32
+-rw-r--r--  1 shinyamori  staff    5 12 31  1979 a.txt
+-rw-r--r--  1 shinyamori  staff    5 12 31  1979 b.txt
+-rw-r--r--  1 shinyamori  staff  457  4 13 21:33 main.go
+-rw-r--r--  1 shinyamori  staff  244  4 13 21:34 result.zip
+
+$ cat a.txt 
+aaaaa
+
+$ cat b.txt 
+bbbbb              
+</code></pre></div><h3 id="q34-zipファイルをwebサーバからダウンロード">Q3.4 ZipファイルをWebサーバからダウンロード</h3>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
 
 <span style="color:#f92672">import</span> (
-	<span style="color:#e6db74">&#34;compress/gzip&#34;</span>
-	<span style="color:#e6db74">&#34;encoding/json&#34;</span>
-	<span style="color:#e6db74">&#34;fmt&#34;</span>
+	<span style="color:#e6db74">&#34;archive/zip&#34;</span>
 	<span style="color:#e6db74">&#34;io&#34;</span>
 	<span style="color:#e6db74">&#34;net/http&#34;</span>
-	<span style="color:#e6db74">&#34;os&#34;</span>
 )
 
 <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">handler</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
-	<span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Header</span>().<span style="color:#a6e22e">Set</span>(<span style="color:#e6db74">&#34;Content-Encoding&#34;</span>, <span style="color:#e6db74">&#34;gzip&#34;</span>)
-	<span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Header</span>().<span style="color:#a6e22e">Set</span>(<span style="color:#e6db74">&#34;Content-Type&#34;</span>, <span style="color:#e6db74">&#34;application/json&#34;</span>)
-	<span style="color:#a6e22e">source</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">string</span>{
-		<span style="color:#e6db74">&#34;hello&#34;</span>: <span style="color:#e6db74">&#34;world&#34;</span>,
-	}
+	<span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Header</span>().<span style="color:#a6e22e">Set</span>(<span style="color:#e6db74">&#34;Content-Type&#34;</span>, <span style="color:#e6db74">&#34;application/zip&#34;</span>)
+	<span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Header</span>().<span style="color:#a6e22e">Set</span>(<span style="color:#e6db74">&#34;Content-Disposition&#34;</span>, <span style="color:#e6db74">&#34;attachment; filename=result.zip&#34;</span>)
 
-	<span style="color:#a6e22e">jsonBytes</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">json</span>.<span style="color:#a6e22e">Marshal</span>(<span style="color:#a6e22e">source</span>)
+	<span style="color:#a6e22e">zipWriter</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">zip</span>.<span style="color:#a6e22e">NewWriter</span>(<span style="color:#a6e22e">w</span>)
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">zipWriter</span>.<span style="color:#a6e22e">Close</span>()
+
+	<span style="color:#a6e22e">httpWriter</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">zipWriter</span>.<span style="color:#a6e22e">Create</span>(<span style="color:#e6db74">&#34;a.txt&#34;</span>)
 	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
-		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;JSON marshal error: &#34;</span>, <span style="color:#a6e22e">err</span>)
-		<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>
+		panic(<span style="color:#a6e22e">err</span>)
 	}
-
-	<span style="color:#a6e22e">gzipWriter</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">gzip</span>.<span style="color:#a6e22e">NewWriter</span>(<span style="color:#a6e22e">w</span>)
-	<span style="color:#a6e22e">multiWriter</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">MultiWriter</span>(<span style="color:#a6e22e">gzipWriter</span>, <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stdout</span>)
-	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">WriteString</span>(<span style="color:#a6e22e">multiWriter</span>, string(<span style="color:#a6e22e">jsonBytes</span>))
-	<span style="color:#a6e22e">gzipWriter</span>.<span style="color:#a6e22e">Close</span>()
+	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">WriteString</span>(<span style="color:#a6e22e">httpWriter</span>, <span style="color:#e6db74">&#34;aaaaa&#34;</span>)
 }
 
 <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
 	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/&#34;</span>, <span style="color:#a6e22e">handler</span>)
 	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#e6db74">&#34;:8080&#34;</span>, <span style="color:#66d9ef">nil</span>)
 }
-</code></pre></div><p>動作を確認するにはcurlのいくつかのオプションを知っておくと便利です。<br>
-Request/Response headerを確認できるように <code>-v</code>オプションを、gzipで圧縮されたなかみを確認するために<code>--compressed</code>オプションを使います。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -v --compressed localhost:8080
-*   Trying 127.0.0.1:8080...
-* Connected to localhost (127.0.0.1) port 8080 (#0)
-&gt; GET / HTTP/1.1
-&gt; Host: localhost:8080
-&gt; User-Agent: curl/7.79.1
-&gt; Accept: */*
-&gt; Accept-Encoding: deflate, gzip
-&gt;
-* Mark bundle as not supporting multiuse
-&lt; HTTP/1.1 200 OK
-&lt; Content-Encoding: gzip
-&lt; Content-Type: application/json
-&lt; Date: Wed, 13 Apr 2022 08:01:26 GMT
-&lt; Content-Length: 41
-&lt;
-* Connection #0 to host localhost left intact
-{&#34;hello&#34;:&#34;world&#34;}
-</code></pre></div><p>圧縮されたデータを解凍して確認する。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -s -v --compressed --raw -o result.gz localhost:8080
-*   Trying 127.0.0.1:8080...
-* Connected to localhost (127.0.0.1) port 8080 (#0)
-&gt; GET / HTTP/1.1
-&gt; Host: localhost:8080
-&gt; User-Agent: curl/7.79.1
-&gt; Accept: */*
-&gt; Accept-Encoding: deflate, gzip
-&gt;
-* Mark bundle as not supporting multiuse
-&lt; HTTP/1.1 200 OK
-&lt; Content-Encoding: gzip
-&lt; Content-Type: application/json
-&lt; Date: Wed, 13 Apr 2022 08:03:29 GMT
-&lt; Content-Length: 41
-&lt;
-{ [41 bytes data]
-* Connection #0 to host localhost left intact
+</code></pre></div><h3 id="q35-copyn">Q3.5 CopyN</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
 
-$ ls result.gz
-result.gz
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;io&#34;</span>
+	<span style="color:#e6db74">&#34;os&#34;</span>
+	<span style="color:#e6db74">&#34;strconv&#34;</span>
+	<span style="color:#e6db74">&#34;strings&#34;</span>
+)
 
-$ cat result.gz
-��V�H���W�R*�/�IQ����A	�%
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">writer</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stdout</span>
+	<span style="color:#a6e22e">reader</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">NewReader</span>(<span style="color:#e6db74">&#34;123456789012345678901234567890&#34;</span>)
+	<span style="color:#a6e22e">size</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">strconv</span>.<span style="color:#a6e22e">Atoi</span>(<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Args</span>[<span style="color:#ae81ff">1</span>])
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
 
-$ gunzip -c result.gz
-{&#34;hello&#34;:&#34;world&#34;}
+	<span style="color:#a6e22e">myCopyN</span>(<span style="color:#a6e22e">writer</span>, <span style="color:#a6e22e">reader</span>, <span style="color:#a6e22e">size</span>)
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">myCopyN</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Writer</span>, <span style="color:#a6e22e">r</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Reader</span>, <span style="color:#a6e22e">size</span> <span style="color:#66d9ef">int</span>) {
+	<span style="color:#a6e22e">buffer</span> <span style="color:#f92672">:=</span> make([]<span style="color:#66d9ef">byte</span>, <span style="color:#a6e22e">size</span>)
+	<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">ReadFull</span>(<span style="color:#a6e22e">r</span>, <span style="color:#a6e22e">buffer</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">WriteString</span>(<span style="color:#a6e22e">w</span>, string(<span style="color:#a6e22e">buffer</span>))
+}
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% go run main.go 0
+
+% go run main.go 3
+123
+
+% go run main.go 10
+1234567890
+</code></pre></div><h3 id="q36-ストリーム総集編">Q3.6 ストリーム総集編</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;io&#34;</span>
+	<span style="color:#e6db74">&#34;os&#34;</span>
+	<span style="color:#e6db74">&#34;strings&#34;</span>
+)
+
+<span style="color:#66d9ef">var</span> (
+	<span style="color:#a6e22e">computer</span>    = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">NewReader</span>(<span style="color:#e6db74">&#34;COMPUTER&#34;</span>)
+	<span style="color:#a6e22e">system</span>      = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">NewReader</span>(<span style="color:#e6db74">&#34;SYSTEM&#34;</span>)
+	<span style="color:#a6e22e">programming</span> = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">NewReader</span>(<span style="color:#e6db74">&#34;PROGRAMMING&#34;</span>)
+)
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">stream</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Reader</span>
+	<span style="color:#a6e22e">charA</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">NewSectionReader</span>(<span style="color:#a6e22e">programming</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">1</span>)
+	<span style="color:#a6e22e">charS</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">NewSectionReader</span>(<span style="color:#a6e22e">system</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>)
+	<span style="color:#a6e22e">charC</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">NewSectionReader</span>(<span style="color:#a6e22e">computer</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>)
+	<span style="color:#a6e22e">charI1</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">NewSectionReader</span>(<span style="color:#a6e22e">programming</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">1</span>)
+	<span style="color:#a6e22e">charI2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">NewSectionReader</span>(<span style="color:#a6e22e">programming</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">1</span>)
+	<span style="color:#a6e22e">stream</span> = <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">MultiReader</span>(<span style="color:#a6e22e">charA</span>, <span style="color:#a6e22e">charS</span>, <span style="color:#a6e22e">charC</span>, <span style="color:#a6e22e">charI1</span>, <span style="color:#a6e22e">charI2</span>)
+
+	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Copy</span>(<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stdout</span>, <span style="color:#a6e22e">stream</span>)
+}
 </code></pre></div>
     </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
     <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
@@ -317,7 +315,7 @@ $ gunzip -c result.gz
 </div>
 <div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
     <h5>記事へのフィードバック</h5>
-    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Go%e3%81%aa%e3%82%89%e3%82%8f%e3%81%8b%e3%82%8b%e3%82%b7%e3%82%b9%e3%83%86%e3%83%a0%e3%83%97%e3%83%ad%e3%82%b0%e3%83%a9%e3%83%9f%e3%83%b3%e3%82%b0%ef%bc%9a%e7%ac%ac2%e7%ab%a0%20io.Writer" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Goならわかるシステムプログラミング：第2章 io.Writer'});">記事の内容にフィードバックしてみる</a></p>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Go%e3%81%aa%e3%82%89%e3%82%8f%e3%81%8b%e3%82%8b%e3%82%b7%e3%82%b9%e3%83%86%e3%83%a0%e3%83%97%e3%83%ad%e3%82%b0%e3%83%a9%e3%83%9f%e3%83%b3%e3%82%b0%ef%bc%9a%e7%ac%ac3%e7%ab%a0%20io.Reader" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Goならわかるシステムプログラミング：第3章 io.Reader'});">記事の内容にフィードバックしてみる</a></p>
 </div><div class="entry-sub-content post-share">
         <div class="post-share-links">
             <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
@@ -448,7 +446,7 @@ $ gunzip -c result.gz
       <h3>関連する記事</h3>
       <ul class="list-group">
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Goならわかるシステムプログラミング：第3章 io.Reader'});">Goならわかるシステムプログラミング：第3章 io.Reader</a> (2022/03/01)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Goならわかるシステムプログラミング：第2章 io.Writer'});">Goならわかるシステムプログラミング：第2章 io.Writer</a> (2022/03/01)</li>
         
       </ul>
     </div>
