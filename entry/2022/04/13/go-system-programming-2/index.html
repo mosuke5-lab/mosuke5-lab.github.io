@@ -75,6 +75,13 @@
     <li><a href="#iowriterでhttpリクエストする">io.WriterでHTTPリクエストする</a></li>
     <li><a href="#curlの動きを観察する">curlの動きを観察する</a></li>
     <li><a href="#ログの全貌">ログの全貌</a></li>
+    <li><a href="#問題への挑戦">問題への挑戦</a>
+      <ul>
+        <li><a href="#q21-ファイルに対するフォーマット出力">Q2.1 ファイルに対するフォーマット出力</a></li>
+        <li><a href="#q22-csv出力">Q2.2 CSV出力</a></li>
+        <li><a href="#q23-gzipされたjson出力をしながら標準出力にログを出力">Q2.3 gzipされたJSON出力をしながら、標準出力にログを出力</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
         <p>こんにちは、もーすけです。<br>
@@ -169,6 +176,133 @@ send() は、ソケットが 接続された (connected) 状態にある場合�
 <h2 id="ログの全貌">ログの全貌</h2>
 <p>上で記載したログは、一部の抜粋です。全ログは以下Gistに記載しました。
 <a href="https://gist.github.com/mosuke5/8fbdfada7150f832a44248c16ed06a7a">https://gist.github.com/mosuke5/8fbdfada7150f832a44248c16ed06a7a</a></p>
+<h2 id="問題への挑戦">問題への挑戦</h2>
+<h3 id="q21-ファイルに対するフォーマット出力">Q2.1 ファイルに対するフォーマット出力</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;fmt&#34;</span>
+	<span style="color:#e6db74">&#34;os&#34;</span>
+	<span style="color:#e6db74">&#34;time&#34;</span>
+)
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Create</span>(<span style="color:#e6db74">&#34;tmp.txt&#34;</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">Close</span>()
+
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintf</span>(<span style="color:#a6e22e">file</span>, <span style="color:#e6db74">&#34;write time %v\n&#34;</span>, <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>())
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintf</span>(<span style="color:#a6e22e">file</span>, <span style="color:#e6db74">&#34;write int %d\n&#34;</span>, <span style="color:#ae81ff">1</span>)
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintf</span>(<span style="color:#a6e22e">file</span>, <span style="color:#e6db74">&#34;write string %s\n&#34;</span>, <span style="color:#e6db74">&#34;hello&#34;</span>)
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintf</span>(<span style="color:#a6e22e">file</span>, <span style="color:#e6db74">&#34;write floot %f\n&#34;</span>, <span style="color:#ae81ff">1.234</span>)
+}
+</code></pre></div><h3 id="q22-csv出力">Q2.2 CSV出力</h3>
+<p><code>csv.Write</code> は、1レコードを書き込むことができますが、<code>csv.WriteAll</code>は複数レコードを同時に書き込めるとともにFlushも内部的に実行してくれるため、こちらを使って実装するのも良さそうです。(<a href="https://pkg.go.dev/encoding/csv@go1.18.1#Writer.WriteAll" target="_blank"></a>)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;encoding/csv&#34;</span>
+	<span style="color:#e6db74">&#34;os&#34;</span>
+)
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Create</span>(<span style="color:#e6db74">&#34;tmp.txt&#34;</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">Close</span>()
+
+	<span style="color:#a6e22e">w</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">csv</span>.<span style="color:#a6e22e">NewWriter</span>(<span style="color:#a6e22e">file</span>)
+	<span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Write</span>([]<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;foo&#34;</span>, <span style="color:#e6db74">&#34;bar&#34;</span>, <span style="color:#e6db74">&#34;hoge&#34;</span>})
+	<span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Write</span>([]<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;kuu&#34;</span>, <span style="color:#e6db74">&#34;kaa&#34;</span>, <span style="color:#e6db74">&#34;joe&#34;</span>})
+	<span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Flush</span>()
+}
+</code></pre></div><h3 id="q23-gzipされたjson出力をしながら標準出力にログを出力">Q2.3 gzipされたJSON出力をしながら、標準出力にログを出力</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;compress/gzip&#34;</span>
+	<span style="color:#e6db74">&#34;encoding/json&#34;</span>
+	<span style="color:#e6db74">&#34;fmt&#34;</span>
+	<span style="color:#e6db74">&#34;io&#34;</span>
+	<span style="color:#e6db74">&#34;net/http&#34;</span>
+	<span style="color:#e6db74">&#34;os&#34;</span>
+)
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">handler</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
+	<span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Header</span>().<span style="color:#a6e22e">Set</span>(<span style="color:#e6db74">&#34;Content-Encoding&#34;</span>, <span style="color:#e6db74">&#34;gzip&#34;</span>)
+	<span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Header</span>().<span style="color:#a6e22e">Set</span>(<span style="color:#e6db74">&#34;Content-Type&#34;</span>, <span style="color:#e6db74">&#34;application/json&#34;</span>)
+	<span style="color:#a6e22e">source</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">string</span>{
+		<span style="color:#e6db74">&#34;hello&#34;</span>: <span style="color:#e6db74">&#34;world&#34;</span>,
+	}
+
+	<span style="color:#a6e22e">jsonBytes</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">json</span>.<span style="color:#a6e22e">Marshal</span>(<span style="color:#a6e22e">source</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;JSON marshal error: &#34;</span>, <span style="color:#a6e22e">err</span>)
+		<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>
+	}
+
+	<span style="color:#a6e22e">gzipWriter</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">gzip</span>.<span style="color:#a6e22e">NewWriter</span>(<span style="color:#a6e22e">w</span>)
+	<span style="color:#a6e22e">multiWriter</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">MultiWriter</span>(<span style="color:#a6e22e">gzipWriter</span>, <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stdout</span>)
+	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">WriteString</span>(<span style="color:#a6e22e">multiWriter</span>, string(<span style="color:#a6e22e">jsonBytes</span>))
+	<span style="color:#a6e22e">gzipWriter</span>.<span style="color:#a6e22e">Close</span>()
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/&#34;</span>, <span style="color:#a6e22e">handler</span>)
+	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#e6db74">&#34;:8080&#34;</span>, <span style="color:#66d9ef">nil</span>)
+}
+</code></pre></div><p>動作を確認するにはcurlのいくつかのオプションを知っておくと便利です。<br>
+Request/Response headerを確認できるように <code>-v</code>オプションを、gzipで圧縮されたなかみを確認するために<code>--compressed</code>オプションを使います。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -v --compressed localhost:8080
+*   Trying 127.0.0.1:8080...
+* Connected to localhost (127.0.0.1) port 8080 (#0)
+&gt; GET / HTTP/1.1
+&gt; Host: localhost:8080
+&gt; User-Agent: curl/7.79.1
+&gt; Accept: */*
+&gt; Accept-Encoding: deflate, gzip
+&gt;
+* Mark bundle as not supporting multiuse
+&lt; HTTP/1.1 200 OK
+&lt; Content-Encoding: gzip
+&lt; Content-Type: application/json
+&lt; Date: Wed, 13 Apr 2022 08:01:26 GMT
+&lt; Content-Length: 41
+&lt;
+* Connection #0 to host localhost left intact
+{&#34;hello&#34;:&#34;world&#34;}
+</code></pre></div><p>圧縮されたデータを解凍して確認する。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl -s -v --compressed --raw -o result.gz localhost:8080
+*   Trying 127.0.0.1:8080...
+* Connected to localhost (127.0.0.1) port 8080 (#0)
+&gt; GET / HTTP/1.1
+&gt; Host: localhost:8080
+&gt; User-Agent: curl/7.79.1
+&gt; Accept: */*
+&gt; Accept-Encoding: deflate, gzip
+&gt;
+* Mark bundle as not supporting multiuse
+&lt; HTTP/1.1 200 OK
+&lt; Content-Encoding: gzip
+&lt; Content-Type: application/json
+&lt; Date: Wed, 13 Apr 2022 08:03:29 GMT
+&lt; Content-Length: 41
+&lt;
+{ [41 bytes data]
+* Connection #0 to host localhost left intact
+
+$ ls result.gz
+result.gz
+
+$ cat result.gz
+��V�H���W�R*�/�IQ����A	�%
+
+$ gunzip -c result.gz
+{&#34;hello&#34;:&#34;world&#34;}
+</code></pre></div>
     </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
     <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
     <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
