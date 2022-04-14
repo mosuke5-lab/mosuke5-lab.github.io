@@ -9,20 +9,20 @@
 <link rel="stylesheet" href="/css/main.css">
 <link rel="stylesheet" href="/css/customization.css">
 
-<title>TerraformでCloudFlareのDNS設定を操る</title>
-<link rel="canonical" href="https://blog.mosuke.tech/entry/2018/01/01/terraform-dns/">
-<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2018/01/01/terraform-dns/" />
+<title>Goならわかるシステムプログラミング：第5章 システムコール</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" />
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@mosuke5" />
 <meta name="twitter:creator" content="@mosuke5" />
-<meta name="twitter:title" content="TerraformでCloudFlareのDNS設定を操る &middot; Goldstine研究所">
-<meta name="twitter:description" content="TerraformでCloudFlareのDNSの設定を行います。AWSのEIPを使ってCloudFlareのDNSを設定します。その際の設定のポイントなどを解説します。">
+<meta name="twitter:title" content="Goならわかるシステムプログラミング：第5章 システムコール &middot; Goldstine研究所">
+<meta name="twitter:description" content="「Goならわかるシステムプログラミング」を読みすすめる中で独自に実験したことなどをまとめています。今回は第5章のシステムコールです。問題にもチャレンジしているのでサンプル解答としても使ってください。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="TerraformでCloudFlareのDNS設定を操る &middot; Goldstine研究所">
-<meta property="og:description" content="TerraformでCloudFlareのDNSの設定を行います。AWSのEIPを使ってCloudFlareのDNSを設定します。その際の設定のポイントなどを解説します。">
+<meta property="og:title" content="Goならわかるシステムプログラミング：第5章 システムコール &middot; Goldstine研究所">
+<meta property="og:description" content="「Goならわかるシステムプログラミング」を読みすすめる中で独自に実験したことなどをまとめています。今回は第5章のシステムコールです。問題にもチャレンジしているのでサンプル解答としても使ってください。">
 <meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
-<meta property="og:url" content="https://blog.mosuke.tech/entry/2018/01/01/terraform-dns/" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" />
 <link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
 <link rel="icon" href="/image/favicon.ico" />
 <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
@@ -59,89 +59,140 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
-    <h1>TerraformでCloudFlareのDNS設定を操る</h1>
+    <h1>Goならわかるシステムプログラミング：第5章 システムコール</h1>
     <div class="entry-sub-title">
-        <span class="">01 Jan 2018, 07:34</span>
+        <span class="">01 Mar 2022, 23:39</span>
         <span class="">By mosuke5</span>
         
             
-                <a class="badge badge-inf post-category post-category-AWS" href="/categories/aws">AWS</a>
-            
-                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+                <a class="badge badge-inf post-category post-category-サーバ技術" href="/categories/%E3%82%B5%E3%83%BC%E3%83%90%E6%8A%80%E8%A1%93">サーバ技術</a>
             
         
     </div>
     <div class="entry-content">
         <nav id="TableOfContents">
   <ul>
-    <li><a href="#設定方法">設定方法</a></li>
-    <li><a href="#cloudflareのdns">CloudFlareのDNS</a></li>
+    <li><a href="#問題への挑戦">問題への挑戦</a>
+      <ul>
+        <li><a href="#q51-システムコールの確認">Q5.1 システムコールの確認</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
-        <p>あけましておめでとうございます。今年も本ブログおよびmosuke5をよろしくお願いします。<br>
-新年元旦のブログなので軽く。年末年始は普段できない開発をやっていて、そこでできたちょっとしたメモを。</p>
-<p>趣味で作っているサービスで、基盤はAWSを利用し、CloudFlareも利用したい理由もありDNSの設定などはRoute53ではなくCloudFlareで制御する必要があった。複数のサービスをまたいで設定を管理できるTerraformの出番なわけだが、その設定方法についてメモしておく。</p>
-<h2 id="設定方法">設定方法</h2>
-<p>まずはAWS側の設定を見ておく。<br>
-今回はELB使うわけではなかったので、EC2インスタンスにElasticIPをバインドした。
-aws側のTerraformのコードでいつも通りEIPを購入する。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># aws.tf
-resource &#34;aws_eip&#34; &#34;main&#34; {
-  instance = &#34;${aws_instance.main.id}&#34;
-  vpc      = true
-}
-</code></pre></div><p>次に、CloudFlare側のコードをみる。<br>
-CloudFlareをTerraformで扱うには３つの情報が必要なのでここは変数化しておくとよい。<br>
-providerを指定し、あとはresouceを書いていく。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># cloudflare.tf
-variable &#34;cloudflare_email&#34; {}
-variable &#34;cloudflare_token&#34; {}
-variable &#34;cloudflare_domain&#34; {}
-
-provider &#34;cloudflare&#34; {
-  email = &#34;${var.cloudflare_email}&#34;
-  token = &#34;${var.cloudflare_token}&#34;
-}
-
-resource &#34;cloudflare_record&#34; &#34;gill-search-manage&#34; {
-  domain = &#34;${var.cloudflare_domain}&#34;
-  name   = &#34;gill-search-manage&#34;
-  value  = &#34;${aws_eip.main.public_ip}&#34;
-  type   = &#34;A&#34;
-  ttl    = 1
-  proxied = false
-}
-
-resource &#34;cloudflare_record&#34; &#34;gill-search&#34; {
-  domain = &#34;${var.cloudflare_domain}&#34;
-  name   = &#34;gill-search&#34;
-  value  = &#34;${aws_eip.main.public_ip}&#34;
-  type   = &#34;A&#34;
-  ttl    = 1
-  proxied = true
-}
-</code></pre></div><ul>
-<li><code>domain</code>はCloudFlareで管理しているドメイン名を入力。今回の場合は<code>mosuke.tech</code>を管理しているのでそれを入力。</li>
-<li><code>name</code>は今回Aレコードなのでサブドメインに当たる部分。</li>
-<li><code>value</code>は実際にIPアドレス。なので今回はAWS EIPの値が入る。<code>${aws_eip.main.public_ip}</code></li>
-<li><code>type</code>はAレコードなりCNAMEなり。</li>
-<li><code>ttl</code>は名前の通り、TTLの値。１にすると、CloudFlareの設定で言うAutomaticになる。</li>
-<li><code>proxied</code>はCloudFlareの仕組みによるもの。次に説明する。</li>
+        <p>こんにちは、もーすけです。<br>
+「Goならわかるシステムプログラミング」を読み進めています。とてもいい本です。
+読み進めながら実験していることを書いていきます。同じ本を読んでいる人の参考（寄り道？）になればと思います。
+今回は「システムコール」です。</p>
+<div class="belg-link row">
+  <div class="belg-right col-md-12">
+  <div class="belg-title">
+      <a href="https://www.amazon.co.jp/Go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0-%E7%AC%AC2%E7%89%88-%E6%B8%8B%E5%B7%9D%E3%82%88%E3%81%97%E3%81%8D/dp/4908686122?keywords=go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0&amp;qid=1649828170&amp;sprefix=go%E3%81%AA%E3%82%89,aps,295&amp;sr=8-1&amp;linkCode=sl1&amp;tag=mosuke5-22&amp;linkId=657574facc6fad628c327647d446818a&amp;language=ja_JP&amp;ref_=as_li_ss_tl" target="_blank">Goならわかるシステムプログラミング 第2版 | 渋川よしき, ごっちん |本 | 通販 | Amazon</a>
+    </div>
+    <div class="belg-description">Amazonで渋川よしき, ごっちんのGoならわかるシステムプログラミング 第2版。アマゾンならポイント還元本が多数。渋川よしき, ごっちん作品ほか、お急ぎ便対象商品は当日お届けも可能。またGoならわかるシステムプログラミング 第2版もアマゾン配送商品なら通常配送無料。</div>
+    <div class="belg-site">
+      <span class="belg-site-name">www.amazon.co.jp</span>
+    </div>
+  </div>
+</div>
+<hr>
+<h5>Goならわかるシステムプログラミングの学習シリーズ</h5>
+<ul>
+<li><a href="/entry/2022/04/13/go-system-programming-2/">第2章 io.Writer</a></li>
+<li><a href="/entry/2022/04/13/go-system-programming-3/">第3章 io.Reader</a></li>
+<li><a href="/entry/2022/04/13/go-system-programming-4/">第4章 チャネル</a></li>
+<li><a href="/entry/2022/04/13/go-system-programming-5/">第5章 システムコール</a></li>
+<li>Coming soon</a></li>
 </ul>
-<h2 id="cloudflareのdns">CloudFlareのDNS</h2>
-<p>設定すると下記のようになるのだが、右側のオレンジやグレーの雲マークが注目だ。<br>
-<img src="/image/cloudflare_dns.png" alt="cloudflare_proxy"></p>
-<p>CloudFlareでのDNSは、普通のDNSとちがってProxyの設定のON/OFFが必要だ。なぜなら、もともとCloudFlareはHTTP Proxyであり、それによってキャッシュしたりセキュリティを高めたりするものだからだ。
-なので、例えばSSHで接続などHTTPプロトコル以外を通そうとするとCloudFlareが邪魔になる。
-そのため、サービスで利用するHTTP用のアクセスルートと管理で利用するSSH用のアクセスルートを分けておくといい。</p>
-<p><img src="/image/cloudflare_proxy.png" alt="cloudflare_proxy"></p>
+<hr>
+<h2 id="問題への挑戦">問題への挑戦</h2>
+<p>本章は、問題に挑戦した結果だけまとめます。</p>
+<h3 id="q51-システムコールの確認">Q5.1 システムコールの確認</h3>
+<p>システムコールの確認は、すでに<a href="/entry/2022/04/13/go-system-programming-2/">第2章 io.Writer</a> でもネットワーク通信関連で行っているので確認してみてください。</p>
+<p>せっかくなので他のネタでシステムコールを確認してみます。<br>
+Q2.2で実践したcsvデータのファイルへの書き込みでシステムコールをトレースしてみます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;encoding/csv&#34;</span>
+	<span style="color:#e6db74">&#34;os&#34;</span>
+)
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Create</span>(<span style="color:#e6db74">&#34;tmp.txt&#34;</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">Close</span>()
+
+	<span style="color:#a6e22e">w</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">csv</span>.<span style="color:#a6e22e">NewWriter</span>(<span style="color:#a6e22e">file</span>)
+	<span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Write</span>([]<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;foo&#34;</span>, <span style="color:#e6db74">&#34;bar&#34;</span>, <span style="color:#e6db74">&#34;hoge&#34;</span>})
+	<span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Write</span>([]<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;kuu&#34;</span>, <span style="color:#e6db74">&#34;kaa&#34;</span>, <span style="color:#e6db74">&#34;joe&#34;</span>})
+	<span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Flush</span>()
+}
+</code></pre></div><p>環境は、RHEL8.5です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ uname -a
+Linux mosuke5-station 4.18.0-348.7.1.el8_5.x86_64 #1 SMP Wed Dec 8 21:51:17 EST 2021 x86_64 x86_64 x86_64 GNU/Linux
+
+$ cat /etc/redhat-release
+Red Hat Enterprise Linux release 8.5 (Ootpa)
+</code></pre></div><p>Goのプログラムのビルドはトレースする必要がないので事前にビルドしておきます。
+straceには <code>-y</code>, <code>-f</code>, <code>-e openat,read,write,clone,close</code>, <code>-o output</code> のオプションを付けていますが、それぞれ簡単に説明しておきます。</p>
+<ul>
+<li><code>-y</code> は、ファイルディスクリプタに関連のあるパスを表示します。どのファイルに対しての操作かわかりやすくなります。</li>
+<li><code>-f</code> は、フォークされたプロセスもトレースします。</li>
+<li><code>-e</code> は、表示するシステムコールを絞り込みます。これは、全システムコールだと表示がながくなりわかりづらくなるので、説明用に絞っているだけです。</li>
+<li><code>-o</code> は、ファイルに結果をアウトプットしています。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ go build main.go
+$ ls -l main
+-rwxrwxr-x. 1 mosuke5 mosuke5 1789722  4月 14 20:17 main
+
+$ strace -y -f -e openat,read,write,clone,close -o output ./main
+$ cat output
+1127332 openat(AT_FDCWD, &#34;/sys/kernel/mm/transparent_hugepage/hpage_pmd_size&#34;, O_RDONLY) = 3&lt;/sys/kernel/mm/transparent_hugepage/hpage_pmd_size&gt;
+1127332 read(3&lt;/sys/kernel/mm/transparent_hugepage/hpage_pmd_size&gt;, &#34;2097152\n&#34;, 20) = 8
+1127332 close(3&lt;/sys/kernel/mm/transparent_hugepage/hpage_pmd_size&gt;) = 0
+1127332 clone(child_stack=0xc000096000, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS, tls=0xc00007c090) = 1127333
+1127332 clone(child_stack=0xc000098000, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS, tls=0xc00007c490) = 1127334
+1127332 clone(child_stack=0xc000092000, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS, tls=0xc00007c890) = 1127335
+1127334 clone(child_stack=0xc000112000, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS, tls=0xc000100090) = 1127336
+1127332 openat(AT_FDCWD, &#34;tmp.txt&#34;, O_RDWR|O_CREAT|O_TRUNC|O_CLOEXEC, 0666) = 3&lt;/home/mosuke5/work/tmp/tmp.txt&gt;
+1127332 write(3&lt;/home/mosuke5/work/tmp/tmp.txt&gt;, &#34;foo,bar,hoge\nkuu,kaa,joe\n&#34;, 25) = 25
+1127332 close(3&lt;/home/mosuke5/work/tmp/tmp.txt&gt;) = 0
+1127332 exit_group(0)                   = ?
+1127336 +++ exited with 0 +++
+1127335 +++ exited with 0 +++
+1127334 +++ exited with 0 +++
+1127333 +++ exited with 0 +++
+1127332 +++ exited with 0 +++
+</code></pre></div><p>いくつかの気になったポイントを紹介します。</p>
+<ul>
+<li>straceの結果で一番左に記載の番号は、実行したプロセスのPIDになります。</li>
+<li><code>clone</code> で、スレッドを作っています。今回はあまり活躍の場はなさそうですが、いくつかスレッドを起動して処理してます</li>
+<li><code>openat</code> で、書き込み用の<code>tmp.txt</code>をオープンしています</li>
+<li><code>write</code> で、書き込みを行っています。コード上では、2回に分けてCSVレコードを記述していますが、どうやらLinux上では一度に書き込みを行うようですね。</li>
+<li><code>close</code> で、対象のファイルをしっかりクローズしています。</li>
+<li>最後に <code>exit_group</code> で、すべてのスレッドを終了しています。</li>
+</ul>
+<p>システムコールについては、こちらの本「Linuxシステムコール基本リファレンス」をよく参考にしていますので、一緒に学ぶとよいです。</p>
+<div class="belg-link row">
+  <div class="belg-right col-md-12">
+  <div class="belg-title">
+      <a href="https://www.amazon.co.jp/Linux%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%82%B3%E3%83%BC%E3%83%AB%E5%9F%BA%E6%9C%AC%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9-%E2%94%80%E2%94%80OS%E3%82%92%E7%9F%A5%E3%82%8B%E7%AA%81%E7%A0%B4%E5%8F%A3-WEB-PRESS-plus/dp/4774195553?__mk_ja_JP=%E3%82%AB%E3%82%BF%E3%82%AB%E3%83%8A&amp;crid=29VBZ9GD6CH3&amp;keywords=%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%82%B3%E3%83%BC%E3%83%AB%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9&amp;qid=1649943648&amp;sprefix=%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%82%B3%E3%83%BC%E3%83%AB%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9,aps,343&amp;sr=8-1&amp;linkCode=sl1&amp;tag=mosuke5-22&amp;linkId=4edcbee08465347c8b47c318fb7f02eb&amp;language=ja_JP&amp;ref_=as_li_ss_tl" target="_blank">Linuxシステムコール基本リファレンス ──OSを知る突破口 (WEB&#43;DB PRESS plus) | 山森 丈範 |本 | 通販 | Amazon</a>
+    </div>
+    <div class="belg-description">Amazonで山森 丈範のLinuxシステムコール基本リファレンス ──OSを知る突破口 (WEB&#43;DB PRESS plus)。アマゾンならポイント還元本が多数。山森 丈範作品ほか、お急ぎ便対象商品は当日お届けも可能。またLinuxシステムコール基本リファレンス ──OSを知る突破口 (WEB&#43;DB PRESS plus)もアマゾン配送商品なら通常配送無料。</div>
+    <div class="belg-site">
+      <span class="belg-site-name">www.amazon.co.jp</span>
+    </div>
+  </div>
+</div>
     </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
     <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
     <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
 </div>
 <div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
     <h5>記事へのフィードバック</h5>
-    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Terraform%e3%81%a7CloudFlare%e3%81%aeDNS%e8%a8%ad%e5%ae%9a%e3%82%92%e6%93%8d%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'TerraformでCloudFlareのDNS設定を操る'});">記事の内容にフィードバックしてみる</a></p>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Go%e3%81%aa%e3%82%89%e3%82%8f%e3%81%8b%e3%82%8b%e3%82%b7%e3%82%b9%e3%83%86%e3%83%a0%e3%83%97%e3%83%ad%e3%82%b0%e3%83%a9%e3%83%9f%e3%83%b3%e3%82%b0%ef%bc%9a%e7%ac%ac5%e7%ab%a0%20%e3%82%b7%e3%82%b9%e3%83%86%e3%83%a0%e3%82%b3%e3%83%bc%e3%83%ab" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">記事の内容にフィードバックしてみる</a></p>
 </div><div class="entry-sub-content post-share">
         <div class="post-share-links">
             <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
@@ -272,13 +323,11 @@ resource &#34;cloudflare_record&#34; &#34;gill-search&#34; {
       <h3>関連する記事</h3>
       <ul class="list-group">
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-4/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Goならわかるシステムプログラミング：第4章 チャネル'});">Goならわかるシステムプログラミング：第4章 チャネル</a> (2022/03/01)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて'});">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a> (2022/01/24)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Goならわかるシステムプログラミング：第3章 io.Reader'});">Goならわかるシステムプログラミング：第3章 io.Reader</a> (2022/03/01)</li>
         
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/10/28/kubernetes-test-by-terratest/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Kubernetes環境についてTerratestでテストを書く'});">Kubernetes環境についてTerratestでテストを書く</a> (2021/10/28)</li>
-        
-        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/07/21/sre/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'SREは何を目指せばいいか？Google流から大事なことを学ぼう。'});">SREは何を目指せばいいか？Google流から大事なことを学ぼう。</a> (2021/07/21)</li>
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Goならわかるシステムプログラミング：第2章 io.Writer'});">Goならわかるシステムプログラミング：第2章 io.Writer</a> (2022/03/01)</li>
         
       </ul>
     </div>
