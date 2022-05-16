@@ -61,6 +61,29 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2021/01/31/network-debug-on-containers/" class="entry-title">Kubernetes上のアプリケーションをtcpdumpでデバッグする</a></h1>
+    <div class="entry-sub-title">
+        <span class="">31 Jan 2021, 12:10</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-kubernetes" href="/categories/kubernetes">kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。休日はもっぱら住宅購入の検討で忙しいマンです。<br>
+さて、本日は、Kubernetesのアプリケーションのデバッグに関して書きます。</p>
+<p>Kubernetesで運用中のアプリケーションの障害対応で、ネットワーク関連のデバッグをしたいことはよくあります。
+このブログでは具体的にtcpdumpを取得したいという場面を想定して書きます。
+コンテナアプリケーションの開発・運用をしていると、<strong>イメージのサイズを小さく保っておきたい</strong>と思うはずです。
+その理由についてはいろいろとありますが、イメージの展開のスピードを高めることで、デプロイや障害時の復旧を早めるなどが代表的なところです。（関連するトピックとして「<a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/">コンテナイメージを軽くする方法と、その原理原則を考える</a>」も読んでみてください。）</p>
+<p>それゆえに、アプリケーションの動作に必要なライブラリ以外は入れないことが多く、デバッグツールを除外しておくことが多いでしょう。
+しかし、障害発生時にいざtcpdumpやstrace, ping ,digなどを打ちたいと思ってもインストールされておらず困ることがあります。
+そんな場面に遭遇しても焦らないようにあらかじめ対応策を頭に入れて練習しておきましょう。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/01/31/network-debug-on-containers/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/" class="entry-title">OpenShift on NVIDIA GPU（導入編）</a></h1>
     <div class="entry-sub-title">
         <span class="">17 Dec 2020, 22:01</span>
@@ -263,30 +286,6 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
         <a href="https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/" class="entry-title">コンテナイメージを軽くする方法と、その原理原則を考える</a></h1>
-    <div class="entry-sub-title">
-        <span class="">09 Jul 2020, 18:50</span>
-        <span class="">By mosuke5</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-コンテナ" href="/categories/%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A">コンテナ</a>
-            
-                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <p>こんにちは。もーすけです。<br>
-先日、はじめてラーメン作りに挑戦しました。非常に美味しくできました。
-ラーメン作りにも興味ある方はこちらのブログ（<a href="https://note.com/morisan_life/n/n2f855f8e5a46">初心者のための、家系ラーメン自作 徹底ガイド！</a>）をご参照ください（笑）</p>
-<p>さて本題ですが、はじめてコンテナアプリケーションの開発に挑戦していると覚えることがたくさんあり、楽しさ反面大変さもおそらく感じるかと思います。
-そんな覚えることがたくさんの中には、コンテナイメージは軽くしたほうがいいというものも含まれるかもしれません。
-軽くしないと動かないわけではないので、はじめてコンテナ環境に挑戦している人はどうしても忘れがち、見落としがちなことかもしれません。
-しかし、実際の運用を見据えると、軽量であるほうが断然よいです。<br>
-その理由を理解すると、みなさんが「なぜコンテナに挑戦しているのか」思い出してくるのではないかと思います。</p>
-        <a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       <a href="/categories/kubernetes/page/3/" class="post-list-pagination-item pure-button post-list-pagination-item-prev">
@@ -303,11 +302,11 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
   <div class="sidebar-content related-post">
     <h3>最近の記事</h3>
     <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-4/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第4章 チャネル'});">Goならわかるシステムプログラミング：第4章 チャネル</a></li>
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第3章 io.Reader'});">Goならわかるシステムプログラミング：第3章 io.Reader</a></li>
       </ul>
   </div>
   <div class="sidebar-content campaign-ad">
@@ -344,7 +343,7 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
         <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (58)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (59)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
@@ -406,7 +405,7 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
         <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
       </li>
       <li class="list-group-item">
-        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (10)</a>
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (11)</a>
       </li>
       </ul>
   </div>
