@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Kubernetesを学ぶ</title>
+<link rel="canonical" href="https://blog.mosuke.tech/kubernetes/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/kubernetes/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Kubernetesを学ぶ &middot; Goldstine研究所">
+<meta name="twitter:description" content="Kubernetesを学びたい人のためのページを作成しました。Kubernetesの効率よく学ぶためのクイズなどを公開。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetesを学ぶ &middot; Goldstine研究所">
+<meta property="og:description" content="Kubernetesを学びたい人のためのページを作成しました。Kubernetesの効率よく学ぶためのクイズなどを公開。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/kubernetes/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Kubernetesを学ぶ</h1>
+    <div class="entry-sub-title">
+        <span class="">16 Oct 2020, 00:00</span>
+        <span class="">By mosuke5</span>
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#なぜコンテナを使いたいかを考える">なぜコンテナを使いたいかを考える</a></li>
+    <li><a href="#kubernetesの前に単体コンテナの扱いを学ぶ">Kubernetesの前に単体コンテナの扱いを学ぶ</a></li>
+    <li><a href="#コンテナ謎解き-for-アプリ開発者">コンテナ謎解き for アプリ開発者</a></li>
+    <li><a href="#おすすめの勉強材料">おすすめの勉強材料</a>
+      <ul>
+        <li><a href="#基礎知識">基礎知識</a></li>
+        <li><a href="#devops">DevOps</a></li>
+        <li><a href="#セキュリティ">セキュリティ</a></li>
+        <li><a href="#拡張">拡張</a></li>
+        <li><a href="#認定試験">認定試験</a></li>
+      </ul>
+    </li>
+    <li><a href="#kubernetesに関するブログ記事">Kubernetesに関するブログ記事</a></li>
+  </ul>
+</nav>
+        <p>本ページは、Kubernetesを学びたい人向けにコンテンツを整備していくことを目的にしたものです。
+随時更新しますので、ぜひご活用ください。</p>
+<h2 id="なぜコンテナを使いたいかを考える">なぜコンテナを使いたいかを考える</h2>
+<p>まずはなぜ自分たちがコンテナやKubernetesに興味を持っているのか、使いたいのかを改めて考えるきっかけをつくるといいです。
+もちろん触ってみないとわからないことも多いので、勉強という意味では意義を無視してどんどんすすめてみてください。
+なぜコンテナを使いたいかを考える材料として、「<a href="https://amzn.to/2HRo47K" target="_blank">LeanとDevOpsの科学 テクノロジーの戦略的活用が組織変革を加速する</a>」がとてもオススメです。<a href="https://blog.mosuke.tech/entry/2019/12/26/the-science-of-lean-software-and-devops/">書評ブログ</a>も過去に書いているのであわせてご覧ください。</p>
+<h2 id="kubernetesの前に単体コンテナの扱いを学ぶ">Kubernetesの前に単体コンテナの扱いを学ぶ</h2>
+<p>Kubernetesは、コンテナオーケストレーションツールです。
+Kubernetesを学びたいと思っていて、まだDockerなどのコンテナをきちんと勉強したことない方は、先にコンテナを単体として扱う練習をしておくといいです。一番手軽な方法として、Dockerを手元の端末にインストールし、操作感や概念を理解しておくことです。
+Kubernetesは、アプリケーションをコンテナで運用する際に、コンテナ単体だけでは足りなかった部分を補ってくれる存在となります。いきなりKubernetesから入ると学習効率は下がる可能性がありますので注意してください。</p>
+<h2 id="コンテナ謎解き-for-アプリ開発者">コンテナ謎解き for アプリ開発者</h2>
+<p>友人から、書籍を読めばトピック毎のことはわかるが、膨大にあるKubernetesのことをなにからどの様に学んでいけばいいかわからないという相談をうけました。
+そこで、わたしの経験からアプリ開発を主に行う人がKubernetesの何をどのように学んでいけばいいかをクイズ形式でまとめたところ、好評だったため本サイトでも公開してみました。
+以下のクイズは順番を意識して作っているので順にこなしていけばと思います。</p>
+<ol>
+<li>Dockerを用いて、Nginxを起動せよ</li>
+<li>Dockerを用いて、&ldquo;Hello mokumoku kai&rdquo; と返すNginxイメージを自作せよ
+<ul>
+<li>また、そのイメージをDockerhubで公開せよ</li>
+</ul>
+</li>
+<li>minikube上に、前の項目で作成したNginxイメージをデプロイせよ
+<ul>
+<li>マニフェストファイルを用意できていること</li>
+<li>Podを削除してもサービスを継続できること</li>
+<li>Pod数が3以上であること</li>
+</ul>
+</li>
+<li>Deployment、ReplicaSet、Podの3つの関係性を考えよ</li>
+<li>Serviceの役割について説明せよ</li>
+<li>作成したNginxに追加して下記の仕組みに変えよ
+<ul>
+<li>なんらかのアプリケーションサーバの追加（phpでもrubyでもなんでも可）</li>
+<li>環境変数 <code>MOKUMOKUKAI=mokumokusaikou</code> を設定し、設定した環境変数を返すアプリケーションを作成せよ</li>
+</ul>
+</li>
+<li>MySQLを追加し、MySQL内の任意のデータを返すアプリケーションを作成せよ</li>
+<li>Nginxのバージョンを変更しデプロイしてみよ</li>
+<li>アプリケーションに変更を加えてアプリケーションのイメージを作り直しデプロイしてみよ</li>
+<li>その際、コンテナイメージのタグ名をどのように指定したか復習し、latestタグを使うことが悪手といわれているか理由を考えよ
+<ul>
+<li>（ヒント）イメージの管理やimagePullPolicyの観点から考えるといい</li>
+</ul>
+</li>
+<li>作成したアプリケーションのイメージのサイズを確認してみよ</li>
+<li>コンテナイメージは一般的に軽いほうが良いといわれるが、その理由と軽くする方法について調べ考えよ</li>
+<li>上の例でいうとNginxとアプリケーションは同じPod上で動作させることも可能だが、同じPodで動かした場合のデメリットを考えよ
+<ul>
+<li>（ヒント）１コンテナ１プロセスの原則が何を意味するのか考えてみよう</li>
+</ul>
+</li>
+<li>ここまで完了したらそろそろ、minikubeを卒業してクラウドサービスのKubernetesで上をデプロイしてみよう。
+<ul>
+<li>より分散環境で動作することを意識していこう</li>
+</ul>
+</li>
+<li>GKE上でIngressリソースを使って、デプロイしたアプリケーションをインターネットに公開せよ
+<ul>
+<li>GKEでなくても、Kubernetesサービスならなんでもいいですが、手軽で安価に使えるクラウド上のKubernetesとしてGKEとしました。</li>
+</ul>
+</li>
+<li>Ingressがどのような仕組みで動き、どんな働きをするのか考察せよ
+<ul>
+<li>その際には、Sevice Type:loadbalancerやNodePort Serviceとの違いに着目せよ</li>
+</ul>
+</li>
+<li>アプリケーションで利用しているMySQLのボリュームをGCP上のPersistent Volume（ブロックストレージ）に置き換えよ（すでに対応済みならスキップ）</li>
+<li>クラウドサービスとKubernetesの関係性について整理せよ</li>
+<li>デプロイしたNginxに、<code>/hello</code> のリクエストのときだけバックエンドサーバへプロキシせずに &ldquo;Hello from Nginx&quot;と返すように設定せよ
+<ul>
+<li>その際、Nginxの設定ファイルはKubernetesのConfigMapを用いてNginx Podに引き渡すこと</li>
+</ul>
+</li>
+<li>アプリケーションのMySQLへの接続のIDとPasswordをKubernetesのSecretを用いる構成に変更せよ</li>
+<li>SecretとConfigMapの違いを説明せよ</li>
+<li>作成したSecretのYAMLの中身を閲覧し、エンコードされた文字列を確認せよ。このエンコードされた文字列はセキュアである状態か考えてみよ。もしセキュアでないと考えた場合、どのようにSecretを管理するべきか検討せよ。</li>
+</ol>
+<h2 id="おすすめの勉強材料">おすすめの勉強材料</h2>
+<p>Kubernetesを学ぶのに非常に参考になっている書籍などを紹介します。</p>
+<h3 id="基礎知識">基礎知識</h3>
+<p>本ブログ内ではよく紹介していますが、Kubernetesの基礎知識や仕様の辞書として使いたいのであればKubernetes完全ガイドがまずいちばんの良書と考えています。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.amazon.co.jp/Kubernetes%25E5%25AE%258C%25E5%2585%25A8%25E3%2582%25AC%25E3%2582%25A4%25E3%2583%2589-%25E7%25AC%25AC2%25E7%2589%2588-impress-top-gear%25E3%2582%25B7%25E3%2583%25AA%25E3%2583%25BC%25E3%2582%25BA-ebook/dp/B08FZX8PYW" data-iframely-url="//cdn.iframe.ly/xzXY0oj?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h3 id="devops">DevOps</h3>
+<p>「Kubernetesで実践するクラウドネイティブDevOps」という本があります。こちらについては過去にレビュー記事を書いたのでこちらからご参照ください。</p>
+<div class="belg-link row">
+  <div class="belg-left col-md-2 d-none d-md-block">
+    <a href="https://blog.mosuke.tech/entry/2020/02/26/cloud-native-devops/" target="_blank">
+      <img class="belg-site-image" src="https://blog.mosuke.tech/image/logo.png" />
+    </a>
+  </div>
+  <div class="belg-right col-md-10">
+  <div class="belg-title">
+      <a href="https://blog.mosuke.tech/entry/2020/02/26/cloud-native-devops/" target="_blank">運用課題の指南書、Kubernetesで実践するクラウドネイティブDevOps · Goldstine研究所</a>
+    </div>
+    <div class="belg-description">Kubernetesで実践するクラウドネイティブDevOps、という書籍が発売しました。Kubernetes上でのアプリケーションの開発・運用について網羅的に知見が展開されている良い本です。デプロイやSecret管理、モニタリングなど様々な視点で書かれています。</div>
+    <div class="belg-site">
+      <img src="https://blog.mosuke.tech/image/favicon.ico" class="belg-site-icon">
+      <span class="belg-site-name">Goldstine研究所</span>
+    </div>
+  </div>
+</div>
+<h3 id="セキュリティ">セキュリティ</h3>
+<p>セキュリティに特化してここまで詳細に書かれた本はほかにありません。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.amazon.co.jp/Docker-Kubernetes%25E9%2596%258B%25E7%2599%25BA%25E3%2583%25BB%25E9%2581%258B%25E7%2594%25A8%25E3%2581%25AE%25E3%2581%259F%25E3%2582%2581%25E3%2581%25AE%25E3%2582%25BB%25E3%2582%25AD%25E3%2583%25A5%25E3%2583%25AA%25E3%2583%2586%25E3%2582%25A3%25E5%25AE%259F%25E8%25B7%25B5%25E3%2582%25AC%25E3%2582%25A4%25E3%2583%2589-Compass-Books%25E3%2582%25B7%25E3%2583%25AA%25E3%2583%25BC%25E3%2582%25BA-%25E9%25A0%2588%25E7%2594%25B0/dp/4839970505" data-iframely-url="//cdn.iframe.ly/14dZOCz?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h3 id="拡張">拡張</h3>
+<p>Kubernetesをより使いこなすために、自作のコントローラ（Operator）を作ってみたい人やKubernetesの内部をより良く理解したい人はこちらから入るとおすすめです。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.amazon.co.jp/%25E5%25AE%259F%25E8%25B7%25B5%25E5%2585%25A5%25E9%2596%2580-Kubernetes%25E3%2582%25AB%25E3%2582%25B9%25E3%2582%25BF%25E3%2583%25A0%25E3%2582%25B3%25E3%2583%25B3%25E3%2583%2588%25E3%2583%25AD%25E3%2583%25BC%25E3%2583%25A9%25E3%2583%25BC%25E3%2581%25B8%25E3%2581%25AE%25E9%2581%2593-%25E6%258A%2580%25E8%25A1%2593%25E3%2581%25AE%25E6%25B3%2589%25E3%2582%25B7%25E3%2583%25AA%25E3%2583%25BC%25E3%2582%25BA%25EF%25BC%2588NextPublishing%25EF%25BC%2589-%25E7%25A3%25AF-%25E8%25B3%25A2%25E5%25A4%25A7-ebook/dp/B0851QCR81" data-iframely-url="//cdn.iframe.ly/r2pMc79?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h3 id="認定試験">認定試験</h3>
+<p>Linux FoundationとCloud Native Computing Foundation（CNCF）によって、Kubernetesの認定試験を提供しています。
+Certified Kubernetes Administrator(CKA)とCertified Kubernetes Application Developer(CKAD)の2種類です。
+試験はコマンド操作による実技試験のため、非常に実践的なスキルが学べます。こちらの認定資格をはじめの目標にしてみるのもよいかとおもいます。わたしも過去にCKADを受けたことがあります。（ブログ: <a href="https://blog.mosuke.tech/entry/2019/07/08/ckad/">CKADを取得の対策や試験当日の対応について</a>）</p>
+<h2 id="kubernetesに関するブログ記事">Kubernetesに関するブログ記事</h2>
+<p>本サイトのKubernetesに関するブログ記事は下記からたどれます。</p>
+<div class="belg-link row">
+  <div class="belg-left col-md-2 d-none d-md-block">
+    <a href="https://blog.mosuke.tech/categories/kubernetes/" target="_blank">
+      <img class="belg-site-image" src="https://blog.mosuke.tech/image/logo.png" />
+    </a>
+  </div>
+  <div class="belg-right col-md-10">
+  <div class="belg-title">
+      <a href="https://blog.mosuke.tech/categories/kubernetes/" target="_blank">Kubernetes · Goldstine研究所</a>
+    </div>
+    <div class="belg-description">@mosuke5のブログサイト。クラウド技術やアプリ開発、インフラ系ツールなどを主に情報発信しています。</div>
+    <div class="belg-site">
+      <img src="https://blog.mosuke.tech/image/favicon.ico" class="belg-site-icon">
+      <span class="belg-site-name">Goldstine研究所</span>
+    </div>
+  </div>
+</div>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Kubernetes%e3%82%92%e5%ad%a6%e3%81%b6" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Kubernetesを学ぶ'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

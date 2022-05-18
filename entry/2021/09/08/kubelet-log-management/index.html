@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Kubeletのログ管理を追ってみる</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/09/08/kubelet-log-management/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/09/08/kubelet-log-management/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Kubeletのログ管理を追ってみる &middot; Goldstine研究所">
+<meta name="twitter:description" content="Kubeletのログ管理について、実験とソースコードから確認しました。containerLogMaxFilesやcontainerLogMaxSizeが何を指し示すのか？ソースコードからの細かな動きを確認しましょう。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubeletのログ管理を追ってみる &middot; Goldstine研究所">
+<meta property="og:description" content="Kubeletのログ管理について、実験とソースコードから確認しました。containerLogMaxFilesやcontainerLogMaxSizeが何を指し示すのか？ソースコードからの細かな動きを確認しましょう。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/09/08/kubelet-log-management/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Kubeletのログ管理を追ってみる</h1>
+    <div class="entry-sub-title">
+        <span class="">08 Sep 2021, 10:36</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#kubeletのログ管理">kubeletのログ管理</a></li>
+    <li><a href="#実験見た目上の動きを確認">実験！見た目上の動きを確認</a>
+      <ul>
+        <li><a href="#検証環境">検証環境</a></li>
+        <li><a href="#実験">実験</a></li>
+      </ul>
+    </li>
+    <li><a href="#kubeletのソースコードを確認">Kubeletのソースコードを確認</a></li>
+    <li><a href="#openshiftユーザ向け">OpenShiftユーザ向け</a></li>
+    <li><a href="#さいごに">さいごに</a></li>
+  </ul>
+</nav>
+        <p>こんにちは。もーすけです。<br>
+今回はKubeletのログ管理について調べたことを残します。
+Kubernetesにおけるログ管理については以前もブログを書いてきましたが、どちらかというとアプリ目線でのことで、実際のところKubeletがどうログ管理しているかよくわかっていなかったので調査してみました。
+きっかけは、KubernetesのPodのログはローテートされるのか？ずっと標準出力にログを吐き続けたらストレージはどうなるのか？そのあたり気になったことです。</p>
+<h2 id="kubeletのログ管理">kubeletのログ管理</h2>
+<p>Kubeletは、さまざまな機能を持ちますが、その代表的なものが「Podを起動、管理すること」です。
+その管理プロセスには、ログ管理も含まれています。ざっとKubeletのログ管理の全体像を示してみます。
+（Kubeletの全体像を把握しているわけではないので、かなり限定的なスコープになっているかもしれません）</p>
+<p>Kubeletの設定オプションの中に、コンテナのログに関するところは2つあります。
+（参考リンク: <a href="https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/#kubelet-config-k8s-io-v1beta1-KubeletConfiguration">kubeletConfiguration</a>）</p>
+<ul>
+<li><code>containerLogMaxSize</code>
+<ul>
+<li>コンテナが出力したログファイルの最大サイズ。（デフォルト: 10Mi）</li>
+<li>最大サイズを越えると、Kubeletがログをローテーション。</li>
+</ul>
+</li>
+<li><code>containerLogMaxFiles</code>
+<ul>
+<li>ローテーションされたファイルをいくつ保持するかの設定。（デフォルト: 5）</li>
+<li>この値は必ず2以上。</li>
+</ul>
+</li>
+</ul>
+<p><img src="/image/kubelet-log-management.png" alt="kubelet-log-management"></p>
+<h2 id="実験見た目上の動きを確認">実験！見た目上の動きを確認</h2>
+<h3 id="検証環境">検証環境</h3>
+<p>次の環境で検証しました。</p>
+<ul>
+<li>Kubernetes 1.21 (OpenShift 4.8)</li>
+<li>containerLogMaxSize: 5MB</li>
+<li>containerLogMaxFiles: 5</li>
+</ul>
+<h3 id="実験">実験</h3>
+<p>実験用に、ログを大量に出力するコンテナを準備します。<br>
+今回は以下を用いました。ループで&quot;RandomString&quot;を出力するだけのコンテナです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">#logtest.yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">debug</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">debug</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">selector</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">matchLabels</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">debug</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">template</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">debug</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">containers</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">image</span>: <span style="color:#ae81ff">registry.gitlab.com/mosuke5/debug-container:latest</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">name</span>: <span style="color:#ae81ff">debug</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">args</span>: [<span style="color:#e6db74">&#34;sh&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;i=1; while [ $i -le 10000 ]; do j=1; while [ $j -le 2000 ]; do echo RandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomStringRandomString; j=$(( j+1 )); done; sleep 1; i=$(( i+1 )); done&#34;</span>]
+</span></span></code></pre></div><p>デプロイし、Podがスケジュールされたノード名を確認します。
+<code>ip-10-0-166-31.ap-southeast-1.compute.internal</code>でPodが動作していることが確認できました。後ほどノードにアクセスしてログファイルを確認します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% kubectl apply -f logtest.yaml
+</span></span><span style="display:flex;"><span>deployment.apps/debug created
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% kubectl get pod -w -o wide
+</span></span><span style="display:flex;"><span>NAME                     READY   STATUS              RESTARTS   AGE   IP       NODE                                             NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>debug-5cf4c8b545-jxx65   0/1     ContainerCreating   0          25s   &lt;none&gt;   ip-10-0-166-31.ap-southeast-1.compute.internal   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>debug-5cf4c8b545-jxx65   1/1     Running             0          38s   10.128.2.10   ip-10-0-166-31.ap-southeast-1.compute.internal   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% kubectl logs -f debug-5cf4c8b545-jxx65
+</span></span><span style="display:flex;"><span>RandomStringRandomStringRandomStringRandomString...
+</span></span></code></pre></div><p>では、ノードにアクセスしてファイルを確認します。<br>
+Podのログは<code>/var/log/pods/xxx</code>に配置されています。
+<code>ls -lh</code>を何度か打って、状況を確認しましょう。後ほど動画も掲載します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>以下ノード内
+</span></span><span style="display:flex;"><span>sh-4.4# cd /var/log/pods/default_debug-5cf4c8b545-jxx65_eef7dd8e-5df1-4861-920c-90fd8788b8f9/debug
+</span></span><span style="display:flex;"><span>sh-4.4# pwd
+</span></span><span style="display:flex;"><span>/var/log/pods/default_debug-5cf4c8b545-jxx65_eef7dd8e-5df1-4861-920c-90fd8788b8f9/debug
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sh-4.4# ls -lh
+</span></span><span style="display:flex;"><span>total 8.7M
+</span></span><span style="display:flex;"><span>-rw-------. 1 root root 840K Sep  9 04:33 0.log
+</span></span><span style="display:flex;"><span>-rw-r--r--. 1 root root 125K Sep  9 04:33 0.log.20210909-043310.gz
+</span></span><span style="display:flex;"><span>-rw-r--r--. 1 root root 124K Sep  9 04:33 0.log.20210909-043320.gz
+</span></span><span style="display:flex;"><span>-rw-r--r--. 1 root root 127K Sep  9 04:33 0.log.20210909-043330.gz
+</span></span><span style="display:flex;"><span>-rw-------. 1 root root 7.4M Sep  9 04:33 0.log.20210909-043340
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sh-4.4# ls -lh
+</span></span><span style="display:flex;"><span>total 24M
+</span></span><span style="display:flex;"><span>-rw-------. 1 root root 8.3M Sep  9 04:33 0.log
+</span></span><span style="display:flex;"><span>-rw-r--r--. 1 root root 124K Sep  9 04:33 0.log.20210909-043320.gz
+</span></span><span style="display:flex;"><span>-rw-r--r--. 1 root root 127K Sep  9 04:33 0.log.20210909-043330.gz
+</span></span><span style="display:flex;"><span>-rw-------. 1 root root 7.4M Sep  9 04:33 0.log.20210909-043340
+</span></span><span style="display:flex;"><span>-rw-r--r--. 1 root root  35K Sep  9 04:33 0.log.20210909-043340.tmp
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sh-4.4# ls -lh
+</span></span><span style="display:flex;"><span>total 13M
+</span></span><span style="display:flex;"><span>-rw-------. 1 root root 3.3M Sep  9 04:33 0.log
+</span></span><span style="display:flex;"><span>-rw-r--r--. 1 root root 124K Sep  9 04:33 0.log.20210909-043320.gz
+</span></span><span style="display:flex;"><span>-rw-r--r--. 1 root root 127K Sep  9 04:33 0.log.20210909-043330.gz
+</span></span><span style="display:flex;"><span>-rw-r--r--. 1 root root 113K Sep  9 04:33 0.log.20210909-043340.gz
+</span></span><span style="display:flex;"><span>-rw-------. 1 root root 8.3M Sep  9 04:33 0.log.20210909-043351
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sh-4.4# ls -lh
+</span></span><span style="display:flex;"><span>total 17M
+</span></span><span style="display:flex;"><span>-rw-------. 1 root root 5.8M Sep  9 04:33 0.log
+</span></span><span style="display:flex;"><span>-rw-r--r--. 1 root root 124K Sep  9 04:33 0.log.20210909-043320.gz
+</span></span><span style="display:flex;"><span>-rw-r--r--. 1 root root 127K Sep  9 04:33 0.log.20210909-043330.gz
+</span></span><span style="display:flex;"><span>-rw-r--r--. 1 root root 113K Sep  9 04:33 0.log.20210909-043340.gz
+</span></span><span style="display:flex;"><span>-rw-------. 1 root root 8.3M Sep  9 04:33 0.log.20210909-043351
+</span></span></code></pre></div><p>どうやら見た目上は次のように動いているようです。</p>
+<ol>
+<li>コンテナは<code>0.log</code>にログを書き込む</li>
+<li>一番古いログファイルを削除するを削除する（<code>containerLogMaxFiles</code>を超える場合）</li>
+<li><code>0.log</code>が5MB（<code>containerLogMaxSize</code>）を越えると、ひとつ前のログを圧縮する</li>
+<li><code>0.log</code>にタイムスタンプを付けてログローテートする</li>
+<li>コンテナは<code>0.log</code>に書き込み続ける</li>
+</ol>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/tlcVRMhMUw0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<h2 id="kubeletのソースコードを確認">Kubeletのソースコードを確認</h2>
+<p>動作を見た目上確認してみましたが、いちおうKubeletのソースコードを簡単に追ってみようと思います。
+ソースコードは、難しくなく概ね予想通りでありました。</p>
+<p>まず、Kubeletのログ管理ですが、10秒間隔（<code>logMonitorPeriod = 10 * time.Second</code>）で動作していることを確認できます。ファイルに付けられたタイムスタンプがきれいに10秒おきになっているのが理解できます。（<a href="https://github.com/kubernetes/kubernetes/blob/release-1.21/pkg/kubelet/logs/container_log_manager.go#L178-L186">該当ソースコード</a>）<br>
+ループで実行しているのは<code>rotateLogs()</code>になります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// logMonitorPeriod is the period container log manager monitors
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#75715e">// container logs and performs log rotation.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">logMonitorPeriod</span> = <span style="color:#ae81ff">10</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// timestampFormat is format of the timestamp suffix for rotated log.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#75715e">// See https://golang.org/pkg/time/#Time.Format.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">timestampFormat</span> = <span style="color:#e6db74">&#34;20060102-150405&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// compressSuffix is the suffix for compressed log.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">compressSuffix</span> = <span style="color:#e6db74">&#34;.gz&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// tmpSuffix is the suffix for temporary file.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">tmpSuffix</span> = <span style="color:#e6db74">&#34;.tmp&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Start the container log manager.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">containerLogManager</span>) <span style="color:#a6e22e">Start</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// Start a goroutine periodically does container log rotation.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#66d9ef">go</span> <span style="color:#a6e22e">wait</span>.<span style="color:#a6e22e">Forever</span>(<span style="color:#66d9ef">func</span>() {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">rotateLogs</span>(); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">klog</span>.<span style="color:#a6e22e">ErrorS</span>(<span style="color:#a6e22e">err</span>, <span style="color:#e6db74">&#34;Failed to rotate container logs&#34;</span>)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}, <span style="color:#a6e22e">logMonitorPeriod</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>rotateLogs()</code>を見てみましょう。<br>
+<code>c.policy.MaxSize</code> が <code>containerLogMaxSize</code> の値になりますが、ログファイルのサイズがそれ以上だった場合に <code>rotateLog()</code> を実行しているようです。（<a href="https://github.com/kubernetes/kubernetes/blob/release-1.21/pkg/kubelet/logs/container_log_manager.go#L254-L261">該当ソースコード</a>）</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">containerLogManager</span>) <span style="color:#a6e22e">rotateLogs</span>() <span style="color:#66d9ef">error</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">//...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">info</span>.<span style="color:#a6e22e">Size</span>() &lt; <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">policy</span>.<span style="color:#a6e22e">MaxSize</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#75715e">// Perform log rotation.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">rotateLog</span>(<span style="color:#a6e22e">id</span>, <span style="color:#a6e22e">path</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">klog</span>.<span style="color:#a6e22e">ErrorS</span>(<span style="color:#a6e22e">err</span>, <span style="color:#e6db74">&#34;Failed to rotate log for container&#34;</span>, <span style="color:#e6db74">&#34;path&#34;</span>, <span style="color:#a6e22e">path</span>, <span style="color:#e6db74">&#34;containerID&#34;</span>, <span style="color:#a6e22e">id</span>)
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span></code></pre></div><p><code>rotateLog()</code>を見ると、大きく4つの処理で動いています。（<a href="https://github.com/kubernetes/kubernetes/blob/release-1.21/pkg/kubelet/logs/container_log_manager.go#L266-L299">該当ソースコード</a>）</p>
+<ol>
+<li><code>cleanupUnusedLogs()</code>
+<ul>
+<li>一時ファイルや前回にログローテートで失敗して残ってしまったファイルなど削除</li>
+</ul>
+</li>
+<li><code>removeExcessLogs()</code>
+<ul>
+<li><code>containerLogMaxFiles</code>を超える場合にファイルを削除</li>
+</ul>
+</li>
+<li><code>compressLog()</code>
+<ul>
+<li>ファイルの圧縮</li>
+</ul>
+</li>
+<li><code>rotateLatestLog()</code>
+<ul>
+<li>最新ログファイルのローテート</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">containerLogManager</span>) <span style="color:#a6e22e">rotateLog</span>(<span style="color:#a6e22e">id</span>, <span style="color:#a6e22e">log</span> <span style="color:#66d9ef">string</span>) <span style="color:#66d9ef">error</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// pattern is used to match all rotated files.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">pattern</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;%s.*&#34;</span>, <span style="color:#a6e22e">log</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">logs</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">filepath</span>.<span style="color:#a6e22e">Glob</span>(<span style="color:#a6e22e">pattern</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;failed to list all log files with pattern %q: %v&#34;</span>, <span style="color:#a6e22e">pattern</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">logs</span>, <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">cleanupUnusedLogs</span>(<span style="color:#a6e22e">logs</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;failed to cleanup logs: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">logs</span>, <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">removeExcessLogs</span>(<span style="color:#a6e22e">logs</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;failed to remove excess logs: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// Compress uncompressed log files.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">l</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">logs</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">HasSuffix</span>(<span style="color:#a6e22e">l</span>, <span style="color:#a6e22e">compressSuffix</span>) {
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">compressLog</span>(<span style="color:#a6e22e">l</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;failed to compress log %q: %v&#34;</span>, <span style="color:#a6e22e">l</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">rotateLatestLog</span>(<span style="color:#a6e22e">id</span>, <span style="color:#a6e22e">log</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;failed to rotate log %q: %v&#34;</span>, <span style="color:#a6e22e">log</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="openshiftユーザ向け">OpenShiftユーザ向け</h2>
+<p>OpenShiftを使っている人は、Kubeletの設定は<code>KubeletConfig</code>リソースを用いてKubeletの設定を書き変えられます。今回は次の設定を投入しました。KubeletConfigを追加すると、MachineConfigOperatorが各ノードに設定を配置してくれます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">machineconfiguration.openshift.io/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">KubeletConfig</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">set-my-conf</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">machineConfigPoolSelector</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">matchLabels</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">pools.operator.machineconfiguration.openshift.io/worker</span>: <span style="color:#e6db74">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">kubeletConfig</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">maxPods</span>: <span style="color:#ae81ff">500</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">containerLogMaxSize</span>: <span style="color:#ae81ff">5Mi</span>
+</span></span></code></pre></div><h2 id="さいごに">さいごに</h2>
+<p>今回は、Kubeletのログ管理について確認していきました。
+ソースコードも今回の箇所は非常にわかりやすく、見かけ上の動作を超えて処理を確認できたいい体験でした。今後も積極的にソースコードも可能な限り確認していきたい思いです。</p>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Kubelet%e3%81%ae%e3%83%ad%e3%82%b0%e7%ae%a1%e7%90%86%e3%82%92%e8%bf%bd%e3%81%a3%e3%81%a6%e3%81%bf%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Kubeletのログ管理を追ってみる'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a> (2022/05/16)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a> (2022/05/15)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Argo CD、外部クラスタへのデプロイと認証の仕組み'});">Argo CD、外部クラスタへのデプロイと認証の仕組み</a> (2022/02/08)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

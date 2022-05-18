@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Entries</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Entries &middot; Goldstine研究所">
+<meta name="twitter:description" content="@mosuke5のブログサイト。クラウド技術やアプリ開発、インフラ系ツールなどを主に情報発信しています。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Entries &middot; Goldstine研究所">
+<meta property="og:description" content="@mosuke5のブログサイト。クラウド技術やアプリ開発、インフラ系ツールなどを主に情報発信しています。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+
+<div class="entry col-md-8 col-xs-12">
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/" class="entry-title">Datadog APMとトレーシングの仕組みについて</a></h1>
+    <div class="entry-sub-title">
+        <span class="">21 Nov 2019, 11:32</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-クラウド技術" href="/categories/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89%E6%8A%80%E8%A1%93">クラウド技術</a>
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+                <a class="badge badge-inf post-category post-category-アプリケーション開発" href="/categories/%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E9%96%8B%E7%99%BA">アプリケーション開発</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは。<a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br>
+みなさん普段の監視はどのように行っていますか？Datadog使っていますか？</p>
+<p>最近<a href="https://www.datadoghq.com/">Datadog</a>を触る機会が多いのですが、Datadogはobservabilityの3本柱ということで、メトリックとトレース(APM)とログ、この3つを統合した監視サービスであることを強くおしだしています。
+3つの分野のそれぞれに対応したOSSやサービスは多いですが、統合されてシームレスに連携できる点はDatadogの非常に強いポイントと感じます。
+さて、そんななかでDatadog APM (Application Perfomance Monitoring) が強力だったので紹介したいのと、その仕組みを探っていきましょう。</p>
+        <a href="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2019/11/12/wedding/" class="entry-title">結婚式を楽に円満に行う！やって本当によかった７つのこと</a></h1>
+    <div class="entry-sub-title">
+        <span class="">12 Nov 2019, 22:06</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-キャリア" href="/categories/%E3%82%AD%E3%83%A3%E3%83%AA%E3%82%A2">キャリア</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは。@mosuke5です。<br>
+私ごとですが、先日結婚式をあげました。結婚式は、普通であれば一生に一回しかないことが望ましいわけですが、逆にいうと一度しかないので、他の人の助けになればと、我が家では振り返り会を実施しました。その中で、おもによかったなと思うポイントをピックアップしてまとめました。是非、こらから結婚式をあげようとしている方々の参考になればと思います。</p>
+        <a href="https://blog.mosuke.tech/entry/2019/11/12/wedding/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2019/09/23/apsara-conference-trip/" class="entry-title">Apsara Conference 杭州に上海経由でいくために必要なこと</a></h1>
+    <div class="entry-sub-title">
+        <span class="">23 Sep 2019, 15:33</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Alibaba Cloud" href="/categories/alibaba-cloud">Alibaba Cloud</a>
+            
+                <a class="badge badge-inf post-category post-category-イベント" href="/categories/%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88">イベント</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p><strong>※本内容は、アリババのカンファレンス以外でも杭州に行きたい人に役立つ情報です。</strong></p>
+<p>こんにちは<a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br>
+9月といえば、、そうAlibaba Cloudのカンファレンス Apsara Conferenceですね。（強引）<br>
+昨年までは TCC(The Computing Conference)という名前だったのですが、今年からはアリババらしさを出すためか名前を変更しました。今年も参加してきたのご紹介していきたいと思います。</p>
+<p>本記事では、まず会場までの行き方など旅路的なところを紹介します。<br>
+来年ものカンファレンスに参加する人や杭州にいく予定のある人の助けになればと思います。</p>
+        <a href="https://blog.mosuke.tech/entry/2019/09/23/apsara-conference-trip/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2019/08/28/datadog-for-alibaba-cloud/" class="entry-title">DatadogのAlibaba Cloud integrationでできること</a></h1>
+    <div class="entry-sub-title">
+        <span class="">28 Aug 2019, 00:11</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Alibaba Cloud" href="/categories/alibaba-cloud">Alibaba Cloud</a>
+            
+                <a class="badge badge-inf post-category post-category-クラウド技術" href="/categories/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89%E6%8A%80%E8%A1%93">クラウド技術</a>
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>仕事でDatadogを触る機会があり、フリートライアルのアカウントを作りました。<br>
+ちょうどいい機会だったので、前々から試したいと思っていたAlibaba Cloudとの連携について試してみました。
+この連携は2019年の3月くらいに開始したものです。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.datadoghq.com/blog/monitor-alibaba-cloud-datadog/" data-iframely-url="//cdn.iframe.ly/bkZv6KL?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+        <a href="https://blog.mosuke.tech/entry/2019/08/28/datadog-for-alibaba-cloud/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2019/08/21/ansible-for-k8s-resources/" class="entry-title">Kubernetes上のリソースをAnsibleで管理する</a></h1>
+    <div class="entry-sub-title">
+        <span class="">21 Aug 2019, 19:36</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>お久しぶりです。@mosuke5です。<br>
+Kubernetes上のリソースをどのように管理していますか？
+<code>kubectl apply -f manifest-file.yml</code> のようにkubectlを使うことがまず多いのかなと思います。
+自分もそのようにデプロイすることがおおいです。
+今日はAnsibleを用いてKubernetes上のリソースを管理することを試してみたいと思います。</p>
+        <a href="https://blog.mosuke.tech/entry/2019/08/21/ansible-for-k8s-resources/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2019/07/19/alibaba-private-zone/" class="entry-title">Alibaba CloudでのPrivate DNS(PrivateZone)の仕様と用途の解説</a></h1>
+    <div class="entry-sub-title">
+        <span class="">19 Jul 2019, 18:24</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Alibaba Cloud" href="/categories/alibaba-cloud">Alibaba Cloud</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>お疲れ様です。mosuke5です。<br>
+Alibaba Cloudのプライベートの名前解決機能である、<a href="https://www.alibabacloud.com/products/private-zone" target="_bkank">PrivateZone</a>の仕様とその用途について解説していきます。</p>
+<h2 id="privatezoneとは">PrivateZoneとは</h2>
+<p>Alibaba CloudにはDNSのサービスがあり、インターネットからのアクセスに対しては昔から名前解決をすることができました。
+しかし、VPC内部でだけ使うプライベートアドレスに対しての名前解決については今までできませんでした。
+PrivateZoneは、VPC内部だけで使えるDNSです。
+この機能により、VPC内部でのシステム間の連携やサーバ管理などが楽になります。</p>
+        <a href="https://blog.mosuke.tech/entry/2019/07/19/alibaba-private-zone/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2019/07/12/sidecar-fluentd-to-cloudwatchlogs/" class="entry-title">Sidecar方式のFluentdでCloudWatch logsへログを集約することについての検討</a></h1>
+    <div class="entry-sub-title">
+        <span class="">12 Jul 2019, 12:57</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-AWS" href="/categories/aws">AWS</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p><a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br>
+Kubernetes上でのアプリケーションのロギングについてFluentdを使ってどうできるか考えていきます。
+今回はサイドカー方式という方法を使ってFluentdでAWS CloudWatch logsへ集約することについてやってみました。CloudWatch logsを例に取っていますが、それ以外でも考え方は応用できますので読んでみてください。
+また、サイドカー方式以外の方式については、こちらの「<a href="/entry/2021/04/18/kubernetes-application-logging/">Kubernetesのロギングパターンは結局どれを採用したらいいの？</a>」を参照してください。</p>
+<p>FluentdとAWSの連携については、以前に「<a href="/entry/2017/09/03/fluentd_to_dynamodb/">NginxのログをFluentdでDynamoDBへ送る</a>」もかきましたので、参考にしてください。自分も復習で見返しました。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/" data-iframely-url="//cdn.iframe.ly/qKFqn1a"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+        <a href="https://blog.mosuke.tech/entry/2019/07/12/sidecar-fluentd-to-cloudwatchlogs/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2019/07/10/the-lean-startup/" class="entry-title">「リーンスタートアップ」を読んだ。計測することの重要性と難しさ</a></h1>
+    <div class="entry-sub-title">
+        <span class="">10 Jul 2019, 18:08</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>会社のブログも含めて、やたら執筆ばかりしている<a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br>
+前回の <a href="/entry/2019/06/30/scram/">&quot;「スクラム」（ジェフ・サザーランド）を読んだ&quot;</a>に続いて、「リーンスタートアップ」という本を読んだのでそちらについての学びについてまとめます。</p>
+<h2 id="この書籍について">この書籍について</h2>
+<p>この書籍は、アメリカシリコンバレーで起業家として活動していたエリック・リース氏が自らの起業体験を元に書かれた、「リーンスタートアップ」というスタートアップビジネスのマネジメント手法についてのものです。
+彼が「リーンスタートアップ」という手法の提唱者になります。
+スタートアップというも、その定義は広く、なにも「スタートアップベンチャー」だけを指し示しているものでもなく、
+本書では <strong>「スタートアップとは、とてつもなく不確実な状態で新しい製品やサービスを創り出さなければならない人的組織である。」</strong> と定義しています。</p>
+<p>そのため、会社のサイズや業界などに関係なく、上に当てはまる人にとってはとても有益な本です。
+本書では、なぜスタートアップがうまくいかないのかにはじまり、科学的にどうしたらうまくまわせるかのエッセンスがつまっています。
+新規プロジェクト・ビジネスでうまくいかなかった経験がある、これからやっていく予定がある人はぜひ一度読んでみてほしいです。</p>
+        <a href="https://blog.mosuke.tech/entry/2019/07/10/the-lean-startup/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2019/07/08/ckad/" class="entry-title">CKADを取得の対策や試験当日の対応について</a></h1>
+    <div class="entry-sub-title">
+        <span class="">08 Jul 2019, 09:12</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-資格試験" href="/categories/%E8%B3%87%E6%A0%BC%E8%A9%A6%E9%A8%93">資格試験</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p><a href="https://twitter.com/mosuke5">@mosuke5</a>です。<a href="https://www.cncf.io/certification/ckad/" target="_blank">CKAD(Certified Kubernetes Application Developer)</a>を受けてきました。<br>
+すでに多くのCKA/CKADの合格レポートや体験記がでておりますが、
+それでも自分が実際に受けてみるまで不安な要素も多くあったので、
+そのあたりを払拭するべくこの記事を書きたいと思います。</p>
+<p>2019年7月5日にCKADを受験して無事に合格しました。<br>
+スコアは89%と案外高く(66%で合格)、驚きでもあったのですが、その体験をこれから受験する人にもシェアできればと思います。</p>
+<p><img src="/image/ckad-certificate.png" alt="ckad-certificate"></p>
+        <a href="https://blog.mosuke.tech/entry/2019/07/08/ckad/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2019/06/30/scram/" class="entry-title">「スクラム」(ジェフ・サザーランド): 新しい仕事の仕方を学ぶ最良の本</a></h1>
+    <div class="entry-sub-title">
+        <span class="">30 Jun 2019, 15:59</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>このブログで「読んだ」記事を書くのは実は初めてです。<br>
+なので拙い書評になるかもしれませんが、これもこのブログに新しいコンテンツを提供するための第一歩としてやってみます。</p>
+<p>今回読んだのはこちらの「スクラム」という本です。</p>
+<div class="amazlet-box" style="margin-bottom:0px;"><div class="amazlet-image" style="float:left;margin:0px 12px 1px 0px;"><a href="https://amzn.to/39EoJCX" name="amazletlink" target="_blank"><img src="https://images-fe.ssl-images-amazon.com/images/I/31YRID0DRaL._SL160_.jpg" alt="スクラム　仕事が４倍速くなる“世界標準”のチーム戦術" style="border: none;" /></a></div><div class="amazlet-info" style="line-height:120%; margin-bottom: 10px"><div class="amazlet-name" style="margin-bottom:10px;line-height:120%"><a href="https://amzn.to/39EoJCX" name="amazletlink" target="_blank">スクラム　仕事が４倍速くなる“世界標準”のチーム戦術</a><div class="amazlet-powered-date" style="font-size:80%;margin-top:5px;line-height:120%">posted with amazlet at 19.06.30</div></div><div class="amazlet-detail">ジェフ・サザーランド <br />早川書房 <br />売り上げランキング: 15,652<br /></div><div class="amazlet-sub-info" style="float: left;"><div class="amazlet-link" style="margin-top: 5px"><a href="https://amzn.to/39EoJCX" name="amazletlink" target="_blank">Amazon.co.jpで詳細を見る</a></div></div></div><div class="amazlet-footer" style="clear: left"></div></div>
+        <a href="https://blog.mosuke.tech/entry/2019/06/30/scram/">続きを読む</a>
+    </div>
+    
+<div class="pagination">
+  <nav role="pagination" class="post-list-pagination">
+      <a href="/entry/page/8/" class="post-list-pagination-item pure-button post-list-pagination-item-prev">
+        <i class="fa fa-angle-double-left"></i>&nbsp;Newer
+      </a>
+      <span class="post-list-pagination-item post-list-pagination-item-current">Page 9 of 18</span>
+    <a href="/entry/page/10/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
+        Older&nbsp;<i class="fa fa-angle-double-right"></i>
+      </a>
+    </nav>
+</div>
+
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて &middot; Goldstine研究所">
+<meta name="twitter:description" content="Tektonのgit-cloneタスクでプライベートレポジトリを扱う際の認証・クレデンシャル管理の方法と仕組みをみていきます。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて &middot; Goldstine研究所">
+<meta property="og:description" content="Tektonのgit-cloneタスクでプライベートレポジトリを扱う際の認証・クレデンシャル管理の方法と仕組みをみていきます。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</h1>
+    <div class="entry-sub-title">
+        <span class="">24 Jan 2022, 10:52</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#git-cloneタスクのssh-directoryを使う">git-cloneタスクのssh-directoryを使う</a></li>
+    <li><a href="#tektonに実装された認証の仕組みを使う">Tektonに実装された認証の仕組みを使う</a></li>
+    <li><a href="#まとめ">まとめ</a></li>
+  </ul>
+</nav>
+        <hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
+<li>第13回: <a href="/entry/2022/03/01/tekton-lib-cache/">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
+<li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。<br>
+このシリーズの中で<a href="https://hub.tekton.dev/tekton/task/git-clone">git-clone</a>タスクを利用してきましたが、いままではパブリックなレポジトリを対象に扱ってきましたが、実運用では当然ながらプライベートレポジトリを活用するはずです。
+プライベートレポジトリを使っていくにはどうしたらいいのか、その場合の挙動などを確認しておきます。</p>
+<p>Tektonパイプラインで、git-cloneタスクを使う場合、git-cloneタスクに実装される <code>ssh-directory</code> 設定を使うか、Tektonで用意した認証の仕組みを使うかのどちらかになると思います。それぞれの方法について見ていきましょう。</p>
+<h2 id="git-cloneタスクのssh-directoryを使う">git-cloneタスクのssh-directoryを使う</h2>
+<p>※ここで紹介しているgit-cloneタスクは<a href="https://github.com/tektoncd/catalog/blob/main/task/git-clone/0.5/git-clone.yaml">v0.5</a>です。<br>
+ひとつめの方法は、git-cloneタスクに実装されているworkspace設定を利用する方法です。
+git-cloneタスクでは、次のようにworkspacesの設定（<code>ssh-directory</code>）が定義されています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># https://github.com/tektoncd/catalog/blob/main/task/git-clone/0.5/git-clone.yaml</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">workspaces</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">output</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">description</span>: <span style="color:#ae81ff">The git repo will be cloned onto the volume backing this Workspace.</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">ssh-directory</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">optional</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">description</span>: |<span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        A .ssh directory with private key, known_hosts, config, etc. Copied to
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        the user&#39;s home before git commands are executed. Used to authenticate
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        with the git remote when performing the clone. Binding a Secret to this
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        Workspace is strongly recommended over other volume types.</span>        
+</span></span></code></pre></div><p><code>ssh-directory</code>の情報（パスやバインド有無）が環境変数で指定されPodが起動します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># https://github.com/tektoncd/catalog/blob/main/task/git-clone/0.5/git-clone.yaml</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">steps</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">clone</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">image</span>: <span style="color:#e6db74">&#34;$(params.gitInitImage)&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">env</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ae81ff">...</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">WORKSPACE_SSH_DIRECTORY_BOUND</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">value</span>: <span style="color:#ae81ff">$(workspaces.ssh-directory.bound)</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">WORKSPACE_SSH_DIRECTORY_PATH</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">value</span>: <span style="color:#ae81ff">$(workspaces.ssh-directory.path)</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#ae81ff">...</span>
+</span></span></code></pre></div><p>Taskが実行されるPod内で、上の環境情報を用いて、ホームディレクトリの<code>.ssh</code>内にコピーされることもわかります。
+ホームディレクトリの <code>.ssh</code>までコピーされれば、LinuxやUNIXシステムでいつもどおり扱っているとおりですね。
+つまり、<code>ssh-directory</code>に指定するシークレット内で、<code>id_rsa</code>や<code>known_host</code>, <code>config</code>ファイルを用意すれば良さそうですね。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e"># https://github.com/tektoncd/catalog/blob/main/task/git-clone/0.5/git-clone.yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>WORKSPACE_SSH_DIRECTORY_BOUND<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;true&#34;</span> <span style="color:#f92672">]</span> ; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>  cp -R <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>WORKSPACE_SSH_DIRECTORY_PATH<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>PARAM_USER_HOME<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>/.ssh
+</span></span><span style="display:flex;"><span>  chmod <span style="color:#ae81ff">700</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>PARAM_USER_HOME<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>/.ssh
+</span></span><span style="display:flex;"><span>  chmod -R <span style="color:#ae81ff">400</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>PARAM_USER_HOME<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>/.ssh/*
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span></code></pre></div><p>次のようなシークレットを作って、Task利用時にパラメータを指定してあげれば問題なしです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Secret</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-ssh-credentials</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">data</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">id_rsa</span>: <span style="color:#ae81ff">&lt;base64でエンコードされた秘密鍵&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">known_hosts</span>: <span style="color:#ae81ff">&lt;base64ででエンコードされたknown_hosts&gt;</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pipeline</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-pipeline </span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">workspaces</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">shared-workspace</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">ssh-cred</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">#...</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">tasks</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fetch-repository</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">taskRef</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">git-clone</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">workspaces</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">output</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">shared-workspace</span>
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">ssh-directory</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">ssh-cred</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">params</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">url</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#ae81ff">$(params.git-url)</span>
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">deleteExisting</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;true&#34;</span>
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">revision</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#ae81ff">$(params.git-revision)</span>
+</span></span></code></pre></div><h2 id="tektonに実装された認証の仕組みを使う">Tektonに実装された認証の仕組みを使う</h2>
+<p>もうひとつの方法が、Tektonのもつ認証の仕組みを利用するものです。<br>
+Tektonでは、所定の方式で記述したSecretをTaskのPod内で展開する仕組みを持っています。
+実際の使い方と、動きを見ていきましょう。</p>
+<p>公式ドキュメントは以下を参照してください。</p>
+<div class="belg-link row">
+  <div class="belg-right col-md-12">
+  <div class="belg-title">
+      <a href="https://tekton.dev/vault/pipelines-v0.28.2/auth/" target="_blank">Tekton: Using custom ServiceAccount credentials</a>
+    </div>
+    <div class="belg-description">Authentication at Run Time This document describes how Tekton handles authentication when executing TaskRuns and PipelineRuns. Since authentication concepts and processes apply to both of those entities in the same manner, this document collectively refers to TaskRuns and PipelineRuns as Runs for the sake of brevity.</div>
+    <div class="belg-site">
+      <img src="https://tekton.dev/favicons/android-192x192.png" class="belg-site-icon">
+      <span class="belg-site-name">Tekton</span>
+    </div>
+  </div>
+</div>
+<p>次のようにSecretを作ります。<br>
+後ほど見ますが、Tekton的には、<code>github.com</code>に対して、設定した<code>private-key</code>を使いますということです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Secret</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-ssh</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">annotations</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">tekton.dev/git-0</span>: <span style="color:#ae81ff">github.com</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">type</span>: <span style="color:#ae81ff">kubernetes.io/ssh-auth</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">stringData</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">ssh-privatekey</span>: <span style="color:#ae81ff">&lt;private-key&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">known_hosts</span>: <span style="color:#ae81ff">&lt;known-hosts&gt;</span>
+</span></span></code></pre></div><p>Taskの実行にpipelineというService Accountを使います。
+次のように上で作ったシークレットをServiceAccountと紐付けておきます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get sa pipeline -o yaml
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>imagePullSecrets:
+</span></span><span style="display:flex;"><span>- name: pipeline-dockercfg-5hww7
+</span></span><span style="display:flex;"><span>kind: ServiceAccount
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  creationTimestamp: &#34;2022-01-24T07:01:01Z&#34;
+</span></span><span style="display:flex;"><span>  name: pipeline
+</span></span><span style="display:flex;"><span>  namespace: cicd-demo
+</span></span><span style="display:flex;"><span>  ownerReferences:
+</span></span><span style="display:flex;"><span>  - apiVersion: operator.tekton.dev/v1alpha1
+</span></span><span style="display:flex;"><span>    blockOwnerDeletion: true
+</span></span><span style="display:flex;"><span>    controller: true
+</span></span><span style="display:flex;"><span>    kind: TektonInstallerSet
+</span></span><span style="display:flex;"><span>    name: rbac-resources
+</span></span><span style="display:flex;"><span>    uid: a90a96f6-5ca5-4823-b3bd-46e21d8161b8
+</span></span><span style="display:flex;"><span>  resourceVersion: &#34;145756&#34;
+</span></span><span style="display:flex;"><span>  uid: 40c66ae7-9a4a-46ea-bc4e-7a8224f12402
+</span></span><span style="display:flex;"><span>secrets:
+</span></span><span style="display:flex;"><span>- name: pipeline-token-fp78s
+</span></span><span style="display:flex;"><span>- name: pipeline-dockercfg-5hww7
+</span></span><span style="display:flex;"><span>- name: my-ssh
+</span></span></code></pre></div><p>この状態でTaskを実行したときの、Pod内の状態を確認します。<br>
+次のTask/TaskRunを使用し、起動したPod内でいろいろとファイルを確認していきましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">## sleep-task.yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Task</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">sleep-task</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">steps</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">sleep</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">image</span>: <span style="color:#ae81ff">fedora:latest</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">command</span>: [<span style="color:#e6db74">&#34;sleep&#34;</span>]
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">args</span>: [<span style="color:#e6db74">&#34;3600&#34;</span>]
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">## sleep-task-run.yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">TaskRun</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">sleep-task-run</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">taskRef</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">sleep-task</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f sleep-task.yaml
+</span></span><span style="display:flex;"><span>task.tekton.dev/sleep-task created
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl apply -f sleep-task-run.yaml
+</span></span><span style="display:flex;"><span>taskrun.tekton.dev/sleep-task-run created
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl get pod
+</span></span><span style="display:flex;"><span>NAME                             READY   STATUS      RESTARTS   AGE
+</span></span><span style="display:flex;"><span>sleep-task-run-pod-spz2n         1/1     Running     0          25s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl exec -it sleep-task-run-pod-spz2n -- bash
+</span></span><span style="display:flex;"><span>[root@sleep-task-run-pod-slq52 ~]#
+</span></span><span style="display:flex;"><span>[root@sleep-task-run-pod-slq52 ~]# ls -l /tekton/creds-secrets/my-ssh/
+</span></span><span style="display:flex;"><span>total 0
+</span></span><span style="display:flex;"><span>lrwxrwxrwx. 1 root 1000670000 21 Jan 24 09:21 ssh-privatekey -&gt; ..data/ssh-privatekey
+</span></span><span style="display:flex;"><span>[root@sleep-task-run-pod-slq52 ~]#
+</span></span><span style="display:flex;"><span>[root@sleep-task-run-pod-slq52 ~]# ls -al /tekton/creds/.ssh/
+</span></span><span style="display:flex;"><span>total 8
+</span></span><span style="display:flex;"><span>drwxr-sr-x. 2 root 1000670000   80 Jan 24 14:36 .
+</span></span><span style="display:flex;"><span>drwxrwsrwt. 4 root 1000670000   80 Jan 24 14:36 ..
+</span></span><span style="display:flex;"><span>-rw-------. 1 root 1000670000   98 Jan 24 14:36 config
+</span></span><span style="display:flex;"><span>-rw-------. 1 root 1000670000 1675 Jan 24 14:36 id_my-ssh
+</span></span><span style="display:flex;"><span>[root@sleep-task-run-pod-slq52 ~]#
+</span></span><span style="display:flex;"><span>[root@sleep-task-run-pod-slq52 ~]# #のちほど説明するが、ホームディレクトリにクレデンシャル等がコピーされている
+</span></span><span style="display:flex;"><span>[root@sleep-task-run-pod-slq52 ~]# ls -al /root/.ssh/
+</span></span><span style="display:flex;"><span>total 8
+</span></span><span style="display:flex;"><span>drwx------. 2 root root   37 Jan 24 09:21 .
+</span></span><span style="display:flex;"><span>dr-xr-x---. 1 root root   33 Jan 24 09:21 ..
+</span></span><span style="display:flex;"><span>-rw-------. 1 root root   98 Jan 24 09:21 config
+</span></span><span style="display:flex;"><span>-rw-------. 1 root root 1675 Jan 24 09:21 id_my-ssh
+</span></span><span style="display:flex;"><span>[root@sleep-task-run-pod-slq52 ~]#
+</span></span><span style="display:flex;"><span>[root@sleep-task-run-pod-slq52 ~]# cat /root/.ssh/config
+</span></span><span style="display:flex;"><span>Host github.com
+</span></span><span style="display:flex;"><span>    HostName github.com
+</span></span><span style="display:flex;"><span>    Port 22
+</span></span><span style="display:flex;"><span>    IdentityFile /tekton/creds/.ssh/id_my-ssh
+</span></span><span style="display:flex;"><span>[root@sleep-task-run-pod-slq52 ~]#
+</span></span><span style="display:flex;"><span>[root@sleep-task-run-pod-slq52 ~]# cat /root/.ssh/id_my-ssh
+</span></span><span style="display:flex;"><span>-----BEGIN RSA PRIVATE KEY-----
+</span></span><span style="display:flex;"><span>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+</span></span><span style="display:flex;"><span>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+</span></span><span style="display:flex;"><span>-----END RSA PRIVATE KEY-----
+</span></span></code></pre></div><p>では、これらの設定はいつどのように行われるのでしょうか。
+TektonがTaskを実行するPodでは、<code>/tekton/tools/entrypoint</code> が実行されます。
+<code>entrypoint</code> の引数には <code>-ssh-git=my-ssh=github.com</code> が書かれており、シークレットで定義した情報がわたっています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>  <span style="color:#f92672">containers</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">args</span>:
+</span></span><span style="display:flex;"><span>    - -<span style="color:#ae81ff">wait_file</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">/tekton/downward/ready</span>
+</span></span><span style="display:flex;"><span>    - -<span style="color:#ae81ff">wait_file_content</span>
+</span></span><span style="display:flex;"><span>    - -<span style="color:#ae81ff">post_file</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">/tekton/tools/0</span>
+</span></span><span style="display:flex;"><span>    - -<span style="color:#ae81ff">termination_path</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">/tekton/termination</span>
+</span></span><span style="display:flex;"><span>    - -<span style="color:#ae81ff">step_metadata_dir</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">/tekton/steps/step-sleep</span>
+</span></span><span style="display:flex;"><span>    - -<span style="color:#ae81ff">step_metadata_dir_link</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">/tekton/steps/0</span>
+</span></span><span style="display:flex;"><span>    - -<span style="color:#ae81ff">docker-cfg=pipeline-dockercfg-5hww7</span>
+</span></span><span style="display:flex;"><span>    - -<span style="color:#ae81ff">ssh-git=my-ssh=github.com</span>
+</span></span><span style="display:flex;"><span>    - -<span style="color:#ae81ff">entrypoint</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">sleep</span>
+</span></span><span style="display:flex;"><span>    - --
+</span></span><span style="display:flex;"><span>    - <span style="color:#e6db74">&#34;3600&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">command</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">/tekton/tools/entrypoint</span>
+</span></span></code></pre></div><p><code>/tekton/tools/entrypoint</code>の実装を見てみると、実態がみえてきます。<br>
+以下は <a href="https://github.com/tektoncd/pipeline/blob/release-v0.21.x/cmd/entrypoint/main.go#L88-L97">/cmd/entrypoint/main.goの88-97行</a> ですが、このWrite処理にて、<code>/tekton/creds</code>配下に秘密鍵の書き込みや生成した<code>.ssh/config</code>を書き込みます。
+Writeの処理は、Gitレポジトリかイメージレジストリ向けのクレデンシャルで処理がことなりますが、Gitレポジトリむけのsshの設定ファイルは <a href="https://github.com/tektoncd/pipeline/blob/release-v0.21.x/pkg/credentials/gitcreds/ssh.go#L74-L126">pkg/credentials/gitcreds/ssh.go</a> に記載があります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>	<span style="color:#75715e">// Copy credentials we&#39;re expecting from the legacy credentials helper (creds-init)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#75715e">// from secret volume mounts to /tekton/creds. This is done to support the expansion
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#75715e">// of a variable, $(credentials.path), that resolves to a single place with all the
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#75715e">// stored credentials.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">builders</span> <span style="color:#f92672">:=</span> []<span style="color:#a6e22e">credentials</span>.<span style="color:#a6e22e">Builder</span>{<span style="color:#a6e22e">dockercreds</span>.<span style="color:#a6e22e">NewBuilder</span>(), <span style="color:#a6e22e">gitcreds</span>.<span style="color:#a6e22e">NewBuilder</span>()}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">c</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">builders</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">Write</span>(<span style="color:#e6db74">&#34;/tekton/creds&#34;</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Error initializing credentials: %s&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span></code></pre></div><p>その上で、ホームディレクトリに対してコピーを行うという処理になっています。
+以下は <a href="https://github.com/tektoncd/pipeline/blob/release-v0.21.x/cmd/entrypoint/main.go#L113-L117">/cmd/entrypoint/main.goの113-117行</a> です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>  <span style="color:#75715e">// Copy any creds injected by the controller into the $HOME directory of the current
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// user so that they&#39;re discoverable by git / ssh.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">credentials</span>.<span style="color:#a6e22e">CopyCredsToHome</span>(<span style="color:#a6e22e">credentials</span>.<span style="color:#a6e22e">CredsInitCredentials</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>  	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;non-fatal error copying credentials: %q&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>  }
+</span></span></code></pre></div><p>やっていること自体はそれほど難しくないことがうかがえます。</p>
+<h2 id="まとめ">まとめ</h2>
+<p>今回は、git-cloneタスクを使った場合にプライベートレポジトリへどうやってアクセスできるか？（クレデンシャルをどう扱えるか？）を確認してみました。
+実装を追っていくとそれほど難しくないこともわかります。
+また、今回はGitレポジトリのクレデンシャルを扱いましたが、コンテナイメージレジストリへのクレデンシャルについてもほぼ同様の仕組みが使われています。</p>
+<p>もう怖くないですね。<br>
+今後もTektonを楽しんでいきましょう。</p>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Tekton%e3%80%81%e3%83%97%e3%83%a9%e3%82%a4%e3%83%99%e3%83%bc%e3%83%88%e3%81%aaGit%e3%83%ac%e3%83%9d%e3%82%b8%e3%83%88%e3%83%aa%e3%82%92%e6%89%b1%e3%81%86%e6%96%b9%e6%b3%95%e3%81%a8%e4%bb%95%e7%b5%84%e3%81%bf%e3%81%ab%e3%81%a4%e3%81%84%e3%81%a6" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/10/28/kubernetes-test-by-terratest/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Kubernetes環境についてTerratestでテストを書く'});">Kubernetes環境についてTerratestでテストを書く</a> (2021/10/28)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'カスタマイズしたJenkinsを作成する方法 on OpenShift'});">カスタマイズしたJenkinsを作成する方法 on OpenShift</a> (2020/07/05)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton 徹底解説、Operatorによるインストールとはじめの一歩（学習シリーズ01）'});">Tekton 徹底解説、Operatorによるインストールとはじめの一歩（学習シリーズ01）</a> (2020/05/10)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

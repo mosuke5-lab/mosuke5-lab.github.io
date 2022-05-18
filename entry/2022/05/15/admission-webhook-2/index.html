@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編） &middot; Goldstine研究所">
+<meta name="twitter:description" content="Kubernetesの運用には欠かせなくなってくる拡張。そのひとつであるAdmission Webhookを作って遊んでみるというものです。本記事は実際に作って動かす動作編です。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編） &middot; Goldstine研究所">
+<meta property="og:description" content="Kubernetesの運用には欠かせなくなってくる拡張。そのひとつであるAdmission Webhookを作って遊んでみるというものです。本記事は実際に作って動かす動作編です。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</h1>
+    <div class="entry-sub-title">
+        <span class="">16 May 2022, 18:37</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#解説動画">解説動画</a></li>
+    <li><a href="#サンプルで作ってみるもの">サンプルで作ってみるもの</a>
+      <ul>
+        <li><a href="#仕様">仕様</a></li>
+        <li><a href="#ポイント">ポイント</a></li>
+        <li><a href="#ソースコード">ソースコード</a></li>
+      </ul>
+    </li>
+    <li><a href="#kubernetesクラスタへのデプロイ">Kubernetesクラスタへのデプロイ</a>
+      <ul>
+        <li><a href="#tls証明書の作成">TLS証明書の作成</a></li>
+        <li><a href="#subjectaltnameに対応しましょう">SubjectAltNameに対応しましょう</a></li>
+        <li><a href="#ローカル実行">ローカル実行</a></li>
+        <li><a href="#デプロイ-to-kubernetes">デプロイ to Kubernetes</a></li>
+        <li><a href="#admissionwebhook設定">AdmissionWebhook設定</a></li>
+      </ul>
+    </li>
+    <li><a href="#さいごに">さいごに</a></li>
+    <li><a href="#参考文献">参考文献</a></li>
+  </ul>
+</nav>
+        <p>こんにちは、もーすけです。<br>
+前回は、Admission Webhookの説明編を書きました。今回は実際に動かしていくことをやっていきたいと思います。</p>
+<div class="belg-link row">
+  <div class="belg-left col-md-2 d-none d-md-block">
+    <a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" target="_blank">
+      <img class="belg-site-image" src="https://blog.mosuke.tech/image/logo.png" />
+    </a>
+  </div>
+  <div class="belg-right col-md-10">
+  <div class="belg-title">
+      <a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" target="_blank">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編） · Goldstine研究所</a>
+    </div>
+    <div class="belg-description">Kubernetesの運用には欠かせなくなってくる拡張。そのひとつであるAdmission Webhookを作って遊んでみるというものです。本記事は説明編で、動作編にも続きます。</div>
+    <div class="belg-site">
+      <img src="https://blog.mosuke.tech/image/favicon.ico" class="belg-site-icon">
+      <span class="belg-site-name">Goldstine研究所</span>
+    </div>
+  </div>
+</div>
+<h2 id="解説動画">解説動画</h2>
+<p>はじめての試みで、ブログ記事をみながら雑に解説していく動画をとってみました。
+こういうの良かったと思えば評価ボタンとかコメントでフィードバックもらえると嬉しいです。</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/E0XCDpUTR0I" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<h2 id="サンプルで作ってみるもの">サンプルで作ってみるもの</h2>
+<p>というわけで、さっそくValidating Admission Webhookをスクラッチで作ってみましょう。今回は動きを理解するためにあえて <a href="https://github.com/slok/kubewebhook" target="_blank">kubewebhook</a> や <a href="https://github.com/kubernetes-sigs/kubebuilder" target="_blank">kubebuilder</a> といったフレームワークは使わずにやってみようと思います。</p>
+<p><img src="/image/admission-webhook-overview.png" alt="admission-webhook-overview"></p>
+<h3 id="仕様">仕様</h3>
+<p>Podの <code>.spec.SecurityContext.RunAsUser</code>がrootの場合、あるいは明示的に指定されていないときにPodの作成を禁止する。ただし、特定のNamespace(&ldquo;admin-*&quot;)内では許可する。というValidatingAdmissionWebhookを作ってみたいと思います。<br>
+※ <code>.spec.containers[].SecurityContext.RunAsUser</code> が記載があった場合はどうするんだ？というツッコミを自分でいれたいところではありますが、ブログ用のサンプルなので許してください。気が向いたら修正するかもしれません。</p>
+<h3 id="ポイント">ポイント</h3>
+<p>ポイントとしては、対象とNamespaceが一定でないことです。<br>
+<code>ValidatingWebhookConfiguration</code> の設定で次のように <code>namespaceSelector</code> を指定できます。
+しかし、この<code>namespaceSelector</code>では、正規表現は使えず、対象のNamespaceを明示的に指定する必要があります。そのため、Webhook Server側で対象のNamespaceかどうかを判定するようにしてみました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">admissionregistration.k8s.io/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ValidatingWebhookConfiguration</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#e6db74">&#34;sample-validating-webhook&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">webhooks</span>:
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">name</span>: <span style="color:#e6db74">&#34;sample-validating-webhook.hoge.fuga.local&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespaceSelector</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">matchExpressions</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">key</span>: <span style="color:#ae81ff">kubernetes.io/metadata.name</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">operator</span>: <span style="color:#ae81ff">In</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">values</span>: [<span style="color:#e6db74">&#34;admin-1&#34;</span>, <span style="color:#e6db74">&#34;admin-2&#34;</span>, <span style="color:#e6db74">&#34;admin-3&#34;</span>]
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><h3 id="ソースコード">ソースコード</h3>
+<p>ソースコードおよび、ビルドしたコンテナイメージはGitHubにアップロードしてあります。</p>
+<div class="belg-link row">
+  <div class="belg-left col-md-2 d-none d-md-block">
+    <a href="https://github.com/mosuke5/sample-validating-admission-webhook" target="_blank">
+      <img class="belg-site-image" src="https://opengraph.githubassets.com/23cae14e2ee81ca608367b12d22b9743d374b5948981aa1b6c9e0b4a1f33cd91/mosuke5/sample-validating-admission-webhook" />
+    </a>
+  </div>
+  <div class="belg-right col-md-10">
+  <div class="belg-title">
+      <a href="https://github.com/mosuke5/sample-validating-admission-webhook" target="_blank">GitHub - mosuke5/sample-validating-admission-webhook</a>
+    </div>
+    <div class="belg-description">Contribute to mosuke5/sample-validating-admission-webhook development by creating an account on GitHub.</div>
+    <div class="belg-site">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="belg-site-icon">
+      <span class="belg-site-name">GitHub</span>
+    </div>
+  </div>
+</div>
+<h2 id="kubernetesクラスタへのデプロイ">Kubernetesクラスタへのデプロイ</h2>
+<h3 id="tls証明書の作成">TLS証明書の作成</h3>
+<p>今回は、opensslを使って自己証明書を作って対応することにします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>## webhook serverの秘密鍵作成
+</span></span><span style="display:flex;"><span>$ openssl genrsa 2048 &gt; server.key
+</span></span><span style="display:flex;"><span>Generating RSA private key, 2048 bit long modulus
+</span></span><span style="display:flex;"><span>..+++
+</span></span><span style="display:flex;"><span>................+++
+</span></span><span style="display:flex;"><span>e is 65537 (0x10001)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>## CSRの作成
+</span></span><span style="display:flex;"><span>$ openssl req -new -key server.key -out server.csr
+</span></span><span style="display:flex;"><span>You are about to be asked to enter information that will be incorporated
+</span></span><span style="display:flex;"><span>into your certificate request.
+</span></span><span style="display:flex;"><span>What you are about to enter is what is called a Distinguished Name or a DN.
+</span></span><span style="display:flex;"><span>There are quite a few fields but you can leave some blank
+</span></span><span style="display:flex;"><span>For some fields there will be a default value,
+</span></span><span style="display:flex;"><span>If you enter &#39;.&#39;, the field will be left blank.
+</span></span><span style="display:flex;"><span>-----
+</span></span><span style="display:flex;"><span>Country Name (2 letter code) []:JP
+</span></span><span style="display:flex;"><span>State or Province Name (full name) []:Tokyo
+</span></span><span style="display:flex;"><span>Locality Name (eg, city) []:
+</span></span><span style="display:flex;"><span>Organization Name (eg, company) []:
+</span></span><span style="display:flex;"><span>Organizational Unit Name (eg, section) []:
+</span></span><span style="display:flex;"><span>Common Name (eg, fully qualified host name) []:mywebook.mynamespace.svc.cluster.local
+</span></span><span style="display:flex;"><span>Email Address []:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Please enter the following &#39;extra&#39; attributes
+</span></span><span style="display:flex;"><span>to be sent with your certificate request
+</span></span><span style="display:flex;"><span>A challenge password []:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% ll
+</span></span><span style="display:flex;"><span>total 16
+</span></span><span style="display:flex;"><span>-rw-r--r--  1 shinyamori  staff   968B  5 17 11:49 server.csr
+</span></span><span style="display:flex;"><span>-rw-r--r--  1 shinyamori  staff   1.6K  5 16 22:41 server.key
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>## SubjectAltNameに対応するためのファイル作成
+</span></span><span style="display:flex;"><span>$ echo &#34;subjectAltName = DNS:mywebhook.mynamespace.svc, DNS:mywebhook.mynamespace.svc.cluster.local&#34; &gt; san.txt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ cat san.txt
+</span></span><span style="display:flex;"><span>subjectAltName = DNS:mywebhook.mynamespace.svc, DNS:mywebhook.mynamespace.svc.cluster.local
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>## サーバ証明書の作成
+</span></span><span style="display:flex;"><span>$ openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt -extfile san.txt
+</span></span><span style="display:flex;"><span>Signature ok
+</span></span><span style="display:flex;"><span>subject=/C=JP/ST=Tokyo/CN=mywebook.mynamespace.svc.cluster.local
+</span></span><span style="display:flex;"><span>Getting Private key
+</span></span></code></pre></div><p>x509の証明書の中身を確認する方法はぱっとコマンドを打てるようにしておくと結構便利です。
+Kubernetes環境の運用でも、各種サービスの証明書を確認することも多いでしょう。
+ここでのポイントは <code>X509v3 Subject Alternative Name</code> がきちんと付与されているかです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>## 証明書の中身確認
+</span></span><span style="display:flex;"><span>$ openssl x509 -text -noout -in server.crt
+</span></span><span style="display:flex;"><span>Certificate:
+</span></span><span style="display:flex;"><span>    Data:
+</span></span><span style="display:flex;"><span>        Version: 3 (0x2)
+</span></span><span style="display:flex;"><span>        Serial Number: 14353298851236901938 (0xc731294216ff7432)
+</span></span><span style="display:flex;"><span>    Signature Algorithm: sha1WithRSAEncryption
+</span></span><span style="display:flex;"><span>        Issuer: C=JP, ST=Tokyo, CN=mywebook.mynamespace.svc.cluster.local
+</span></span><span style="display:flex;"><span>        Validity
+</span></span><span style="display:flex;"><span>            Not Before: May 17 02:52:21 2022 GMT
+</span></span><span style="display:flex;"><span>            Not After : May 17 02:52:21 2023 GMT
+</span></span><span style="display:flex;"><span>        Subject: C=JP, ST=Tokyo, CN=mywebook.mynamespace.svc.cluster.local
+</span></span><span style="display:flex;"><span>        Subject Public Key Info:
+</span></span><span style="display:flex;"><span>            Public Key Algorithm: rsaEncryption
+</span></span><span style="display:flex;"><span>                Public-Key: (2048 bit)
+</span></span><span style="display:flex;"><span>                Modulus:
+</span></span><span style="display:flex;"><span>                    ...
+</span></span><span style="display:flex;"><span>                Exponent: 65537 (0x10001)
+</span></span><span style="display:flex;"><span>        X509v3 extensions:
+</span></span><span style="display:flex;"><span>            X509v3 Subject Alternative Name:
+</span></span><span style="display:flex;"><span>                DNS:mywebhook.mynamespace.svc, DNS:mywebhook.mynamespace.svc.cluster.local
+</span></span><span style="display:flex;"><span>    Signature Algorithm: sha1WithRSAEncryption
+</span></span><span style="display:flex;"><span>         ...
+</span></span></code></pre></div><h3 id="subjectaltnameに対応しましょう">SubjectAltNameに対応しましょう</h3>
+<p>サーバ証明書を作成するときに、CommonNameのみで、SANをとくに付与しなくても作成が可能です。
+しかし、<a href="https://datatracker.ietf.org/doc/html/rfc2818" target="_blank">HTTP Over TLSのRFC2818</a>に次のように書かれています。</p>
+<blockquote>
+<p>If a subjectAltName extension of type dNSName is present, that MUST be used as the identity. Otherwise, the (most specific) Common Name field in the Subject field of the certificate MUST be used. Although the use of the Common Name is existing practice, it is deprecated and  Certification Authorities are encouraged to use the dNSName instead.</p>
+<p>(<a href="https://www.ipa.go.jp/security/rfc/RFC2818JA.html#31" target="_blank">日本語訳</a>)<br>
+dNSName 型の subjectAltName 拡張 がある場合、それは、身元として使われなければなりません（MUST）。それ以外の場合は、証明書の Subject フィールドにある（最も具体的）な Common Name フィールドを使用しなければなりません（MUST）。 Common Name の利用が既存の実践ですが、これは不当であり、代わりに認証機関には、dNSName を使うことが強く薦められます。（日本語訳は）</p>
+</blockquote>
+<p>もし、SANを使っていないCommon Nameのみでの証明を使うとWebhookをcallするときに次のようなエラーがでます。
+Goの古いバージョンでは、<code>GODEBUG=x509ignoreCN=0</code> を与えることで回避できましたが、Go1.17移行を使っているKubernetesのバージョンでは正式にSANを使った証明書を用意しましょう。
+Go 1.17で <code>The temporary GODEBUG=x509ignoreCN=0 flag has been removed.</code> と無視するオプションが削除されています（<a href="https://go.dev/doc/go1.17#crypto/x509" target="_blank">リリースノート</a>）。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Error from server (InternalError): Internal error occurred: failed calling webhook &#34;sample-validating-webhook.hoge.fuga.local&#34;: failed to call webhook: Post &#34;https://mywebhook.mynamespace.svc:443/runasuser-validation?timeout=5s&#34;: x509: certificate relies on legacy Common Name field, use SANs instead
+</span></span></code></pre></div><h3 id="ローカル実行">ローカル実行</h3>
+<p>作成した証明書を使って動作するかローカルで確認しておきます。
+起動オプションに証明書と鍵を指定できるようにしました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ go run server.go -server-cert=./tmp/server.crt -server-key=./tmp/server.key -body-dump
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>別ターミナルセッションでCurlを使ってリクエストを送信してみます。
+<code>testdata</code>ディレクトリにサンプルのJSONリクエストを用意しておきました。
+レスポンスの形式が、公式ドキュメントであることをしっかり確認しておきましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl -s -k -H &#39;Content-Type: application/json&#39; -XPOST https://localhost:8443/runasuser-validation -d @testdata/noRunAsUserRequestTemplate.json | jq .
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;response&#34;: {
+</span></span><span style="display:flex;"><span>    &#34;uid&#34;: &#34;2e556680-fe1b-412d-9660-4e0574adcf47&#34;,
+</span></span><span style="display:flex;"><span>    &#34;allowed&#34;: false,
+</span></span><span style="display:flex;"><span>    &#34;status&#34;: {
+</span></span><span style="display:flex;"><span>      &#34;metadata&#34;: {},
+</span></span><span style="display:flex;"><span>      &#34;message&#34;: &#34;runAsUser is required in user namespace.&#34;,
+</span></span><span style="display:flex;"><span>      &#34;code&#34;: 403
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="デプロイ-to-kubernetes">デプロイ to Kubernetes</h3>
+<p>作成した証明書と鍵は、Kubernetes上で動作するPodも読み込む必要があります。
+証明書等の機密情報はSecretに格納してマウントするのが常套手段ですね。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl create ns mynamespace
+</span></span><span style="display:flex;"><span>$ kubectl create secret tls mywebhook-secret --key server.key --cert server.crt -n mynamespace
+</span></span><span style="display:flex;"><span>secret/mywebhook-secret created
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl describe secret mywebhook-secret -n mynamespace
+</span></span><span style="display:flex;"><span>Name:         mywebhook-secret
+</span></span><span style="display:flex;"><span>Namespace:    mynamespace
+</span></span><span style="display:flex;"><span>Labels:       &lt;none&gt;
+</span></span><span style="display:flex;"><span>Annotations:  &lt;none&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Type:  kubernetes.io/tls
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Data
+</span></span><span style="display:flex;"><span>====
+</span></span><span style="display:flex;"><span>tls.crt:  1253 bytes
+</span></span><span style="display:flex;"><span>tls.key:  1675 bytes
+</span></span></code></pre></div><p>次のようなかたちで証明書と鍵をPod内にマウントして使うようにしてみました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">mywebhook</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">selector</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">matchLabels</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">mywebhook</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">template</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">mywebhook</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">containers</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">app</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">args</span>:
+</span></span><span style="display:flex;"><span>          - -<span style="color:#ae81ff">server-cert=/tmp/tls/tls.crt</span>
+</span></span><span style="display:flex;"><span>          - -<span style="color:#ae81ff">server-key=/tmp/tls/tls.key</span>
+</span></span><span style="display:flex;"><span>          - -<span style="color:#ae81ff">body-dump</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">imagePullPolicy</span>: <span style="color:#ae81ff">Always</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">ghcr.io/mosuke5/sample-validating-admission-webhook:main</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">8443</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">volumeMounts</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">tls</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">mountPath</span>: <span style="color:#ae81ff">/tmp/tls/</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">volumes</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">tls</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">secret</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">secretName</span>: <span style="color:#ae81ff">mywebhook-secret</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f manifests/deploy.yaml -n mynamespace
+</span></span><span style="display:flex;"><span>$ kubectl get pod,service -n mynamespace
+</span></span><span style="display:flex;"><span>NAME                             READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>pod/mywebhook-685f859975-tfd2n   1/1     Running   0          37s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+</span></span><span style="display:flex;"><span>service/mywebhook   ClusterIP   172.30.26.80   &lt;none&gt;        443/TCP   2m6s
+</span></span></code></pre></div><h3 id="admissionwebhook設定">AdmissionWebhook設定</h3>
+<p>いよいよデプロイの最後のフェーズです。<br>
+Webhook Serverとしてはデプロイできましたので、AdmissionWebhookの設定を行って実際に動作するようにします。
+今回は自己証明書をつかっているので、<code>caBundle</code>の記載を忘れずに行いましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ sed  &#34;s/BASE64_ENCODED_PEM_FILE/$(base64 server.crt)/g&#34; manifests/validatingwebhookconfiguration.yaml.template | kubectl apply -f -
+</span></span><span style="display:flex;"><span>validatingwebhookconfiguration.admissionregistration.k8s.io/sample-validating-webhook created
+</span></span></code></pre></div><p>これで、Admission webhookの設定は終わりです。<br>
+期待通り動くのでしょうか？
+<code>user-foo</code>と<code>admin-bar</code>というnamespaceに対してPodを作成して挙動を確認してみます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl create ns user-foo
+</span></span><span style="display:flex;"><span>$ kubectl create ns admin-bar
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl run debug --rm -it --image busybox:latest -n user-foo -- /bin/sh
+</span></span><span style="display:flex;"><span>Error from server: admission webhook &#34;mywebhook.mynamespace.svc.cluster.local&#34; denied the request: runAsUser is required in user namespace.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl run debug --rm -it --image busybox:latest -n admin-bar -- /bin/sh
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>If you don&#39;t see a command prompt, try pressing enter.
+</span></span><span style="display:flex;"><span>/ # uname -a
+</span></span><span style="display:flex;"><span>Linux debug 4.18.0-305.45.1.el8_4.x86_64 #1 SMP Wed Apr 6 13:48:37 EDT 2022 x86_64 GNU/Linux
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ cat &lt;&lt;EOF | kubectl apply -n user-foo -f -
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Pod
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    run: debug
+</span></span><span style="display:flex;"><span>  name: debug
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  containers:
+</span></span><span style="display:flex;"><span>    - image: busybox:latest
+</span></span><span style="display:flex;"><span>      command:
+</span></span><span style="display:flex;"><span>        - /bin/sh
+</span></span><span style="display:flex;"><span>      args:
+</span></span><span style="display:flex;"><span>        - -c
+</span></span><span style="display:flex;"><span>        - &#39;sleep 3600&#39;
+</span></span><span style="display:flex;"><span>      name: debug
+</span></span><span style="display:flex;"><span>      resources: {}
+</span></span><span style="display:flex;"><span>  securityContext:
+</span></span><span style="display:flex;"><span>    runAsUser: 1001
+</span></span><span style="display:flex;"><span>EOF
+</span></span><span style="display:flex;"><span>pod/debug created
+</span></span></code></pre></div><h2 id="さいごに">さいごに</h2>
+<p>解説編と動作編の2回に分けて、Admission webhookの作成について見てきました。
+わかるとそんなにむずかしくないですね？</p>
+<p>今回は、フレームワークを使わずに作りましたが、やはりTLS証明書の管理であったり、そもそもデプロイなど自分で用意するのがめんどうになってきます。あとは、メトリクスを仕込んだりするのも大変ですよね。フレームワークはそういった煩わしいところをまとめてやってくれるので非常に便利そうです。機会あれば、フレームワークを使ったAdmission webhook開発もトライしてみようと思います。</p>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a href="https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/" target="_blank">Dynamic Admission Control | Kubernetes</a></li>
+<li><a href="https://amzn.to/3MsfCs7" target="_blank">Docker/Kubernetes開発・運用のためのセキュリティ実践ガイド</a></li>
+<li><a href="https://amzn.to/3lfSKQP" target="_blank">Programming Kubernetes</a></li>
+</ul>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Admission%20Webhook%e3%82%92%e4%bd%9c%e3%81%a3%e3%81%a6%e9%81%8a%e3%82%93%e3%81%a7%e3%80%81%e3%81%9d%e3%81%ae%e4%bb%95%e7%b5%84%e3%81%bf%e3%82%92%e7%90%86%e8%a7%a3%e3%81%97%e3%82%88%e3%81%86%ef%bc%88%e5%8b%95%e4%bd%9c%e7%b7%a8%ef%bc%89" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a> (2022/05/15)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Argo CD、外部クラスタへのデプロイと認証の仕組み'});">Argo CD、外部クラスタへのデプロイと認証の仕組み</a> (2022/02/08)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて'});">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a> (2022/01/24)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

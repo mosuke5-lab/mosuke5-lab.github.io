@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>CKADを取得の対策や試験当日の対応について</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2019/07/08/ckad/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/07/08/ckad/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="CKADを取得の対策や試験当日の対応について &middot; Goldstine研究所">
+<meta name="twitter:description" content="CKAD(Certified Kubernetes Application Developer)を受験してきて無事に合格しました。合格のために準備すべきことと、試験受験に関して不安だったことなどをまとめました。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CKADを取得の対策や試験当日の対応について &middot; Goldstine研究所">
+<meta property="og:description" content="CKAD(Certified Kubernetes Application Developer)を受験してきて無事に合格しました。合格のために準備すべきことと、試験受験に関して不安だったことなどをまとめました。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2019/07/08/ckad/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>CKADを取得の対策や試験当日の対応について</h1>
+    <div class="entry-sub-title">
+        <span class="">08 Jul 2019, 09:12</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-資格試験" href="/categories/%E8%B3%87%E6%A0%BC%E8%A9%A6%E9%A8%93">資格試験</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#モチベーション">モチベーション</a></li>
+    <li><a href="#準備したこと">準備したこと</a>
+      <ul>
+        <li><a href="#ckad-exercises">CKAD-exercises</a></li>
+        <li><a href="#linux-academy">Linux Academy</a></li>
+        <li><a href="#cloud-academy">Cloud Academy</a></li>
+        <li><a href="#kubernetes完全ガイド">Kubernetes完全ガイド</a></li>
+      </ul>
+    </li>
+    <li><a href="#受験開始まで">受験開始まで</a>
+      <ul>
+        <li><a href="#申し込み環境チェック">申し込み、環境チェック</a></li>
+        <li><a href="#場所の確保">場所の確保</a></li>
+      </ul>
+    </li>
+    <li><a href="#試験について">試験について</a>
+      <ul>
+        <li><a href="#試験開始前の準備">試験開始前の準備</a></li>
+        <li><a href="#試験問題について">試験問題について</a></li>
+        <li><a href="#合否について">合否について</a></li>
+      </ul>
+    </li>
+    <li><a href="#さいごに">さいごに</a>
+      <ul>
+        <li><a href="#2021年2月追記-ckad受験">2021年2月追記 CKAD受験</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        <p><a href="https://twitter.com/mosuke5">@mosuke5</a>です。<a href="https://www.cncf.io/certification/ckad/" target="_blank">CKAD(Certified Kubernetes Application Developer)</a>を受けてきました。<br>
+すでに多くのCKA/CKADの合格レポートや体験記がでておりますが、
+それでも自分が実際に受けてみるまで不安な要素も多くあったので、
+そのあたりを払拭するべくこの記事を書きたいと思います。</p>
+<p>2019年7月5日にCKADを受験して無事に合格しました。<br>
+スコアは89%と案外高く(66%で合格)、驚きでもあったのですが、その体験をこれから受験する人にもシェアできればと思います。</p>
+<p><img src="/image/ckad-certificate.png" alt="ckad-certificate"></p>
+<h2 id="モチベーション">モチベーション</h2>
+<p>前置き的な。適当に流してください。<br>
+今年の4月からDevOpsを中心とした技術・プロダクトやそのプロセスなどをお客さんに提供する立場になりました。
+個人的にいつもそうなのですが、自分の資格そのものはお客さんからのはじめの信頼を得るため、くらいのものでしかないと思っていますが、一方で、資格試験は「学び」の手段の１つとして有効と思います。
+仕事の中で自分のスキルも当然必要ですが、他者がよりはやく正確な学びをするためにどうしたらいいかも自分の関心事なわけです。
+この資格試験がどういうレベル感でなにをもとめているのか、それを自分で知りたいというのが一番のモチベーションでした。</p>
+<h2 id="準備したこと">準備したこと</h2>
+<p>なにを勉強すればいいかについては、すでにでているブログなどを多く参考にしました。
+その中で、下記が一番役に立ったものでしたので紹介します。</p>
+<h3 id="ckad-exercises">CKAD-exercises</h3>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/dgkanatsios/CKAD-exercises" data-iframely-url="//cdn.iframe.ly/MAoLizS"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<p>こちらのサイトはGithubのページなのですが、CKADの資格試験の問題の中で行うであろう「操作」について効率的に学べるものです。
+ここにある問題のレベルがそのままでるわけではないのですが（一部そのレベルのものもある）、CKADでは問題を解くスピードも重要で、基本的な動作を「身体に染み込ませる」ために役立ちます。
+必要なコマンドや概念についてはexercisesをやっておけばほぼ網羅できるものだったかなと感じています。</p>
+<p>しかし、CKAD-exercisesでは、実際に実行する環境までは用意していないので、自分で環境は用意する必要があります。
+自分の場合は、自分で構築したKubernetesクラスターがあったのでそちらで練習しましたが、お持ちでない方も多いとお思います。
+もし今後、Kubernetesをガッツリ触っていく予定があるのであれば、自前で構築するないしはGKEやEKSなどを一時的に借りて触ってみることをおすすめします。
+自前構築は、CKAを受ける方はやることになるはずですが、それなりに大変なのも事実です。
+まずはアプリケーション寄りでCKADを取りたいというかたはパブリッククラウドのKubernetesサービスか、Katacodaなどをおすすめします。
+Katacoda自身も基本操作を学べるサイトですが、ここでは一時的にクラスタを借りれるのでその上でCKAD-exercisesに練習をすることも一部可能かなと思います。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.katacoda.com/" data-iframely-url="//cdn.iframe.ly/rhYCdmg?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h3 id="linux-academy">Linux Academy</h3>
+<p>CKAD-exercisesで基本的な操作は体得できるとして、とはいえ実際にどんな問題がでるのだろうか、、と気になるのではないかと思います。
+試験の内容は公開してはいけないので、ブログ等をみてもあまり参考になるものはでてきませんでした。Linux Academyと下記のCloud Academyでは実際の問題に近い練習ができるのでやっておくといいでしょう。</p>
+<p>Linux AcademyとCloud Academyは実践問題だけではなく、1から学ぶコースも用意しています。基礎の部分からやっていきたいというかたはどちらかを選んでやってみてもいいと思います。<br>
+こちらの練習問題ですが、かなり本番のテストとにていますが、問題数が3つと多くないので、あくまで「こういう形式のテストね」と納得するものとして活用するといいです。</p>
+<p><a href="https://linuxacademy.com/cp/modules/view/id/327">Course: Cloud Native Certified Kubernetes Administrator (CKA)</a></p>
+<h5 id="20201215追記">2020/12/15追記</h5>
+<p>気がついたら、A Cloud GuruがLinux Academyを買収していいて少しコンテンツ体系などかわっているようでした。
+<a href="https://iblnews.org/a-cloud-guru-acquires-the-linux-academy-and-claims-1-5-m-learners/">A Cloud Guru Acquires The Linux Academy and Claims 1.5 M Learners</a></p>
+<h3 id="cloud-academy">Cloud Academy</h3>
+<p>こちらも上のLinux Academyとほぼ同様です。基礎の部分から学ぶことができ、最後に練習問題があるという形式です。
+すべて受講したわけではないのですが、以前にAWSの資格試験を取得する際にこちらのサイトはお世話になり、それなりに内容は充実していました。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://cloudacademy.com/learning-paths/certified-kubernetes-application-developer-ckad-exam-preparation-451/" data-iframely-url="//cdn.iframe.ly/iq3FYij?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h3 id="kubernetes完全ガイド">Kubernetes完全ガイド</h3>
+<p>CKADの資格取得対策、という意味で役立つわけではないですが、Kubernetesを理解する上で圧倒的に役に立ったのがKubernetes完全ガイドです。これなくして、CKADは受からなかったと思います。みなさんはCKADを取得することが目的ではないはずです。
+ぜひ完全ガイドで基礎を身につけましょう。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.amazon.co.jp/Kubernetes%25E5%25AE%258C%25E5%2585%25A8%25E3%2582%25AC%25E3%2582%25A4%25E3%2583%2589-impress-top-gear-%25E9%259D%2592%25E5%25B1%25B1/dp/4295004804" data-iframely-url="//cdn.iframe.ly/uH10ejv?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h2 id="受験開始まで">受験開始まで</h2>
+<h3 id="申し込み環境チェック">申し込み、環境チェック</h3>
+<p>ある程度勉強ができたら、思い切って試験の申込みをしてみましょう。
+実は、この試験では「再試験」が1度だけ可能です。仮に落ちたとしても無料でもう一度受けることができるので、
+ある程度の勉強ができたらトライしてみることも重要です。</p>
+<p>申込みが完了したら、ポータルページから「Check System Requirements」というのがあるので必ずチェックしておきましょう。
+他の人のブログ等でWebカメラを用意した、というのを書いている人もいますが、要件を満たしていればノートPCに備え付けのインカメラでも受験可能です。
+実際に自分は、2017年モデルのMacBook Proで受験しました。</p>
+<h3 id="場所の確保">場所の確保</h3>
+<p>申し込みにあたって、「場所の確保」という難題があります。
+この試験は、オンラインで受験することが可能ですが、試験の時間まわりにだれもいない環境を作らなければいけません。
+だれにも邪魔されない自分の部屋をもっているか、持っていない方は会議室などを抑える必要があります。ご注意ください。
+自分の場合は、会社の会議室を人があまりいない時間帯で抑えて利用しました。</p>
+<p>試験時間は、CKAで3時間、CKADで2時間なのですが、会議室は試験予定の前後30分程度多くとっておくといいです。
+というのも、後述しますが、実際の試験開始までの準備ややり取りで30分程時間もかかるためです。</p>
+<h2 id="試験について">試験について</h2>
+<h3 id="試験開始前の準備">試験開始前の準備</h3>
+<p>試験もそうなのですが、試験をきちんとうけられるのか？そこが実際に受けるまで不安な要素でした。</p>
+<p>マイポータルのページに行くと、残り何時間で試験が受けられます、というカウントダウンがされています。当日はそのカウントが０になるまでとりあえず待ちます。
+カウントが０になると、試験開始のボタンが出てくるのでそちらを押して、試験監とのやりとりがはじまります。</p>
+<p>基本的に下記おようなチェックが試験監との間で行われます。<br>
+やりとりはすべてチャットで英語で行われます。こちらから質問がない限りは、英語を書く必要はなく、相手から言われたことを淡々とこなせば大丈夫です。</p>
+<ul>
+<li>画面共有がきちんと相手側とされているかどうか</li>
+<li>カメラの映像が相手に届いているか</li>
+<li>身の回りの環境にだれもいないか、筆記用具など不必要なものが置かれていないか
+<ul>
+<li>カメラをゆっくり回して周りの状況を相手に伝えます</li>
+<li>ドリンクはOK。ただしラベルははずせと言われました。</li>
+</ul>
+</li>
+<li>本人確認
+<ul>
+<li>日本人の場合はたいてい２つのIDが必要です。顔がわかる運転免許証などと、英語表記で名前が書かれたクレジットカードなどの２つ。</li>
+</ul>
+</li>
+<li>ブラウザ以外に余計なアプリケーションが立ち上がっていないか
+<ul>
+<li>ブラウザのタブも余分なものは閉じる必要があります</li>
+<li>kubernetesの公式ドキュメントはみてよい。公式ドキュメント内の検索ももちろん使ってよい</li>
+</ul>
+</li>
+</ul>
+<h3 id="試験問題について">試験問題について</h3>
+<p>試験問題については、多く語れませんが下記だけは注意しておいたほうがいいです。
+自分もヒヤッとした場面がありました。</p>
+<ul>
+<li>問題ごとに利用するクラスタ環境が異なります。連続して同じクラスタ環境を使うこともあるのですが、必ず問題冒頭のクラスタ切り替えは年のため毎回実施しておいたほうが安心です。</li>
+<li>かなりサクサク解いたつもりでも時間はギリギリなので、わからないものは飛ばしてもいいかもしれません。ただし、あとで戻れるように問題にフラグを立てたりはできなかったので注意です。</li>
+<li>調べ方をマスターしておきましょう。どういうことかというと、問題ごとにだいたいキーワードがあります。&ldquo;ConfigMap&quot;とか&quot;PersistentVolume&quot;とか。そのYAMLの書き方をすべて覚えておくのは不可能なので、どうやって自分のやりたいことが書いてあるドキュメントにたどり着けるかは練習しておいたほうがいいです。基本的には検索を使ってキーワードでたどり着けるとお思いますが、見慣れておきましょう。</li>
+</ul>
+<h3 id="合否について">合否について</h3>
+<p>合否は試験後36時間以内にメールで通知がきます。</p>
+<h2 id="さいごに">さいごに</h2>
+<p>自分がとくにきになったところを中心にCKAD受験について書きました。<br>
+他の人の体験記なども多く参考にしながら、ぜひKubernetesライフを楽しんでください。</p>
+<p>次はCKAを取るのかとも聞かれるのですが、個人的にはしばらくKubernetesの構築サイドよりは、それを使ったアプリケーション開発や運用に焦点をあてる予定なので、いまのところCKAの予定はありません。
+アプリケーション開発・運用の観点で今後も情報発信できればと思います。</p>
+<h3 id="2021年2月追記-ckad受験">2021年2月追記 CKAD受験</h3>
+<p>この記事を書いた当初は、CKAの受験予定はありませんでしたが、1年半後ではありますが受験しました。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2021/02/07/cka/" data-iframely-url="//cdn.iframe.ly/4BV8i7A"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=CKAD%e3%82%92%e5%8f%96%e5%be%97%e3%81%ae%e5%af%be%e7%ad%96%e3%82%84%e8%a9%a6%e9%a8%93%e5%bd%93%e6%97%a5%e3%81%ae%e5%af%be%e5%bf%9c%e3%81%ab%e3%81%a4%e3%81%84%e3%81%a6" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'CKADを取得の対策や試験当日の対応について'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/02/07/cka/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '新形式のCKAを受験し合格しました。受験の教訓紹介。'});">新形式のCKAを受験し合格しました。受験の教訓紹介。</a> (2021/02/07)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a> (2022/05/16)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a> (2022/05/15)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

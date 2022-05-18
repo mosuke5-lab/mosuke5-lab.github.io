@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/05/06/argocd-application/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/05/06/argocd-application/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ &middot; Goldstine研究所">
+<meta name="twitter:description" content="Argo CDにKustomizeアプリケーションを登録して複数環境へデプロイする方法を確認します。なぜHelmやKustomizeなどが必要なのかといった基本的な部分から解説します。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ &middot; Goldstine研究所">
+<meta property="og:description" content="Argo CDにKustomizeアプリケーションを登録して複数環境へデプロイする方法を確認します。なぜHelmやKustomizeなどが必要なのかといった基本的な部分から解説します。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/05/06/argocd-application/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ</h1>
+    <div class="entry-sub-title">
+        <span class="">06 May 2021, 09:46</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#argo-cdがサポートするアプリケーション">Argo CDがサポートするアプリケーション</a></li>
+    <li><a href="#そもそもkustomizeやhelmが必要な理由">そもそもKustomizeやHelmが必要な理由</a></li>
+    <li><a href="#kustomizeを用いた環境ごとのデプロイ">Kustomizeを用いた環境ごとのデプロイ</a></li>
+    <li><a href="#kustomizeアプリケーションの登録">Kustomizeアプリケーションの登録</a>
+      <ul>
+        <li><a href="#追加可能なパラメータ">追加可能なパラメータ</a></li>
+      </ul>
+    </li>
+    <li><a href="#さいごに">さいごに</a></li>
+  </ul>
+</nav>
+        <hr>
+<h5>Argo CD学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2021/04/13/argocd/">Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></li>
+<li>第2回: <a href="/entry/2021/05/06/argocd-application/">Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
+<li>第3回: <a href="/entry/2021/05/06/argocd-sync-action/">Argo CD、Syncの実行方法やタイミングについての検討</a></li>
+<li>第4回: <a href="/entry/2021/06/12/argocd-resourcehooks/">Argo CD、Resource Hooksを使ってデプロイを高度化する</a></li>
+<li>第5回: <a href="/entry/2022/02/08/argocd-deploy-to-external-cluster/">Argo CD、外部クラスタへのデプロイ</a></li>
+<li>関連記事: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。
+Argo CD学習シリーズの続きを行っていきたいと思います。
+前回はチュートリアル的に動かしてみるところまで行いましたが、もう少し細かなアプリケーションの設定を見ていきます。</p>
+<h2 id="argo-cdがサポートするアプリケーション">Argo CDがサポートするアプリケーション</h2>
+<p>Argo CDでは、アプリケーションの作成が必要でした。
+アプリケーションには、監視するGitレポジトリやどのクラスタへデプロイするかなどの設定が記述できます。
+さて、Gitレポジトリを監視したとして、Argo CDはどのようにそのレポジトリの内容をデプロイするのでしょうか？
+一定の規則を持たないことには、デプロイできませんよね？</p>
+<p>Argo CDでは、現在以下の形式をサポートしています。
+重要なことは、最終的に「Kubernetesマニフェストの形になる」ということです。</p>
+<ul>
+<li>Kustomize applications
+<ul>
+<li>テンプレートエンジン（テンプレートエンジンというよりは、オーバライド型のマニフェスト生成ツールといったほうが正しい？）の一角のKustomizeを使ってデプロイできる形式ならデプロイ可能。</li>
+<li>Kustomizeはいまとなっては、<code>kubectl</code>にも統合されており、<code>kubectl apply -k xxxxx</code>で使える程度に一般的。</li>
+</ul>
+</li>
+<li>Helm charts
+<ul>
+<li>テンプレートエンジンとしての色がつよいツールで、代表格的存在。</li>
+<li>Argo CDに利用するValues File（パラメータファイル）を指定することで、商用・テスト・開発などの環境を分けられる。</li>
+</ul>
+</li>
+<li>Ksonnet applications
+<ul>
+<li>Kubernetesマニフェストを生成するフレームワークだったが、今はプロジェクトが終了。利用は非推奨。</li>
+<li>いままでKsonnetを使っていなかった人は無視してOK</li>
+</ul>
+</li>
+<li>directory of YAML/JSON/Jsonnet manifests, including Jsonnet.
+<ul>
+<li>プレーンなYAML/JSON形式のマニフェストを配置しておいてもOK。まあプレーンなんで。</li>
+<li>Jsonnetは、JSONを生成するためのデータテンプレートツール。最終的にJSON形式のマニフェストを作る。</li>
+</ul>
+</li>
+<li>Any custom config management tool configured as a config management plugin
+<ul>
+<li>上記以外でも、任意のツールを用いてマニフェストを生成できればプラグイン機能で対応可能。</li>
+<li>シェルスクリプトでも、独自のツールでも最終的にマニフェストができあがれば利用できる。</li>
+<li>OpenShiftを利用の人でOpenShift Templateを使いたい場合はこれ。</li>
+</ul>
+</li>
+</ul>
+<h2 id="そもそもkustomizeやhelmが必要な理由">そもそもKustomizeやHelmが必要な理由</h2>
+<p>説明不要の方も多くいるかと思いますが、簡単に書いておきます。<br>
+Kubernetesを使ってアプリケーションを運用しているならば、ほぼほぼ商用環境のほかにもテスト環境や開発環境などいくつかの環境があるかと思います。Kubernetesクラスタレベルで別れていることもあれば、Namespaceだけ異なる場合もあるでしょう。
+いずれにせよ、複数の環境でアプリケーションを動かす必要があります。</p>
+<p>Kubernetes上で動かすアプリケーションはマニフェストで表現をしてデプロイするわけですが、<strong>環境ごとに違うパラメータ</strong>ってありますよね？あるはずです。
+Podにつけたい名前が違う、Podの利用するリソース量が違う、接続先のDBのアドレスが違うなどなど、あげたらきりがありません。</p>
+<p>では、環境ごとに異なるマニフェストファイルを用意すればいいのでしょうか？<br>
+それは、プログラミングをするときに共通処理を関数にして使い回さないのと同じようなものです。
+そのため、共通部分を持ちつつ、異なるパラメータだけ変更するすべがどうしても必要で、それがKustomizeだったりHelmだったりというわけです。詳しくは、CI/CDの勘所のブログを参照ください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/" data-iframely-url="//cdn.iframe.ly/AWtNlfG"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h2 id="kustomizeを用いた環境ごとのデプロイ">Kustomizeを用いた環境ごとのデプロイ</h2>
+<p>まずは、Kustomizeを使った環境ごとに異なるマニフェストを作るとはどういうことなのか復習しておきましょう。
+練習台にとても簡単なサンプルを使います。この<a href="https://github.com/mosuke5/kustomize-examples">サンプルコード</a>は、Nginxをデプロイする簡単なものですが、<code>development</code>と<code>production</code>でパラメータや設定を変えたいと思っているというシナリオです。
+<code>base/</code>が共通部で、<code>overlays/development</code>と<code>overlays/production</code>が異なる部分です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ git clone https://github.com/mosuke5/kustomize-examples
+</span></span><span style="display:flex;"><span>$ cd kustomize-examples/overlay-example
+</span></span><span style="display:flex;"><span>$ tree
+</span></span><span style="display:flex;"><span>.
+</span></span><span style="display:flex;"><span>├── base
+</span></span><span style="display:flex;"><span>│   ├── kustomization.yml
+</span></span><span style="display:flex;"><span>│   ├── nginx-deployment.yml
+</span></span><span style="display:flex;"><span>│   └── nginx-service.yml
+</span></span><span style="display:flex;"><span>└── overlays
+</span></span><span style="display:flex;"><span>    ├── development
+</span></span><span style="display:flex;"><span>    │   └── kustomization.yml
+</span></span><span style="display:flex;"><span>    └── production
+</span></span><span style="display:flex;"><span>        ├── change-nginx-service-to-loadbalancer.yml
+</span></span><span style="display:flex;"><span>        └── kustomization.yml
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>4 directories, 6 files
+</span></span></code></pre></div><p><code>development</code>と<code>production</code>の違いは、次の2つです。</p>
+<ol>
+<li>デプロイするnamespaceを分けたい</li>
+<li><code>production</code>では、ServiceのTypeをLoadBalancerにしたい</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -k overlays/development --dry-run=client -o yaml &gt; dev
+</span></span><span style="display:flex;"><span>$ kubectl apply -k overlays/production --dry-run=client -o yaml &gt; prod
+</span></span><span style="display:flex;"><span>$ diff dev prod
+</span></span><span style="display:flex;"><span>8c8
+</span></span><span style="display:flex;"><span>&lt;         {&#34;apiVersion&#34;:&#34;v1&#34;,&#34;kind&#34;:&#34;Service&#34;,&#34;metadata&#34;:{&#34;annotations&#34;:{},&#34;name&#34;:&#34;nginx-service&#34;,&#34;namespace&#34;:&#34;development&#34;},&#34;spec&#34;:{&#34;ports&#34;:[{&#34;name&#34;:&#34;http-port&#34;,&#34;port&#34;:80,&#34;protocol&#34;:&#34;TCP&#34;,&#34;targetPort&#34;:80}],&#34;selector&#34;:{&#34;app&#34;:&#34;nginx&#34;},&#34;type&#34;:&#34;ClusterIP&#34;}}
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>&gt;         {&#34;apiVersion&#34;:&#34;v1&#34;,&#34;kind&#34;:&#34;Service&#34;,&#34;metadata&#34;:{&#34;annotations&#34;:{},&#34;name&#34;:&#34;nginx-service&#34;,&#34;namespace&#34;:&#34;production&#34;},&#34;spec&#34;:{&#34;ports&#34;:[{&#34;name&#34;:&#34;http-port&#34;,&#34;port&#34;:80,&#34;protocol&#34;:&#34;TCP&#34;,&#34;targetPort&#34;:80}],&#34;selector&#34;:{&#34;app&#34;:&#34;nginx&#34;},&#34;type&#34;:&#34;LoadBalancer&#34;}}
+</span></span><span style="display:flex;"><span>10c10
+</span></span><span style="display:flex;"><span>&lt;     namespace: development
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>&gt;     namespace: production
+</span></span><span style="display:flex;"><span>19c19
+</span></span><span style="display:flex;"><span>&lt;     type: ClusterIP
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>&gt;     type: LoadBalancer
+</span></span><span style="display:flex;"><span>25c25
+</span></span><span style="display:flex;"><span>&lt;         {&#34;apiVersion&#34;:&#34;apps/v1&#34;,&#34;kind&#34;:&#34;Deployment&#34;,&#34;metadata&#34;:{&#34;annotations&#34;:{},&#34;name&#34;:&#34;nginx-deployment&#34;,&#34;namespace&#34;:&#34;development&#34;},&#34;spec&#34;:{&#34;replicas&#34;:1,&#34;selector&#34;:{&#34;matchLabels&#34;:{&#34;app&#34;:&#34;nginx&#34;}},&#34;template&#34;:{&#34;metadata&#34;:{&#34;labels&#34;:{&#34;app&#34;:&#34;nginx&#34;}},&#34;spec&#34;:{&#34;containers&#34;:[{&#34;image&#34;:&#34;nginx:1.17.0&#34;,&#34;name&#34;:&#34;nginx&#34;,&#34;ports&#34;:[{&#34;containerPort&#34;:80}]}]}}}}
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>&gt;         {&#34;apiVersion&#34;:&#34;apps/v1&#34;,&#34;kind&#34;:&#34;Deployment&#34;,&#34;metadata&#34;:{&#34;annotations&#34;:{},&#34;name&#34;:&#34;nginx-deployment&#34;,&#34;namespace&#34;:&#34;production&#34;},&#34;spec&#34;:{&#34;replicas&#34;:1,&#34;selector&#34;:{&#34;matchLabels&#34;:{&#34;app&#34;:&#34;nginx&#34;}},&#34;template&#34;:{&#34;metadata&#34;:{&#34;labels&#34;:{&#34;app&#34;:&#34;nginx&#34;}},&#34;spec&#34;:{&#34;containers&#34;:[{&#34;image&#34;:&#34;nginx:1.17.0&#34;,&#34;name&#34;:&#34;nginx&#34;,&#34;ports&#34;:[{&#34;containerPort&#34;:80}]}]}}}}
+</span></span><span style="display:flex;"><span>27c27
+</span></span><span style="display:flex;"><span>&lt;     namespace: development
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>&gt;     namespace: production
+</span></span></code></pre></div><p>vimdiffは差分がわかりやすいですね。</p>
+<p><img src="/image/kustomize-result-diff.png" alt="kustomize-result-diff"></p>
+<h2 id="kustomizeアプリケーションの登録">Kustomizeアプリケーションの登録</h2>
+<p>Kustomizeの仕組みがわかったところで、Argo CDにKustomizeアプリケーションを登録してみましょう。
+Argo CD内では、開発(development)と商用(production)のふたつのアプリケーションを作成します。
+異なるパラメータは以下3つです。</p>
+<ul>
+<li><code>.metadata.name</code></li>
+<li><code>.spec.destination.namespace</code></li>
+<li><code>.spec.source.path</code></li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">## development.yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">argoproj.io/v1alpha1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Application</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-development</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">my-argocd-operator</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">destination</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">development</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">server</span>: <span style="color:#ae81ff">https://kubernetes.default.svc</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">project</span>: <span style="color:#ae81ff">default</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">source</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">path</span>: <span style="color:#ae81ff">overlay-example/overlays/development</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">repoURL</span>: <span style="color:#ae81ff">https://github.com/mosuke5/kustomize-examples</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">targetRevision</span>: <span style="color:#ae81ff">HEAD</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">syncPolicy</span>: {}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">## production.yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">argoproj.io/v1alpha1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Application</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-production</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">my-argocd-operator</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">destination</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">development</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">server</span>: <span style="color:#ae81ff">https://kubernetes.default.svc</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">project</span>: <span style="color:#ae81ff">default</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">source</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">path</span>: <span style="color:#ae81ff">overlay-example/overlays/production</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">repoURL</span>: <span style="color:#ae81ff">https://github.com/mosuke5/kustomize-examples</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">targetRevision</span>: <span style="color:#ae81ff">HEAD</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">syncPolicy</span>: {}
+</span></span></code></pre></div><p>上のマニフェストをapplyして、Argo CDでSyncしたあとに状況を確認してみます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get all -n development
+</span></span><span style="display:flex;"><span>NAME                                    READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>pod/nginx-deployment-7465f86b8f-w8fbl   1/1     Running   0          4m28s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                    TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE
+</span></span><span style="display:flex;"><span>service/nginx-service   ClusterIP   10.7.244.44   &lt;none&gt;        80/TCP    4m31s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deployment   1/1     1            1           4m32s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                                          DESIRED   CURRENT   READY   AGE
+</span></span><span style="display:flex;"><span>replicaset.apps/nginx-deployment-7465f86b8f   1         1         1       4m33s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl get all -n production
+</span></span><span style="display:flex;"><span>NAME                                    READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>pod/nginx-deployment-599969c8d9-pkvtl   1/1     Running   0          2m13s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                    TYPE           CLUSTER-IP    EXTERNAL-IP    PORT(S)        AGE
+</span></span><span style="display:flex;"><span>service/nginx-service   LoadBalancer   10.7.245.56   34.84.191.23   80:30826/TCP   2m16s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deployment   1/1     1            1           2m17s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                                          DESIRED   CURRENT   READY   AGE
+</span></span><span style="display:flex;"><span>replicaset.apps/nginx-deployment-599969c8d9   1         1         1       2m18s
+</span></span></code></pre></div><p>このようにして同じGitレポジトリでありながら、複数の環境に対してArgo CDを使ってデプロイできるようになるということです。Kustomizeなどのテンプレートエンジンの必要性も理解できましたでしょうか？
+理解を深めたい場合は、次のブログも参考にしてください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2019/06/21/kustomize/" data-iframely-url="//cdn.iframe.ly/4yC552R"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h3 id="追加可能なパラメータ">追加可能なパラメータ</h3>
+<p>Gitレポジトリ側で準備したオーバレイを使って環境ごとに設定を変える事ができますが、それ以外にArgo CD側でいくつかのパラメータは追加可能です。
+ドキュメント通りですが、以下の5つの項目はArgo CDのアプリケーション設定で追加できるわけです。</p>
+<ul>
+<li>namePrefix</li>
+<li>nameSuffix</li>
+<li>images</li>
+<li>commonLabels</li>
+<li>commonAnnotations</li>
+</ul>
+<p>ためしに、イメージの差し替えをやってみます。
+<code>production.yaml</code>を次のように変更します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">## production.yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">argoproj.io/v1alpha1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Application</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-production</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">my-argocd-operator</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">destination</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">production</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">server</span>: <span style="color:#ae81ff">https://kubernetes.default.svc</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">project</span>: <span style="color:#ae81ff">default</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">source</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">path</span>: <span style="color:#ae81ff">overlay-example/overlays/production</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">repoURL</span>: <span style="color:#ae81ff">https://github.com/mosuke5/kustomize-examples</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">targetRevision</span>: <span style="color:#ae81ff">HEAD</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ↓追加</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">kustomize</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">images</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#e6db74">&#34;nginx:1.20.0&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">syncPolicy</span>: {}
+</span></span></code></pre></div><p>マニフェストを変更後、applyしてSyncすると、Deploymentのイメージが差し替わっていますね。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get deploy nginx-deployment -n production -o yaml | grep &#34;image: nginx:1.20.0&#34;
+</span></span><span style="display:flex;"><span>      - image: nginx:1.20.0
+</span></span></code></pre></div><p>アプリケーションの更新後に、Gitレポジトリに最新のタグを記述して保存する方法もよいですが、場合によってはイメージタグはArgo CD側で管理するのもひとつの手法として考えられると思います。
+<strong>Gitレポジトリを信頼できる唯一の情報源とするというコンセプトでいうとイメージタグもGitに保存したいところですが、スコープは柔軟に判断してよいと思います。</strong></p>
+<h2 id="さいごに">さいごに</h2>
+<p>今回は、KustomizeアプリケーションをArgo CDに登録して、複数環境へのデプロイする方法についてみてみました。
+Kustomizeを使って複数環境へデプロイできる状態でしたら、なにも難しいことはなさそうですね。
+Argo CD側で管理するスコープはチーム内で話し合ってきめてください。</p>
+<p>Helmの場合も、もちろんパラメータは違えど、ほぼ同じような要領で利用できますので、みなさんの環境にあわせて挑戦してみてください。</p>
+<hr>
+<h5>Argo CD学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2021/04/13/argocd/">Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></li>
+<li>第2回: <a href="/entry/2021/05/06/argocd-application/">Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
+<li>第3回: <a href="/entry/2021/05/06/argocd-sync-action/">Argo CD、Syncの実行方法やタイミングについての検討</a></li>
+<li>第4回: <a href="/entry/2021/06/12/argocd-resourcehooks/">Argo CD、Resource Hooksを使ってデプロイを高度化する</a></li>
+<li>第5回: <a href="/entry/2022/02/08/argocd-deploy-to-external-cluster/">Argo CD、外部クラスタへのデプロイ</a></li>
+<li>関連記事: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=%e7%ac%ac2%e5%9b%9e%3a%20Argo%20CD%e3%80%81Kustomize%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%9f%e8%a4%87%e6%95%b0%e7%92%b0%e5%a2%83%e3%81%b8%e3%81%ae%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': '第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a> (2022/05/16)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a> (2022/05/15)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Argo CD、外部クラスタへのデプロイと認証の仕組み'});">Argo CD、外部クラスタへのデプロイと認証の仕組み</a> (2022/02/08)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

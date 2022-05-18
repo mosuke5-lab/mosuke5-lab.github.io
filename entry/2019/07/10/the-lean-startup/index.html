@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>「リーンスタートアップ」を読んだ。計測することの重要性と難しさ</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2019/07/10/the-lean-startup/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/07/10/the-lean-startup/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="「リーンスタートアップ」を読んだ。計測することの重要性と難しさ &middot; Goldstine研究所">
+<meta name="twitter:description" content="「リーンスタートアップ」を読んだ学びについてまとめました。スタートアップ、アジャイルというと「とりあえずやってみる」と考えがちですが、そうではない正しいアプローチを学ぶことができます。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「リーンスタートアップ」を読んだ。計測することの重要性と難しさ &middot; Goldstine研究所">
+<meta property="og:description" content="「リーンスタートアップ」を読んだ学びについてまとめました。スタートアップ、アジャイルというと「とりあえずやってみる」と考えがちですが、そうではない正しいアプローチを学ぶことができます。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2019/07/10/the-lean-startup/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>「リーンスタートアップ」を読んだ。計測することの重要性と難しさ</h1>
+    <div class="entry-sub-title">
+        <span class="">10 Jul 2019, 18:08</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#この書籍について">この書籍について</a></li>
+    <li><a href="#着目したポイント">着目したポイント</a></li>
+    <li><a href="#自分の経験と照らし合わせて">自分の経験と照らし合わせて</a></li>
+  </ul>
+</nav>
+        <p>会社のブログも含めて、やたら執筆ばかりしている<a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br>
+前回の <a href="/entry/2019/06/30/scram/">&quot;「スクラム」（ジェフ・サザーランド）を読んだ&quot;</a>に続いて、「リーンスタートアップ」という本を読んだのでそちらについての学びについてまとめます。</p>
+<h2 id="この書籍について">この書籍について</h2>
+<p>この書籍は、アメリカシリコンバレーで起業家として活動していたエリック・リース氏が自らの起業体験を元に書かれた、「リーンスタートアップ」というスタートアップビジネスのマネジメント手法についてのものです。
+彼が「リーンスタートアップ」という手法の提唱者になります。
+スタートアップというも、その定義は広く、なにも「スタートアップベンチャー」だけを指し示しているものでもなく、
+本書では <strong>「スタートアップとは、とてつもなく不確実な状態で新しい製品やサービスを創り出さなければならない人的組織である。」</strong> と定義しています。</p>
+<p>そのため、会社のサイズや業界などに関係なく、上に当てはまる人にとってはとても有益な本です。
+本書では、なぜスタートアップがうまくいかないのかにはじまり、科学的にどうしたらうまくまわせるかのエッセンスがつまっています。
+新規プロジェクト・ビジネスでうまくいかなかった経験がある、これからやっていく予定がある人はぜひ一度読んでみてほしいです。</p>
+<div class="amazlet-box" style="margin-bottom:0px;"><div class="amazlet-image" style="float:left;margin:0px 12px 1px 0px;"><a href="https://amzn.to/2S5PeJk" name="amazletlink" target="_blank"><img src="https://images-fe.ssl-images-amazon.com/images/I/51bOkHsFFlL._SL160_.jpg" alt="リーン・スタートアップ" style="border: none;" /></a></div><div class="amazlet-info" style="line-height:120%; margin-bottom: 10px"><div class="amazlet-name" style="margin-bottom:10px;line-height:120%"><a href="https://amzn.to/2S5PeJk" name="amazletlink" target="_blank">リーン・スタートアップ</a><div class="amazlet-powered-date" style="font-size:80%;margin-top:5px;line-height:120%">posted with <a href="http://www.amazlet.com/" title="amazlet" target="_blank">amazlet</a> at 19.07.11</div></div><div class="amazlet-detail">エリック・リース <br />日経BP <br />売り上げランキング: 5,761<br /></div><div class="amazlet-sub-info" style="float: left;"><div class="amazlet-link" style="margin-top: 5px"><a href="https://amzn.to/2S5PeJk" name="amazletlink" target="_blank">Amazon.co.jpで詳細を見る</a></div></div></div><div class="amazlet-footer" style="clear: left"></div></div>
+<h2 id="着目したポイント">着目したポイント</h2>
+<p>この書籍で何度も強調されることに <strong>「検証による学び」</strong> というのがあります。
+スタートアップとかアジャイルとかというと「とりあえずやってみよう。失敗してから考えよう」、と思いがちですがこれでは何回やってもきっとうまくいかないでしょう。恥ずかしながら自分もそう考えてやってきたことも多かったです。<br>
+スピードはスタートアップにおいて非常に大事な要素ではありますが、そこには必ず仮説と検証による学びがないといけないといいます。
+それを「検証による学び」と本書では言っていてこれを重要視していました。
+事業の成長の柱だけではありません、これから行っていく改善の行動についても、仮説と検証を繰り返していくことが必要と書かれています。</p>
+<p>では、「学ぶ」（仮説を検証していく）にはどうしたら良いいのでしょうか。
+それには「計測」が重要です。</p>
+<p>そんなのあたりまえではないか！と思いますが、自分の経験では有益な計測ができているケースは少なく感じますし、本書でもいくつか紹介しています。<br>
+彼の経験の中で、単純なユーザ数などで測ると一見よさそうにみえるが、それは過去に作り上げたものによって増えているだけで、今行っている行動が改善につながっていなかったことがあったということが書かれていました。
+どういうことかというと、ユーザ数は増えているのは過去に築いた成長エンジンが回っているだけで、直近の行動が改善に結びついていなかったということです。
+これは、コーホート分析という手法を使ったときにわかったようです。このように、ときに正しい計測には適切な手法をもちいる必要性があるということです。</p>
+<p>事業のはじめのフェーズでは、仮説と検証を繰り返して、まずは事業の成長エンジンを探っていくわけですが、成長エンジンを見つけたあとも仮説と検証のサイクルは継続する必要があるといいます。
+それはこの成長エンジンが持続するわけではないことです。常に成長エンジンのチューニングが必要といっています。
+まさに、上の例で、それに気づかずに進んでいってしまうとそのうちに事業がうまくいかなくなるときがきてしまう可能性あるということです。</p>
+<p>仮説と検証を繰り返し、成長エンジンをチューニングするも、やはりビジネスである以上、それでもだめなときもあるといいます。
+その際には、ピボット（方向転換）するか辛抱するかという非常に難しい選択に迫られます。<br>
+ピボットする場合は、必ず基のビジョンに基づくこと。これが重要だといいます。あくまでピボットするのは「戦略」「アプローチ」であり、ビジョンまでころころ変えては今までの努力が無駄になってしまうことが多いでしょう。<br>
+ピボットと一口に言ってもいろんな種類があるので、そのあたりは事業のフェーズや立場に応じて変えていく必要がありそうです。</p>
+<p>個人的に、この本を読んで一番の中核にあるのは <strong>「計測」</strong> ではないかなと感じています。（あるいは正しい仮説を立てること）
+すべてが、仮説と検証して学ぶことにあり、その学びを正しく行うために「計測」があるからです。</p>
+<p>計測と一口に言っても、非常に難しいものであると個人の体験からも感じています。
+システム・サービスを自ら作って運用していったことのある方なら体験したことがあると思いますが、自分の知りたいデータを適切に取得するというのは言葉でいうより難しいものであることが多いです。
+また、初期の段階ではMVP（実用最小限の製品： minimum viable product）であり、必ずしもあらゆるデータがとれているわけでもないし、ユーザ数も多くない場合に果たして有効なデータと言えるのか、といった問題もあります。<br>
+定量データだけではなく、ユーザヒアリングなど定性データも視野にいれて、いくつかの調査方法を知っておくことは、実践では重要になってくると感じています。
+また、定量データについていえば、やはりGoogle AnalyticsやA/Bテストツール、これらがいかに重要な存在であるか改めて感じるところです。</p>
+<p>より具体的な計測の手法的についてよい本があれば教えてください。</p>
+<h2 id="自分の経験と照らし合わせて">自分の経験と照らし合わせて</h2>
+<p>みなさんも少なからずなんらかの新規プロジェクトにおいて、失敗したり成功したりしてきたのではないでしょうか。
+わたしも、過去にいくつかの新規ビジネスやプロジェクトをやってきましたが、この本を読んで振り返ってみるといろんな失敗があったなと感じているところです。</p>
+<p>この「検証による学び」がごっそり抜け落ちていたことが多かったなと思います。
+たとえば、案件をスタートするために、上層部向けに「こんな〇〇な方法で、△△を実現していきます」みたいな資料を作って承認をとるわけですが、その仮説が本当に正しいのか確認することは少ないと思います。また、無駄な自信がそうさせてくれないこともあります。
+あるいは、失敗と薄々わかりながらもどう変えていいかわからずに進めてしまっている、こんなこともあるかなと思います。</p>
+<p>口で言うのは簡単なのですが、「仮説検証」と「測定」の部分をもうすこしうまくやれたらと思います。この力をつけるためには、日々から意識していくことからトライできそうです。
+いまからやろうとしていることが効果があるとどうやったらわかるか、そして果たして本当に効果があったのか、確認する。
+行動したことで満足してしまうケースが多いので、まずはその意識改革からできるのではないかと考えます。</p>
+<p>ばいばい。</p>
+<div class="amazlet-box" style="margin-bottom:0px;"><div class="amazlet-image" style="float:left;margin:0px 12px 1px 0px;"><a href="https://amzn.to/2S5PeJk" name="amazletlink" target="_blank"><img src="https://images-fe.ssl-images-amazon.com/images/I/51bOkHsFFlL._SL160_.jpg" alt="リーン・スタートアップ" style="border: none;" /></a></div><div class="amazlet-info" style="line-height:120%; margin-bottom: 10px"><div class="amazlet-name" style="margin-bottom:10px;line-height:120%"><a href="https://amzn.to/2S5PeJk" name="amazletlink" target="_blank">リーン・スタートアップ</a><div class="amazlet-powered-date" style="font-size:80%;margin-top:5px;line-height:120%">posted with <a href="http://www.amazlet.com/" title="amazlet" target="_blank">amazlet</a> at 19.07.11</div></div><div class="amazlet-detail">エリック・リース <br />日経BP <br />売り上げランキング: 5,761<br /></div><div class="amazlet-sub-info" style="float: left;"><div class="amazlet-link" style="margin-top: 5px"><a href="https://amzn.to/2S5PeJk" name="amazletlink" target="_blank">Amazon.co.jpで詳細を見る</a></div></div></div><div class="amazlet-footer" style="clear: left"></div></div>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=%e3%80%8c%e3%83%aa%e3%83%bc%e3%83%b3%e3%82%b9%e3%82%bf%e3%83%bc%e3%83%88%e3%82%a2%e3%83%83%e3%83%97%e3%80%8d%e3%82%92%e8%aa%ad%e3%82%93%e3%81%a0%e3%80%82%e8%a8%88%e6%b8%ac%e3%81%99%e3%82%8b%e3%81%93%e3%81%a8%e3%81%ae%e9%87%8d%e8%a6%81%e6%80%a7%e3%81%a8%e9%9b%a3%e3%81%97%e3%81%95" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': '「リーンスタートアップ」を読んだ。計測することの重要性と難しさ'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて'});">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a> (2022/01/24)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/10/28/kubernetes-test-by-terratest/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Kubernetes環境についてTerratestでテストを書く'});">Kubernetes環境についてTerratestでテストを書く</a> (2021/10/28)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/07/21/sre/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'SREは何を目指せばいいか？Google流から大事なことを学ぼう。'});">SREは何を目指せばいいか？Google流から大事なことを学ぼう。</a> (2021/07/21)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

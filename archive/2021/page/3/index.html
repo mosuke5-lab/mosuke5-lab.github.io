@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>2021</title>
+<link rel="canonical" href="https://blog.mosuke.tech/archive/2021/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/archive/2021/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="2021 &middot; Goldstine研究所">
+<meta name="twitter:description" content="@mosuke5のブログサイト。クラウド技術やアプリ開発、インフラ系ツールなどを主に情報発信しています。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2021 &middot; Goldstine研究所">
+<meta property="og:description" content="@mosuke5のブログサイト。クラウド技術やアプリ開発、インフラ系ツールなどを主に情報発信しています。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/archive/2021/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+
+<div class="entry col-md-8 col-xs-12">
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/" class="entry-title">Kubernetesのロギングパターンは結局どれを採用したらいいの？</a></h1>
+    <div class="entry-sub-title">
+        <span class="">18 Apr 2021, 14:44</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。<br>
+本日は、Kubernetes上で動くアプリケーションのロギングについて考えていきたいと思います。
+以前に<a href="/entry/2019/07/12/sidecar-fluentd-to-cloudwatchlogs/">「Sidecar方式のFluentdでCloudWatch logsへログを集約することについての検討」</a>という記事を書いたのですが、この記事では、ロギングパターンのひとつであるSidecar方式（サイドカー方式）の検討についてのみ触れており、「で、結局どうしたらいいの？」という部分がたりなかったためです。<br>
+本記事では、その他の方式も含めて、どれを採用したらいいのか？という考え方についてまとめていきたいとおもいます。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/04/13/argocd/" class="entry-title">第1回: Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></h1>
+    <div class="entry-sub-title">
+        <span class="">13 Apr 2021, 10:21</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <hr>
+<h5>Argo CD学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2021/04/13/argocd/">Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></li>
+<li>第2回: <a href="/entry/2021/05/06/argocd-application/">Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
+<li>第3回: <a href="/entry/2021/05/06/argocd-sync-action/">Argo CD、Syncの実行方法やタイミングについての検討</a></li>
+<li>第4回: <a href="/entry/2021/06/12/argocd-resourcehooks/">Argo CD、Resource Hooksを使ってデプロイを高度化する</a></li>
+<li>第5回: <a href="/entry/2022/02/08/argocd-deploy-to-external-cluster/">Argo CD、外部クラスタへのデプロイ</a></li>
+<li>関連記事: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。<br>
+前回の「Tekton学習シリーズ」に続きArgo CD学習シリーズをやっていきます。
+わたしは、Argo CDを何年か前に検証で確認はしていたのですが、だいぶ忘れてしまったい、改めてまとめなおしたいと思っています。
+初回は、インストールと概念編です。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/04/13/argocd/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/" class="entry-title">Tekton、interceptorを使ってイベントトリガーを進化させる</a></h1>
+    <div class="entry-sub-title">
+        <span class="">08 Apr 2021, 21:47</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
+<li>第13回: <a href="/entry/2022/03/01/tekton-lib-cache/">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
+<li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。<br>
+本日もTekton学習シリーズをやっていきます。今回も前回の内容の続きになるので、はじめてTekton Triggersをさわるよという方は第10回の記事をやっておくとよいです。</p>
+<p>前回、クラスタの外部からcurlを用いてHTTPリクエストを発行して、そのイベントをトリガーにパイプラインを実行しました。実運用では、GitレポジトリからのWebhookでパイプラインを動かしたいですよね？<br>
+しかし、前回のままでは認証も実装しておらず、そのまま外部公開してしまうのは危険な状態です。というわけで、interceptorという機能を使って、認証や特定のイベントのみにパイプラインを実行する方法などをみていきます。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/" class="entry-title">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></h1>
+    <div class="entry-sub-title">
+        <span class="">06 Apr 2021, 17:20</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
+<li>第13回: <a href="/entry/2022/03/01/tekton-lib-cache/">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
+<li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。<br>
+今回も、Tekton学習シリーズをやっていきます。Tekton Triggersを用いて、WebhookイベントからTektonパイプラインを実行する方法をみていきます。
+利用するパイプラインは前回の第9回のものを利用しますので、まだやってない人は第9回を事前に済ませておきましょう。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" class="entry-title">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></h1>
+    <div class="entry-sub-title">
+        <span class="">22 Mar 2021, 21:38</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
+<li>第13回: <a href="/entry/2022/03/01/tekton-lib-cache/">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
+<li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。本日もTekton学習シリーズやっていきます。<br>
+第9回目は、ついにアプリケーションをKubernetesクラスタにデプロイします。
+今回は第8回の続きになりますので、まだ第8回を実施していない人は先にみておいてください。
+前回は、GitHubのレポジトリからソースコードをダウンロードしてきて、コンテナイメージをビルドし、イメージレジストリに格納するところまでやりました。
+今回は、そのビルドしたイメージをKubernetesクラスタにデプロイします。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/" class="entry-title">Tekton、ClusterTaskとTekton Hubを理解する</a></h1>
+    <div class="entry-sub-title">
+        <span class="">21 Mar 2021, 17:24</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
+<li>第13回: <a href="/entry/2022/03/01/tekton-lib-cache/">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
+<li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。<br>
+Tekton学習シリーズ、どんどん進めていきましょう。第8回は、ClusterTaskとTekton Hubについてです。
+今までの内容より軽い内容になっています。これまで学習を進めてきた方ならすぐに理解できるはずです。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/" class="entry-title">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></h1>
+    <div class="entry-sub-title">
+        <span class="">20 Mar 2021, 00:36</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
+<li>第13回: <a href="/entry/2022/03/01/tekton-lib-cache/">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
+<li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。<br>
+本日もTekton学習フェーズやっていきます。第7回では、カタログの活用とTektonを使っていく上で必ず通るであろうイメージビルドについてあわせてやっていきたいと思います。
+本日のゴールは、Tektonが公開しているカタログ（公開Task）を用いて、任意のGitレポジトリにあるDockerfileをビルドしてレジストリにPushするまです。ではよろしくおねがいします。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/" class="entry-title">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></h1>
+    <div class="entry-sub-title">
+        <span class="">17 Mar 2021, 17:17</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
+<li>第13回: <a href="/entry/2022/03/01/tekton-lib-cache/">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
+<li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。<br>
+本日もTekton学習シリーズやっていきましょう。第6回はPipelineでWorkspaceを利用してTask間でデータを連携する方法についてです。
+あるTaskで作ったデータを別のTaskで利用することはパイプラインを作っていく上で非常に重要です。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/03/16/squid/" class="entry-title">squidを使ってプロキシ環境の再現検証に活用する</a></h1>
+    <div class="entry-sub-title">
+        <span class="">16 Mar 2021, 19:05</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-インフラ構築" href="/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E6%A7%8B%E7%AF%89">インフラ構築</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。  squidを使った検証は年に1回くらいは出てくるのですが、やるたびに忘れるのでメモします。
+ちなみに、squidを使う理由としてはいろいろなのですが、だいたい以下のような理由です。</p>
+<ol>
+<li>顧客のシステムを使う際にIPアドレス制限がかかっており、特定のサーバからアクセスさせたい</li>
+<li>顧客のネットワーク環境ではプロキシを利用しており、それゆえに環境を再現するためにプロキシを立てたい</li>
+<li>システムにアクセスするのにクラウドのリージョン間専用線を通して接続したい</li>
+</ol>
+        <a href="https://blog.mosuke.tech/entry/2021/03/16/squid/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/03/11/kubernetes-node-down/" class="entry-title">Kubernetesのノード障害時のPodの動きについての検証</a></h1>
+    <div class="entry-sub-title">
+        <span class="">11 Mar 2021, 00:13</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。<br>
+本日はKubernetesのノード障害が起きたときのPodの挙動について確認します。
+いままで、ノード障害が起きたときのPodの挙動、スケジューリングについて誤った認識をしていました。
+お恥ずかしい限りなのですが、同じような誤った認識をしているかたに向けて確認したことを解説します。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/03/11/kubernetes-node-down/">続きを読む</a>
+    </div>
+    
+<div class="pagination">
+  <nav role="pagination" class="post-list-pagination">
+      <a href="/archive/2021/page/2/" class="post-list-pagination-item pure-button post-list-pagination-item-prev">
+        <i class="fa fa-angle-double-left"></i>&nbsp;Newer
+      </a>
+      <span class="post-list-pagination-item post-list-pagination-item-current">Page 3 of 4</span>
+    <a href="/archive/2021/page/4/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
+        Older&nbsp;<i class="fa fa-angle-double-right"></i>
+      </a>
+    </nav>
+</div>
+
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

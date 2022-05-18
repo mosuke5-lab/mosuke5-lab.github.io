@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>カスタマイズしたJenkinsを作成する方法 on OpenShift</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="カスタマイズしたJenkinsを作成する方法 on OpenShift &middot; Goldstine研究所">
+<meta name="twitter:description" content="OpenShift上でJenkinsを利用する際のプラグインの管理方法やカスタマイズの方法などをご紹介します。プラグインが消えてしまうなどの問題にどう対応したらよいかなどまとめています。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="カスタマイズしたJenkinsを作成する方法 on OpenShift &middot; Goldstine研究所">
+<meta property="og:description" content="OpenShift上でJenkinsを利用する際のプラグインの管理方法やカスタマイズの方法などをご紹介します。プラグインが消えてしまうなどの問題にどう対応したらよいかなどまとめています。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>カスタマイズしたJenkinsを作成する方法 on OpenShift</h1>
+    <div class="entry-sub-title">
+        <span class="">05 Jul 2020, 23:00</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#課題">課題</a></li>
+    <li><a href="#guiからプラグインをインストールアップデートするのではだめか">GUIからプラグインをインストール・アップデートするのではだめか？</a>
+      <ul>
+        <li><a href="#問題その１jenkinsの複製ができない">問題その１：Jenkinsの複製ができない</a></li>
+        <li><a href="#問題その２特定の条件でインストールしたプラグインが消える">問題その２：特定の条件でインストールしたプラグインが消える</a></li>
+      </ul>
+    </li>
+    <li><a href="#jenkinsのイメージをカスタマイズする">Jenkinsのイメージをカスタマイズする</a>
+      <ul>
+        <li><a href="#サンプル実装">サンプル実装</a></li>
+      </ul>
+    </li>
+    <li><a href="#おすすめのプラグインのアップデート">おすすめのプラグインのアップデート</a></li>
+    <li><a href="#マニフェストをカスタマイズする">マニフェストをカスタマイズする</a></li>
+    <li><a href="#まとめ">まとめ</a></li>
+  </ul>
+</nav>
+        <p>こんにちは。もーすけです。<br>
+本日はRed Hatが提供しているKubernetesディストリビューションであるOpenShift上のJenkinsの管理に関するお話です。
+OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカスタマイズ方法などをご紹介します。
+ハマリポイントもあり困っている方も見かけたのでお役に立てばと思います。</p>
+<p>Jenkins本体ではなくJenkins agnetのカスタマイズに関しては以前に下記ブログを書いてますのでこちらをご参照ください。</p>
+<iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Frheb.hatenablog.com%2Fentry%2Fopenshift-custom-jenkins-agent" style="border: 0; width: 100%; height: 190px;" allowfullscreen scrolling="no"></iframe>
+<h2 id="課題">課題</h2>
+<p>OpenShiftでは、Red Hatが作成したJenkinsイメージが内包されており、簡単にOpenShiftと連携したJenkinsをインストールすることが可能です。<br>
+一番手っ取り早く試す方法としては下記のように<code>oc new-app</code>で、すでに用意されているテンプレートを用いて起動することです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>// OpenShift v4.4で用意されているイメージ
+</span></span><span style="display:flex;"><span>$ oc get is -n openshift | grep jenkins
+</span></span><span style="display:flex;"><span>jenkins                xxx.com/openshift/jenkins                2,latest       24 hours ago
+</span></span><span style="display:flex;"><span>jenkins-agent-maven    xxx.com/openshift/jenkins-agent-maven    latest,v4.0    24 hours ago
+</span></span><span style="display:flex;"><span>jenkins-agent-nodejs   xxx.com/openshift/jenkins-agent-nodejs   latest,v4.0    24 hours ago
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// OpenShift v4.4で用意されているテンプレート
+</span></span><span style="display:flex;"><span>$ oc get template -n openshift | grep jenkins
+</span></span><span style="display:flex;"><span>jenkins-ephemeral               Jenkins service, without persistent storage....    8 (all set)     6
+</span></span><span style="display:flex;"><span>jenkins-ephemeral-monitored     Jenkins service, without persistent storage....    9 (all set)     7
+</span></span><span style="display:flex;"><span>jenkins-persistent              Jenkins service, with persistent storage....       10 (all set)    7
+</span></span><span style="display:flex;"><span>jenkins-persistent-monitored    Jenkins service, with persistent storage....       11 (all set)    8
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// テンプレートを使って簡単に起動
+</span></span><span style="display:flex;"><span>$ oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=10Gi --param DISABLE_ADMINISTRATIVE_MONITORS=true
+</span></span></code></pre></div><p>しかし、この状態のJenkinsを利用するにあたってはいくつかの問題があります。</p>
+<ol>
+<li>デフォルトで入っているプラグインが古いことがある</li>
+<li>追加でプラグインをインストールしたい</li>
+<li>ジョブの定義をはじめからしておきたい</li>
+<li>Jenkinsを起動しているマニフェストを編集したい</li>
+</ol>
+<h2 id="guiからプラグインをインストールアップデートするのではだめか">GUIからプラグインをインストール・アップデートするのではだめか？</h2>
+<p>プラグインのインストールやアップデートについて、Jenkinsの起動後にGUIから行うのでもいいのではないか？そう思われる方も多いかもしれません。
+しかしいくつかの観点で、GUIから行うことに問題があります。</p>
+<h3 id="問題その１jenkinsの複製ができない">問題その１：Jenkinsの複製ができない</h3>
+<p>GUIからプラグインをインストール・アップデートした場合には、そのJenkinsには当然ながらプラグイン管理ができますが、Jenkinsの作り直しや複製をしようとした場合に同じ作業を繰り返し行わなければいけません。<br>
+コンテナのメリットを活かした、再構築の容易性といったメリットを損なってしまいますのでイメージ化しておくことが重要です。</p>
+<p>また、Jenkinsのプラグインのインストール・アップデートは、その後にJenkins自身の再起動が必要になりますので、正直かなり手間がかかるということです。</p>
+<h3 id="問題その２特定の条件でインストールしたプラグインが消える">問題その２：特定の条件でインストールしたプラグインが消える</h3>
+<p>OpenShiftに内包されているJenkinsイメージには、ある特定の条件のときにイメージにもともと持っているプラグインに上書きするという処理があります。
+Jenkinsのイメージのバージョンが上がった際などに、強制的に上書きするようになっています。
+実際にあった例としては、OpenShiftのマイナーバージョンを上げたあとに、Jenkinsを再起動した際にforce_copy_pluginが実行されてアップデートしたプラグインなどがロールバックされてしまったなどです。</p>
+<p>気になる方は、Jenkinsのイメージのコードを見てみるといいです。<br>
+ソースコードの改変により行数が変わっている可能性がありますが、<code>force_copy_plugin</code>で検索すると見つかると思います。</p>
+<p><a href="https://github.com/openshift/jenkins/blob/release-4.4/2/contrib/s2i/run" target="_blank">Github: jenkins/run at release-4.4 · openshift/jenkins</a></p>
+<h2 id="jenkinsのイメージをカスタマイズする">Jenkinsのイメージをカスタマイズする</h2>
+<p>上で見てきたとおり、いくつかの理由でJenkins自身にプラグインをインストールしたりアップグレードしたい場合には、イメージ化しておくことが重要です。
+Jenkinsのイメージのカスタマイズは非常に簡単です。環境変数で指定できる項目もありますが、以下のドキュメントの通りイメージレベルで作ってしまったほうが運用が楽ではないかと思います。まずは以下のドキュメントを確かめてください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://access.redhat.com/documentation/ja-jp/openshift_container_platform/4.4/html/images/images-other-jenkins" data-iframely-url="//cdn.iframe.ly/ET99cFk"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h3 id="サンプル実装">サンプル実装</h3>
+<p>上のドキュメントを見ていただいて、すぐに理解できる方はよしなのですが、正直わかりづらい部分もあるかなと個人的に思います。
+サンプル実装を以下においておきましたので合わせて参考にしてみてください。<br>
+<code>plugins.txt</code>でプラグインの管理を<code>configuration/jobs/sample-job/config.xml</code>でジョブの設定を書いています。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/mosuke5/openshift-custom-jenkins" data-iframely-url="//cdn.iframe.ly/3eDTKnz"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h2 id="おすすめのプラグインのアップデート">おすすめのプラグインのアップデート</h2>
+<p>以下のプラグインはアップデートしておくことをおすすめします。（下の記述のバージョンは執筆時点のため確認の上修正してください）<br>
+JenkinsのKubernetesプラグインでDecralative記法を利用するのにバージョンが古くうまく動かないなどがあったためです。
+Gitも最新にしておくとパイプラインの記述でエラーに遭遇することが減ると思います。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>kubernetes:1.19.3
+</span></span><span style="display:flex;"><span>pipeline-model-definition:1.6.0
+</span></span><span style="display:flex;"><span>git:4.2.2
+</span></span><span style="display:flex;"><span>git-client:3.2.1
+</span></span></code></pre></div><h2 id="マニフェストをカスタマイズする">マニフェストをカスタマイズする</h2>
+<p>最後にマニフェストのカスタマイズについてです。<br>
+OpenShiftでは、Jenkinsを起動するためのテンプレートが用意されています。
+冒頭で<code>oc new-app</code>でJenkinsを簡単に起動できるのもこのテンプレートが存在するおかげです。
+しかし、実際にこのテンプレートを使ってJenkinsを起動していると、リソースの都合上Jenkinsが遅くてしょうがないというケースがただありました。
+用意されているJenkinsのテンプレートでは、メモリーのリミットは設定できるのですが、CPU・メモリーのリクエスト値を設定しておきたいことがただあったのでテンプレートをカスタマイズして使います。</p>
+<p>元のテンプレートは参考にしつつ、自分でカスタマイズできるようにしておくと良いでしょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc get template jenkins-persistent -o yaml &gt; my-jenkins-template.yaml
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// 任意に変更して管理する
+</span></span><span style="display:flex;"><span>$ vim my-jenkins-template.yaml
+</span></span></code></pre></div><h2 id="まとめ">まとめ</h2>
+<p>OpenShift上でJenkinsを使うときのプラグイン管理やカスタマイズなど注意すべき点を見てきました。
+OpenShiftに内包されているJenkinsは、OpenShiftと連携しやすいようにカスタマイズされており、便利なのでぜひ使っていきたいのですが、そのままでみなさんのワークロードに合うとは正直思いません。<br>
+利用できる部分は利用しつつ、カスタマイズしていけるように準備しておくことが非常に重要と思っています。</p>
+<p>また、KubernetesにおけるCI/CDの実装の観点について深堀りして理解したい方はぜひ下記のブログもご参照ください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/" data-iframely-url="//cdn.iframe.ly/AWtNlfG"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=%e3%82%ab%e3%82%b9%e3%82%bf%e3%83%9e%e3%82%a4%e3%82%ba%e3%81%97%e3%81%9fJenkins%e3%82%92%e4%bd%9c%e6%88%90%e3%81%99%e3%82%8b%e6%96%b9%e6%b3%95%20on%20OpenShift" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'カスタマイズしたJenkinsを作成する方法 on OpenShift'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'イメージのプルの効率化を考える。kubernetes-image-puller の紹介'});">イメージのプルの効率化を考える。kubernetes-image-puller の紹介</a> (2020/04/28)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Jenkins pipelineで複数のOpenShiftクラスタを扱う'});">Jenkins pipelineで複数のOpenShiftクラスタを扱う</a> (2020/04/14)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Argo CD、外部クラスタへのデプロイと認証の仕組み'});">Argo CD、外部クラスタへのデプロイと認証の仕組み</a> (2022/02/08)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

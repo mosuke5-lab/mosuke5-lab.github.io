@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Tekton、アプリケーションをKubernetesクラスタへデプロイする</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Tekton、アプリケーションをKubernetesクラスタへデプロイする &middot; Goldstine研究所">
+<meta name="twitter:description" content="Tekton学習シリーズの第9回は、ついにコンテナイメージのビルドからデプロイまで実施します。TektonからKubernetesリソースを扱う方法を学んでいきます。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tekton、アプリケーションをKubernetesクラスタへデプロイする &middot; Goldstine研究所">
+<meta property="og:description" content="Tekton学習シリーズの第9回は、ついにコンテナイメージのビルドからデプロイまで実施します。TektonからKubernetesリソースを扱う方法を学んでいきます。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Tekton、アプリケーションをKubernetesクラスタへデプロイする</h1>
+    <div class="entry-sub-title">
+        <span class="">22 Mar 2021, 21:38</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#kubernetes-actions-taskのインストール">kubernetes-actions taskのインストール</a></li>
+    <li><a href="#kubernetes-actionsの使い方">kubernetes-actionsの使い方</a></li>
+    <li><a href="#serviceaccountへの権限付与">ServiceAccountへの権限付与</a></li>
+    <li><a href="#パイプラインの作成">パイプラインの作成</a></li>
+    <li><a href="#パイプラインの実行">パイプラインの実行</a></li>
+    <li><a href="#さいごに">さいごに</a></li>
+  </ul>
+</nav>
+        <hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
+<li>第13回: <a href="/entry/2022/03/01/tekton-lib-cache/">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
+<li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。本日もTekton学習シリーズやっていきます。<br>
+第9回目は、ついにアプリケーションをKubernetesクラスタにデプロイします。
+今回は第8回の続きになりますので、まだ第8回を実施していない人は先にみておいてください。
+前回は、GitHubのレポジトリからソースコードをダウンロードしてきて、コンテナイメージをビルドし、イメージレジストリに格納するところまでやりました。
+今回は、そのビルドしたイメージをKubernetesクラスタにデプロイします。</p>
+<h2 id="kubernetes-actions-taskのインストール">kubernetes-actions taskのインストール</h2>
+<p>前回は、<code>git-clone</code>と<code>buildah</code>のTaskをカタログからインストールしました。
+今回はさらに、<code>kubernetes-actions</code>というTaskをインストールします（Tekton Hub: <a href="https://hub.tekton.dev/tekton/task/kubernetes-actions">kubernetes-actions</a>）。目的は、<code>kubectl apply -f manifests</code>を実行するためです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f catalog/task/kubernetes-actions/0.1/kubernetes-actions.yaml
+</span></span><span style="display:flex;"><span>task.tekton.dev/kubernetes-actions created
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl get task kubernetes-actions
+</span></span><span style="display:flex;"><span>NAME                 AGE
+</span></span><span style="display:flex;"><span>kubernetes-actions   10s
+</span></span></code></pre></div><h2 id="kubernetes-actionsの使い方">kubernetes-actionsの使い方</h2>
+<p>かんたんに使い方と注意事項を説明しておきます。
+<code>kubectl</code> がインストールされたイメージを用いて任意の処理を実行できます。
+最低限の設定としては以下のサンプルのとおりです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">deploy-application</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">taskRef</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kubernetes-actions</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">params</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">image  </span> <span style="color:#75715e"># 利用するイメージ</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#ae81ff">bitnami/kubectl:1.20</span>
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">script </span> <span style="color:#75715e"># 実行したい処理</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: |<span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            </span>            <span style="color:#ae81ff">kubectl apply -f xxxx.yaml</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">workspaces</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">manifest-dir </span> <span style="color:#75715e"># マニフェストが保存されたworkspace</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">shared-workspace</span>
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kubeconfig-dir </span> <span style="color:#75715e"># kubeconfigが保存されたworkspace。不要の場合はemptyDirでいける</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">kubeconfig-dir</span>
+</span></span></code></pre></div><p>注意点として、利用するイメージがあります。このカタログに記載されているデフォルトのイメージ <code>gcr.io/cloud-builders/kubectl@sha256:8ab94be8b2b4f3d117f02d868b39540fddd225447abf4014f7ba4765cb39f753</code> はコメントにも書かれているのですが、非常にイメージサイズが大きいです（<code>image is huge</code>というコメントがTaskにかかれている）。はっきりいって利用を推奨しません。
+このTaskは基本的にkubectlがインストールされていれば、ほかのイメージでも代用可能なので、<a href="https://hub.docker.com/layers/bitnami/kubectl/1.20/images/sha256-8dcf02cf4f9c8f8004c911c29731a2f0992aec8f9e2d5608452ab006f1db1c32?context=explore">bitnami/kubectl:1.20</a>を利用しました。パラメータで利用できるイメージを指定できます。</p>
+<p><code>kubeconfig-dir</code>ですが、利用したいコンフィグがある場合はマウントして利用できます。
+しかし、TektonではTask自体がPodとして動いており、自身のKubernetesクラスタへの操作であれば、ServiceAccountのTokenを使うことが一番簡単です。
+そのため、とくに外部のコンフィグを利用しない場合は、<code>kubeconfig-dir</code>はemptyDirを指定しておけば大丈夫です。後ほどで実践例を見ます。</p>
+<h2 id="serviceaccountへの権限付与">ServiceAccountへの権限付与</h2>
+<p>ひとつ前のセクションで<code>kubeconfig-dir</code>について解説しました。
+TektonのTaskからKubernetesを操作するには、ServiceAccountに利用したい権限を付与する必要があります。
+ServiceAccountは、前回同様の<code>my-kekton-pipeline</code>を利用しますが、<code>Role</code>と<code>RoleBinding</code>を追加しました。
+今回はシンプルにDeploymentとPodのみ操作できる権限を付けました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># my-tekton-pipeline-sa.yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceAccount</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-tekton-pipeline</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">secrets</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">dockerhub-cred</span>
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Role</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-tekton-pipeline-role</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">rules</span>:
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">apiGroups</span>: [<span style="color:#e6db74">&#34;&#34;</span>]
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">resources</span>: [<span style="color:#e6db74">&#34;pods&#34;</span>]
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">verbs</span>: [<span style="color:#e6db74">&#34;get&#34;</span>, <span style="color:#e6db74">&#34;list&#34;</span>, <span style="color:#e6db74">&#34;watch&#34;</span>, <span style="color:#e6db74">&#34;create&#34;</span>, <span style="color:#e6db74">&#34;update&#34;</span>, <span style="color:#e6db74">&#34;patch&#34;</span>, <span style="color:#e6db74">&#34;delete&#34;</span>]
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">apiGroups</span>: [<span style="color:#e6db74">&#34;apps&#34;</span>]
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">resources</span>: [<span style="color:#e6db74">&#34;deployments&#34;</span>]
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">verbs</span>: [<span style="color:#e6db74">&#34;get&#34;</span>, <span style="color:#e6db74">&#34;list&#34;</span>, <span style="color:#e6db74">&#34;watch&#34;</span>, <span style="color:#e6db74">&#34;create&#34;</span>, <span style="color:#e6db74">&#34;update&#34;</span>, <span style="color:#e6db74">&#34;patch&#34;</span>, <span style="color:#e6db74">&#34;delete&#34;</span>]
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">RoleBinding</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-tekton-pipeline-rolebinding</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">subjects</span>:
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceAccount</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-tekton-pipeline</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">apiGroup</span>: <span style="color:#e6db74">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">roleRef</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Role</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-tekton-pipeline-role</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">apiGroup</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f my-tekton-pipeline-sa.yaml
+</span></span><span style="display:flex;"><span>serviceaccount/my-tekton-pipeline configured
+</span></span><span style="display:flex;"><span>role.rbac.authorization.k8s.io/my-tekton-pipeline-role created
+</span></span><span style="display:flex;"><span>rolebinding.rbac.authorization.k8s.io/my-tekton-pipeline-rolebinding created
+</span></span></code></pre></div><p>この権限付与がないと以下のようなエラーになります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Error from server (Forbidden): error when retrieving current configuration of:
+</span></span><span style="display:flex;"><span>Resource: &#34;apps/v1, Resource=deployments&#34;, GroupVersionKind: &#34;apps/v1, Kind=Deployment&#34;
+</span></span><span style="display:flex;"><span>Name: &#34;myapp&#34;, Namespace: &#34;goldstine-lab&#34;
+</span></span><span style="display:flex;"><span>from server for: &#34;/tmp/new-deployment.yaml&#34;: deployments.apps &#34;myapp&#34; is forbidden: User &#34;system:serviceaccount:goldstine-lab:my-tekton-pipeline&#34; cannot get resource &#34;deployments&#34; in API group &#34;apps&#34; in the namespace &#34;goldstine-lab&#34;
+</span></span></code></pre></div><h2 id="パイプラインの作成">パイプラインの作成</h2>
+<p>では、パイプラインを作ります。7割は前回と同様です。Pipelineの名前は一応変えておきました。
+サンプルのPipelineマニフェストは以下のとおりです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># build-deploy-pipeline.yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pipeline</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-deploy-pipeline</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">workspaces</span>: 
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">shared-workspace</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kubeconfig-dir</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">params</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">git-url</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">git-revision</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">default</span>: <span style="color:#e6db74">&#34;master&#34;</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">image</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">tasks</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fetch-repository</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">taskRef</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">git-clone</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">workspaces</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">output</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">shared-workspace</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">params</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">url</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#ae81ff">$(params.git-url)</span>
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">deleteExisting</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;true&#34;</span>
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">revision</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#ae81ff">$(params.git-revision)</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-push-image</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">taskRef</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">buildah</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">params</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">IMAGE</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#ae81ff">$(params.image)</span>
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">DOCKERFILE</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;Dockerfile&#34;</span>
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">CONTEXT</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;$(workspaces.source.path)&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">workspaces</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">source</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">shared-workspace</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">runAfter</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#ae81ff">fetch-repository</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">deploy-application</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">taskRef</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kubernetes-actions</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">params</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">image</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#ae81ff">bitnami/kubectl:1.20</span>
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">script</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: |<span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            IMAGE=$(echo &#34;$(params.image)&#34; | sed -e &#39;s/\//\\\//g&#39;)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            cat ./config/deployment.yaml | sed -e &#34;s/myapp:latest/$IMAGE/g&#34; -e &#34;s/Never/IfNotPresent/g&#34; &gt; /tmp/new-deployment.yaml
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            cat /tmp/new-deployment.yaml
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            echo &#34;-----------&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            kubectl apply -f /tmp/new-deployment.yaml
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            echo &#34;-----------&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            kubectl get deploy
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            kubectl get pods </span>            
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">workspaces</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">manifest-dir</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">shared-workspace</span>
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kubeconfig-dir</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">kubeconfig-dir</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">runAfter</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#ae81ff">build-push-image</span>
+</span></span></code></pre></div><p>説明が必要なポイントとしては、<code>kubernetes-actions</code>の<code>script</code>部分でしょうか。
+<code>sed</code>などを実行していますが、なにをしているかというと、今回利用したレポジトリの中にマニフェストファイルが含まれているのですが、HelmやKustomizeではなくプレーンなマニフェストです。そのため、コンテナイメージが固定です。それを<code>sed</code>で書き換えていますということです。あとは、<code>apply</code>後に確認用でPodやDeploymentを確認しているということです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">script</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: |<span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            IMAGE=$(echo &#34;$(params.image)&#34; | sed -e &#39;s/\//\\\//g&#39;)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            cat ./config/deployment.yaml | sed -e &#34;s/myapp:latest/$IMAGE/g&#34; -e &#34;s/Never/IfNotPresent/g&#34; &gt; /tmp/new-deployment.yaml
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            cat /tmp/new-deployment.yaml
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            echo &#34;-----------&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            kubectl apply -f /tmp/new-deployment.yaml
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            echo &#34;-----------&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            kubectl get deploy
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            kubectl get pods </span>            
+</span></span></code></pre></div><h2 id="パイプラインの実行">パイプラインの実行</h2>
+<p>最後に実行します。ここはいつもどおり<code>PipelineRun</code>を作成して実行するのみです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># build-deploy-pipeline-run.yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PipelineRun</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-deploy-pipeline-run</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">pipelineRef</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-deploy-pipeline</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">params</span>: 
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">git-url</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">value</span>: <span style="color:#ae81ff">https://github.com/ncskier/myapp</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">image</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">value</span>: <span style="color:#ae81ff">mosuke5/tekton-practice:from-pipeline</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">serviceAccountName</span>: <span style="color:#ae81ff">my-tekton-pipeline</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">workspaces</span>: 
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">shared-workspace</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">volumeClaimTemplate</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">accessModes</span>:
+</span></span><span style="display:flex;"><span>            - <span style="color:#ae81ff">ReadWriteOnce</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">resources</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">requests</span>:
+</span></span><span style="display:flex;"><span>              <span style="color:#f92672">storage</span>: <span style="color:#ae81ff">1Gi</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kubeconfig-dir</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">emptyDir</span>: {}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f build-deploy-pipeline.yaml
+</span></span><span style="display:flex;"><span>pipeline.tekton.dev/build-deploy-pipeline created
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl apply -f build-deploy-pipeline-run.yaml
+</span></span><span style="display:flex;"><span>pipelinerun.tekton.dev/build-deploy-pipeline-run created
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl get pod
+</span></span><span style="display:flex;"><span>kc get pod -w
+</span></span><span style="display:flex;"><span>NAME                                                           READY   STATUS      RESTARTS   AGE
+</span></span><span style="display:flex;"><span>build-deploy-pipeline-run-build-push-image-ddzpc-pod-zg2lv     0/3     Completed   0          89s
+</span></span><span style="display:flex;"><span>build-deploy-pipeline-run-deploy-application-m6rhm-pod-2fqjb   0/1     Completed   0          34s
+</span></span><span style="display:flex;"><span>build-deploy-pipeline-run-fetch-repository-zljww-pod-tpfds     0/1     Completed   0          117s
+</span></span><span style="display:flex;"><span>myapp-656b6c9b99-hv58j                                         1/1     Running     0          24s
+</span></span></code></pre></div><p>ダッシュボードからの見え方。</p>
+<p><img src="/image/tekton-dashboard-build-deploy-pipeline.png" alt="dashboard"></p>
+<h2 id="さいごに">さいごに</h2>
+<p>第9回では、ついにイメージのビルドからデプロイまで実施しました。
+できるひとは、レポジトリを独自のものに変更するなどして遊んでみてください。
+次回からは、TektonのEventに着目していく予定です。</p>
+<hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
+<li>第13回: <a href="/entry/2022/03/01/tekton-lib-cache/">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
+<li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Tekton%e3%80%81%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e3%82%92Kubernetes%e3%82%af%e3%83%a9%e3%82%b9%e3%82%bf%e3%81%b8%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4%e3%81%99%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Tekton、アプリケーションをKubernetesクラスタへデプロイする'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a> (2022/05/16)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a> (2022/05/15)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Argo CD、外部クラスタへのデプロイと認証の仕組み'});">Argo CD、外部クラスタへのデプロイと認証の仕組み</a> (2022/02/08)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

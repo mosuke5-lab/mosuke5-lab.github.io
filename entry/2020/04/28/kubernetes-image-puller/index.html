@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>イメージのプルの効率化を考える。kubernetes-image-puller の紹介</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="イメージのプルの効率化を考える。kubernetes-image-puller の紹介 &middot; Goldstine研究所">
+<meta name="twitter:description" content="Kubernetes利用時のコンテナイメージのプルに関する効率化について考えてみます。kubernetes-image-pullerを使ったイメージの事前プルする方法などについてご紹介します。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="イメージのプルの効率化を考える。kubernetes-image-puller の紹介 &middot; Goldstine研究所">
+<meta property="og:description" content="Kubernetes利用時のコンテナイメージのプルに関する効率化について考えてみます。kubernetes-image-pullerを使ったイメージの事前プルする方法などについてご紹介します。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>イメージのプルの効率化を考える。kubernetes-image-puller の紹介</h1>
+    <div class="entry-sub-title">
+        <span class="">28 Apr 2020, 17:17</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#課題感">課題感</a></li>
+    <li><a href="#対策">対策</a>
+      <ul>
+        <li><a href="#イメージサイズを小さくする">イメージサイズを小さくする</a></li>
+        <li><a href="#レイヤーを意識してイメージを作成する">レイヤーを意識してイメージを作成する</a></li>
+        <li><a href="#事前にノードにイメージをプルしておく">事前にノードにイメージをプルしておく</a></li>
+      </ul>
+    </li>
+    <li><a href="#kubernetes-image-puller">kubernetes-image-puller</a>
+      <ul>
+        <li><a href="#仕組み">仕組み</a></li>
+        <li><a href="#使ってみる">使ってみる</a></li>
+      </ul>
+    </li>
+    <li><a href="#まとめ">まとめ</a></li>
+  </ul>
+</nav>
+        <p>FF7リメイク、クリアしました。いまSwitchで原作のFF7をやり直しています。もーすけです。<br>
+今日は<a href="https://github.com/che-incubator/kubernetes-image-puller" target="_blank">kubernetes-image-puller</a>というツールを発見し試してみたので、背景や課題感含めてご紹介していきます。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/che-incubator/kubernetes-image-puller" data-iframely-url="//cdn.iframe.ly/VbiFtNx"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h2 id="課題感">課題感</h2>
+<p>Kubernetesを利用していて、イメージのプル（ダウンロード）を効率化したいと考えたことはないでしょうか。
+たとえば、イメージのプルの時間を短縮してデプロイを早くしたいや、ネットワーク帯域などの都合上で事前にノードにイメージをプルしておきたいといったことなどがあります。</p>
+<h2 id="対策">対策</h2>
+<p>このような問題にどう立ち向かっていったらいいでしょうか。</p>
+<h3 id="イメージサイズを小さくする">イメージサイズを小さくする</h3>
+<p>一つは当然ながら、イメージのサイズを可能な限り小さくすることが考えられます。
+イメージサイズを小さくすることで、イメージプルにかかる時間の削減やネットワークの有効活用が可能になります。
+イメージのサイズを小さくするプラクティスについては、いろんなところで紹介されていますので、本記事では詳しくは割愛しますが、
+マルチステージビルドやレイヤー数を少なくするなどがあります。</p>
+<p>こちらのDockerfileのベストプラクティスをご参照ください。<br>
+<a href="https://docs.docker.com/develop/develop-images/dockerfile_best-practices/" target="_blank">Best practices for writing Dockerfiles | Docker Documentation</a></p>
+<h3 id="レイヤーを意識してイメージを作成する">レイヤーを意識してイメージを作成する</h3>
+<p>コンテナイメージはレイヤー構造で構成されています。<br>
+簡単な例でいうと<code>docker pull</code>したときに表示されるハッシュ値のリストですが、これがレイヤーです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% docker pull nginxinc/nginx-unprivileged:1.18
+</span></span><span style="display:flex;"><span>1.18: Pulling from nginxinc/nginx-unprivileged
+</span></span><span style="display:flex;"><span>54fec2fa59d0: Already exists
+</span></span><span style="display:flex;"><span>3a4d0e4b78ef: Downloading [=============&gt;                                     ]  7.153MB/26.2MB
+</span></span><span style="display:flex;"><span>83b11c8c3a6e: Download complete
+</span></span><span style="display:flex;"><span>56e6a727dfef: Download complete
+</span></span><span style="display:flex;"><span>e575c5ee613a: Download complete
+</span></span><span style="display:flex;"><span>5073a53c326e: Download complete
+</span></span></code></pre></div><p>このレイヤーを意識してコンテナイメージを作成することで、イメージの一部に変更があったとしても最小限のレイヤーのプルのみで済むなどの工夫ができます。プルする対象を減らすことができるので、結果的にイメージプルの効率が上がります。
+よくある例としては、アプリケーションのコードに変更があった場合です。
+以下はRailsを例にしていますが、アプリケーションを実行するために必要な依存関係のライブラリのインストール(<code>RUN bundle install部分</code>)をアプリケーションのコードを置く前に実施しています。
+アプリケーションの変更の多くはソースコードであるため、変わらない部分を前に持ってくることで、そこまでのイメージレイヤーを使い回すことができるためです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span># Dockerfile
+</span></span><span style="display:flex;"><span>FROM ruby:2.6
+</span></span><span style="display:flex;"><span>RUN gem install bundler -v &#34;1.15.4&#34;
+</span></span><span style="display:flex;"><span>RUN mkdir /usr/local/src/app
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># ----- 依存関係ライブラリのインストールを先に行う -----
+</span></span><span style="display:flex;"><span>## ソースコードを入れる前にGemfileをコピーしbundle installしておく
+</span></span><span style="display:flex;"><span>COPY Gemfile /usr/local/src/app/Gemfile
+</span></span><span style="display:flex;"><span>COPY Gemfile.lock /usr/local/src/app/Gemfile.lock
+</span></span><span style="display:flex;"><span>WORKDIR /usr/local/src/app
+</span></span><span style="display:flex;"><span>RUN bundle install
+</span></span><span style="display:flex;"><span># ----- ここまで -----
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># アプリケーション本体コードの配置
+</span></span><span style="display:flex;"><span>COPY . /usr/local/src/app/
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>CMD [&#34;bundle&#34;, &#34;exec&#34;, &#34;rails&#34;, &#34;server&#34;, &#34;-b&#34;, &#34;0.0.0.0&#34;, &#34;-p&#34;, &#34;3000&#34;]
+</span></span></code></pre></div><h3 id="事前にノードにイメージをプルしておく">事前にノードにイメージをプルしておく</h3>
+<p>うえ２つの方法については、Kubernetesを利用している多くの方が実践していることではないかなと思っています。
+これらの対策をしたとしても、ベースイメージが変更になってしまうときにはプルするイメージのサイズが大きくなってしまいます。
+よりコンテナのアップデートを早くするためにデプロイ時にそもそもプルさせたくないこともあると思います。
+こういったニーズに応えるために、イメージを各ノードに事前にダウンロードさせておくといった方法もあります。</p>
+<p>今日紹介する<a href="https://github.com/che-incubator/kubernetes-image-puller" target="_blank">kubernetes-image-puller</a>は、このような問題を解消する１つの手段です。</p>
+<h2 id="kubernetes-image-puller">kubernetes-image-puller</h2>
+<p>上の説明したような問題点を解決するため、事前にノードにイメージをプルさせておくことが１つの対策になるわけですが、それを実装したのがこのkubernetes-image-pullerです。
+このソフトウェアはEclipse Cheのレポジトリで公開されているわけですが、もともとの課題を少し書いておきます。
+Eclipse CheはKubernetes上で動作するオンラインのエディタです。利用者毎にコンテナとしてエディタ環境を提供します。
+より速く開発環境の提供するためにはイメージのプルの効率化が必要だっとのことです。<br>
+では、さっそく簡単に仕組みを見ていきましょう。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/che-incubator/kubernetes-image-puller" data-iframely-url="//cdn.iframe.ly/VbiFtNx"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h3 id="仕組み">仕組み</h3>
+<p>全体像は以下のとおりです。<br>
+<img src="/image/kubernetes-image-puller-overview.png" alt="kubernetes-image-puller-overview"></p>
+<p>ImagePullerを理解する上で重要なポイントは下記のとおりです。</p>
+<ul>
+<li>ImagePullerを利用するためには、Deployment/ConfigMap/ServiceAccountの3つをデプロイする
+<ul>
+<li>デプロイ方法はHelmかOpenShift Templateで可能</li>
+</ul>
+</li>
+<li>Deploymentは、ImagePullerの本体を動作させるためのもの。</li>
+<li>ImagePuller本体は、DaemonSetを作成し各ノードにPodをデプロイすることで、イメージをプルさせる</li>
+<li>ConfigMapは、主にDaemonSetに関する設定値
+<ul>
+<li>ノードにプルさせたいイメージ</li>
+<li>利用するNamespaceなど</li>
+<li>詳しい設定は<a href="https://github.com/che-incubator/kubernetes-image-puller#configuration" target="_blank">こちらを参照</a></li>
+</ul>
+</li>
+<li>ServiceAccountは、ImagePuller自身がDaemoSetなどKubernetesリソースを操作するために利用
+<ul>
+<li>DaemonSetの作成権限などを付与</li>
+</ul>
+</li>
+</ul>
+<h3 id="使ってみる">使ってみる</h3>
+<p>筆者はOpenShift 4.3の環境で行いましたが、GKEやEKSなどKubernetes環境であれば問題なく動作します。<br>
+以下、デプロイ部分以外は<code>oc xxxx</code>は<code>kubectl xxxx</code>と読み替えてもらってよいです。</p>
+<h4 id="環境">環境</h4>
+<p>本環境ではWorkerノードが3台ある状態です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc get node | grep worker
+</span></span><span style="display:flex;"><span>ip-10-0-129-134.ap-southeast-1.compute.internal   Ready    worker   75m   v1.16.2
+</span></span><span style="display:flex;"><span>ip-10-0-158-129.ap-southeast-1.compute.internal   Ready    worker   75m   v1.16.2
+</span></span><span style="display:flex;"><span>ip-10-0-175-177.ap-southeast-1.compute.internal   Ready    worker   50m   v1.16.2
+</span></span></code></pre></div><h4 id="デプロイ">デプロイ</h4>
+<p>OpenShift Templateを使ってデプロイします。OpenShift以外の環境の人はHelmをお使いください。
+デプロイ方法は異なりますが、デプロイされるリソースや仕組み自体は変わりません。<br>
+今回、各ノードに<code>centos:8</code>と<code>nginxinc/nginx-unprivileged:1.18</code>の2つを事前にプルしておきたいと考えた想定とします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc process -f deploy/openshift/serviceaccount.yaml | oc apply -f -
+</span></span><span style="display:flex;"><span>$ oc process -f deploy/openshift/configmap.yaml \
+</span></span><span style="display:flex;"><span>-p IMAGES=&#34;centos=centos:8;nginx=nginxinc/nginx-unprivileged:1.18&#34; \
+</span></span><span style="display:flex;"><span>-p DAEMONSET_NAME=&#34;puller&#34; \
+</span></span><span style="display:flex;"><span>| oc apply -f -
+</span></span><span style="display:flex;"><span>$ oc process -f deploy/openshift/app.yaml | oc apply -f -
+</span></span></code></pre></div><h4 id="動作確認">動作確認</h4>
+<p>デプロイしたので、どのようなリソースが作成されているかみていきます。<br>
+ポイントは以下のとおりです。</p>
+<ul>
+<li>ImagePuller本体がdeploymentとしてデプロイ
+<ul>
+<li>Pod <code>pod/kubernetes-image-puller-b556c8bd4-p8shz</code>が作成されている</li>
+</ul>
+</li>
+<li>Puller DaemonSetが作成され、<code>pod/puller-xxxxx</code> が3つ作成
+<ul>
+<li>各ノード分</li>
+<li>このDaemonSetは前の項目のデプロイ時にデプロイしたものではない。ImagePullerが作成したもの。</li>
+</ul>
+</li>
+<li><code>pod/puller-94tfv</code>内では2つのコンテナが起動。
+<ul>
+<li>centosとnginxのイメージを使った2つのコンテナ</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc get ds,deployment,pod
+</span></span><span style="display:flex;"><span>NAME                          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+</span></span><span style="display:flex;"><span>daemonset.extensions/puller   3         3         3       3            3           &lt;none&gt;          35m
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                                            READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span style="display:flex;"><span>deployment.extensions/kubernetes-image-puller   1/1     1            1           36m
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                                          READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>pod/kubernetes-image-puller-b556c8bd4-p8shz   1/1     Running   0          36m
+</span></span><span style="display:flex;"><span>pod/puller-94tfv                              2/2     Running   0          35m
+</span></span><span style="display:flex;"><span>pod/puller-p9mcm                              2/2     Running   0          35m
+</span></span><span style="display:flex;"><span>pod/puller-tzd6n                              2/2     Running   0          35m
+</span></span></code></pre></div><h4 id="daemonset">DaemonSet</h4>
+<p>DaemonSetの中の設定が気になるので見てみます。<br>
+<code>spec.template.spec.containers</code>には、ConfigMapで指定したcentosとnginxの2つのイメージを利用したコンテナが起動しているのがわかります。
+実行コマンドは<code>sleep 30d</code>となっています。<code>ImagePullPolicy: Always</code>となっていることから、30日後にこのPodは終了し、その際に最新となっているイメージをまたプルすることになります。
+あまり好ましくないですがlatestタグで運用していても定期的にイメージをプルすることができるわけです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">extensions/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">DaemonSet</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">puller</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">k8s-image-puller</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">revisionHistoryLimit</span>: <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">selector</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">matchLabels</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">test</span>: <span style="color:#ae81ff">daemonset-test</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">template</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">test</span>: <span style="color:#ae81ff">daemonset-test</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">name</span>: <span style="color:#ae81ff">test-po</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">containers</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">args</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#ae81ff">30d</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">command</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#ae81ff">sleep</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">centos:8</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">imagePullPolicy</span>: <span style="color:#ae81ff">Always</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">centos</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">resources</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">limits</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">memory</span>: <span style="color:#ae81ff">20Mi</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">requests</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">memory</span>: <span style="color:#ae81ff">10Mi</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">terminationMessagePath</span>: <span style="color:#ae81ff">/dev/termination-log</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">terminationMessagePolicy</span>: <span style="color:#ae81ff">File</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">args</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#ae81ff">30d</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">command</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#ae81ff">sleep</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginxinc/nginx-unprivileged:1.18</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">imagePullPolicy</span>: <span style="color:#ae81ff">Always</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">resources</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">limits</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">memory</span>: <span style="color:#ae81ff">20Mi</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">requests</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">memory</span>: <span style="color:#ae81ff">10Mi</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">terminationMessagePath</span>: <span style="color:#ae81ff">/dev/termination-log</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">terminationMessagePolicy</span>: <span style="color:#ae81ff">File</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">dnsPolicy</span>: <span style="color:#ae81ff">ClusterFirst</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">restartPolicy</span>: <span style="color:#ae81ff">Always</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">schedulerName</span>: <span style="color:#ae81ff">default-scheduler</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">securityContext</span>: {}
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">terminationGracePeriodSeconds</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">templateGeneration</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">updateStrategy</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">rollingUpdate</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">maxUnavailable</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">type</span>: <span style="color:#ae81ff">RollingUpdate</span>
+</span></span></code></pre></div><h2 id="まとめ">まとめ</h2>
+<p>kubernetes-image-pullerを参考に、Kubernetes環境におけるイメージの効率化について考えてみました。<br>
+このソフトウェアをそのまま利用するかどうかは別にしても、DaemonSetを活用してイメージの事前のプルなどが実現でき活用できる場面もありそうです。</p>
+<p>今後もKubernetesについて情報発信していきます。</p>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=%e3%82%a4%e3%83%a1%e3%83%bc%e3%82%b8%e3%81%ae%e3%83%97%e3%83%ab%e3%81%ae%e5%8a%b9%e7%8e%87%e5%8c%96%e3%82%92%e8%80%83%e3%81%88%e3%82%8b%e3%80%82kubernetes-image-puller%20%e3%81%ae%e7%b4%b9%e4%bb%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'イメージのプルの効率化を考える。kubernetes-image-puller の紹介'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'カスタマイズしたJenkinsを作成する方法 on OpenShift'});">カスタマイズしたJenkinsを作成する方法 on OpenShift</a> (2020/07/05)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Jenkins pipelineで複数のOpenShiftクラスタを扱う'});">Jenkins pipelineで複数のOpenShiftクラスタを扱う</a> (2020/04/14)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Argo CD、外部クラスタへのデプロイと認証の仕組み'});">Argo CD、外部クラスタへのデプロイと認証の仕組み</a> (2022/02/08)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

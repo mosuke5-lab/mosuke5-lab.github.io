@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Argo CD、Resource Hooksを使ってデプロイを高度化する</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Argo CD、Resource Hooksを使ってデプロイを高度化する &middot; Goldstine研究所">
+<meta name="twitter:description" content="Argo CDのResource Hooksについて解説します。単純なデプロイではなく、任意の処理をデプロイの前後に挟み込む非常に重要な機能です。Argo CDの実戦投入前に検証しておくべき項目のひとつでしょう。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Argo CD、Resource Hooksを使ってデプロイを高度化する &middot; Goldstine研究所">
+<meta property="og:description" content="Argo CDのResource Hooksについて解説します。単純なデプロイではなく、任意の処理をデプロイの前後に挟み込む非常に重要な機能です。Argo CDの実戦投入前に検証しておくべき項目のひとつでしょう。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Argo CD、Resource Hooksを使ってデプロイを高度化する</h1>
+    <div class="entry-sub-title">
+        <span class="">12 Jun 2021, 18:24</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#sync以外の処理をどこで行うのか">Sync以外の処理をどこで行うのか？</a></li>
+    <li><a href="#resource-hooksをどうやって使うの">Resource Hooksをどうやって使うの？</a>
+      <ul>
+        <li><a href="#処理のタイミング">処理のタイミング</a></li>
+        <li><a href="#リソースの削除タイミング">リソースの削除タイミング</a></li>
+      </ul>
+    </li>
+    <li><a href="#job以外にも使える">Job以外にも使える</a></li>
+    <li><a href="#まとめ">まとめ</a></li>
+  </ul>
+</nav>
+        <hr>
+<h5>Argo CD学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2021/04/13/argocd/">Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></li>
+<li>第2回: <a href="/entry/2021/05/06/argocd-application/">Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
+<li>第3回: <a href="/entry/2021/05/06/argocd-sync-action/">Argo CD、Syncの実行方法やタイミングについての検討</a></li>
+<li>第4回: <a href="/entry/2021/06/12/argocd-resourcehooks/">Argo CD、Resource Hooksを使ってデプロイを高度化する</a></li>
+<li>第5回: <a href="/entry/2022/02/08/argocd-deploy-to-external-cluster/">Argo CD、外部クラスタへのデプロイ</a></li>
+<li>関連記事: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。<br>
+Argo CD学習シリーズをやっていきます。
+今回は、Argo CDのResource Hooksという仕組みについて解説します。
+前回にやったArgo CDのSyncと密接に関連するトピックです。
+運用レベルでArgo CDを使っていく場合、避けて通れない内容になってきます。
+Argo CDを使った本格運用に向けて学んでいきましょう。</p>
+<h2 id="sync以外の処理をどこで行うのか">Sync以外の処理をどこで行うのか？</h2>
+<p>第3回「<a href="/entry/2021/05/06/argocd-sync-action/">Argo CD、Syncの実行方法やタイミングについての検討</a>」にて、Argo CDとCIツールの連携について述べました。
+状況によっては、CIツールからArgo CDのSyncを実行させることが選択できることを紹介しました。
+CIツールから実行することで、Sync以外の処理をCIツール側から操作できるなどのメリットがありますが、Argo CDでもResource Hooksを利用することで、Syncの前後に任意の処理を挟むことができます。</p>
+<p><img src="/image/argocd-sync-from-ci.png" alt="argocd-sync-from-ci"></p>
+<p>Syncの前後ではさみたい処理にどのようなものがあるでしょうか？<br>
+代表的なものとして以下のようなことが考えられます。</p>
+<ol>
+<li>データベースのスキーマ変更処理をSync前に実行したい</li>
+<li>Sync後に結合テストを実施したい</li>
+<li>Syncの失敗を通知して受け取りたい</li>
+<li>デプロイの順番を制御したい（単純なrollingupdate以上のことを実装したい）</li>
+</ol>
+<h2 id="resource-hooksをどうやって使うの">Resource Hooksをどうやって使うの？</h2>
+<p>さて、このResource Hooksですがどのように使うのか説明します。
+利用方法は簡単で、Argo CDでSyncするアプリケーションのマニフェスト内に特定のAnnotationsを記述したリソースを含めておくだけです。Resource Hooks用にリポジトリを用意したりすることはなく、あなたのアプリケーションのマニフェストレポジトリ内に、マニフェストを用意するのみです。</p>
+<p>主な設定は、処理のタイミング（<code>argocd.argoproj.io/hook</code>）と、処理に利用したリソースをどのタイミングで削除するか（<code>argocd.argoproj.io/hook-delete-policy</code>）だけです。
+それぞれの設定を見ていきましょう。</p>
+<h3 id="処理のタイミング">処理のタイミング</h3>
+<p>処理のタイミングの設定は、Annotationに<code>argocd.argoproj.io/hook</code>をつけることで可能です。
+対象のリソース（たとえばSyncの前後で実行したいJob）に対して、以下のhookタイミングを設定できます。
+多く用いられるのは、<code>PreSync</code>, <code>PostSync</code>, <code>SyncFail</code>かと思います。</p>
+
+
+  
+
+
+
+<table  class="table">
+<thead>
+<tr>
+<th>Hook</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PreSync</code></td>
+<td>アプリケーションマニフェストの適用前（Sync前）に実行する。DBのスキーマ変更などにい用いることが多い。</td>
+</tr>
+<tr>
+<td><code>Sync</code></td>
+<td>すべての<code>PreSync</code> hookが完了し成功した後に実行。マニフェストの適用と同タイミング。</td>
+</tr>
+<tr>
+<td><code>Skip</code></td>
+<td>マニフェストの適用をスキップする。</td>
+</tr>
+<tr>
+<td><code>PostSync</code></td>
+<td><code>Sync</code> hookが完了し成功したあとに実行（すべてのリソースが<code>Healthy</code>ステータスになったとき実行される）。結合テストなどの処理はこちらを利用する。</td>
+</tr>
+<tr>
+<td><code>SyncFail</code></td>
+<td><code>Sync</code> hookが失敗したときに実行。デプロイの失敗通知などに利用できる。</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>参考として、ジョブをSync前に実行したい場合は、Jobリソースを用意して、JobのAnnotationsに<code>argocd.argoproj.io/hook: PreSync</code>を付与するとなります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">batch/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Job</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">presync-job</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">annotations</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ↓これを付与</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">argocd.argoproj.io/hook</span>: <span style="color:#ae81ff">PreSync</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">template</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">containers</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">presync</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">fedora:33</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">command</span>:
+</span></span><span style="display:flex;"><span>          - <span style="color:#e6db74">&#34;/bin/bash&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">args</span>:
+</span></span><span style="display:flex;"><span>          - <span style="color:#e6db74">&#34;-c&#34;</span>
+</span></span><span style="display:flex;"><span>          - <span style="color:#e6db74">&#34;date &amp;&amp; echo &#39;presync&#39;&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">restartPolicy</span>: <span style="color:#ae81ff">Never</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">backoffLimit</span>: <span style="color:#ae81ff">2</span>
+</span></span></code></pre></div><h3 id="リソースの削除タイミング">リソースの削除タイミング</h3>
+<p>Resource Hooksで利用したリソースの削除のタイミングは、Annotationに<code>argocd.argoproj.io/hook-delete-policy</code>をつけることで設定可能です。
+もし、なにも設定しなかった場合、以下のように実行したJobがPodとして残りますが（<code>presync-job-gj4bd</code>が処理に利用したJobのPod）、任意のタイミングで削除できるというわけです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc get pod
+</span></span><span style="display:flex;"><span>NAME                                READY   STATUS      RESTARTS   AGE
+</span></span><span style="display:flex;"><span>nginx-deployment-64b6fc996b-94ttg   1/1     Running     0          4m33s
+</span></span><span style="display:flex;"><span>presync-job-gj4bd                   0/1     Completed   0          86s
+</span></span></code></pre></div>
+
+  
+
+
+
+<table  class="table">
+<thead>
+<tr>
+<th>Hook</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HookSucceeded</code></td>
+<td>Hook処理が成功したあとにリソースは削除されます。たとえば、Sync前にデータベースのスキーマ変更の処理を行った場合、そのスキーマ変更を行うJobが成功した時点で削除します。</td>
+</tr>
+<tr>
+<td><code>HookFailed</code></td>
+<td>Hook処理が失敗したあとにリソースは削除されます。</td>
+</tr>
+<tr>
+<td><code>BeforeHookCreation</code></td>
+<td>既存に存在するリソースをHook処理実行前に削除します。これがデフォルト設定です。次回の処理までは残っているということです。</td>
+</tr>
+</tbody>
+</table>
+
+
+<h2 id="job以外にも使える">Job以外にも使える</h2>
+<p>ドキュメントを読むと、Jobの設定ばかりですが、Job以外にも利用できます。
+多くの場合、Sync前後の「処理」が主なユースケースのため、処理を実行するJobがサンプルとなっています。しかしJob以外にもこの機能を使えることは実は重要です。</p>
+<p>たとえば、<strong>Syncする前に特定のリソースを作っておきたい</strong>というニーズです。
+Sync前に、アプリケーションが利用するSecretやConfigMapをデプロイしておきたいといったものです。この場合であれば、SecretやConfigMapのリソースに対して、上で紹介したAnnotationsをつければよいということです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ConfigMap</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">pre-cm</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">annotations</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">argocd.argoproj.io/hook</span>: <span style="color:#ae81ff">PreSync</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#...</span>
+</span></span></code></pre></div><h2 id="まとめ">まとめ</h2>
+<p>今回は、Argo CDのResource Hooksという機能についてみてきました。
+Argo CDを実戦投入する上では欠かせない機能と考えています。おそらく多くのアプリケーションでは、本番環境では「ただデプロイすればいい」ということは少なく、なんらかの処理やテスト、通知が必要になるはずです。それらを実現するためのArgo CDの機能がResource Hooksでした。
+任意の処理やテストを、CIツールなどArgo CDの外からも実施が可能ですが、デプロイをシンプルにするためにはCIツールのパイプラインは少ないほうがいいでしょう。
+すべてをArgo CDにやらせるべきか？は、処理の性質次第かなと思いますが、有力な候補としてあがってくることまちがいなしです。</p>
+<hr>
+<h5>Argo CD学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2021/04/13/argocd/">Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></li>
+<li>第2回: <a href="/entry/2021/05/06/argocd-application/">Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
+<li>第3回: <a href="/entry/2021/05/06/argocd-sync-action/">Argo CD、Syncの実行方法やタイミングについての検討</a></li>
+<li>第4回: <a href="/entry/2021/06/12/argocd-resourcehooks/">Argo CD、Resource Hooksを使ってデプロイを高度化する</a></li>
+<li>第5回: <a href="/entry/2022/02/08/argocd-deploy-to-external-cluster/">Argo CD、外部クラスタへのデプロイ</a></li>
+<li>関連記事: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Argo%20CD%e3%80%81Resource%20Hooks%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%a6%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4%e3%82%92%e9%ab%98%e5%ba%a6%e5%8c%96%e3%81%99%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Argo CD、Resource Hooksを使ってデプロイを高度化する'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a> (2022/05/16)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a> (2022/05/15)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Argo CD、外部クラスタへのデプロイと認証の仕組み'});">Argo CD、外部クラスタへのデプロイと認証の仕組み</a> (2022/02/08)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

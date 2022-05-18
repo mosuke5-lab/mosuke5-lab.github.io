@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Kubernetes上のリソースをTerraformで管理するメリットとデメリット</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Kubernetes上のリソースをTerraformで管理するメリットとデメリット &middot; Goldstine研究所">
+<meta name="twitter:description" content="TerraformでKubernetes上のリソースを管理する方法およびそのメリット・デメリットをみてみます。こちらをふまえ、最近のOperatorの動きなどを考察してみたいと思います。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes上のリソースをTerraformで管理するメリットとデメリット &middot; Goldstine研究所">
+<meta property="og:description" content="TerraformでKubernetes上のリソースを管理する方法およびそのメリット・デメリットをみてみます。こちらをふまえ、最近のOperatorの動きなどを考察してみたいと思います。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Kubernetes上のリソースをTerraformで管理するメリットとデメリット</h1>
+    <div class="entry-sub-title">
+        <span class="">07 Mar 2019, 01:06</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#kubernetesクラスターそのものをterraformで操る">KubernetesクラスターそのものをTerraformで操る</a></li>
+    <li><a href="#kubernetes上のリソースをterraformから操るメリットとデメリット">Kubernetes上のリソースをTerraformから操るメリットとデメリット</a>
+      <ul>
+        <li><a href="#メリット">メリット</a></li>
+        <li><a href="#デメリット">デメリット</a></li>
+      </ul>
+    </li>
+    <li><a href="#hello-world">Hello world</a>
+      <ul>
+        <li><a href="#認証provider設定">認証、provider設定</a></li>
+        <li><a href="#deploymentを作ってみる">Deploymentを作ってみる</a></li>
+      </ul>
+    </li>
+    <li><a href="#kubernetes側からクラウドリソースを制御する動き">Kubernetes側からクラウドリソースを制御する動き</a></li>
+  </ul>
+</nav>
+        <p>@mosuke5です。早くも3月になってしまいました。<br>
+しかし、個人的にはこの2か月は非常に動きがあった2か月でしたのでいろいろ楽しかったです。</p>
+<p>さて、本題ですが、、<br>
+わたしの好きなTerraformを使ってKubernetesクラスタ上のリソースを管理するのをやってみたいと思います。<br>
+そもそもKubernetesをTeraformで管理するとなると2つのレイヤーの話があります。
+今回は、後者のほうに重きを置いてお伝えします。</p>
+<ol>
+<li>KubernetesクラスターそのものをTerraformで管理する</li>
+<li>Kubernetesクラスター上のリソースをTerraformで管理する</li>
+</ol>
+<h2 id="kubernetesクラスターそのものをterraformで操る">KubernetesクラスターそのものをTerraformで操る</h2>
+<p>こちらは軽く流していきますが、Terraformでクラウドのサービスを操ることができるので、もしKubernetesのサービスを提供している場合は、下記のようにクラスターそのものを構築することが容易です。
+こちらは、Alibaba CloudのContainer Serviceを起動する例としていてます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">provider</span> <span style="color:#e6db74">&#34;alicloud&#34;</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">access_key</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;${var.access_key}&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">secret_key</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;${var.secret_key}&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">region</span>     <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;${var.region}&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">resource</span> <span style="color:#e6db74">&#34;alicloud_cs_kubernetes&#34;</span> <span style="color:#e6db74">&#34;main&#34;</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">name_prefix</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;my-first-k8s&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">availability_zone</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;${data.alicloud_zones.default.zones.0.id}&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">new_nat_gateway</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">master_instance_types</span> <span style="color:#960050;background-color:#1e0010">=</span> [<span style="color:#e6db74">&#34;ecs.n4.small&#34;</span>]
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">worker_instance_types</span> <span style="color:#960050;background-color:#1e0010">=</span> [<span style="color:#e6db74">&#34;ecs.n4.small&#34;</span>]
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">worker_numbers</span> <span style="color:#960050;background-color:#1e0010">=</span> [<span style="color:#ae81ff">3</span>]
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">key_name</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;hogekey&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">pod_cidr</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;192.168.1.0/24&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">service_cidr</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;192.168.2.0/24&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">enable_ssh</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">install_cloud_monitor</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="kubernetes上のリソースをterraformから操るメリットとデメリット">Kubernetes上のリソースをTerraformから操るメリットとデメリット</h2>
+<p>次はクラスターそのものではなくて、クラスター上のリソースをどう扱うかを見ていきます。
+そもそもKubernetesクラスタのリソースはmanifestファイルで扱うことが一般的です。
+Terraformで管理するメリット/デメリットってどんなところにあるのか考えてみたいと思います。</p>
+<h3 id="メリット">メリット</h3>
+<ul>
+<li>stateファイルを使って状態管理、差分管理ができる</li>
+<li>他の豊富なproviderと組み合わせて利用ができる</li>
+<li>削除が容易</li>
+</ul>
+<h3 id="デメリット">デメリット</h3>
+<ul>
+<li>対応リソースが少ない or 最新のリソースへの対応が遅い</li>
+<li>manifestで十分な感じもある</li>
+</ul>
+<h2 id="hello-world">Hello world</h2>
+<h3 id="認証provider設定">認証、provider設定</h3>
+<p>まずは試してみます。認証ですが、いろんな方法がありますが、もしすでに<code>~/.kube/config</code>にクライアント証明の入った設定ファイルがあるのならば、特に設定することなく利用できます。
+認証に、<code>servicea ccount</code>のtokenを利用している場合などは、既定の設定をいれる必要があります。
+ここでは、<code>~/.kube/config</code>があるので以下だけのProvider設定で行きます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>provider &#34;kubernetes&#34; {}
+</span></span></code></pre></div><h3 id="deploymentを作ってみる">Deploymentを作ってみる</h3>
+<p>例えばすごく単純に、Nginxが3つ立ち上がるdeploymentを作ることとします。
+manifestなら以下のようになりますね。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-sample-deployment</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">selector</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">matchLabels</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx-sample</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">template</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx-sample</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">containers</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:latest</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">80</span>
+</span></span></code></pre></div><p>こちらをTerraformで記述していくとどうなるのか。<br>
+書いてみた所感だと、ストラクチャーはもちろんmanifestファイルと同じなので書きやすいのですが、
+一部のArgumentsの名前がmanifestで書くものと異なります。
+例えば、<code>matchLabels</code>を<code>match_labels</code>としなければいけなかったりします。
+このあたりが少し面倒という印象です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">resource</span> <span style="color:#e6db74">&#34;kubernetes_deployment&#34;</span> <span style="color:#e6db74">&#34;test&#34;</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">metadata</span> <span style="color:#960050;background-color:#1e0010">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">name</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;nginx-sample-deployment&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">spec</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">selector</span> <span style="color:#960050;background-color:#1e0010">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#960050;background-color:#1e0010">match_labels</span> <span style="color:#960050;background-color:#1e0010">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#960050;background-color:#1e0010">app</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;nginx-sample-deployment&#34;</span>
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">replicas</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">template</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#960050;background-color:#1e0010">metadata</span> <span style="color:#960050;background-color:#1e0010">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#960050;background-color:#1e0010">labels</span> <span style="color:#960050;background-color:#1e0010">{</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#960050;background-color:#1e0010">app</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;nginx-sample-deployment&#34;</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>      <span style="color:#960050;background-color:#1e0010">}</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#960050;background-color:#1e0010">spec</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#960050;background-color:#1e0010">container</span> <span style="color:#960050;background-color:#1e0010">{</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#960050;background-color:#1e0010">name</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;nignx&#34;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#960050;background-color:#1e0010">image</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;nginx:latest&#34;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#960050;background-color:#1e0010">port</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#960050;background-color:#1e0010">container_port</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#960050;background-color:#1e0010">80</span>
+</span></span><span style="display:flex;"><span>          }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>      <span style="color:#960050;background-color:#1e0010">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">}</span>
+</span></span></code></pre></div><p>Terraform管理のいいところは、なんといっても、この<code>terraform plan</code>によるDry-runができることですね。
+やってみます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ terraform plan
+</span></span><span style="display:flex;"><span>Refreshing Terraform state in-memory prior to plan...
+</span></span><span style="display:flex;"><span>The refreshed state will be used to calculate this plan, but will not be
+</span></span><span style="display:flex;"><span>persisted to local or remote state storage.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>------------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>An execution plan has been generated and is shown below.
+</span></span><span style="display:flex;"><span>Resource actions are indicated with the following symbols:
+</span></span><span style="display:flex;"><span>  + create
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Terraform will perform the following actions:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  + kubernetes_deployment.test
+</span></span><span style="display:flex;"><span>      id:                                                            &lt;computed&gt;
+</span></span><span style="display:flex;"><span>      metadata.#:                                                    &#34;1&#34;
+</span></span><span style="display:flex;"><span>      metadata.0.generation:                                         &lt;computed&gt;
+</span></span><span style="display:flex;"><span>      metadata.0.name:                                               &#34;nginx-sample-deployment&#34;
+</span></span><span style="display:flex;"><span>      metadata.0.namespace:                                          &#34;default&#34;
+</span></span><span style="display:flex;"><span>(中略)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Plan: 1 to add, 0 to change, 0 to destroy.
+</span></span></code></pre></div><p>差分を確認してapplyしてデプロイしていきます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ terraform apply
+</span></span><span style="display:flex;"><span>(中略)
+</span></span><span style="display:flex;"><span>Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl get deployment
+</span></span><span style="display:flex;"><span>NAME                       DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span style="display:flex;"><span>nginx-sample-deployment    3         3         3            3           30s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl get pods
+</span></span><span style="display:flex;"><span>NAME                                        READY     STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>nginx-sample-deployment-6c668d7f76-2djrb    1/1       Running   0          49s
+</span></span><span style="display:flex;"><span>nginx-sample-deployment-6c668d7f76-5ncww    1/1       Running   0          49s
+</span></span><span style="display:flex;"><span>nginx-sample-deployment-6c668d7f76-t9lfp    1/1       Running   0          49s
+</span></span></code></pre></div><p>変更があったと仮定して、Terraformの定義ファイルの中身を少し変えてみます。
+レプリカ数とコンテナ名を変更してみました。<br>
+変更の差分を確認できるのはやっぱりTerraformで管理する最大のメリットですね。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ terraform plan
+</span></span><span style="display:flex;"><span>kubernetes_deployment.test: Refreshing state... (ID: default/nginx-sample-deployment)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>------------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>An execution plan has been generated and is shown below.
+</span></span><span style="display:flex;"><span>Resource actions are indicated with the following symbols:
+</span></span><span style="display:flex;"><span>  ~ update in-place
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Terraform will perform the following actions:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  ~ kubernetes_deployment.test
+</span></span><span style="display:flex;"><span>      spec.0.replicas:                           &#34;3&#34; =&gt; &#34;5&#34;
+</span></span><span style="display:flex;"><span>      spec.0.template.0.spec.0.container.0.name: &#34;nignx&#34; =&gt; &#34;nignx-hogege&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Plan: 0 to add, 1 to change, 0 to destroy.
+</span></span></code></pre></div><h2 id="kubernetes側からクラウドリソースを制御する動き">Kubernetes側からクラウドリソースを制御する動き</h2>
+<p>しかし最近はKubernetes側からクラウドリソースを制御するようにするという動きが顕著です。
+先日Redhatがオープンした<a href="https://www.operatorhub.io/">OperatorHub.io</a>ではAWSもカスタムリソースを提供していて、DynamoDBやSQSなどの一部のクラウドリソースをKubernetesから扱えるようにするモジュールを提供しています。<br>
+こちらについては、まだ試せていないので試したら別でブログに書こうと思います。</p>
+<p>以上にみてきたように、Terraformではstate管理ができるので、それゆえに差分管理やDry-runなどの機能が使えて便利な側面がありました。一方で、Kubernetes側からのクラウドリソースの管理の流れをみると、アプリケーション寄りの人はこちらのほうがスタンダードになってくるかなと思っている部分もあります。</p>
+<p>今後の動きが楽しみです。</p>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Kubernetes%e4%b8%8a%e3%81%ae%e3%83%aa%e3%82%bd%e3%83%bc%e3%82%b9%e3%82%92Terraform%e3%81%a7%e7%ae%a1%e7%90%86%e3%81%99%e3%82%8b%e3%83%a1%e3%83%aa%e3%83%83%e3%83%88%e3%81%a8%e3%83%87%e3%83%a1%e3%83%aa%e3%83%83%e3%83%88" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Kubernetes上のリソースをTerraformで管理するメリットとデメリット'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて'});">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a> (2022/01/24)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/10/28/kubernetes-test-by-terratest/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Kubernetes環境についてTerratestでテストを書く'});">Kubernetes環境についてTerratestでテストを書く</a> (2021/10/28)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'カスタマイズしたJenkinsを作成する方法 on OpenShift'});">カスタマイズしたJenkinsを作成する方法 on OpenShift</a> (2020/07/05)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

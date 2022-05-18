@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>OpenShift on Goldstine研究所</title>
+    <link>https://blog.mosuke.tech/categories/openshift/</link>
+    <description>Recent content in OpenShift on Goldstine研究所</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Tue, 08 Feb 2022 14:16:45 +0900</lastBuildDate><atom:link href="https://blog.mosuke.tech/categories/openshift/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Argo CD、外部クラスタへのデプロイと認証の仕組み</title>
+      <link>https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/</link>
+      <pubDate>Tue, 08 Feb 2022 14:16:45 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/</guid>
+      <description>&lt;hr&gt;
+&lt;h5&gt;Argo CD学習シリーズ&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/&#34;&gt;Argo CD、外部クラスタへのデプロイ&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
+今回はArgo CDを用いて、外部のKubernetesクラスタへアプリケーションをデプロイすることについて動きを確認します。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>OpenShift、プロジェクトスコープのノードセレクターの挙動確認</title>
+      <link>https://blog.mosuke.tech/entry/2022/01/20/openshift-project-scoped-nodeselector/</link>
+      <pubDate>Thu, 20 Jan 2022 15:07:28 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2022/01/20/openshift-project-scoped-nodeselector/</guid>
+      <description>&lt;p&gt;あけましておめでとうございます。もーすけです。&lt;br&gt;
+今年もよろしくおねがいします。&lt;/p&gt;
+&lt;p&gt;OpenShiftのプロジェクトスコープのノードセレクターに関する雑多なメモです。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>OpenShift、Routerシャーディングを使って用途ごとにアクセス経路を分ける</title>
+      <link>https://blog.mosuke.tech/entry/2021/12/28/openshift-router-sharding/</link>
+      <pubDate>Tue, 28 Dec 2021 17:24:16 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2021/12/28/openshift-router-sharding/</guid>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
+本日もOpenShift関連のTipsについてアウトプットします。
+Ingress Controller(Router)のシャーディング（分割）についてです。
+半分は自分の備忘録ではありますが、同じような境遇の方の参考になればと思います。&lt;/p&gt;
+&lt;p&gt;本ブログでは、OpenShift 4.9 on AWSの環境を用いていますが、オンプレミスなど他の環境でも活用できます。もちろんAWS環境とオンプレミス環境では若干Ingressの実装に差はでますが、大きくは変わらないと思います。&lt;/p&gt;
+&lt;p&gt;※いろいろまだ書き残したことがあるので随時更新します。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>OpenShift、送信元IPアドレスで制限がかかった環境でのIPIインストールの注意事項</title>
+      <link>https://blog.mosuke.tech/entry/2021/12/22/openshift-ipi-limited-sourceip/</link>
+      <pubDate>Wed, 22 Dec 2021 15:55:22 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2021/12/22/openshift-ipi-limited-sourceip/</guid>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
+最近ハマったOpenShiftのネタを雑にアウトプットします。
+送信元IPアドレスでAWSリソース操作に制限がかけられている環境での、IPI方式を用いたOpenShiftを構築する際の注意事項です。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>「OpenShift徹底入門」という書籍を執筆しました</title>
+      <link>https://blog.mosuke.tech/entry/2021/12/20/openshift-tettei-nyumon/</link>
+      <pubDate>Mon, 20 Dec 2021 21:32:02 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2021/12/20/openshift-tettei-nyumon/</guid>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
+この度「&lt;a href=&#34;https://amzn.to/3Ekifri&#34; target=&#34;_blank&#34;&gt;OpenShift徹底入門&lt;/a&gt;」というOpenShiftの書籍を執筆しましたのでお知らせします。
+2022年1月19日発売です。ブログ執筆時点では予約段階ですが、ぜひぜひご購入ください！&lt;/p&gt;
+&lt;blockquote class=&#34;twitter-tweet&#34;&gt;&lt;p lang=&#34;ja&#34; dir=&#34;ltr&#34;&gt;ついに「OpenShift徹底入門」予約開始しました〜！自分も何章か執筆しました。書き始めてから約1年で発売なので、長かった！がんばったと思います😃 &lt;a href=&#34;https://t.co/Cgfe6hn3Z5&#34;&gt;https://t.co/Cgfe6hn3Z5&lt;/a&gt;&lt;/p&gt;&amp;mdash; もーすけ (@mosuke5) &lt;a href=&#34;https://twitter.com/mosuke5/status/1461257300149104642?ref_src=twsrc%5Etfw&#34;&gt;November 18, 2021&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+    </item>
+    
+    <item>
+      <title>OpenShift、スタティックルートの追加方法と確認事項について</title>
+      <link>https://blog.mosuke.tech/entry/2021/08/31/openshift-add-static-route/</link>
+      <pubDate>Tue, 31 Aug 2021 14:46:13 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2021/08/31/openshift-add-static-route/</guid>
+      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;
+あまりここのブログネタにしないようなトピックですが、ちょっと機会があって軽くまとめておこうと思います。
+OpenShiftのノードへスタティックルート（static route、ルーティング設定）を追加する方法と関連することがらについてです。&lt;/p&gt;
+&lt;p&gt;解決方法だけいえば、以下のSolutionがそのまま活用できますが、それに伴ってなにがおこるのか？なにを確認したらよいのか？と関連付けたかったためにこのメモを残します。&lt;/p&gt;
+&lt;div class=&#34;belg-link row&#34;&gt;
+  &lt;div class=&#34;belg-left col-md-2 d-none d-md-block&#34;&gt;
+    &lt;a href=&#34;https://access.redhat.com/solutions/5876771&#34; target=&#34;_blank&#34;&gt;
+      &lt;img class=&#34;belg-site-image&#34; src=&#34;https://access.redhat.com/webassets/avalon/g/shadowman-200.png&#34; /&gt;
+    &lt;/a&gt;
+  &lt;/div&gt;
+  &lt;div class=&#34;belg-right col-md-10&#34;&gt;
+    &lt;div class=&#34;belg-title&#34;&gt;
+      &lt;a href=&#34;https://access.redhat.com/solutions/5876771&#34; target=&#34;_blank&#34;&gt;Create static routes post cluster installation for a specific worker pool - Red Hat Customer Portal&lt;/a&gt;
+    &lt;/div&gt;
+    &lt;div class=&#34;belg-description&#34;&gt;How could a user include static route on the node running with two interfaces? The static route would be required for the machine to communicate with the machines in the private network, can this be added to the rhcos nodes post cluster installation?&lt;/div&gt;
+    &lt;div class=&#34;belg-site&#34;&gt;
+      &lt;img src=&#34;https://access.redhat.com/webassets/avalon/g/favicon.ico&#34; class=&#34;belg-site-icon&#34;&gt;
+      &lt;span class=&#34;belg-site-name&#34;&gt;Red Hat Customer Portal&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</description>
+    </item>
+    
+    <item>
+      <title>OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？</title>
+      <link>https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/</link>
+      <pubDate>Sat, 24 Apr 2021 14:05:54 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/</guid>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
+本日は、OpenShift 4.6から新規に追加された「ユーザ定義プロジェクトの監視機能 (Monitoring for user-defined project)」ってなんなのか？どこまでできるのか？と気になってので検証してみます。正式な機能名があるわけではなさそうなので、本ブログでは「ユーザ定義プロジェクトの監視」ということにしておきます。&lt;/p&gt;
+&lt;p&gt;ちなみに本ブログを読みすすめる上で、&lt;code&gt;$ コマンド&lt;/code&gt; はクラスタ管理者の操作、&lt;code&gt;% コマンド&lt;/code&gt; はユーザ（開発者）の操作として記述しているので注意してください。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>OpenShiftでCA証明書を追加することについての検証</title>
+      <link>https://blog.mosuke.tech/entry/2021/03/01/openshift-add-user-ca/</link>
+      <pubDate>Mon, 01 Mar 2021 18:47:31 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2021/03/01/openshift-add-user-ca/</guid>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
+最近検証したOpenShiftへのCA証明書を追加することについてです。
+どういうケースでCA証明書の追加が必要かというと、自己証明書で運用されているレジストリとかプロキシに接続しなければいけないケースなどです。
+たとえば以下のようなケースでしょうか。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;非インターネット環境でのOpenShiftのインストールでミラーレジストリを構築した場合（ミラーレジストリの証明書が必要なケース）&lt;/li&gt;
+&lt;li&gt;OpenShift外にプライベートのコンテナレジストリを構築していて使っている場合（上とほぼ同義）&lt;/li&gt;
+&lt;li&gt;インターネットに出るのにプロキシを経由する必要があり、その証明書が必要な場合&lt;/li&gt;
+&lt;li&gt;社内のセキュリティでTLS復号化装置（SSL可視化ソリューションとかよばれるもの）を導入しており、その機器の証明書をインストールしなければならない場合&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;このときの証明書の追加の動きについて確認したので見ていきたいと思います。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Jaegerを使った分散トレーシングの検証 on Kubernetes (1)</title>
+      <link>https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/</link>
+      <pubDate>Mon, 08 Feb 2021 17:04:05 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/</guid>
+      <description>&lt;p&gt;もーすけです。&lt;br&gt;
+過去にDatadogでAPMを少し検証したり、トレーニングの中でJaegerを触ったりしましたが、正直ちゃんとわかっていなかったので、改めてJaegerというか分散トレーシングについて検証してみたいと思います。&lt;/p&gt;
+&lt;p&gt;今回はKubernetes上にJaegerを構築するので、&lt;a href=&#34;https://www.jaegertracing.io/docs/1.21/operator/&#34;&gt;Jaeger Operatorをインストール&lt;/a&gt;して利用します。
+今回はOpenShiftにて検証していますが、他のKubernetesディストリビューションでも同じように利用可能です。&lt;code&gt;oc&lt;/code&gt; は &lt;code&gt;kubectl&lt;/code&gt; と置き換えて読んでください。
+検証環境は下記のとおりです。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;OpenShift: 4.4&lt;/li&gt;
+&lt;li&gt;Jaeger: 1.17&lt;/li&gt;
+&lt;/ul&gt;</description>
+    </item>
+    
+    <item>
+      <title>OpenShift on NVIDIA GPU（導入編）</title>
+      <link>https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/</link>
+      <pubDate>Thu, 17 Dec 2020 22:01:20 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/</guid>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
+今回は前回に続き、OpenShiftにGPUのノードを追加して利用する方法（導入編）として書いていきます。
+インストールの細かな方法については英語ですが公式ドキュメントに譲るとして、実行していくにあたってのポイントなどを経験者としてまとめておきます。
+概要編につきましては以下をご覧ください。&lt;/p&gt;
+&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/12/16/openshift-on-nvidia-gpu/&#34; data-iframely-url=&#34;//cdn.iframe.ly/PbejT6X&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+    </item>
+    
+    <item>
+      <title>OpenShift on NVIDIA GPU（概要編）</title>
+      <link>https://blog.mosuke.tech/entry/2020/12/16/openshift-on-nvidia-gpu/</link>
+      <pubDate>Wed, 16 Dec 2020 19:21:02 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2020/12/16/openshift-on-nvidia-gpu/</guid>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
+本日はOpenShiftにNVIDIA GPUのノードを追加して利用する方法2つのブログ（概要編と導入編）に分けて紹介したいと思います。
+あまりまだ日本語での情報がないので、挑戦したいと考えている人の参考になればと思います。
+また、非常に進化が速く、情報が古くなる可能性もあります。なるべく更新していきたいと思っていますが、最新情報は公式情報をみてください。。
+導入編では、OpenShiftを取り扱いますが、他のKubernetesディストリビューションをお使いの方も参考になるところはあると思います。&lt;/p&gt;
+&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/&#34; data-iframely-url=&#34;//cdn.iframe.ly/ELaxDLL&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+    </item>
+    
+    <item>
+      <title>カスタマイズしたJenkinsを作成する方法 on OpenShift</title>
+      <link>https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/</link>
+      <pubDate>Sun, 05 Jul 2020 23:00:50 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/</guid>
+      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;
+本日はRed Hatが提供しているKubernetesディストリビューションであるOpenShift上のJenkinsの管理に関するお話です。
+OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカスタマイズ方法などをご紹介します。
+ハマリポイントもあり困っている方も見かけたのでお役に立てばと思います。&lt;/p&gt;
+&lt;p&gt;Jenkins本体ではなくJenkins agnetのカスタマイズに関しては以前に下記ブログを書いてますのでこちらをご参照ください。&lt;/p&gt;
+&lt;iframe src=&#34;https://hatenablog-parts.com/embed?url=https%3A%2F%2Frheb.hatenablog.com%2Fentry%2Fopenshift-custom-jenkins-agent&#34; style=&#34;border: 0; width: 100%; height: 190px;&#34; allowfullscreen scrolling=&#34;no&#34;&gt;&lt;/iframe&gt;</description>
+    </item>
+    
+    <item>
+      <title>Sock Shopを使ったサービスメッシュ体験のハンズオン</title>
+      <link>https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/</link>
+      <pubDate>Wed, 01 Jul 2020 23:00:53 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/</guid>
+      <description>&lt;p&gt;おひさしぶりです。もーすけです。&lt;br&gt;
+あっという間に６月が終わってしまい、６月はブログが書けませんでしたが、ブログで書きたいなと思うネタはいくつかありますので、時間のすきをみつけて書いていきたいと思います。&lt;/p&gt;
+&lt;p&gt;以前に、Sock Shopを使ったマイクロサービスのハンズオン体験についてのブログを書きました。
+このネタに、Istioを使ったサービスメッシュを適応するハンズオンを追加したのでお知らせします。&lt;/p&gt;
+&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/01/22/sockshop/&#34; data-iframely-url=&#34;//cdn.iframe.ly/YDI2rVR&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+    </item>
+    
+    <item>
+      <title>イメージのプルの効率化を考える。kubernetes-image-puller の紹介</title>
+      <link>https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/</link>
+      <pubDate>Tue, 28 Apr 2020 17:17:54 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/</guid>
+      <description>&lt;p&gt;FF7リメイク、クリアしました。いまSwitchで原作のFF7をやり直しています。もーすけです。&lt;br&gt;
+今日は&lt;a href=&#34;https://github.com/che-incubator/kubernetes-image-puller&#34; target=&#34;_blank&#34;&gt;kubernetes-image-puller&lt;/a&gt;というツールを発見し試してみたので、背景や課題感含めてご紹介していきます。&lt;/p&gt;
+&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://github.com/che-incubator/kubernetes-image-puller&#34; data-iframely-url=&#34;//cdn.iframe.ly/VbiFtNx&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+    </item>
+    
+    <item>
+      <title>Jenkins pipelineで複数のOpenShiftクラスタを扱う</title>
+      <link>https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/</link>
+      <pubDate>Tue, 14 Apr 2020 17:05:07 +0900</pubDate>
+      
+      <guid>https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/</guid>
+      <description>&lt;p&gt;もーすけです。今日はJenkinsを使ったKubernetes(OpenShift)環境でのデプロイ関連についてです。&lt;br&gt;
+Jenkins pipelineで複数クラスタ（マルチクラスタ）を扱いたい場合の設定方法について確認したので共有します。&lt;/p&gt;
+&lt;h2 id=&#34;背景&#34;&gt;背景&lt;/h2&gt;
+&lt;p&gt;以前にskopeoを用いたコンテナイメージの別レジストリへのコピーする方法について書きました。
+イメージを別レジストリへコピーする目的は、イメージをビルドしたクラスタと本番環境が別クラスタの場合などがあります。
+複数のクラスタを利用する環境では、１つのJenkins pipelineから複数のOpenShiftのクラスタに対して操作するケースがでてきます。
+やることは単純で、複数のクラスタの認証情報を用意して操作することになるわけですが、JenkinsのOpenShift Client Pluginを用いた方法についてメモしていきます。&lt;/p&gt;
+&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/04/05/skopeo/&#34; data-iframely-url=&#34;//cdn.iframe.ly/SsqYHwS&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

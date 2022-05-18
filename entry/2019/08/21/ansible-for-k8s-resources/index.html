@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Kubernetes上のリソースをAnsibleで管理する</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2019/08/21/ansible-for-k8s-resources/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/08/21/ansible-for-k8s-resources/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Kubernetes上のリソースをAnsibleで管理する &middot; Goldstine研究所">
+<meta name="twitter:description" content="Ansibleを使ったKubernetes上のリソース管理について試してみました。manifestファイルの適応の選択肢として考えるきっかけになればと思います。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes上のリソースをAnsibleで管理する &middot; Goldstine研究所">
+<meta property="og:description" content="Ansibleを使ったKubernetes上のリソース管理について試してみました。manifestファイルの適応の選択肢として考えるきっかけになればと思います。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2019/08/21/ansible-for-k8s-resources/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Kubernetes上のリソースをAnsibleで管理する</h1>
+    <div class="entry-sub-title">
+        <span class="">21 Aug 2019, 19:36</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#kubernetesモジュール">Kubernetesモジュール</a></li>
+    <li><a href="#ansibleでkubernetes上のリソースを管理する">AnsibleでKubernetes上のリソースを管理する</a>
+      <ul>
+        <li><a href="#まずは試す">まずは試す</a></li>
+        <li><a href="#既存のmanifestファイルを利用する">既存のmanifestファイルを利用する</a></li>
+        <li><a href="#templateを使ってmanifestを生成して利用する">Templateを使ってmanifestを生成して利用する</a></li>
+      </ul>
+    </li>
+    <li><a href="#ansibleで管理するメリットについて考える">Ansibleで管理するメリットについて考える</a>
+      <ul>
+        <li><a href="#1-template機能を利用できる">1. Template機能を利用できる</a></li>
+        <li><a href="#2-ansible-vaultを利用してシークレット情報の管理ができる">2. ansible-vaultを利用してシークレット情報の管理ができる</a></li>
+        <li><a href="#3-他の作業の流れに組み込みやすい">3. 他の作業の流れに組み込みやすい</a></li>
+      </ul>
+    </li>
+    <li><a href="#まとめ">まとめ</a></li>
+    <li><a href="#関連情報">関連情報</a></li>
+  </ul>
+</nav>
+        <p>お久しぶりです。@mosuke5です。<br>
+Kubernetes上のリソースをどのように管理していますか？
+<code>kubectl apply -f manifest-file.yml</code> のようにkubectlを使うことがまず多いのかなと思います。
+自分もそのようにデプロイすることがおおいです。
+今日はAnsibleを用いてKubernetes上のリソースを管理することを試してみたいと思います。</p>
+<h2 id="kubernetesモジュール">Kubernetesモジュール</h2>
+<p>AnsibleにはKubernetes上のリソースを操作するためのモジュールが用意されています。<br>
+<a href="https://docs.ansible.com/ansible/latest/modules/k8s_module.html#k8s-raw-module" target="_blank">k8s – Manage Kubernetes (K8s) objects — Ansible Documentation</a></p>
+<p>似たモジュールに<a href="https://docs.ansible.com/ansible/latest/modules/kubernetes_module.html" target="_blank">kubernetes</a>というのがあるのですが、こちらはDepricatedになっており、Ansible2.9以降で削除される予定とのことなので、上のものを利用しましょう。</p>
+<h2 id="ansibleでkubernetes上のリソースを管理する">AnsibleでKubernetes上のリソースを管理する</h2>
+<p>それでは早速<code>k8s</code>モジュールを使って行きたいと思います。まずは事前準備です。<br>
+このモジュールではいくつかrequirementがあります。内部ではopenshiftのpythonライブラリを利用しているようなので忘れずインストールしましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ pip install openshift
+</span></span></code></pre></div><p>認証の方法も一通り用意されています。<br>
+基本的にAnsibleを実行する端末でkubeconfigなりtokenを使ってkubectlが使える環境であれば問題ないです。
+内部的にはkubectlを使うわけではないですが、認証の方法は同じです。</p>
+<h3 id="まずは試す">まずは試す</h3>
+<p>まずはスタンダードにansibleのtaskに直接リソース情報を書いてみます。<br>
+基本的には<code>resource_definition</code>の部分にmanifestのyamlが入るイメージです。
+この程度の量なら問題ないですが、行数が増えてくるとだいぶ辛いですね。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>- <span style="color:#f92672">name</span>: <span style="color:#ae81ff">Create nginx deployment</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">k8s</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">gillsearch-development</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">resource_definition</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">run</span>: <span style="color:#ae81ff">nginx</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">selector</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">matchLabels</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">run</span>: <span style="color:#ae81ff">nginx</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">strategy</span>: {}
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">template</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>              <span style="color:#f92672">run</span>: <span style="color:#ae81ff">nginx</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">containers</span>:
+</span></span><span style="display:flex;"><span>            - <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:latest</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#f92672">resources</span>: {}
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">status</span>: {}
+</span></span></code></pre></div><h3 id="既存のmanifestファイルを利用する">既存のmanifestファイルを利用する</h3>
+<p>上の方法では、辛いケースも多く出てくると思います。
+また、すでに書いてあるmanifestもあることも多いと思いますので、既存のmanifestファイルから読みたいです。
+このようにファイルから読み出すことももちろん可能です。<br>
+<code>./templates/nginx-from-file.yml</code>は通常通りのmanifestファイルです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>- <span style="color:#f92672">name</span>: <span style="color:#ae81ff">Create nginx deployment</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">k8s</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">gillsearch-development</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">state</span>: <span style="color:#ae81ff">present</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">src</span>: <span style="color:#ae81ff">./templates/nginx-from-file.yml</span>
+</span></span></code></pre></div><h3 id="templateを使ってmanifestを生成して利用する">Templateを使ってmanifestを生成して利用する</h3>
+<p>manifestファイルをそのまま利用するのであればAnsibleを使うメリットは少なくなってしまうかなと思います。<br>
+AnsibleではJinja2を使ったテンプレートの機能があるのでこれを活用しない手はありません。
+例えば、Nginxのデプロイメントのレプリカ数を変数にしてmanifestファイルをテンプレート化して使ってみます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>- name: Create nginx deployment
+</span></span><span style="display:flex;"><span>  k8s:
+</span></span><span style="display:flex;"><span>    namespace: gillsearch-development
+</span></span><span style="display:flex;"><span>    state: present
+</span></span><span style="display:flex;"><span>    resource_definition: &#34;{{ lookup(&#39;template&#39;, &#39;./templates/nginx-from-template.yml.j2&#39;) }}&#34;
+</span></span></code></pre></div><p><code>./templates/nginx-from-template.yml.j2</code>内で変数展開などが可能。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">run</span>: <span style="color:#ae81ff">nginx-from-template</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-from-template</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">replicas</span>: {{ <span style="color:#ae81ff">nginx_replicas }} </span> <span style="color:#75715e">## &lt;--ここ</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">selector</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">matchLabels</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">run</span>: <span style="color:#ae81ff">nginx-from-template</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">strategy</span>: {}
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">template</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">run</span>: <span style="color:#ae81ff">nginx-from-template</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">containers</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:latest</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-from-template</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">resources</span>: {}
+</span></span></code></pre></div><p>この例は簡単な例ですが、AnsibleのTemplateや他の機能を使うことで、
+環境ごとでの（例えばProductionとTest環境）とで挙動や値を変えることももちろん可能です。</p>
+<h2 id="ansibleで管理するメリットについて考える">Ansibleで管理するメリットについて考える</h2>
+<p>それではAnsibleを使ってKubernetesを管理するメリットについてもう少し考えてみたいと思います。<br>
+基本的にAnsibleの機能をどう活かすかというところにつきるわけですが、どんな活用法があるでしょうか。</p>
+<h3 id="1-template機能を利用できる">1. Template機能を利用できる</h3>
+<p>上の例でも見てきましたが、Template機能を使えることはまず１つメリットとして考えられると思います。<br>
+もちろんHelmなど他のツールでもKubernetesのmanifestのテンプレート化などは可能ですが、Ansibleでも同様に可能です。
+AnsibleではJinja2のテンプレートエンジンを利用していますが、変数展開はもちろんif文なども利用でき活用の幅は大きいと思います。</p>
+<h3 id="2-ansible-vaultを利用してシークレット情報の管理ができる">2. ansible-vaultを利用してシークレット情報の管理ができる</h3>
+<p>Ansibleにはシークレット情報を暗号化できる<a href="https://docs.ansible.com/ansible/latest/user_guide/vault.html" target="_blank">ansible-vault</a>という機能・コマンドがあります。<br>
+こちらを使うことで、Kubernetesのsecretリソースの管理にも活用できる点は良いポイントかもしれません。<br>
+例えば、credential情報をvar_fileとして記述しansible-vaultで暗号化して保存しておくとします。
+そうするとKubernetesのSecretを作る際に下記のように展開して作成することも可能です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>data:
+</span></span><span style="display:flex;"><span>  password: {{ password | b64encode }}
+</span></span><span style="display:flex;"><span>kind: Secret
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  creationTimestamp: null
+</span></span><span style="display:flex;"><span>  name: mysecret
+</span></span></code></pre></div><h3 id="3-他の作業の流れに組み込みやすい">3. 他の作業の流れに組み込みやすい</h3>
+<p>Ansibleはもとはサーバのプロビジョニングツールとしての位置づけが強いツールですが、今となっては今回のKubernetesやクラウドサービスなど様々なツールのプロビジョニングに活用されています。
+そのため、他のツールやサーバ上の管理の流れと一部としてKubernetesの制御しやすいのは特徴的なポイントです。</p>
+<p>例えば、Kubernetes上にリソースをデプロイ後に、DNSの設定を追加・変更するなどのKubernetes以外の操作と組み合わせしやすいかと思います。</p>
+<h2 id="まとめ">まとめ</h2>
+<p>Ansibleを使って、Kubernetes上のリソースに対する操作をやってみました。
+Ansibleという使い慣れているツールで、Templateやvaultの機能を利用できるのは良いポイントと感じました。
+実際の運用に組み込めるか、採用するかどうかはいろいろ考えてみないとわかりませんが、選択肢の１つとしてありかなと現時点では思っています。</p>
+<h2 id="関連情報">関連情報</h2>
+<p>過去に書いた関連情報を掲載しておきます。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/" data-iframely-url="//cdn.iframe.ly/al5KMSQ"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Kubernetes%e4%b8%8a%e3%81%ae%e3%83%aa%e3%82%bd%e3%83%bc%e3%82%b9%e3%82%92Ansible%e3%81%a7%e7%ae%a1%e7%90%86%e3%81%99%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Kubernetes上のリソースをAnsibleで管理する'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて'});">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a> (2022/01/24)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/10/28/kubernetes-test-by-terratest/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Kubernetes環境についてTerratestでテストを書く'});">Kubernetes環境についてTerratestでテストを書く</a> (2021/10/28)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'カスタマイズしたJenkinsを作成する方法 on OpenShift'});">カスタマイズしたJenkinsを作成する方法 on OpenShift</a> (2020/07/05)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

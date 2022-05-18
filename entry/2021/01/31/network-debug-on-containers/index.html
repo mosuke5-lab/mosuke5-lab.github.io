@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Kubernetes上のアプリケーションをtcpdumpでデバッグする</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/01/31/network-debug-on-containers/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/01/31/network-debug-on-containers/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Kubernetes上のアプリケーションをtcpdumpでデバッグする &middot; Goldstine研究所">
+<meta name="twitter:description" content="Kubernetes上で運用しているアプリケーションのデバッグでtcpdumpなどネットワーク関連コマンドを打ちたいときがあります。イメージを小さく保つことをするとデバッグツールが入っておらず慌てることがあるのでその対処法について紹介します。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes上のアプリケーションをtcpdumpでデバッグする &middot; Goldstine研究所">
+<meta property="og:description" content="Kubernetes上で運用しているアプリケーションのデバッグでtcpdumpなどネットワーク関連コマンドを打ちたいときがあります。イメージを小さく保つことをするとデバッグツールが入っておらず慌てることがあるのでその対処法について紹介します。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/01/31/network-debug-on-containers/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Kubernetes上のアプリケーションをtcpdumpでデバッグする</h1>
+    <div class="entry-sub-title">
+        <span class="">31 Jan 2021, 12:10</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-kubernetes" href="/categories/kubernetes">kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#はじめに">はじめに</a></li>
+    <li><a href="#sidecarでデバッグコンテナを起動する">Sidecarでデバッグコンテナを起動する</a>
+      <ul>
+        <li><a href="#pod内のコンテナはnetwork-namespaceを共有する">Pod内のコンテナはNetwork Namespaceを共有する</a></li>
+        <li><a href="#sidecarを起動して実行する">Sidecarを起動して実行する</a></li>
+        <li><a href="#ephemeral-containersエフェメラルコンテナを使う">Ephemeral containers(エフェメラルコンテナ)を使う</a></li>
+        <li><a href="#runasuserを確認しておく">runAsUserを確認しておく</a></li>
+        <li><a href="#デバッグ用コンテナイメージの準備しておく">デバッグ用コンテナイメージの準備しておく</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        <p>こんにちは、もーすけです。休日はもっぱら住宅購入の検討で忙しいマンです。<br>
+さて、本日は、Kubernetesのアプリケーションのデバッグに関して書きます。</p>
+<p>Kubernetesで運用中のアプリケーションの障害対応で、ネットワーク関連のデバッグをしたいことはよくあります。
+このブログでは具体的にtcpdumpを取得したいという場面を想定して書きます。
+コンテナアプリケーションの開発・運用をしていると、<strong>イメージのサイズを小さく保っておきたい</strong>と思うはずです。
+その理由についてはいろいろとありますが、イメージの展開のスピードを高めることで、デプロイや障害時の復旧を早めるなどが代表的なところです。（関連するトピックとして「<a href="https://blog.mosuke.tech/entry/2020/07/09/container-image-size/">コンテナイメージを軽くする方法と、その原理原則を考える</a>」も読んでみてください。）</p>
+<p>それゆえに、アプリケーションの動作に必要なライブラリ以外は入れないことが多く、デバッグツールを除外しておくことが多いでしょう。
+しかし、障害発生時にいざtcpdumpやstrace, ping ,digなどを打ちたいと思ってもインストールされておらず困ることがあります。
+そんな場面に遭遇しても焦らないようにあらかじめ対応策を頭に入れて練習しておきましょう。</p>
+<h2 id="はじめに">はじめに</h2>
+<p>Kubernetes上で動いているアプリケーションのデバッグ方法に対するアプローチはいくつかあります。
+以下のブログに、他のパターンも含めて紹介されていたので合わせて読むとよさそうです。
+本ブログでは、その中のサイドカーでデバッグコンテナを起動する方法に焦点を当てています。既存のアプリケーションに影響を与えることなく実現できる点としてよく使う方法ではないかと思っています。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://qiita.com/tkusumi/items/a62c209972bd0d4913fc" data-iframely-url="//cdn.iframe.ly/9u1xfhJ?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h2 id="sidecarでデバッグコンテナを起動する">Sidecarでデバッグコンテナを起動する</h2>
+<p>いくつかのアプローチはありますが、既存のアプリケーションに影響を与えることなく実施できる方法として、Sidecar（サイドカー）でデバッグ用のコンテナを起動する、があります。
+デバッグ用のコンテナイメージを事前に準備しておくことで手軽に実現できます。</p>
+<h3 id="pod内のコンテナはnetwork-namespaceを共有する">Pod内のコンテナはNetwork Namespaceを共有する</h3>
+<p>Kubernetesの世界では、PodがWorkloadの最小単位ですが、Pod内に複数のコンテナを起動することが可能です。同じPod内のコンテナはネットワーク的には分離されておらず、IPアドレスを共有します。下の図のように、Network Namespaceを共有しておりNICも同一です。
+つまり、アプリケーション向けのパケットに対して、サイドカーコンテナ（Pod内の別のコンテナ）からパケットをキャプチャできます。</p>
+<p><img src="/image/share-network-namespace.png" alt="share-network-namespace"></p>
+<p>試しにfedoraとbusyboxを同一のPod内に起動した<code>my-pod</code>があります。
+それぞれのコンテナで<code>ifconfig -a</code>をうってインターフェイス情報を確認してみます。同じIPアドレスのeth0を保有しているのがわかります。ぜひためしてみてください。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get pod
+</span></span><span style="display:flex;"><span>NAME                         READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>my-pod   2/2     Running   0          4m22s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl exec  my-pod -c busybox -- ifconfig -a
+</span></span><span style="display:flex;"><span>eth0      Link encap:Ethernet  HWaddr 0A:58:0A:80:02:28
+</span></span><span style="display:flex;"><span>          inet addr:10.128.2.40  Bcast:10.128.3.255  Mask:255.255.254.0
+</span></span><span style="display:flex;"><span>          inet6 addr: fe80::85f:20ff:fe4c:314a/64 Scope:Link
+</span></span><span style="display:flex;"><span>          UP BROADCAST RUNNING MULTICAST  MTU:8951  Metric:1
+</span></span><span style="display:flex;"><span>          RX packets:13900 errors:0 dropped:0 overruns:0 frame:0
+</span></span><span style="display:flex;"><span>          TX packets:7949 errors:0 dropped:0 overruns:0 carrier:0
+</span></span><span style="display:flex;"><span>          collisions:0 txqueuelen:0
+</span></span><span style="display:flex;"><span>          RX bytes:118417427 (112.9 MiB)  TX bytes:570079 (556.7 KiB)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>lo        Link encap:Local Loopback
+</span></span><span style="display:flex;"><span>          inet addr:127.0.0.1  Mask:255.0.0.0
+</span></span><span style="display:flex;"><span>          inet6 addr: ::1/128 Scope:Host
+</span></span><span style="display:flex;"><span>          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+</span></span><span style="display:flex;"><span>          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+</span></span><span style="display:flex;"><span>          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+</span></span><span style="display:flex;"><span>          collisions:0 txqueuelen:1000
+</span></span><span style="display:flex;"><span>          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl exec  my-pod -c fedora -- ifconfig -a
+</span></span><span style="display:flex;"><span>eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 8951
+</span></span><span style="display:flex;"><span>        inet 10.128.2.40  netmask 255.255.254.0  broadcast 10.128.3.255
+</span></span><span style="display:flex;"><span>        inet6 fe80::85f:20ff:fe4c:314a  prefixlen 64  scopeid 0x20&lt;link&gt;
+</span></span><span style="display:flex;"><span>        ether 0a:58:0a:80:02:28  txqueuelen 0  (Ethernet)
+</span></span><span style="display:flex;"><span>        RX packets 13900  bytes 118417427 (112.9 MiB)
+</span></span><span style="display:flex;"><span>        RX errors 0  dropped 0  overruns 0  frame 0
+</span></span><span style="display:flex;"><span>        TX packets 7949  bytes 570079 (556.7 KiB)
+</span></span><span style="display:flex;"><span>        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536
+</span></span><span style="display:flex;"><span>        inet 127.0.0.1  netmask 255.0.0.0
+</span></span><span style="display:flex;"><span>        inet6 ::1  prefixlen 128  scopeid 0x10&lt;host&gt;
+</span></span><span style="display:flex;"><span>        loop  txqueuelen 1000  (Local Loopback)
+</span></span><span style="display:flex;"><span>        RX packets 0  bytes 0 (0.0 B)
+</span></span><span style="display:flex;"><span>        RX errors 0  dropped 0  overruns 0  frame 0
+</span></span><span style="display:flex;"><span>        TX packets 0  bytes 0 (0.0 B)
+</span></span><span style="display:flex;"><span>        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+</span></span></code></pre></div><h3 id="sidecarを起動して実行する">Sidecarを起動して実行する</h3>
+<p>実例でわかりやすくするため、Nginxを起動しておき、Nginxコンテナにたいしてtcpdumpを実行したいとします。
+まずは、以下のNginxコンテナを起動しておきます。また、起動したNginxのイメージにはtcpdumpがインストールされておらず、実行しても当然エラーで弾かれます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl create deployment my-nginx --image=nginxinc/nginx-unprivileged:latest
+</span></span><span style="display:flex;"><span>deployment.apps/my-nginx created
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl get deploy,pod
+</span></span><span style="display:flex;"><span>NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span style="display:flex;"><span>deployment.apps/my-nginx   1/1     1            1           9s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                            READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>pod/my-nginx-65c459cdc6-g2gdg   1/1     Running   0          9s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl exec -it pod/my-nginx-65c459cdc6-g2gdg -- tcpdump
+</span></span><span style="display:flex;"><span>ERRO[0000] exec failed: container_linux.go:349: starting container process caused &#34;exec: \&#34;tcpdump\&#34;: executable file not found in $PATH&#34;
+</span></span><span style="display:flex;"><span>exec failed: container_linux.go:349: starting container process caused &#34;exec: \&#34;tcpdump\&#34;: executable file not found in $PATH&#34;
+</span></span><span style="display:flex;"><span>command terminated with exit code 1
+</span></span></code></pre></div><p>ではこのNginxに対してtcpdumpがインストールされたデバッグ用のコンテナをサイドカーとして起動します。
+この場で利用するのは、<a href="https://hub.docker.com/r/nicolaka/netshoot">nicolaka/netshoot</a> というパブリックのコンテナイメージです。
+ネットワークデバッグに必要なコマンドがあらかじめインストールされています。
+のちほど後述しますが、自分たちの運用のしやすいよう自作しておくのもいいでしょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl edit deploy my-nginx
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>        # ここを追加
+</span></span><span style="display:flex;"><span>        - image: nicolaka/netshoot
+</span></span><span style="display:flex;"><span>          name: debug
+</span></span><span style="display:flex;"><span>          command:
+</span></span><span style="display:flex;"><span>            - /bin/sh
+</span></span><span style="display:flex;"><span>            - -c
+</span></span><span style="display:flex;"><span>            - sleep 3600
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Podが2/2と2つ目のコンテナが追加されている
+</span></span><span style="display:flex;"><span>$ kubectl get pod
+</span></span><span style="display:flex;"><span>NAME                       READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>my-nginx-894b94fbb-5qcwb   2/2     Running   0          2m15s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>tcpdumpを確認
+</span></span><span style="display:flex;"><span>$ kubectl exec my-nginx-894b94fbb-5qcwb -c debug -- which tcpdump
+</span></span><span style="display:flex;"><span>/usr/bin/tcpdump
+</span></span></code></pre></div><h3 id="ephemeral-containersエフェメラルコンテナを使う">Ephemeral containers(エフェメラルコンテナ)を使う</h3>
+<p>前のセクションでは直接Deploymentのマニフェストを編集しましたが、こんなときはEphemeral containersを使うのもいいでしょう。
+Ephemeral containersは、Kubernetes 1.20現在ではまだGAされていないので、その点は注意が必要です。
+詳しくは、こちらの<a href="https://kubernetes.io/ja/docs/concepts/workloads/pods/ephemeral-containers/">公式ドキュメント</a>を確認しましょう。</p>
+<h3 id="runasuserを確認しておく">runAsUserを確認しておく</h3>
+<p>tcpdumpのような実行にroot権限が必要なコマンドを使いたい場合は、コンテナの起動ユーザ（<code>runAsUser</code>）にも注意しましょう。
+サイドカーでデバッグコンテナを起動しても、デバッグコンテナ自身のプロセスがrootで動いていない場合、以下のように実行に失敗します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zed" data-lang="zed"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> kubectl exec <span style="color:#f92672">-</span>it my<span style="color:#f92672">-</span>nginx<span style="color:#f92672">-</span><span style="color:#960050;background-color:#1e0010">664</span>cc58c8c<span style="color:#f92672">-</span>k4vjp <span style="color:#f92672">-</span>c debug <span style="color:#f92672">--</span> tcpdump
+</span></span><span style="display:flex;"><span>tcpdump<span style="color:#f92672">:</span> eth0<span style="color:#f92672">:</span> You don<span style="color:#960050;background-color:#1e0010">&#39;</span>t have <span style="color:#66d9ef">permission</span> to capture on that device
+</span></span><span style="display:flex;"><span>(socket<span style="color:#f92672">:</span> Operation not permitted)
+</span></span><span style="display:flex;"><span>command terminated with exit code <span style="color:#960050;background-color:#1e0010">1</span>
+</span></span></code></pre></div><p>OpenShiftを使っていている場合、SCCの設定によっては、自動で<code>runAsUser</code>が設定されます。
+その場合は、管理者に連絡し、一時的にでもSCCの設定を緩めてもらうなどで対応が必要です。</p>
+<h3 id="デバッグ用コンテナイメージの準備しておく">デバッグ用コンテナイメージの準備しておく</h3>
+<p>上の例では、nicolaka/netshootのパブリックイメージを利用しましたが、アプリケーションによってデバッグに使いたいツールは異なるでしょう。
+場合によってはデータベースへの接続のクライアントや使い慣れているプログラミング言語などが必要です。
+自分たちが使いやすいデバッグ用のコンテナイメージを準備しておくといざというときにすばやく行動できます。
+サンプルですが、自分はGitlabにデバッグ用のコンテナイメージをビルドするためのDockerfileとGitlab CIを用いたビルドの環境を用意しています。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://gitlab.com/mosuke5/debug-container" data-iframely-url="//cdn.iframe.ly/bSnGj1z"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Kubernetes%e4%b8%8a%e3%81%ae%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e3%82%92tcpdump%e3%81%a7%e3%83%87%e3%83%90%e3%83%83%e3%82%b0%e3%81%99%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Kubernetes上のアプリケーションをtcpdumpでデバッグする'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

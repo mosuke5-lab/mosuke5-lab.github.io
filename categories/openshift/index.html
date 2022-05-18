@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>OpenShift</title>
+<link rel="canonical" href="https://blog.mosuke.tech/categories/openshift/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/categories/openshift/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="OpenShift &middot; Goldstine研究所">
+<meta name="twitter:description" content="@mosuke5のブログサイト。クラウド技術やアプリ開発、インフラ系ツールなどを主に情報発信しています。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenShift &middot; Goldstine研究所">
+<meta property="og:description" content="@mosuke5のブログサイト。クラウド技術やアプリ開発、インフラ系ツールなどを主に情報発信しています。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/categories/openshift/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+
+<div class="entry col-md-8 col-xs-12">
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/" class="entry-title">Argo CD、外部クラスタへのデプロイと認証の仕組み</a></h1>
+    <div class="entry-sub-title">
+        <span class="">08 Feb 2022, 14:16</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <hr>
+<h5>Argo CD学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2021/04/13/argocd/">Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></li>
+<li>第2回: <a href="/entry/2021/05/06/argocd-application/">Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
+<li>第3回: <a href="/entry/2021/05/06/argocd-sync-action/">Argo CD、Syncの実行方法やタイミングについての検討</a></li>
+<li>第4回: <a href="/entry/2021/06/12/argocd-resourcehooks/">Argo CD、Resource Hooksを使ってデプロイを高度化する</a></li>
+<li>第5回: <a href="/entry/2022/02/08/argocd-deploy-to-external-cluster/">Argo CD、外部クラスタへのデプロイ</a></li>
+<li>関連記事: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。<br>
+今回はArgo CDを用いて、外部のKubernetesクラスタへアプリケーションをデプロイすることについて動きを確認します。</p>
+        <a href="https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2022/01/20/openshift-project-scoped-nodeselector/" class="entry-title">OpenShift、プロジェクトスコープのノードセレクターの挙動確認</a></h1>
+    <div class="entry-sub-title">
+        <span class="">20 Jan 2022, 15:07</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>あけましておめでとうございます。もーすけです。<br>
+今年もよろしくおねがいします。</p>
+<p>OpenShiftのプロジェクトスコープのノードセレクターに関する雑多なメモです。</p>
+        <a href="https://blog.mosuke.tech/entry/2022/01/20/openshift-project-scoped-nodeselector/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/12/28/openshift-router-sharding/" class="entry-title">OpenShift、Routerシャーディングを使って用途ごとにアクセス経路を分ける</a></h1>
+    <div class="entry-sub-title">
+        <span class="">28 Dec 2021, 17:24</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。<br>
+本日もOpenShift関連のTipsについてアウトプットします。
+Ingress Controller(Router)のシャーディング（分割）についてです。
+半分は自分の備忘録ではありますが、同じような境遇の方の参考になればと思います。</p>
+<p>本ブログでは、OpenShift 4.9 on AWSの環境を用いていますが、オンプレミスなど他の環境でも活用できます。もちろんAWS環境とオンプレミス環境では若干Ingressの実装に差はでますが、大きくは変わらないと思います。</p>
+<p>※いろいろまだ書き残したことがあるので随時更新します。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/12/28/openshift-router-sharding/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/12/22/openshift-ipi-limited-sourceip/" class="entry-title">OpenShift、送信元IPアドレスで制限がかかった環境でのIPIインストールの注意事項</a></h1>
+    <div class="entry-sub-title">
+        <span class="">22 Dec 2021, 15:55</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。<br>
+最近ハマったOpenShiftのネタを雑にアウトプットします。
+送信元IPアドレスでAWSリソース操作に制限がかけられている環境での、IPI方式を用いたOpenShiftを構築する際の注意事項です。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/12/22/openshift-ipi-limited-sourceip/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/12/20/openshift-tettei-nyumon/" class="entry-title">「OpenShift徹底入門」という書籍を執筆しました</a></h1>
+    <div class="entry-sub-title">
+        <span class="">20 Dec 2021, 21:32</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。<br>
+この度「<a href="https://amzn.to/3Ekifri" target="_blank">OpenShift徹底入門</a>」というOpenShiftの書籍を執筆しましたのでお知らせします。
+2022年1月19日発売です。ブログ執筆時点では予約段階ですが、ぜひぜひご購入ください！</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">ついに「OpenShift徹底入門」予約開始しました〜！自分も何章か執筆しました。書き始めてから約1年で発売なので、長かった！がんばったと思います😃 <a href="https://t.co/Cgfe6hn3Z5">https://t.co/Cgfe6hn3Z5</a></p>&mdash; もーすけ (@mosuke5) <a href="https://twitter.com/mosuke5/status/1461257300149104642?ref_src=twsrc%5Etfw">November 18, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        <a href="https://blog.mosuke.tech/entry/2021/12/20/openshift-tettei-nyumon/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/08/31/openshift-add-static-route/" class="entry-title">OpenShift、スタティックルートの追加方法と確認事項について</a></h1>
+    <div class="entry-sub-title">
+        <span class="">31 Aug 2021, 14:46</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは。もーすけです。<br>
+あまりここのブログネタにしないようなトピックですが、ちょっと機会があって軽くまとめておこうと思います。
+OpenShiftのノードへスタティックルート（static route、ルーティング設定）を追加する方法と関連することがらについてです。</p>
+<p>解決方法だけいえば、以下のSolutionがそのまま活用できますが、それに伴ってなにがおこるのか？なにを確認したらよいのか？と関連付けたかったためにこのメモを残します。</p>
+<div class="belg-link row">
+  <div class="belg-left col-md-2 d-none d-md-block">
+    <a href="https://access.redhat.com/solutions/5876771" target="_blank">
+      <img class="belg-site-image" src="https://access.redhat.com/webassets/avalon/g/shadowman-200.png" />
+    </a>
+  </div>
+  <div class="belg-right col-md-10">
+    <div class="belg-title">
+      <a href="https://access.redhat.com/solutions/5876771" target="_blank">Create static routes post cluster installation for a specific worker pool - Red Hat Customer Portal</a>
+    </div>
+    <div class="belg-description">How could a user include static route on the node running with two interfaces? The static route would be required for the machine to communicate with the machines in the private network, can this be added to the rhcos nodes post cluster installation?</div>
+    <div class="belg-site">
+      <img src="https://access.redhat.com/webassets/avalon/g/favicon.ico" class="belg-site-icon">
+      <span class="belg-site-name">Red Hat Customer Portal</span>
+    </div>
+  </div>
+</div>
+        <a href="https://blog.mosuke.tech/entry/2021/08/31/openshift-add-static-route/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/" class="entry-title">OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？</a></h1>
+    <div class="entry-sub-title">
+        <span class="">24 Apr 2021, 14:05</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。<br>
+本日は、OpenShift 4.6から新規に追加された「ユーザ定義プロジェクトの監視機能 (Monitoring for user-defined project)」ってなんなのか？どこまでできるのか？と気になってので検証してみます。正式な機能名があるわけではなさそうなので、本ブログでは「ユーザ定義プロジェクトの監視」ということにしておきます。</p>
+<p>ちなみに本ブログを読みすすめる上で、<code>$ コマンド</code> はクラスタ管理者の操作、<code>% コマンド</code> はユーザ（開発者）の操作として記述しているので注意してください。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/03/01/openshift-add-user-ca/" class="entry-title">OpenShiftでCA証明書を追加することについての検証</a></h1>
+    <div class="entry-sub-title">
+        <span class="">01 Mar 2021, 18:47</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。<br>
+最近検証したOpenShiftへのCA証明書を追加することについてです。
+どういうケースでCA証明書の追加が必要かというと、自己証明書で運用されているレジストリとかプロキシに接続しなければいけないケースなどです。
+たとえば以下のようなケースでしょうか。</p>
+<ol>
+<li>非インターネット環境でのOpenShiftのインストールでミラーレジストリを構築した場合（ミラーレジストリの証明書が必要なケース）</li>
+<li>OpenShift外にプライベートのコンテナレジストリを構築していて使っている場合（上とほぼ同義）</li>
+<li>インターネットに出るのにプロキシを経由する必要があり、その証明書が必要な場合</li>
+<li>社内のセキュリティでTLS復号化装置（SSL可視化ソリューションとかよばれるもの）を導入しており、その機器の証明書をインストールしなければならない場合</li>
+</ol>
+<p>このときの証明書の追加の動きについて確認したので見ていきたいと思います。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/03/01/openshift-add-user-ca/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/" class="entry-title">Jaegerを使った分散トレーシングの検証 on Kubernetes (1)</a></h1>
+    <div class="entry-sub-title">
+        <span class="">08 Feb 2021, 17:04</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-アプリケーション開発" href="/categories/%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E9%96%8B%E7%99%BA">アプリケーション開発</a>
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>もーすけです。<br>
+過去にDatadogでAPMを少し検証したり、トレーニングの中でJaegerを触ったりしましたが、正直ちゃんとわかっていなかったので、改めてJaegerというか分散トレーシングについて検証してみたいと思います。</p>
+<p>今回はKubernetes上にJaegerを構築するので、<a href="https://www.jaegertracing.io/docs/1.21/operator/">Jaeger Operatorをインストール</a>して利用します。
+今回はOpenShiftにて検証していますが、他のKubernetesディストリビューションでも同じように利用可能です。<code>oc</code> は <code>kubectl</code> と置き換えて読んでください。
+検証環境は下記のとおりです。</p>
+<ul>
+<li>OpenShift: 4.4</li>
+<li>Jaeger: 1.17</li>
+</ul>
+        <a href="https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/">続きを読む</a>
+    </div>
+    
+    <h1><a href="https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/" class="entry-title">OpenShift on NVIDIA GPU（導入編）</a></h1>
+    <div class="entry-sub-title">
+        <span class="">17 Dec 2020, 22:01</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。<br>
+今回は前回に続き、OpenShiftにGPUのノードを追加して利用する方法（導入編）として書いていきます。
+インストールの細かな方法については英語ですが公式ドキュメントに譲るとして、実行していくにあたってのポイントなどを経験者としてまとめておきます。
+概要編につきましては以下をご覧ください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/12/16/openshift-on-nvidia-gpu/" data-iframely-url="//cdn.iframe.ly/PbejT6X"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+        <a href="https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/">続きを読む</a>
+    </div>
+    
+<div class="pagination">
+  <nav role="pagination" class="post-list-pagination">
+      <span class="post-list-pagination-item post-list-pagination-item-current">Page 1 of 2</span>
+    <a href="/categories/openshift/page/2/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
+        Older&nbsp;<i class="fa fa-angle-double-right"></i>
+      </a>
+    </nav>
+</div>
+
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

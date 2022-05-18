@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Github Pagesと、独自ドメイン適応時の通信経路について</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2016/03/19/232437/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2016/03/19/232437/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Github Pagesと、独自ドメイン適応時の通信経路について &middot; Goldstine研究所">
+<meta name="twitter:description" content=" 今更ながらgithubページでプロフィールサイトを作った。 (もう少しデザインブラッシュアップしたい…)  mosuke tech  また、独自ドメイン（カスタムドメイン）の設定やその仕組みをおっている時に、 独自ドメイン適応時の通信につ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Github Pagesと、独自ドメイン適応時の通信経路について &middot; Goldstine研究所">
+<meta property="og:description" content=" 今更ながらgithubページでプロフィールサイトを作った。 (もう少しデザインブラッシュアップしたい…)  mosuke tech  また、独自ドメイン（カスタムドメイン）の設定やその仕組みをおっている時に、 独自ドメイン適応時の通信につ">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2016/03/19/232437/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Github Pagesと、独自ドメイン適応時の通信経路について</h1>
+    <div class="entry-sub-title">
+        <span class="">19 Mar 2016, 23:24</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-ブログ運用" href="/categories/%E3%83%96%E3%83%AD%E3%82%B0%E9%81%8B%E7%94%A8">ブログ運用</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents"></nav>
+        <body>
+<p><strong>執筆当時の状況で、現在は異なる状況のように見えた。そのため本記事は検証の観点としてとどめてください。</strong></p>
+<p>今更ながら<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>ページでプロフィールサイトを作った。<br>
+(もう少しデザインブラッシュアップしたい…)</p>
+<p><a href="http://mosuke.tech/">mosuke tech</a></p>
+<p>また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%C8%BC%AB%A5%C9%A5%E1%A5%A4%A5%F3">独自ドメイン</a>（カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>）の設定やその仕組みをおっている時に、<br>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%C8%BC%AB%A5%C9%A5%E1%A5%A4%A5%F3">独自ドメイン</a>適応時の通信について面白いことがわかったのでかく。</p>
+<h1>求めていたもの</h1>
+<ul>
+<li>ブログとか作ったプロダクトをまとめたかった</li>
+<li>極力シンプルでメンテしやすいものがよかった</li>
+<li>でもレスポンシブなデザインがよかった</li>
+</ul>
+<h1>どのようにつくったか</h1>
+<p>上の条件を満たすために以下の２パターンのどっちで作ろうか迷った。</p>
+<ul>
+<li>Jekyllなどを使いテンプレートを使って作る</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/CSS">CSS</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>のみ利用し、あとは自分で作る</li>
+</ul>
+<p>１ページだけのシンプルなプロフィールサイトがよかったので、<br>
+Jekyllとか複雑なものは利用したくないと考えた。</p>
+<p>また、<a class="keyword" href="http://d.hatena.ne.jp/keyword/CSS">CSS</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>だが、いつもよくTwitterBootstrapを使っているので、<br>
+それ以外のものでやってみようと考えた。</p>
+<p>その結果、行き着いたのが<a href="http://getskeleton.com/">Skeleton</a>だった。<br>
+Skeletonは<b>"A dead simple, responsive boilerplate."</b>をうたっているものでよかった。</p>
+<h1>カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>の設定</h1>
+<p>デフォルトだと<code>mosuke5.github.io</code>のURLが利用できる。<br>
+しかし、この前<code>mosuke.tech</code>といういい感じの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>を安く手に入れてたので、カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>の設定を行うことにした。</p>
+<p>カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>の設定方法は以下のみだ。</p>
+<ol>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>にCNAMEファイルを作成する <code>$ echo mosuke.tech &gt; CNAME</code>
+</li>
+<li>
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>の設定：Aレコードに<code>192.30.252.153</code>と<code>192.30.252.154</code>を追加</li>
+</ol>
+<p>(本家ドキュメント)<br>
+<a href="https://help.github.com/articles/setting-up-an-apex-domain/">Setting up an apex domain - User Documentation</a></p>
+<h1>カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>設定時の通信について</h1>
+<p>カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>がどのような仕組みで実現されているのか気になって、<br>
+いろいろと調べている時にあることに気づいた。</p>
+<p>Aレコードに登録した<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を逆引きで調べると、pages.<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>.comが出てくるが、<br>
+pages.<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>.comをdigすると違う結果が返ってくる。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ dig -x 192.30.252.153
+</span></span><span style="display:flex;"><span>;; ANSWER SECTION:
+</span></span><span style="display:flex;"><span>153.252.30.192.in-addr.arpa. 3600 IN    PTR pages.github.com.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ dig pages.github.com
+</span></span><span style="display:flex;"><span>;; ANSWER SECTION:
+</span></span><span style="display:flex;"><span>pages.github.com.   900 IN  CNAME   github.map.fastly.net.
+</span></span><span style="display:flex;"><span>github.map.fastly.net.  23  IN  A   103.245.222.133[f:id:mosuke5:20160319233634j:plain] 
+</span></span></code></pre></div><p>後者のほうでは、fastly（CDN）の結果が返ってくる。<br>
+つまり、カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>を設定しなければ、通常はCDN経由で通信されるが、<br>
+カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>を割り当てるとCDNを利用できないのではないかということがわかった。</p>
+<p>実際に<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ping">Ping</a>で確かめてみる。明らかに速度差がでている。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% ping mosuke5.github.io
+</span></span><span style="display:flex;"><span>PING github.map.fastly.net (103.245.222.133): 56 data bytes
+</span></span><span style="display:flex;"><span>64 bytes from 103.245.222.133: icmp_seq=0 ttl=58 time=18.485 ms
+</span></span><span style="display:flex;"><span>64 bytes from 103.245.222.133: icmp_seq=1 ttl=58 time=19.108 ms
+</span></span><span style="display:flex;"><span>64 bytes from 103.245.222.133: icmp_seq=2 ttl=58 time=18.709 ms
+</span></span><span style="display:flex;"><span>64 bytes from 103.245.222.133: icmp_seq=3 ttl=58 time=19.161 ms
+</span></span><span style="display:flex;"><span>64 bytes from 103.245.222.133: icmp_seq=4 ttl=58 time=20.574 ms
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% ping mosuke.tech
+</span></span><span style="display:flex;"><span>PING mosuke.tech (192.30.252.154): 56 data bytes
+</span></span><span style="display:flex;"><span>64 bytes from 192.30.252.154: icmp_seq=0 ttl=52 time=203.329 ms
+</span></span><span style="display:flex;"><span>64 bytes from 192.30.252.154: icmp_seq=1 ttl=52 time=205.535 ms
+</span></span><span style="display:flex;"><span>64 bytes from 192.30.252.154: icmp_seq=2 ttl=52 time=203.178 ms
+</span></span><span style="display:flex;"><span>64 bytes from 192.30.252.154: icmp_seq=3 ttl=52 time=201.345 ms
+</span></span><span style="display:flex;"><span>64 bytes from 192.30.252.154: icmp_seq=4 ttl=52 time=205.125 ms 
+</span></span></code></pre></div><p>また、それぞれの<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>から場所も調べてみた。<br>
+CDN利用時がオーストラリア、そうでないとアメリカ西海岸ということがわかった。
+<p>以上のことをまとめつつ、地図に表した。
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160319/20160319233634.jpg" alt="f:id:mosuke5:20160319233634j:plain" title="f:id:mosuke5:20160319233634j:plain" class="hatena-fotolife" itemprop="image"></span></p>
+<p>オーストラリアとアメリカ西海岸だとそんなに直線距離は変わらない気もするけど、<br>
+CDNの力なのかルート的な問題ないのか<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ping">Ping</a>の応答速度は10倍ほどの差があった。</p>
+<p>カスタム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>を使うと遅くなる！？（まあ全然いいんだけど…）</p>
+<h1>最後に</h1>
+<p>CDNの仕組みとかいまいち忘れてしまったので、アカマイ本を読み返したい。</p>
+<p></p>
+<div class="hatena-asin-detail">
+<a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00MIFE3BC/hatena-blog-22/"><img src="http://ecx.images-amazon.com/images/I/51T4L8K2yLL._SL160_.jpg" class="hatena-asin-detail-image" alt="アカマイ　知られざるインターネットの巨人&lt;アカマイ&gt; (角川ＥＰＵＢ選書)" title="アカマイ　知られざるインターネットの巨人&lt;アカマイ&gt; (角川ＥＰＵＢ選書)"></a><div class="hatena-asin-detail-info">
+<p class="hatena-asin-detail-title"><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00MIFE3BC/hatena-blog-22/">アカマイ　知られざるインターネットの巨人 (角川ＥＰＵＢ選書)</a></p>
+<ul>
+<li>
+<span class="hatena-asin-detail-label">作者:</span> 小川晃通</li>
+<li>
+<span class="hatena-asin-detail-label">出版社/メーカー:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/KADOKAWA">KADOKAWA</a> / <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%C7%A5%A3%A5%A2%A5%D5%A5%A1%A5%AF%A5%C8%A5%EA%A1%BC">メディアファクトリー</a>
+</li>
+<li>
+<span class="hatena-asin-detail-label">発売日:</span> 2014/08/11</li>
+<li>
+<span class="hatena-asin-detail-label">メディア:</span> <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kindle">Kindle</a>版</li>
+<li><a href="http://d.hatena.ne.jp/asin/B00MIFE3BC/hatena-blog-22" target="_blank">この商品を含むブログ (5件) を見る</a></li>
+</ul>
+</div>
+<div class="hatena-asin-detail-foot"></div>
+</div>
+</body>
+
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Github%20Pages%e3%81%a8%e3%80%81%e7%8b%ac%e8%87%aa%e3%83%89%e3%83%a1%e3%82%a4%e3%83%b3%e9%81%a9%e5%bf%9c%e6%99%82%e3%81%ae%e9%80%9a%e4%bf%a1%e7%b5%8c%e8%b7%af%e3%81%ab%e3%81%a4%e3%81%84%e3%81%a6" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Github Pagesと、独自ドメイン適応時の通信経路について'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/05/18/support-brave-bat/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '本ブログが暗号通貨BATの支援受付をサポートしました'});">本ブログが暗号通貨BATの支援受付をサポートしました</a> (2021/05/18)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Docker Hubのダウンロード回数制限の対策を考える'});">Docker Hubのダウンロード回数制限の対策を考える</a> (2020/11/18)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/10/17/site-design-for-adsense/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Googleアドセンス合格に必要なサイトのレイアウトについて'});">Googleアドセンス合格に必要なサイトのレイアウトについて</a> (2020/10/17)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/01/04/purge-specified-cache-with-ci/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '更新したファイルのCloudFlareキャッシュをCI過程で自動で削除する'});">更新したファイルのCloudFlareキャッシュをCI過程で自動で削除する</a> (2019/01/04)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

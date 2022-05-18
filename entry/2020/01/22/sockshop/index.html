@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Sock Shopを使ったマイクロサービス体験のハンズオン</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2020/01/22/sockshop/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/01/22/sockshop/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Sock Shopを使ったマイクロサービス体験のハンズオン &middot; Goldstine研究所">
+<meta name="twitter:description" content="Sock Shopを使ってマイクロサービスの体験をしていきます。マイクロサービスの特徴や課題を体験できるようにシナリオを作りました。ただ起動して終わりではなく、Sock Shopからより多くのことを学ぶきっかけとなればと思います。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sock Shopを使ったマイクロサービス体験のハンズオン &middot; Goldstine研究所">
+<meta property="og:description" content="Sock Shopを使ってマイクロサービスの体験をしていきます。マイクロサービスの特徴や課題を体験できるようにシナリオを作りました。ただ起動して終わりではなく、Sock Shopからより多くのことを学ぶきっかけとなればと思います。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2020/01/22/sockshop/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Sock Shopを使ったマイクロサービス体験のハンズオン</h1>
+    <div class="entry-sub-title">
+        <span class="">22 Jan 2020, 14:44</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-アプリケーション開発" href="/categories/%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E9%96%8B%E7%99%BA">アプリケーション開発</a>
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#sock-shopを動かす">Sock Shopを動かす</a></li>
+    <li><a href="#sock-shopのアーキテクチャ">Sock Shopのアーキテクチャ</a></li>
+    <li><a href="#データ構造を見る">データ構造を見る</a>
+      <ul>
+        <li><a href="#catalogue">catalogue</a></li>
+        <li><a href="#user">user</a></li>
+        <li><a href="#cart">cart</a></li>
+        <li><a href="#order">order</a></li>
+        <li><a href="#データ分割による弊害">データ分割による弊害</a></li>
+      </ul>
+    </li>
+    <li><a href="#apiを実行する">APIを実行する</a></li>
+    <li><a href="#独立性回復性">独立性、回復性</a>
+      <ul>
+        <li><a href="#cartsサービスの停止">cartsサービスの停止</a></li>
+        <li><a href="#front-endのスケールとデプロイ">front-endのスケールとデプロイ</a></li>
+      </ul>
+    </li>
+    <li><a href="#非同期通信">非同期通信</a></li>
+    <li><a href="#トレーシング">トレーシング</a></li>
+    <li><a href="#フィードバック">フィードバック</a></li>
+    <li><a href="#参考文献">参考文献</a></li>
+  </ul>
+</nav>
+        <p>あけましておめでとうございます。<a href="https://twitter.com/mosuke5" target="_blank">@mosuke5</a>です。<br>
+マイクロサービスの実際の体験や研修を探したことがありますでしょうか。
+残念ながら、実際に手を動かしなら学ぶトレーニングや研修は多く存在しませんが、
+マイクロサービスのデモアプリケーションとして<a href='https://microservices-demo.github.io/' target='_blank'>Sock Shop</a>が有名で、これはトレーニングに最適です。</p>
+<p>日本語でもたくさんのSock Shopの紹介やインストール記事がでています。しかし、自分もそうだったのですが、なんとなく起動して動かして、終わりとなっているものがおおく、どんな観点でこのSock Shopをいじっていけばいいかの情報が足りないと感じました。
+機会があり、Sock Shopをさわるタイミングがあったので、実際にどんなデータ構造になっているのか、マイクロサービスゆえの課題など、Sock Shopから少しでも多くの学びが得られるようにこの記事を書きます。</p>
+<h2 id="sock-shopを動かす">Sock Shopを動かす</h2>
+<p>Sock Shopはdocker-composeを始め、Kubernetesなど多様な環境で動かせるようになっています。
+この記事では、Kubernetesを例に書きますが、どの環境で動かしていただいても構いません。
+本ブログでは起動方法については割愛します。お好みの環境で動かしてみてください。</p>
+<p>また、OpenShift上でSock Shopを動かしたい場合は<a href="https://github.com/mosuke5/microservices-demo-openshift">こちらのレポジトリ</a>も参考にしてください。</p>
+<h2 id="sock-shopのアーキテクチャ">Sock Shopのアーキテクチャ</h2>
+<p>Sock Shopのデザインは下記の通りで、Java, NodeJS, Goなどとマイクロサービスの特徴であるポリグロットを体現しています。
+ポリグロットな構成に「できる」、というだけで戦略なしに「やっていい」というわけではないので、この点は誤解ないように理解していきましょう。</p>
+<p><img src="/image/sockshop-architecture.png" alt="application-design"></p>
+<h2 id="データ構造を見る">データ構造を見る</h2>
+<p>まずは、データ構造を見ていきます。<br>
+マイクロサービスでは、どこのサービスでどのようにデータを持つかは非常に重要です。
+Sock Shopではデータベースを持つサービスが4つあります。
+下では、サンプルの出力結果を表示しておきますが、ぜひ自分の目で確かめていくといいです。</p>
+<ul>
+<li>catalogue (mysql)</li>
+<li>user (mongodb)</li>
+<li>cart (mongodb)</li>
+<li>order (mongodb)</li>
+</ul>
+<h3 id="catalogue">catalogue</h3>
+<p>靴下の商品情報や、靴下のタグの情報を管理するcatalogueサービスのデータベース構造を示します。
+MySQLを利用しており、非常にわかりやすいデータ構造となっています。
+<code>sock</code>テーブルでは靴下の情報を<code>tag</code>テーブルでは靴下のタグ情報を管理しており、それらは1対nの関係性なので、<code>sock_tag</code>テーブルで中間テーブルとして機能させています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>mysql&gt; desc sock;
+</span></span><span style="display:flex;"><span>+-------------+--------------+------+-----+---------+-------+
+</span></span><span style="display:flex;"><span>| Field       | Type         | Null | Key | Default | Extra |
+</span></span><span style="display:flex;"><span>+-------------+--------------+------+-----+---------+-------+
+</span></span><span style="display:flex;"><span>| sock_id     | varchar(40)  | NO   | PRI | NULL    |       |
+</span></span><span style="display:flex;"><span>| name        | varchar(20)  | YES  |     | NULL    |       |
+</span></span><span style="display:flex;"><span>| description | varchar(200) | YES  |     | NULL    |       |
+</span></span><span style="display:flex;"><span>| price       | float        | YES  |     | NULL    |       |
+</span></span><span style="display:flex;"><span>| count       | int(11)      | YES  |     | NULL    |       |
+</span></span><span style="display:flex;"><span>| image_url_1 | varchar(40)  | YES  |     | NULL    |       |
+</span></span><span style="display:flex;"><span>| image_url_2 | varchar(40)  | YES  |     | NULL    |       |
+</span></span><span style="display:flex;"><span>+-------------+--------------+------+-----+---------+-------+
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>mysql&gt; desc sock_tag;
+</span></span><span style="display:flex;"><span>+---------+--------------+------+-----+---------+-------+
+</span></span><span style="display:flex;"><span>| Field   | Type         | Null | Key | Default | Extra |
+</span></span><span style="display:flex;"><span>+---------+--------------+------+-----+---------+-------+
+</span></span><span style="display:flex;"><span>| sock_id | varchar(40)  | YES  | MUL | NULL    |       |
+</span></span><span style="display:flex;"><span>| tag_id  | mediumint(9) | NO   | MUL | NULL    |       |
+</span></span><span style="display:flex;"><span>+---------+--------------+------+-----+---------+-------+
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>mysql&gt; desc tag;
+</span></span><span style="display:flex;"><span>+--------+--------------+------+-----+---------+----------------+
+</span></span><span style="display:flex;"><span>| Field  | Type         | Null | Key | Default | Extra          |
+</span></span><span style="display:flex;"><span>+--------+--------------+------+-----+---------+----------------+
+</span></span><span style="display:flex;"><span>| tag_id | mediumint(9) | NO   | PRI | NULL    | auto_increment |
+</span></span><span style="display:flex;"><span>| name   | varchar(20)  | YES  |     | NULL    |                |
+</span></span><span style="display:flex;"><span>+--------+--------------+------+-----+---------+----------------+
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>mysql&gt; select * from tag;
+</span></span><span style="display:flex;"><span>+--------+--------+
+</span></span><span style="display:flex;"><span>| tag_id | name   |
+</span></span><span style="display:flex;"><span>+--------+--------+
+</span></span><span style="display:flex;"><span>|      1 | brown  |
+</span></span><span style="display:flex;"><span>|      2 | geek   |
+</span></span><span style="display:flex;"><span>|      3 | formal |
+</span></span><span style="display:flex;"><span>|      4 | blue   |
+</span></span><span style="display:flex;"><span>|      5 | skin   |
+</span></span><span style="display:flex;"><span>|      6 | red    |
+</span></span><span style="display:flex;"><span>|      7 | action |
+</span></span><span style="display:flex;"><span>|      8 | sport  |
+</span></span><span style="display:flex;"><span>|      9 | black  |
+</span></span><span style="display:flex;"><span>|     10 | magic  |
+</span></span><span style="display:flex;"><span>|     11 | green  |
+</span></span><span style="display:flex;"><span>+--------+--------+
+</span></span></code></pre></div><h3 id="user">user</h3>
+<p>続いて、ユーザを管理するサービスです。
+mongodbのcollectionは3つ存在します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>&gt; show collections;
+</span></span><span style="display:flex;"><span>addresses
+</span></span><span style="display:flex;"><span>cards
+</span></span><span style="display:flex;"><span>customers
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&gt; db.customers.find()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;_id&#34; : ObjectId(&#34;57a98d98e4b00679b4a830af&#34;),
+</span></span><span style="display:flex;"><span>  &#34;firstName&#34; : &#34;Eve&#34;,
+</span></span><span style="display:flex;"><span>  &#34;lastName&#34; : &#34;Berger&#34;,
+</span></span><span style="display:flex;"><span>  &#34;username&#34; : &#34;Eve_Berger&#34;,
+</span></span><span style="display:flex;"><span>  &#34;password&#34; : &#34;fec51acb3365747fc61247da5e249674cf8463c2&#34;,
+</span></span><span style="display:flex;"><span>  &#34;salt&#34; : &#34;c748112bc027878aa62812ba1ae00e40ad46d497&#34;,
+</span></span><span style="display:flex;"><span>  &#34;addresses&#34; : [ ObjectId(&#34;57a98d98e4b00679b4a830ad&#34;) ],
+</span></span><span style="display:flex;"><span>  &#34;cards&#34; : [ ObjectId(&#34;57a98d98e4b00679b4a830ae&#34;) ]
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&gt; db.cards.find()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;_id&#34; : ObjectId(&#34;57a98d98e4b00679b4a830ae&#34;),
+</span></span><span style="display:flex;"><span>  &#34;longNum&#34; : &#34;5953580604169678&#34;,
+</span></span><span style="display:flex;"><span>  &#34;expires&#34; : &#34;08/19&#34;,
+</span></span><span style="display:flex;"><span>  &#34;ccv&#34; : &#34;678&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&gt; db.addresses.find()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;_id&#34; : ObjectId(&#34;57a98d98e4b00679b4a830ad&#34;),
+</span></span><span style="display:flex;"><span>  &#34;street&#34; : &#34;ebisu street&#34;,
+</span></span><span style="display:flex;"><span>  &#34;number&#34; : &#34;1-1-1&#34;,
+</span></span><span style="display:flex;"><span>  &#34;country&#34; : &#34;japan&#34;,
+</span></span><span style="display:flex;"><span>  &#34;city&#34; : &#34;tokyo&#34;,
+</span></span><span style="display:flex;"><span>  &#34;postcode&#34; : &#34;111-1111&#34;,
+</span></span><span style="display:flex;"><span>  &#34;links&#34; : {  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="cart">cart</h3>
+<p>次は、ショッピングカートです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>&gt; show collections
+</span></span><span style="display:flex;"><span>cart
+</span></span><span style="display:flex;"><span>item
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&gt; db.cart.find()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;_id&#34; : ObjectId(&#34;5e20278e03277a00079dd215&#34;),
+</span></span><span style="display:flex;"><span>  &#34;_class&#34; : &#34;works.weave.socks.cart.entities.Cart&#34;,
+</span></span><span style="display:flex;"><span>  &#34;customerId&#34; : &#34;5e184694b6c6850001a762da&#34;,
+</span></span><span style="display:flex;"><span>  &#34;items&#34; : [
+</span></span><span style="display:flex;"><span>    DBRef(&#34;item&#34;, ObjectId(&#34;5e2115f003277a00079dd217&#34;))
+</span></span><span style="display:flex;"><span>  ]
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&gt; db.item.find()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;_id&#34; : ObjectId(&#34;5e2115f003277a00079dd217&#34;),
+</span></span><span style="display:flex;"><span>  &#34;_class&#34; : &#34;works.weave.socks.cart.entities.Item&#34;,
+</span></span><span style="display:flex;"><span>  &#34;itemId&#34; : &#34;510a0d7e-8e83-4193-b483-e27e09ddc34d&#34;,
+</span></span><span style="display:flex;"><span>  &#34;quantity&#34; : 1,
+</span></span><span style="display:flex;"><span>  &#34;unitPrice&#34; : 15
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><h3 id="order">order</h3>
+<p>最後は、注文履歴を管理するorderサービスです。<br>
+orderサービスの中では、注文した商品のIDのみ保有し、そのデータは持っていないことは少し頭の片隅に覚えておいてください。
+後ほど、サービスをまたいだデータの取得に関して考えていきます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>&gt; show collections;
+</span></span><span style="display:flex;"><span>customerOrder
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&gt; db.customerOrder.find()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;_id&#34; : ObjectId(&#34;5e197a445196950008004bf1&#34;),
+</span></span><span style="display:flex;"><span>  &#34;_class&#34; : &#34;works.weave.socks.orders.entities.CustomerOrder&#34;,
+</span></span><span style="display:flex;"><span>  &#34;customerId&#34; : &#34;5e184694b6c6850001a762da&#34;,
+</span></span><span style="display:flex;"><span>  &#34;customer&#34; : {
+</span></span><span style="display:flex;"><span>    &#34;_id&#34; : null,
+</span></span><span style="display:flex;"><span>    &#34;firstName&#34; : &#34;shinya&#34;,
+</span></span><span style="display:flex;"><span>    &#34;lastName&#34; : &#34;mori&#34;,
+</span></span><span style="display:flex;"><span>    &#34;username&#34; : &#34;mosuke5&#34;,
+</span></span><span style="display:flex;"><span>    &#34;addresses&#34; : [ ],
+</span></span><span style="display:flex;"><span>    &#34;cards&#34; : [ ]
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  &#34;address&#34; : {
+</span></span><span style="display:flex;"><span>    &#34;_id&#34; : null,
+</span></span><span style="display:flex;"><span>    &#34;number&#34; : &#34;1-1-1&#34;,
+</span></span><span style="display:flex;"><span>    &#34;street&#34; : &#34;ebisu street&#34;,
+</span></span><span style="display:flex;"><span>    &#34;city&#34; : &#34;tokyo&#34;,
+</span></span><span style="display:flex;"><span>    &#34;postcode&#34; : &#34;111-1111&#34;,
+</span></span><span style="display:flex;"><span>    &#34;country&#34; : &#34;japan&#34;
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  &#34;card&#34; : {
+</span></span><span style="display:flex;"><span>    &#34;_id&#34; : null,
+</span></span><span style="display:flex;"><span>    &#34;longNum&#34; : &#34;111111111&#34;,
+</span></span><span style="display:flex;"><span>    &#34;expires&#34; : &#34;03.22&#34;,
+</span></span><span style="display:flex;"><span>    &#34;ccv&#34; : &#34;111&#34;
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  &#34;items&#34; : [
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      &#34;_id&#34; : ObjectId(&#34;5e184c4b03277a00079dd204&#34;),
+</span></span><span style="display:flex;"><span>      &#34;itemId&#34; : &#34;3395a43e-2d88-40de-b95f-e00e1502085b&#34;,
+</span></span><span style="display:flex;"><span>      &#34;quantity&#34; : 1,
+</span></span><span style="display:flex;"><span>      &#34;unitPrice&#34; : 18 
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      &#34;_id&#34; : ObjectId(&#34;5e197a2703277a00079dd206&#34;),
+</span></span><span style="display:flex;"><span>      &#34;itemId&#34; : &#34;510a0d7e-8e83-4193-b483-e27e09ddc34d&#34;,
+</span></span><span style="display:flex;"><span>      &#34;quantity&#34; : 1,
+</span></span><span style="display:flex;"><span>      &#34;unitPrice&#34; : 15
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      &#34;_id&#34; : ObjectId(&#34;5e197a2f03277a00079dd207&#34;),
+</span></span><span style="display:flex;"><span>      &#34;itemId&#34; : &#34;808a2de1-1aaa-4c25-a9b9-6612e8f29a38&#34;,
+</span></span><span style="display:flex;"><span>      &#34;quantity&#34; : 1,
+</span></span><span style="display:flex;"><span>      &#34;unitPrice&#34; : 17.31999969482422
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      &#34;_id&#34; : ObjectId(&#34;5e197a3203277a00079dd208&#34;),
+</span></span><span style="display:flex;"><span>      &#34;itemId&#34; : &#34;819e1fbf-8b7e-4f6d-811f-693534916a8b&#34;,
+</span></span><span style="display:flex;"><span>      &#34;quantity&#34; : 1,
+</span></span><span style="display:flex;"><span>      &#34;unitPrice&#34; : 14
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      &#34;_id&#34; : ObjectId(&#34;5e197a3a03277a00079dd209&#34;),
+</span></span><span style="display:flex;"><span>      &#34;itemId&#34; : &#34;d3588630-ad8e-49df-bbd7-3167f7efb246&#34;,
+</span></span><span style="display:flex;"><span>      &#34;quantity&#34; : 1,
+</span></span><span style="display:flex;"><span>      &#34;unitPrice&#34; : 10.989999771118164
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      &#34;_id&#34; : ObjectId(&#34;5e197a3e03277a00079dd20a&#34;),
+</span></span><span style="display:flex;"><span>      &#34;itemId&#34; : &#34;a0a4f044-b040-410d-8ead-4de0446aec7e&#34;,
+</span></span><span style="display:flex;"><span>      &#34;quantity&#34; : 1,
+</span></span><span style="display:flex;"><span>      &#34;unitPrice&#34; : 7.989999771118164
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  ],
+</span></span><span style="display:flex;"><span>  &#34;shipment&#34; : {
+</span></span><span style="display:flex;"><span>    &#34;_id&#34; : &#34;70a338f4-f40c-4512-86c7-5ad6ed8d57eb&#34;,
+</span></span><span style="display:flex;"><span>    &#34;name&#34; : &#34;5e184694b6c6850001a762da&#34; 
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  &#34;date&#34; : ISODate(&#34;2020-01-11T07:33:24.861Z&#34;),
+</span></span><span style="display:flex;"><span>  &#34;total&#34; : 88.29000091552734
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="データ分割による弊害">データ分割による弊害</h3>
+<p>このアプリケーションではマイクロサービス特有のデータの分割による問題がしっかり発生しています。<br>
+靴下を注文したあと、注文履歴を見るページでは、注文の情報と注文した商品の情報の両方を表示しています。
+しかし、catalogueとorderの2つでサービスを分離しているため、これらの情報をまとめて取得することができません。</p>
+<p><img src="/image/sockshop-order-screen.png" alt="sockshop-order-screen"></p>
+<p>では、どのように取得しているか見ていきます。<br>
+下記のように、orderサービスに問い合わせたあと、注文した商品を別でcatalogueサービスに問い合わせにいっています。
+いわゆるN+1問題が発生しています(<a href="https://github.com/microservices-demo/front-end/blob/5e21067c2011a1f220322a704c9984fa206c4d12/public/customer-order.html#L205" target="_blank">該当のコード</a>)。
+これは、マイクロサービスではよく発生します。</p>
+<p><img src="/image/sockshop-order.png" alt="sockshop-order"></p>
+<p>解決へのアプローチはいくつかあります。<br>
+どれがいいということはなく、データの特性などによるのですが、以下のようなポイントを考えていくといいと思います。</p>
+<ol>
+<li>そもそもデータの特性はどうか？
+<ul>
+<li>リアルタイムに更新が必要な情報か。</li>
+</ul>
+</li>
+<li>DBを非正規化して対応するか？</li>
+<li>オーダー処理をイベントとして保存しておくか？</li>
+<li>複数のitemを取得できるAPIをつくるか？</li>
+<li>共有データベースにしてしまうか？</li>
+<li>BFFで結合、キャッシュするか？</li>
+<li>item情報を同期するか？CQRSパターンを採用するか？</li>
+</ol>
+<h2 id="apiを実行する">APIを実行する</h2>
+<p>商品オーダーのAPIなどは当然ながら認証しないとと実行できません。
+残念ながら、認証の方法などについてドキュメントに書いていなかったので補足していきます。
+認証はクッキーを使います。<br>
+試しに、ログインセッションを持たないまま、オーダーAPIを実行してみるとログインしてくれとエラーが返ってきます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl -XGET $FRONTEND_ADDRESS/orders
+</span></span><span style="display:flex;"><span>{&#34;message&#34;:&#34;User not logged in.&#34;,&#34;error&#34;:{}}
+</span></span></code></pre></div><p>ログインには&quot;username:password&quot;をbase64でエンコードしたものが必要です(<a href="https://github.com/microservices-demo/front-end/blob/5d9a4272fec3983250364917d8ea7a210cdbf58c/public/js/client.js#L23">該当コード</a>)。<br>
+コマンドラインで生成するか、こちらのような<a href="https://uic.jp/base64encode/">Base64エンコードをしてくれるWebサービス</a>で生成しましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ echo -n &#34;user:password&#34; | base64
+</span></span><span style="display:flex;"><span>dXNlcjpwYXNzd29yZA==
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ curl -XGET -c cookie.txt -H &#34;Authorization: Basic dXNlcjpwYXNzd29yZA==&#34; -v $FRONTEND_ADDRESS/login
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ cat cookie.txt
+</span></span><span style="display:flex;"><span># Netscape HTTP Cookie File
+</span></span><span style="display:flex;"><span># https://curl.haxx.se/docs/http-cookies.html
+</span></span><span style="display:flex;"><span># This file was generated by libcurl! Edit at your own risk.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>xxxxxxx
+</span></span></code></pre></div><p>ログインができているか確認します。オーダー情報が返ってきていれば成功です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl -XGET -b cookie.txt $FRONTEND_ADDRESS/orders
+</span></span><span style="display:flex;"><span>[
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        &#34;customerId&#34;: &#34;57a98d98e4b00679b4a830b2&#34;,
+</span></span><span style="display:flex;"><span>        &#34;customer&#34;: {
+</span></span><span style="display:flex;"><span>            &#34;firstName&#34;: &#34;User&#34;,
+</span></span><span style="display:flex;"><span>            &#34;lastName&#34;: &#34;Name&#34;,
+</span></span><span style="display:flex;"><span>            &#34;username&#34;: &#34;user&#34;,
+</span></span><span style="display:flex;"><span>            &#34;addresses&#34;: [],
+</span></span><span style="display:flex;"><span>            &#34;cards&#34;: []
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        &#34;address&#34;: {
+</span></span><span style="display:flex;"><span>            &#34;number&#34;: &#34;246&#34;,
+</span></span><span style="display:flex;"><span>            &#34;street&#34;: &#34;Whitelees Road&#34;,
+</span></span><span style="display:flex;"><span>            &#34;city&#34;: &#34;Glasgow&#34;,
+</span></span><span style="display:flex;"><span>            &#34;postcode&#34;: &#34;G67 3DL&#34;,
+</span></span><span style="display:flex;"><span>            &#34;country&#34;: &#34;United Kingdom&#34;
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        &#34;card&#34;: {
+</span></span><span style="display:flex;"><span>            &#34;longNum&#34;: &#34;5544154011345918&#34;,
+</span></span><span style="display:flex;"><span>            &#34;expires&#34;: &#34;08/19&#34;,
+</span></span><span style="display:flex;"><span>            &#34;ccv&#34;: &#34;958&#34;
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        &#34;items&#34;: [
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                &#34;itemId&#34;: &#34;808a2de1-1aaa-4c25-a9b9-6612e8f29a38&#34;,
+</span></span><span style="display:flex;"><span>                &#34;quantity&#34;: 1,
+</span></span><span style="display:flex;"><span>                &#34;unitPrice&#34;: 17.32
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        ],
+</span></span><span style="display:flex;"><span>        &#34;shipment&#34;: {
+</span></span><span style="display:flex;"><span>            &#34;name&#34;: &#34;57a98d98e4b00679b4a830b2&#34;
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        &#34;date&#34;: &#34;2019-12-23T06:35:49.925+0000&#34;,
+</span></span><span style="display:flex;"><span>        &#34;total&#34;: 22.31,
+</span></span><span style="display:flex;"><span>        &#34;_links&#34;: {
+</span></span><span style="display:flex;"><span>            &#34;self&#34;: {
+</span></span><span style="display:flex;"><span>                &#34;href&#34;: &#34;http://orders/orders/5e006045dc2f2e0006f35ee4&#34;
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            &#34;order&#34;: {
+</span></span><span style="display:flex;"><span>                &#34;href&#34;: &#34;http://orders/orders/5e006045dc2f2e0006f35ee4&#34;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>]
+</span></span></code></pre></div><p>ログインさえできてしまえば、同じ要領で他のAPIも実行することが可能です。
+APIは<a href="https://microservices-demo.github.io/api/index.html">こちらを参考</a>にしながら実行していくことが可能です。</p>
+<h2 id="独立性回復性">独立性、回復性</h2>
+<p>マイクロサービスのメリットの中には、サービスが独立することによる、デプロイやスケールのしやすさや回復性があります。
+実際に特定のサービスの停止・スケール・デプロイをやってみます。</p>
+<h3 id="cartsサービスの停止">cartsサービスの停止</h3>
+<p>マイクロサービスの回復性について考えてみます。<br>
+cartsサービスを落としてみて、どんな影響があるか確認してみます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl scale --replicas=0 deployment/carts
+</span></span></code></pre></div><ul>
+<li>オーダーはできるか？</li>
+<li>他のコンポーネントへの影響は？</li>
+<li>ユーザ体験はどう変わったか？</li>
+</ul>
+<h4 id="デグレードの実装">デグレードの実装</h4>
+<p>cartsサービスを落としたあと、UI上からカートボタンが消えました。（ボタンが消えるのにタイムラグがあるのはまあサンプル実装だから大目に見ようｗ）
+これは、よくあるデグレードの考え方を実装しているからです。マイクロサービスでは、利用するマイクロサービスがどういう状態か把握し、防御的な実装をいれることがあります。
+その１つの例になりますでしょうか。
+<a href="https://github.com/microservices-demo/front-end/blob/5d9a4272fec3983250364917d8ea7a210cdbf58c/public/navbar.html#L227">該当のコード</a></p>
+<h4 id="サーキットブレーカについて">サーキットブレーカについて</h4>
+<p>cartsサービスを落とした状態で、ブラウザのデバッグツールを開いて、cartsサービスへの通信状況を見てみましょう。<br>
+アクセスの度にcartsサービスのタイムアウトを待っているのがわかるのがわかります。
+このサンプルではサーキットブレーカの実装は入っていません。こういった通信状況をみているとなぜサーキットブレーカが必要なのか、など感じてくるかと思います。</p>
+<h3 id="front-endのスケールとデプロイ">front-endのスケールとデプロイ</h3>
+<p>マイクロサービスのスケーリングについて考えてみます。<br>
+マイクロサービスでは特定のサービスのみをスケールすることが容易であることが特徴の１つです。
+以下、実行することは非常に簡単なわけですが、重要なのはそのサービスの独立性です。
+１サービスで１チームと仮に想定した場合、チームの動きやすさを想像することができると思います。</p>
+<p>ためしにフロントエンドサービスをスケールさせてみてみましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl scale --replicas=3 deployment/front-end 
+</span></span></code></pre></div><p>フロントエンドのコンテナイメージを変更してデプロイしてみます。<br>
+サンプルで、背景色を変更したフロントエンドのイメージを用意しました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">extensions/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">front-end</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">sock-shop</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">template</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">front-end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">containers</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">front-end</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">mosuke5/front-end:master-bd5039f4</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">#image: weaveworksdemos/front-end:0.3.12</span>
+</span></span></code></pre></div><h2 id="非同期通信">非同期通信</h2>
+<p>マイクロサービスアーキテクチャでは、サービス間の通信をどのように行うかは重要な選択の１つです。<br>
+Sock Shopでも、アーキテクチャデザインの図を見ると、shippingサービスはRabbitMQに対してデータを送り、queue-masterが処理していることがわかります。</p>
+<p><code>shipping</code>サービスと<code>queue-master</code>サービスのPodのログを見ながら、画面上からオーダー処理を行ってみましょう。
+ログからキューへの書き込みおよび、キューからの受信を確認することができます。</p>
+<p>非同期通信のメリットは、通信先の相手の状態に関係なく通信できることです。<br>
+例えば、あなたがAWSなどのパブリッククラウドで仮想サーバを作成すると仮定します。
+作成する仮想サーバの設定をしたあと、作成ボタンを押してから実際にできあがるまで約5分程度かかります。
+同期的処理では、仮想サーバが出来上がるまでの間、ずっと待っていなければいけません。その間、ブラウザのタブを閉じたりしてはいけません。
+非同期処理では、「仮想サーバの作成を受け付けました」とレスポンスを先に返すことが可能であり、実際の作成は裏側で行うことができます。
+これにより、仮想サーバが出来上がるまでの間、自由に他のことをすることができます。<br>
+一般的に、時間のかかる処理や、同期的な処理では間に合わない場合などに利用されることが多いです。</p>
+<h2 id="トレーシング">トレーシング</h2>
+<p>Soch Shopでは、トレーシングも体験することができます。
+jaegerなどのコンポーネントをデプロイします。デプロイについてはドキュメントには書かれておらず、Githubにあるマニフェストファイルを使って起動することが必要です。
+<a href="https://github.com/microservices-demo/microservices-demo/tree/master/deploy/kubernetes/manifests-jaeger">こちら</a>を参考にしてください。</p>
+<p>下記のような画面にアクセスできれば成功です。</p>
+<p><img src="/image/jaeger-query.png" alt="jaeger-query"></p>
+<p>トレーシングのコンポーネント起動後に、もう一度Sock Shopで購入などの様々なアクションを実行しましょう。
+起動後はSock Shop内でのアクションがjaeger内部に保存されていきます。
+検索から<code>orders</code>サービスで検索をし、<code>orders: http:/orders</code>を探してみましょう。
+靴下の注文処理の裏側では、userやpaymentなど複数のサービスにまたいで処理が行われていることがわかってきます。</p>
+<p><img src="/image/jaeger-query-order.png" alt="jaeger-query-order"></p>
+<p>paymentサービスに障害が起きたと仮定し、paymentサービスを落としたあとに、もう一度購入操作をしてみましょう。
+この複雑な処理のなかでもどこでエラーが起きたか一目瞭然に確認することができます。</p>
+<h2 id="フィードバック">フィードバック</h2>
+<p>Sock Shopを使ったマイクロサービスの体験を紹介してきました。<br>
+もっと〇〇なことも体験できるよ、とかシナリオとして入れたほうがいい、というものがあればリクエストください。
+みなさんでマイクロサービスを理解するいいきっかけを作れればと思っています。</p>
+<h2 id="参考文献">参考文献</h2>
+<p>マイクロサービスを学習していく中でかなりお世話になった書籍があります。
+デモアプリケーションで試すと同時にこちらの書籍での学習も進めてみてください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.amazon.co.jp/%25E3%2583%259E%25E3%2582%25A4%25E3%2582%25AF%25E3%2583%25AD%25E3%2582%25B5%25E3%2583%25BC%25E3%2583%2593%25E3%2582%25B9%25E3%2582%25A2%25E3%2583%25BC%25E3%2582%25AD%25E3%2583%2586%25E3%2582%25AF%25E3%2583%2581%25E3%2583%25A3-Sam-Newman/dp/4873117607" data-iframely-url="//cdn.iframe.ly/bLsItzw?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Sock%20Shop%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%9f%e3%83%9e%e3%82%a4%e3%82%af%e3%83%ad%e3%82%b5%e3%83%bc%e3%83%93%e3%82%b9%e4%bd%93%e9%a8%93%e3%81%ae%e3%83%8f%e3%83%b3%e3%82%ba%e3%82%aa%e3%83%b3" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Sock Shopを使ったマイクロサービス体験のハンズオン'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Jaegerを使った分散トレーシングの検証 on Kubernetes (1)'});">Jaegerを使った分散トレーシングの検証 on Kubernetes (1)</a> (2021/02/08)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a> (2022/05/16)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a> (2022/05/15)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

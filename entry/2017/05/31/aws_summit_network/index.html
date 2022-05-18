@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>AWS Summit2017 Day2 ネットワーク設計入門のセッション</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2017/05/31/aws_summit_network/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2017/05/31/aws_summit_network/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="AWS Summit2017 Day2 ネットワーク設計入門のセッション &middot; Goldstine研究所">
+<meta name="twitter:description" content="AWS Summit2017に行ってみた。雰囲気などの簡単感想とAWSのネットワーク設計入門セッションのメモ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS Summit2017 Day2 ネットワーク設計入門のセッション &middot; Goldstine研究所">
+<meta property="og:description" content="AWS Summit2017に行ってみた。雰囲気などの簡単感想とAWSのネットワーク設計入門セッションのメモ">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2017/05/31/aws_summit_network/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>AWS Summit2017 Day2 ネットワーク設計入門のセッション</h1>
+    <div class="entry-sub-title">
+        <span class="">31 May 2017, 19:25</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-クラウド技術" href="/categories/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89%E6%8A%80%E8%A1%93">クラウド技術</a>
+            
+                <a class="badge badge-inf post-category post-category-AWS" href="/categories/aws">AWS</a>
+            
+                <a class="badge badge-inf post-category post-category-イベント" href="/categories/%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88">イベント</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#雰囲気">雰囲気</a></li>
+    <li><a href="#ブース">ブース</a></li>
+    <li><a href="#セッションネットワーク設計入門">セッション「ネットワーク設計入門」</a>
+      <ul>
+        <li><a href="#1クラウド上のnwの特徴">(1)クラウド上のNWの特徴</a></li>
+        <li><a href="#2nwサービス">(2)NWサービス</a></li>
+        <li><a href="#3前提知識">(3)前提知識</a></li>
+        <li><a href="#4設計をはじめよう">(4)設計をはじめよう</a></li>
+        <li><a href="#5プライベートnw設計のステップ">(5)プライベートNW設計のステップ</a></li>
+        <li><a href="#6ユースケースごとのnw設計">(6)ユースケースごとのNW設計</a></li>
+        <li><a href="#7vpc間のピア接続">(7)VPC間のピア接続</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        <p>弊社はプレミアムフライデー導入企業なのだが、最終金曜日に早く帰る必要はなく、月内でどこか1日15時に帰りましょうという制度になっている。<br>
+金曜日が仕事の都合上取れなかったので、今月は5/31にプレミアムフライデー（プレミアムウェンズデー）を使った。<br>
+ちょうどAWS Summit開催中だったのでのぞきにいった。</p>
+<h2 id="雰囲気">雰囲気</h2>
+<p>想像していた雰囲気とはだいぶ異なっていたというのが第一印象。<br>
+想像以上にスーツの年齢層の高い人が多かった。それだけ、AWSもエンタープライズでも注目されるようになったということだろう。<br>
+以前に、JAWS2015に参加したことある。もちろんJAWSとAWS Summitでは参加者の層が違う。<br>
+が、あれから2年たちAWSに興味を持つ層も大きく変わってきたのを感じた。</p>
+<p>セッションも非IT企業への導入事例や、思ったより入門セッションも多かった。<br>
+登壇者の話しぶりも「オンプレからの移行」を意識したように感じた。</p>
+<h2 id="ブース">ブース</h2>
+<p>セッションだけではなく、AWSに関連するサービスを提供している企業がたくさんブースをだしている。<br>
+ここでのコミュニケーションが案外一番楽しい。お酒も用意されていて楽しくおしゃべりできた。</p>
+<p>Heroku+AWSの組み合わせで利用するケースの話を聞いて、あーなるほどねって感じだった。<br>
+HerokuはAWS上で動作しているし、インターネット経由してもそこまで遅くはならない。<br>
+そんな利点を使って組み合わせて使う事例なんかきいた。</p>
+<p>そのほかは、やっぱりどこもかしこもコンテナ。<br>
+コンテナをどう扱うか、どう監視するか、そんなところの話が多かった。</p>
+<h2 id="セッションネットワーク設計入門">セッション「ネットワーク設計入門」</h2>
+<p>セッションは１つだけ「<a href="http://www.awssummit.tokyo/summit/index.html#D2T3-5">ネットワーク設計入門</a>」を聞いた。<br>
+普段ならネットワーク設計入門のセッションは聞かないと思っているのだが、<br>
+どんなことを話すのか興味あって聞いてみた。</p>
+<h3 id="1クラウド上のnwの特徴">(1)クラウド上のNWの特徴</h3>
+<ol>
+<li>物理設計はいらない</li>
+<li>可用性はすでにセット(VRRPなど気にしなくてよい）</li>
+<li>プロフラマブルに操作可能</li>
+</ol>
+<h3 id="2nwサービス">(2)NWサービス</h3>
+<p>NWサービスは意外とすくない。VPCがほぼすべて。<br>
+VPCが本質であり、ここが理解できればほぼ問題ない。</p>
+<ol>
+<li>VPC</li>
+<li>Direct Connect</li>
+<li>Route53</li>
+</ol>
+<h3 id="3前提知識">(3)前提知識</h3>
+<h4 id="vpc">VPC</h4>
+<p>物理設計はいらないんだけど、<br>
+やっぱり物理知っていることがアドバンテージになる。
+VPCはリージョンの中のみ。ゾーンはまたぐことができる。</p>
+<h4 id="専用線">専用線</h4>
+<p>当たり前だがDCの場所は公開していない。<br>
+じゃどうやって接続するか？<br>
+相互接続接続ポイントを用意しているからそこにつなぎに来てね、という考え方。</p>
+<h4 id="エッジロケーション">エッジロケーション</h4>
+<p>CDNノードやRoute53が動作しているところ。<br>
+リージョンとはまた別にある。</p>
+<h3 id="4設計をはじめよう">(4)設計をはじめよう</h3>
+<p>AWSのどのサービスを使いたいかでNWの設計方針はかわる。<br>
+まずはVPCの中で利用するサービスとVPCの外で使うものがあるのでその区別。</p>
+<ul>
+<li>VPCの中で使うもの
+<ul>
+<li>EC2とかRDSとかRedshift、EMR</li>
+</ul>
+</li>
+<li>VPCの外で使うもの
+<ul>
+<li>S3、LamdaとかDynamoDB、CloudWatch</li>
+</ul>
+</li>
+</ul>
+<p>次に、外部通信の設計</p>
+<ul>
+<li>VPCと外部を接続する場合
+<ul>
+<li>専用線orインターネットVPNorパブリック(ssh/https)</li>
+</ul>
+</li>
+<li>VPCがないけど外部から利用したい場合
+<ul>
+<li>httpsでまかなう場合が多い。</li>
+<li>実は、VPCがなくてもDicrectConnectは使えるよ。
+<ul>
+<li>DirectConnectのパブリック接続</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="5プライベートnw設計のステップ">(5)プライベートNW設計のステップ</h3>
+<ol>
+<li>VPCの作成
+<ol>
+<li>VPCのCIDRレンジは変えられないから大きくとっておこう</li>
+<li>オンプレミスとのレンジも被らないように</li>
+<li>/16がおすすめ</li>
+</ol>
+</li>
+<li>サブネット作成
+<ol>
+<li>インターネットに接続するものとしないもの。ここでサブネット分けよう</li>
+<li>AZが落ちてもいいように設計しよう。サブネットは２つずつ</li>
+<li>サブネットサイズは24がおすすめ</li>
+</ol>
+</li>
+<li>VPCコンポーネントの作成
+<ol>
+<li>カスタマーGW</li>
+<li>インターネットGW</li>
+<li>VPC単位、サブネット単位、インスタンス単位で配置できるコンポーネントがあるよ</li>
+</ol>
+</li>
+<li>インスタンスの配置
+<ol>
+<li>セキュリティポリシーを考えよう</li>
+<li>セキュリティグループとネットワークACLがあるよ</li>
+<li>セキュリティグループのほうが柔軟</li>
+</ol>
+</li>
+<li>名前解決の検討</li>
+</ol>
+<h3 id="6ユースケースごとのnw設計">(6)ユースケースごとのNW設計</h3>
+<h4 id="公開サービスの場合">公開サービスの場合</h4>
+<ul>
+<li>インターネットから接続でいるのはロードバランサーだけにしよう
+<ul>
+<li>あるいはあとはメンテナンス用の踏み台サーバだけ</li>
+</ul>
+</li>
+<li>S3を活用するときは、VPCエンドポイントつかえばVPC内部から接続できるよ</li>
+<li>管理拠点とはVPNでつなぐことをおすすめするよ</li>
+<li>管理拠点とのルーティングはルートテーブル</li>
+<li>DNSはRoute53使うと便利だよ
+<ul>
+<li>ALIASレコードという独自機能</li>
+<li>DNSのフェイルオーバー機能
+<ul>
+<li>ソーリーページへの転送が可能</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="社内システム基盤の場合">社内システム基盤の場合</h4>
+<ul>
+<li>DirectConnectを使おう
+<ul>
+<li>パートナーがたくさんいるので連絡してみよう</li>
+</ul>
+</li>
+<li>Route53はプライベートゾーン、オンプレからVPC内の名前解決にも使えるよ</li>
+<li>DirectConnect体験ラボあるからつかってみて
+<ul>
+<li><a href="https://aws.amazon.com/jp/dx_labo/">https://aws.amazon.com/jp/dx_labo/</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="7vpc間のピア接続">(7)VPC間のピア接続</h3>
+<ul>
+<li>異なるVPC間をピア接続することもできるよ</li>
+<li>VPC間でルーティングの設定が必要</li>
+<li>マルチホップルーティングはできないので注意</li>
+<li>サブネットは重複しないように注意</li>
+</ul>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=AWS%20Summit2017%20Day2%20%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e8%a8%ad%e8%a8%88%e5%85%a5%e9%96%80%e3%81%ae%e3%82%bb%e3%83%83%e3%82%b7%e3%83%a7%e3%83%b3" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'AWS Summit2017 Day2 ネットワーク設計入門のセッション'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/04/13/aws-ecs-deploy/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Amazon ECSを使った際のFargateの仕組みとそのデプロイフローを学ぶ'});">Amazon ECSを使った際のFargateの仕組みとそのデプロイフローを学ぶ</a> (2019/04/14)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2018/10/16/object-storage-metadata/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'S3(オブジェクトストレージ)のメタデータの管理方法について'});">S3(オブジェクトストレージ)のメタデータの管理方法について</a> (2018/10/16)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2018/09/24/dedicated/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'AWSとAlibaba Cloudの「Dedicated」インスタンスを整理する'});">AWSとAlibaba Cloudの「Dedicated」インスタンスを整理する</a> (2018/09/24)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2017/11/03/serverlessconf_tokyo/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Serverlessconf Tokyo(2017)に参加。サーバレスの進化'});">Serverlessconf Tokyo(2017)に参加。サーバレスの進化</a> (2017/11/03)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

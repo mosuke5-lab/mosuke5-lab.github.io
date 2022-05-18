@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>【VPS1台でインフラ勉強】SoftEtherを使ってVPN構築</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2014/12/07/212156/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2014/12/07/212156/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="【VPS1台でインフラ勉強】SoftEtherを使ってVPN構築 &middot; Goldstine研究所">
+<meta name="twitter:description" content=" VPS1台でインフラ勉強シリーズでVPN構築を行った。Softeatherを使って、VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにします">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【VPS1台でインフラ勉強】SoftEtherを使ってVPN構築 &middot; Goldstine研究所">
+<meta property="og:description" content=" VPS1台でインフラ勉強シリーズでVPN構築を行った。Softeatherを使って、VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにします">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2014/12/07/212156/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>【VPS1台でインフラ勉強】SoftEtherを使ってVPN構築</h1>
+    <div class="entry-sub-title">
+        <span class="">07 Dec 2014, 21:21</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-インフラ構築" href="/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E6%A7%8B%E7%AF%89">インフラ構築</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#ユーザを作っただけではパスワードが設定されないので">ユーザを作っただけではパスワードが設定されないので</a></li>
+  </ul>
+</nav>
+        <body>
+<p>おつかれさまです。もーすけです。<br>
+VPS1台でインフラ勉強シリーズの第3回目でVPN構築を行ったのでその知見を残しておきます。</p>
+<li>第1回 <a href="https://blog.mosuke.tech/entry/2014/10/09/230555/">サーバ複数台構成、Nginxでリバースプロキシ構築</a></li>
+<li>第2回 <a href="https://blog.mosuke.tech/entry/2014/11/09/171436">HAProxyでロードバランサ構築</a></li>
+<li>第3回 SoftEtherを使ってVPN構築</li>
+<div class="section">
+    <h2>1. 実施したこと</h2>
+    <p>VPSのホストサーバをVPSサーバとし、その上で仮想で立ち上げたサーバ(ローカルネットワーク)に外部から接続できるようにすること。</p>
+<div class="section">
+    <p><span itemscope itemtype="http://schema.org/Photograph"><img src="/image/20141207200544.png" alt="f:id:mosuke5:20141207200544p:plain" title="f:id:mosuke5:20141207200544p:plain" class="hatena-fotolife" itemprop="image"></span><br>
+</p>
+</div>
+</div>
+<div class="section">
+    <h2>2. 環境</h2>
+    <p>・VPNソフトウェア：<a href="https://ja.softether.org/">SoftEther VPN プロジェクト - SoftEther VPN プロジェクト</a><br>
+・メモリ：１GB<br>
+・CPU：仮想２コア<br>
+・HDD：100GB<br>
+・OS：CentOS7<br>
+・サーバ仮想化：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>(Utuntu13)</p>
+</div>
+<div class="section">
+    <h2>3. <a class="keyword" href="http://d.hatena.ne.jp/keyword/SoftEther">SoftEther</a>のインストール</h2>
+    <p>インストール手順は公式ドキュメント通りなので簡単にコマンドのみ記述しておく。<br>
+<a href="https://ja.softether.org/4-docs/1-manual/7/7.3">7.3 Linux へのインストールと初期設定 - SoftEther VPN プロジェクト</a></p>
+<p>【ダウンロードしたもの】<br>
+ここから環境に応じて対象のソフトウェアを選ぶ<br>
+<a href="http://www.softether-download.com/ja.aspx?product=softether">SoftEther ダウンロード センター</a></p>
+<p>・<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DD%A1%BC%A5%CD%A5%F3%A5%C8">コンポーネント</a>：<a class="keyword" href="http://d.hatena.ne.jp/keyword/SoftEther">SoftEther</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a> Server<br>
+・プラットフォーム：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Linux">Linux</a><br>
+・CPU：<a class="keyword" href="http://d.hatena.ne.jp/keyword/Intel">Intel</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/x86">x86</a> / <a class="keyword" href="http://d.hatena.ne.jp/keyword/AMD64">AMD64</a>(64bit)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">## ダウンロード</span>
+</span></span><span style="display:flex;"><span>$ wget ttp://jp.softether-download.com/files/softether/v4.08-9449-rtm-2014.06.08-tree/Linux/SoftEther%20VPN%20Server/64bit%20-%20Intel%20x64%20or%20AMD64/softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 解凍</span>
+</span></span><span style="display:flex;"><span>$ tar zxvf softether-vpnserver-v4.08-9449-rtm-2014.06.08-linux-x64-64bit.tar.gz
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 実行可能ファイル作成</span>
+</span></span><span style="display:flex;"><span>$ cd vpnserver/
+</span></span><span style="display:flex;"><span>$ sudo make
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## /usr/localへ配置</span>
+</span></span><span style="display:flex;"><span>$ sudo mv vpnserver /usr/local
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## パーミッション変更</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">### 基本的には600。実行ファイルのみ700</span>
+</span></span><span style="display:flex;"><span>$ cd /usr/local/vpnserver
+</span></span><span style="display:flex;"><span>$ sudo chown root:root ./*
+</span></span><span style="display:flex;"><span>$ sudo chmod <span style="color:#ae81ff">600</span> ./*
+</span></span><span style="display:flex;"><span>$ sudo chmod <span style="color:#ae81ff">700</span> ./vpncmd
+</span></span><span style="display:flex;"><span>$ sudo chmod <span style="color:#ae81ff">700</span> ./vpnserver
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 動作チェック</span>
+</span></span><span style="display:flex;"><span>$ sudo ./vpncmd
+</span></span><span style="display:flex;"><span>1. VPN Server または VPN Bridge の管理
+</span></span><span style="display:flex;"><span>2. VPN Client の管理
+</span></span><span style="display:flex;"><span>3. VPN Tools コマンドの使用 <span style="color:#f92672">(</span>証明書作成や通信速度測定<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span> - <span style="color:#ae81ff">3</span> を選択: <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>VPN Tools&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##helpとうつと利用可能なコマンドが出る</span>
+</span></span><span style="display:flex;"><span>VPN Tools&gt; help
+</span></span><span style="display:flex;"><span>下記の <span style="color:#ae81ff">6</span> 個のコマンドが使用できます:
+</span></span><span style="display:flex;"><span> About         - バージョン情報の表示
+</span></span><span style="display:flex;"><span> Check         - SoftEther VPN の動作が可能かどうかチェックする
+</span></span><span style="display:flex;"><span> MakeCert      - 新しい X.509 証明書と秘密鍵の作成 <span style="color:#f92672">(</span><span style="color:#ae81ff">1024</span> bit<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span> MakeCert2048  - 新しい X.509 証明書と秘密鍵の作成 <span style="color:#f92672">(</span><span style="color:#ae81ff">2048</span> bit<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span> TrafficClient - 通信スループット測定ツールクライアントの実行
+</span></span><span style="display:flex;"><span> TrafficServer - 通信スループット測定ツールサーバーの実行
+</span></span><span style="display:flex;"><span>VPN Tools&gt; 
+</span></span><span style="display:flex;"><span>VPN Tools&gt; Check
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>略<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>すべてのチェックに合格しました。
+</span></span><span style="display:flex;"><span>VPN Tools&gt; 
+</span></span><span style="display:flex;"><span>VPN Tools&gt; exit
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##起動スクリプトの作成</span>
+</span></span><span style="display:flex;"><span>$ sudo vim /etc/init.d/vpnserver
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#!/bin/sh</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># chkconfig: 2345 99 01</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># description: SoftEther VPN Server</span>
+</span></span><span style="display:flex;"><span>DAEMON<span style="color:#f92672">=</span>/usr/local/vpnserver/vpnserver
+</span></span><span style="display:flex;"><span>LOCK<span style="color:#f92672">=</span>/var/lock/subsys/vpnserver
+</span></span><span style="display:flex;"><span>test -x $DAEMON <span style="color:#f92672">||</span> exit <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span> in
+</span></span><span style="display:flex;"><span>start<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>$DAEMON start
+</span></span><span style="display:flex;"><span>touch $LOCK
+</span></span><span style="display:flex;"><span>;;
+</span></span><span style="display:flex;"><span>stop<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>$DAEMON stop
+</span></span><span style="display:flex;"><span>rm $LOCK
+</span></span><span style="display:flex;"><span>;;
+</span></span><span style="display:flex;"><span>restart<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>$DAEMON stop
+</span></span><span style="display:flex;"><span>sleep <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>$DAEMON start
+</span></span><span style="display:flex;"><span>;;
+</span></span><span style="display:flex;"><span>*<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;Usage: </span>$0<span style="color:#e6db74"> {start|stop|restart}&#34;</span>
+</span></span><span style="display:flex;"><span>exit <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">esac</span>
+</span></span><span style="display:flex;"><span>exit <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##サービス登録</span>
+</span></span><span style="display:flex;"><span>$ sudo chkconfig --add vpnserver
+</span></span><span style="display:flex;"><span>$ sudo chkconfig --list vpnserver
+</span></span><span style="display:flex;"><span>vpnserver      	0:off	1:off	2:on	3:on	4:on	5:on	6:off
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##起動</span>
+</span></span><span style="display:flex;"><span>$ sudo /etc/init.d/vpnserver start  
+</span></span></code></pre></div></div>
+<div class="section">
+    <h2>4. 設定</h2>
+<div class="section">
+    <h4>(1)管理者パスワードの設定</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>## vpnserverへ接続
+</span></span><span style="display:flex;"><span>$ sudo ./vpncmd localhost:443 /SERVER
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>## 管理者パスワード設定
+</span></span><span style="display:flex;"><span>VPN Server&gt; ServerPasswordSet 
+</span></span></code></pre></div></div>
+<div class="section">
+    <h4>(2)仮想HUBの作成</h4>
+    <p>デフォルトで「default」という仮想がHUBがあるのでそれで構築。<br>
+自分の仮想HUBを作りたければHubCreateでつくれる。</p>
+```
+VPN Server> HubCreate 
+```
+<p>※HELPコマンドがだいぶ使えるので使おう。日本語で書かれているのでわかりやすいです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>VPN Server&gt;HELP
+</span></span><span style="display:flex;"><span>下記の 205 個のコマンドが使用できます:
+</span></span><span style="display:flex;"><span> About                      - バージョン情報の表示
+</span></span><span style="display:flex;"><span> AcAdd                      - 接続元 IP 制限リストにルールを追加 (IPv4)
+</span></span><span style="display:flex;"><span> AcAdd6                     - 接続元 IP 制限リストにルールを追加 (IPv6)
+</span></span><span style="display:flex;"><span> AcDel                      - 接続元 IP 制限リスト内のルールの削除
+</span></span><span style="display:flex;"><span> AcList                     - 接続元 IP 制限リストのルール一覧の取得
+</span></span><span style="display:flex;"><span>(...以下略) 
+</span></span></code></pre></div></div>
+<div class="section">
+    <h4>(3) <a class="keyword" href="http://d.hatena.ne.jp/keyword/IPsec">IPsec</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a> サーバー機能の有効化</h4>
+    <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VPN">VPN</a>のトンネリングをするにあたって事前共有鍵が必要なので作成する必要がある。</p>
+```
+VPN Server>IPsecEnable
+    IPsecEnable コマンド - IPsec VPN サーバー機能の有効化 / 無効化
+    L2TP over IPsec サーバー機能を有効 (yes / no): yes
+    Raw L2TP サーバー機能を有効 (yes / no): yes
+    EtherIP / L2TPv3 over IPsec サーバー機能を有効 (yes / no): yes
+    IPsec 事前共有鍵の文字列 (9 文字以下を推奨): *******
+    VPN 接続時に仮想 HUB 名が省略された場合のデフォルト仮想 HUB 名: Default 
+```
+</div>
+<div class="section">
+    <h4>(4) グループとユーザの作成</h4>
+    <p>ユーザを作成するにはグループの作成が必要なので先にグループを作る。<br>
+また、ユーザを作ったでではパスワードが設定されないので忘れずにパスワード設定。</p>
+```
+VPN Server>Hub Default
+VPN Server/DEFAULT>GroupCreate
+    GroupCreate コマンド - グループの作成
+    グループ名: mygroup
+    グループの本名: mygroup
+    グループの説明: mygroup
+<p>VPN Server/DEFAULT&gt;UserCreate
+UserCreate コマンド - ユーザーの作成
+ユーザー名: myuser
+参加するグループ名: mygroup
+ユーザーの本名: myuser
+ユーザーの説明: myuser
+コマンドは正常に終了しました。</p>
+<h2 id="ユーザを作っただけではパスワードが設定されないので">ユーザを作っただけではパスワードが設定されないので</h2>
+<p>VPN Server/DEFAULT&gt; UserPasswordSet</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>&lt;/div&gt;
+</span></span><span style="display:flex;"><span>&lt;div class=&#34;section&#34;&gt;
+</span></span><span style="display:flex;"><span>    &lt;h4&gt;(5) ローカルブリッジの設定&lt;/h4&gt;
+</span></span><span style="display:flex;"><span>    &lt;p&gt;次にローカルブリッジの設定をする。&lt;br&gt;
+</span></span><span style="display:flex;"><span>ローカルブリッジは&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPN&#34;&gt;VPN&lt;/a&gt;の仮想ネットワークと、LAN の実ネットワーク（ここでは&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPS&#34;&gt;VPS&lt;/a&gt;ホストサーバと仮想Webサーバ間のローカルネットワーク）をつなげる設定です。&lt;br&gt;
+</span></span><span style="display:flex;"><span>ローカルブリッジを行うLANカードを指定する必要があるが、ここでは仮想の「vboxnet0」を使用します。&lt;/p&gt;
+</span></span></code></pre></div><p>VPN Server/DEFAULT&gt;BridgeCreate
+BridgeCreate コマンド - ローカルブリッジ接続の作成
+ブリッジする仮想 HUB 名: Default
+ブリッジ先のデバイス名: vboxnet0</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>&lt;/div&gt;
+</span></span><span style="display:flex;"><span>&lt;div class=&#34;section&#34;&gt;
+</span></span><span style="display:flex;"><span>    &lt;h4&gt;(6) &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/DHCP&#34;&gt;DHCP&lt;/a&gt;の設定&lt;/h4&gt;
+</span></span><span style="display:flex;"><span>    &lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPN&#34;&gt;VPN&lt;/a&gt;クライアント側に割り当てる&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&#34;&gt;IPアドレス&lt;/a&gt;のレンジを決めてあげます。&lt;br&gt;
+</span></span><span style="display:flex;"><span>今回は最小限構成で実現するため、ローカルの&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&#34;&gt;IPアドレス&lt;/a&gt;は同一セグメントとしました。&lt;br&gt;
+</span></span><span style="display:flex;"><span>192.168.33.0/24を利用セグメントとした。&lt;br&gt;
+</span></span><span style="display:flex;"><span>また、サーバ側に割り当てているIPとバッティングしないように192.168.33.20以降を&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/DHCP&#34;&gt;DHCP&lt;/a&gt;のIPレンジとした。&lt;/p&gt;
+</span></span></code></pre></div><p>##まずは有効化。これをやらないと「PPPサーバーとの接続が確立ができません」ってなってハマります。
+VPN Server/example&gt; SecureNatEnable</p>
+<p>VPN Server/DEFAULT&gt;DhcpSet
+DhcpSet コマンド - SecureNAT 機能の仮想 DHCP サーバー機能の設定の変更
+配布するアドレス帯の開始点: 192.168.33.20
+配布するアドレス帯の終了点: 192.168.33.50
+サブネットマスク: 255.255.255.0
+リース期限 (秒): 7200
+デフォルトゲートウェイ (未設定可):
+DNS サーバー 1 (未設定可):
+DNS サーバー 2 (未設定可):
+ドメイン名:
+ログの保存 (yes / no): yes</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>&lt;/div&gt;
+</span></span><span style="display:flex;"><span>&lt;/div&gt;
+</span></span><span style="display:flex;"><span>&lt;div class=&#34;section&#34;&gt;
+</span></span><span style="display:flex;"><span>    &lt;h2&gt;5. &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPN&#34;&gt;VPN&lt;/a&gt;接続試験&lt;/h2&gt;
+</span></span><span style="display:flex;"><span>    &lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/iPhone&#34;&gt;iPhone&lt;/a&gt;の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPN&#34;&gt;VPN&lt;/a&gt;の設定から以下のように設定をする。&lt;br&gt;
+</span></span><span style="display:flex;"><span>アカウントの部分は「ユーザ名@仮想Hub名」にすること。&lt;br&gt;
+</span></span><span style="display:flex;"><span>&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207212531.jpg&#34; alt=&#34;f:id:mosuke5:20141207212531j:plain&#34; title=&#34;f:id:mosuke5:20141207212531j:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
+</span></span><span style="display:flex;"><span>&lt;br&gt;
+</span></span><span style="display:flex;"><span>&lt;p&gt;接続すると、ローカルのIPが割り当てられていることを確認。&lt;br&gt;
+</span></span><span style="display:flex;"><span>途中で切れているが192.168.33.21が割り当てられました。&lt;br&gt;
+</span></span><span style="display:flex;"><span>&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207212546.jpg&#34; alt=&#34;f:id:mosuke5:20141207212546j:plain&#34; title=&#34;f:id:mosuke5:20141207212546j:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
+</span></span><span style="display:flex;"><span>&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPN&#34;&gt;VPN&lt;/a&gt;につないだ状態でブラウザから192.168.33.10にアクセスすると”It works!!!”。&lt;br&gt;
+</span></span><span style="display:flex;"><span>&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141207/20141207212556.jpg&#34; alt=&#34;f:id:mosuke5:20141207212556j:plain&#34; title=&#34;f:id:mosuke5:20141207212556j:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;br&gt;
+</span></span><span style="display:flex;"><span>&lt;/p&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&lt;/div&gt;
+</span></span><span style="display:flex;"><span>&lt;div class=&#34;section&#34;&gt;
+</span></span><span style="display:flex;"><span>    &lt;h2&gt;6 最後に&lt;/h2&gt;
+</span></span><span style="display:flex;"><span>    &lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPN&#34;&gt;VPN&lt;/a&gt;の構築そのものはなんとかできるが、やはり奥は深い。&lt;br&gt;
+</span></span><span style="display:flex;"><span>挙動がまだ不安定な部分もあるので、きちんと仕組みを理解していくことと、&lt;br&gt;
+</span></span><span style="display:flex;"><span>今回は&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/VPN&#34;&gt;VPN&lt;/a&gt;クライアント側とアクセス先サーバを同一セグメントとしたので、L3の設定などをして違うセグメントにもアクセスできるようにしていきたい。&lt;/p&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&lt;/div&gt;
+</span></span><span style="display:flex;"><span>&lt;/body&gt;
+</span></span></code></pre></div>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=%e3%80%90VPS1%e5%8f%b0%e3%81%a7%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e5%8b%89%e5%bc%b7%e3%80%91SoftEther%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%a6VPN%e6%a7%8b%e7%af%89" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': '【VPS1台でインフラ勉強】SoftEtherを使ってVPN構築'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/03/16/squid/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'squidを使ってプロキシ環境の再現検証に活用する'});">squidを使ってプロキシ環境の再現検証に活用する</a> (2021/03/16)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2018/04/21/basic-mysql-on-docker/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'DockerでのMySQLのセットアップ方法とその仕組みを理解する'});">DockerでのMySQLのセットアップ方法とその仕組みを理解する</a> (2018/04/21)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2018/01/14/elasticsearch-api/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '[随時更新] ElasticSearchの基本APIのまとめ'});">[随時更新] ElasticSearchの基本APIのまとめ</a> (2018/01/14)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2017/08/13/elasticsearch_basic/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'ElasticSearch入門 インストールから検索、そしてKibanaまで'});">ElasticSearch入門 インストールから検索、そしてKibanaまで</a> (2017/08/13)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

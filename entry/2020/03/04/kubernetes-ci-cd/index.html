@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>KubernetesにおけるCI/CD実践の勘所まとめ</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="KubernetesにおけるCI/CD実践の勘所まとめ &middot; Goldstine研究所">
+<meta name="twitter:description" content="KubernetesにおけるCI/CDの実践の重要なポイントをまとめました。ブランチ戦略からマニフェストの管理、デプロイの考え方などご紹介します。Kubernetesでの運用をしている人、これから考えてい人の参考になればと思います。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="KubernetesにおけるCI/CD実践の勘所まとめ &middot; Goldstine研究所">
+<meta property="og:description" content="KubernetesにおけるCI/CDの実践の重要なポイントをまとめました。ブランチ戦略からマニフェストの管理、デプロイの考え方などご紹介します。Kubernetesでの運用をしている人、これから考えてい人の参考になればと思います。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>KubernetesにおけるCI/CD実践の勘所まとめ</h1>
+    <div class="entry-sub-title">
+        <span class="">04 Mar 2020, 18:14</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#ブランチ戦略">ブランチ戦略</a></li>
+    <li><a href="#宣言的な設定">宣言的な設定</a></li>
+    <li><a href="#マニフェストのテンプレート化">マニフェストのテンプレート化</a></li>
+    <li><a href="#テスト">テスト</a></li>
+    <li><a href="#モノレポジトリマルチレポジトリ">モノレポジトリ、マルチレポジトリ</a>
+      <ul>
+        <li><a href="#gitopsという考え方">GitOpsという考え方</a></li>
+      </ul>
+    </li>
+    <li><a href="#イメージ管理">イメージ管理</a></li>
+    <li><a href="#イメージスキャニング">イメージスキャニング</a>
+      <ul>
+        <li><a href="#注意事項">注意事項</a></li>
+        <li><a href="#セキュリティに関するdeepdive">セキュリティに関するDeepDive</a></li>
+      </ul>
+    </li>
+    <li><a href="#シークレット管理">シークレット管理</a></li>
+    <li><a href="#デプロイ">デプロイ</a></li>
+    <li><a href="#ciツール">CIツール</a></li>
+    <li><a href="#チェックリスト">チェックリスト</a></li>
+    <li><a href="#さいごに">さいごに</a></li>
+  </ul>
+</nav>
+        <p>こんにちは、<a href="https://twitter.com/mosuke5" target="_blank">もーすけ</a>です。<br>
+前回のブログでは「<a href="https://amzn.to/2PraGZ8" target="_blank" onClick="ga('send','event','link','click','to-amz-cloudnativedevops');">Kubernetesで実践するクラウドネイティブDevOps</a>」の書籍を紹介しました。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/02/26/cloud-native-devops/" data-iframely-url="//cdn.iframe.ly/0pYInqQ"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<p>こちらの反響もよかったこともあり、KubernetesにおけるCI/CD（継続的インテグレーションと継続的デリバリー）に焦点を絞って、いままでの経験も含めて大事なポイントをいくつかの切り口でまとめることにしました。
+一部は書籍の内容とかぶる部分もあるのですが、わたしが普段Kubernetesでのアプリケーション運用に携わる中で大事だと思うことなど含めてご紹介します。
+KubernetesにおけるCI/CDとしていますが、項目は必ずしもKubernetesに限った話ではありませんのでご了承ください。</p>
+<p>また、もっといろんなトピックを書きたいのですが、すべてのトピックを揃えると記事自体のボリュームも大きくなり公開も遅くなりそうだったので、基本的な内容のみ選んでみました。随時追加されていく（あるいは別記事？）可能性があります。</p>
+<h2 id="ブランチ戦略">ブランチ戦略</h2>
+<p>CI/CDの実践にまず根本的に関わるポイントとして、ブランチ戦略があります。<br>
+CI/CDパイプラインのトリガーはさまざまですが、Gitレポジトリのアクション（主にPushやMerge）をトリガーとすることが多いです。つまり、Gitレポジトリの運用の仕方とCI/CDは切っても切り離せない関係です。
+特に環境が複数面ある場合（例えば、テスト環境とプロダクション環境がある場合）は、どのタイミングでどの環境にデプロイさせるべきかはよく考えないといけないです。<br>
+CI/CDを実践したいと思っている人は、まず自分たちのチームのブランチの運用方法を見直すところから行ってみるといいでしょう。</p>
+<p>以下は、モノレポジトリ（アプリケーションとマニフェストを同一レポジトリで管理）でデプロイ先のステージが複数ある場合の一例です。<br>
+<img src="/image/branch-and-pipeline.png" alt="branch-and-pileline"></p>
+<h2 id="宣言的な設定">宣言的な設定</h2>
+<p>Kubernetesのマニフェストによる「宣言的な設定」は最も強力なポイントの１つです。<br>
+宣言的な設定が可能とはどういうことかというと、アプリケーションを実行するワークロードの「あるべき姿を記述」できるということです。
+アプリケーション単体だけではなく、他のコンポーネント（例えばDB）や必要とするストレージ、ネットワーク、ジョブなどといったアプリケーションを動かす上で必要になることをまとめてコードとして管理できます。
+もっと平たく言うと、マニフェストはYAML形式で記述することができ、Gitを通じてバージョン管理が可能ということです。アプリケーションの動作する環境を、バージョン管理できるということです。</p>
+<p>いままでもクラウドインフラの上で、<a href="https://www.terraform.io/" target="_blank">Terraform</a>や<a href="https://aws.amazon.com/jp/cloudformation/" target="_blank">CloudFormation</a>などといったツールでの宣言的な記述は行われてきました。
+Kubernetesには、Pod Lifecycle Event Generator(PLEG)を使用したKubernetes コントロールプレーンが機能することで、クラスターの現在の状態を望ましい状態に一致させるように動きます。これにより、この宣言的な設定がより強力なものになったと感じています。</p>
+<p>Kubernetesを利用する以上、マニフェストの管理は非常に重要なポイントになるのです。
+いまの運用・これからやろうとしている運用が、上のメリットを崩してしまわないように常に注意していくといいでしょう。</p>
+<h2 id="マニフェストのテンプレート化">マニフェストのテンプレート化</h2>
+<p>上でアプリケーションを動かす上で必要になることをマニフェストという形で記述できる、記述して管理しようと書いたわけですが、そんなに現実世界をきれいにマニフェストで表せるものでしょうか？<br>
+たとえば、テスト環境と本番環境のKubernetesクラスターがあったとして、まったく同じマニフェストが適応できるでしょうか？</p>
+<p>CI/CDの世界では、基本的に環境ごとのデプロイの方法は同一のほうが望ましいです。<br>
+「テスト環境はテスト環境用にマニフェストを用意して、本番環境は本番環境用のマニフェストを用意して、本番環境にデプロイするときには追加でこの作業をして、、、」<br>
+こういった状況はわれわれの目指したい姿ではないはずです。<br>
+理由は簡単です。環境毎に用意したマニフェストの記述の多くは重複があり、変更の追従が大変だからです。
+変更の追従が困難であると、環境ごとの環境差分が生まれやすく、そのうちデプロイミスにもつながるでしょう。<br>
+ではこういった問題にどう立ち向かえばいいのでしょうか？</p>
+<p>マニフェストのテンプレート化がひとつの解決策になります。<br>
+大本のマニフェストは同一で使いまわしつつ、環境によってパラメータや一部の変更ができるという状態を作る必要があります。
+マニフェストをテンプレート化するツールはたくさんありますが代表的なものに下記があります。</p>
+<ol>
+<li>Helm</li>
+<li>Kustomize</li>
+<li>Ansible</li>
+</ol>
+<p>個人的にはKustomizeがお気に入りです。Kustomizeの使用感や必要性については下記をぜひご覧ください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2019/06/21/kustomize/" data-iframely-url="//cdn.iframe.ly/4yC552R"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h2 id="テスト">テスト</h2>
+<p>アプリケーションのテストはKubernetes環境でもそれほど変わりはないです。
+どのCIツールを使うかにもよりますが、たとえばJenkinsでは、Jenkins自身とCI/CDパイプラインの実行環境をKubernetes上で実行できます。そうなると、テスト環境は、コンテナ上になり一時的な環境でのテストを行うことになります。特定の環境依存せずポータブルに動作可能なように、アプリケーションはTwelve factor appなどに基づいておくことが重要です。</p>
+<p>アプリケーションのテストに、外部コンポーネント（RDBなど）が必要になる場合は、テスト用に常時稼働のDBを用意するのではなく、パイプライン毎に個別のDBを起動できるようにしておくといいでしょう。<br>
+Jenkinsを使う場合、テストを実行するJenkins SlaveのPodのサイドカーとしてMySQLなどのDBを起動することなどができます。
+テストを実行するPod内にMySQLなどのDBを起動することで、アプリケーションからはローカルホストへの接続でDBを利用できるようになります。(下記はJenkinsfileの例)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>podTemplate(
+</span></span><span style="display:flex;"><span>  cloud: &#39;kubernetes&#39;,
+</span></span><span style="display:flex;"><span>  label: &#39;jenkins-slave-ruby&#39;,
+</span></span><span style="display:flex;"><span>  serviceAccount: &#39;jenkins&#39;,
+</span></span><span style="display:flex;"><span>  containers: [
+</span></span><span style="display:flex;"><span>    // メインのコンテナでアプリケーションのテストなどを行う
+</span></span><span style="display:flex;"><span>    containerTemplate(
+</span></span><span style="display:flex;"><span>      name: &#39;jnlp&#39;,
+</span></span><span style="display:flex;"><span>      image: &#39;xxxx/jenkins-slave-ruby&#39;,
+</span></span><span style="display:flex;"><span>      args: &#39;${computer.jnlpmac} ${computer.name}&#39;,
+</span></span><span style="display:flex;"><span>      workingDir: &#39;/tmp&#39;,
+</span></span><span style="display:flex;"><span>      envVars: [
+</span></span><span style="display:flex;"><span>        envVar(key: &#39;RAILS_ENV&#39;, value: &#39;test&#39;)
+</span></span><span style="display:flex;"><span>      ]
+</span></span><span style="display:flex;"><span>    ),
+</span></span><span style="display:flex;"><span>    // サイドカーとしてアプリケーションのテストに利用するDBを起動する
+</span></span><span style="display:flex;"><span>    containerTemplate(
+</span></span><span style="display:flex;"><span>      name: &#39;mysql&#39;,
+</span></span><span style="display:flex;"><span>      image: &#39;xxxx/mysql:5.7&#39;,
+</span></span><span style="display:flex;"><span>      envVars: [
+</span></span><span style="display:flex;"><span>        envVar(key: &#39;MYSQL_USER&#39;, value: &#39;xxxx&#39;),
+</span></span><span style="display:flex;"><span>        envVar(key: &#39;MYSQL_PASSWORD&#39;, value: &#39;xxxx&#39;),
+</span></span><span style="display:flex;"><span>        envVar(key: &#39;MYSQL_DATABASE&#39;, value: &#39;xxxx&#39;)
+</span></span><span style="display:flex;"><span>      ]
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>])
+</span></span></code></pre></div><h2 id="モノレポジトリマルチレポジトリ">モノレポジトリ、マルチレポジトリ</h2>
+<p>Kubernetesのマニフェストをどこのレポジトリで管理するかはひとつの選択です。<br>
+アプリケーションレポジトリで管理するもよし、マニフェスト用のレポジトリで管理するのもよしです。
+ただし、それぞれの方法で向き不向きがあるので、それを理解した上で選択するといいでしょう。</p>
+<ul>
+<li>モノレポジトリ
+<ul>
+<li>アプリケーションとマニフェストをひとつのレポジトリで管理する</li>
+<li>アプリケーションの変更に対してトリガーできる</li>
+<li>アプリケーション開発者がマニフェストやアプリケーション運用も面倒みれる体制では向いている</li>
+<li>単一のアプリケーションが独立してデプロイできる場合などは向いている</li>
+</ul>
+</li>
+<li>マルチレポジトリ
+<ul>
+<li>アプリケーションとマニフェストを異なるレポジトリで管理する</li>
+<li>アプリケーションの変更とは異なるトリガーで実行できる</li>
+<li>運用担当者との役割分担が別れている場合は向いている</li>
+<li>複数のアプリケーションのデプロイを管理したい場合などにも向いている</li>
+</ul>
+</li>
+</ul>
+<h3 id="gitopsという考え方">GitOpsという考え方</h3>
+<p>マニフェストをどう管理するかの観点でシングルレポジトリかマルチレポジトリかがでてきました。
+この議論は、デプロイとも関連してくるのでここで「GitOps」という考え方と密接に関係があることを理解しておくといいです。<br>
+GitOpsとは、<strong>Kubernetesクラスタの管理やアプリケーションデプロイの手法のひとつで、Gitレポジトリを唯一信頼できる情報源（Single source of truth）と考え、クラスタ上の状態とGitレポジトリ上の差分を埋めるやりかた</strong>と認識すると良さそうです。</p>
+<p>Kubernetesのコントローラの発想と非常に近しいかなと思います。
+Kubernetesでは、API Serverの管理する期待する状態（マニフェスト）と、クラスタ上の実際の状態との差分をReconciliation loopが解消する、というのが大きなコンセプトです。そう考えると、Gitレポジトリを期待する状態とし、クラスタ上の実態との差分をGitOpsツール（Reconciliation loop）が解消すると置き換えて読むこともできますよね。</p>
+<p><img src="/image/gitops-overview.png" alt="gitops"></p>
+<p>また、Kubernetesにおいてこの考え方が重要な理由は、ソースコードとそれが動く状態としたコンテナイメージ、そしてオーケストレーションとしてKubernetesマニフェストこれらの関係性にあると考えます。
+コンテナイメージは、ソースコードとDockerfileから作ることができます。Kubernetesのマニフェストは、コンテナイメージとその他の設定記述で表すことができます。つまり、アプリケーション成果物としてのコンテナイメージと、それをどうコンフィギュレーションして動かすか（オーケストレーションするか）は切り離して考えることができるということです。</p>
+<p>GitOpsを実現するツールの代表格として<a href="https://argo-cd.readthedocs.io/en/stable/">Argo CD</a>や<a href="https://fluxcd.io/">Flux</a>があります。<br>
+また、個人的な意見ですが、Argo CDといったGitOpsツールを採用するかどうかは別にしても、GitOpsの発想は非常にこのKubernetesの環境と相性がいいと思っています。デプロイ手法は、マニフェストレポジトリの変更をトリガーにしたCIパイプラインからだったとしても、Gitレポジトリを唯一信頼できる情報源と捉えてデプロイする手法はぜひとりいれることを検討してほしいです。</p>
+<h2 id="イメージ管理">イメージ管理</h2>
+<p>Kubernetesではアプリケーションはコンテナイメージに同梱して管理することがメジャーです。<br>
+コンテナイメージにはタグをつけることが可能で、タグを指定してデプロイするイメージを決定できます。
+代表的なタグの付け方に以下2つの方法があります。</p>
+<ul>
+<li>gitのコミットのハッシュ値を使用する
+<ul>
+<li>コンテナイメージのタグにgitのコミットのハッシュをつける</li>
+<li>Git上のバージョンとコンテナイメージのバージョンの紐づけが簡単</li>
+</ul>
+</li>
+<li>セマンティクバージョンを使用する
+<ul>
+<li>gitのTagやアプリケーションコード内に記述のバージョンなどを活用して、セマンティクバージョンを使用する</li>
+<li>セマンティクスバージョンに加えて、ビルドナンバーなどを付与して一意性を確保することもある</li>
+</ul>
+</li>
+</ul>
+<p><img src="/image/container-image-tag-git-commit.png" alt="container-image-tag-git-commit"></p>
+<p>また、コンテナイメージはどこで作成してレポジトリに保存していますか。<br>
+だれかメンバーのローカルPCで<code>docker build</code>した結果をイメージレポジトリへ保存しているのであれば避けましょう。
+イメージのビルド環境を統一化し、自動化のパイプラインに含められるように検討が必要です。
+コンテナイメージのビルドの属人化を避けるとともに、ビルド環境を共通化することでビルドした環境の差分をなくすことが重要です。</p>
+<h2 id="イメージスキャニング">イメージスキャニング</h2>
+<p>コンテナ、Kubernetesの利用にといてセキュリティの考慮レイヤーは多岐にわたります。
+その中で、CI/CDのスコープで関連する部分にイメージスキャニングがあります。
+パイプラインの中で生成したコンテナイメージに脆弱性がないかどうかの検査できます。
+コンテナイメージの脆弱性といっても、いくつかの観点がありますが、代表的なものとしてイメージ内で利用されているパッケージに脆弱性がないか確認するという点があります。
+脆弱性のあるイメージを不用意にデプロイしないよう、デプロイする前に気づくことができるようになります。</p>
+<p>イメージスキャニングをする方法の代表的なツールとして<a href="https://github.com/quay/clair" target="_blank">Clair</a>や<a href="https://github.com/aquasecurity/trivy" target="_blank">Trivy</a>があります。
+Clairはクライアント・サーバ方式で構成されるため、利用するためにDBの用意などが必要になります。一方、Trivyはバイナリさえあれば動くので気軽に実行できます。パイプラインの実装ではTrivyのタイプのほうが実装しやすいです。</p>
+<h3 id="注意事項">注意事項</h3>
+<p>イメージスキャニングをパイプラインに実装する上ではいくつか注意するといい点があります。<br>
+ひとつはキャッシュです。脆弱性のスキャンには、当然ながら脆弱性情報を利用します。コンテナ環境においてもキャッシュできるようにしておくと、実行時間を短くできるので工夫が必要です。<br>
+次に、脆弱性の検知ができる範囲のスコープです。
+上で紹介したものはイメージの中で利用されているパッケージに対する脆弱性の検査です。
+コンテナイメージに対する脆弱性はパッケージだけで判断できるものではありません。あくまでパッケージに対する脆弱性の検査であることを理解して利用してください。<br>
+最後に、検査結果に対する対応です。おそらく検査をすると影響の大小にかかわらず多くの脆弱性が指摘されると思います。
+利用するチーム・組織の中でどのレベルの脆弱性の場合に対応するべきかなどの指針を決めておくことが重要になります。</p>
+<h3 id="セキュリティに関するdeepdive">セキュリティに関するDeepDive</h3>
+<p>コンテナ、Kubernetesに関するセキュリティはイメージスキャニングだけではなく多くの観点があります。
+網羅的に勉強したい人は下記の書籍で勉強することを強くオススメします。Kubernetesセキュリティについては圧倒的に詳しく解説しています。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://www.amazon.co.jp/Docker-Kubernetes%25E9%2596%258B%25E7%2599%25BA%25E3%2583%25BB%25E9%2581%258B%25E7%2594%25A8%25E3%2581%25AE%25E3%2581%259F%25E3%2582%2581%25E3%2581%25AE%25E3%2582%25BB%25E3%2582%25AD%25E3%2583%25A5%25E3%2583%25AA%25E3%2583%2586%25E3%2582%25A3%25E5%25AE%259F%25E8%25B7%25B5%25E3%2582%25AC%25E3%2582%25A4%25E3%2583%2589-Compass-Books%25E3%2582%25B7%25E3%2583%25AA%25E3%2583%25BC%25E3%2582%25BA-%25E9%25A0%2588%25E7%2594%25B0/dp/4839970505" data-iframely-url="//cdn.iframe.ly/ugsGZgB?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h2 id="シークレット管理">シークレット管理</h2>
+<p>運用環境へのデプロイを考えると必ず問題になるのが、シークレット管理です。<br>
+本番環境のDBへのパスワードをどう管理するか？みたいなのはいつどのプラットフォームになってもつきまとう問題です。
+Excelにパスワードかけて保存しておいて、そのExcelのパスワードを忘れるという経験をしたければまあそれはそれでいいでしょう。
+それぞれメリットデメリットはあるのですが、代表的な方法は下記のようなものがあります。</p>
+<ol>
+<li>バージョン管理を通じた機密情報の暗号化</li>
+<li>機密情報のリモート保存</li>
+<li>専用の機密情報管理ツールの使用</li>
+</ol>
+<p>Gitレポジトリに機密情報を保存する方法は、よくアンチパターンとよくいわれたりします。
+機密情報をGit管理する際には、なんといっても平文でコミットしてしまったときのリスクがあります。
+しかし、シークレット含めたデプロイの自動化を考えると、Gitレポジトリに保存する方法も一概に悪いとは思えません。
+適切に暗号化して保存することが必要になるわけですが、具体的なツールとして<a target="_blank" href="https://github.com/mozilla/sops">SOPS</a>が結構使えます。<br>
+SOPSは、ファイル全体を暗号化するのではなく、JsonやYAMLのvalueだけを暗号化できます。
+そのためプルリクエストでも内容をみやすく非常に強力なツールです。
+暗号化のキーにクラウドサービスのKey Management Serviceなどを利用できる点もよいです。
+以前にAnsibleのansible-vaultを使って同様のことを行いましたが、ファイル単位での暗号化のため苦労した覚えもありました。</p>
+<h2 id="デプロイ">デプロイ</h2>
+<p>アプリケーションを環境にデプロイする際の方式（strategy）ですが、kubernetsのネイティブの機能だと、recreateかrollingの選択が可能です。
+それ以外にblue greenデプロイメントなどを選択したい場合には、CI/CDパイプライン内での実装が必要になるでしょう。</p>
+<p>デプロイについて、そのスコープについて述べられることは多くないと感じているのですが、
+デプロイの対象や範囲を明確にしておくことも非常に大事と感じています。
+アプリケーションのみの変更を期待するのか、他のKubernetesのリソースの変更も期待とするのか、またはAWSなどのクラウド側のリソースのデプロイも含むかということです。
+この問題は、上のモノレポジトリかマルチレポジトリかの選択と本質的には一緒と言えるかもしれません。
+アプリケーション以外のコンポーネントの管理をどのチームが責務をもっているか、そことの連携をどうするかを確認して決定する必要があります。</p>
+<p>例として、Kubernetesでアプリケーションを実行しつつも、AWSのマネージドサービスも併用して活用しているとします(AWSのリソース管理をTerraformで行っていると仮定)。もしアプリケーションチームで他のコンポーネントにも責務をもっているのであれば、アプリケーションコードと一緒にTerraformコードも管理し、KuberntesのデプロイとともにTerraformコードの適応も検討することができます。
+マルチレポジトリで、KubernetesのマニフェストファイルとTerraformのコードを&quot;インフラコード&quot;としてまとめて管理することもできるでしょう。</p>
+<p>大事なことは、アプリケーションの変更は必ずしもアプリケーションの入れ替えだけでは済まないことがあるため、
+影響範囲の責務をどこでどのように持つかを考えていかなければいけないということです。
+アプリケーション以外の部分は、他チームなので手動でやっています、という体制はそれはそれでいいですが、アプリケーションのデプロイまでの全体のバリューストリームの改善にならないことがあるので一緒に考えましょうというはなしです。</p>
+<h2 id="ciツール">CIツール</h2>
+<p>CIツールに何を使ったらいいのか？ということもよく聞かれるので記述します。このブログでは具体的にこれがいい！というのは示しませんが、<strong>CIの実行環境もコンテナで実現できるかどうか？</strong> ここを重要視するといいのではないかと思います。（現代的なCIツールであれば当然だろうと思われるかもしれませんが）<br>
+CIとコンテナは非常に相性がいいです。なぜならば、テストや自動化作業は毎度クリーンな環境で行うほうが効率的だからです。前に行ったテストデータが残っていたのでその準備から行うや、CIで実行したい対象のアプリケーションが必要なバージョンのソフトウェアを利用できないといったことがなくなります。それでいて、仮想サーバとことなり起動もはやいので効率的です。<br>
+まずは、最近のSaaS製品であれば、多くがコンテナとして動かすことができますのでそちらを探してみましょう。
+CIツール自身もKubernetes上で動かすことも検討できます。以下、代表例です。</p>
+<ol>
+<li>Jenkinsであれば、<a href="https://plugins.jenkins.io/kubernetes/" target="_blank">Kubernetes Plugin for Jenkins</a>を使えば、Jenkins agentをKubernetesのPodとして動作可能です。Jenkins本体も当然Kubernetes上に構築することもできますが、既存にJenkinsを持っている場合は、agentのみでもKubernetesで動かすことを検討してみましょう。</li>
+<li>Gitlabであれば、<a href="https://docs.gitlab.com/runner/install/kubernetes.html">Gitlab runnerをKubernetesで実行</a>する方法があります。Gitlabを利用されている企業の方はすごく多くなってきていると感じています。余計なツールを増やすことなく、Kubernetes上でCIを実行できるので非常に有力な候補となりえます。</li>
+<li>もっとクラウドネイティブなCIツールとしてTektonがあります。まだまだ発展途上のプロダクトではありますが、Kubernetes Nativeにつくられたツールであり非常に楽しみです。もしTektonについて学びたい人は、<a href="/entry/2020/05/10/tekton-operator/">Tekton学習シリーズ（全11回）</a>もやっていますので学んでみてください。</li>
+</ol>
+<h2 id="チェックリスト">チェックリスト</h2>
+<p>上で出てきた項目を、一言でチェックリスト形式にまとめました。</p>
+<ol>
+<li>どんなブランチ戦略を採用しているか？ブランチとパイプラインのトリガーの関係性を整理できたか？</li>
+<li>マニフェストの宣言的な設定のメリットを活かしてあるか？</li>
+<li>環境ごとにマニフェストを個別に作っていないか？テンプレート化などをして再利用性を高めているか？</li>
+<li>テストは一時的な環境で実施できるようになっているか？テスト時の他のコンポーネントをどう扱うか？</li>
+<li>マニフェストの管理はどこのレポジトリで行っているか？その管理が体制に向いているか考えたか？</li>
+<li>コンテナイメージはどこでどのように作成しているか？タグ付けの方法は適切か？</li>
+<li>シークレット情報の管理の方法について検討したか？採用した方法のリスクを検討したか？</li>
+<li>アプリケーションのデプロイ方式を検討したか？</li>
+<li>デプロイのスコープを明確にしたか？</li>
+<li>利用するCIツールは決まったか？なぜそれを選んだか説明できるか？</li>
+</ol>
+<h2 id="さいごに">さいごに</h2>
+<p>KubernetesにおけるCI/CDで重要になるポイントを紹介してきました。<br>
+ほかにも紹介したいことがいくつかあるので、別記事ないしは内容の更新を随時おこなっていこうと思います。
+またこの手の内容については「<a href="https://amzn.to/2PraGZ8" target="_blank" onClick="ga('send','event','link','click','to-amz-cloudnativedevops');">Kubernetesで実践するクラウドネイティブDevOps</a>」という書籍でより広範囲に紹介されています。
+是非手にとって学んでみてください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/02/26/cloud-native-devops/" data-iframely-url="//cdn.iframe.ly/0pYInqQ"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Kubernetes%e3%81%ab%e3%81%8a%e3%81%91%e3%82%8bCI%2fCD%e5%ae%9f%e8%b7%b5%e3%81%ae%e5%8b%98%e6%89%80%e3%81%be%e3%81%a8%e3%82%81" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'KubernetesにおけるCI\/CD実践の勘所まとめ'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて'});">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a> (2022/01/24)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/10/28/kubernetes-test-by-terratest/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Kubernetes環境についてTerratestでテストを書く'});">Kubernetes環境についてTerratestでテストを書く</a> (2021/10/28)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'カスタマイズしたJenkinsを作成する方法 on OpenShift'});">カスタマイズしたJenkinsを作成する方法 on OpenShift</a> (2020/07/05)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

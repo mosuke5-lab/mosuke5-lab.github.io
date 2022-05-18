@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>オブジェクトストレージの仕組みと活用シーンを正しく理解する</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2017/03/18/182252/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2017/03/18/182252/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="オブジェクトストレージの仕組みと活用シーンを正しく理解する &middot; Goldstine研究所">
+<meta name="twitter:description" content="Amazon S3をはじめ、オブジェクトストレージが身近になってきています。一見、万能にも見えるオブジェクトストレージですがその仕組みを理解すれば正しい活用方法が見えてきます。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="オブジェクトストレージの仕組みと活用シーンを正しく理解する &middot; Goldstine研究所">
+<meta property="og:description" content="Amazon S3をはじめ、オブジェクトストレージが身近になってきています。一見、万能にも見えるオブジェクトストレージですがその仕組みを理解すれば正しい活用方法が見えてきます。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2017/03/18/182252/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>オブジェクトストレージの仕組みと活用シーンを正しく理解する</h1>
+    <div class="entry-sub-title">
+        <span class="">18 Mar 2017, 18:22</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-クラウド技術" href="/categories/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89%E6%8A%80%E8%A1%93">クラウド技術</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1オブジェクトストレージとは">1.オブジェクトストレージとは</a></li>
+    <li><a href="#2特徴">2.特徴</a>
+      <ul>
+        <li><a href="#特徴1-ディレクリ構造の排除">特徴1: ディレクリ構造の排除</a></li>
+        <li><a href="#特徴2-分散保存">特徴2: 分散保存</a></li>
+        <li><a href="#特徴3-アプリケーションからの利用を意識">特徴3: アプリケーションからの利用を意識</a></li>
+      </ul>
+    </li>
+    <li><a href="#4オブジェクトストレージのアーキテクチャ">4.オブジェクトストレージのアーキテクチャ</a>
+      <ul>
+        <li><a href="#アーキテクチャ">アーキテクチャ</a></li>
+        <li><a href="#ファイルアップロード">ファイルアップロード</a></li>
+        <li><a href="#ファイルダウンロード">ファイルダウンロード</a></li>
+        <li><a href="#オブジェクトの配置情報の管理">オブジェクトの配置情報の管理</a></li>
+        <li><a href="#eventual-consistency結果整合性">Eventual Consistency（結果整合性）</a></li>
+        <li><a href="#erasure-coding">Erasure Coding</a></li>
+      </ul>
+    </li>
+    <li><a href="#5オブジェクトストレージの向き不向き">5.オブジェクトストレージの向き不向き</a></li>
+    <li><a href="#6オブジェクトストレージの勘違いしがちなユースケース">6.オブジェクトストレージの勘違いしがちなユースケース</a>
+      <ul>
+        <li><a href="#1ログのリアルタイムでの保存">(1)ログのリアルタイムでの保存</a></li>
+        <li><a href="#2サーバにオブジェクトストレージをマウントするケース">(2)サーバにオブジェクトストレージをマウントするケース</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考">参考</a></li>
+    <li><a href="#追記メモ-20170328">追記メモ (2017/03/28)</a></li>
+  </ul>
+</nav>
+        <p>こんにちは、<a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br>
+Amazon S3をはじめとして、オブジェクトストレージが身近になってきています。
+各クラウドベンダーはオブジェクトストレージサービスを提供しています。</p>
+<ul>
+<li><a href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/Welcome.html" target="_blank">Amazon S3</a></li>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/storage/storage-introduction" target="_blank">Azure Blob Storage</a></li>
+<li><a href="https://cloud.google.com/storage/" target="_blank">Google Cloud Storage</a></li>
+<li><a href="https://www.alibabacloud.com/ja/product/oss" target="_blank">Alibaba Cloud OSS</a></li>
+<li><a href="https://www.idcf.jp/cloud/storage/" target="_blank">IDCF オブジェクトストレージ</a></li>
+</ul>
+<p>注目をあびているオブジェクトストレージですが、その性質や特性をあまり理解しておらずを魔法のストレージとして理解されているケースも多いように感じます。クラウドプロバイダーとして働く身としては非常にもどかしい思いでいます！
+なので原点に振り返ってそもそもオブジェクトストレージとはなんなのか。どんな特徴を持っているストレージなのか、まとめてみました。</p>
+<h2 id="1オブジェクトストレージとは">1.オブジェクトストレージとは</h2>
+<p>オブジェクトストレージとは一言で言うと、「オブジェクト単位（ファイル単位）で出し入れのできる、ネットワークストレージ」です。
+オブジェクトストレージでは直接にストレージ上のファイルをRead/Writeすることはできません。
+いうなれば、FTPサーバに近い存在とも言えます。</p>
+<p>今やクラウド上のストレージの代名詞として扱われるオブジェクトストレージですが、
+実はファイルの出し入れしかできないストレージなのです！？！？</p>
+<h2 id="2特徴">2.特徴</h2>
+<p>では、そんなファイル単位での出し入れしかできないFTPサーバに似たオブジェクトストレージですが、その本当の特徴はどこにあるのでしょうか。</p>
+<h3 id="特徴1-ディレクリ構造の排除">特徴1: ディレクリ構造の排除</h3>
+<p>1つ目の特徴としては、ディレクトリ構造でファイルを管理しないことです。
+ディレクトリ構造は、もしストレージサーバのハードディスク容量がいっぱいになり、
+ファイルを別のディスクに移動する場合、そのディレクトリパスも変更しなければいけません。
+クラウドサービスのようなたくさんのユーザが利用し拡張性の求められる場面では、ディレクトリ構造は適さないのです。</p>
+<p>そこで、オブジェクトストレージはディレクトリ構造ではなく、階層のないフラットな関係でファイルが保存されます。
+すべてのファイルにIDが付与され、そのIDがどこに保管されているか別で管理する仕組みとなっています。</p>
+<p>とはいってもS3の管理コンソール上では、フォルダを作ったり階層にできるではないか？とも思うかもしれません。これは、人間がファイルを構造的に管理しやすいよう、インターフェイスとしてそうしているけれど、中身の実装はディレクトリ構造にはなっていないです。</p>
+<h3 id="特徴2-分散保存">特徴2: 分散保存</h3>
+<p>2つ目の特徴は「分散保存」です。
+オブジェクトストレージでは、ファイルを分散保存するアーキテクチャによって、
+ファイルの冗長化と大量のファイルへのアクセスさばくことを可能にしています。
+詳しくは次の「オブジェクトストレージのアーキテクチャ」の項目でご紹介します。</p>
+<h3 id="特徴3-アプリケーションからの利用を意識">特徴3: アプリケーションからの利用を意識</h3>
+<p>3つ目の特徴はアプリケーションでの利用を強く意識していることです。
+この項目は製品によって異なる部分もありますが、主な3点を紹介します。</p>
+<h4 id="1メタ情報管理">(1)メタ情報管理</h4>
+<p>従来のファイルシステムでのファイルへのメタデータは、ファイルのサイズや更新日付などが一般的でした。
+オブジェクトストレージではファイルの有効期限などの付加情報を設定することができ、インフラ管理を容易にします。
+上の「ディレクトリ構造の排除」でもふれたように、ファイルはIDを持っており、そのファイルの名前も含めてメタデータとして別に管理されます。</p>
+<h4 id="2httpプロトコルを使ったインターフェイス">(2)HTTPプロトコルを使ったインターフェイス</h4>
+<p>オブジェクトストレージでは、ファイルのアップロード、ダウンロードなどすべての操作はHTTPプロトコルを利用します。
+HTTPのような汎用的なプロトコルを採用することにより、サーバからはもちろん、モバイル端末など幅広いデバイスから利用が可能です。</p>
+<h4 id="3web公開機能">(3)Web公開機能</h4>
+<p>さらには、保存したオブジェクトに対してURLを割り当てて公開することもできます。
+静的なWebサイトの公開や、cssやJavaScript、画像ファイルなどを直接オブジェクトストレージへ取得しにいくこともできます。</p>
+<h2 id="4オブジェクトストレージのアーキテクチャ">4.オブジェクトストレージのアーキテクチャ</h2>
+<p>オブジェクトストレージとひとまとめにいっても、製品によってその実現方法はさまざまで異なります。
+ここでは一例として利用されるアーキテクチャについて紹介します。</p>
+<p><span style="color: #999999"><span style="font-size: 80%">※ここで紹介するアーキテクチャがオブジェクトストレージのすべてのアーキテクチャを表すものではありません。また、わかりやすくするためかなり簡略化して記載しています。</span></span></p>
+<h3 id="アーキテクチャ">アーキテクチャ</h3>
+<p>大きく分けて、プロキシノードとストレージノードの2つによって構成されています。<br>
+ファイルをアップロードする時（保存する時）、プロキシノードは受け取ったファイルを、
+バックエンドのストレージノードに保存する必要がありますが、この際に複数のストレージノードに対してファイルを保存します。これによって、ファイルの冗長化（三重保存）を実現しています。
+各ストレージノードではRAIDは行わず、複数のノードに対して保存することで冗長化をはかっています。</p>
+<p>一方、ファイルをダウンロードときは、複数のノードに保存されているファイルのうちどれか1つを選びます。
+これによって大量のファイルへのアクセスの負荷分散も実現しています。</p>
+<h3 id="ファイルアップロード">ファイルアップロード</h3>
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20170318/20170318164020.jpg" alt="f:id:mosuke5:20170318164020j:plain:w600" title="f:id:mosuke5:20170318164020j:plain:w600" class="hatena-fotolife" style="width:600px" itemprop="image"></span></p>
+<h3 id="ファイルダウンロード">ファイルダウンロード</h3>
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20170318/20170318164028.jpg" alt="f:id:mosuke5:20170318164028j:plain:w600" title="f:id:mosuke5:20170318164028j:plain:w600" class="hatena-fotolife" style="width:600px" itemprop="image"></span></p>
+<h3 id="オブジェクトの配置情報の管理">オブジェクトの配置情報の管理</h3>
+<p>ファイルをアップロードする際に、プロキシノードは複数のノードに保存すると説明しました。
+たとえば10台のストレージノードがあり、そのうち3台に保存したとします。
+ファイルを取得する際に、対象のファイルがどのノードにあるかわからなくなってしまうので、ファイルとノードの対応付けの管理が必要です。</p>
+<p>そのため、すごく簡略化すると下記のような対応表を作って管理します。
+あるファイルがどこに保存されているのか記述された対応表です。</p>
+<table class="table">
+<thead>
+<tr>
+<th style="text-align:center;"></th>
+<th style="text-align:center;">ファイル名1</th>
+<th style="text-align:center;">ファイル名2</th>
+<th style="text-align:center;">ファイル名3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;">保存場所1</td>
+<td style="text-align:center;">1</td>
+<td style="text-align:center;">2</td>
+<td style="text-align:center;">5</td>
+</tr>
+<tr>
+<td style="text-align:center;">保存場所2</td>
+<td style="text-align:center;">5</td>
+<td style="text-align:center;">3</td>
+<td style="text-align:center;">8</td>
+</tr>
+<tr>
+<td style="text-align:center;">保存場所3</td>
+<td style="text-align:center;">9</td>
+<td style="text-align:center;">10</td>
+<td style="text-align:center;">10</td>
+</tr>
+</tbody>
+</table>
+<p>また、オブジェクトストレージは拡張が優れている点が特徴と述べました。
+ストレージノードが追加されることは頻繁に行われます。
+その際には、リバランスと呼ばれる処理が行われ、追加されたノードを含めてオブジェクトの再配置が行われるようです。</p>
+<h3 id="eventual-consistency結果整合性">Eventual Consistency（結果整合性）</h3>
+<p>複数のストレージノードに対してファイルを保存しているわけですが、ファイルの更新をした場合どうなるのでしょうか？
+実装にもよるかと思いますが、あるノードのオブジェクトが更新されてから、他のノードのオブジェクトに同期が行われます。同期の間、にファイルを取得しに行くとタイミングによっては古いファイルを取得してしまうことがあります。しかし、最終的には同期が終わりすべてのノードで同じファイルが格納されます。このことを「Eventual Consistency（結果整合性）」と呼びます。
+直訳で考えると「最終的には整合性があるよ」といったことろでしょうか。</p>
+<p>このシナリオはストレージノードの障害時にファイルが更新されたときも同じです。
+障害があったストレージノードの復旧後、そのノードだけファイルが古い状態となります。
+この状態でファイルの取得を行うと、古いファイルを取得してしまう可能性があります。
+オブジェクトストレージでは定期的に同期の処理が行われ、正しい状態へもどす機能があります。
+この機能によりしばらく時間が立つと全体の整合性がとれた状態となります。</p>
+<p>Amazon S3でもデータの整合性について記述されています。<br>
+<a href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/Introduction.html#ConsistencyModel" target="_blank">Amazon S3 のデータ整合性モデル</a></p>
+<h4 id="s3の強い一貫性のサポート">S3の「強い一貫性」のサポート</h4>
+<p>2020年12月のre:Inventの中で、S3がいままでの結果整合性モデルではなく、「強い一貫性」のサポートをすることを発表しました。
+もともとのオブジェクトストレージの仕組みでは上で述べたような結果整合性のモデルになることが普通ですが、テクノロジーの進化によってクラウドプロバイダーの製品は進化を遂げているようです。具体的な実現方法については明記がありませんでした。<br>
+<a href="https://aws.amazon.com/jp/blogs/aws/amazon-s3-update-strong-read-after-write-consistency/">Amazon S3 Update – Strong Read-After-Write Consistency</a></p>
+<h3 id="erasure-coding">Erasure Coding</h3>
+<p>Erasure Codingとはデータの保存方法のことです。
+上の例ではレプリケーション的なデータの複製保存をしていることを書きました。
+3箇所に分散して保存すると、単純にストレージの利用効率は1/3になります。
+その効率をあげるためにErasure Codingを採用することがあります。
+ここで詳細を説明するには重たすぎるので、下記を参照してください。</p>
+<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fwww.jdsf.gr.jp%2Fbackup%2FJEITA%2F2015%2Fjeita07.html" title="RAIDを絶滅に追い込むイレ―ジャーコーディング
+テープには15年以上前から使われていた！" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://www.jdsf.gr.jp/backup/JEITA/2015/jeita07.html">www.jdsf.gr.jp</a></cite>
+<h2 id="5オブジェクトストレージの向き不向き">5.オブジェクトストレージの向き不向き</h2>
+<p>上記にみてきた特徴を持つオブジェクトストレージですが、その最適な利用用途はなんでしょうか。<br>
+その特性上、Read/Writeはブロックレベルではなく、オブジェクトレベルとなります。
+更新頻度の高いDBのバックエンドストレージとしては当然不向きでしょう。比較的更新頻度の低く、古いデータを読み出すことがあっても影響の少ないたぐいのものが最適と考えられます。よく利用される用途としては、HTMLやCSS、画像、動画などのスタティックなファイル。そして、バッチ処理の計算結果の置き場などでしょうか。</p>
+<p>また、AWSなどのパブリッククラウドを利用していると、Lambdaを代表としたFunctionなコンピューティングがあるがゆえにその利用用途も拡大していると考えます。Lambdaであれば、S3のイベントをトリガーに処理を実行できるためその点は大きいです。</p>
+<h2 id="6オブジェクトストレージの勘違いしがちなユースケース">6.オブジェクトストレージの勘違いしがちなユースケース</h2>
+<h3 id="1ログのリアルタイムでの保存">(1)ログのリアルタイムでの保存</h3>
+<p>よくFluentdを使ってS3へのログの保存が紹介されます。
+この利用方法はとてもまっとうであり、正しい使い方といえます。</p>
+<p>ですが、たまにリアルタイムでのログ保存と勘違いしている話をききます。
+上で紹介してきたように、オブジェクトストレージはファイルの出し入れしかできません。
+リアルタイムのログを1行ずつオブジェクトストレージに書き込むには、その都度ファイルを入れ替えるしかありません。</p>
+<p>そのため、オブジェクトストレージを利用したログ管理はリアルタイムなものでなく、
+ログファイルがローテーションされるたびにアップロードするなどの利用になる点は抑えておきましょう。
+更新頻度をしっかり考慮することが大事です。</p>
+<p>また、クラウド環境ではサーバは負荷に応じて増減することが日常的です。
+Fluentdではサーバのシャットダウンシグナルを受け取った時に、ログを出力する機能があるので、
+クラウド環境でもオブジェクトストレージを使ってログ管理を行うことは可能です。</p>
+<h3 id="2サーバにオブジェクトストレージをマウントするケース">(2)サーバにオブジェクトストレージをマウントするケース</h3>
+<p>オブジェクトストレージをサーバにマウントして利用するケースも多く見受けられます。</p>
+<iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fqiita.com%2FYuki_BB3%2Fitems%2F9f5eb233b152be1c4bc9" title="EC2インスタンスにS3をマウントして使用する（IAM Role ver) - Qiita" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://qiita.com/Yuki_BB3/items/9f5eb233b152be1c4bc9">qiita.com</a></cite>
+<p>オブジェクトストレージでは階層構造はなく、フラットなファイル管理を行います。
+またファイルの操作はすべてHTTPで行います。
+サーバにマウントすると、一見通常のファイルシステムのように見えてしまいますが、見せかけだけです。
+その点を理解して利用するようにしましょう。</p>
+<h2 id="参考">参考</h2>
+<p>結果整合性などの話は、データ指向のアプリケーションを考える上では欠かせない観点です。
+内容としては難しいものではあるのですが、下記の書籍はデータストレージの特性などを理解するには非常に有益です。
+書籍の最終章のまとめについて動画で解説もしましたので興味ある方みてみてください。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2021/01/24/designing-data-intensive-applications/" data-iframely-url="//cdn.iframe.ly/Tu7Fr2P"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h2 id="追記メモ-20170328">追記メモ (2017/03/28)</h2>
+<ul>
+<li>FTPにも近いが、今は忘れられつつあるWebDavが似たような実装</li>
+<li>突き詰めれば、従来ファイルシステムもR/Wしかできないのは同じ。ブロックサイズの違い。</li>
+<li>いつになってもR/Wしかできないのです。</li>
+</ul>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=%e3%82%aa%e3%83%96%e3%82%b8%e3%82%a7%e3%82%af%e3%83%88%e3%82%b9%e3%83%88%e3%83%ac%e3%83%bc%e3%82%b8%e3%81%ae%e4%bb%95%e7%b5%84%e3%81%bf%e3%81%a8%e6%b4%bb%e7%94%a8%e3%82%b7%e3%83%bc%e3%83%b3%e3%82%92%e6%ad%a3%e3%81%97%e3%81%8f%e7%90%86%e8%a7%a3%e3%81%99%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'オブジェクトストレージの仕組みと活用シーンを正しく理解する'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/01/24/designing-data-intensive-applications/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '分散システム構築の良書「データ指向アプリケーションデザイン」を動画で解説する'});">分散システム構築の良書「データ指向アプリケーションデザイン」を動画で解説する</a> (2021/01/24)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Datadog APMとトレーシングの仕組みについて'});">Datadog APMとトレーシングの仕組みについて</a> (2019/11/21)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/08/28/datadog-for-alibaba-cloud/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'DatadogのAlibaba Cloud integrationでできること'});">DatadogのAlibaba Cloud integrationでできること</a> (2019/08/28)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/04/13/aws-ecs-deploy/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Amazon ECSを使った際のFargateの仕組みとそのデプロイフローを学ぶ'});">Amazon ECSを使った際のFargateの仕組みとそのデプロイフローを学ぶ</a> (2019/04/14)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

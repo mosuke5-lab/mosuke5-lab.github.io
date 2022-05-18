@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Kubernetes環境についてTerratestでテストを書く</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/10/28/kubernetes-test-by-terratest/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/10/28/kubernetes-test-by-terratest/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Kubernetes環境についてTerratestでテストを書く &middot; Goldstine研究所">
+<meta name="twitter:description" content="Terratestを用いたKubernetesのテストについてのメモです。TDD的に使う方法やモジュール外のことをしようとしたときなど、実運用を想定してためしてみました。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes環境についてTerratestでテストを書く &middot; Goldstine研究所">
+<meta property="og:description" content="Terratestを用いたKubernetesのテストについてのメモです。TDD的に使う方法やモジュール外のことをしようとしたときなど、実運用を想定してためしてみました。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/10/28/kubernetes-test-by-terratest/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Kubernetes環境についてTerratestでテストを書く</h1>
+    <div class="entry-sub-title">
+        <span class="">28 Oct 2021, 23:11</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#環境">環境</a></li>
+    <li><a href="#quick-start">Quick Start</a>
+      <ul>
+        <li><a href="#サンプルマニフェスト">サンプルマニフェスト</a></li>
+        <li><a href="#terratestのテストコード">Terratestのテストコード</a></li>
+        <li><a href="#terratestのモジュール">Terratestのモジュール</a></li>
+      </ul>
+    </li>
+    <li><a href="#applyとdeleteを行わないでテストだけしたい">applyとdeleteを行わないでテストだけしたい</a></li>
+    <li><a href="#assertion">assertion</a></li>
+    <li><a href="#モジュール外のテストを検討する">モジュール外のテストを検討する</a></li>
+    <li><a href="#さいごに">さいごに</a></li>
+  </ul>
+</nav>
+        <p>こんにちは、もーすけです。<br>
+今回は<a href="https://github.com/gruntwork-io/terratest" target="_blank">Terratest</a> を用いたKubernetes環境のテストについて検討します。</p>
+<p>TerratestはGruntwork.ioが作成しているインフラのテスティングソフトウェアです。
+もともとは、Terraformで作成したクラウド環境のテストとして発達がしましたが、いまの時代となってKubernetes環境やコンテナイメージもテストできるようになっています。</p>
+<p>Kubernetesマニフェストにより、宣言的にインフラ環境を表現できるようになってきているととはいえ、その結果が期待通りに動作しているのかは日々の悩みのタネであることはかわりません。
+Terratestがこの悩みを解消するのにイケてそうなので調査してみます。</p>
+<p>かつて仮想サーバでアプリケーションを運用している時代に、Serverspecを用いてテスト駆動のインフラ構築を行っていてとても気持ちがよかったので、そのレイヤーが移ってきているとも考えられます。</p>
+<h2 id="環境">環境</h2>
+<p>本検証を行ったGoとKubernetesのバージョンは下記のとおりです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% go version
+</span></span><span style="display:flex;"><span>go version go1.17.2 darwin/amd64
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% kubectl version --short
+</span></span><span style="display:flex;"><span>Client Version: v1.22.2
+</span></span><span style="display:flex;"><span>Server Version: v1.22.0-rc.0+894a78b
+</span></span></code></pre></div><h2 id="quick-start">Quick Start</h2>
+<p>なにごともはじめはあります。まずはドキュメントのサンプルをみながら試してみます。
+参考にしたのは公式ドキュメントの<a href="https://terratest.gruntwork.io/docs/getting-started/quick-start/#example-4-kubernetes" target="_blank">Example #4: Kubernetes</a>です。
+最終的に以下のようなファイル構成で進めました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% tree .
+</span></span><span style="display:flex;"><span>.
+</span></span><span style="display:flex;"><span>├── hello-world-deployment.yaml
+</span></span><span style="display:flex;"><span>└── test
+</span></span><span style="display:flex;"><span>    ├── go.mod
+</span></span><span style="display:flex;"><span>    ├── go.sum
+</span></span><span style="display:flex;"><span>    └── kubernetes_hello_world_example_test.go
+</span></span></code></pre></div><h3 id="サンプルマニフェスト">サンプルマニフェスト</h3>
+<p>まずは、サンプルのKubernetesマニフェストを理解しましょう。
+このブログの読者であれば解説は不要かと思いますが、かんたんに残しておきます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Pythonで動くかんたんなWebサーバです。ポート5000でリッスンすると&#34;Hello, World!&#34;を返します。</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># コンテナイメージはすでに用意されているものです。</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-world-deployment</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">selector</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">matchLabels</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">hello-world</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">template</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">hello-world</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">containers</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-world</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">image</span>: <span style="color:#ae81ff">training/webapp:latest</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>            - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">5000</span>
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 上のアプリケーションを外部公開します。</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Kubernetesにおけるアプリケーションの公開方法はいくつかありますが、SeviceのType: LoadBalancerで公開します。</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Service</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hello-world-service</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">selector</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">hello-world</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">protocol</span>: <span style="color:#ae81ff">TCP</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">targetPort</span>: <span style="color:#ae81ff">5000</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">port</span>: <span style="color:#ae81ff">5000</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">type</span>: <span style="color:#ae81ff">LoadBalancer</span>
+</span></span></code></pre></div><p>試した環境は、AWS上に構築したKubernetesクラスタであり、Type: LoadBalancerのServiceリソースを作成するとELBが作成されてエンドポイントとなります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% kubectl apply -f hello-world-deployment.yaml
+</span></span><span style="display:flex;"><span>deployment.apps/hello-world-deployment created
+</span></span><span style="display:flex;"><span>service/hello-world-service created
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% kubectl get pod,service
+</span></span><span style="display:flex;"><span>NAME                                          READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>pod/hello-world-deployment-698bfbc4fc-pcvfl   1/1     Running   0          24s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                          TYPE           CLUSTER-IP      EXTERNAL-IP                              PORT(S)          AGE
+</span></span><span style="display:flex;"><span>service/hello-world-service   LoadBalancer   172.30.205.11   xxxxx.ap-southeast-1.elb.amazonaws.com   5000:30287/TCP   24s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>% curl http://xxxxx.ap-southeast-1.elb.amazonaws.com:5000
+</span></span><span style="display:flex;"><span>Hello world!
+</span></span></code></pre></div><h3 id="terratestのテストコード">Terratestのテストコード</h3>
+<p>マニフェストが確認できたので、次にテストコードを確認していきましょう。
+コメントアウトを日本語でいれてみました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">test</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;testing&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;time&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">http_helper</span> <span style="color:#e6db74">&#34;github.com/gruntwork-io/terratest/modules/http-helper&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;github.com/gruntwork-io/terratest/modules/k8s&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">TestKubernetesHelloWorldExample</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Parallel</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Kubernetesマニフェストのパス。ディレクトリ構成に合わせて編集しましょう
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">kubeResourcePath</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">&#34;../hello-world-deployment.yaml&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Kubectlのオプション指定
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// 引数は左から順番に、&#34;contextName, configPath, namespace&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// この例だとdefault namespaceにKubernetesリソースが作られます
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// 仕様を確認したいときはドキュメントを見る https://pkg.go.dev/github.com/gruntwork-io/terratest@v0.38.2/modules/k8s#NewKubectlOptions
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">options</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">NewKubectlOptions</span>(<span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;default&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// テストの終了後にリソースの削除を行う
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// deferは、上位ブロックの関数がreturnするまで遅延するもので、つまりテスト終了後に削除が走る
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">KubectlDelete</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">options</span>, <span style="color:#a6e22e">kubeResourcePath</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// `kubectl apply`の実行
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">KubectlApply</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">options</span>, <span style="color:#a6e22e">kubeResourcePath</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Serviceが利用可能になるまで待つ
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">WaitUntilServiceAvailable</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">options</span>, <span style="color:#e6db74">&#34;hello-world-service&#34;</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">1</span><span style="color:#f92672">*</span><span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Serviceリソースを取得
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">service</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">GetService</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">options</span>, <span style="color:#e6db74">&#34;hello-world-service&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// HTTPリクエストを投げる先のURLを取得
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">url</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;http://%s&#34;</span>, <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">GetServiceEndpoint</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">options</span>, <span style="color:#a6e22e">service</span>, <span style="color:#ae81ff">5000</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 取得したURLへリクエスを送付し、HTTPステータス200で&#34;Hello world!&#34;が返るまでリトライ
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// ドキュメントの記載のリトライ数ではタイムアウトすることがあったので調整しました。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">http_helper</span>.<span style="color:#a6e22e">HttpGetWithRetry</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">url</span>, <span style="color:#66d9ef">nil</span>, <span style="color:#ae81ff">200</span>, <span style="color:#e6db74">&#34;Hello world!&#34;</span>, <span style="color:#ae81ff">60</span>, <span style="color:#ae81ff">3</span><span style="color:#f92672">*</span><span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="terratestのモジュール">Terratestのモジュール</h3>
+<p>Terratestでは、KubernetesのリソースやHTTPリクエストをテストするためやの便利なモジュールを用意してくれています。
+上のソースコードの例では <code>k8s.*</code>や<code>http_helper.HttpGetWithRetry</code>は、すべてTerratestライブラリが用意したものです。</p>
+<p>Terratestが用意した関数の一覧や仕様はこちらのドキュメントから確認できます。</p>
+<div class="belg-link row">
+  <div class="belg-right col-md-12">
+  <div class="belg-title">
+      <a href="https://pkg.go.dev/github.com/gruntwork-io/terratest@v0.38.2/modules/k8s" target="_blank">k8s package - github.com/gruntwork-io/terratest/modules/k8s - pkg.go.dev</a>
+    </div>
+    <div class="belg-description"></div>
+    <div class="belg-site">
+      <img src="https://pkg.go.dev/static/shared/icon/favicon.ico" class="belg-site-icon">
+      <span class="belg-site-name">pkg.go.dev</span>
+    </div>
+  </div>
+</div>
+<h2 id="applyとdeleteを行わないでテストだけしたい">applyとdeleteを行わないでテストだけしたい</h2>
+<p>前述の例では、テストを実行するたびにマニフェストをApplyして、テストして、テスト後に削除するというステップで行いました。
+CI環境などではそのような実行ステップでまったく問題ないですが、個人的に望んでいるのはもうすこしTDD的な使い方です。
+テストを書いてそれを満たすマニフェストを書いていく、というマニフェスト作成時にもっとカジュアルにテストしたいとも思っています。
+その際には、時間がかからずすぐにテストできることが重要です。</p>
+<p>ApplyやDeleteはせずに、テストだけ単純にするというケースについても考えてみます。<br>
+次のようにかなりシンプルなコーディングができますね。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">test</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;testing&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;time&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">http_helper</span> <span style="color:#e6db74">&#34;github.com/gruntwork-io/terratest/modules/http-helper&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;github.com/gruntwork-io/terratest/modules/k8s&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">TestKubernetesHelloWorldExampleNoApply</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Parallel</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">options</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">NewKubectlOptions</span>(<span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;default&#34;</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">service</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">GetService</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">options</span>, <span style="color:#e6db74">&#34;hello-world-service&#34;</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">url</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;http://%s&#34;</span>, <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">GetServiceEndpoint</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">options</span>, <span style="color:#a6e22e">service</span>, <span style="color:#ae81ff">5000</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">http_helper</span>.<span style="color:#a6e22e">HttpGetWithRetry</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">url</span>, <span style="color:#66d9ef">nil</span>, <span style="color:#ae81ff">200</span>, <span style="color:#e6db74">&#34;Hello world!&#34;</span>, <span style="color:#ae81ff">60</span>, <span style="color:#ae81ff">3</span><span style="color:#f92672">*</span><span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>go test</code>で実行するとわかりますが、1.973秒でテストが完了しています。
+開発中においては、テストの都度にリソースの作成をする必要はないことが多いかなと思います。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% go test -v
+</span></span><span style="display:flex;"><span>=== RUN   TestKubernetesHelloWorldExample
+</span></span><span style="display:flex;"><span>=== PAUSE TestKubernetesHelloWorldExample
+</span></span><span style="display:flex;"><span>=== CONT  TestKubernetesHelloWorldExample
+</span></span><span style="display:flex;"><span>TestKubernetesHelloWorldExample 2021-10-30T18:44:31+09:00 client.go:42: Configuring Kubernetes client using config file /Users/shinyamori/.kube/config with context
+</span></span><span style="display:flex;"><span>TestKubernetesHelloWorldExample 2021-10-30T18:44:31+09:00 node.go:33: Getting list of nodes from Kubernetes
+</span></span><span style="display:flex;"><span>TestKubernetesHelloWorldExample 2021-10-30T18:44:31+09:00 client.go:42: Configuring Kubernetes client using config file /Users/shinyamori/.kube/config with context
+</span></span><span style="display:flex;"><span>TestKubernetesHelloWorldExample 2021-10-30T18:44:32+09:00 retry.go:91: HTTP GET to URL http://af5ba2bb2822c4c68a6d1b629a7d3178-1669677222.ap-southeast-1.elb.amazonaws.com:5000
+</span></span><span style="display:flex;"><span>TestKubernetesHelloWorldExample 2021-10-30T18:44:32+09:00 http_helper.go:32: Making an HTTP GET call to URL http://af5ba2bb2822c4c68a6d1b629a7d3178-1669677222.ap-southeast-1.elb.amazonaws.com:5000
+</span></span><span style="display:flex;"><span>--- PASS: TestKubernetesHelloWorldExample (1.37s)
+</span></span><span style="display:flex;"><span>PASS
+</span></span><span style="display:flex;"><span>ok    github.com/mosuke5/terratest-kubernetes-practice  1.973s
+</span></span></code></pre></div><h2 id="assertion">assertion</h2>
+<p>Goのテスティングフレームワークの話になるのですが、assertionを書きたいことがあります。
+Terratestが用意したモジュールのみでテスト可能であればいいのですが、取得したなんらかの値が期待通りかどうかを確認したいこともあります。その場合には、testifyをインストールして使いましょう。</p>
+<div class="belg-link row">
+  <div class="belg-left col-md-2 d-none d-md-block">
+    <a href="https://github.com/stretchr/testify" target="_blank">
+      <img class="belg-site-image" src="https://opengraph.githubassets.com/f5798fdc3b09f020c310b902a1ed2b3f5ef5a96b6e23f99efa477d4ae306ac42/stretchr/testify" />
+    </a>
+  </div>
+  <div class="belg-right col-md-10">
+  <div class="belg-title">
+      <a href="https://github.com/stretchr/testify" target="_blank">GitHub - stretchr/testify: A toolkit with common assertions and mocks that plays nicely with the standard library</a>
+    </div>
+    <div class="belg-description">A toolkit with common assertions and mocks that plays nicely with the standard library - GitHub - stretchr/testify: A toolkit with common assertions and mocks that plays nicely with the standard li...</div>
+    <div class="belg-site">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="belg-site-icon">
+      <span class="belg-site-name">GitHub</span>
+    </div>
+  </div>
+</div>
+<h2 id="モジュール外のテストを検討する">モジュール外のテストを検討する</h2>
+<p>Terratestのモジュールは便利ですが、実際のテストシナリオを考えるとTerratestのモジュールだけでは足りないことが出てくると思います。
+ここからさきはGoのプログラミングとして考えていく必要がありますが、実際に遭遇したシナリオの例に簡単に実装してみます。</p>
+<p>ふたつのシナリオを追加しました。※これらのシナリオが必要というわけではないです。<br>
+ひとつめは、作成されたPodのQoSClassのテストです。LimitRangeを設定していて、Resource設定を行わなかった場合も<code>BestEffort</code>ではなく<code>Burstable</code>に設定されていることを確認したかったケースです。また、testifyを用いたAssertionでテストしています。</p>
+<p>もうひとつが、作成したServiceをPod内から名前解決できるかどうかのテストです。
+レアなケースかも知れませんが、KubernetesのDNS機能を外だししていて設定がうまくいっていないと名前解決できないことがあったため確認した例です。IPアドレスの妥当性というよりは、単純にレコードが登録されたかどうかだけのテストですが、デバッグ用のコンテナを用いて確認しました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">test</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;testing&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;time&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">http_helper</span> <span style="color:#e6db74">&#34;github.com/gruntwork-io/terratest/modules/http-helper&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;github.com/gruntwork-io/terratest/modules/k8s&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;github.com/gruntwork-io/terratest/modules/shell&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;github.com/stretchr/testify/assert&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">metav1</span> <span style="color:#e6db74">&#34;k8s.io/apimachinery/pkg/apis/meta/v1&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">TestKubernetesHelloWorldExampleAssertion</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Parallel</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Kubectlのオプション指定
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">options</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">NewKubectlOptions</span>(<span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;default&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Serviceリソースを取得
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">service</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">GetService</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">options</span>, <span style="color:#e6db74">&#34;hello-world-service&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// HTTPリクエストを投げる先のURLを取得
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">url</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;http://%s&#34;</span>, <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">GetServiceEndpoint</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">options</span>, <span style="color:#a6e22e">service</span>, <span style="color:#ae81ff">5000</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 取得したURLへリクエスを送付し、HTTPステータス200で&#34;Hello world!&#34;が返るまでリトライ
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// ドキュメントの記載のリトライ数ではタイムアウトすることがあったので調整しました。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">http_helper</span>.<span style="color:#a6e22e">HttpGetWithRetry</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">url</span>, <span style="color:#66d9ef">nil</span>, <span style="color:#ae81ff">200</span>, <span style="color:#e6db74">&#34;Hello world!&#34;</span>, <span style="color:#ae81ff">60</span>, <span style="color:#ae81ff">3</span><span style="color:#f92672">*</span><span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 作成されたPodのQoSClassをassertionで確認
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">pods</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">k8s</span>.<span style="color:#a6e22e">ListPods</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">options</span>, <span style="color:#a6e22e">metav1</span>.<span style="color:#a6e22e">ListOptions</span>{})
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">pod</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">pods</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">assert</span>.<span style="color:#a6e22e">Equal</span>(<span style="color:#a6e22e">t</span>, <span style="color:#e6db74">&#34;Burstable&#34;</span>, string(<span style="color:#a6e22e">pod</span>.<span style="color:#a6e22e">Status</span>.<span style="color:#a6e22e">QOSClass</span>))
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Pod内からServiceを名前解決できるか確認
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// 名前解決できないとexit 1で返すのでエラーでテストに失敗する
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">command</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">shell</span>.<span style="color:#a6e22e">Command</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Command</span>: <span style="color:#e6db74">&#34;bash&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Args</span>: []<span style="color:#66d9ef">string</span>{
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;-c&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;kubectl run --restart=Never --rm -it debug --image registry.gitlab.com/mosuke5/debug-container:latest -- nslookup hello-world-service&#34;</span>,
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">shell</span>.<span style="color:#a6e22e">RunCommandAndGetStdOut</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">command</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="さいごに">さいごに</h2>
+<p>Terratestでテストを書いていくともっともっと実践的なトピックはでてきますが、はじめの一歩ということで共有します。
+なかなか書いている人が少ないネタでありながらも、Kubernetesのテストは非常に重要なトピックなので、新しい知見がでてき次第更新したいと思います。</p>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Kubernetes%e7%92%b0%e5%a2%83%e3%81%ab%e3%81%a4%e3%81%84%e3%81%a6Terratest%e3%81%a7%e3%83%86%e3%82%b9%e3%83%88%e3%82%92%e6%9b%b8%e3%81%8f" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Kubernetes環境についてTerratestでテストを書く'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて'});">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a> (2022/01/24)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'カスタマイズしたJenkinsを作成する方法 on OpenShift'});">カスタマイズしたJenkinsを作成する方法 on OpenShift</a> (2020/07/05)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton 徹底解説、Operatorによるインストールとはじめの一歩（学習シリーズ01）'});">Tekton 徹底解説、Operatorによるインストールとはじめの一歩（学習シリーズ01）</a> (2020/05/10)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

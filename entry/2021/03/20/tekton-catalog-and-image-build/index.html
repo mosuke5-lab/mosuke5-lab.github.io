@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド） &middot; Goldstine研究所">
+<meta name="twitter:description" content="Tekton学習シリーズ第7回では、カタログを利用してパイプラインを作ることをやります。GitHubからソースコードをダウンロードして、コンテナイメージをビルドした結果をレジストリにPushします。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド） &middot; Goldstine研究所">
+<meta property="og:description" content="Tekton学習シリーズ第7回では、カタログを利用してパイプラインを作ることをやります。GitHubからソースコードをダウンロードして、コンテナイメージをビルドした結果をレジストリにPushします。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</h1>
+    <div class="entry-sub-title">
+        <span class="">20 Mar 2021, 00:36</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#カタログを活用する">カタログを活用する</a></li>
+    <li><a href="#ビルドパイプラインを構成する">ビルドパイプラインを構成する</a>
+      <ul>
+        <li><a href="#全体構成">全体構成</a></li>
+        <li><a href="#下準備レジストリ認証">下準備（レジストリ認証）</a></li>
+        <li><a href="#パイプライン">パイプライン</a></li>
+        <li><a href="#パイプラインの実行">パイプラインの実行</a></li>
+      </ul>
+    </li>
+    <li><a href="#まとめ">まとめ</a></li>
+  </ul>
+</nav>
+        <hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
+<li>第13回: <a href="/entry/2022/03/01/tekton-lib-cache/">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
+<li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<p>こんにちは、もーすけです。<br>
+本日もTekton学習フェーズやっていきます。第7回では、カタログの活用とTektonを使っていく上で必ず通るであろうイメージビルドについてあわせてやっていきたいと思います。
+本日のゴールは、Tektonが公開しているカタログ（公開Task）を用いて、任意のGitレポジトリにあるDockerfileをビルドしてレジストリにPushするまです。ではよろしくおねがいします。</p>
+<h2 id="カタログを活用する">カタログを活用する</h2>
+<p>カタログについて紹介します。今までの学習ではTaskは全部自分で作成してきました。
+一方で、パイプライン内で実行したいTaskは共通化されてきます。たとえば、GitHubからソースコードをダウンロードしたい、コンテナイメージをビルドしたい、ビルドしたイメージをレジストリにプッシュしたい、などなど数え切れないほどありますよね。
+そこで、Tektonではカタログという形で、Taskを公開してくれています。これを使わない手はありません。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0; margin-bottom: 30px;"><a href="https://github.com/tektoncd/catalog" data-iframely-url="//cdn.iframe.ly/XxCD6ka"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<p>例として、本日使うTaskのひとつである<code>git-clone</code>を見てみましょう。
+catalogをまずはダウンロードしてきて中身を確認します。<code>0.1</code>, <code>0.2</code>, <code>0.3</code>とバージョニングされているのは、Task自体のバージョンです。利用しているTektonのバージョンに合わせて利用するものを決定しましょう。本環境では、まだ<code>0.15.2</code>を使っているので<code>0.2</code>が該当します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ git clone https://github.com/tektoncd/catalog
+</span></span><span style="display:flex;"><span>$ cd catalog/task/git-clone
+</span></span><span style="display:flex;"><span>$ tree
+</span></span><span style="display:flex;"><span>.
+</span></span><span style="display:flex;"><span>├── 0.1
+</span></span><span style="display:flex;"><span>│   ├── README.md
+</span></span><span style="display:flex;"><span>│   ├── git-clone.yaml
+</span></span><span style="display:flex;"><span>│   ├── samples
+</span></span><span style="display:flex;"><span>│   │   ├── git-clone-checking-out-a-branch.yaml
+</span></span><span style="display:flex;"><span>│   │   ├── git-clone-checking-out-a-commit.yaml
+</span></span><span style="display:flex;"><span>│   │   └── using-git-clone-result.yaml
+</span></span><span style="display:flex;"><span>│   └── tests
+</span></span><span style="display:flex;"><span>│       └── run.yaml
+</span></span><span style="display:flex;"><span>├── 0.2
+</span></span><span style="display:flex;"><span>│   ├── README.md
+</span></span><span style="display:flex;"><span>│   ├── git-clone.yaml
+</span></span><span style="display:flex;"><span>│   ├── samples
+</span></span><span style="display:flex;"><span>│   │   ├── git-clone-checking-out-a-branch.yaml
+</span></span><span style="display:flex;"><span>│   │   ├── git-clone-checking-out-a-commit.yaml
+</span></span><span style="display:flex;"><span>│   │   └── using-git-clone-result.yaml
+</span></span><span style="display:flex;"><span>│   └── tests
+</span></span><span style="display:flex;"><span>│       └── run.yaml
+</span></span><span style="display:flex;"><span>└── 0.3
+</span></span><span style="display:flex;"><span>    ├── README.md
+</span></span><span style="display:flex;"><span>    ├── git-clone.yaml
+</span></span><span style="display:flex;"><span>    ├── samples
+</span></span><span style="display:flex;"><span>    │   ├── git-clone-checking-out-a-branch.yaml
+</span></span><span style="display:flex;"><span>    │   ├── git-clone-checking-out-a-commit.yaml
+</span></span><span style="display:flex;"><span>    │   ├── git-clone-sparse-checkout.yaml
+</span></span><span style="display:flex;"><span>    │   └── using-git-clone-result.yaml
+</span></span><span style="display:flex;"><span>    └── tests
+</span></span><span style="display:flex;"><span>        └── run.yaml
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// 対象のバージョンはREADME.mdを読めばわかる
+</span></span><span style="display:flex;"><span>$ cat 0.2/README.md
+</span></span><span style="display:flex;"><span># `git-clone`
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>**Please Note: this Task is only compatible with Tekton Pipelines versions 0.14.0 and greater!**
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>長いのでブログには記載しませんが、<a href="https://github.com/tektoncd/catalog/blob/main/task/git-clone/0.2/git-clone.yaml">catalog/task/git-clone/0.2/git-clone.yaml</a> を確認してみてください。
+Taskが記載されていており、すぐ利用できるようになっています。かなり汎用的に利用できるようパラメータ化も進んでいます。
+利用するときには、Taskの中身を確認し必要なパラメータを確認しTaskRunやPipelineRunから指定して利用します。
+実践はこのあと見ていきましょう。</p>
+<h2 id="ビルドパイプラインを構成する">ビルドパイプラインを構成する</h2>
+<h3 id="全体構成">全体構成</h3>
+<p>では、作成するパイプラインの形を決めていきましょう。<br>
+あるレポジトリからソースコードをダウンロードしてきて、その中にあるDockerfileをビルドして、DockerHubにPushするまでを実現することとします。次のようなイメージでしょうか？</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>(Pipeline start) - (git-clone) - (builah[build &amp; push])
+</span></span><span style="display:flex;"><span>                         \     /
+</span></span><span style="display:flex;"><span>                          \   /
+</span></span><span style="display:flex;"><span>                   (Persistent Volume [for workspace])
+</span></span></code></pre></div><p>今回はイメージのビルドとレジストリへのPushに <a href="https://github.com/tektoncd/catalog/tree/main/task/buildah/0.1">buildah</a> というTaskを使います。
+buildahは、OCIに準拠したデーモンレスのコンテナビルドツールのひとつです。TektonのTask自身がKubernetes上のコンテナとして動作することもあり、Dockerのようなデーモンプロセスを利用するより、デーモンレスのBuildahやkanikoといったツールを用いたほうが容易に実装できます。</p>
+<h3 id="下準備レジストリ認証">下準備（レジストリ認証）</h3>
+<p>カタログにある <a href="https://github.com/tektoncd/catalog/tree/main/task/buildah/0.1">buildah</a> は、イメージのビルドとレジストリへのプッシュをあわせて行います。レジストリへのプッシュには当然レジストリへの認証が必要になります。
+コンテナレジストリへの認証を簡単に実現する仕組みもTektonでは用意されています。
+Taskを実行するPodの利用するServiceAccountを指定できるのですが、そのServiceAccountにレジストリの認証情報をリンクさせておけばできます。<br>
+詳しくは、公式ドキュメントの <a href="https://tekton.dev/vault/pipelines-v0.15.2/auth/#kubernetes-s-docker-registry-s-secret">Authentication</a> を参照しましょう。</p>
+<p>今回は、レジストリにDockerHubを利用するので次のような設定ファイルを用意しておきます。
+Dockerなどで利用する認証用の<code>config.json</code>です。<code>xxxxx</code>には、認証に必要なトークンをいれてください。簡単に取得する方法としては、レジストリのIDとパスワードをコロンでつなげてbase64でエンコードすることですかね。<code>echo -n &quot;id:password&quot; | base64</code> このような感じです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#75715e">// config.json
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>{
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">&#34;auths&#34;</span>: {
+</span></span><span style="display:flex;"><span>		<span style="color:#f92672">&#34;https://index.docker.io/v1/&#34;</span>: {
+</span></span><span style="display:flex;"><span>			<span style="color:#f92672">&#34;auth&#34;</span>: <span style="color:#e6db74">&#34;xxxxx&#34;</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl create secret generic dockerhub-cred \
+</span></span><span style="display:flex;"><span>    --from-file=.dockerconfigjson=/path/to/config.json \
+</span></span><span style="display:flex;"><span>    --type=kubernetes.io/dockerconfigjson
+</span></span><span style="display:flex;"><span>secret/dockerhub-cred created
+</span></span></code></pre></div><p>次にServiceAccountです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceAccount</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-tekton-pipeline</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">secrets</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">dockerhub-cred</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f my-tekton-pipeline-sa.yaml
+</span></span><span style="display:flex;"><span>serviceaccount/my-tekton-pipeline created
+</span></span></code></pre></div><p>SecretとSecretを紐付けたServiceAccountの作成ができたら下準備は終了です。</p>
+<h3 id="パイプライン">パイプライン</h3>
+<p>いよいよパイプラインの作成です。<br>
+以下のようなパイプラインを作成しました。Taskを独自に作る必要がなかったので、指定するパラメータさえ把握できていればシンプルに書くことができました。Task内に定義されているパラメータをすべてパイプラインで定義する必要はありません。多くのパラメータはデフォルト値が設定されているので、変更したい部分だけパラメータ設定してください。
+前回の<a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">第6回</a>でやりましたが、Task間はデータを引き継ぎできません。Workspaceが必要になります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># build-image-pipeline.yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pipeline</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-image-pipeline</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">workspaces</span>: 
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">shared-workspace</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">params</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">git-url</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">git-revision</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">default</span>: <span style="color:#e6db74">&#34;master&#34;</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">image</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">type</span>: <span style="color:#ae81ff">string</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">tasks</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fetch-repository</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">taskRef</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">git-clone</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">workspaces</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">output</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">shared-workspace</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">params</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">url</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#ae81ff">$(params.git-url)</span>
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">deleteExisting</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;true&#34;</span>
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">revision</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#ae81ff">$(params.git-revision)</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-push-image</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">taskRef</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">buildah</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">params</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">IMAGE</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#ae81ff">$(params.image)</span>
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">DOCKERFILE</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;Dockerfile&#34;</span>
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">CONTEXT</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;$(workspaces.source.path)&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">workspaces</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">source</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">workspace</span>: <span style="color:#ae81ff">shared-workspace</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">runAfter</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#ae81ff">fetch-repository</span>
+</span></span></code></pre></div><p>では、実行してみましょう。
+次のようにPipelineRunを準備しました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># build-image-pipeline-run.yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">tekton.dev/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PipelineRun</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-image-pipeline-run</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">pipelineRef</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">build-image-pipeline</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">params</span>: 
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">git-url</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">value</span>: <span style="color:#ae81ff">https://github.com/ncskier/myapp</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">image</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">value</span>: <span style="color:#ae81ff">mosuke5/tekton-practice:from-pipeline</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">serviceAccountName</span>: <span style="color:#ae81ff">my-tekton-pipeline</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">workspaces</span>: 
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">shared-workspace</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">volumeClaimTemplate</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">accessModes</span>:
+</span></span><span style="display:flex;"><span>            - <span style="color:#ae81ff">ReadWriteOnce</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">resources</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">requests</span>:
+</span></span><span style="display:flex;"><span>              <span style="color:#f92672">storage</span>: <span style="color:#ae81ff">1Gi</span>
+</span></span></code></pre></div><h4 id="pipelineresourceはどこにいった">PipelineResourceはどこにいった？</h4>
+<p>第4回 <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a> では、Gitレポジトリ上にあるソースコードをPipelineResourceという機能を利用してTaskと連携しました。今回はPipelineResourceを使わずにカタログの <code>git-clone task</code> を利用したわけですが、どちらを利用したほうがいいのでしょうか？と疑問がわくと思います。
+今回やってみてわかったのですが、PipelineResourceは忘れていただいて、Taskで操作したほうが使い勝手がいいと考えました。理由として、<code>buildah task</code> もworkspaceでソースコードが引き渡されることが前提となっておりPipelineResourceを使う場合、Task自身を修正しなければなりませんでした。
+また、余計なKubernetesリソースを作成することなくPipeline内で完結できるので、PipelineResourceは不要かな。。？と現時点では思っています。</p>
+<h3 id="パイプラインの実行">パイプラインの実行</h3>
+<p>パイプラインを実行して、実行結果を見てみます。<br>
+確認ポイントとしては、各Taskの実行結果や最終的なアウトプットとしてのコンテナレジストリです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f build-image-pipeline.yaml
+</span></span><span style="display:flex;"><span>pipeline.tekton.dev/build-image-pipeline created
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl apply -f build-image-pipeline-run.yaml
+</span></span><span style="display:flex;"><span>pipelinerun.tekton.dev/build-image-pipeline-run created
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// build-image-pipeline-run-fetch-repository-s588m-pod-dc5h9 が完了後に
+</span></span><span style="display:flex;"><span>// build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7 が実行
+</span></span><span style="display:flex;"><span>$ kubectl get pod -w
+</span></span><span style="display:flex;"><span>affinity-assistant-38b60e39a8-0                             0/1     Pending     0          5s
+</span></span><span style="display:flex;"><span>affinity-assistant-38b60e39a8-0                             0/1     ContainerCreating   0          5s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-fetch-repository-s588m-pod-dc5h9   0/1     Pending             0          5s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-fetch-repository-s588m-pod-dc5h9   0/1     Init:0/2            0          5s
+</span></span><span style="display:flex;"><span>affinity-assistant-38b60e39a8-0                             1/1     Running             0          7s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-fetch-repository-s588m-pod-dc5h9   0/1     Init:1/2            0          15s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-fetch-repository-s588m-pod-dc5h9   0/1     PodInitializing     0          16s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-fetch-repository-s588m-pod-dc5h9   1/1     Running             0          17s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-fetch-repository-s588m-pod-dc5h9   1/1     Running             0          17s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-fetch-repository-s588m-pod-dc5h9   0/1     Completed           0          19s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   0/3     Pending             0          1s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   0/3     Pending             0          1s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   0/3     Init:0/3            0          1s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   0/3     Init:1/3            0          18s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   0/3     Init:2/3            0          19s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   0/3     PodInitializing     0          21s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   3/3     Running             0          22s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   3/3     Running             0          22s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   2/3     Running             0          47s
+</span></span><span style="display:flex;"><span>build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7   0/3     Completed           0          62s
+</span></span><span style="display:flex;"><span>affinity-assistant-38b60e39a8-0                             1/1     Terminating         0          83s
+</span></span><span style="display:flex;"><span>affinity-assistant-38b60e39a8-0                             0/1     Terminating         0          83s
+</span></span><span style="display:flex;"><span>affinity-assistant-38b60e39a8-0                             0/1     Terminating         0          84s
+</span></span><span style="display:flex;"><span>affinity-assistant-38b60e39a8-0                             0/1     Terminating         0          84s
+</span></span></code></pre></div><p>buildah taskは3 Stepになっているのでそれぞれのログ結果を確認します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ kubectl logs build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7 -c step-build
+</span></span><span style="display:flex;"><span>+ buildah --storage-driver=overlay bud --format=oci --tls-verify=true --no-cache -f Dockerfile -t mosuke5/tekton-practice:from-pipeline /workspace/source
+</span></span><span style="display:flex;"><span>STEP 1: FROM node:10-alpine
+</span></span><span style="display:flex;"><span>Getting image source signatures
+</span></span><span style="display:flex;"><span>Copying blob sha256:d9692e56401d84fa6b0165d088b435621acc6be27d969b047d62413658094b78
+</span></span><span style="display:flex;"><span>Copying blob sha256:299bbe2100ab5b3ff39aeba08c0335acd76659a5cefd364d351a0b93695bfd77
+</span></span><span style="display:flex;"><span>Copying blob sha256:e95f33c60a645d6d31f52fdc334aecec0d79a1b410789eae37fbf69efcd587ab
+</span></span><span style="display:flex;"><span>Copying blob sha256:bc3b38a692a9ec24681521bbae19ba05bd8d8cf3c24120351c1aed643142ea6c
+</span></span><span style="display:flex;"><span>Copying config sha256:8dd791b3335fdda7c9214afcb2942ade98881493a3d9a2172c2a6f3001ef0268
+</span></span><span style="display:flex;"><span>Writing manifest to image destination
+</span></span><span style="display:flex;"><span>Storing signatures
+</span></span><span style="display:flex;"><span>STEP 2: WORKDIR /myapp
+</span></span><span style="display:flex;"><span>STEP 3: COPY package*.json ./
+</span></span><span style="display:flex;"><span>STEP 4: RUN npm install
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&gt; node@12.15.0 preinstall /myapp/node_modules/node
+</span></span><span style="display:flex;"><span>&gt; node installArchSpecificPackage
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>+ node-linux-x64@12.15.0
+</span></span><span style="display:flex;"><span>added 1 package in 3.109s
+</span></span><span style="display:flex;"><span>found 0 vulnerabilities
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>added 52 packages from 38 contributors and audited 52 packages in 5.773s
+</span></span><span style="display:flex;"><span>found 0 vulnerabilities
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>STEP 5: COPY . .
+</span></span><span style="display:flex;"><span>STEP 6: EXPOSE 3000
+</span></span><span style="display:flex;"><span>STEP 7: CMD [&#34;node&#34;, &#34;app.js&#34;]
+</span></span><span style="display:flex;"><span>STEP 8: COMMIT mosuke5/tekton-practice:from-pipeline
+</span></span><span style="display:flex;"><span>--&gt; d849f62cbdd
+</span></span><span style="display:flex;"><span>d849f62cbdde81bc3732c8c77ac8f757a9b129a7b8d20d2966c03dcbb3e40943
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl logs build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7 -c step-push
+</span></span><span style="display:flex;"><span>+ buildah --storage-driver=overlay push --tls-verify=true --digestfile /workspace/source/image-digest mosuke5/tekton-practice:from-pipeline docker://mosuke5/tekton-practice:from-pipeline
+</span></span><span style="display:flex;"><span>Getting image source signatures
+</span></span><span style="display:flex;"><span>Copying blob sha256:1200582c7aaeec2befa0416b9425b2dd7cf904750c6e2b37ae6b95c18b0e91cc
+</span></span><span style="display:flex;"><span>Copying blob sha256:9120c3c4dc211acf21a892c913e3410cc5c217504941307a821e9259bc662132
+</span></span><span style="display:flex;"><span>Copying blob sha256:796f68ff5eda2be2c081ac8276373cf0d61b7aedebc846909069cffeb85f3d9d
+</span></span><span style="display:flex;"><span>Copying blob sha256:af4e4e5799facf73eff4d722502aedc093c2bdfaf1eefce793347ab6e611387d
+</span></span><span style="display:flex;"><span>Copying blob sha256:6169bf830ae69f192382cfe9a6fe96e7f28a21c0c5e5045b85871b510de58435
+</span></span><span style="display:flex;"><span>Copying config sha256:d849f62cbdde81bc3732c8c77ac8f757a9b129a7b8d20d2966c03dcbb3e40943
+</span></span><span style="display:flex;"><span>Writing manifest to image destination
+</span></span><span style="display:flex;"><span>Storing signatures
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl logs build-image-pipeline-run-build-push-image-srdsz-pod-wj4l7 -c step-digest-to-results
+</span></span><span style="display:flex;"><span>+ tee /tekton/results/IMAGE_DIGEST
+</span></span><span style="display:flex;"><span>+ cat /workspace/source/image-digest
+</span></span><span style="display:flex;"><span>sha256:b25636094be442def8fb922a6b8a0893eba3ddc258f8042a76008af4ad3a92cc
+</span></span></code></pre></div><p>DockerHubにも無事にイメージがプッシュされているのを確認しました。</p>
+<p><img src="/image/tekton-dockerhub-after-buildah-task.png" alt="tekton-dockerhub"></p>
+<h2 id="まとめ">まとめ</h2>
+<p>本日は、カタログを使用した、イメージのビルド方法について学びました。<br>
+だいぶ実践的なパイプラインになってきましたね。これからはKubernetesクラスタにアプリケーションをデプロイするなど、より実践的な内容へと発展していきます。
+内容が難しかったよという人は、ぜひ前の学習シリーズの復習などしてみてください。</p>
+<hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
+<li>第13回: <a href="/entry/2022/03/01/tekton-lib-cache/">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
+<li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Tekton%e3%80%81%e3%82%ab%e3%82%bf%e3%83%ad%e3%82%b0%e3%82%92%e3%81%86%e3%81%be%e3%81%8f%e6%b4%bb%e7%94%a8%e3%81%97%e3%81%a6%e3%83%91%e3%82%a4%e3%83%97%e3%83%a9%e3%82%a4%e3%83%b3%e3%82%92%e4%bd%9c%e3%82%8b%ef%bc%88%e3%82%a4%e3%83%a1%e3%83%bc%e3%82%b8%e3%83%93%e3%83%ab%e3%83%89%ef%bc%89" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a> (2022/05/16)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a> (2022/05/15)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る'});">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a> (2022/03/01)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Argo CD、外部クラスタへのデプロイと認証の仕組み'});">Argo CD、外部クラスタへのデプロイと認証の仕組み</a> (2022/02/08)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

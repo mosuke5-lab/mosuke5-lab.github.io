@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Datadog APMとトレーシングの仕組みについて</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Datadog APMとトレーシングの仕組みについて &middot; Goldstine研究所">
+<meta name="twitter:description" content="Datadog APMを体験しました。非常に強力で、いままでアプリケーションをいかに把握していなかった痛感しました。本ブログではAPMとはなにか、なぜ必要か、どんな情報が取得されているのかなど紹介します。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Datadog APMとトレーシングの仕組みについて &middot; Goldstine研究所">
+<meta property="og:description" content="Datadog APMを体験しました。非常に強力で、いままでアプリケーションをいかに把握していなかった痛感しました。本ブログではAPMとはなにか、なぜ必要か、どんな情報が取得されているのかなど紹介します。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2019/11/21/datadog-apm/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Datadog APMとトレーシングの仕組みについて</h1>
+    <div class="entry-sub-title">
+        <span class="">21 Nov 2019, 11:32</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-クラウド技術" href="/categories/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89%E6%8A%80%E8%A1%93">クラウド技術</a>
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+                <a class="badge badge-inf post-category post-category-アプリケーション開発" href="/categories/%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E9%96%8B%E7%99%BA">アプリケーション開発</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#apmとはなにかなぜ必要か">APMとはなにか、なぜ必要か</a>
+      <ul>
+        <li><a href="#従来的な監視との違い">従来的な監視との違い</a></li>
+        <li><a href="#なぜ必要か">なぜ必要か？</a></li>
+        <li><a href="#どのようなものか">どのようなものか</a></li>
+        <li><a href="#datadog-apmの導入">Datadog APMの導入</a></li>
+      </ul>
+    </li>
+    <li><a href="#どうしてできるのか">どうしてできるのか</a>
+      <ul>
+        <li><a href="#トレースの簡単な仕組み">トレースの簡単な仕組み</a></li>
+        <li><a href="#実際のトレースのログ">実際のトレースのログ</a></li>
+      </ul>
+    </li>
+    <li><a href="#まとめ">まとめ</a></li>
+  </ul>
+</nav>
+        <p>こんにちは。<a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br>
+みなさん普段の監視はどのように行っていますか？Datadog使っていますか？</p>
+<p>最近<a href="https://www.datadoghq.com/">Datadog</a>を触る機会が多いのですが、Datadogはobservabilityの3本柱ということで、メトリックとトレース(APM)とログ、この3つを統合した監視サービスであることを強くおしだしています。
+3つの分野のそれぞれに対応したOSSやサービスは多いですが、統合されてシームレスに連携できる点はDatadogの非常に強いポイントと感じます。
+さて、そんななかでDatadog APM (Application Perfomance Monitoring) が強力だったので紹介したいのと、その仕組みを探っていきましょう。</p>
+<h2 id="apmとはなにかなぜ必要か">APMとはなにか、なぜ必要か</h2>
+<h3 id="従来的な監視との違い">従来的な監視との違い</h3>
+<p>今回に至るまで、APMは名前は聞いたことがありましたが、実際に利用したことはありませんでした。
+APMはApplication Performance Monigoringの略で、名前から想像ができる通りアプリケーションに関するモニタリングです。
+アプリケーションのモニタリングというと、通常の監視となにも変わらないように思えるのですが下記の点で異なります。</p>
+<ul>
+<li><strong>APM</strong>
+<ul>
+<li>専用のライブラリをアプリケーションに組み込んで、「実際のユーザからのリクエスト」に対するパフォーマンスやエラーを計測、監視する。</li>
+</ul>
+</li>
+<li><strong>従来的なアプリケーションの監視</strong><small> (※1)</small>
+<ul>
+<li>アプリケーションのプロセスが動いているか確認する。</li>
+<li>外形監視として定期的に、アプリケーションにリクエストを発行して正常か確認する。
+<ul>
+<li>あくまで実際のユーザのリクエストではなく、監視のためのリクエスト。</li>
+</ul>
+</li>
+<li>アプリケーションが出力したログからエラーが出ていないか監視する。</li>
+</ul>
+</li>
+</ul>
+<p><small>※1: 「従来的なアプリケーションの監視」とは、私のAPMに出会う前のアプリケーションの監視の認識をもとに書いています。</small></p>
+<h3 id="なぜ必要か">なぜ必要か？</h3>
+<p>なぜAPMが必要なのでしょうか？<br>
+一番の理由はアプリケーションのパフォーマンスがビジネスにおいてより重要な役割を果たすようになってきたからでしょう。
+そして、アプリケーションがどんどん複雑化していて、パフォーマンスの改善やエラーの特定が難しくなってきているからです。</p>
+<p>このような状況にもかかわらず、APMを利用してみて感じたことなのですが、いかに今まで自らのアプリケーションの監視ができていなかったか痛感します。<br>
+それは、やはり今までは外側からしかアプリケーションを監視していなかったからです。
+アプリケーションのことはアプリケーションが一番よく知っているわけで、内側から計測していかないといけません。</p>
+<h3 id="どのようなものか">どのようなものか</h3>
+<p>具体的にどのようなメトリックを収集できるのか例をあげてみます。</p>
+<ul>
+<li>時間ごとのリクエスト数、エラー数</li>
+<li>アプリケーションのレイテンシー</li>
+<li>エンドポイント毎のリクエスト数、レイテンシー、エラー率</li>
+<li>各リクエストごとの処理時間、ボトルネック</li>
+</ul>
+<p>とくに各リクエストごとの処理時間やボトルネックが追えるのが魅力的です。<br>
+下記は、あるリクエストでエラーが発生したときのAPMの画面です。どこの処理でなんのエラーがでているか簡単に追うことができます。またそのときのホストのリソース状況も同時に確認できます。</p>
+<p><img src="/image/datadog-apm-error.png" alt="datadog-apm-error"></p>
+<p>動画もありましたので、イメージをわいてもらうために掲載しておきます。</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/iScrJXR3mLI?start=52" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<h3 id="datadog-apmの導入">Datadog APMの導入</h3>
+<p>上のような素晴らしいことができるわけですが、Datadog APMの場合、導入も非常に簡単です。<br>
+このブログではあまり手順的な話にしたくないので、こちらも1分の動画がありましたので参考にしてください。</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/faoR5M-BaSw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<h2 id="どうしてできるのか">どうしてできるのか</h2>
+<p>ドキュメントのインストールの手順の通りで言えば、ライブラリを入れて、アプリケーションの設定ファイルに数行書くだけ。
+それだけで、上のようなことができてしまうわけです。一見魔法のように見えるDatadog APMですが、どんな情報を取得しているのか気になります。</p>
+<h3 id="トレースの簡単な仕組み">トレースの簡単な仕組み</h3>
+<p>トレース、トレーシングというと、最近では「分散トレーシング」という言葉で聞くことが多いと思いますが、
+必ずしも分散システムやマイクロサービスのでなくてもトレースは実現できるし役に立ちます。
+ひとつのモノリシックなアプリケーションの中での各処理もトレーシングを使ってみていくことができます。
+（分散トレーシングに対してシングルトレーシングなんていったりするらしいです）</p>
+<p>まずは、トレーシングの簡単な概要について説明します。<br>
+下記のような簡単な処理を行うWebアプリケーションの1つのリクエスト例に考えてみましょう。</p>
+<ol>
+<li>アプリケーションがリクエストを受け付けます</li>
+<li>コントローラがリクエストを処理をします</li>
+<li>コントローラは画面を表示するのに必要なデータをDBから取り出します</li>
+<li>ビューレンダリングをします</li>
+</ol>
+<p>実際にどうやってトレースされていくのかというと、
+下図のように3つのIDが振られて管理されていきます。
+各処理に3つのIDをふることで親子関係を認識し、またここには書いてませんが、それぞれの処理の開始時間と終了時間がわかれば下記のような図が書けます。
+こちらは簡単な例でしたが、Datadog APMではこのようなことを実際のアプリケーションに対して行ってくれます。</p>
+<p><img src="/image/tracing-basic.png" alt="tracing-basic"></p>
+<table>
+<thead>
+<tr>
+<th>項目名</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Trace ID</td>
+<td>一連のトレースを管理するID。この例でいうとすべて同じ。</td>
+</tr>
+<tr>
+<td>Parent ID</td>
+<td>親の処理のSpan ID。Parent IDが0のものは一番親でありはじめの処理。</td>
+</tr>
+<tr>
+<td>Span ID</td>
+<td>それぞれの処理のID</td>
+</tr>
+</tbody>
+</table>
+<h3 id="実際のトレースのログ">実際のトレースのログ</h3>
+<p>上で簡単な例として見ていきましたが、実際のアプリケーションでどのようになっているのでしょうか。
+デフォルトの設定だとトレースのログの出力がされませんが、設定を変更してログファイルを出力させてみると理解ができますのでやってみます。
+こちらの例は、Ruby on Railsで動いているRedmineに対してDatadog APMを導入したものです。</p>
+<h4 id="設定の変更">設定の変更</h4>
+<p>Datadogの設定において、下記のように<code>my-custom.log</code>にログを出力するようにしておきます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ruby" data-lang="ruby"><span style="display:flex;"><span>f <span style="color:#f92672">=</span> <span style="color:#66d9ef">File</span><span style="color:#f92672">.</span>new(<span style="color:#e6db74">&#34;my-custom.log&#34;</span>, <span style="color:#e6db74">&#34;w+&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Datadog</span><span style="color:#f92672">.</span>configure <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>c<span style="color:#f92672">|</span>
+</span></span><span style="display:flex;"><span>  c<span style="color:#f92672">.</span>use <span style="color:#e6db74">:rails</span>
+</span></span><span style="display:flex;"><span>  c<span style="color:#f92672">.</span>tracer <span style="color:#e6db74">log</span>: <span style="color:#66d9ef">Logger</span><span style="color:#f92672">.</span>new(f)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><h4 id="トレースログ">トレースログ</h4>
+<p>こちらが実際に、Redmineのトップページにアクセスしたときに出力されたログのはじめの部分です。
+サンプルの例でみたものよりももっとたくさんの情報で構成されています。
+データベースからの情報取得についてみてみると、実際に発行されたSQLもデータとして扱われています。
+ゆえに、どのSQLの処理がボトルネックになっているか判断したりできるわけです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span> Name: rack.request
+</span></span><span style="display:flex;"><span>Span ID: 4092285044422002896
+</span></span><span style="display:flex;"><span>Parent ID: 0
+</span></span><span style="display:flex;"><span>Trace ID: 5153016093792861274
+</span></span><span style="display:flex;"><span>Type: web
+</span></span><span style="display:flex;"><span>Service: redmine_app
+</span></span><span style="display:flex;"><span>Resource: WelcomeController#index
+</span></span><span style="display:flex;"><span>Error: 0
+</span></span><span style="display:flex;"><span>Start: 1574235569204547584
+</span></span><span style="display:flex;"><span>End: 1574235569259600128
+</span></span><span style="display:flex;"><span>Duration: 55052569
+</span></span><span style="display:flex;"><span>Allocations: 9632
+</span></span><span style="display:flex;"><span>Tags: [
+</span></span><span style="display:flex;"><span>   system.pid =&gt; 12492,
+</span></span><span style="display:flex;"><span>   language =&gt; ruby,
+</span></span><span style="display:flex;"><span>   http.method =&gt; GET,
+</span></span><span style="display:flex;"><span>   http.url =&gt; /,
+</span></span><span style="display:flex;"><span>   http.base_url =&gt; http://xxxxx.ap-northeast-1.elb.amazonaws.com,
+</span></span><span style="display:flex;"><span>   http.status_code =&gt; 200,
+</span></span><span style="display:flex;"><span>   http.response.headers.content_type =&gt; text/html; charset=utf-8,
+</span></span><span style="display:flex;"><span>   http.response.headers.x_request_id =&gt; a1c70291-36bd-41ad-bbb8-8ef1d1c6c2b0]
+</span></span><span style="display:flex;"><span>Metrics: [
+</span></span><span style="display:flex;"><span>   _sampling_priority_v1 =&gt; 1.0],
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> Name: postgres.query
+</span></span><span style="display:flex;"><span>Span ID: 5781776840616204252
+</span></span><span style="display:flex;"><span>Parent ID: 4092285044422002896
+</span></span><span style="display:flex;"><span>Trace ID: 5153016093792861274
+</span></span><span style="display:flex;"><span>Type: sql
+</span></span><span style="display:flex;"><span>Service: redmine_app-postgres
+</span></span><span style="display:flex;"><span>Resource: UPDATE &#34;tokens&#34; SET &#34;updated_on&#34; = &#39;2019-11-20 07:39:29.205854&#39; WHERE &#34;tokens&#34;.&#34;user_id&#34; = $1 AND &#34;tokens&#34;.&#34;value&#34; = $2 AND &#34;tokens&#34;.&#34;action&#34; = $3
+</span></span><span style="display:flex;"><span>Error: 0
+</span></span><span style="display:flex;"><span>Start: 1574235569208989952
+</span></span><span style="display:flex;"><span>End: 1574235569215289088
+</span></span><span style="display:flex;"><span>Duration: 6299193
+</span></span><span style="display:flex;"><span>Allocations: 26
+</span></span><span style="display:flex;"><span>Tags: [
+</span></span><span style="display:flex;"><span>   active_record.db.vendor =&gt; postgres,
+</span></span><span style="display:flex;"><span>   active_record.db.name =&gt; redmine,
+</span></span><span style="display:flex;"><span>   out.host =&gt; xxxxx.ap-northeast-1.rds.amazonaws.com,
+</span></span><span style="display:flex;"><span>   out.port =&gt; 5432]
+</span></span><span style="display:flex;"><span>Metrics: [ ],
+</span></span></code></pre></div>
+
+  
+
+
+
+<table  class="table">
+<thead>
+<tr>
+<th>項目名</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Name</td>
+<td>処理の名前</td>
+</tr>
+<tr>
+<td>Span ID</td>
+<td>それぞれの処理のID</td>
+</tr>
+<tr>
+<td>Parent ID</td>
+<td>親のSpan ID。</td>
+</tr>
+<tr>
+<td>Trace ID</td>
+<td>一連の処理のトレースID</td>
+</tr>
+<tr>
+<td>Resource</td>
+<td>実行されたアプリケーションのメソッド名やSQL</td>
+</tr>
+<tr>
+<td>Start</td>
+<td>開始した時間</td>
+</tr>
+<tr>
+<td>End</td>
+<td>終了した時間</td>
+</tr>
+<tr>
+<td>Duration</td>
+<td>処理にかかった時間</td>
+</tr>
+</tbody>
+</table>
+
+
+<h4 id="分散トレーシングの場合">分散トレーシングの場合</h4>
+<p>分散トレーシングまでは実施していないのですが、考え方は基本的に同じです。
+他の異なるサービスにたとえばHTTP経由でアクセスする場合には、HTTPヘッダーに<code>x-datadog-trace-id</code>や<code>x-datadog-parent-id</code>を追加することで、他のシステムの処理であっても紐づけすることができます。
+そのため、下記の<a href="https://docs.datadoghq.com/ja/tracing/visualization/services_map/">Service Map</a>と呼ばれる分散システム間でのマッピングがかけるわけです。</p>
+<p>また、分散トレーシングが本当に必要になるのはマイクロサービスの世界でのことでしょう。
+マイクロサービスも非常に誤解の多い言葉であり概念です。SockShopというマイクロサービスの練習をするためのアプリケーションでハンズオンしてみるとよいでしょう。
+以下のブログの中では、JaegerというOSSの分散トレーシングのツールを利用する場面もでてきます。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/01/22/sockshop/" data-iframely-url="//cdn.iframe.ly/YDI2rVR"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<h2 id="まとめ">まとめ</h2>
+<p>APMの魅力や仕組みについて理解できましたでしょうか。<br>
+Datadog APMを体験すれば、アプリケーションをいかに理解していないか痛感することもあると思います。
+また、トレーシングときくと最近は分散トレーシングの文脈で聞くことが多いですが、普段身近に扱っているもっと小規模なシステムでも十分にトレーシングの考え方を応用できます。</p>
+<p>自分自身が動かしているアプリケーションの運用状態を本当に理解できているか、監視・計測できているか、あらためて問いかけてみましょう。</p>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Datadog%20APM%e3%81%a8%e3%83%88%e3%83%ac%e3%83%bc%e3%82%b7%e3%83%b3%e3%82%b0%e3%81%ae%e4%bb%95%e7%b5%84%e3%81%bf%e3%81%ab%e3%81%a4%e3%81%84%e3%81%a6" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Datadog APMとトレーシングの仕組みについて'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/01/24/designing-data-intensive-applications/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': '分散システム構築の良書「データ指向アプリケーションデザイン」を動画で解説する'});">分散システム構築の良書「データ指向アプリケーションデザイン」を動画で解説する</a> (2021/01/24)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2019/08/28/datadog-for-alibaba-cloud/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'DatadogのAlibaba Cloud integrationでできること'});">DatadogのAlibaba Cloud integrationでできること</a> (2019/08/28)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2018/06/20/terraform_import/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Terraformのimportの使い方と注意ポイント'});">Terraformのimportの使い方と注意ポイント</a> (2018/06/20)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2018/06/17/terraform-backend/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Terraformのbackend機能を利用してstateファイルを共有する'});">Terraformのbackend機能を利用してstateファイルを共有する</a> (2018/06/17)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>

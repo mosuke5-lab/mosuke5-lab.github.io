@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Alibaba CloudのALBとは？AWSのALBとの違い</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2021/07/03/ali-alb/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2021/07/03/ali-alb/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Alibaba CloudのALBとは？AWSのALBとの違い &middot; Goldstine研究所">
+<meta name="twitter:description" content="Alibaba CloudのALBをAWSのものと比べながらその内容を確認します。機能が充実したCLBとどう使い分けていけばいいかそのヒントを探ります。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Alibaba CloudのALBとは？AWSのALBとの違い &middot; Goldstine研究所">
+<meta property="og:description" content="Alibaba CloudのALBをAWSのものと比べながらその内容を確認します。機能が充実したCLBとどう使い分けていけばいいかそのヒントを探ります。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2021/07/03/ali-alb/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Alibaba CloudのALBとは？AWSのALBとの違い</h1>
+    <div class="entry-sub-title">
+        <span class="">03 Jul 2021, 19:50</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Alibaba Cloud" href="/categories/alibaba-cloud">Alibaba Cloud</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#スライド">スライド</a></li>
+    <li><a href="#awsにおけるalbとclb">AWSにおけるALBとCLB</a></li>
+    <li><a href="#alibaba-cloudのclbは高機能">Alibaba CloudのCLBは高機能</a></li>
+    <li><a href="#alibaba-cloudのalb">Alibaba CloudのALB</a>
+      <ul>
+        <li><a href="#サポートプロトコル">サポートプロトコル</a></li>
+        <li><a href="#高度なルーティング">高度なルーティング</a></li>
+        <li><a href="#課金体系">課金体系</a></li>
+        <li><a href="#kubernetes連携">Kubernetes連携</a></li>
+      </ul>
+    </li>
+    <li><a href="#まとめ">まとめ</a></li>
+    <li><a href="#関連ドキュメント">関連ドキュメント</a></li>
+  </ul>
+</nav>
+        <p>こんにちは、もーすけです。<br>
+ひさびさにAlibaba Cloud関連の情報を更新します。
+2021年1月頃にALB（Application Load Balancer）がリリースしました。本日は、ALBについて、そしてCLB（Classic　Load Balancer、従来のSLB）はかなり高機能だったのでどう違うのかなどみていきます。</p>
+<h2 id="スライド">スライド</h2>
+<p>本内容はAliEaters#18でも発表しているためスライドもあります。
+合わせてご確認ください。</p>
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/BcvBLyaHLlbnCt" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/mosuke5/20210714-alibaba-cloudalbaws" title="20210714 なるほど、Alibaba CloudのALB。AWS脳の人はこう考えろ" target="_blank">20210714 なるほど、Alibaba CloudのALB。AWS脳の人はこう考えろ</a> </strong> from <strong><a href="https://www.slideshare.net/mosuke5" target="_blank">Shinya Mori (@mosuke5)</a></strong> </div>
+<h2 id="awsにおけるalbとclb">AWSにおけるALBとCLB</h2>
+<p>「ALB」と聞くと、AWSのALBを思い浮かべるでしょう。というわけで、まずはAWSのALBとCLBをおさらいしておきます。</p>
+<p>2021年7月現在、AWSでは多くのLoad Balancerサービスがあります。ALB,NLB,GLB,CLBと4種類提供しています。今回は、ALBとCLBだけピックアップしますが、従来のCLBはL4/L7をサポートしつつも、L7らしい機能はあまり多く提供していませんでした。詳細は「<a href="https://aws.amazon.com/jp/elasticloadbalancing/features/" target="_blank">特徴 - Elastic Load Balancing | AWS</a>」を参照していただくとして、ここでは後ほどのAlibaba Cloudとの比較のために、超抜粋していくつかピックアップします。<br>
+AWS ALBは、L7のLBとして特化しているために、対応するプロトコルにTCPは当然含みません。そして、L7レイヤーでのデータを用いたルーティングや、コンテナへの分散ができるように設計されています。</p>
+
+
+  
+
+
+
+<table  class="table">
+<thead>
+<tr>
+<th></th>
+<th>AWS ALB</th>
+<th>AWS CLB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ロードバランサの種類</td>
+<td>L7</td>
+<td>L4/L7</td>
+</tr>
+<tr>
+<td>プロトコルレイヤー</td>
+<td>HTTP、HTTPS、gRPC</td>
+<td>TCP、SSL/TLS、HTTP、HTTPS</td>
+</tr>
+<tr>
+<td>サポートネットワーク</td>
+<td>VPC</td>
+<td>VPC/EC2-Classic</td>
+</tr>
+<tr>
+<td>パスベースルーティング</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td>ドメインベースルーティング</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td>WebSocket対応</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td>コンテナへの分散</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td>SNI対応</td>
+<td>✓</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+
+<h2 id="alibaba-cloudのclbは高機能">Alibaba CloudのCLBは高機能</h2>
+<p>続いて、Alibaba Cloudの話にいきましょう。Alibaba Cloudでは、2020年10月に<a href="https://www.alibabacloud.com/blog/alibaba-cloud-releases-alb-to-accelerate-the-delivery-of-enterprise-applications_596711" target="_blank">ALBをリリース</a>しましたが、そもそもCLBの機能が非常に充実していたのも事実です。
+先程の表にAlibaba CloudのCLBを追加して比較してみましょう。</p>
+
+
+  
+
+
+
+<table  class="table">
+<thead>
+<tr>
+<th></th>
+<th>AWS ALB</th>
+<th>AWS CLB</th>
+<th>Alibaba Cloud CLB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ロードバランサの種類</td>
+<td>L7</td>
+<td>L4/L7</td>
+<td>L4/L7</td>
+</tr>
+<tr>
+<td>プロトコルレイヤー</td>
+<td>HTTP、HTTPS、gRPC</td>
+<td>TCP、SSL/TLS、HTTP、HTTPS</td>
+<td>TCP、UDP、SSL/TLS、HTTP、HTTPS</td>
+</tr>
+<tr>
+<td>サポートネットワーク</td>
+<td>VPC</td>
+<td>VPC/EC2-Classic</td>
+<td>クラシックネットワーク</td>
+</tr>
+<tr>
+<td>パスベースルーティング</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+</tr>
+<tr>
+<td>ドメインベースルーティング</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+</tr>
+<tr>
+<td>WebSocket対応</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+</tr>
+<tr>
+<td>コンテナへの分散</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+</tr>
+<tr>
+<td>SNI対応</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>いくつかピックアップして機能にたいしてコメントします。</p>
+<ul>
+<li>パスベースルーティング、ドメインベースルーティング
+<ul>
+<li>Alibaba Cloud CLBでは、Listerの設定に&quot;forwarding&quot;の設定ができ、ドメインおよびパスベースのルーティングの設定が可能です。</li>
+<li><a href="https://www.alibabacloud.com/help/doc-detail/85955.html" target="_blank">Forward requests based on domain names or URLs</a></li>
+</ul>
+</li>
+<li>WebSocket対応
+<ul>
+<li>共有型のSLBではなく、パフォーマンス確保型のSLBのみの対応になります。</li>
+<li><a href="https://www.alibabacloud.com/help/doc-detail/63421.htm" target="_blank">WebSocket and WebSocket Secure support FAQ</a></li>
+</ul>
+</li>
+<li>コンテナへの分散
+<ul>
+<li>正確には、CLBはENIにも分散でき、ECIにも分散できるという意味です。また、SLB Ingress Controllerも用意されているので、Container Service for Kubernetesを利用していてもSLBをIngressに利用できます。</li>
+</ul>
+</li>
+</ul>
+<h2 id="alibaba-cloudのalb">Alibaba CloudのALB</h2>
+<p>Alibaba CloudのCLBは高機能とのことで、ALBはなんの役に立つのかと疑問に思います。
+細かいところではいくつかあるみたいですが、大きな方向性としてピックアップします。
+ALBとCLBの違いはドキュメントにまとまっていませんが、以下が参考になります。</p>
+<p><a href="https://www.alibabacloud.com/help/doc-detail/197204.htm" target="_blank">Features and limits of different editions - Application Load Balancer</a></p>
+<h3 id="サポートプロトコル">サポートプロトコル</h3>
+<p>まずは、サポートプロトコルです。当然ALBはL7に特化しているので、CLBが対応していたTCP/UDPでのListenerは作れません。その代わりQUICに対応しているのはめずらしいですね。</p>
+<h3 id="高度なルーティング">高度なルーティング</h3>
+<p>L7レイヤーのルーティングがより充実している印象です。
+たとえば、HTTPのメソッドレベルのルーティングや、クエリストリングベースでのルーティングなどです。
+おそらく、マイクロサービスの文脈で、Readする処理とWriteする処理を別々のアプリで受けたいといったニーズに対応するものではないかと思います。</p>
+<h3 id="課金体系">課金体系</h3>
+<p>課金体系をみると、ALBが現代的なビジネスシナリオのために作られたことがわかります。
+以下はドキュメントのALBの料金体系に独自にCLBの料金体系を加えたものです。</p>
+
+
+  
+
+
+
+<table  class="table">
+<thead>
+<tr>
+<th>タイプ</th>
+<th>インスタンス料金</th>
+<th>CU料金</th>
+<th>帯域幅料金</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ALB Internet</td>
+<td>課金</td>
+<td>課金</td>
+<td>課金</td>
+</tr>
+<tr>
+<td>ALB Private Network</td>
+<td>課金</td>
+<td>課金</td>
+<td></td>
+</tr>
+<tr>
+<td>CLB Internet</td>
+<td>課金</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>CLB Private Network</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+
+<p>ALBでは、主にCU料金と帯域幅料金が追加されていることがわかります。
+帯域幅料金はインターネットに対するものなので、Private NetworkのALBであればかかりません。</p>
+<p>このCU料金がなにものかというと、「新規コネクション数」「同時接続数」「処理トラフィック量」「ルール数」といった複数の指標をもとに計算されるものです。CLBでは、パフォーマンス確保型インスタンスと、ある程度トラフィック需要見込んだインスタンスの準備が必要でした。このあたりが、より現代のビジネスシナリオに対応してきたという感じです。</p>
+<h3 id="kubernetes連携">Kubernetes連携</h3>
+<p>ちなみに、Container Service for Kubernetesでは、SLB Ingress Controllerが用意されており、IngressにSLBを利用できます。しかし、現時点で国際版では、このIngress ControllerにはCLBが利用されます。前に述べたとおり、CLBはドメインやパスベースルーティングが可能であり、コンテナの世界でも十分使えてしまうということです。</p>
+<p><strike>おそらく、今後Ingress ControllerはALBに移行していくとは思います。</strike></p>
+<p>【2021/9/6追記】<br>
+2021年8月よりALB Ingress Controllerが追加されました（<a href="https://www.alibabacloud.com/help/doc-detail/283329.htm">ドキュメント</a>）。
+Serverless Kubernetesを用いて検証しました。Serverless Kubernetesの所属するvswitchを自動で検出することはなく、Ingressリソースにvswitch idsを記載しなければならない点が少し使いづらくもありますが、期待通りにALB対応もしておきました。</p>
+<h2 id="まとめ">まとめ</h2>
+<p>今回は、Alibaba CloudがリリースしたALBをAWSのものと比較しながら確認してきました。
+個人的には、Container Service for Kubernetesでの、SLB Ingress Controllerでの対応を楽しみにしています。
+より現代的なビジネスシナリオにあったプロダクトの登場をもっと楽しみにしています。</p>
+<h2 id="関連ドキュメント">関連ドキュメント</h2>
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/hiPphlQUSvL00u" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/sbcloud/awsalibaba-cloudvpc" title="AWSユーザがはじめる、Alibaba CloudのVPCとネットワーク" target="_blank">AWSユーザがはじめる、Alibaba CloudのVPCとネットワーク</a> </strong> from <strong><a href="https://www.slideshare.net/sbcloud" target="_blank">SBクラウド株式会社</a></strong> </div>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Alibaba%20Cloud%e3%81%aeALB%e3%81%a8%e3%81%af%ef%bc%9fAWS%e3%81%aeALB%e3%81%a8%e3%81%ae%e9%81%95%e3%81%84" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Alibaba CloudのALBとは？AWSのALBとの違い'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/09/17/ali-container-registry-build/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Alibaba Cloud、Container Registryのビルドを中国外で行う意味'});">Alibaba Cloud、Container Registryのビルドを中国外で行う意味</a> (2021/09/17)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/09/12/ask-multiaz/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Alibaba Cloud、Serverless KubernetesのマルチAZ対応について'});">Alibaba Cloud、Serverless KubernetesのマルチAZ対応について</a> (2021/09/12)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/09/04/alibabacloud-image-cache/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Alibaba Cloud, Kubernetesのイメージキャッシュ機能を検証する'});">Alibaba Cloud, Kubernetesのイメージキャッシュ機能を検証する</a> (2021/09/04)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2020/12/02/dragonfly/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'P2Pでコンテナイメージを配信できるDragonflyとAlibaba Cloudのなぞ'});">P2Pでコンテナイメージを配信できるDragonflyとAlibaba Cloudのなぞ</a> (2020/12/02)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>
