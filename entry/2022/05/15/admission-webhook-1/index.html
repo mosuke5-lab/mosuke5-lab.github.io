@@ -87,7 +87,7 @@
   </ul>
 </nav>
         <p>こんにちは、もーすけです。<br>
-今回はKubernetesの拡張する仕組みの一つであるAdmission Webhookをスクラッチで作ることで、その仕組や作り方を理解しようというものです。自分自身はじめて試みて詰まったところなど多数あったので、その整理も兼ねて書きます。
+今回はKubernetesの拡張する仕組みのひとつであるAdmission Webhookをスクラッチで作ることで、その仕組や作り方を理解しようというものです。自分自身はじめて試みて詰まったところなど多数あったので、その整理も兼ねて書きます。
 いままで、ドキュメントや文献を読んで、Admission webhookというものの存在やなんとなくの仕組みは理解しているつもりでした。一方で、実際に作ってみると見えていなかった要素もわかってきました。</p>
 <p>Kubernetesを運用すると、業務に合わせた機能拡張はほぼ必須と言っても過言ではなく、一度自分の手で作っていくことはとても有益と思います。</p>
 <p>後編はこちら。</p>
@@ -112,7 +112,7 @@
 <p>Kubernetes API Serverが、APIリクエストを発行するまでには次の3フェーズで実行されます。
 こういった図は、いたるところで語られているので見たこともある人も多いでしょう。</p>
 <p><img src="/image/kubernetes-api-flow.png" alt="kuberbetes-api-flow"></p>
-<p>図の「Admission control」に「Admission controllerによるリクエストの改変など」と書いてありますが、この部分をもう少し深ぼって理解していきます。
+<p>図の「Admission control」に「Admission controllerによるリクエストの改変など」と書いてありますが、この部分をもう少し深ぼって理解します。
 Admission controllerは、プラグイン形式になっていて、次のような機能がKubernetesに備え付けで用意されています。
 以下は独断と偏見でいくつかをピックアップしたものです。プラグインのリストは <a href="https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#what-does-each-admission-controller-do" target="_blank">こちらのドキュメント</a> を確認するといいです。</p>
 <ul>
@@ -133,12 +133,12 @@ Admission controllerは、プラグイン形式になっていて、次のよう
 </li>
 <li><strong>MutatingAdmissionWebhook</strong>
 <ul>
-<li>独自のリソース変更を実装するためのWebhookwo呼び出す。</li>
+<li>独自のリソース変更を実装するためのWebhookを呼び出す。</li>
 </ul>
 </li>
 <li><strong>ValidatingAdmissionWebhook</strong>
 <ul>
-<li>独自のリソース検証を実装するためのWebhookwo呼び出す。</li>
+<li>独自のリソース検証を実装するためのWebhookを呼び出す。</li>
 </ul>
 </li>
 </ul>
@@ -161,7 +161,7 @@ ServiceAccountプラグインはデフォルトで有効にされており、い
 <li>Validating
 <ul>
 <li>英語) validateは動詞で「〜を法律的に有効にする、確証する、確認する」</li>
-<li>リクエストされあAPIの正しさを検証すると理解しておくといいでしょう。値は変えずに妥当性を判断するのみです。</li>
+<li>リクエストされたAPIの正しさを検証すると理解しておくといいでしょう。値は変えずに妥当性を判断するのみです。</li>
 </ul>
 </li>
 </ul>
