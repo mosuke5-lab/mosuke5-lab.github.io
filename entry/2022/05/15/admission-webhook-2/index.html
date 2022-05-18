@@ -318,7 +318,7 @@ service/mywebhook   ClusterIP   172.30.26.80   &lt;none&gt;        443/TCP   2m6
 <p>いよいよデプロイの最後のフェーズです。<br>
 Webhook Serverとしてはデプロイできましたので、AdmissionWebhookの設定を行って実際に動作するようにします。
 今回は自己証明書をつかっているので、<code>caBundle</code>の記載を忘れずに行いましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sed  &#34;s/BASE64_ENCODED_PEM_FILE/$(base64 server.crt)/g&#34; manifests/validatingwebhookconfiguration.yaml.template | kubectl apply -f -n mynamespace -
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sed  &#34;s/BASE64_ENCODED_PEM_FILE/$(base64 server.crt)/g&#34; manifests/validatingwebhookconfiguration.yaml.template | kubectl apply -f -
 validatingwebhookconfiguration.admissionregistration.k8s.io/sample-validating-webhook created
 </code></pre></div><p>これで、Admission webhookの設定は終わりです。<br>
 期待通り動くのでしょうか？
