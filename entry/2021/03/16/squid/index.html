@@ -74,6 +74,7 @@
   <ul>
     <li><a href="#squidのインストールと動作確認">squidのインストールと動作確認</a></li>
     <li><a href="#外部からのプロキシ利用">外部からのプロキシ利用</a></li>
+    <li><a href="#特定のドメインのみ許可したいホワイトリスト">特定のドメインのみ許可したい（ホワイトリスト）</a></li>
     <li><a href="#まとめ">まとめ</a></li>
   </ul>
 </nav>
@@ -195,6 +196,67 @@
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>http_access allow myhome
 </span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ sudo systemctl restart squid
+</span></span></code></pre></div><h2 id="特定のドメインのみ許可したいホワイトリスト">特定のドメインのみ許可したい（ホワイトリスト）</h2>
+<p>プロキシを構築する場合の多くは、コンテンツフィルタリングも行いたいことが多いのではないでしょうか。
+squidでは、接続先のドメインを制御に組み込むことが可能です。</p>
+<p>基本的には次のようにかけます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>acl whitelist_domain dstdomain blog.mosuke.tech
+</span></span><span style="display:flex;"><span>http_access allow whitelist_domain
+</span></span></code></pre></div><p>上では宛先ドメイン（<code>dstdomain</code>）が <code>blog.mosuke.tech</code> である通信を通すです。
+しかし、多くのケースでは、決められたネットワークのみがまずプロキシできて、そのなかでも決められたドメインのみが疎通できるというのがやりたいことになるのではないかと思います。</p>
+<p>その場合は、複数の条件でマッチさせる必要があります。<br>
+次の場合、送信元のIP(<code>src</code>)が <code>192.168.0.0/16</code> であり、かつ宛先ドメイン(<code>dstdomain</code>)が <code>blog.mosuke.tech</code>である場合に許可するということになります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>acl localnet src 192.168.0.0/16
+</span></span><span style="display:flex;"><span>acl domain dstdomain blog.mosuke.tech
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>http_access allow localnet domain
+</span></span><span style="display:flex;"><span>http_access deny all
+</span></span></code></pre></div><p>上の設定を追加して、<code>blog.mosuke.tech</code>と<code>www.google.com</code>の通信を確認してみましょう。
+ちなみに、<code>192.168.122.150</code>はsquidサーバで、接続元は <code>192.168.0.0/16</code> に属しています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl -I https://blog.mosuke.tech -x http://192.168.122.150:3128
+</span></span><span style="display:flex;"><span>HTTP/1.1 200 Connection established
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>HTTP/2 200
+</span></span><span style="display:flex;"><span>date: Tue, 24 May 2022 06:31:32 GMT
+</span></span><span style="display:flex;"><span>content-type: text/html; charset=utf-8
+</span></span><span style="display:flex;"><span>last-modified: Wed, 18 May 2022 12:26:18 GMT
+</span></span><span style="display:flex;"><span>access-control-allow-origin: *
+</span></span><span style="display:flex;"><span>expires: Wed, 18 May 2022 12:36:51 GMT
+</span></span><span style="display:flex;"><span>cache-control: max-age=691200
+</span></span><span style="display:flex;"><span>x-proxy-cache: MISS
+</span></span><span style="display:flex;"><span>x-github-request-id: C328:6720:2F3AE8:32A2C7:6284E60B
+</span></span><span style="display:flex;"><span>via: 1.1 varnish
+</span></span><span style="display:flex;"><span>age: 496181
+</span></span><span style="display:flex;"><span>x-served-by: cache-tyo11932-TYO
+</span></span><span style="display:flex;"><span>x-cache: HIT
+</span></span><span style="display:flex;"><span>x-cache-hits: 1
+</span></span><span style="display:flex;"><span>x-timer: S1652877711.175430,VS0,VE1
+</span></span><span style="display:flex;"><span>vary: Accept-Encoding
+</span></span><span style="display:flex;"><span>x-fastly-request-id: 5a5b5d4febe10479775cb2825ebed33c94c6f86d
+</span></span><span style="display:flex;"><span>cf-cache-status: HIT
+</span></span><span style="display:flex;"><span>expect-ct: max-age=604800, report-uri=&#34;https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct&#34;
+</span></span><span style="display:flex;"><span>report-to: {&#34;endpoints&#34;:[{&#34;url&#34;:&#34;https:\/\/a.nel.cloudflare.com\/report\/v3?s=G4qZHQWiapgs714L7sXbrVReFHZGfIei1%2F8Zm%2FJ%2BWKoWSa4%2FJEkzsr0OzCq6i5D09w5rKVeGEaXDKxRUKyENXhmDYVOuajVpKyeSz98ykf83BpwCdI5vBuyt%2FoaFkNkQEdfS&#34;}],&#34;group&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span style="display:flex;"><span>nel: {&#34;success_fraction&#34;:0,&#34;report_to&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span style="display:flex;"><span>x-content-type-options: nosniff
+</span></span><span style="display:flex;"><span>server: cloudflare
+</span></span><span style="display:flex;"><span>cf-ray: 7103fd2deab68a62-NRT
+</span></span><span style="display:flex;"><span>alt-svc: h3=&#34;:443&#34;; ma=86400, h3-29=&#34;:443&#34;; ma=86400
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl -I https://www.google.com -x http://192.168.122.150:3128
+</span></span><span style="display:flex;"><span>HTTP/1.1 403 Forbidden
+</span></span><span style="display:flex;"><span>Server: squid/5.2
+</span></span><span style="display:flex;"><span>Mime-Version: 1.0
+</span></span><span style="display:flex;"><span>Date: Tue, 24 May 2022 06:30:55 GMT
+</span></span><span style="display:flex;"><span>Content-Type: text/html;charset=utf-8
+</span></span><span style="display:flex;"><span>Content-Length: 3516
+</span></span><span style="display:flex;"><span>X-Squid-Error: ERR_ACCESS_DENIED 0
+</span></span><span style="display:flex;"><span>Vary: Accept-Language
+</span></span><span style="display:flex;"><span>Content-Language: en
+</span></span><span style="display:flex;"><span>X-Cache: MISS from bastion.mosuke5.local
+</span></span><span style="display:flex;"><span>X-Cache-Lookup: NONE from bastion.mosuke5.local:3128
+</span></span><span style="display:flex;"><span>Via: 1.1 bastion.mosuke5.local (squid/5.2)
+</span></span><span style="display:flex;"><span>Connection: keep-alive
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>curl: (56) Received HTTP code 403 from proxy after CONNECT
 </span></span></code></pre></div><h2 id="まとめ">まとめ</h2>
 <p>簡単ですが、squidのインストール方法と簡単な設定方法を見てきました。いつも忘れてしまうため未来の自分および同じような境遇のひとの役に立てばと思います。プロキシ環境をさっと建てられるように準備しておくと、再現検証などに非常に役に立ちます。
 いちどは自分の手で構築して感覚を掴んでおくと良いでしょう。</p>
