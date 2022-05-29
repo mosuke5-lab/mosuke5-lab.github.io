@@ -61,6 +61,33 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/" class="entry-title">Jaegerを使った分散トレーシングの検証 on Kubernetes (1)</a></h1>
+    <div class="entry-sub-title">
+        <span class="">08 Feb 2021, 17:04</span>
+        <span class="">By mosuke5</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-アプリケーション開発" href="/categories/%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E9%96%8B%E7%99%BA">アプリケーション開発</a>
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>もーすけです。<br>
+過去にDatadogでAPMを少し検証したり、トレーニングの中でJaegerを触ったりしましたが、正直ちゃんとわかっていなかったので、改めてJaegerというか分散トレーシングについて検証してみたいと思います。</p>
+<p>今回はKubernetes上にJaegerを構築するので、<a href="https://www.jaegertracing.io/docs/1.21/operator/">Jaeger Operatorをインストール</a>して利用します。
+今回はOpenShiftにて検証していますが、他のKubernetesディストリビューションでも同じように利用可能です。<code>oc</code> は <code>kubectl</code> と置き換えて読んでください。
+検証環境は下記のとおりです。</p>
+<ul>
+<li>OpenShift: 4.4</li>
+<li>Jaeger: 1.17</li>
+</ul>
+        <a href="https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2021/02/07/cka/" class="entry-title">新形式のCKAを受験し合格しました。受験の教訓紹介。</a></h1>
     <div class="entry-sub-title">
         <span class="">07 Feb 2021, 11:57</span>
@@ -272,30 +299,12 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
         <a href="https://blog.mosuke.tech/entry/2020/10/10/develop-ansible-operator/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2020/09/09/kuubernetes-dns-test/" class="entry-title">KubernetesのPod内からの名前解決を検証する</a></h1>
-    <div class="entry-sub-title">
-        <span class="">09 Sep 2020, 17:45</span>
-        <span class="">By mosuke5</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <p>もーすけです。本日は最近おこなったトラブルシューティングの中で、自分がKubernetesのDNSまわりについて理解が乏しく手こずっていたのでその内容について簡単に書いていきたいと思います。</p>
-<h2 id="前提">前提</h2>
-<p>これからcurlをhttpサーバに打ったり、digを行ったりしますが、Kubernetes内の下記のような環境で行ってます。</p>
-<p><img src="/image/kubernetes-dns-test-overview.png" alt="overview"></p>
-        <a href="https://blog.mosuke.tech/entry/2020/09/09/kuubernetes-dns-test/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       <a href="/categories/kubernetes/page/3/" class="post-list-pagination-item pure-button post-list-pagination-item-prev">
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
-      <span class="post-list-pagination-item post-list-pagination-item-current">Page 4 of 6</span>
+      <span class="post-list-pagination-item post-list-pagination-item-current">Page 4 of 7</span>
     <a href="/categories/kubernetes/page/5/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>
       </a>
@@ -306,11 +315,11 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
   <div class="sidebar-content related-post">
     <h3>最近の記事</h3>
     <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ImagePolicyWebhookって必要なの？'});">ImagePolicyWebhookって必要なの？</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/18/first-side-work/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ITエンジニアが副業に挑戦してみた感想をまとめるよ'});">ITエンジニアが副業に挑戦してみた感想をまとめるよ</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装'});">Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</a></li>
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Goならわかるシステムプログラミング：第5章 システムコール'});">Goならわかるシステムプログラミング：第5章 システムコール</a></li>
       </ul>
   </div>
   <div class="sidebar-content campaign-ad">
@@ -347,7 +356,7 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
         <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (60)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (61)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
@@ -409,7 +418,7 @@ OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメン
         <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
       </li>
       <li class="list-group-item">
-        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (12)</a>
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (13)</a>
       </li>
       </ul>
   </div>
