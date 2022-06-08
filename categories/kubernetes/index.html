@@ -77,23 +77,15 @@
 CKSの勉強をしていて、関連あるトピックがでてきたので紹介します。</p>
 <p>Gatekeeperというツールについてなのですが、本ブログでは<u>Gatekeeperの細かな使い方を説明するものではありません</u>。前回までにやってきた「Admission Webhookを作って遊んで、その仕組みを理解する」の延長上で、Gatekeeperの動きを見ていくものです。
 この仕組みがわかっていると、Gatekeeperの構成ややろうとしていることがすっと頭に入りそうだったので、この続編を書くことにしました。</p>
-<div class="belg-link row">
-  <div class="belg-left col-md-2 d-none d-md-block">
-    <a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" target="_blank">
-      <img class="belg-site-image" src="https://blog.mosuke.tech/image/logo.png" />
-    </a>
-  </div>
-  <div class="belg-right col-md-10">
-  <div class="belg-title">
-      <a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" target="_blank">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編） · Goldstine研究所</a>
-    </div>
-    <div class="belg-description">Kubernetesの運用には欠かせなくなってくる拡張。そのひとつであるAdmission Webhookを作って遊んでみるというものです。本記事は説明編で、動作編にも続きます。</div>
-    <div class="belg-site">
-      <img src="https://blog.mosuke.tech/image/favicon.ico" class="belg-site-icon">
-      <span class="belg-site-name">Goldstine研究所</span>
-    </div>
-  </div>
-</div>
+<hr>
+<h5>Admission Webhookを作って遊んで、その仕組みを理解しよう</h5>
+<ul>
+<li>第1回: <a href="/entry/2022/05/15/admission-webhook-1/">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+<li>第2回: <a href="/entry/2022/05/15/admission-webhook-2/">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+<li>第3回: <a href="/entry/2022/06/07/admission-webhook-opa/">Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）</a></li>
+<li>おまけ: <a href="/entry/2022/05/29/image-policy-webhook/">ImagePolicyWebhookって必要なの？</a></li>
+</ul>
+<hr>
         <a href="https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/">続きを読む</a>
     </div>
     
@@ -160,24 +152,17 @@ CKSの勉強をしていて、関連あるトピックがでてきたので紹�
     </div>
     <div class="entry-content">
         <p>こんにちは、もーすけです。<br>
-前回は、Admission Webhookの説明編を書きました。今回は実際に動かしていくことをやっていきたいと思います。</p>
-<div class="belg-link row">
-  <div class="belg-left col-md-2 d-none d-md-block">
-    <a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" target="_blank">
-      <img class="belg-site-image" src="https://blog.mosuke.tech/image/logo.png" />
-    </a>
-  </div>
-  <div class="belg-right col-md-10">
-  <div class="belg-title">
-      <a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" target="_blank">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編） · Goldstine研究所</a>
-    </div>
-    <div class="belg-description">Kubernetesの運用には欠かせなくなってくる拡張。そのひとつであるAdmission Webhookを作って遊んでみるというものです。本記事は説明編で、動作編にも続きます。</div>
-    <div class="belg-site">
-      <img src="https://blog.mosuke.tech/image/favicon.ico" class="belg-site-icon">
-      <span class="belg-site-name">Goldstine研究所</span>
-    </div>
-  </div>
-</div>
+前回は、Admission Webhookの説明編を書きました。今回は実際に動かしていくことをやっていきたいと思います。
+前回ブログおよび関連ブログは以下にもありますので、あわせて確認してみてください。</p>
+<hr>
+<h5>Admission Webhookを作って遊んで、その仕組みを理解しよう</h5>
+<ul>
+<li>第1回: <a href="/entry/2022/05/15/admission-webhook-1/">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+<li>第2回: <a href="/entry/2022/05/15/admission-webhook-2/">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+<li>第3回: <a href="/entry/2022/06/07/admission-webhook-opa/">Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）</a></li>
+<li>おまけ: <a href="/entry/2022/05/29/image-policy-webhook/">ImagePolicyWebhookって必要なの？</a></li>
+</ul>
+<hr>
         <a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/">続きを読む</a>
     </div>
     
@@ -196,24 +181,15 @@ CKSの勉強をしていて、関連あるトピックがでてきたので紹�
 今回はKubernetesの拡張する仕組みのひとつであるAdmission Webhookをスクラッチで作ることで、その仕組や作り方を理解しようというものです。自分自身はじめて試みて詰まったところなど多数あったので、その整理も兼ねて書きます。
 いままで、ドキュメントや文献を読んで、Admission webhookというものの存在やなんとなくの仕組みは理解しているつもりでした。一方で、実際に作ってみると見えていなかった要素もわかってきました。</p>
 <p>Kubernetesを運用すると、業務に合わせた機能拡張はほぼ必須と言っても過言ではなく、一度自分の手で作っていくことはとても有益と思います。</p>
-<p>後編はこちら。</p>
-<div class="belg-link row">
-  <div class="belg-left col-md-2 d-none d-md-block">
-    <a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" target="_blank">
-      <img class="belg-site-image" src="https://blog.mosuke.tech/image/logo.png" />
-    </a>
-  </div>
-  <div class="belg-right col-md-10">
-  <div class="belg-title">
-      <a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" target="_blank">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編） · Goldstine研究所</a>
-    </div>
-    <div class="belg-description">Kubernetesの運用には欠かせなくなってくる拡張。そのひとつであるAdmission Webhookを作って遊んでみるというものです。本記事は実際に作って動かす動作編です。</div>
-    <div class="belg-site">
-      <img src="https://blog.mosuke.tech/image/favicon.ico" class="belg-site-icon">
-      <span class="belg-site-name">Goldstine研究所</span>
-    </div>
-  </div>
-</div>
+<hr>
+<h5>Admission Webhookを作って遊んで、その仕組みを理解しよう</h5>
+<ul>
+<li>第1回: <a href="/entry/2022/05/15/admission-webhook-1/">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+<li>第2回: <a href="/entry/2022/05/15/admission-webhook-2/">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+<li>第3回: <a href="/entry/2022/06/07/admission-webhook-opa/">Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）</a></li>
+<li>おまけ: <a href="/entry/2022/05/29/image-policy-webhook/">ImagePolicyWebhookって必要なの？</a></li>
+</ul>
+<hr>
         <a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/">続きを読む</a>
     </div>
     
