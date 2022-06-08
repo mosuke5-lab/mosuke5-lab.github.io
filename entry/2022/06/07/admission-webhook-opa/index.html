@@ -9,16 +9,16 @@
 <link rel="stylesheet" href="/css/main.css">
 <link rel="stylesheet" href="/css/customization.css">
 
-<title>Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）</title>
+<title>Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）</title>
 <link rel="canonical" href="https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/">
 <link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/" />
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@mosuke5" />
 <meta name="twitter:creator" content="@mosuke5" />
-<meta name="twitter:title" content="Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編） &middot; Goldstine研究所">
+<meta name="twitter:title" content="Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編） &middot; Goldstine研究所">
 <meta name="twitter:description" content="「Admission Webhookを作って遊んで、その仕組みを理解する」のシリーズで、Admission Webhookの仕組みをわかった上でGatekeeperの動きを見ていきます。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編） &middot; Goldstine研究所">
+<meta property="og:title" content="Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編） &middot; Goldstine研究所">
 <meta property="og:description" content="「Admission Webhookを作って遊んで、その仕組みを理解する」のシリーズで、Admission Webhookの仕組みをわかった上でGatekeeperの動きを見ていきます。">
 <meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
@@ -59,7 +59,7 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
-    <h1>Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）</h1>
+    <h1>Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）</h1>
     <div class="entry-sub-title">
         <div class="publish-date">
             <p>執筆日:<time datetime="2022-06-07T21:34">2022-06-07 21:34</time></p>
@@ -221,8 +221,7 @@ OPA自体は、Kubernetesのためのツールということではなく、汎�
 通信先は、Serviceを参照していて <code>gatekeeper-webhook-service</code> というService宛であることがわかります。
 こちらは調べると <code>gatekeeper-controller-manage</code> のPod向けであることがわかります。</p>
 <p>そして、Validationする対象ですが、<code>CREATE</code> と <code>UPDATE</code> されるすべてのリソースであるのは面白いです。
-つまり、Kubernetes内でおこるすべての <code>CREATE</code> と <code>UPDATE</code> イベントに対して、いちどGatekeeperが検査するということですね。
-<code>failurePolicy: Fail</code> となっているのもあり、gatekeeperが応答を返せなかった場合はFailするためなかなか重要な役割を果たすこともわかってきますね。</p>
+つまり、Kubernetes内でおこるすべての <code>CREATE</code> と <code>UPDATE</code> イベントに対して、いちどGatekeeperが検査するということですね。</p>
 <h3 id="証明書">証明書</h3>
 <p>Webhook serverは、<code>gatekeeper-controller-manage</code> Podが担っていることはわかりました。
 証明書管理はどうしているのでしょうか？
@@ -290,13 +289,13 @@ OPA自体は、Kubernetesのためのツールということではなく、汎�
 今回もすでにライブラリとしてあったので、次のものを使ってさくっと作ってしまいます。</p>
 <div class="belg-link row">
   <div class="belg-left col-md-2 d-none d-md-block">
-    <a href="https://github.com/open-policy-agent/gatekeeper-library" target="_blank">
+    <a href="https://github.com/open-policy-agent/gatekeeper-library/tree/5ba4b4dad404c60655524cfc25adc2477c153c56/library/pod-security-policy/users" target="_blank">
       <img class="belg-site-image" src="https://repository-images.githubusercontent.com/191437603/f134af34-0986-4d94-add3-6fecc0b4f192" />
     </a>
   </div>
   <div class="belg-right col-md-10">
   <div class="belg-title">
-      <a href="https://github.com/open-policy-agent/gatekeeper-library" target="_blank">gatekeeper-library/library/pod-security-policy/users at 5ba4b4dad404c60655524cfc25adc2477c153c56 · open-policy-agent/gatekeeper-library</a>
+      <a href="https://github.com/open-policy-agent/gatekeeper-library/tree/5ba4b4dad404c60655524cfc25adc2477c153c56/library/pod-security-policy/users" target="_blank">gatekeeper-library/library/pod-security-policy/users at 5ba4b4dad404c60655524cfc25adc2477c153c56 · open-policy-agent/gatekeeper-library</a>
     </div>
     <div class="belg-description">The OPA Gatekeeper policy library. Contribute to open-policy-agent/gatekeeper-library development by creating an account on GitHub.</div>
     <div class="belg-site">
@@ -339,7 +338,7 @@ Gatekeeperでは非常に便利なことに、<code>Config</code>リソースで
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">rule</span>: <span style="color:#ae81ff">MustRunAsNonRoot</span>
 </span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f config.yaml
 </span></span><span style="display:flex;"><span>$ kubectl apply -f constraint.yaml
-</span></span></code></pre></div><p>あとは検証するのみです。　　
+</span></span></code></pre></div><p>あとは検証するのみです。<br>
 <code>admin-foo</code>と<code>user-bar</code>に対してrunAsUser未指定（root）でPodを作成して確認します。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl run -n user-bar nginx --image=nginxinc/nginx-unprivileged:latest
 </span></span><span style="display:flex;"><span>Error from server (Forbidden): admission webhook &#34;validation.gatekeeper.sh&#34; denied the request: [psp-pods-allowed-user-ranges] Container nginx is attempting to run without a required securityContext/runAsNonRoot or securityContext/runAsUser != 0
@@ -357,7 +356,7 @@ Gatekeeperでは非常に便利なことに、<code>Config</code>リソースで
 </div>
 <div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
     <h5>記事へのフィードバック</h5>
-    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Admission%20Webhook%e3%82%92%e4%bd%9c%e3%81%a3%e3%81%a6%e9%81%8a%e3%82%93%e3%81%a7%e3%80%81%e3%81%9d%e3%81%ae%e4%bb%95%e7%b5%84%e3%81%bf%e3%82%92%e7%90%86%e8%a7%a3%e3%81%97%e3%82%88%e3%81%86%ef%bc%88Gatekeepr%e7%b7%a8%ef%bc%89" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）'});">記事の内容にフィードバックしてみる</a></p>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Admission%20Webhook%e3%82%92%e4%bd%9c%e3%81%a3%e3%81%a6%e9%81%8a%e3%82%93%e3%81%a7%e3%80%81%e3%81%9d%e3%81%ae%e4%bb%95%e7%b5%84%e3%81%bf%e3%82%92%e7%90%86%e8%a7%a3%e3%81%97%e3%82%88%e3%81%86%ef%bc%88Gatekeeper%e7%b7%a8%ef%bc%89" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）'});">記事の内容にフィードバックしてみる</a></p>
 </div><div class="entry-sub-content post-share">
         <div class="post-share-links">
             <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
@@ -369,7 +368,7 @@ Gatekeeperでは非常に便利なことに、<code>Config</code>リソースで
   <div class="sidebar-content related-post">
     <h3>最近の記事</h3>
     <ul class="list-group">
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/31/multi-az-pv/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？'});">マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ImagePolicyWebhookって必要なの？'});">ImagePolicyWebhookって必要なの？</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
