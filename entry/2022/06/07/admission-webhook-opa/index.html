@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編） &middot; Goldstine研究所">
+<meta name="twitter:description" content="「Admission Webhookを作って遊んで、その仕組みを理解する」のシリーズで、Admission Webhookの仕組みをわかった上でGatekeeperの動きを見ていきます。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編） &middot; Goldstine研究所">
+<meta property="og:description" content="「Admission Webhookを作って遊んで、その仕組みを理解する」のシリーズで、Admission Webhookの仕組みをわかった上でGatekeeperの動きを見ていきます。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）</h1>
+    <div class="entry-sub-title">
+        <div class="publish-date">
+            <p>執筆日:<time datetime="2022-06-07T21:34">2022-06-07 21:34</time></p>
+            
+            <p>更新日:<time datetime="2022-06-07T21:34">2022-06-07 21:34</time></p>
+            
+        </div>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#gatekeeperとは">Gatekeeperとは</a></li>
+    <li><a href="#インストールして構成確認">インストールして構成確認</a>
+      <ul>
+        <li><a href="#validating-webhook-configuration">Validating Webhook Configuration</a></li>
+        <li><a href="#証明書">証明書</a></li>
+      </ul>
+    </li>
+    <li><a href="#rootで動くpodを禁止する">rootで動くPodを禁止する</a></li>
+    <li><a href="#さいごに">さいごに</a></li>
+  </ul>
+</nav>
+        <p>こんにちは、もーすけです。<br>
+以前に投稿した「Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編&amp;動作編）」の続編です。
+CKSの勉強をしていて、関連あるトピックがでてきたので紹介します。</p>
+<p>Gatekeeperというツールについてなのですが、本ブログでは<u>Gatekeeperの細かな使い方を説明するものではありません</u>。前回までにやってきた「Admission Webhookを作って遊んで、その仕組みを理解する」の延長上で、Gatekeeperの動きを見ていくものです。
+この仕組みがわかっていると、Gatekeeperの構成ややろうとしていることがすっと頭に入りそうだったので、この続編を書くことにしました。</p>
+<div class="belg-link row">
+  <div class="belg-left col-md-2 d-none d-md-block">
+    <a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" target="_blank">
+      <img class="belg-site-image" src="https://blog.mosuke.tech/image/logo.png" />
+    </a>
+  </div>
+  <div class="belg-right col-md-10">
+  <div class="belg-title">
+      <a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" target="_blank">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編） · Goldstine研究所</a>
+    </div>
+    <div class="belg-description">Kubernetesの運用には欠かせなくなってくる拡張。そのひとつであるAdmission Webhookを作って遊んでみるというものです。本記事は説明編で、動作編にも続きます。</div>
+    <div class="belg-site">
+      <img src="https://blog.mosuke.tech/image/favicon.ico" class="belg-site-icon">
+      <span class="belg-site-name">Goldstine研究所</span>
+    </div>
+  </div>
+</div>
+<h2 id="gatekeeperとは">Gatekeeperとは</h2>
+<p>正直に、OPA,Gatekeeperについてはよくカンファレンスやミートアップ等でも話は聞いていて、なんとなくの概要はしっていました。しかし、あらためてAdmission Webhookの仕組みを理解すると、Gatekeeperのやっていることがクリアに理解できました。</p>
+<p>GatekeeperのベースになっているのはOpen Policy Agent（略称OPA,「おーぱ」と発音するらしい）です。
+OPA自体は、Kubernetesのためのツールということではなく、汎用的なポリシーエンジンです。ポリシー言語であるRegoで、任意のポリシーを作成し、APIを経由してリクエストの妥当性を検査するものです。</p>
+<p><img src="https://d33wubrfki0l68.cloudfront.net/b394f524e15a67457b85fdfeed02ff3f2764eb9e/6ac2b/docs/latest/images/opa-service.svg" alt="opa"><br>
+※画像は<code>https://www.openpolicyagent.org/docs/latest/#overview</code>より引用</p>
+<p>Gatekeeperは、OPAをベースとして、KubernetesのAdmission Webhookの仕組みの中でポリシーエンジンを実現したものです。
+前回までのブログで利用してきた図を改変してGatekeeperに当てはめると以下のような感じです。</p>
+<p><img src="/image/gatekeeper-overview.png" alt="gatekeeper"></p>
+<h2 id="インストールして構成確認">インストールして構成確認</h2>
+<p>ここではさくっとドキュメント通りにインストールします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper/release-3.8/deploy/gatekeeper.yaml
+</span></span><span style="display:flex;"><span>namespace/gatekeeper-system unchanged
+</span></span><span style="display:flex;"><span>resourcequota/gatekeeper-critical-pods configured
+</span></span><span style="display:flex;"><span>customresourcedefinition.apiextensions.k8s.io/assign.mutations.gatekeeper.sh configured
+</span></span><span style="display:flex;"><span>customresourcedefinition.apiextensions.k8s.io/assignmetadata.mutations.gatekeeper.sh configured
+</span></span><span style="display:flex;"><span>customresourcedefinition.apiextensions.k8s.io/configs.config.gatekeeper.sh configured
+</span></span><span style="display:flex;"><span>customresourcedefinition.apiextensions.k8s.io/constraintpodstatuses.status.gatekeeper.sh configured
+</span></span><span style="display:flex;"><span>customresourcedefinition.apiextensions.k8s.io/constrainttemplatepodstatuses.status.gatekeeper.sh configured
+</span></span><span style="display:flex;"><span>customresourcedefinition.apiextensions.k8s.io/constrainttemplates.templates.gatekeeper.sh configured
+</span></span><span style="display:flex;"><span>customresourcedefinition.apiextensions.k8s.io/modifyset.mutations.gatekeeper.sh configured
+</span></span><span style="display:flex;"><span>customresourcedefinition.apiextensions.k8s.io/mutatorpodstatuses.status.gatekeeper.sh configured
+</span></span><span style="display:flex;"><span>customresourcedefinition.apiextensions.k8s.io/providers.externaldata.gatekeeper.sh configured
+</span></span><span style="display:flex;"><span>serviceaccount/gatekeeper-admin unchanged
+</span></span><span style="display:flex;"><span>Warning: policy/v1beta1 PodSecurityPolicy is deprecated in v1.21+, unavailable in v1.25+
+</span></span><span style="display:flex;"><span>podsecuritypolicy.policy/gatekeeper-admin unchanged
+</span></span><span style="display:flex;"><span>role.rbac.authorization.k8s.io/gatekeeper-manager-role configured
+</span></span><span style="display:flex;"><span>clusterrole.rbac.authorization.k8s.io/gatekeeper-manager-role configured
+</span></span><span style="display:flex;"><span>rolebinding.rbac.authorization.k8s.io/gatekeeper-manager-rolebinding unchanged
+</span></span><span style="display:flex;"><span>clusterrolebinding.rbac.authorization.k8s.io/gatekeeper-manager-rolebinding unchanged
+</span></span><span style="display:flex;"><span>secret/gatekeeper-webhook-server-cert unchanged
+</span></span><span style="display:flex;"><span>service/gatekeeper-webhook-service unchanged
+</span></span><span style="display:flex;"><span>deployment.apps/gatekeeper-audit configured
+</span></span><span style="display:flex;"><span>deployment.apps/gatekeeper-controller-manager configured
+</span></span><span style="display:flex;"><span>Warning: policy/v1beta1 PodDisruptionBudget is deprecated in v1.21+, unavailable in v1.25+; use policy/v1 PodDisruptionBudget
+</span></span><span style="display:flex;"><span>poddisruptionbudget.policy/gatekeeper-controller-manager unchanged
+</span></span><span style="display:flex;"><span>mutatingwebhookconfiguration.admissionregistration.k8s.io/gatekeeper-mutating-webhook-configuration configured
+</span></span><span style="display:flex;"><span>validatingwebhookconfiguration.admissionregistration.k8s.io/gatekeeper-validating-webhook-configuration configured
+</span></span></code></pre></div><h3 id="validating-webhook-configuration">Validating Webhook Configuration</h3>
+<p>前回までのブログおよび動画を見てくださった方なら、いくつか気になるポイントがあるでしょう。
+まずは、Validating Webhook Configurationをみてみます。
+もうこのConfigurationの設定の意味は簡単にわかるかもしれません。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get validatingwebhookconfiguration.admissionregistration.k8s.io/gatekeeper-validating-webhook-configuration -o yaml
+</span></span><span style="display:flex;"><span>apiVersion: admissionregistration.k8s.io/v1
+</span></span><span style="display:flex;"><span>kind: ValidatingWebhookConfiguration
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  annotations:
+</span></span><span style="display:flex;"><span>    kubectl.kubernetes.io/last-applied-configuration: |
+</span></span><span style="display:flex;"><span>      {&#34;apiVersion&#34;:&#34;admissionregistration.k8s.io/v1&#34;,&#34;kind&#34;:&#34;ValidatingWebhookConfiguration&#34;,&#34;metadata&#34;:{&#34;annotations&#34;:{},&#34;labels&#34;:{&#34;gatekeeper.sh/system&#34;:&#34;yes&#34;},&#34;name&#34;:&#34;gatekeeper-validating-webhook-configuration&#34;},&#34;webhooks&#34;:[{&#34;admissionReviewVersions&#34;:[&#34;v1&#34;,&#34;v1beta1&#34;],&#34;clientConfig&#34;:{&#34;service&#34;:{&#34;name&#34;:&#34;gatekeeper-webhook-service&#34;,&#34;namespace&#34;:&#34;gatekeeper-system&#34;,&#34;path&#34;:&#34;/v1/admit&#34;}},&#34;failurePolicy&#34;:&#34;Ignore&#34;,&#34;matchPolicy&#34;:&#34;Exact&#34;,&#34;name&#34;:&#34;validation.gatekeeper.sh&#34;,&#34;namespaceSelector&#34;:{&#34;matchExpressions&#34;:[{&#34;key&#34;:&#34;admission.gatekeeper.sh/ignore&#34;,&#34;operator&#34;:&#34;DoesNotExist&#34;}]},&#34;rules&#34;:[{&#34;apiGroups&#34;:[&#34;*&#34;],&#34;apiVersions&#34;:[&#34;*&#34;],&#34;operations&#34;:[&#34;CREATE&#34;,&#34;UPDATE&#34;],&#34;resources&#34;:[&#34;*&#34;]}],&#34;sideEffects&#34;:&#34;None&#34;,&#34;timeoutSeconds&#34;:3},{&#34;admissionReviewVersions&#34;:[&#34;v1&#34;,&#34;v1beta1&#34;],&#34;clientConfig&#34;:{&#34;service&#34;:{&#34;name&#34;:&#34;gatekeeper-webhook-service&#34;,&#34;namespace&#34;:&#34;gatekeeper-system&#34;,&#34;path&#34;:&#34;/v1/admitlabel&#34;}},&#34;failurePolicy&#34;:&#34;Fail&#34;,&#34;matchPolicy&#34;:&#34;Exact&#34;,&#34;name&#34;:&#34;check-ignore-label.gatekeeper.sh&#34;,&#34;rules&#34;:[{&#34;apiGroups&#34;:[&#34;&#34;],&#34;apiVersions&#34;:[&#34;*&#34;],&#34;operations&#34;:[&#34;CREATE&#34;,&#34;UPDATE&#34;],&#34;resources&#34;:[&#34;namespaces&#34;]}],&#34;sideEffects&#34;:&#34;None&#34;,&#34;timeoutSeconds&#34;:3}]}
+</span></span><span style="display:flex;"><span>  creationTimestamp: &#34;2022-06-06T11:53:53Z&#34;
+</span></span><span style="display:flex;"><span>  generation: 2
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    gatekeeper.sh/system: &#34;yes&#34;
+</span></span><span style="display:flex;"><span>  name: gatekeeper-validating-webhook-configuration
+</span></span><span style="display:flex;"><span>  resourceVersion: &#34;181540173&#34;
+</span></span><span style="display:flex;"><span>  uid: c672e177-b021-4f41-a9d6-eb22aec12ebf
+</span></span><span style="display:flex;"><span>webhooks:
+</span></span><span style="display:flex;"><span>- admissionReviewVersions:
+</span></span><span style="display:flex;"><span>  - v1
+</span></span><span style="display:flex;"><span>  - v1beta1
+</span></span><span style="display:flex;"><span>  clientConfig:
+</span></span><span style="display:flex;"><span>    caBundle: xxxxxxxxxxxxxx
+</span></span><span style="display:flex;"><span>    service:
+</span></span><span style="display:flex;"><span>      name: gatekeeper-webhook-service
+</span></span><span style="display:flex;"><span>      namespace: gatekeeper-system
+</span></span><span style="display:flex;"><span>      path: /v1/admit
+</span></span><span style="display:flex;"><span>      port: 443
+</span></span><span style="display:flex;"><span>  failurePolicy: Ignore
+</span></span><span style="display:flex;"><span>  matchPolicy: Exact
+</span></span><span style="display:flex;"><span>  name: validation.gatekeeper.sh
+</span></span><span style="display:flex;"><span>  namespaceSelector:
+</span></span><span style="display:flex;"><span>    matchExpressions:
+</span></span><span style="display:flex;"><span>    - key: admission.gatekeeper.sh/ignore
+</span></span><span style="display:flex;"><span>      operator: DoesNotExist
+</span></span><span style="display:flex;"><span>  objectSelector: {}
+</span></span><span style="display:flex;"><span>  rules:
+</span></span><span style="display:flex;"><span>  - apiGroups:
+</span></span><span style="display:flex;"><span>    - &#39;*&#39;
+</span></span><span style="display:flex;"><span>    apiVersions:
+</span></span><span style="display:flex;"><span>    - &#39;*&#39;
+</span></span><span style="display:flex;"><span>    operations:
+</span></span><span style="display:flex;"><span>    - CREATE
+</span></span><span style="display:flex;"><span>    - UPDATE
+</span></span><span style="display:flex;"><span>    resources:
+</span></span><span style="display:flex;"><span>    - &#39;*&#39;
+</span></span><span style="display:flex;"><span>    scope: &#39;*&#39;
+</span></span><span style="display:flex;"><span>  sideEffects: None
+</span></span><span style="display:flex;"><span>  timeoutSeconds: 3
+</span></span><span style="display:flex;"><span>- admissionReviewVersions:
+</span></span><span style="display:flex;"><span>  - v1
+</span></span><span style="display:flex;"><span>  - v1beta1
+</span></span><span style="display:flex;"><span>  clientConfig:
+</span></span><span style="display:flex;"><span>    caBundle: xxxxxxxxxxxxxxxxxx
+</span></span><span style="display:flex;"><span>    service:
+</span></span><span style="display:flex;"><span>      name: gatekeeper-webhook-service
+</span></span><span style="display:flex;"><span>      namespace: gatekeeper-system
+</span></span><span style="display:flex;"><span>      path: /v1/admitlabel
+</span></span><span style="display:flex;"><span>      port: 443
+</span></span><span style="display:flex;"><span>  failurePolicy: Fail
+</span></span><span style="display:flex;"><span>  matchPolicy: Exact
+</span></span><span style="display:flex;"><span>  name: check-ignore-label.gatekeeper.sh
+</span></span><span style="display:flex;"><span>  namespaceSelector: {}
+</span></span><span style="display:flex;"><span>  objectSelector: {}
+</span></span><span style="display:flex;"><span>  rules:
+</span></span><span style="display:flex;"><span>  - apiGroups:
+</span></span><span style="display:flex;"><span>    - &#34;&#34;
+</span></span><span style="display:flex;"><span>    apiVersions:
+</span></span><span style="display:flex;"><span>    - &#39;*&#39;
+</span></span><span style="display:flex;"><span>    operations:
+</span></span><span style="display:flex;"><span>    - CREATE
+</span></span><span style="display:flex;"><span>    - UPDATE
+</span></span><span style="display:flex;"><span>    resources:
+</span></span><span style="display:flex;"><span>    - namespaces
+</span></span><span style="display:flex;"><span>    scope: &#39;*&#39;
+</span></span><span style="display:flex;"><span>  sideEffects: None
+</span></span><span style="display:flex;"><span>  timeoutSeconds: 3
+</span></span></code></pre></div><p>まず、気になったのは通信先です。<br>
+通信先は、Serviceを参照していて <code>gatekeeper-webhook-service</code> というService宛であることがわかります。
+こちらは調べると <code>gatekeeper-controller-manage</code> のPod向けであることがわかります。</p>
+<p>そして、Validationする対象ですが、<code>CREATE</code> と <code>UPDATE</code> されるすべてのリソースであるのは面白いです。
+つまり、Kubernetes内でおこるすべての <code>CREATE</code> と <code>UPDATE</code> イベントに対して、いちどGatekeeperが検査するということですね。
+<code>failurePolicy: Fail</code> となっているのもあり、gatekeeperが応答を返せなかった場合はFailするためなかなか重要な役割を果たすこともわかってきますね。</p>
+<h3 id="証明書">証明書</h3>
+<p>Webhook serverは、<code>gatekeeper-controller-manage</code> Podが担っていることはわかりました。
+証明書管理はどうしているのでしょうか？
+前回は、opensslを使ってお手製で作りました。
+調べると、OpenPolicyAgentのチーム内で証明書を管理するコントローラを作っていることがわかりました。
+<code>gatekeeper-controller-manage</code>に組み込んでいて、証明書の生成と期限切れの証明書のローテーションを行っていることがわかりました。</p>
+<div class="belg-link row">
+  <div class="belg-left col-md-2 d-none d-md-block">
+    <a href="https://github.com/open-policy-agent/cert-controller" target="_blank">
+      <img class="belg-site-image" src="https://opengraph.githubassets.com/a2172e569abb4de46fc5f87854721b2e8d1350b886916d999df44a129947a28b/open-policy-agent/cert-controller" />
+    </a>
+  </div>
+  <div class="belg-right col-md-10">
+  <div class="belg-title">
+      <a href="https://github.com/open-policy-agent/cert-controller" target="_blank">GitHub - open-policy-agent/cert-controller</a>
+    </div>
+    <div class="belg-description">Contribute to open-policy-agent/cert-controller development by creating an account on GitHub.</div>
+    <div class="belg-site">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="belg-site-icon">
+      <span class="belg-site-name">GitHub</span>
+    </div>
+  </div>
+</div>
+<p>実際に中身をのぞいてみましょう。<br>
+10年期限であり、<code>DNS:gatekeeper-webhook-service.gatekeeper-system.svc</code>のSANが設定されています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get secret gatekeeper-webhook-server-cert -o jsonpath=&#34;{.data.tls\.crt}&#34; | base64 -d | openssl x509 -noout -text
+</span></span><span style="display:flex;"><span>Certificate:
+</span></span><span style="display:flex;"><span>    Data:
+</span></span><span style="display:flex;"><span>        Version: 3 (0x2)
+</span></span><span style="display:flex;"><span>        Serial Number: 1 (0x1)
+</span></span><span style="display:flex;"><span>        Signature Algorithm: sha256WithRSAEncryption
+</span></span><span style="display:flex;"><span>        Issuer: O = gatekeeper, CN = gatekeeper-ca
+</span></span><span style="display:flex;"><span>        Validity
+</span></span><span style="display:flex;"><span>            Not Before: Jun  6 10:55:33 2022 GMT
+</span></span><span style="display:flex;"><span>            Not After : Jun  3 11:55:33 2032 GMT
+</span></span><span style="display:flex;"><span>        Subject: CN = gatekeeper-webhook-service.gatekeeper-system.svc
+</span></span><span style="display:flex;"><span>        Subject Public Key Info:
+</span></span><span style="display:flex;"><span>            Public Key Algorithm: rsaEncryption
+</span></span><span style="display:flex;"><span>                RSA Public-Key: (2048 bit)
+</span></span><span style="display:flex;"><span>                Modulus:
+</span></span><span style="display:flex;"><span>                  xxxxxx
+</span></span><span style="display:flex;"><span>                Exponent: 65537 (0x10001)
+</span></span><span style="display:flex;"><span>        X509v3 extensions:
+</span></span><span style="display:flex;"><span>            X509v3 Key Usage: critical
+</span></span><span style="display:flex;"><span>                Digital Signature, Key Encipherment
+</span></span><span style="display:flex;"><span>            X509v3 Extended Key Usage:
+</span></span><span style="display:flex;"><span>                TLS Web Server Authentication
+</span></span><span style="display:flex;"><span>            X509v3 Basic Constraints: critical
+</span></span><span style="display:flex;"><span>                CA:FALSE
+</span></span><span style="display:flex;"><span>            X509v3 Authority Key Identifier:
+</span></span><span style="display:flex;"><span>                keyid:xxxx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            X509v3 Subject Alternative Name:
+</span></span><span style="display:flex;"><span>                DNS:gatekeeper-webhook-service.gatekeeper-system.svc
+</span></span><span style="display:flex;"><span>    Signature Algorithm: sha256WithRSAEncryption
+</span></span><span style="display:flex;"><span>         xxxxxx
+</span></span></code></pre></div><h2 id="rootで動くpodを禁止する">rootで動くPodを禁止する</h2>
+<p>前回にGoで作った以下のAdmission Webhookは、かんたんに実装できるんでしょうか？</p>
+<blockquote>
+<p>Podの <code>.spec.SecurityContext.RunAsUser</code>がrootの場合、あるいは明示的に指定されていないときにPodの作成を禁止する。ただし、特定のNamespace(&ldquo;admin-*&quot;)内では許可する。というValidatingAdmissionWebhookを作ってみたいと思います。<br>
+※ <code>.spec.containers[].SecurityContext.RunAsUser</code> が記載があった場合はどうするんだ？というツッコミを自分でいれたいところではありますが、ブログ用のサンプルなので許してください。気が向いたら修正するかもしれません。</p>
+</blockquote>
+<p>便利なことに、すでに便利なライブラリを用意してくれています。<br>
+基本的なことでやりたいであろうことはかなり揃っているんじゃないかと思います。
+今回もすでにライブラリとしてあったので、次のものを使ってさくっと作ってしまいます。</p>
+<div class="belg-link row">
+  <div class="belg-left col-md-2 d-none d-md-block">
+    <a href="https://github.com/open-policy-agent/gatekeeper-library" target="_blank">
+      <img class="belg-site-image" src="https://repository-images.githubusercontent.com/191437603/f134af34-0986-4d94-add3-6fecc0b4f192" />
+    </a>
+  </div>
+  <div class="belg-right col-md-10">
+  <div class="belg-title">
+      <a href="https://github.com/open-policy-agent/gatekeeper-library" target="_blank">gatekeeper-library/library/pod-security-policy/users at 5ba4b4dad404c60655524cfc25adc2477c153c56 · open-policy-agent/gatekeeper-library</a>
+    </div>
+    <div class="belg-description">The OPA Gatekeeper policy library. Contribute to open-policy-agent/gatekeeper-library development by creating an account on GitHub.</div>
+    <div class="belg-site">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="belg-site-icon">
+      <span class="belg-site-name">GitHub</span>
+    </div>
+  </div>
+</div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/5ba4b4dad404c60655524cfc25adc2477c153c56/library/pod-security-policy/users/template.yaml
+</span></span><span style="display:flex;"><span>constrainttemplate.templates.gatekeeper.sh/k8spspallowedusers created
+</span></span></code></pre></div><p><code>ConstraintTemplate</code>を作成すると、GatekeeperはCRDを作成します。<br>
+<code>Constraint</code>を作成できるようになり、Constraintに対応したPolicyがConstraintTemplateに記載しています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get crd | grep constraints.gatekeeper
+</span></span><span style="display:flex;"><span>k8spspallowedusers.constraints.gatekeeper.sh                      2022-06-07T09:39:20Z
+</span></span></code></pre></div><p>特定のNamespaceのみを、検査の対象から除外するには、ValidatingWebhookConfigurationのNamespaceSelectorでも実現できるということは前回にお知らせしました。しかし、正規表現等でNamespaceを表現することはできず、必要なNamespace名をすべてベタ書きせざるをえませんでした。
+そこで、Webhook server側でNamespaceの判定を行っていました。
+Gatekeeperでは非常に便利なことに、<code>Config</code>リソースで除外するNamespace/Processを指定できました。なんとも便利です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">## config.yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">config.gatekeeper.sh/v1alpha1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Config</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">config</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#e6db74">&#34;gatekeeper-system&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">match</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">excludedNamespaces</span>: [<span style="color:#e6db74">&#34;default&#34;</span>, <span style="color:#e6db74">&#34;gatekeeper-system&#34;</span>, <span style="color:#e6db74">&#34;admin-*&#34;</span>]
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">processes</span>: [<span style="color:#e6db74">&#34;*&#34;</span>]
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e">## constraint.yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">constraints.gatekeeper.sh/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">K8sPSPAllowedUsers</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">psp-pods-allowed-user-ranges</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">match</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">kinds</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">apiGroups</span>: [<span style="color:#e6db74">&#34;&#34;</span>]
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">kinds</span>: [<span style="color:#e6db74">&#34;Pod&#34;</span>]
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">parameters</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">runAsUser</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">rule</span>: <span style="color:#ae81ff">MustRunAsNonRoot</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f config.yaml
+</span></span><span style="display:flex;"><span>$ kubectl apply -f constraint.yaml
+</span></span></code></pre></div><p>あとは検証するのみです。　　
+<code>admin-foo</code>と<code>user-bar</code>に対してrunAsUser未指定（root）でPodを作成して確認します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl run -n user-bar nginx --image=nginxinc/nginx-unprivileged:latest
+</span></span><span style="display:flex;"><span>Error from server (Forbidden): admission webhook &#34;validation.gatekeeper.sh&#34; denied the request: [psp-pods-allowed-user-ranges] Container nginx is attempting to run without a required securityContext/runAsNonRoot or securityContext/runAsUser != 0
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl run -n admin-foo nginx --image=nginxinc/nginx-unprivileged:latest
+</span></span><span style="display:flex;"><span>pod/nginx created
+</span></span></code></pre></div><h2 id="さいごに">さいごに</h2>
+<p>前回までは、Goを使ってスクラッチでAdmission Webhookを作ってきました。
+スクラッチで作ることで、Admission Webhookの仕組みをよりよく理解できたことは事実ですが、やはり現実の運用を作っていく上では、GatekeeperのようなOSSを使っていくことは非常に有益です。
+そして、いちどスクラッチで作ったことで、Gatekeeperの仕組みややろうとしていることがすっと頭に入ってきました。</p>
+<p>おそらく「Admission Webhookを作って遊んで、その仕組みを理解しよう」関連の投稿は、これで一旦終了になると思いますが非常におもしろい学びでした。やってよかったです。</p>
+    </div><div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事へのフィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Admission%20Webhook%e3%82%92%e4%bd%9c%e3%81%a3%e3%81%a6%e9%81%8a%e3%82%93%e3%81%a7%e3%80%81%e3%81%9d%e3%81%ae%e4%bb%95%e7%b5%84%e3%81%bf%e3%82%92%e7%90%86%e8%a7%a3%e3%81%97%e3%82%88%e3%81%86%ef%bc%88Gatekeepr%e7%b7%a8%ef%bc%89" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最近の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/31/multi-az-pv/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？'});">マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ImagePolicyWebhookって必要なの？'});">ImagePolicyWebhookって必要なの？</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (63)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (15)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014年 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016年 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017年 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018年 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019年 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020年 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (15)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/31/multi-az-pv/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？'});">マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？</a> (2022/05/31)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'ImagePolicyWebhookって必要なの？'});">ImagePolicyWebhookって必要なの？</a> (2022/05/29)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a> (2022/05/16)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a> (2022/05/15)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>
