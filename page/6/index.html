@@ -60,6 +60,36 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
+  <h1><a href="https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/" class="entry-title">Tekton、TaskのStepの実行順序について確認する</a></h1>
+  <div class="entry-sub-title">
+      <span class="">2021-03-06</span>
+      <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+          </div>
+  <div class="entry-content">
+      <hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
+<li>第13回: <a href="/entry/2022/03/01/tekton-lib-cache/">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
+<li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<p>前回、TektonのOperatorを使ったインストールについて解説しました。
+今回は、もうすこしTaskの動きを確認してみます。具体的には、Task内のStepの役割や、複数のStepがある場合の実行順序の制御方法などについて確認してみます。</p>
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" data-iframely-url="//cdn.iframe.ly/aQ48OK3"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+      <a href="https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/">続きを読む</a>
+  </div>
   <h1><a href="https://blog.mosuke.tech/entry/2021/03/03/redis-on-kubernetes/" class="entry-title">Redis on Kubernetesの検討ポイントとredis-ha Helm chart</a></h1>
   <div class="entry-sub-title">
       <span class="">2021-03-03</span>
@@ -209,27 +239,6 @@
 <div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/" data-iframely-url="//cdn.iframe.ly/ELaxDLL"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
       <a href="https://blog.mosuke.tech/entry/2020/12/16/openshift-on-nvidia-gpu/">続きを読む</a>
   </div>
-  <h1><a href="https://blog.mosuke.tech/entry/2020/12/02/dragonfly/" class="entry-title">P2Pでコンテナイメージを配信できるDragonflyとAlibaba Cloudのなぞ</a></h1>
-  <div class="entry-sub-title">
-      <span class="">2020-12-02</span>
-      <a class="badge badge-inf post-category post-category-Alibaba Cloud" href="/categories/alibaba-cloud">Alibaba Cloud</a>
-          <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-          </div>
-  <div class="entry-content">
-      <p>こんにちは、もーすけです。<br>
-ここ最近、ワケアッて少しAlibaba Cloud関連のKubernetesについて調べています。
-ちなみにこちらの記事は<a href="https://qiita.com/advent-calendar/2020/alibabacloud">Alibaba Cloud Adovent Calender 2020</a>の2日目の投稿です。</p>
-<p>Alibaba Cloudの中の人をやめて、もう1年半以上たちますが、まだこうやって調べるとは思わなかったです。いまになっていろいろAlibaba Cloudが取り組んでいるコンテナ関連のことがよく理解できるようになってきました（笑）
-本日はアリババ/Alibaba Cloudが開発するP2Pのファイル配信ソフトウェアのDragonflyについて少し書いてみたいと思います。（まだ調べ中のところもあるので許してください）</p>
-<h2 id="dragonflyとは">Dragonflyとは</h2>
-<p>Dragonflyは、アリババおよびAlibaba Cloudがメインとなって開発している、オープンソースのP2Pファイル配信の仕組みです。<br>
-よくコンテナイメージの配信のためのソフトウェアといわれることもありますが、実態はコンテナイメージだけでなく、どんなファイルにも活用できるものです。
-コンテナ時代より前からアリババが研究していた効率的なアプリケーションの配布、キャッシュの配布、ログの配布、画像の配布がもとになっています。
-現代のクラウドネイティブの環境になってコンテナイメージの配布にも活用されてきているということです。
-その目標は、クラウドネイティブのシナリオにおけるすべての配布問題に取り組むことです。現在、Dragonflyは以下の点に焦点を当てています。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/dragonflyoss/Dragonfly" data-iframely-url="//cdn.iframe.ly/VOFvh8T"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-      <a href="https://blog.mosuke.tech/entry/2020/12/02/dragonfly/">続きを読む</a>
-  </div>
   
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
@@ -247,11 +256,11 @@
   <div class="sidebar-content related-post">
     <h3>最近の記事</h3>
     <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/19/cks/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'CKS合格しました。学習方法や気になる疑問などまとめ'});">CKS合格しました。学習方法や気になる疑問などまとめ</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/31/multi-az-pv/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？'});">マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ImagePolicyWebhookって必要なの？'});">ImagePolicyWebhookって必要なの？</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
       </ul>
   </div>
   <div class="sidebar-content campaign-ad">
@@ -288,7 +297,7 @@
         <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (63)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (64)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
@@ -318,7 +327,7 @@
         <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (9)</a>
       </li>
       </ul>
   </div>
@@ -350,7 +359,7 @@
         <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
       </li>
       <li class="list-group-item">
-        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (15)</a>
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (16)</a>
       </li>
       </ul>
   </div>

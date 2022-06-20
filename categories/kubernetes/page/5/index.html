@@ -61,6 +61,34 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/" class="entry-title">Docker Hubのダウンロード回数制限の対策を考える</a></h1>
+    <div class="entry-sub-title">
+        <span class="">2020-11-18</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-コンテナ" href="/categories/%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A">コンテナ</a>
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-ブログ運用" href="/categories/%E3%83%96%E3%83%AD%E3%82%B0%E9%81%8B%E7%94%A8">ブログ運用</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは。もーすけです。<br>
+今日は最近開始されたDocker Hubのイメージダウンロードの回数制限について書きたいと思います。
+動向だけはなんとなく追っていたのですが、先日に自分がこの問題に向き合わなければいけないケースに遭遇したため、残しておこうと思い立ちました。</p>
+<h2 id="きっかけ">きっかけ</h2>
+<p>本ブログの記事のビルドやデプロイには<a href="https://app.wercker.com/">Wecker</a>というサービスを利用しています。
+ある日、記事を投稿しようとしたところCIのビルドがコケて記事を投稿できませんでした。
+エラーは以下のとおりで、調べるとDocker Hubのイメージダウンロードの回数制限に引っかかっていることがわかりました。</p>
+<blockquote>
+<p><code>fetch failed to pull image debian: API error (500): {&quot;message&quot;:&quot;toomanyrequests: You have reached your pull rate limit. You may increase the limit by authenticating and upgrading: https://www.docker.com/increase-rate-limit&quot;}</code></p>
+</blockquote>
+<p><img src="/image/wercker-docker-rate-limit-error.png" alt="docker-rate-limit-error"></p>
+        <a href="https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/" class="entry-title">【翻訳】Kubernetes as a serviceの謎を解く。Alibaba Cloudが1万個のKubernetesクラスタを管理する方法</a></h1>
     <div class="entry-sub-title">
         <span class="">2020-11-17</span>
@@ -262,26 +290,6 @@ Tekton学習シリーズということで入門者向けの連載企画をお�
         <a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/" class="entry-title">イメージのプルの効率化を考える。kubernetes-image-puller の紹介</a></h1>
-    <div class="entry-sub-title">
-        <span class="">2020-04-28</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-            
-                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
-            
-                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <p>FF7リメイク、クリアしました。いまSwitchで原作のFF7をやり直しています。もーすけです。<br>
-今日は<a href="https://github.com/che-incubator/kubernetes-image-puller" target="_blank">kubernetes-image-puller</a>というツールを発見し試してみたので、背景や課題感含めてご紹介していきます。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://github.com/che-incubator/kubernetes-image-puller" data-iframely-url="//cdn.iframe.ly/VbiFtNx"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-        <a href="https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       <a href="/categories/kubernetes/page/4/" class="post-list-pagination-item pure-button post-list-pagination-item-prev">
@@ -298,11 +306,11 @@ Tekton学習シリーズということで入門者向けの連載企画をお�
   <div class="sidebar-content related-post">
     <h3>最近の記事</h3>
     <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/19/cks/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'CKS合格しました。学習方法や気になる疑問などまとめ'});">CKS合格しました。学習方法や気になる疑問などまとめ</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/31/multi-az-pv/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？'});">マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ImagePolicyWebhookって必要なの？'});">ImagePolicyWebhookって必要なの？</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</a></li>
       </ul>
   </div>
   <div class="sidebar-content campaign-ad">
@@ -339,7 +347,7 @@ Tekton学習シリーズということで入門者向けの連載企画をお�
         <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (63)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (64)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
@@ -369,7 +377,7 @@ Tekton学習シリーズということで入門者向けの連載企画をお�
         <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (8)</a>
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (9)</a>
       </li>
       </ul>
   </div>
@@ -401,7 +409,7 @@ Tekton学習シリーズということで入門者向けの連載企画をお�
         <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
       </li>
       <li class="list-group-item">
-        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (15)</a>
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (16)</a>
       </li>
       </ul>
   </div>
