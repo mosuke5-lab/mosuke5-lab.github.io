@@ -61,6 +61,28 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2021/10/28/kubernetes-test-by-terratest/" class="entry-title">Kubernetes環境についてTerratestでテストを書く</a></h1>
+    <div class="entry-sub-title">
+        <span class="">2021-10-28</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <p>こんにちは、もーすけです。<br>
+今回は<a href="https://github.com/gruntwork-io/terratest" target="_blank">Terratest</a> を用いたKubernetes環境のテストについて検討します。</p>
+<p>TerratestはGruntwork.ioが作成しているインフラのテスティングソフトウェアです。
+もともとは、Terraformで作成したクラウド環境のテストとして発達がしましたが、いまの時代となってKubernetes環境やコンテナイメージもテストできるようになっています。</p>
+<p>Kubernetesマニフェストにより、宣言的にインフラ環境を表現できるようになってきているととはいえ、その結果が期待通りに動作しているのかは日々の悩みのタネであることはかわりません。
+Terratestがこの悩みを解消するのにイケてそうなので調査してみます。</p>
+<p>かつて仮想サーバでアプリケーションを運用している時代に、Serverspecを用いてテスト駆動のインフラ構築を行っていてとても気持ちがよかったので、そのレイヤーが移ってきているとも考えられます。</p>
+        <a href="https://blog.mosuke.tech/entry/2021/10/28/kubernetes-test-by-terratest/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2021/09/12/ask-multiaz/" class="entry-title">Alibaba Cloud、Serverless KubernetesのマルチAZ対応について</a></h1>
     <div class="entry-sub-title">
         <span class="">2021-09-12</span>
@@ -270,34 +292,6 @@ Argo CD学習シリーズの続きを行っていきたいと思います。
         <a href="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2021/04/13/argocd/" class="entry-title">第1回: Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></h1>
-    <div class="entry-sub-title">
-        <span class="">2021-04-13</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <hr>
-<h5>Argo CD学習シリーズ</h5>
-<ul>
-<li>第1回: <a href="/entry/2021/04/13/argocd/">Argo CD、Operatorでのインストールと主要コンポーネントの解説</a></li>
-<li>第2回: <a href="/entry/2021/05/06/argocd-application/">Argo CD、Kustomizeを使った複数環境へのデプロイ</a></li>
-<li>第3回: <a href="/entry/2021/05/06/argocd-sync-action/">Argo CD、Syncの実行方法やタイミングについての検討</a></li>
-<li>第4回: <a href="/entry/2021/06/12/argocd-resourcehooks/">Argo CD、Resource Hooksを使ってデプロイを高度化する</a></li>
-<li>第5回: <a href="/entry/2022/02/08/argocd-deploy-to-external-cluster/">Argo CD、外部クラスタへのデプロイ</a></li>
-<li>関連記事: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
-</ul>
-<hr>
-<p>こんにちは、もーすけです。<br>
-前回の「Tekton学習シリーズ」に続きArgo CD学習シリーズをやっていきます。
-わたしは、Argo CDを何年か前に検証で確認はしていたのですが、だいぶ忘れてしまったい、改めてまとめなおしたいと思っています。
-初回は、インストールと概念編です。</p>
-        <a href="https://blog.mosuke.tech/entry/2021/04/13/argocd/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       <a href="/categories/kubernetes/" class="post-list-pagination-item pure-button post-list-pagination-item-prev">
@@ -314,11 +308,11 @@ Argo CD学習シリーズの続きを行っていきたいと思います。
   <div class="sidebar-content related-post">
     <h3>最近の記事</h3>
     <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/24/k8s-finalizer/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetesで、NamespaceがTerminatingのまま消せない理由についての実験(finalizer)'});">Kubernetesで、NamespaceがTerminatingのまま消せない理由についての実験(finalizer)</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/19/cks/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'CKS合格しました。学習方法や気になる疑問などまとめ'});">CKS合格しました。学習方法や気になる疑問などまとめ</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/31/multi-az-pv/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？'});">マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ImagePolicyWebhookって必要なの？'});">ImagePolicyWebhookって必要なの？</a></li>
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
       </ul>
   </div>
   <div class="sidebar-content campaign-ad">
@@ -355,7 +349,7 @@ Argo CD学習シリーズの続きを行っていきたいと思います。
         <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (64)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (65)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
@@ -417,7 +411,7 @@ Argo CD学習シリーズの続きを行っていきたいと思います。
         <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
       </li>
       <li class="list-group-item">
-        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (16)</a>
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (17)</a>
       </li>
       </ul>
   </div>

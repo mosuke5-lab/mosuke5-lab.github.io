@@ -61,6 +61,46 @@
 
 <div class="entry col-md-8 col-xs-12">
     
+    <h1><a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/" class="entry-title">Tekton 徹底解説、Operatorによるインストールとはじめの一歩（学習シリーズ01）</a></h1>
+    <div class="entry-sub-title">
+        <span class="">2020-05-10</span>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
+<li>第13回: <a href="/entry/2022/03/01/tekton-lib-cache/">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
+<li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<p><a href="https://twitter.com/mosuke5" target="_blank">もーすけ</a>です。
+GWはみなさんいかがお過ごしでしたか？<br>
+外に出れないGWという一生でもそんなことが2度あるかわかりませんが非常に大変な日々を過ごされたのではないかと思います。自分は、GWを使ってKubernetes Operatorの開発などに挑戦してみていました。
+このあたりの話は別で書きたいと思いますが、Kubernetesのよさについてさらに理解を深めた気がします。</p>
+<p>さて、今日はCloud NativeなCI/CDツールと言われているTektonについて。<br>
+Tekton学習シリーズということで入門者向けの連載企画をおこないました。第1回目は、Operatorによるインストール編です。</p>
+        <a href="https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/">続きを読む</a>
+    </div>
+    
     <h1><a href="https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/" class="entry-title">イメージのプルの効率化を考える。kubernetes-image-puller の紹介</a></h1>
     <div class="entry-sub-title">
         <span class="">2020-04-28</span>
@@ -245,27 +285,6 @@ Kubernetes上のリソースをどのように管理していますか？
         <a href="https://blog.mosuke.tech/entry/2019/08/21/ansible-for-k8s-resources/">続きを読む</a>
     </div>
     
-    <h1><a href="https://blog.mosuke.tech/entry/2019/07/12/sidecar-fluentd-to-cloudwatchlogs/" class="entry-title">Sidecar方式のFluentdでCloudWatch logsへログを集約することについての検討</a></h1>
-    <div class="entry-sub-title">
-        <span class="">2019-07-12</span>
-        
-            
-                <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-            
-                <a class="badge badge-inf post-category post-category-AWS" href="/categories/aws">AWS</a>
-            
-        
-    </div>
-    <div class="entry-content">
-        <p><a href="https://twitter.com/mosuke5">@mosuke5</a>です。<br>
-Kubernetes上でのアプリケーションのロギングについてFluentdを使ってどうできるか考えていきます。
-今回はサイドカー方式という方法を使ってFluentdでAWS CloudWatch logsへ集約することについてやってみました。CloudWatch logsを例に取っていますが、それ以外でも考え方は応用できますので読んでみてください。
-また、サイドカー方式以外の方式については、こちらの「<a href="/entry/2021/04/18/kubernetes-application-logging/">Kubernetesのロギングパターンは結局どれを採用したらいいの？</a>」を参照してください。</p>
-<p>FluentdとAWSの連携については、以前に「<a href="/entry/2017/09/03/fluentd_to_dynamodb/">NginxのログをFluentdでDynamoDBへ送る</a>」もかきましたので、参考にしてください。自分も復習で見返しました。</p>
-<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/" data-iframely-url="//cdn.iframe.ly/qKFqn1a"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
-        <a href="https://blog.mosuke.tech/entry/2019/07/12/sidecar-fluentd-to-cloudwatchlogs/">続きを読む</a>
-    </div>
-    
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       <a href="/categories/kubernetes/page/5/" class="post-list-pagination-item pure-button post-list-pagination-item-prev">
@@ -282,11 +301,11 @@ Kubernetes上でのアプリケーションのロギングについてFluentdを
   <div class="sidebar-content related-post">
     <h3>最近の記事</h3>
     <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/24/k8s-finalizer/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetesで、NamespaceがTerminatingのまま消せない理由についての実験(finalizer)'});">Kubernetesで、NamespaceがTerminatingのまま消せない理由についての実験(finalizer)</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/19/cks/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'CKS合格しました。学習方法や気になる疑問などまとめ'});">CKS合格しました。学習方法や気になる疑問などまとめ</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/31/multi-az-pv/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？'});">マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ImagePolicyWebhookって必要なの？'});">ImagePolicyWebhookって必要なの？</a></li>
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</a></li>
       </ul>
   </div>
   <div class="sidebar-content campaign-ad">
@@ -323,7 +342,7 @@ Kubernetes上でのアプリケーションのロギングについてFluentdを
         <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (64)</a>
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (65)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
@@ -385,7 +404,7 @@ Kubernetes上でのアプリケーションのロギングについてFluentdを
         <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021年 Archive (40)</a>
       </li>
       <li class="list-group-item">
-        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (16)</a>
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022年 Archive (17)</a>
       </li>
       </ul>
   </div>
