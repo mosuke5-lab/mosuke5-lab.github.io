@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Pod behavior during Kubernetes node failure</title>
+<link rel="canonical" href="https://blog.mosuke.tech/en/entry/2022/07/22/kubernetes-node-down/">
+<link rel="alternate" hreflang="en" href="https://blog.mosuke.tech/en/entry/2022/07/22/kubernetes-node-down/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Pod behavior during Kubernetes node failure &middot; Goldstine lab">
+<meta name="twitter:description" content="This blog provides a detailed explanation of how pods work when a Kubernetes node fails.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pod behavior during Kubernetes node failure &middot; Goldstine lab">
+<meta property="og:description" content="This blog provides a detailed explanation of how pods work when a Kubernetes node fails.">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine lab" />
+<meta property="og:url" content="https://blog.mosuke.tech/en/entry/2022/07/22/kubernetes-node-down/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine lab" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/en/">Goldstine lab</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/en/">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/en/about">About this site</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/en/entry">Articles</a>
+        </li>
+        
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>Pod behavior during Kubernetes node failure</h1>
+    <div class="entry-sub-title">
+        <div class="publish-date">
+            <p>Published:<time datetime="2022-07-22T00:13">2022-07-22</time></p>
+            
+            <p>Updated:<time datetime="2022-07-22T00:13">2022-07-22</time></p>
+            
+        </div>
+        
+            
+                <a class="badge badge-inf post-category post-category-Kubernetes" href="/en/categories/kubernetes">Kubernetes</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#what-happens-when-you-shut-down-a-node">What happens when you shut down a node</a></li>
+    <li><a href="#detailed-explanation">Detailed Explanation</a></li>
+    <li><a href="#why-pod-has-been-running-for-a-while">Why Pod has been Running for a while</a></li>
+    <li><a href="#why-pod-remained-terminating">Why Pod remained Terminating</a></li>
+    <li><a href="#when-node-is-restored-in-a-short-time">When Node is restored in a short time</a></li>
+    <li><a href="#considerations-when-using-statefulset">Considerations when using StatefulSet</a></li>
+    <li><a href="#if-the-pod-is-deleted-before-the-tolerationseconds-is-reached">If the Pod is deleted before the tolerationSeconds is reached</a></li>
+    <li><a href="#when-a-node-object-is-deleted">When a node object is deleted</a></li>
+    <li><a href="#summary">Summary</a></li>
+  </ul>
+</nav>
+        <p>(<a href="https://blog.mosuke.tech/entry/2021/03/11/kubernetes-node-down/">Original Japanese text</a>)</p>
+<p>Hello, this is mosuke.<br>
+Today, I would like to confirm the behavior of pods when a node failure occurs in Kubernetes.
+Until now, I had an incorrect understanding of pod behavior and scheduling in the event of node failure.
+I am ashamed to admit it, but I would like to explain what I have confirmed for those who have the same misconceptions.</p>
+<h2 id="overview">Overview</h2>
+<p>First of all, let me explain the situation: let&rsquo;s say we have 3 Worker nodes and an application is running.</p>
+<p>If Worker#1 shuts down, kubelet stops, network communication fails, etc., what happens to the pods running on top of it? This is what we are talking about.
+In my mind, it would be like, &ldquo;Well, it will be moved to another node to maintain the number of replicas! But in reality, it is not that simple.
+We will see how it works in the case of Deployment and the case of StatefulSet.</p>
+<p><img src="/image/kubernetes-node-down-overview.png" alt="node-down-overview"></p>
+<h2 id="what-happens-when-you-shut-down-a-node">What happens when you shut down a node</h2>
+<p>*This section describes the events. Explanations of the events are described later in this section.</p>
+<p>When I shutdown a node or stop kubelet, the status of Node becomes <code>NotReady</code>.
+We currently have a cluster running with 3 Master nodes and 3 Worker nodes. In this blog, we don&rsquo;t need to care about the Master node, so we will only retrieve the Worker when we run <code>kubectl get node</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get node --selector=&#39;node-role.kubernetes.io/worker&#39;
+</span></span><span style="display:flex;"><span>NAME                                              STATUS   ROLES    AGE     VERSION
+</span></span><span style="display:flex;"><span>ip-10-0-163-234.ap-southeast-1.compute.internal   Ready    worker   9m6s    v1.19.0+8d12420
+</span></span><span style="display:flex;"><span>ip-10-0-168-85.ap-southeast-1.compute.internal    Ready    worker   18h     v1.19.0+8d12420
+</span></span><span style="display:flex;"><span>ip-10-0-184-189.ap-southeast-1.compute.internal   Ready    worker   9m28s   v1.19.0+8d12420
+</span></span></code></pre></div><p>Also, start Nginx Deployment with Replicas=3. The node where the pod is running is important. Check it carefully.<br>
+One Pod on <code>ip-10-0-184-189.ap-southeast-1.compute.internal</code> (henceforth <code>ip-10-0-184-189</code>).<br>
+The other two pod are running on <code>ip-10-0-163-234.ap-southeast-1.compute.internal</code> (henceforth <code>ip-10-0-163-234</code>).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl create deployment nginx --image=nginxinc/nginx-unprivileged:1.19 --replicas=3
+</span></span><span style="display:flex;"><span>deployment.apps/nginx created
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl get pod -o wide
+</span></span><span style="display:flex;"><span>NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE                                              NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>nginx-5998485d44-44bsh   1/1     Running   0          32s   10.131.0.7    ip-10-0-184-189.ap-southeast-1.compute.internal   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>nginx-5998485d44-gg8h9   1/1     Running   0          32s   10.128.2.12   ip-10-0-163-234.ap-southeast-1.compute.internal   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>nginx-5998485d44-xcxpl   1/1     Running   0          32s   10.128.2.13   ip-10-0-163-234.ap-southeast-1.compute.internal   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl get deploy
+</span></span><span style="display:flex;"><span>NAME    READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span style="display:flex;"><span>nginx   3/3     3            3           73s
+</span></span></code></pre></div><p>Now we will shut down the node ip-10-0-184-189, which has one Pod running. After that, note the status of the Node and the movement of the Pod.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ ssh ip-10-0-184-189.ap-southeast-1.compute.internal
+</span></span><span style="display:flex;"><span>node# shutdown -h now
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// One minute later, ip-10-0-184-189 became NotReady status.
+</span></span><span style="display:flex;"><span>$ kubectl get node --selector=&#39;node-role.kubernetes.io/worker&#39; -w
+</span></span><span style="display:flex;"><span>NAME                                              STATUS   ROLES    AGE   VERSION
+</span></span><span style="display:flex;"><span>ip-10-0-163-234.ap-southeast-1.compute.internal   Ready     worker   22m   v1.19.0+8d12420
+</span></span><span style="display:flex;"><span>ip-10-0-168-85.ap-southeast-1.compute.internal    Ready     worker   18h   v1.19.0+8d12420
+</span></span><span style="display:flex;"><span>ip-10-0-184-189.ap-southeast-1.compute.internal   NotReady  worker   23m   v1.19.0+8d12420
+</span></span></code></pre></div><p>Let&rsquo;s check the state of the Pod at this time.<br>
+The node is shut down, but the pod (nginx-5998485d44-44bsh) is still running. I try to access this pod with curl, but of course it does not return any response.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get pod -o wide
+</span></span><span style="display:flex;"><span>NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE                                              NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>nginx-5998485d44-44bsh   1/1     Running   0          10m   10.131.0.7    ip-10-0-184-189.ap-southeast-1.compute.internal   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>nginx-5998485d44-gg8h9   1/1     Running   0          10m   10.128.2.12   ip-10-0-163-234.ap-southeast-1.compute.internal   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>nginx-5998485d44-xcxpl   1/1     Running   0          10m   10.128.2.13   ip-10-0-163-234.ap-southeast-1.compute.internal   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// Connect to Nginx on the shutdown node by IP address.
+</span></span><span style="display:flex;"><span>// Ofcource connection was failed.
+</span></span><span style="display:flex;"><span>$ kubectl exec nginx-5998485d44-gg8h9 -- curl -I http://10.131.0.7:8080/
+</span></span><span style="display:flex;"><span>curl: (7) Failed to connect to 10.131.0.7 port 8080: No route to host
+</span></span><span style="display:flex;"><span>command terminated with exit code 7
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// Confirm that other nginx pods are accessible
+</span></span><span style="display:flex;"><span>$ kubectl exec nginx-5998485d44-gg8h9 -- curl -I http://10.128.2.13:8080/
+</span></span><span style="display:flex;"><span>HTTP/1.1 200
+</span></span><span style="display:flex;"><span>Server: nginx/1.19.8
+</span></span><span style="display:flex;"><span>Date: Sat, 13 Mar 2021 05:29:51 GMT
+</span></span><span style="display:flex;"><span>Content-Type: text/html
+</span></span><span style="display:flex;"><span>Content-Length: 612
+</span></span><span style="display:flex;"><span>Last-Modified: Tue, 09 Mar 2021 15:27:51 GMT
+</span></span><span style="display:flex;"><span>Connection: keep-alive
+</span></span><span style="display:flex;"><span>ETag: &#34;604793f7-264&#34;
+</span></span><span style="display:flex;"><span>Accept-Ranges: bytes
+</span></span></code></pre></div><p>I&rsquo;ll give a detailed explanation later, but let&rsquo;s move on.<br>
+After 5 minutes, a change occurred. The <code>nginx-5998485d44-44bsh</code> running on shutdown node became <code>Terminating</code> and a new <code>nginx-5998485d44-84zkg</code> was created on other node.<br>
+<code>nginx-5998485d44-44bsh</code> continues to remain <code>Terminating</code> status.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get node -o wide
+</span></span><span style="display:flex;"><span>NAME                     READY   STATUS        RESTARTS   AGE   IP            NODE                                              NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>nginx-5998485d44-44bsh   1/1     Terminating   0          14m   10.131.0.7    ip-10-0-184-189.ap-southeast-1.compute.internal   &lt;none&gt;      &lt;none&gt;
+</span></span><span style="display:flex;"><span>nginx-5998485d44-84zkg   1/1     Running       0          8s    10.128.2.24   ip-10-0-163-234.ap-southeast-1.compute.internal   &lt;none&gt;      &lt;none&gt;
+</span></span><span style="display:flex;"><span>nginx-5998485d44-gg8h9   1/1     Running       0          14m   10.128.2.12   ip-10-0-163-234.ap-southeast-1.compute.internal   &lt;none&gt;      &lt;none&gt;
+</span></span><span style="display:flex;"><span>nginx-5998485d44-xcxpl   1/1     Running       0          14m   10.128.2.13   ip-10-0-163-234.ap-southeast-1.compute.internal   &lt;none&gt;      &lt;none&gt;
+</span></span></code></pre></div><h2 id="detailed-explanation">Detailed Explanation</h2>
+<p>It is time to explain. Did you understand what happened?<br>
+As soon as the node was shut down, the pods on the node were not rescheduled.</p>
+<p>After shutting down a node, node_lifecycle_controller (one of the functions of the Kubernetes control plane) detects that Kubelet no longer updates Node information and changes the Node Status to <code>NotReady</code>.<br>
+At this time, a Taint of <code>key: node.kubernetes.io/unreachable</code> is given to the node at the same time.</p>
+<p><a href="https://github.com/kubernetes/kubernetes/blob/release-1.19/pkg/controller/nodelifecycle/node_lifecycle_controller.go#L759">monitorNodeHealth() in node_licecycle_controller.go</a> is responsible for this process.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl describe node ip-10-0-184-189.ap-southeast-1.compute.internal
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>Taints:             node.kubernetes.io/unreachable:NoExecute
+</span></span><span style="display:flex;"><span>                    node.kubernetes.io/unreachable:NoSchedule
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>In Kubernetes, the <a href="https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#defaulttolerationseconds">DefaultTolerationSeconds</a> Admission Controller works by default, so when a pod is created, it is assigned the following tolerations.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get pod -o yaml anypod
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>  tolerations:
+</span></span><span style="display:flex;"><span>  - effect: NoExecute
+</span></span><span style="display:flex;"><span>    key: node.kubernetes.io/not-ready
+</span></span><span style="display:flex;"><span>    operator: Exists
+</span></span><span style="display:flex;"><span>    tolerationSeconds: 300
+</span></span><span style="display:flex;"><span>  - effect: NoExecute
+</span></span><span style="display:flex;"><span>    key: node.kubernetes.io/unreachable
+</span></span><span style="display:flex;"><span>    operator: Exists
+</span></span><span style="display:flex;"><span>    tolerationSeconds: 300
+</span></span></code></pre></div><p>The <code>tolerationSeconds</code> given by DefaultTolerationSeconds is set to 300 seconds by default, and if the node is not recovered after 300 seconds (Taint is not removed from the node), the pod is evicted and scheduled to another node.</p>
+<p>Therefore, the pod was not rescheduled for 5 minutes (300 seconds) after the node shutdown.</p>
+<p>By the way, <code>-tolerationSeconds</code> can be specified as an option when starting kube-apiserver. It can be set with <code>--default-not-ready-toleration-seconds</code>, <code>--default-unreachable-toleration-seconds</code>. Check <a href="https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/">this document</a> for details.</p>
+<h2 id="why-pod-has-been-running-for-a-while">Why Pod has been Running for a while</h2>
+<p>After 5 minutes, I moved to another node, during which time the Pod remained <code>Running</code>.
+I accessed the Pod with Curl and received no response, but why was it Running?
+I think this is because Kubelet is stopped.
+Normally, Kubelet updates the status of a pod, but since Kubelet was stopped due to the node shutdown, it was not possible to update the status of the pod.</p>
+<h2 id="why-pod-remained-terminating">Why Pod remained Terminating</h2>
+<p>After 5 minutes, the status of the Pod changed to <code>Terminating</code> and another Pod was started.
+However, the Pod remains <code>Terminating</code>. After some time has passed, the Pod status remains and does not disappear.
+I think this is also because Kubelet is not running, after the Pod is deleted, Kubelet terminates it as a process, but since it is not running, it is stuck in the status of waiting for Kubelet&rsquo;s confirmation.
+There are several ways to resolve this issue, such as forcibly deleting the pod or deleting the Node object.</p>
+<h2 id="when-node-is-restored-in-a-short-time">When Node is restored in a short time</h2>
+<p>What if Node can be recovered in a short time?<br>
+For example, restart instead of shutdown. If the node recovers within 5 minutes (<code>tolerationSeconds</code>), the <code>key: node.kubernetes.io/unreachable</code> taint is removed and the pod is restarted without being evicted.
+The pod will be restarted without being evicted. So it will keep running on the same node.</p>
+<p>Suppose you set the <code>tolerationSeconds</code> to an extremely short value. For example, 1 second. Even if the node is restarted or there is a temporary node failure, the Pod will move to another node. On the other hand, it is a trade-off because it increases the possibility of Pods being biased to some nodes. Let`s wake up with sufficient caution.</p>
+<h2 id="considerations-when-using-statefulset">Considerations when using StatefulSet</h2>
+<p>The previous examples used Nginx Deployment, but if you are using StatefulSet, there is another point to consider: Deployment, unlike StatefulSet, does not require strictness regarding the number of Pod replicas.</p>
+<p>If one Pod becomes Terminating, it can launch other Pods, but StatefulSet, as stated in <a href="https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/">the official documentation</a>, <code>StatefulSet ensures that, at any time, there is at most one Pod with a given identity running in a cluster.</code>. In other words, a Pod cannot be created until it is confirmed that it has been completely deleted, even if it is in Terminating status.</p>
+<blockquote>
+<p>In normal operation of a StatefulSet, there is never a need to force delete a StatefulSet Pod. The StatefulSet controller is responsible for creating, scaling and deleting members of the StatefulSet. It tries to ensure that the specified number of Pods from ordinal 0 through N-1 are alive and ready. StatefulSet ensures that, at any time, there is at most one Pod with a given identity running in a cluster. This is referred to as at most one semantics provided by a StatefulSet.</p>
+</blockquote>
+<p>The following is also described in the official documentation as a way to resolve a pod stuck in Terminating in a StatefulSet.
+For example, you can force delete by <code>kubectl delete pod xxxx --force</code> to reschedule at worst even if the node is unrecoverable.</p>
+<ul>
+<li>The Node object is deleted (either by you, or by the Node Controller).</li>
+<li>The kubelet on the unresponsive Node starts responding, kills the Pod and removes the entry from the apiserver.</li>
+<li>Force deletion of the Pod by the user.</li>
+</ul>
+<h2 id="if-the-pod-is-deleted-before-the-tolerationseconds-is-reached">If the Pod is deleted before the tolerationSeconds is reached</h2>
+<p>As we have seen, the reason why the Pod is not rescheduled after shutting down the Node is that the status of the Pod is not changed by Kubelet.
+If you are using Deployment instead of StatefulSet and your application is stateless, you can choose to remove the Pod before waiting a tolerationSecond to deal with the problem.</p>
+<h2 id="when-a-node-object-is-deleted">When a node object is deleted</h2>
+<p>What happens if we delete the node object from Kubernetes instead of shutting down the node?<br>
+If you delete the node object with <code>kubectl delete node worker-xxxx</code> or similar, the pod will be rescheduled quickly because there is no waiting for the node/Kubelet to recover as we have seen before.</p>
+<h2 id="summary">Summary</h2>
+<p>We have seen the behavior of a Kubernetes Worker node when it stops and fails.
+In Kubernetes, just because a node is stopped does not mean that the pods running on it will be immediately rescheduled to another node; this is not the same behavior as when a pod is deleted, so be very careful.</p>
+<p>In production operations, it is necessary to fully consider what to do when a node goes down.
+The approach will differ depending on whether you are using Deployment or StatefulSet, the type of workloads you are using, and the availability of storage. It is important to have a proper understanding of the dynamics.</p>
+    </div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>Feedback</h5>
+    <p>If you have any feedback on this article, please fill out this form.<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Pod%20behavior%20during%20Kubernetes%20node%20failure" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Pod behavior during Kubernetes node failure'});">Feedback form</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>Latest entries</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/en/entry/2022/07/22/kubernetes-node-down/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Pod behavior during Kubernetes node failure'});">Pod behavior during Kubernetes node failure</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/en/about/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'About'});">About</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>Categories</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/en/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (1)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>Arcive</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/en/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022 Archive (1)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>Search entries</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>
