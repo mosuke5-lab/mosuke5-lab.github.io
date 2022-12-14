@@ -172,7 +172,7 @@ ECSへのデプロイは、<a href="https://github.com/silinternational/ecs-depl
 プライベートレポジトリから取得するためには認証がいるのですが、ここでしょうもないことにハマりました。
 設定自体は<a href="https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/private-auth.html">こちらのドキュメント</a>をみながらやっていたのですが、うまくいかない状況でした。<br>
 下記は出ていたエラーメッセージです。IAMのポリシーがおかしいというのは分かっていたのですが、はじめなにがおかしいかわかりませんでした。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Asm fetching secret from the service for arn:aws:secretsmanager:ap-northeast-1:xxxxxxxxxx:secret:gitlab-sample-registry-y54JnU: AccessDeniedException: User: arn:aws:sts::xxxxxxxxxx:assumed-role/ecsTaskExecutionRole/14edf050-3d47-4c90-8e13-cb4a6d0e67a1 is not authorized to perform: secretsmanager:GetSecretValue on resource: arn:aws:secretsmanager:ap-northeast-1:xxxxxxxxxx:secret:gitlab-sample-registry-y54JnU status code: 400, request id: 83b3a590-db73-43d8-a0cb-abf894994173
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Asm fetching secret from the service for arn:aws:secretsmanager:ap-northeast-1:xxxxxxxxxx㊙️gitlab-sample-registry-y54JnU: AccessDeniedException: User: arn:aws:sts::xxxxxxxxxx:assumed-role/ecsTaskExecutionRole/14edf050-3d47-4c90-8e13-cb4a6d0e67a1 is not authorized to perform: secretsmanager:GetSecretValue on resource: arn:aws:secretsmanager:ap-northeast-1:xxxxxxxxxx㊙️gitlab-sample-registry-y54JnU status code: 400, request id: 83b3a590-db73-43d8-a0cb-abf894994173
 </span></span></code></pre></div><p>IAMのロールのポリシーの設定で下記を設定する必要があるのですが、<code>Resource</code>ででてくる<code>secret_name</code>に少し罠がありました。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;Version&#34;</span>: <span style="color:#e6db74">&#34;2012-10-17&#34;</span>,
@@ -184,8 +184,8 @@ ECSへのデプロイは、<a href="https://github.com/silinternational/ecs-depl
 </span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;secretsmanager:GetSecretValue&#34;</span>
 </span></span><span style="display:flex;"><span>      ],
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;Resource&#34;</span>: [
-</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;arn:aws:secretsmanager:region:aws_account_id:secret:secret_name&#34;</span>,
-</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;arn:aws:kms:region:aws_account_id:key:key_id&#34;</span>     
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;arn:aws:secretsmanager:region:aws_account_id㊙️secret_name&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;arn:aws:kms:region:aws_account_id🔑key_id&#34;</span>     
 </span></span><span style="display:flex;"><span>      ]
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">]</span>
@@ -215,11 +215,11 @@ ECSへのデプロイは、<a href="https://github.com/silinternational/ecs-depl
   <div class="sidebar-content related-post">
     <h3>最新の記事</h3>
     <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/12/14/openshift-user-alert-routing/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、開発者向けの監視機能（アラート通知）が進化しました'});">OpenShift、開発者向けの監視機能（アラート通知）が進化しました</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/10/28/ikukyu/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '3ヶ月の育休にチャレンジして感じたぼくのエンジニアキャリア'});">3ヶ月の育休にチャレンジして感じたぼくのエンジニアキャリア</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/24/k8s-finalizer/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetesで、NamespaceがTerminatingのまま消せない理由についての実験(finalizer)'});">Kubernetesで、NamespaceがTerminatingのまま消せない理由についての実験(finalizer)</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/19/cks/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'CKS合格しました。学習方法や気になる疑問などまとめ'});">CKS合格しました。学習方法や気になる疑問などまとめ</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）</a></li>
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/05/31/multi-az-pv/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？'});">マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？</a></li>
       </ul>
   </div>
   <div class="sidebar-content campaign-ad">
@@ -259,7 +259,7 @@ ECSへのデプロイは、<a href="https://github.com/silinternational/ecs-depl
         <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (65)</a>
       </li>
       <li class="list-group-item">
-        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (15)</a>
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (16)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
@@ -318,7 +318,7 @@ ECSへのデプロイは、<a href="https://github.com/silinternational/ecs-depl
         <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021 Archive (40)</a>
       </li>
       <li class="list-group-item">
-        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022 Archive (18)</a>
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022 Archive (19)</a>
       </li>
       </ul>
   </div>

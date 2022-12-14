@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>OpenShift、開発者向けの監視機能（アラート通知）が進化しました</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2022/12/14/openshift-user-alert-routing/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2022/12/14/openshift-user-alert-routing/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="OpenShift、開発者向けの監視機能（アラート通知）が進化しました &middot; Goldstine研究所">
+<meta name="twitter:description" content="OpenShiftの開発者向けの監視機能がありました。しかし、アラート通知に欠点があり、使いづらい部分がありましたが改善されたので紹介します。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenShift、開発者向けの監視機能（アラート通知）が進化しました &middot; Goldstine研究所">
+<meta property="og:description" content="OpenShiftの開発者向けの監視機能がありました。しかし、アラート通知に欠点があり、使いづらい部分がありましたが改善されたので紹介します。">
+<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2022/12/14/openshift-user-alert-routing/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+        
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    <h1>OpenShift、開発者向けの監視機能（アラート通知）が進化しました</h1>
+    <div class="entry-sub-title">
+        <div class="publish-date">
+            <p>執筆日:<time datetime="2022-12-14T09:16">2022-12-14</time></p>
+            
+            <p>更新日:<time datetime="2022-12-14T09:16">2022-12-14</time></p>
+            
+        </div>
+        
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#これまでの課題">これまでの課題</a></li>
+    <li><a href="#機能の概要">機能の概要</a></li>
+    <li><a href="#ふたつの選択肢">ふたつの選択肢</a></li>
+    <li><a href="#設定するとどうなるか">設定するとどうなるか？</a>
+      <ul>
+        <li><a href="#設定の有効化とインスタンス起動">設定の有効化とインスタンス起動</a></li>
+        <li><a href="#thanos-rulerの設定ファイル">thanos rulerの設定ファイル</a></li>
+        <li><a href="#alertmanagerconfigの作成">AlertmanagerConfigの作成</a></li>
+        <li><a href="#アラート通知">アラート通知</a></li>
+      </ul>
+    </li>
+    <li><a href="#まとめ">まとめ</a></li>
+  </ul>
+</nav>
+        <p>こんにちは、もーすけです。<br>
+OpenShiftアドベントカレンダー14日目のゆるネタ投稿です。<br>
+2022年、OpenShiftネタで一番PVを稼いだ記事が「<a href="https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/">OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？</a>」でした。
+OpenShiftをお使いのみなさんはだいぶ監視設定周りで困っているということがわかりますね笑
+ちなみに余談ですが、この記事だけで2500PVくらいあったらしいです。</p>
+<p>そこで今回は、そんなOpenShiftの監視機能の不足点であったアラート通知が進化したよってことを書いていこうと思います。</p>
+<div class="belg-link row">
+  <div class="belg-left col-md-2 d-none d-md-block">
+    <a href="https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/" target="_blank">
+      <img class="belg-site-image" src="https://blog.mosuke.tech/image/logo.png" />
+    </a>
+  </div>
+  <div class="belg-right col-md-10">
+  <div class="belg-title">
+      <a href="https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/" target="_blank">OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？ · Goldstine研究所</a>
+    </div>
+    <div class="belg-description">OpenShift 4.6から正式に追加されたユーザ定義プロジェクトの監視機能について、どこまで使えるのか？実戦投入できそうかなどの観点で検証していきます。Prometheusを独自で構築することなく監視できる新機能を紹介します。</div>
+    <div class="belg-site">
+      <img src="https://blog.mosuke.tech/image/favicon.ico" class="belg-site-icon">
+      <span class="belg-site-name">Goldstine研究所</span>
+    </div>
+  </div>
+</div>
+<h2 id="これまでの課題">これまでの課題</h2>
+<p>ユーザ定義プロジェクトの監視では、開発者にPrometheus等を用意させずにOpenShift上で監視ができるということでニーズのある機能でした。<br>
+一方で、<u>アラート通知先の設定がクラスタ管理者のみしかできず、マルチテナント的にOpenShiftを利用する組織では使いづらい</u>側面がありました。</p>
+<p>OpenShift 4.11でついにこの点が解消され、より開発者にとって使いやすい監視機能を提供できるようになりました👏👏<br>
+公式ドキュメントは「<a href="https://access.redhat.com/documentation/ja-jp/openshift_container_platform/4.11/html/monitoring/enabling-alert-routing-for-user-defined-projects" target="_blank">第6章 ユーザー定義プロジェクトのアラートルーティングの有効化</a>」です。</p>
+<p><img src="/image/openshift-monitoring-alert-before.png" alt=""></p>
+<h2 id="機能の概要">機能の概要</h2>
+<p>まず、ざっくりとした機能の概要を説明します。<br>
+ユーザ定義プロジェクトの監視では、開発者が <code>ServiceMonitor</code>や<code>PrometheusRule</code>のリソースを作成することができ、開発者自身で監視設定およびアラート設定が可能でした。詳しくは、以前のブログ（<a href="https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/">OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？</a>）を見てください。</p>
+<p>さらに、<code>AlermanageConfig</code>リソースを開発者が作成できるようになり、Namespace単位にアラート通知先の管理ができるようになりました。
+ユーザ側（開発者側）で <code>AlertmanagerConfig</code> を作成するとPrometheus OperatorがAlertmanagerにアラートルーティングの設定を追加するようになりました。</p>
+<p><img src="/image/openshift-monitoring-alert-after.png" alt=""></p>
+<h2 id="ふたつの選択肢">ふたつの選択肢</h2>
+<p>おおよその概要はつかめましたでしょうか？
+とりあえず、開発者にアラート通知先管理の権限移譲ができるようになりました。便利になることは間違いなしですね。</p>
+<p>この機能を使うにあたって、ふたつのオプションを選択できます。
+以下のふたつになりますが、なぜこのオプションが必要かというと、Alertmanagerの処理のオフロードになります。<br>
+また、そもそもの話ですが、OpenShiftには、デフォルトでクラスタ監視のためのAlertmanagerが起動しています。</p>
+<ol>
+<li>既存のCluster MonitoringのAlertmanagerを共有する方法</li>
+<li>ユーザ定義プロジェクトの監視向けに個別のAlertmanagerを作成して使用する方法</li>
+</ol>
+<p><img src="/image/openshift-user-workload-alertmanager.png" alt=""></p>
+<h2 id="設定するとどうなるか">設定するとどうなるか？</h2>
+<h3 id="設定の有効化とインスタンス起動">設定の有効化とインスタンス起動</h3>
+<p>まずはドキュメント通り、ユーザ定義アラートルーティングを有効にします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ConfigMap</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">user-workload-monitoring-config</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">openshift-user-workload-monitoring</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">data</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">config.yaml</span>: |<span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    alertmanager:
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      enabled: true
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      enableAlertmanagerConfig: true</span>    
+</span></span></code></pre></div><p>設定するとなにが起こるか確認してみましょう。<br>
+まず、<code>openshift-user-workload-monitoring</code> プロジェクト内に新しくAlertmanagerのインスタンスが起動します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% oc get pod -n openshift-user-workload-monitoring | grep alert
+</span></span><span style="display:flex;"><span>alertmanager-user-workload-0           6/6     Running   0          8d
+</span></span><span style="display:flex;"><span>alertmanager-user-workload-1           6/6     Running   0          8d
+</span></span></code></pre></div><h3 id="thanos-rulerの設定ファイル">thanos rulerの設定ファイル</h3>
+<p>さらに、thanos rulerの設定ファイルを見てみましょう。<br>
+thanos rulerは、<code>PrometheusRule</code>の設定内容をみて、アラート発報を担当しています。
+その通知先のAlertmanagerの向き先が <code>dnssrv+_web._tcp.alertmanager-operated.openshift-user-workload-monitoring.svc</code> となっていて、<code>openshift-user-workload-monitoring</code>内に新しく起動したAlertmanagerインスタンスであることがわかります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% oc get -n openshift-user-workload-monitoring secret thanos-ruler-alertmanagers-config -o jsonpath=&#34;{.data.alertmanagers\.yaml}&#34; | base64 -d
+</span></span><span style="display:flex;"><span>alertmanagers:
+</span></span><span style="display:flex;"><span>- scheme: https
+</span></span><span style="display:flex;"><span>  api_version: v2
+</span></span><span style="display:flex;"><span>  http_config:
+</span></span><span style="display:flex;"><span>    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+</span></span><span style="display:flex;"><span>    tls_config:
+</span></span><span style="display:flex;"><span>      ca_file: /etc/prometheus/configmaps/serving-certs-ca-bundle/service-ca.crt
+</span></span><span style="display:flex;"><span>      server_name: alertmanager-user-workload.openshift-user-workload-monitoring.svc
+</span></span><span style="display:flex;"><span>  static_configs:
+</span></span><span style="display:flex;"><span>  - dnssrv+_web._tcp.alertmanager-operated.openshift-user-workload-monitoring.svc
+</span></span></code></pre></div><p>ちなみに、既存のCluster MonitoringのAlertmanagerを共有する方法を採用した場合、向き先は変わり <code>dnssrv+_web._tcp.alertmanager-operated.openshift-monitoring.svc</code> となっています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% oc get -n openshift-user-workload-monitoring secret thanos-ruler-alertmanagers-config -o jsonpath=&#34;{.data.alertmanagers\.yaml}&#34; | base64 -d
+</span></span><span style="display:flex;"><span>alertmanagers:
+</span></span><span style="display:flex;"><span>- scheme: https
+</span></span><span style="display:flex;"><span>  api_version: v2
+</span></span><span style="display:flex;"><span>  http_config:
+</span></span><span style="display:flex;"><span>    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+</span></span><span style="display:flex;"><span>    tls_config:
+</span></span><span style="display:flex;"><span>      ca_file: /etc/prometheus/configmaps/serving-certs-ca-bundle/service-ca.crt
+</span></span><span style="display:flex;"><span>      server_name: alertmanager-main.openshift-monitoring.svc
+</span></span><span style="display:flex;"><span>  static_configs:
+</span></span><span style="display:flex;"><span>  - dnssrv+_web._tcp.alertmanager-operated.openshift-monitoring.svc
+</span></span></code></pre></div><h3 id="alertmanagerconfigの作成">AlertmanagerConfigの作成</h3>
+<p>Alertmanagerの起動ができたので、AlertmanagerConfigを作成して、アラートのルーティングルールを設定してみましょう。
+今回は、Slackに対してアラートを通知してみます。</p>
+<p>AlertmanagerConfigの設定できる項目については、以下のAPIドキュメントをみるといいです。サンプルが少ないので実現できる項目はOperatorのドキュメントが参考になります。</p>
+<div class="belg-link row">
+  <div class="belg-left col-md-2 d-none d-md-block">
+    <a href="https://github.com/prometheus-operator/prometheus-operator" target="_blank">
+      <img class="belg-site-image" src="https://opengraph.githubassets.com/14c402a3e23e028ecb39bd809d50323f3a04483ff729c7a2f3790951e0be8a8a/prometheus-operator/prometheus-operator" />
+    </a>
+  </div>
+  <div class="belg-right col-md-10">
+  <div class="belg-title">
+      <a href="https://github.com/prometheus-operator/prometheus-operator" target="_blank">prometheus-operator/api.md at main · prometheus-operator/prometheus-operator</a>
+    </div>
+    <div class="belg-description">Prometheus Operator creates/configures/manages Prometheus clusters atop Kubernetes - prometheus-operator/api.md at main · prometheus-operator/prometheus-operator</div>
+    <div class="belg-site">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="belg-site-icon">
+      <span class="belg-site-name">GitHub</span>
+    </div>
+  </div>
+</div>
+<p>ドキュメントを確認すると、<code>SlackConfig</code>の<code>apiURL</code>は <code>Kubernetes core/v1.SecretKeySelector</code> で指定できることがわかります。
+SlackへのWebhook URLにはシークレット情報が含まれるので、直接書かずにSecretから読み出せます。</p>
+<p>というわけで、Slack URLを格納したシークレットを作成します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% oc create secret generic my-slack-secret --from-literal=url=https://hooks.slack.com/services/xxxxxxxxx
+</span></span></code></pre></div><p><code>AlertmanagerConfig</code>の設定はこんな感じです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">monitoring.coreos.com/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">AlertmanagerConfig</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">example-routing</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">mosuke5-monitoring</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">route</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">receiver</span>: <span style="color:#ae81ff">default</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">groupBy</span>: [<span style="color:#ae81ff">job]</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">receivers</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">default</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">slackConfigs</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">apiURL</span>:  <span style="color:#75715e">## KubernetesのSecretを指定</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-slack-secret</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">key</span>: <span style="color:#ae81ff">url</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">channel</span>: <span style="color:#ae81ff">mosuke5-alert</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">sendResolved</span>: <span style="color:#66d9ef">true</span>
+</span></span></code></pre></div><p>上の設定を反映後、実際にAlertmanagerにどのように設定されているか確認してみましょう。
+もちろん、利用者サイドでは気にする必要はないですが、管理者目線では知っておくといいです。
+<code>namespace=&quot;mosuke5-monitoring&quot;</code> にマッチするラベルのアラートを<code>mosuke5-monitoring/example-routing/default</code>に飛ばす設定が入ってますね。
+<code>mosuke5-monitoring/example-routing/default</code>の詳細設定には、SlackのURL等が書かれていました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% oc get secret -n openshift-user-workload-monitoring alertmanager-user-workload-generated -o jsonpath=&#34;{.data.alertmanager\.yaml}&#34; | base64 -d
+</span></span><span style="display:flex;"><span>route:
+</span></span><span style="display:flex;"><span>  receiver: Default
+</span></span><span style="display:flex;"><span>  group_by:
+</span></span><span style="display:flex;"><span>  - namespace
+</span></span><span style="display:flex;"><span>  routes:
+</span></span><span style="display:flex;"><span>  - receiver: mosuke5-monitoring/example-routing/default
+</span></span><span style="display:flex;"><span>    group_by:
+</span></span><span style="display:flex;"><span>    - job
+</span></span><span style="display:flex;"><span>    matchers:
+</span></span><span style="display:flex;"><span>    - namespace=&#34;mosuke5-monitoring&#34;
+</span></span><span style="display:flex;"><span>    continue: true
+</span></span><span style="display:flex;"><span>receivers:
+</span></span><span style="display:flex;"><span>- name: Default
+</span></span><span style="display:flex;"><span>- name: mosuke5-monitoring/example-routing/default
+</span></span><span style="display:flex;"><span>  slack_configs:
+</span></span><span style="display:flex;"><span>  - send_resolved: true
+</span></span><span style="display:flex;"><span>    api_url: https://hooks.slack.com/services/xxxxxxxxxxxxxxxx
+</span></span><span style="display:flex;"><span>    channel: mosuke5-alert
+</span></span><span style="display:flex;"><span>templates: []
+</span></span></code></pre></div><h3 id="アラート通知">アラート通知</h3>
+<p>あとは、<code>ServiceMonitor</code>と<code>PrometheusRule</code>を設定して、アラート発報させてみましょう。
+詳しくは、前回ブログで確認してください。
+手元の環境では、しっかりSlackに通知されること確認できました。</p>
+<p><img src="/image/openshift-user-alert-routing-slack-notification.png" alt=""></p>
+<h2 id="まとめ">まとめ</h2>
+<p>2022年もっともPVを稼いだ（裏を返せばニーズのあった）記事は、アプリケーションの監視機能でした。
+そのアプリケーションの監視機能の不足点であるアラート通知が改善されたため、その内容を紹介しました。</p>
+<p>個人的な所感としては、この改善で運用環境への投入も十分視野に入れられる程度、良くなってきたと思っています。
+運用まわりの機能は、ほかにもどんどん改善していっているので、目玉機能がまたでたら紹介したいと思います。</p>
+    </div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼を開始しました。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>フィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=OpenShift%e3%80%81%e9%96%8b%e7%99%ba%e8%80%85%e5%90%91%e3%81%91%e3%81%ae%e7%9b%a3%e8%a6%96%e6%a9%9f%e8%83%bd%ef%bc%88%e3%82%a2%e3%83%a9%e3%83%bc%e3%83%88%e9%80%9a%e7%9f%a5%ef%bc%89%e3%81%8c%e9%80%b2%e5%8c%96%e3%81%97%e3%81%be%e3%81%97%e3%81%9f" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'OpenShift、開発者向けの監視機能（アラート通知）が進化しました'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最新の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/12/14/openshift-user-alert-routing/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、開発者向けの監視機能（アラート通知）が進化しました'});">OpenShift、開発者向けの監視機能（アラート通知）が進化しました</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/10/28/ikukyu/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '3ヶ月の育休にチャレンジして感じたぼくのエンジニアキャリア'});">3ヶ月の育休にチャレンジして感じたぼくのエンジニアキャリア</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/24/k8s-finalizer/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Kubernetesで、NamespaceがTerminatingのまま消せない理由についての実験(finalizer)'});">Kubernetesで、NamespaceがTerminatingのまま消せない理由についての実験(finalizer)</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/19/cks/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'CKS合格しました。学習方法や気になる疑問などまとめ'});">CKS合格しました。学習方法や気になる疑問などまとめ</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）'});">Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (33)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (65)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (9)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021 Archive (40)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022 Archive (19)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Argo CD、外部クラスタへのデプロイと認証の仕組み'});">Argo CD、外部クラスタへのデプロイと認証の仕組み</a> (2022/02/08)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/01/20/openshift-project-scoped-nodeselector/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'OpenShift、プロジェクトスコープのノードセレクターの挙動確認'});">OpenShift、プロジェクトスコープのノードセレクターの挙動確認</a> (2022/01/20)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/28/openshift-router-sharding/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'OpenShift、Routerシャーディングを使って用途ごとにアクセス経路を分ける'});">OpenShift、Routerシャーディングを使って用途ごとにアクセス経路を分ける</a> (2021/12/28)</li>
+        
+        <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2021/12/22/openshift-ipi-limited-sourceip/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'OpenShift、送信元IPアドレスで制限がかかった環境でのIPIインストールの注意事項'});">OpenShift、送信元IPアドレスで制限がかかった環境でのIPIインストールの注意事項</a> (2021/12/22)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>
