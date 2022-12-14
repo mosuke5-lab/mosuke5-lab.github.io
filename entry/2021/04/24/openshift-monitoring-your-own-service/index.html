@@ -66,7 +66,7 @@
         <div class="publish-date">
             <p>執筆日:<time datetime="2021-04-24T14:05">2021-04-24</time></p>
             
-            <p>更新日:<time datetime="2021-04-24T14:05">2021-04-24</time></p>
+            <p>更新日:<time datetime="2022-12-14T09:14">2022-12-14</time></p>
             
         </div>
         
@@ -111,7 +111,7 @@
 4.6にて、ユーザ定義プロジェクトの監視機能が追加されたことで、<u>ユーザ側の監視もできるようになった</u>というわけです。（<a href="https://access.redhat.com/documentation/ja-jp/openshift_container_platform/4.6/html/release_notes/ocp-4-6-new-features-and-enhancements#ocp-4-6-monitoring">リリースノート</a>はこちら）</p>
 <p>OpenShiftを触っている人は、「Cluster Monitoringでもユーザ定義プロジェクトの監視できるのでは！？」と思うはずなので、現時点の状況を説明します。
 従来のCluster Monitoringでも、たしかにユーザが作ったプロジェクト内のPodのメトリクスなどを確認することはできます。しかし、いくつかの課題がありました。</p>
-<p>ひとつめは、Cluster Monitoringに搭載のPrometheus/Grafanaには権限分離する機能がなく、Cluster Monitoringにアクセスできる人は、<strong>すべてのNamespace</strong>の状況が見えてしまいます。
+<p>ひとつめは、Cluster Monitoringに搭載のPrometheus/Grafanaには権限分離する機能がなく、Cluster Monitoringにアクセスできる人は、<strong>すべてのNamespace</strong>の状況が見えてしまいます。
 ひとつのシステムのためだけにOpenShiftを利用していれば問題ないかもしれませんが、マルチテナントとして利用する場合は不適切です。</p>
 <p>ふたつめは、カスタマイズができないということです。OpenShiftのプリセットの設定が入っており、こちらを編集してカスタマイズすることができないということです。そのため、ユーザがデプロイしたアプリケーションの監視設定・アラート設定を追加することはできません。</p>
 <p>という背景があり、この新機能の「ユーザ定義プロジェクトの監視」に注目していたというわけです！
@@ -391,7 +391,8 @@ Webコンソール上でもアラートが<code>Firing</code>になっている�
 ひとつまえの項目ではアラート設定を行いましたが、とくに通知の設定は行っていませんでした。
 Prometheusでは <code>Alertmanager</code> というコンポーネントがアラートを管理します。
 このユーザ定義プロジェクトの監視では、アラート設定はユーザ側に権限はなく<strong>クラスタ管理者側</strong>となります。
-理由は、利用しているAlertManagerは、クラスタ管理用のものと併用しているためです。</p>
+理由は、利用しているAlertManagerは、クラスタ管理用のものと併用しているためです。<br>
+（※OpenShift 4.11からアラート機能は改善され、開発者側もセルフで設定できるようになりました。詳しくは「<a href="https://blog.mosuke.tech/entry/2022/12/14/openshift-user-alert-routing/">OpenShift、開発者向けの監視機能（アラート通知）が進化しました</a>」を確認してください！）</p>
 <p>OpenShiftのWebコンソールの&quot;Administration&rdquo; -&gt; &ldquo;Cluster Settings&rdquo; -&gt; &ldquo;Global Configuration&rdquo; -&gt; &ldquo;Alertmanager&rdquo; -&gt; &ldquo;Create Receiver&quot;から設定できます。公式ドキュメントの設定手順は<a href="https://access.redhat.com/documentation/ja-jp/openshift_container_platform/4.6/html/monitoring/sending-notifications-to-external-systems_managing-alerts#configuring-alert-receivers_managing-alerts">こちら</a>です。</p>
 <p>今回はSlackを通知先に選びました。<br>
 設定で重要になるのは、<code>Routing Labels</code>です。
@@ -430,10 +431,28 @@ Operator化されているので簡単ではあるのですが、それでもあ
 <p>以下の点が制約として考えられるので注意して使っていきましょう。</p>
 <ol>
 <li>ダッシュボードは作れない。Grafanaダッシュボードは含まない。OpenShiftのWebコンソール内で完結。</li>
-<li>アラートの通知先管理がクラスタ管理側権限となる。</li>
-<li>大量のユーザで利用したときのスケーラビリティ（ここは未確認で解消の余地あり）</li>
+<li><del>アラートの通知先管理がクラスタ管理側権限となる。</del> （OpenShift 4.11で改善）</li>
+<li>大量のユーザで利用したときのスケーラビリティ（OpenShift 4.11でクラスタ監視とアプリケーション監視のAlertmanagerを分離できるように改善）</li>
 </ol>
 <p>では、これからもOpenShift Lifeを楽しんでください！</p>
+<p>本編の続報です。</p>
+<div class="belg-link row">
+  <div class="belg-left col-md-2 d-none d-md-block">
+    <a href="https://blog.mosuke.tech/entry/2022/12/14/openshift-user-alert-routing/" target="_blank">
+      <img class="belg-site-image" src="https://blog.mosuke.tech/image/logo.png" />
+    </a>
+  </div>
+  <div class="belg-right col-md-10">
+  <div class="belg-title">
+      <a href="https://blog.mosuke.tech/entry/2022/12/14/openshift-user-alert-routing/" target="_blank">OpenShift、開発者向けの監視機能（アラート通知）が進化しました · Goldstine研究所</a>
+    </div>
+    <div class="belg-description">OpenShiftの開発者向けの監視機能がありました。しかし、アラート通知に欠点があり、使いづらい部分がありましたが改善されたので紹介します。</div>
+    <div class="belg-site">
+      <img src="https://blog.mosuke.tech/image/favicon.ico" class="belg-site-icon">
+      <span class="belg-site-name">Goldstine研究所</span>
+    </div>
+  </div>
+</div>
     </div>
 <div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
     <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>
