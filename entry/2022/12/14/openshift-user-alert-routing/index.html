@@ -160,7 +160,7 @@ OpenShiftをお使いのみなさんはだいぶ監視設定周りで困って�
 <p>さらに、thanos rulerの設定ファイルを見てみましょう。<br>
 thanos rulerは、<code>PrometheusRule</code>の設定内容をみて、アラート発報を担当しています。
 その通知先のAlertmanagerの向き先が <code>dnssrv+_web._tcp.alertmanager-operated.openshift-user-workload-monitoring.svc</code> となっていて、<code>openshift-user-workload-monitoring</code>内に新しく起動したAlertmanagerインスタンスであることがわかります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% oc get -n openshift-user-workload-monitoring secret thanos-ruler-alertmanagers-config -o jsonpath=&#34;{.data.alertmanagers\.yaml}&#34; | base64 -d
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% oc get -n openshift-user-workload-monitoring secret thanos-ruler-alertmanagers-config -o jsonpath=&#34;{.data.alertmanagers\.yaml}&#34; | base64 -d
 </span></span><span style="display:flex;"><span>alertmanagers:
 </span></span><span style="display:flex;"><span>- scheme: https
 </span></span><span style="display:flex;"><span>  api_version: v2
@@ -172,7 +172,7 @@ thanos rulerは、<code>PrometheusRule</code>の設定内容をみて、アラ�
 </span></span><span style="display:flex;"><span>  static_configs:
 </span></span><span style="display:flex;"><span>  - dnssrv+_web._tcp.alertmanager-operated.openshift-user-workload-monitoring.svc
 </span></span></code></pre></div><p>ちなみに、既存のCluster MonitoringのAlertmanagerを共有する方法を採用した場合、向き先は変わり <code>dnssrv+_web._tcp.alertmanager-operated.openshift-monitoring.svc</code> となっています。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% oc get -n openshift-user-workload-monitoring secret thanos-ruler-alertmanagers-config -o jsonpath=&#34;{.data.alertmanagers\.yaml}&#34; | base64 -d
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% oc get -n openshift-user-workload-monitoring secret thanos-ruler-alertmanagers-config -o jsonpath=&#34;{.data.alertmanagers\.yaml}&#34; | base64 -d
 </span></span><span style="display:flex;"><span>alertmanagers:
 </span></span><span style="display:flex;"><span>- scheme: https
 </span></span><span style="display:flex;"><span>  api_version: v2
@@ -230,7 +230,7 @@ SlackへのWebhook URLにはシークレット情報が含まれるので、直�
 もちろん、利用者サイドでは気にする必要はないですが、管理者目線では知っておくといいです。
 <code>namespace=&quot;mosuke5-monitoring&quot;</code> にマッチするラベルのアラートを<code>mosuke5-monitoring/example-routing/default</code>に飛ばす設定が入ってますね。
 <code>mosuke5-monitoring/example-routing/default</code>の詳細設定には、SlackのURL等が書かれていました。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% oc get secret -n openshift-user-workload-monitoring alertmanager-user-workload-generated -o jsonpath=&#34;{.data.alertmanager\.yaml}&#34; | base64 -d
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% oc get secret -n openshift-user-workload-monitoring alertmanager-user-workload-generated -o jsonpath=&#34;{.data.alertmanager\.yaml}&#34; | base64 -d
 </span></span><span style="display:flex;"><span>route:
 </span></span><span style="display:flex;"><span>  receiver: Default
 </span></span><span style="display:flex;"><span>  group_by:
