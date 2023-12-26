@@ -211,22 +211,22 @@
 </span></span><span style="display:flex;"><span>hello momosuke5
 </span></span></code></pre></div><p>ちなみに、実行されたPodのマニフェストを確認すると、Pod作成時点では変数は展開されており、以下のように<code>args</code>内で<code>hello momosuke5</code>となっています。
 Tektonが、Podを作成するときにパラメータは処理されています。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get pod hello-my-name-task-run-pod-lgfbg -o yaml | less
-</span></span><span style="display:flex;"><span>...
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">$</span> kubectl get pod hello<span style="color:#f92672">-</span>my<span style="color:#f92672">-</span>name<span style="color:#f92672">-</span>task<span style="color:#f92672">-</span>run<span style="color:#f92672">-</span>pod<span style="color:#f92672">-</span>lgfbg <span style="color:#f92672">-</span>o yaml <span style="color:#f92672">|</span> less
+</span></span><span style="display:flex;"><span><span style="color:#f92672">...</span>
 </span></span><span style="display:flex;"><span>spec:
 </span></span><span style="display:flex;"><span>  containers:
-</span></span><span style="display:flex;"><span>  - args:
-</span></span><span style="display:flex;"><span>    - -wait_file
-</span></span><span style="display:flex;"><span>    - /tekton/downward/ready
-</span></span><span style="display:flex;"><span>    - -wait_file_content
-</span></span><span style="display:flex;"><span>    - -post_file
-</span></span><span style="display:flex;"><span>    - /tekton/tools/0
-</span></span><span style="display:flex;"><span>    - -termination_path
-</span></span><span style="display:flex;"><span>    - /tekton/termination
-</span></span><span style="display:flex;"><span>    - -entrypoint
-</span></span><span style="display:flex;"><span>    - echo
-</span></span><span style="display:flex;"><span>    - --
-</span></span><span style="display:flex;"><span>    - hello momosuke5
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">-</span> args:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>wait_file
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">/</span>tekton<span style="color:#f92672">/</span>downward<span style="color:#f92672">/</span>ready
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>wait_file_content
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>post_file
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">/</span>tekton<span style="color:#f92672">/</span>tools<span style="color:#f92672">/</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>termination_path
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">/</span>tekton<span style="color:#f92672">/</span>termination
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>entrypoint
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> echo
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">--</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> hello momosuke5
 </span></span></code></pre></div><h2 id="array型のパラメータ">array型のパラメータ</h2>
 <p>パラメータにはarray（配列）も扱えるということでやっていきます。
 <code>my-friends</code>というパラメータが必要であることをTaskに記述します。

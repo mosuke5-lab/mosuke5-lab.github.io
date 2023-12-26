@@ -111,104 +111,104 @@
 </ul>
 <h2 id="2-構成図">2. 構成図</h2>
 <p>非常に簡単ですが、下記の構成を実際に作っていきます。<br>
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141109/20141109170337.png" alt="f🆔mosuke5:20141109170337p:plain" title="f🆔mosuke5:20141109170337p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141109/20141109170337.png" alt="f:id:mosuke5:20141109170337p:plain" title="f:id:mosuke5:20141109170337p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 <h2 id="3-ロードバランサの構築">3. ロードバランサの構築</h2>
 <h3 id="ホストサーバ側の設定">■ホストサーバ側の設定</h3>
 <p>インストールはyumで入れることが可能です。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>#HAProxyインストール
 </span></span><span style="display:flex;"><span>$ sudo yum install haproxy
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>#設定はすごく簡単で以下のファイルのみ。実際に
-</span></span><span style="display:flex;"><span>$ sudo vim /etc/haproxy/haproxy.cfg
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#75715e">#設定はすごく簡単で以下のファイルのみ。実際に</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo vim <span style="color:#f92672">/</span>etc<span style="color:#f92672">/</span>haproxy<span style="color:#f92672">/</span>haproxy<span style="color:#f92672">.</span>cfg
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>#---------------------------------------------------------------------
-</span></span><span style="display:flex;"><span># Example configuration for a possible web application.  See the
-</span></span><span style="display:flex;"><span># full configuration options online.
-</span></span><span style="display:flex;"><span>#
-</span></span><span style="display:flex;"><span>#   http://haproxy.1wt.eu/download/1.4/doc/configuration.txt
-</span></span><span style="display:flex;"><span>#
-</span></span><span style="display:flex;"><span>#---------------------------------------------------------------------
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#---------------------------------------------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Example configuration for a possible web application.  See the</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># full configuration options online.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#   http://haproxy.1wt.eu/download/1.4/doc/configuration.txt</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#---------------------------------------------------------------------</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>#---------------------------------------------------------------------
-</span></span><span style="display:flex;"><span># Global settings
-</span></span><span style="display:flex;"><span>#---------------------------------------------------------------------
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#---------------------------------------------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Global settings</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#---------------------------------------------------------------------</span>
 </span></span><span style="display:flex;"><span>global
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    log         127.0.0.1 local6 debug
+</span></span><span style="display:flex;"><span>    log         <span style="color:#ae81ff">127.0</span><span style="color:#f92672">.</span><span style="color:#ae81ff">0.1</span> local6 debug
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    chroot      /var/lib/haproxy
-</span></span><span style="display:flex;"><span>    pidfile     /var/run/haproxy.pid
-</span></span><span style="display:flex;"><span>    maxconn     4000
+</span></span><span style="display:flex;"><span>    chroot      <span style="color:#f92672">/</span><span style="color:#66d9ef">var</span><span style="color:#f92672">/</span>lib<span style="color:#f92672">/</span>haproxy
+</span></span><span style="display:flex;"><span>    pidfile     <span style="color:#f92672">/</span><span style="color:#66d9ef">var</span><span style="color:#f92672">/</span>run<span style="color:#f92672">/</span>haproxy<span style="color:#f92672">.</span>pid
+</span></span><span style="display:flex;"><span>    maxconn     <span style="color:#ae81ff">4000</span>
 </span></span><span style="display:flex;"><span>    user        haproxy
 </span></span><span style="display:flex;"><span>    group       haproxy
 </span></span><span style="display:flex;"><span>    daemon
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    # turn on stats unix socket
-</span></span><span style="display:flex;"><span>    stats socket /var/lib/haproxy/stats
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># turn on stats unix socket</span>
+</span></span><span style="display:flex;"><span>    stats socket <span style="color:#f92672">/</span><span style="color:#66d9ef">var</span><span style="color:#f92672">/</span>lib<span style="color:#f92672">/</span>haproxy<span style="color:#f92672">/</span>stats
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>#---------------------------------------------------------------------
-</span></span><span style="display:flex;"><span># common defaults that all the &#39;listen&#39; and &#39;backend&#39; sections will
-</span></span><span style="display:flex;"><span># use if not designated in their block
-</span></span><span style="display:flex;"><span>#---------------------------------------------------------------------
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#---------------------------------------------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># common defaults that all the &#39;listen&#39; and &#39;backend&#39; sections will</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># use if not designated in their block</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#---------------------------------------------------------------------</span>
 </span></span><span style="display:flex;"><span>defaults
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    ##ロードバランサの動作モード。tcpにするとL4ロードバランサになる。httpにするとL7ロードバランサ。
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">##ロードバランサの動作モード。tcpにするとL4ロードバランサになる。httpにするとL7ロードバランサ。</span>
 </span></span><span style="display:flex;"><span>    mode                    http
 </span></span><span style="display:flex;"><span>    log                     global
-</span></span><span style="display:flex;"><span>    option              log-health-checks
+</span></span><span style="display:flex;"><span>    option              log<span style="color:#f92672">-</span>health<span style="color:#f92672">-</span>checks
 </span></span><span style="display:flex;"><span>    option                  httplog
 </span></span><span style="display:flex;"><span>    option                  dontlognull
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    ##ヘルスチェック用のhtmlファイルをWebサーバ側に設置している。設置については後述。
-</span></span><span style="display:flex;"><span>    option httpchk GET /health_check.html HTTP/1.0\r\nUser-agent:\ Proxy-Check
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">##ヘルスチェック用のhtmlファイルをWebサーバ側に設置している。設置については後述。</span>
+</span></span><span style="display:flex;"><span>    option httpchk GET <span style="color:#f92672">/</span>health_check<span style="color:#f92672">.</span>html HTTP<span style="color:#f92672">/</span><span style="color:#ae81ff">1.0</span>\r\nUser<span style="color:#f92672">-</span>agent:\ Proxy<span style="color:#f92672">-</span>Check
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    option http-server-close
-</span></span><span style="display:flex;"><span>    option forwardfor       except 127.0.0.0/8
+</span></span><span style="display:flex;"><span>    option http<span style="color:#f92672">-</span>server<span style="color:#f92672">-</span>close
+</span></span><span style="display:flex;"><span>    option forwardfor       except <span style="color:#ae81ff">127.0</span><span style="color:#f92672">.</span><span style="color:#ae81ff">0.0</span><span style="color:#f92672">/</span><span style="color:#ae81ff">8</span>
 </span></span><span style="display:flex;"><span>    option                  redispatch
-</span></span><span style="display:flex;"><span>    retries                 3
-</span></span><span style="display:flex;"><span>    timeout http-request    10s
-</span></span><span style="display:flex;"><span>    timeout queue           1m
-</span></span><span style="display:flex;"><span>    timeout connect         10s
-</span></span><span style="display:flex;"><span>    timeout client          1m
-</span></span><span style="display:flex;"><span>    timeout server          1m
-</span></span><span style="display:flex;"><span>    timeout http-keep-alive 10s
-</span></span><span style="display:flex;"><span>    timeout check           10s
-</span></span><span style="display:flex;"><span>    maxconn                 3000
+</span></span><span style="display:flex;"><span>    retries                 <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>    timeout http<span style="color:#f92672">-</span>request    <span style="color:#ae81ff">10</span>s
+</span></span><span style="display:flex;"><span>    timeout queue           <span style="color:#ae81ff">1</span>m
+</span></span><span style="display:flex;"><span>    timeout connect         <span style="color:#ae81ff">10</span>s
+</span></span><span style="display:flex;"><span>    timeout client          <span style="color:#ae81ff">1</span>m
+</span></span><span style="display:flex;"><span>    timeout server          <span style="color:#ae81ff">1</span>m
+</span></span><span style="display:flex;"><span>    timeout http<span style="color:#f92672">-</span>keep<span style="color:#f92672">-</span>alive <span style="color:#ae81ff">10</span>s
+</span></span><span style="display:flex;"><span>    timeout check           <span style="color:#ae81ff">10</span>s
+</span></span><span style="display:flex;"><span>    maxconn                 <span style="color:#ae81ff">3000</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>#---------------------------------------------------------------------
-</span></span><span style="display:flex;"><span># main frontend which proxys to the backends
-</span></span><span style="display:flex;"><span>#---------------------------------------------------------------------
-</span></span><span style="display:flex;"><span>frontend  main *:80
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#---------------------------------------------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># main frontend which proxys to the backends</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#---------------------------------------------------------------------</span>
+</span></span><span style="display:flex;"><span>frontend  main <span style="color:#f92672">*</span>:<span style="color:#ae81ff">80</span>
 </span></span><span style="display:flex;"><span>    default_backend             hoge
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>#---------------------------------------------------------------------
-</span></span><span style="display:flex;"><span># round robin balancing between the various backends
-</span></span><span style="display:flex;"><span>#---------------------------------------------------------------------
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#---------------------------------------------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># round robin balancing between the various backends</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#---------------------------------------------------------------------</span>
 </span></span><span style="display:flex;"><span>backend hoge
 </span></span><span style="display:flex;"><span>    balance     roundrobin
-</span></span><span style="display:flex;"><span>    server      web10 192.168.33.10:80 check inter 3000 fall 2 rise 2
-</span></span><span style="display:flex;"><span>    server      web11 192.168.33.11:80 check inter 3000 fall 2 rise 2 
+</span></span><span style="display:flex;"><span>    server      web10 <span style="color:#ae81ff">192.168</span><span style="color:#f92672">.</span><span style="color:#ae81ff">33.10</span>:<span style="color:#ae81ff">80</span> check inter <span style="color:#ae81ff">3000</span> fall <span style="color:#ae81ff">2</span> rise <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>    server      web11 <span style="color:#ae81ff">192.168</span><span style="color:#f92672">.</span><span style="color:#ae81ff">33.11</span>:<span style="color:#ae81ff">80</span> check inter <span style="color:#ae81ff">3000</span> fall <span style="color:#ae81ff">2</span> rise <span style="color:#ae81ff">2</span> 
 </span></span></code></pre></div><p>ロードバランサを80番ポートで待ち受けたい場合には、ApacheやNginxが起動していないことは確認しておきましょう。
 立ち上がっているとそもそも、HAProxyの起動に失敗するはずです。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ sudo systemctl stop nginx
 </span></span><span style="display:flex;"><span>$ sudo systemctl stop httpd 
 </span></span></code></pre></div><p>HAProxyのログをsyslogに残すように設定します。<br>
 ただしメインのmessageではなく、独自のファイルに書くために以下の設定します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>##ログの格納場所作成
-</span></span><span style="display:flex;"><span>$ sudo mkdir /var/log/haproxy
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#75715e">##ログの格納場所作成</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo mkdir <span style="color:#f92672">/</span><span style="color:#66d9ef">var</span><span style="color:#f92672">/</span>log<span style="color:#f92672">/</span>haproxy
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>##syslogの設定変更
-</span></span><span style="display:flex;"><span>$ vim /etc/rsyslog.d/haproxy.conf
-</span></span><span style="display:flex;"><span>   $ModLoad imudp
-</span></span><span style="display:flex;"><span>   $UDPServerRun 514
-</span></span><span style="display:flex;"><span>   $template Haproxy,&#34;%msg%\n&#34;
-</span></span><span style="display:flex;"><span>   local6.* -/var/log/haproxy/haproxy.log;Haproxy
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##syslogの設定変更</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> vim <span style="color:#f92672">/</span>etc<span style="color:#f92672">/</span>rsyslog<span style="color:#f92672">.</span>d<span style="color:#f92672">/</span>haproxy<span style="color:#f92672">.</span>conf
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">$</span>ModLoad imudp
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">$</span>UDPServerRun <span style="color:#ae81ff">514</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#f92672">$</span>template Haproxy,<span style="color:#e6db74">&#34;%msg%</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>   local6<span style="color:#f92672">.*</span> <span style="color:#f92672">-/</span><span style="color:#66d9ef">var</span><span style="color:#f92672">/</span>log<span style="color:#f92672">/</span>haproxy<span style="color:#f92672">/</span>haproxy<span style="color:#f92672">.</span>log;Haproxy
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>$ vim /etc/sysconfig/rsyslog
-</span></span><span style="display:flex;"><span>以下を追加
-</span></span><span style="display:flex;"><span>SYSLOGD_OPTIONS=&#34;-r&#34;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> vim <span style="color:#f92672">/</span>etc<span style="color:#f92672">/</span>sysconfig<span style="color:#f92672">/</span>rsyslog
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">以下を追加</span>
+</span></span><span style="display:flex;"><span>SYSLOGD_OPTIONS<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;-r&#34;</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>## haproxyの起動
-</span></span><span style="display:flex;"><span>$ sudo systemctl start haproxy 
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## haproxyの起動</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo systemctl start haproxy 
 </span></span></code></pre></div><h3 id="l4-l7のロードバランサ">L4, L7のロードバランサ</h3>
 <p>次に行く前にL4とL7ロードバランサの違いについて確認します。
 こちらは非常に重要な概念なので、HAProxyをはじめ、AWSなどのクラウドでELBロードバランサを利用する際も役に立ちますので、かならず抑えておきましょう。</p>
@@ -230,44 +230,44 @@
 <a href="https://blog.mosuke.tech/entry/2014/10/09/230555">【VPS1台でインフラ勉強】サーバ複数台構成、Nginxでリバースプロキシ構築</a></p>
 <p>ヘルスチェック用のhtml設置しておくとわかりやすいです。<br>
 負荷分散されていることを確認するために、内容の異なるヘルスチェック用のHTMLをおいておくと非常にわかりやすいです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>## /var/www/html配下にヘルスチェック用のhtml設置
-</span></span><span style="display:flex;"><span>$ sudo touch health_check.html 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#75715e">## /var/www/html配下にヘルスチェック用のhtml設置</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo touch health_check<span style="color:#f92672">.</span>html 
 </span></span></code></pre></div><h2 id="4-動作試験">4. 動作試験</h2>
 <p>ブラウザよりホストサーバへアクセスします。
 きちんとロードバランスされていることを確認します。確認方法は、もしヘルスチェック用のHTMLの中身を変えていればそれでわかるとおもいます。あるいはログから確認する必要があります。<br>
 HAProxy側のログは以下のとおり。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ sudo tail -f /var/log/haproxy/haproxy.conf
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo tail <span style="color:#f92672">-</span>f <span style="color:#f92672">/</span><span style="color:#66d9ef">var</span><span style="color:#f92672">/</span>log<span style="color:#f92672">/</span>haproxy<span style="color:#f92672">/</span>haproxy<span style="color:#f92672">.</span>conf
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>##起動した時。L7のhealt checkが走っている
-</span></span><span style="display:flex;"><span>Proxy main started.
-</span></span><span style="display:flex;"><span>Proxy hoge started.
-</span></span><span style="display:flex;"><span>Health check for server hoge/web10 succeeded, reason: Layer7 check passed, code: 200, info: &#34;OK&#34;, check duration: 33ms, status: 2/2 UP.
-</span></span><span style="display:flex;"><span>Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &#34;OK&#34;, check duration: 12ms, status: 2/2 UP.
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##起動した時。L7のhealt checkが走っている</span>
+</span></span><span style="display:flex;"><span>Proxy main started<span style="color:#f92672">.</span>
+</span></span><span style="display:flex;"><span>Proxy hoge started<span style="color:#f92672">.</span>
+</span></span><span style="display:flex;"><span>Health check <span style="color:#66d9ef">for</span> server hoge<span style="color:#f92672">/</span>web10 succeeded, reason: Layer7 check passed, code: <span style="color:#ae81ff">200</span>, info: <span style="color:#e6db74">&#34;OK&#34;</span>, check duration: <span style="color:#ae81ff">33</span>ms, status: <span style="color:#ae81ff">2</span><span style="color:#f92672">/</span><span style="color:#ae81ff">2</span> UP<span style="color:#f92672">.</span>
+</span></span><span style="display:flex;"><span>Health check <span style="color:#66d9ef">for</span> server hoge<span style="color:#f92672">/</span>web11 succeeded, reason: Layer7 check passed, code: <span style="color:#ae81ff">200</span>, info: <span style="color:#e6db74">&#34;OK&#34;</span>, check duration: <span style="color:#ae81ff">12</span>ms, status: <span style="color:#ae81ff">2</span><span style="color:#f92672">/</span><span style="color:#ae81ff">2</span> UP<span style="color:#f92672">.</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>##webサーバ側でapacheを停止
-</span></span><span style="display:flex;"><span>Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &#34;Not Found&#34;, check duration: 13ms, status: 1/2 UP.
-</span></span><span style="display:flex;"><span>Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &#34;Not Found&#34;, check duration: 8ms, status: 0/2 DOWN.
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##webサーバ側でapacheを停止</span>
+</span></span><span style="display:flex;"><span>Health check <span style="color:#66d9ef">for</span> server hoge<span style="color:#f92672">/</span>web11 failed, reason: Layer7 wrong status, code: <span style="color:#ae81ff">404</span>, info: <span style="color:#e6db74">&#34;Not Found&#34;</span>, check duration: <span style="color:#ae81ff">13</span>ms, status: <span style="color:#ae81ff">1</span><span style="color:#f92672">/</span><span style="color:#ae81ff">2</span> UP<span style="color:#f92672">.</span>
+</span></span><span style="display:flex;"><span>Health check <span style="color:#66d9ef">for</span> server hoge<span style="color:#f92672">/</span>web11 failed, reason: Layer7 wrong status, code: <span style="color:#ae81ff">404</span>, info: <span style="color:#e6db74">&#34;Not Found&#34;</span>, check duration: <span style="color:#ae81ff">8</span>ms, status: <span style="color:#ae81ff">0</span><span style="color:#f92672">/</span><span style="color:#ae81ff">2</span> DOWN<span style="color:#f92672">.</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>##webサーバ側でhealth_check.htmlを削除した時も同様に
-</span></span><span style="display:flex;"><span>Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &#34;Not Found&#34;, check duration: 13ms, status: 1/2 UP.
-</span></span><span style="display:flex;"><span>Health check for server hoge/web11 failed, reason: Layer7 wrong status, code: 404, info: &#34;Not Found&#34;, check duration: 8ms, status: 0/2 DOWN.
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##webサーバ側でhealth_check.htmlを削除した時も同様に</span>
+</span></span><span style="display:flex;"><span>Health check <span style="color:#66d9ef">for</span> server hoge<span style="color:#f92672">/</span>web11 failed, reason: Layer7 wrong status, code: <span style="color:#ae81ff">404</span>, info: <span style="color:#e6db74">&#34;Not Found&#34;</span>, check duration: <span style="color:#ae81ff">13</span>ms, status: <span style="color:#ae81ff">1</span><span style="color:#f92672">/</span><span style="color:#ae81ff">2</span> UP<span style="color:#f92672">.</span>
+</span></span><span style="display:flex;"><span>Health check <span style="color:#66d9ef">for</span> server hoge<span style="color:#f92672">/</span>web11 failed, reason: Layer7 wrong status, code: <span style="color:#ae81ff">404</span>, info: <span style="color:#e6db74">&#34;Not Found&#34;</span>, check duration: <span style="color:#ae81ff">8</span>ms, status: <span style="color:#ae81ff">0</span><span style="color:#f92672">/</span><span style="color:#ae81ff">2</span> DOWN<span style="color:#f92672">.</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>##webサーバ側でhealth_check.htmlを復活させた時
-</span></span><span style="display:flex;"><span>Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &#34;OK&#34;, check duration: 8ms, status: 1/2 DOWN.
-</span></span><span style="display:flex;"><span>Health check for server hoge/web11 succeeded, reason: Layer7 check passed, code: 200, info: &#34;OK&#34;, check duration: 6ms, status: 2/2 UP.
-</span></span><span style="display:flex;"><span>Server hoge/web11 is UP. 2 active and 0 backup servers online. 0 sessions requeued, 0 total in queue. 
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##webサーバ側でhealth_check.htmlを復活させた時</span>
+</span></span><span style="display:flex;"><span>Health check <span style="color:#66d9ef">for</span> server hoge<span style="color:#f92672">/</span>web11 succeeded, reason: Layer7 check passed, code: <span style="color:#ae81ff">200</span>, info: <span style="color:#e6db74">&#34;OK&#34;</span>, check duration: <span style="color:#ae81ff">8</span>ms, status: <span style="color:#ae81ff">1</span><span style="color:#f92672">/</span><span style="color:#ae81ff">2</span> DOWN<span style="color:#f92672">.</span>
+</span></span><span style="display:flex;"><span>Health check <span style="color:#66d9ef">for</span> server hoge<span style="color:#f92672">/</span>web11 succeeded, reason: Layer7 check passed, code: <span style="color:#ae81ff">200</span>, info: <span style="color:#e6db74">&#34;OK&#34;</span>, check duration: <span style="color:#ae81ff">6</span>ms, status: <span style="color:#ae81ff">2</span><span style="color:#f92672">/</span><span style="color:#ae81ff">2</span> UP<span style="color:#f92672">.</span>
+</span></span><span style="display:flex;"><span>Server hoge<span style="color:#f92672">/</span>web11 is UP<span style="color:#f92672">.</span> <span style="color:#ae81ff">2</span> active <span style="color:#f92672">and</span> <span style="color:#ae81ff">0</span> backup servers online<span style="color:#f92672">.</span> <span style="color:#ae81ff">0</span> sessions requeued, <span style="color:#ae81ff">0</span> total <span style="color:#f92672">in</span> queue<span style="color:#f92672">.</span> 
 </span></span></code></pre></div><p>Webサーバ側の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>ログを見てみると。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ sudo tail -f /var/log/apache2/access.log
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo tail <span style="color:#f92672">-</span>f <span style="color:#f92672">/</span><span style="color:#66d9ef">var</span><span style="color:#f92672">/</span>log<span style="color:#f92672">/</span>apache2<span style="color:#f92672">/</span>access<span style="color:#f92672">.</span>log
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>##ロードバランサからのヘルスチェックが来ていることがわかる。
-</span></span><span style="display:flex;"><span>192.168.33.1 - - [09/Nov/2014:08:07:43 +0000] &#34;GET /health_check.html HTTP/1.0&#34; 200 276 &#34;-&#34; &#34;Proxy-Check&#34;
-</span></span><span style="display:flex;"><span>192.168.33.1 - - [09/Nov/2014:08:07:46 +0000] &#34;GET /health_check.html HTTP/1.0&#34; 200 276 &#34;-&#34; &#34;Proxy-Check&#34;
-</span></span><span style="display:flex;"><span>192.168.33.1 - - [09/Nov/2014:08:07:49 +0000] &#34;GET /health_check.html HTTP/1.0&#34; 200 276 &#34;-&#34; &#34;Proxy-Check&#34;
-</span></span><span style="display:flex;"><span>192.168.33.1 - - [09/Nov/2014:08:07:52 +0000] &#34;GET /health_check.html HTTP/1.0&#34; 200 276 &#34;-&#34; &#34;Proxy-Check&#34;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##ロードバランサからのヘルスチェックが来ていることがわかる。</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">192.168</span><span style="color:#f92672">.</span><span style="color:#ae81ff">33.1</span> <span style="color:#f92672">-</span> <span style="color:#f92672">-</span> [<span style="color:#ae81ff">09</span><span style="color:#f92672">/</span>Nov<span style="color:#f92672">/</span><span style="color:#ae81ff">2014</span>:<span style="color:#ae81ff">08</span>:<span style="color:#ae81ff">07</span>:<span style="color:#ae81ff">43</span> <span style="color:#f92672">+</span><span style="color:#ae81ff">0000</span>] <span style="color:#e6db74">&#34;GET /health_check.html HTTP/1.0&#34;</span> <span style="color:#ae81ff">200</span> <span style="color:#ae81ff">276</span> <span style="color:#e6db74">&#34;-&#34;</span> <span style="color:#e6db74">&#34;Proxy-Check&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">192.168</span><span style="color:#f92672">.</span><span style="color:#ae81ff">33.1</span> <span style="color:#f92672">-</span> <span style="color:#f92672">-</span> [<span style="color:#ae81ff">09</span><span style="color:#f92672">/</span>Nov<span style="color:#f92672">/</span><span style="color:#ae81ff">2014</span>:<span style="color:#ae81ff">08</span>:<span style="color:#ae81ff">07</span>:<span style="color:#ae81ff">46</span> <span style="color:#f92672">+</span><span style="color:#ae81ff">0000</span>] <span style="color:#e6db74">&#34;GET /health_check.html HTTP/1.0&#34;</span> <span style="color:#ae81ff">200</span> <span style="color:#ae81ff">276</span> <span style="color:#e6db74">&#34;-&#34;</span> <span style="color:#e6db74">&#34;Proxy-Check&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">192.168</span><span style="color:#f92672">.</span><span style="color:#ae81ff">33.1</span> <span style="color:#f92672">-</span> <span style="color:#f92672">-</span> [<span style="color:#ae81ff">09</span><span style="color:#f92672">/</span>Nov<span style="color:#f92672">/</span><span style="color:#ae81ff">2014</span>:<span style="color:#ae81ff">08</span>:<span style="color:#ae81ff">07</span>:<span style="color:#ae81ff">49</span> <span style="color:#f92672">+</span><span style="color:#ae81ff">0000</span>] <span style="color:#e6db74">&#34;GET /health_check.html HTTP/1.0&#34;</span> <span style="color:#ae81ff">200</span> <span style="color:#ae81ff">276</span> <span style="color:#e6db74">&#34;-&#34;</span> <span style="color:#e6db74">&#34;Proxy-Check&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">192.168</span><span style="color:#f92672">.</span><span style="color:#ae81ff">33.1</span> <span style="color:#f92672">-</span> <span style="color:#f92672">-</span> [<span style="color:#ae81ff">09</span><span style="color:#f92672">/</span>Nov<span style="color:#f92672">/</span><span style="color:#ae81ff">2014</span>:<span style="color:#ae81ff">08</span>:<span style="color:#ae81ff">07</span>:<span style="color:#ae81ff">52</span> <span style="color:#f92672">+</span><span style="color:#ae81ff">0000</span>] <span style="color:#e6db74">&#34;GET /health_check.html HTTP/1.0&#34;</span> <span style="color:#ae81ff">200</span> <span style="color:#ae81ff">276</span> <span style="color:#e6db74">&#34;-&#34;</span> <span style="color:#e6db74">&#34;Proxy-Check&#34;</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>##Webからのアクセスが来た場合
-</span></span><span style="display:flex;"><span>##SorceのIPはロードバランサにIPになっているが、UserAgentなど書き込まれていることを確認。
-</span></span><span style="display:flex;"><span>192.168.33.1 - - [09/Nov/2014:08:10:06 +0000] &#34;GET / HTTP/1.1&#34; 200 488 &#34;-&#34; &#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10) AppleWebKit/600.1.25 (KHTML, like Gecko) Version/8.0 Safari/600.1.25&#34; 
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##Webからのアクセスが来た場合</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##SorceのIPはロードバランサにIPになっているが、UserAgentなど書き込まれていることを確認。</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">192.168</span><span style="color:#f92672">.</span><span style="color:#ae81ff">33.1</span> <span style="color:#f92672">-</span> <span style="color:#f92672">-</span> [<span style="color:#ae81ff">09</span><span style="color:#f92672">/</span>Nov<span style="color:#f92672">/</span><span style="color:#ae81ff">2014</span>:<span style="color:#ae81ff">08</span>:<span style="color:#ae81ff">10</span>:<span style="color:#ae81ff">06</span> <span style="color:#f92672">+</span><span style="color:#ae81ff">0000</span>] <span style="color:#e6db74">&#34;GET / HTTP/1.1&#34;</span> <span style="color:#ae81ff">200</span> <span style="color:#ae81ff">488</span> <span style="color:#e6db74">&#34;-&#34;</span> <span style="color:#e6db74">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10) AppleWebKit/600.1.25 (KHTML, like Gecko) Version/8.0 Safari/600.1.25&#34;</span> 
 </span></span></code></pre></div><h2 id="まとめ">まとめ</h2>
 <p>HAProxyのインストール設定自体は非常に簡単で、ロードバランサといえど恐れる必要はなかったです。<br>
 それ以上にやはり重要なのは、L4/L7ロードバランサの違いやその使いみち。ここを理解しておくことが非常に重要です。

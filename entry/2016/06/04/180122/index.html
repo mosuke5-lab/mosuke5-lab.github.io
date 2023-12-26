@@ -93,13 +93,13 @@ C は「Client（クライアント）」の頭文字、10K は「1 万台」を
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>のデフォルトの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>などで採用されている。<br>
 特徴としては、１リクエストに対して１プロセスが処理する。<br>
 すなわち同時接続が 1000であれば 1000個のプロセスが必要となる。</p>
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604171531.png" alt="f🆔mosuke5:20160604171531p:plain" title="f🆔mosuke5:20160604171531p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604171531.png" alt="f:id:mosuke5:20160604171531p:plain" title="f:id:mosuke5:20160604171531p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 <h3>worker</h3>
 <p>リクエストはスレッドが処理する。<br>
 スレッドは１プロセスのなかで複数立ち上げることができる。<br>
 プロセス数は少なくて済むが、同時接続が1000であれば1000個のスレッドが必要となる。<br>
 <a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>で指定可能な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>の１つ。</p>
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604171542.png" alt="f🆔mosuke5:20160604171542p:plain" title="f🆔mosuke5:20160604171542p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604171542.png" alt="f:id:mosuke5:20160604171542p:plain" title="f:id:mosuke5:20160604171542p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 <p>いずれにしても、1000の同時接続があれば、1000のプロセスやスレッドが必要ということだ。<br>
 プロセス/スレッド数が多くなってくると「<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%AD%A5%B9%A5%C8%A5%B9%A5%A4%A5%C3%A5%C1">コンテキストスイッチ</a>」が多く発生し、処理が遅くなってしまう。</p>
 <h3>
@@ -110,7 +110,7 @@ C は「Client（クライアント）」の頭文字、10K は「1 万台」を
 </h2>
 <p>Nginxが<a class="keyword" href="http://d.hatena.ne.jp/keyword/C10K%20%CC%E4%C2%EA">C10K 問題</a>を解決するために開発されたともいわれている。<br>
 上記のような課題を解決するような<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>を採用している。</p>
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604171559.png" alt="f🆔mosuke5:20160604171559p:plain" title="f🆔mosuke5:20160604171559p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604171559.png" alt="f:id:mosuke5:20160604171559p:plain" title="f:id:mosuke5:20160604171559p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 <p>ワーカプロセスがリクエストを処理する。<br>
 前述のpreforkやworkerと決定的に違うところは、１つのワーカプロセスが複数のリクエストを処理するということだ。</p>
 <p>また、マスタープロセスはワーカプロセスの立ち上げや、制御、管理などが主な仕事。<br>
@@ -131,9 +131,9 @@ Nginxを終了あるいは再起動、設定ファイルを再読み込みして
 そのため、１つのリクエストが遅いとそれに引きづられてあとのリクエストも遅くなる。<br>
 非同期処理では、リクエストがきたら他のリクエストの状況に関わらず処理を行う。</p>
 <h4>同期処理</h4>
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604173212.png" alt="f🆔mosuke5:20160604173212p:plain" title="f🆔mosuke5:20160604173212p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604173212.png" alt="f:id:mosuke5:20160604173212p:plain" title="f:id:mosuke5:20160604173212p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 <h4>非同期処理</h4>
-<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604173226.png" alt="f🆔mosuke5:20160604173226p:plain" title="f🆔mosuke5:20160604173226p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20160604/20160604173226.png" alt="f:id:mosuke5:20160604173226p:plain" title="f:id:mosuke5:20160604173226p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 <h3>向いていること / 向いていないこと</h3>
 <p>Nginxではイベント駆動で非同期的なIO処理によって、リクエストを完全に処理することを待たずに次から次へと処理を受け付けていきます。<br>
 そのため、１処理に時間のかかるものをNginx自身で行おうとするとキューがどんどん溜まってしまいます。<br>

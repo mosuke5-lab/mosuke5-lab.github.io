@@ -6,112 +6,63 @@
     <description>Recent content in コンテナ on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Wed, 18 Nov 2020 17:32:21 +0900</lastBuildDate><atom:link href="https://blog.mosuke.tech/categories/%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 18 Nov 2020 17:32:21 +0900</lastBuildDate>
+    <atom:link href="https://blog.mosuke.tech/categories/%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Docker Hubのダウンロード回数制限の対策を考える</title>
       <link>https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/</link>
       <pubDate>Wed, 18 Nov 2020 17:32:21 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/</guid>
-      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;
-今日は最近開始されたDocker Hubのイメージダウンロードの回数制限について書きたいと思います。
-動向だけはなんとなく追っていたのですが、先日に自分がこの問題に向き合わなければいけないケースに遭遇したため、残しておこうと思い立ちました。&lt;/p&gt;
-&lt;h2 id=&#34;きっかけ&#34;&gt;きっかけ&lt;/h2&gt;
-&lt;p&gt;本ブログの記事のビルドやデプロイには&lt;a href=&#34;https://app.wercker.com/&#34;&gt;Wecker&lt;/a&gt;というサービスを利用しています。
-ある日、記事を投稿しようとしたところCIのビルドがコケて記事を投稿できませんでした。
-エラーは以下のとおりで、調べるとDocker Hubのイメージダウンロードの回数制限に引っかかっていることがわかりました。&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;&lt;code&gt;fetch failed to pull image debian: API error (500): {&amp;quot;message&amp;quot;:&amp;quot;toomanyrequests: You have reached your pull rate limit. You may increase the limit by authenticating and upgrading: https://www.docker.com/increase-rate-limit&amp;quot;}&lt;/code&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;&lt;img src=&#34;https://blog.mosuke.tech/image/wercker-docker-rate-limit-error.png&#34; alt=&#34;docker-rate-limit-error&#34;&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;&#xA;今日は最近開始されたDocker Hubのイメージダウンロードの回数制限について書きたいと思います。&#xA;動向だけはなんとなく追っていたのですが、先日に自分がこの問題に向き合わなければいけないケースに遭遇したため、残しておこうと思い立ちました。&lt;/p&gt;&#xA;&lt;h2 id=&#34;きっかけ&#34;&gt;きっかけ&lt;/h2&gt;&#xA;&lt;p&gt;本ブログの記事のビルドやデプロイには&lt;a href=&#34;https://app.wercker.com/&#34;&gt;Wecker&lt;/a&gt;というサービスを利用しています。&#xA;ある日、記事を投稿しようとしたところCIのビルドがコケて記事を投稿できませんでした。&#xA;エラーは以下のとおりで、調べるとDocker Hubのイメージダウンロードの回数制限に引っかかっていることがわかりました。&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;&lt;code&gt;fetch failed to pull image debian: API error (500): {&amp;quot;message&amp;quot;:&amp;quot;toomanyrequests: You have reached your pull rate limit. You may increase the limit by authenticating and upgrading: https://www.docker.com/increase-rate-limit&amp;quot;}&lt;/code&gt;&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://blog.mosuke.tech/image/wercker-docker-rate-limit-error.png&#34; alt=&#34;docker-rate-limit-error&#34;&gt;&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>コンテナイメージを軽くする方法と、その原理原則を考える</title>
       <link>https://blog.mosuke.tech/entry/2020/07/09/container-image-size/</link>
       <pubDate>Thu, 09 Jul 2020 18:50:01 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/07/09/container-image-size/</guid>
-      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;
-はじめてコンテナアプリケーションの開発に挑戦していると覚えることがたくさんあり、楽しさ反面大変さもおそらく感じるかと思います。
-そんな覚えることがたくさんの中には、コンテナイメージは軽くしたほうがいいというものも含まれるかもしれません。
-軽くしないと動かないわけではないので、はじめてコンテナ環境に挑戦している人はどうしても忘れがち、見落としがちなことかもしれません。
-しかし、実際の運用を見据えると、軽量であるほうが断然よいです。&lt;br&gt;
-その理由を理解すると、みなさんが「なぜコンテナに挑戦しているのか」思い出してくるのではないかと思います。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;&#xA;はじめてコンテナアプリケーションの開発に挑戦していると覚えることがたくさんあり、楽しさ反面大変さもおそらく感じるかと思います。&#xA;そんな覚えることがたくさんの中には、コンテナイメージは軽くしたほうがいいというものも含まれるかもしれません。&#xA;軽くしないと動かないわけではないので、はじめてコンテナ環境に挑戦している人はどうしても忘れがち、見落としがちなことかもしれません。&#xA;しかし、実際の運用を見据えると、軽量であるほうが断然よいです。&lt;br&gt;&#xA;その理由を理解すると、みなさんが「なぜコンテナに挑戦しているのか」思い出してくるのではないかと思います。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Skopeoを利用したコンテナイメージのレジストリ間コピー</title>
       <link>https://blog.mosuke.tech/entry/2020/04/05/skopeo/</link>
       <pubDate>Sun, 05 Apr 2020 17:35:48 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/04/05/skopeo/</guid>
-      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;
-コロナでの在宅に非常にしんどくなってきました。&lt;br&gt;
-ブログを書いて気を紛らわしていきたいと思います。
-今回は軽めの話題でSkopeoを利用したコンテナイメージのレジストリ間のコピーについてです。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;&#xA;コロナでの在宅に非常にしんどくなってきました。&lt;br&gt;&#xA;ブログを書いて気を紛らわしていきたいと思います。&#xA;今回は軽めの話題でSkopeoを利用したコンテナイメージのレジストリ間のコピーについてです。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Kustomizeで環境ごとに異なるマニフェストを作る</title>
       <link>https://blog.mosuke.tech/entry/2019/06/21/kustomize/</link>
       <pubDate>Fri, 21 Jun 2019 10:57:12 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2019/06/21/kustomize/</guid>
-      <description>&lt;p&gt;ブログの更新頻度が落ちていますが、サボっているわけではないです。。
-はい。mosuke5です。&lt;/p&gt;
-&lt;p&gt;やはりKubernetesマニフェストのテンプレートエンジンは必要だ、と気づいてしまったので、マニフェストを生成できるツールを探していました。
-そこで、Kustomizeを試しみたのでアウトプットとして残しておきます。使ってみた上でハマったポイントや注意すべき点なども含めて書きたいと思います。&lt;/p&gt;</description>
+      <description>&lt;p&gt;ブログの更新頻度が落ちていますが、サボっているわけではないです。。&#xA;はい。mosuke5です。&lt;/p&gt;&#xA;&lt;p&gt;やはりKubernetesマニフェストのテンプレートエンジンは必要だ、と気づいてしまったので、マニフェストを生成できるツールを探していました。&#xA;そこで、Kustomizeを試しみたのでアウトプットとして残しておきます。使ってみた上でハマったポイントや注意すべき点なども含めて書きたいと思います。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Virtual Kubeletとは何か。Alibaba Cloud上で実際に動かして検証する</title>
       <link>https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/</link>
       <pubDate>Sun, 03 Feb 2019 15:49:10 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/</guid>
-      <description>&lt;p&gt;はい、@mosuke5です。&lt;br&gt;
-ここ最近、会社でも少しずつKubernetesに関するはなしなどもでてきており、自分の興味ある分野だったこともあり本腰いれて遊んでおります。
-そのなかで、Alibaba CloudもProviderを出しているという、&lt;a href=&#34;https://github.com/virtual-kubelet/virtual-kubelet&#34;&gt;Virtual Kubelet&lt;/a&gt;について気になったので、実際に動かして概念の整理と使いどころについて考えてみました。&lt;/p&gt;
-&lt;p&gt;例ではAlibaba CloudのKubernetesとECIを使っていますが、基本的な考え方は同じですので、Virtual Kubeletについて勉強したい人はぜひ読んでみてください。&lt;/p&gt;
-&lt;h5 id=&#34;2019310-追記&#34;&gt;2019/3/10 追記&lt;/h5&gt;
-&lt;p&gt;こちらの記事の内容についてはSlideShareにしていくつかのイベントで発表しています。&lt;a href=&#34;https://www.slideshare.net/mosuke5/virtualkubeletalibaba-cloud-133164822&#34;&gt;こちらもご参照&lt;/a&gt;ください。&lt;/p&gt;</description>
+      <description>&lt;p&gt;はい、@mosuke5です。&lt;br&gt;&#xA;ここ最近、会社でも少しずつKubernetesに関するはなしなどもでてきており、自分の興味ある分野だったこともあり本腰いれて遊んでおります。&#xA;そのなかで、Alibaba CloudもProviderを出しているという、&lt;a href=&#34;https://github.com/virtual-kubelet/virtual-kubelet&#34;&gt;Virtual Kubelet&lt;/a&gt;について気になったので、実際に動かして概念の整理と使いどころについて考えてみました。&lt;/p&gt;&#xA;&lt;p&gt;例ではAlibaba CloudのKubernetesとECIを使っていますが、基本的な考え方は同じですので、Virtual Kubeletについて勉強したい人はぜひ読んでみてください。&lt;/p&gt;&#xA;&lt;h5 id=&#34;2019310-追記&#34;&gt;2019/3/10 追記&lt;/h5&gt;&#xA;&lt;p&gt;こちらの記事の内容についてはSlideShareにしていくつかのイベントで発表しています。&lt;a href=&#34;https://www.slideshare.net/mosuke5/virtualkubeletalibaba-cloud-133164822&#34;&gt;こちらもご参照&lt;/a&gt;ください。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Docker Compose上でのRailsアプリケーションの開発フロー</title>
       <link>https://blog.mosuke.tech/entry/2018/05/02/rails-app-on-docker/</link>
       <pubDate>Wed, 02 May 2018 23:14:44 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2018/05/02/rails-app-on-docker/</guid>
-      <description>&lt;p&gt;早いものGWも終わり一週間が経ってしまいました。&lt;br&gt;
-長期の連休になるとだいたい自分は趣味のアプリケーション開発をよくすすめています（ふだんからやりたいけどなかなかできない）。今年のGWも趣味アプリケーションの開発をしてました。&lt;/p&gt;
-&lt;p&gt;いま作っているアプリケーションは自分の英語学習用のサービスなのですが(サービスについては別途どこかでご紹介したい)、新しい技術を実際に試す場としても利用しています。自分はいつも趣味アプリケーションで新しいことを試してみて、よかったらそれを職場にもっていくことが多いです。&lt;/p&gt;
-&lt;p&gt;アプリケーションはRailsで書いているのですが、Railsの他にMySQLやNginx、ElasticSearch、Kibanaなど関連するコンポーネントが多いです。
-そのため、Docker Composeを利用して動かすことにしています。Dockerは以前から使っていたのですが、実際にアプリケーションのせてとして開発・運用してみると、いろいろ問題があり試行錯誤することになりました。&lt;/p&gt;
-&lt;p&gt;GWはその部分と主に格闘していて、最終的にそこそこ良い開発フローを整えることができました。今日はそのご紹介です。&lt;br&gt;
-※もちろん、現時点でのやり方であり、改善しているので現状と異なることも多いと思います。&lt;/p&gt;</description>
+      <description>&lt;p&gt;早いものGWも終わり一週間が経ってしまいました。&lt;br&gt;&#xA;長期の連休になるとだいたい自分は趣味のアプリケーション開発をよくすすめています（ふだんからやりたいけどなかなかできない）。今年のGWも趣味アプリケーションの開発をしてました。&lt;/p&gt;&#xA;&lt;p&gt;いま作っているアプリケーションは自分の英語学習用のサービスなのですが(サービスについては別途どこかでご紹介したい)、新しい技術を実際に試す場としても利用しています。自分はいつも趣味アプリケーションで新しいことを試してみて、よかったらそれを職場にもっていくことが多いです。&lt;/p&gt;&#xA;&lt;p&gt;アプリケーションはRailsで書いているのですが、Railsの他にMySQLやNginx、ElasticSearch、Kibanaなど関連するコンポーネントが多いです。&#xA;そのため、Docker Composeを利用して動かすことにしています。Dockerは以前から使っていたのですが、実際にアプリケーションのせてとして開発・運用してみると、いろいろ問題があり試行錯誤することになりました。&lt;/p&gt;&#xA;&lt;p&gt;GWはその部分と主に格闘していて、最終的にそこそこ良い開発フローを整えることができました。今日はそのご紹介です。&lt;br&gt;&#xA;※もちろん、現時点でのやり方であり、改善しているので現状と異なることも多いと思います。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>DockerでのMySQLのセットアップ方法とその仕組みを理解する</title>
       <link>https://blog.mosuke.tech/entry/2018/04/21/basic-mysql-on-docker/</link>
       <pubDate>Sat, 21 Apr 2018 18:25:49 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2018/04/21/basic-mysql-on-docker/</guid>
-      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;
-個人で作っているサービスをDockerベースで動かしているのだが、MySQL使いたくなってきて導入することになった。
-Docker上のMySQL利用ははじめてだったので、いろいろわからないところがあった。その知見をまとめる。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;&#xA;個人で作っているサービスをDockerベースで動かしているのだが、MySQL使いたくなってきて導入することになった。&#xA;Docker上のMySQL利用ははじめてだったので、いろいろわからないところがあった。その知見をまとめる。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>dockerで特定ユーザでログインした状態のシェル環境を提供する</title>
       <link>https://blog.mosuke.tech/entry/2015/01/24/213255/</link>
       <pubDate>Sat, 24 Jan 2015 21:32:00 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2015/01/24/213255/</guid>
       <description>dockerの一般的な利用の仕方ではあまり想定されないケースかもしれないが、 特定のユーザでログインした状態のコンテナを作りたいという場面に遭</description>
     </item>
-    
   </channel>
 </rss>

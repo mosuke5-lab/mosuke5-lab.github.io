@@ -118,7 +118,7 @@ OpenShiftをお使いのみなさんはだいぶ監視設定周りで困って�
 <h2 id="これまでの課題">これまでの課題</h2>
 <p>ユーザ定義プロジェクトの監視では、開発者にPrometheus等を用意させずにOpenShift上で監視ができるということでニーズのある機能でした。<br>
 一方で、<u>アラート通知先の設定がクラスタ管理者のみしかできず、マルチテナント的にOpenShiftを利用する組織では使いづらい</u>側面がありました。</p>
-<p>OpenShift 4.11でついにこの点が解消され、より開発者にとって使いやすい監視機能を提供できるようになりました👏👏<br>
+<p>OpenShift 4.11でついにこの点が解消され、より開発者にとって使いやすい監視機能を提供できるようになりました&#x1f44f;&#x1f44f;<br>
 公式ドキュメントは「<a href="https://access.redhat.com/documentation/ja-jp/openshift_container_platform/4.11/html/monitoring/enabling-alert-routing-for-user-defined-projects" target="_blank">第6章 ユーザー定義プロジェクトのアラートルーティングの有効化</a>」です。</p>
 <p><img src="/image/openshift-monitoring-alert-before.png" alt=""></p>
 <h2 id="機能の概要">機能の概要</h2>
@@ -153,9 +153,9 @@ OpenShiftをお使いのみなさんはだいぶ監視設定周りで困って�
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      enableAlertmanagerConfig: true</span>    
 </span></span></code></pre></div><p>設定するとなにが起こるか確認してみましょう。<br>
 まず、<code>openshift-user-workload-monitoring</code> プロジェクト内に新しくAlertmanagerのインスタンスが起動します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% oc get pod -n openshift-user-workload-monitoring | grep alert
-</span></span><span style="display:flex;"><span>alertmanager-user-workload-0           6/6     Running   0          8d
-</span></span><span style="display:flex;"><span>alertmanager-user-workload-1           6/6     Running   0          8d
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">%</span> oc get pod <span style="color:#f92672">-</span>n openshift<span style="color:#f92672">-</span>user<span style="color:#f92672">-</span>workload<span style="color:#f92672">-</span>monitoring <span style="color:#f92672">|</span> grep alert
+</span></span><span style="display:flex;"><span>alertmanager<span style="color:#f92672">-</span>user<span style="color:#f92672">-</span>workload<span style="color:#f92672">-</span><span style="color:#ae81ff">0</span>           <span style="color:#ae81ff">6</span><span style="color:#f92672">/</span><span style="color:#ae81ff">6</span>     Running   <span style="color:#ae81ff">0</span>          <span style="color:#ae81ff">8</span>d
+</span></span><span style="display:flex;"><span>alertmanager<span style="color:#f92672">-</span>user<span style="color:#f92672">-</span>workload<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>           <span style="color:#ae81ff">6</span><span style="color:#f92672">/</span><span style="color:#ae81ff">6</span>     Running   <span style="color:#ae81ff">0</span>          <span style="color:#ae81ff">8</span>d
 </span></span></code></pre></div><h3 id="thanos-rulerの設定ファイル">thanos rulerの設定ファイル</h3>
 <p>さらに、thanos rulerの設定ファイルを見てみましょう。<br>
 thanos rulerは、<code>PrometheusRule</code>の設定内容をみて、アラート発報を担当しています。

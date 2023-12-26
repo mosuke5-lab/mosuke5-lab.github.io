@@ -6,482 +6,140 @@
     <description>Recent content in 2022 on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Wed, 14 Dec 2022 09:16:06 +0900</lastBuildDate><atom:link href="https://blog.mosuke.tech/archive/2022/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 14 Dec 2022 09:16:06 +0900</lastBuildDate>
+    <atom:link href="https://blog.mosuke.tech/archive/2022/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>OpenShift、開発者向けの監視機能（アラート通知）が進化しました</title>
       <link>https://blog.mosuke.tech/entry/2022/12/14/openshift-user-alert-routing/</link>
       <pubDate>Wed, 14 Dec 2022 09:16:06 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/12/14/openshift-user-alert-routing/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-&lt;a href=&#34;https://qiita.com/advent-calendar/2022/openshift&#34;&gt;OpenShiftアドベントカレンダー&lt;/a&gt;14日目のゆるネタ投稿です。&lt;br&gt;
-2022年、OpenShiftネタで一番PVを稼いだ記事が「&lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/&#34;&gt;OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？&lt;/a&gt;」でした。
-OpenShiftをお使いのみなさんはだいぶ監視設定周りで困っているということがわかりますね笑
-ちなみに余談ですが、この記事だけで2500PVくらいあったらしいです。&lt;/p&gt;
-&lt;p&gt;そこで今回は、そんなOpenShiftの監視機能の不足点であったアラート通知が進化したよってことを書いていこうと思います。&lt;/p&gt;
-&lt;div class=&#34;belg-link row&#34;&gt;
-  &lt;div class=&#34;belg-left col-md-2 d-none d-md-block&#34;&gt;
-    &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/&#34; target=&#34;_blank&#34;&gt;
-      &lt;img class=&#34;belg-site-image&#34; src=&#34;https://blog.mosuke.tech/image/logo.png&#34; /&gt;
-    &lt;/a&gt;
-  &lt;/div&gt;
-  &lt;div class=&#34;belg-right col-md-10&#34;&gt;
-  &lt;div class=&#34;belg-title&#34;&gt;
-      &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/&#34; target=&#34;_blank&#34;&gt;OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？ · Goldstine研究所&lt;/a&gt;
-    &lt;/div&gt;
-    &lt;div class=&#34;belg-description&#34;&gt;OpenShift 4.6から正式に追加されたユーザ定義プロジェクトの監視機能について、どこまで使えるのか？実戦投入できそうかなどの観点で検証していきます。Prometheusを独自で構築することなく監視できる新機能を紹介します。&lt;/div&gt;
-    &lt;div class=&#34;belg-site&#34;&gt;
-      &lt;img src=&#34;https://blog.mosuke.tech/image/favicon.ico&#34; class=&#34;belg-site-icon&#34;&gt;
-      &lt;span class=&#34;belg-site-name&#34;&gt;Goldstine研究所&lt;/span&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;&lt;a href=&#34;https://qiita.com/advent-calendar/2022/openshift&#34;&gt;OpenShiftアドベントカレンダー&lt;/a&gt;14日目のゆるネタ投稿です。&lt;br&gt;&#xA;2022年、OpenShiftネタで一番PVを稼いだ記事が「&lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/&#34;&gt;OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？&lt;/a&gt;」でした。&#xA;OpenShiftをお使いのみなさんはだいぶ監視設定周りで困っているということがわかりますね笑&#xA;ちなみに余談ですが、この記事だけで2500PVくらいあったらしいです。&lt;/p&gt;&#xA;&lt;p&gt;そこで今回は、そんなOpenShiftの監視機能の不足点であったアラート通知が進化したよってことを書いていこうと思います。&lt;/p&gt;&#xA;&lt;div class=&#34;belg-link row&#34;&gt;&#xA;  &lt;div class=&#34;belg-left col-md-2 d-none d-md-block&#34;&gt;&#xA;    &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/&#34; target=&#34;_blank&#34;&gt;&#xA;      &lt;img class=&#34;belg-site-image&#34; src=&#34;https://blog.mosuke.tech/image/logo.png&#34; /&gt;&#xA;    &lt;/a&gt;&#xA;  &lt;/div&gt;&#xA;  &lt;div class=&#34;belg-right col-md-10&#34;&gt;&#xA;  &lt;div class=&#34;belg-title&#34;&gt;&#xA;      &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/24/openshift-monitoring-your-own-service/&#34; target=&#34;_blank&#34;&gt;OpenShiftの新機能、ユーザ定義プロジェクトの監視ってどこまでできる？ · Goldstine研究所&lt;/a&gt;&#xA;    &lt;/div&gt;&#xA;    &lt;div class=&#34;belg-description&#34;&gt;OpenShift 4.6から正式に追加されたユーザ定義プロジェクトの監視機能について、どこまで使えるのか？実戦投入できそうかなどの観点で検証していきます。Prometheusを独自で構築することなく監視できる新機能を紹介します。&lt;/div&gt;&#xA;    &lt;div class=&#34;belg-site&#34;&gt;&#xA;      &lt;img src=&#34;https://blog.mosuke.tech/image/favicon.ico&#34; class=&#34;belg-site-icon&#34;&gt;&#xA;      &lt;span class=&#34;belg-site-name&#34;&gt;Goldstine研究所&lt;/span&gt;&#xA;    &lt;/div&gt;&#xA;  &lt;/div&gt;&#xA;&lt;/div&gt;</description>
     </item>
-    
     <item>
       <title>3ヶ月の育休にチャレンジして感じたぼくのエンジニアキャリア</title>
       <link>https://blog.mosuke.tech/entry/2022/10/28/ikukyu/</link>
       <pubDate>Fri, 28 Oct 2022 23:16:06 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/10/28/ikukyu/</guid>
-      <description>&lt;p&gt;お久しぶりです。もーすけです。&lt;br&gt;
-4ヶ月もブログを更新しなかったのは、開設以来はじめてじゃないでしょうか。
-実は子供が生まれ「3ヶ月間の育休」をとっていました。
-その間、意図的でもあるのですが、&lt;u&gt;一切の仕事および技術系の勉強から離れていました&lt;/u&gt;。&lt;/p&gt;
-&lt;p&gt;&lt;u&gt;仕事からも技術の勉強からも、離れることで見えてきたキャリア・自分の気持ち&lt;/u&gt;について書き残していきます。
-これから結婚や子供を生むことを考えている人たちのひとつの参考になればと思っています。&lt;/p&gt;
-&lt;p&gt;ちなみに下は、このブログに関する一人語り動画です。
-文章を読むのだるいよって人は動画の方をどうぞ。&lt;/p&gt;
-&lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/EQ9oAdnoofY&#34; title=&#34;YouTube video player&#34; frameborder=&#34;0&#34; allow=&#34;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture&#34; allowfullscreen&gt;&lt;/iframe&gt;</description>
+      <description>&lt;p&gt;お久しぶりです。もーすけです。&lt;br&gt;&#xA;4ヶ月もブログを更新しなかったのは、開設以来はじめてじゃないでしょうか。&#xA;実は子供が生まれ「3ヶ月間の育休」をとっていました。&#xA;その間、意図的でもあるのですが、&lt;u&gt;一切の仕事および技術系の勉強から離れていました&lt;/u&gt;。&lt;/p&gt;&#xA;&lt;p&gt;&lt;u&gt;仕事からも技術の勉強からも、離れることで見えてきたキャリア・自分の気持ち&lt;/u&gt;について書き残していきます。&#xA;これから結婚や子供を生むことを考えている人たちのひとつの参考になればと思っています。&lt;/p&gt;&#xA;&lt;p&gt;ちなみに下は、このブログに関する一人語り動画です。&#xA;文章を読むのだるいよって人は動画の方をどうぞ。&lt;/p&gt;&#xA;&lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/EQ9oAdnoofY&#34; title=&#34;YouTube video player&#34; frameborder=&#34;0&#34; allow=&#34;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture&#34; allowfullscreen&gt;&lt;/iframe&gt;</description>
     </item>
-    
     <item>
       <title>Kubernetesで、NamespaceがTerminatingのまま消せない理由についての実験(finalizer)</title>
       <link>https://blog.mosuke.tech/entry/2022/06/24/k8s-finalizer/</link>
       <pubDate>Fri, 24 Jun 2022 14:13:25 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/06/24/k8s-finalizer/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-本日は、Kubernetesのfinalizerについて確認したことをまとめようと思います。
-Kubernetesを使っている方であれば、リソースを削除したのにTerminatingのまま止まってしまって困ったということがあるんではないでしょうか？あるいは、困っていまこのブログにたどり着いたかもしれません。&lt;/p&gt;
-&lt;p&gt;すでに世の中にはいくつか関連の記事は出ていますが、
-自分の整理のためにいくつか書き残していきます。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;本日は、Kubernetesのfinalizerについて確認したことをまとめようと思います。&#xA;Kubernetesを使っている方であれば、リソースを削除したのにTerminatingのまま止まってしまって困ったということがあるんではないでしょうか？あるいは、困っていまこのブログにたどり着いたかもしれません。&lt;/p&gt;&#xA;&lt;p&gt;すでに世の中にはいくつか関連の記事は出ていますが、&#xA;自分の整理のためにいくつか書き残していきます。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>CKS合格しました。学習方法や気になる疑問などまとめ</title>
       <link>https://blog.mosuke.tech/entry/2022/06/19/cks/</link>
       <pubDate>Sun, 19 Jun 2022 15:52:32 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/06/19/cks/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-最近少し時間があったので、ようやくCKS(Certified Kubernetes Security)をとってきたので、やってきたことなどかんたんに残します。
-CKA,CKADの取得に関しては過去ブログを参照ください。&lt;/p&gt;
-&lt;div class=&#34;belg-link row&#34;&gt;
-  &lt;div class=&#34;belg-left col-md-2 d-none d-md-block&#34;&gt;
-    &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/02/07/cka/&#34; target=&#34;_blank&#34;&gt;
-      &lt;img class=&#34;belg-site-image&#34; src=&#34;https://blog.mosuke.tech/image/logo.png&#34; /&gt;
-    &lt;/a&gt;
-  &lt;/div&gt;
-  &lt;div class=&#34;belg-right col-md-10&#34;&gt;
-  &lt;div class=&#34;belg-title&#34;&gt;
-      &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/02/07/cka/&#34; target=&#34;_blank&#34;&gt;新形式のCKAを受験し合格しました。受験の教訓紹介。 · Goldstine研究所&lt;/a&gt;
-    &lt;/div&gt;
-    &lt;div class=&#34;belg-description&#34;&gt;新形式のCKAを受験してきました。受験に際して学習したことや、受験時の失敗談などを中心にまとめました。&lt;/div&gt;
-    &lt;div class=&#34;belg-site&#34;&gt;
-      &lt;img src=&#34;https://blog.mosuke.tech/image/favicon.ico&#34; class=&#34;belg-site-icon&#34;&gt;
-      &lt;span class=&#34;belg-site-name&#34;&gt;Goldstine研究所&lt;/span&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&#34;belg-link row&#34;&gt;
-  &lt;div class=&#34;belg-left col-md-2 d-none d-md-block&#34;&gt;
-    &lt;a href=&#34;https://blog.mosuke.tech/entry/2019/07/08/ckad/&#34; target=&#34;_blank&#34;&gt;
-      &lt;img class=&#34;belg-site-image&#34; src=&#34;https://blog.mosuke.tech/image/logo.png&#34; /&gt;
-    &lt;/a&gt;
-  &lt;/div&gt;
-  &lt;div class=&#34;belg-right col-md-10&#34;&gt;
-  &lt;div class=&#34;belg-title&#34;&gt;
-      &lt;a href=&#34;https://blog.mosuke.tech/entry/2019/07/08/ckad/&#34; target=&#34;_blank&#34;&gt;CKADを取得の対策や試験当日の対応について · Goldstine研究所&lt;/a&gt;
-    &lt;/div&gt;
-    &lt;div class=&#34;belg-description&#34;&gt;CKAD(Certified Kubernetes Application Developer)を受験してきて無事に合格しました。合格のために準備すべきことと、試験受験に関して不安だったことなどをまとめました。&lt;/div&gt;
-    &lt;div class=&#34;belg-site&#34;&gt;
-      &lt;img src=&#34;https://blog.mosuke.tech/image/favicon.ico&#34; class=&#34;belg-site-icon&#34;&gt;
-      &lt;span class=&#34;belg-site-name&#34;&gt;Goldstine研究所&lt;/span&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;最近少し時間があったので、ようやくCKS(Certified Kubernetes Security)をとってきたので、やってきたことなどかんたんに残します。&#xA;CKA,CKADの取得に関しては過去ブログを参照ください。&lt;/p&gt;&#xA;&lt;div class=&#34;belg-link row&#34;&gt;&#xA;  &lt;div class=&#34;belg-left col-md-2 d-none d-md-block&#34;&gt;&#xA;    &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/02/07/cka/&#34; target=&#34;_blank&#34;&gt;&#xA;      &lt;img class=&#34;belg-site-image&#34; src=&#34;https://blog.mosuke.tech/image/logo.png&#34; /&gt;&#xA;    &lt;/a&gt;&#xA;  &lt;/div&gt;&#xA;  &lt;div class=&#34;belg-right col-md-10&#34;&gt;&#xA;  &lt;div class=&#34;belg-title&#34;&gt;&#xA;      &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/02/07/cka/&#34; target=&#34;_blank&#34;&gt;新形式のCKAを受験し合格しました。受験の教訓紹介。 · Goldstine研究所&lt;/a&gt;&#xA;    &lt;/div&gt;&#xA;    &lt;div class=&#34;belg-description&#34;&gt;新形式のCKAを受験してきました。受験に際して学習したことや、受験時の失敗談などを中心にまとめました。&lt;/div&gt;&#xA;    &lt;div class=&#34;belg-site&#34;&gt;&#xA;      &lt;img src=&#34;https://blog.mosuke.tech/image/favicon.ico&#34; class=&#34;belg-site-icon&#34;&gt;&#xA;      &lt;span class=&#34;belg-site-name&#34;&gt;Goldstine研究所&lt;/span&gt;&#xA;    &lt;/div&gt;&#xA;  &lt;/div&gt;&#xA;&lt;/div&gt;&#xA;&lt;div class=&#34;belg-link row&#34;&gt;&#xA;  &lt;div class=&#34;belg-left col-md-2 d-none d-md-block&#34;&gt;&#xA;    &lt;a href=&#34;https://blog.mosuke.tech/entry/2019/07/08/ckad/&#34; target=&#34;_blank&#34;&gt;&#xA;      &lt;img class=&#34;belg-site-image&#34; src=&#34;https://blog.mosuke.tech/image/logo.png&#34; /&gt;&#xA;    &lt;/a&gt;&#xA;  &lt;/div&gt;&#xA;  &lt;div class=&#34;belg-right col-md-10&#34;&gt;&#xA;  &lt;div class=&#34;belg-title&#34;&gt;&#xA;      &lt;a href=&#34;https://blog.mosuke.tech/entry/2019/07/08/ckad/&#34; target=&#34;_blank&#34;&gt;CKADを取得の対策や試験当日の対応について · Goldstine研究所&lt;/a&gt;&#xA;    &lt;/div&gt;&#xA;    &lt;div class=&#34;belg-description&#34;&gt;CKAD(Certified Kubernetes Application Developer)を受験してきて無事に合格しました。合格のために準備すべきことと、試験受験に関して不安だったことなどをまとめました。&lt;/div&gt;&#xA;    &lt;div class=&#34;belg-site&#34;&gt;&#xA;      &lt;img src=&#34;https://blog.mosuke.tech/image/favicon.ico&#34; class=&#34;belg-site-icon&#34;&gt;&#xA;      &lt;span class=&#34;belg-site-name&#34;&gt;Goldstine研究所&lt;/span&gt;&#xA;    &lt;/div&gt;&#xA;  &lt;/div&gt;&#xA;&lt;/div&gt;</description>
     </item>
-    
     <item>
       <title>Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）</title>
       <link>https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/</link>
       <pubDate>Tue, 07 Jun 2022 21:34:44 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-以前に投稿した「Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編&amp;amp;動作編）」の続編です。
-CKSの勉強をしていて、関連あるトピックがでてきたので紹介します。&lt;/p&gt;
-&lt;p&gt;Gatekeeperというツールについてなのですが、本ブログでは&lt;u&gt;Gatekeeperの細かな使い方を説明するものではありません&lt;/u&gt;。前回までにやってきた「Admission Webhookを作って遊んで、その仕組みを理解する」の延長上で、Gatekeeperの動きを見ていくものです。
-この仕組みがわかっていると、Gatekeeperの構成ややろうとしていることがすっと頭に入りそうだったので、この続編を書くことにしました。&lt;/p&gt;
-&lt;hr&gt;
-&lt;h5&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;おまけ: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/&#34;&gt;ImagePolicyWebhookって必要なの？&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;以前に投稿した「Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編&amp;amp;動作編）」の続編です。&#xA;CKSの勉強をしていて、関連あるトピックがでてきたので紹介します。&lt;/p&gt;&#xA;&lt;p&gt;Gatekeeperというツールについてなのですが、本ブログでは&lt;u&gt;Gatekeeperの細かな使い方を説明するものではありません&lt;/u&gt;。前回までにやってきた「Admission Webhookを作って遊んで、その仕組みを理解する」の延長上で、Gatekeeperの動きを見ていくものです。&#xA;この仕組みがわかっていると、Gatekeeperの構成ややろうとしていることがすっと頭に入りそうだったので、この続編を書くことにしました。&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h5&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;おまけ: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/&#34;&gt;ImagePolicyWebhookって必要なの？&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;</description>
     </item>
-    
     <item>
       <title>マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？</title>
       <link>https://blog.mosuke.tech/entry/2022/05/31/multi-az-pv/</link>
       <pubDate>Tue, 31 May 2022 10:24:15 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/05/31/multi-az-pv/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-なんとなくあいまいに理解していなかった、「マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？」について軽く調べてみました。ほぼ自分のメモなので、間違っているところもあるかもしれません。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;なんとなくあいまいに理解していなかった、「マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？」について軽く調べてみました。ほぼ自分のメモなので、間違っているところもあるかもしれません。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>ImagePolicyWebhookって必要なの？</title>
       <link>https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/</link>
       <pubDate>Sun, 29 May 2022 16:48:03 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-最近はCKS(Certified Kubernetes Security)を取ろうかと勉強をはじめているのですが、ImagePolicyWebhookについて出てきたので調べてみました。
-前回にブログを書いた　&amp;ldquo;Admission Webhook&amp;rdquo; と似たような仕組みなのですが、調べた結果の意見を雑に書き残しておきます。&lt;/p&gt;
-&lt;p&gt;おそらくより実践的で使えるのは Validating/Mulating Admission Webhookの方なので、気になる方は下記のブログも参考にしてください。
-&lt;hr&gt;
-&lt;h5&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;おまけ: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/&#34;&gt;ImagePolicyWebhookって必要なの？&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;最近はCKS(Certified Kubernetes Security)を取ろうかと勉強をはじめているのですが、ImagePolicyWebhookについて出てきたので調べてみました。&#xA;前回にブログを書いた　&amp;ldquo;Admission Webhook&amp;rdquo; と似たような仕組みなのですが、調べた結果の意見を雑に書き残しておきます。&lt;/p&gt;&#xA;&lt;p&gt;おそらくより実践的で使えるのは Validating/Mulating Admission Webhookの方なので、気になる方は下記のブログも参考にしてください。&#xA;&lt;hr&gt;&#xA;&lt;h5&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;おまけ: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/&#34;&gt;ImagePolicyWebhookって必要なの？&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</title>
       <link>https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/</link>
       <pubDate>Mon, 16 May 2022 18:37:40 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-前回は、Admission Webhookの説明編を書きました。今回は実際に動かしていくことをやっていきたいと思います。
-前回ブログおよび関連ブログは以下にもありますので、あわせて確認してみてください。&lt;/p&gt;
-&lt;hr&gt;
-&lt;h5&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;おまけ: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/&#34;&gt;ImagePolicyWebhookって必要なの？&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;前回は、Admission Webhookの説明編を書きました。今回は実際に動かしていくことをやっていきたいと思います。&#xA;前回ブログおよび関連ブログは以下にもありますので、あわせて確認してみてください。&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h5&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;おまけ: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/&#34;&gt;ImagePolicyWebhookって必要なの？&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;</description>
     </item>
-    
     <item>
       <title>Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</title>
       <link>https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/</link>
       <pubDate>Sun, 15 May 2022 18:38:40 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-今回はKubernetesの拡張する仕組みのひとつであるAdmission Webhookをスクラッチで作ることで、その仕組や作り方を理解しようというものです。自分自身はじめて試みて詰まったところなど多数あったので、その整理も兼ねて書きます。
-いままで、ドキュメントや文献を読んで、Admission webhookというものの存在やなんとなくの仕組みは理解しているつもりでした。一方で、実際に作ってみると見えていなかった要素もわかってきました。&lt;/p&gt;
-&lt;p&gt;Kubernetesを運用すると、業務に合わせた機能拡張はほぼ必須と言っても過言ではなく、一度自分の手で作っていくことはとても有益と思います。&lt;/p&gt;
-&lt;hr&gt;
-&lt;h5&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;おまけ: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/&#34;&gt;ImagePolicyWebhookって必要なの？&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;今回はKubernetesの拡張する仕組みのひとつであるAdmission Webhookをスクラッチで作ることで、その仕組や作り方を理解しようというものです。自分自身はじめて試みて詰まったところなど多数あったので、その整理も兼ねて書きます。&#xA;いままで、ドキュメントや文献を読んで、Admission webhookというものの存在やなんとなくの仕組みは理解しているつもりでした。一方で、実際に作ってみると見えていなかった要素もわかってきました。&lt;/p&gt;&#xA;&lt;p&gt;Kubernetesを運用すると、業務に合わせた機能拡張はほぼ必須と言っても過言ではなく、一度自分の手で作っていくことはとても有益と思います。&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h5&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;おまけ: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/&#34;&gt;ImagePolicyWebhookって必要なの？&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;</description>
     </item>
-    
     <item>
       <title>ITエンジニアが副業に挑戦してみた感想をまとめるよ</title>
       <link>https://blog.mosuke.tech/entry/2022/04/18/first-side-work/</link>
       <pubDate>Mon, 18 Apr 2022 18:37:40 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/04/18/first-side-work/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-今回はひさびさにキャリア系のことについて書いていきたいと思います。
-3月いっぱいで9ヶ月ほど続けていた副業が一段落したので、その感想やお金の話などをお知らせしたいと思います。
-この30年間賃金の上がらない日本をなんとかすべく、副業で所得を増やす人が増えてほしいです。
-とはいえ、いいことばかりでもないので率直な感想や意見を書き残していこうと思います。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;今回はひさびさにキャリア系のことについて書いていきたいと思います。&#xA;3月いっぱいで9ヶ月ほど続けていた副業が一段落したので、その感想やお金の話などをお知らせしたいと思います。&#xA;この30年間賃金の上がらない日本をなんとかすべく、副業で所得を増やす人が増えてほしいです。&#xA;とはいえ、いいことばかりでもないので率直な感想や意見を書き残していこうと思います。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Goならわかるシステムプログラミング：第6章 TCPソケットとHTTPの実装</title>
       <link>https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/</link>
       <pubDate>Tue, 01 Mar 2022 23:40:40 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-「Goならわかるシステムプログラミング」を読み進めています。とてもいい本です。
-読み進めながら実験したことなどを書いていきます。同じ本を読んでいる人の参考（寄り道？）になればと思います。
-今回は「TCPソケットとHTTPの実装」です。&lt;/p&gt;
-&lt;div class=&#34;belg-link row&#34;&gt;
-  &lt;div class=&#34;belg-right col-md-12&#34;&gt;
-  &lt;div class=&#34;belg-title&#34;&gt;
-      &lt;a href=&#34;https://www.amazon.co.jp/Go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0-%E7%AC%AC2%E7%89%88-%E6%B8%8B%E5%B7%9D%E3%82%88%E3%81%97%E3%81%8D/dp/4908686122?keywords=go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0&amp;amp;qid=1649828170&amp;amp;sprefix=go%E3%81%AA%E3%82%89,aps,295&amp;amp;sr=8-1&amp;amp;linkCode=sl1&amp;amp;tag=mosuke5-22&amp;amp;linkId=657574facc6fad628c327647d446818a&amp;amp;language=ja_JP&amp;amp;ref_=as_li_ss_tl&#34; target=&#34;_blank&#34;&gt;Goならわかるシステムプログラミング 第2版 | 渋川よしき, ごっちん |本 | 通販 | Amazon&lt;/a&gt;
-    &lt;/div&gt;
-    &lt;div class=&#34;belg-description&#34;&gt;Amazonで渋川よしき, ごっちんのGoならわかるシステムプログラミング 第2版。アマゾンならポイント還元本が多数。渋川よしき, ごっちん作品ほか、お急ぎ便対象商品は当日お届けも可能。またGoならわかるシステムプログラミング 第2版もアマゾン配送商品なら通常配送無料。&lt;/div&gt;
-    &lt;div class=&#34;belg-site&#34;&gt;
-      &lt;span class=&#34;belg-site-name&#34;&gt;www.amazon.co.jp&lt;/span&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;hr&gt;
-&lt;h5&gt;Goならわかるシステムプログラミングの学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/&#34;&gt;第2章 io.Writer&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/&#34;&gt;第3章 io.Reader&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-4/&#34;&gt;第4章 チャネル&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/&#34;&gt;第5章 システムコール&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/&#34;&gt;第6章 TCPソケットとHTTPの実装&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Coming soon&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;「Goならわかるシステムプログラミング」を読み進めています。とてもいい本です。&#xA;読み進めながら実験したことなどを書いていきます。同じ本を読んでいる人の参考（寄り道？）になればと思います。&#xA;今回は「TCPソケットとHTTPの実装」です。&lt;/p&gt;&#xA;&lt;div class=&#34;belg-link row&#34;&gt;&#xA;  &lt;div class=&#34;belg-right col-md-12&#34;&gt;&#xA;  &lt;div class=&#34;belg-title&#34;&gt;&#xA;      &lt;a href=&#34;https://www.amazon.co.jp/Go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0-%E7%AC%AC2%E7%89%88-%E6%B8%8B%E5%B7%9D%E3%82%88%E3%81%97%E3%81%8D/dp/4908686122?keywords=go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0&amp;amp;qid=1649828170&amp;amp;sprefix=go%E3%81%AA%E3%82%89,aps,295&amp;amp;sr=8-1&amp;amp;linkCode=sl1&amp;amp;tag=mosuke5-22&amp;amp;linkId=657574facc6fad628c327647d446818a&amp;amp;language=ja_JP&amp;amp;ref_=as_li_ss_tl&#34; target=&#34;_blank&#34;&gt;Goならわかるシステムプログラミング 第2版 | 渋川よしき, ごっちん |本 | 通販 | Amazon&lt;/a&gt;&#xA;    &lt;/div&gt;&#xA;    &lt;div class=&#34;belg-description&#34;&gt;Amazonで渋川よしき, ごっちんのGoならわかるシステムプログラミング 第2版。アマゾンならポイント還元本が多数。渋川よしき, ごっちん作品ほか、お急ぎ便対象商品は当日お届けも可能。またGoならわかるシステムプログラミング 第2版もアマゾン配送商品なら通常配送無料。&lt;/div&gt;&#xA;    &lt;div class=&#34;belg-site&#34;&gt;&#xA;      &lt;span class=&#34;belg-site-name&#34;&gt;www.amazon.co.jp&lt;/span&gt;&#xA;    &lt;/div&gt;&#xA;  &lt;/div&gt;&#xA;&lt;/div&gt;&#xA;&lt;hr&gt;&#xA;&lt;h5&gt;Goならわかるシステムプログラミングの学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/&#34;&gt;第2章 io.Writer&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/&#34;&gt;第3章 io.Reader&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-4/&#34;&gt;第4章 チャネル&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/&#34;&gt;第5章 システムコール&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/&#34;&gt;第6章 TCPソケットとHTTPの実装&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;Coming soon&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;</description>
     </item>
-    
     <item>
       <title>Goならわかるシステムプログラミング：第5章 システムコール</title>
       <link>https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/</link>
       <pubDate>Tue, 01 Mar 2022 23:39:40 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-「Goならわかるシステムプログラミング」を読み進めています。とてもいい本です。
-読み進めながら実験していることを書いていきます。同じ本を読んでいる人の参考（寄り道？）になればと思います。
-今回は「システムコール」です。&lt;/p&gt;
-&lt;div class=&#34;belg-link row&#34;&gt;
-  &lt;div class=&#34;belg-right col-md-12&#34;&gt;
-  &lt;div class=&#34;belg-title&#34;&gt;
-      &lt;a href=&#34;https://www.amazon.co.jp/Go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0-%E7%AC%AC2%E7%89%88-%E6%B8%8B%E5%B7%9D%E3%82%88%E3%81%97%E3%81%8D/dp/4908686122?keywords=go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0&amp;amp;qid=1649828170&amp;amp;sprefix=go%E3%81%AA%E3%82%89,aps,295&amp;amp;sr=8-1&amp;amp;linkCode=sl1&amp;amp;tag=mosuke5-22&amp;amp;linkId=657574facc6fad628c327647d446818a&amp;amp;language=ja_JP&amp;amp;ref_=as_li_ss_tl&#34; target=&#34;_blank&#34;&gt;Goならわかるシステムプログラミング 第2版 | 渋川よしき, ごっちん |本 | 通販 | Amazon&lt;/a&gt;
-    &lt;/div&gt;
-    &lt;div class=&#34;belg-description&#34;&gt;Amazonで渋川よしき, ごっちんのGoならわかるシステムプログラミング 第2版。アマゾンならポイント還元本が多数。渋川よしき, ごっちん作品ほか、お急ぎ便対象商品は当日お届けも可能。またGoならわかるシステムプログラミング 第2版もアマゾン配送商品なら通常配送無料。&lt;/div&gt;
-    &lt;div class=&#34;belg-site&#34;&gt;
-      &lt;span class=&#34;belg-site-name&#34;&gt;www.amazon.co.jp&lt;/span&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;hr&gt;
-&lt;h5&gt;Goならわかるシステムプログラミングの学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/&#34;&gt;第2章 io.Writer&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/&#34;&gt;第3章 io.Reader&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-4/&#34;&gt;第4章 チャネル&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/&#34;&gt;第5章 システムコール&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/&#34;&gt;第6章 TCPソケットとHTTPの実装&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Coming soon&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;「Goならわかるシステムプログラミング」を読み進めています。とてもいい本です。&#xA;読み進めながら実験していることを書いていきます。同じ本を読んでいる人の参考（寄り道？）になればと思います。&#xA;今回は「システムコール」です。&lt;/p&gt;&#xA;&lt;div class=&#34;belg-link row&#34;&gt;&#xA;  &lt;div class=&#34;belg-right col-md-12&#34;&gt;&#xA;  &lt;div class=&#34;belg-title&#34;&gt;&#xA;      &lt;a href=&#34;https://www.amazon.co.jp/Go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0-%E7%AC%AC2%E7%89%88-%E6%B8%8B%E5%B7%9D%E3%82%88%E3%81%97%E3%81%8D/dp/4908686122?keywords=go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0&amp;amp;qid=1649828170&amp;amp;sprefix=go%E3%81%AA%E3%82%89,aps,295&amp;amp;sr=8-1&amp;amp;linkCode=sl1&amp;amp;tag=mosuke5-22&amp;amp;linkId=657574facc6fad628c327647d446818a&amp;amp;language=ja_JP&amp;amp;ref_=as_li_ss_tl&#34; target=&#34;_blank&#34;&gt;Goならわかるシステムプログラミング 第2版 | 渋川よしき, ごっちん |本 | 通販 | Amazon&lt;/a&gt;&#xA;    &lt;/div&gt;&#xA;    &lt;div class=&#34;belg-description&#34;&gt;Amazonで渋川よしき, ごっちんのGoならわかるシステムプログラミング 第2版。アマゾンならポイント還元本が多数。渋川よしき, ごっちん作品ほか、お急ぎ便対象商品は当日お届けも可能。またGoならわかるシステムプログラミング 第2版もアマゾン配送商品なら通常配送無料。&lt;/div&gt;&#xA;    &lt;div class=&#34;belg-site&#34;&gt;&#xA;      &lt;span class=&#34;belg-site-name&#34;&gt;www.amazon.co.jp&lt;/span&gt;&#xA;    &lt;/div&gt;&#xA;  &lt;/div&gt;&#xA;&lt;/div&gt;&#xA;&lt;hr&gt;&#xA;&lt;h5&gt;Goならわかるシステムプログラミングの学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/&#34;&gt;第2章 io.Writer&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/&#34;&gt;第3章 io.Reader&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-4/&#34;&gt;第4章 チャネル&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/&#34;&gt;第5章 システムコール&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/&#34;&gt;第6章 TCPソケットとHTTPの実装&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;Coming soon&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;</description>
     </item>
-    
     <item>
       <title>Goならわかるシステムプログラミング：第4章 チャネル</title>
       <link>https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-4/</link>
       <pubDate>Tue, 01 Mar 2022 23:38:40 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-4/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-「Goならわかるシステムプログラミング」を読み進めています。とてもいい本です。
-読み進めながら実験していることを書いていきます。同じ本を読んでいる人の参考（寄り道？）になればと思います。
-今回は「低レベルアクセスへの入り口3：チャネル」です。&lt;/p&gt;
-&lt;div class=&#34;belg-link row&#34;&gt;
-  &lt;div class=&#34;belg-right col-md-12&#34;&gt;
-  &lt;div class=&#34;belg-title&#34;&gt;
-      &lt;a href=&#34;https://www.amazon.co.jp/Go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0-%E7%AC%AC2%E7%89%88-%E6%B8%8B%E5%B7%9D%E3%82%88%E3%81%97%E3%81%8D/dp/4908686122?keywords=go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0&amp;amp;qid=1649828170&amp;amp;sprefix=go%E3%81%AA%E3%82%89,aps,295&amp;amp;sr=8-1&amp;amp;linkCode=sl1&amp;amp;tag=mosuke5-22&amp;amp;linkId=657574facc6fad628c327647d446818a&amp;amp;language=ja_JP&amp;amp;ref_=as_li_ss_tl&#34; target=&#34;_blank&#34;&gt;Goならわかるシステムプログラミング 第2版 | 渋川よしき, ごっちん |本 | 通販 | Amazon&lt;/a&gt;
-    &lt;/div&gt;
-    &lt;div class=&#34;belg-description&#34;&gt;Amazonで渋川よしき, ごっちんのGoならわかるシステムプログラミング 第2版。アマゾンならポイント還元本が多数。渋川よしき, ごっちん作品ほか、お急ぎ便対象商品は当日お届けも可能。またGoならわかるシステムプログラミング 第2版もアマゾン配送商品なら通常配送無料。&lt;/div&gt;
-    &lt;div class=&#34;belg-site&#34;&gt;
-      &lt;span class=&#34;belg-site-name&#34;&gt;www.amazon.co.jp&lt;/span&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;hr&gt;
-&lt;h5&gt;Goならわかるシステムプログラミングの学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/&#34;&gt;第2章 io.Writer&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/&#34;&gt;第3章 io.Reader&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-4/&#34;&gt;第4章 チャネル&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/&#34;&gt;第5章 システムコール&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/&#34;&gt;第6章 TCPソケットとHTTPの実装&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Coming soon&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;「Goならわかるシステムプログラミング」を読み進めています。とてもいい本です。&#xA;読み進めながら実験していることを書いていきます。同じ本を読んでいる人の参考（寄り道？）になればと思います。&#xA;今回は「低レベルアクセスへの入り口3：チャネル」です。&lt;/p&gt;&#xA;&lt;div class=&#34;belg-link row&#34;&gt;&#xA;  &lt;div class=&#34;belg-right col-md-12&#34;&gt;&#xA;  &lt;div class=&#34;belg-title&#34;&gt;&#xA;      &lt;a href=&#34;https://www.amazon.co.jp/Go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0-%E7%AC%AC2%E7%89%88-%E6%B8%8B%E5%B7%9D%E3%82%88%E3%81%97%E3%81%8D/dp/4908686122?keywords=go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0&amp;amp;qid=1649828170&amp;amp;sprefix=go%E3%81%AA%E3%82%89,aps,295&amp;amp;sr=8-1&amp;amp;linkCode=sl1&amp;amp;tag=mosuke5-22&amp;amp;linkId=657574facc6fad628c327647d446818a&amp;amp;language=ja_JP&amp;amp;ref_=as_li_ss_tl&#34; target=&#34;_blank&#34;&gt;Goならわかるシステムプログラミング 第2版 | 渋川よしき, ごっちん |本 | 通販 | Amazon&lt;/a&gt;&#xA;    &lt;/div&gt;&#xA;    &lt;div class=&#34;belg-description&#34;&gt;Amazonで渋川よしき, ごっちんのGoならわかるシステムプログラミング 第2版。アマゾンならポイント還元本が多数。渋川よしき, ごっちん作品ほか、お急ぎ便対象商品は当日お届けも可能。またGoならわかるシステムプログラミング 第2版もアマゾン配送商品なら通常配送無料。&lt;/div&gt;&#xA;    &lt;div class=&#34;belg-site&#34;&gt;&#xA;      &lt;span class=&#34;belg-site-name&#34;&gt;www.amazon.co.jp&lt;/span&gt;&#xA;    &lt;/div&gt;&#xA;  &lt;/div&gt;&#xA;&lt;/div&gt;&#xA;&lt;hr&gt;&#xA;&lt;h5&gt;Goならわかるシステムプログラミングの学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/&#34;&gt;第2章 io.Writer&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/&#34;&gt;第3章 io.Reader&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-4/&#34;&gt;第4章 チャネル&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/&#34;&gt;第5章 システムコール&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/&#34;&gt;第6章 TCPソケットとHTTPの実装&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;Coming soon&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;</description>
     </item>
-    
     <item>
       <title>Goならわかるシステムプログラミング：第3章 io.Reader</title>
       <link>https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/</link>
       <pubDate>Tue, 01 Mar 2022 23:37:40 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-「Goならわかるシステムプログラミング」を読み進めています。とてもいい本です。
-読み進めながら実験していることを書いていきます。同じ本を読んでいる人の参考（寄り道？）になればと思います。
-今回は「低レベルアクセスへの入り口2：io.Reader」です。&lt;/p&gt;
-&lt;div class=&#34;belg-link row&#34;&gt;
-  &lt;div class=&#34;belg-right col-md-12&#34;&gt;
-  &lt;div class=&#34;belg-title&#34;&gt;
-      &lt;a href=&#34;https://www.amazon.co.jp/Go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0-%E7%AC%AC2%E7%89%88-%E6%B8%8B%E5%B7%9D%E3%82%88%E3%81%97%E3%81%8D/dp/4908686122?keywords=go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0&amp;amp;qid=1649828170&amp;amp;sprefix=go%E3%81%AA%E3%82%89,aps,295&amp;amp;sr=8-1&amp;amp;linkCode=sl1&amp;amp;tag=mosuke5-22&amp;amp;linkId=657574facc6fad628c327647d446818a&amp;amp;language=ja_JP&amp;amp;ref_=as_li_ss_tl&#34; target=&#34;_blank&#34;&gt;Goならわかるシステムプログラミング 第2版 | 渋川よしき, ごっちん |本 | 通販 | Amazon&lt;/a&gt;
-    &lt;/div&gt;
-    &lt;div class=&#34;belg-description&#34;&gt;Amazonで渋川よしき, ごっちんのGoならわかるシステムプログラミング 第2版。アマゾンならポイント還元本が多数。渋川よしき, ごっちん作品ほか、お急ぎ便対象商品は当日お届けも可能。またGoならわかるシステムプログラミング 第2版もアマゾン配送商品なら通常配送無料。&lt;/div&gt;
-    &lt;div class=&#34;belg-site&#34;&gt;
-      &lt;span class=&#34;belg-site-name&#34;&gt;www.amazon.co.jp&lt;/span&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;hr&gt;
-&lt;h5&gt;Goならわかるシステムプログラミングの学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/&#34;&gt;第2章 io.Writer&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/&#34;&gt;第3章 io.Reader&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-4/&#34;&gt;第4章 チャネル&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/&#34;&gt;第5章 システムコール&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/&#34;&gt;第6章 TCPソケットとHTTPの実装&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Coming soon&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;「Goならわかるシステムプログラミング」を読み進めています。とてもいい本です。&#xA;読み進めながら実験していることを書いていきます。同じ本を読んでいる人の参考（寄り道？）になればと思います。&#xA;今回は「低レベルアクセスへの入り口2：io.Reader」です。&lt;/p&gt;&#xA;&lt;div class=&#34;belg-link row&#34;&gt;&#xA;  &lt;div class=&#34;belg-right col-md-12&#34;&gt;&#xA;  &lt;div class=&#34;belg-title&#34;&gt;&#xA;      &lt;a href=&#34;https://www.amazon.co.jp/Go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0-%E7%AC%AC2%E7%89%88-%E6%B8%8B%E5%B7%9D%E3%82%88%E3%81%97%E3%81%8D/dp/4908686122?keywords=go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0&amp;amp;qid=1649828170&amp;amp;sprefix=go%E3%81%AA%E3%82%89,aps,295&amp;amp;sr=8-1&amp;amp;linkCode=sl1&amp;amp;tag=mosuke5-22&amp;amp;linkId=657574facc6fad628c327647d446818a&amp;amp;language=ja_JP&amp;amp;ref_=as_li_ss_tl&#34; target=&#34;_blank&#34;&gt;Goならわかるシステムプログラミング 第2版 | 渋川よしき, ごっちん |本 | 通販 | Amazon&lt;/a&gt;&#xA;    &lt;/div&gt;&#xA;    &lt;div class=&#34;belg-description&#34;&gt;Amazonで渋川よしき, ごっちんのGoならわかるシステムプログラミング 第2版。アマゾンならポイント還元本が多数。渋川よしき, ごっちん作品ほか、お急ぎ便対象商品は当日お届けも可能。またGoならわかるシステムプログラミング 第2版もアマゾン配送商品なら通常配送無料。&lt;/div&gt;&#xA;    &lt;div class=&#34;belg-site&#34;&gt;&#xA;      &lt;span class=&#34;belg-site-name&#34;&gt;www.amazon.co.jp&lt;/span&gt;&#xA;    &lt;/div&gt;&#xA;  &lt;/div&gt;&#xA;&lt;/div&gt;&#xA;&lt;hr&gt;&#xA;&lt;h5&gt;Goならわかるシステムプログラミングの学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/&#34;&gt;第2章 io.Writer&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/&#34;&gt;第3章 io.Reader&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-4/&#34;&gt;第4章 チャネル&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/&#34;&gt;第5章 システムコール&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/&#34;&gt;第6章 TCPソケットとHTTPの実装&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;Coming soon&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;</description>
     </item>
-    
     <item>
       <title>Goならわかるシステムプログラミング：第2章 io.Writer</title>
       <link>https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/</link>
       <pubDate>Tue, 01 Mar 2022 18:37:40 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-「Goならわかるシステムプログラミング」を読み進めています。とてもいい本です。
-読み進めながら実験していることを書いていきます。同じ本を読んでいる人の参考（寄り道？）になればと思います。
-今回は第2章の「低レベルアクセスへの入り口1：io.Writer」です。&lt;/p&gt;
-&lt;div class=&#34;belg-link row&#34;&gt;
-  &lt;div class=&#34;belg-right col-md-12&#34;&gt;
-  &lt;div class=&#34;belg-title&#34;&gt;
-      &lt;a href=&#34;https://www.amazon.co.jp/Go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0-%E7%AC%AC2%E7%89%88-%E6%B8%8B%E5%B7%9D%E3%82%88%E3%81%97%E3%81%8D/dp/4908686122?keywords=go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0&amp;amp;qid=1649828170&amp;amp;sprefix=go%E3%81%AA%E3%82%89,aps,295&amp;amp;sr=8-1&amp;amp;linkCode=sl1&amp;amp;tag=mosuke5-22&amp;amp;linkId=657574facc6fad628c327647d446818a&amp;amp;language=ja_JP&amp;amp;ref_=as_li_ss_tl&#34; target=&#34;_blank&#34;&gt;Goならわかるシステムプログラミング 第2版 | 渋川よしき, ごっちん |本 | 通販 | Amazon&lt;/a&gt;
-    &lt;/div&gt;
-    &lt;div class=&#34;belg-description&#34;&gt;Amazonで渋川よしき, ごっちんのGoならわかるシステムプログラミング 第2版。アマゾンならポイント還元本が多数。渋川よしき, ごっちん作品ほか、お急ぎ便対象商品は当日お届けも可能。またGoならわかるシステムプログラミング 第2版もアマゾン配送商品なら通常配送無料。&lt;/div&gt;
-    &lt;div class=&#34;belg-site&#34;&gt;
-      &lt;span class=&#34;belg-site-name&#34;&gt;www.amazon.co.jp&lt;/span&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;hr&gt;
-&lt;h5&gt;Goならわかるシステムプログラミングの学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/&#34;&gt;第2章 io.Writer&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/&#34;&gt;第3章 io.Reader&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-4/&#34;&gt;第4章 チャネル&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/&#34;&gt;第5章 システムコール&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/&#34;&gt;第6章 TCPソケットとHTTPの実装&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Coming soon&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;「Goならわかるシステムプログラミング」を読み進めています。とてもいい本です。&#xA;読み進めながら実験していることを書いていきます。同じ本を読んでいる人の参考（寄り道？）になればと思います。&#xA;今回は第2章の「低レベルアクセスへの入り口1：io.Writer」です。&lt;/p&gt;&#xA;&lt;div class=&#34;belg-link row&#34;&gt;&#xA;  &lt;div class=&#34;belg-right col-md-12&#34;&gt;&#xA;  &lt;div class=&#34;belg-title&#34;&gt;&#xA;      &lt;a href=&#34;https://www.amazon.co.jp/Go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0-%E7%AC%AC2%E7%89%88-%E6%B8%8B%E5%B7%9D%E3%82%88%E3%81%97%E3%81%8D/dp/4908686122?keywords=go%E3%81%AA%E3%82%89%E3%82%8F%E3%81%8B%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0&amp;amp;qid=1649828170&amp;amp;sprefix=go%E3%81%AA%E3%82%89,aps,295&amp;amp;sr=8-1&amp;amp;linkCode=sl1&amp;amp;tag=mosuke5-22&amp;amp;linkId=657574facc6fad628c327647d446818a&amp;amp;language=ja_JP&amp;amp;ref_=as_li_ss_tl&#34; target=&#34;_blank&#34;&gt;Goならわかるシステムプログラミング 第2版 | 渋川よしき, ごっちん |本 | 通販 | Amazon&lt;/a&gt;&#xA;    &lt;/div&gt;&#xA;    &lt;div class=&#34;belg-description&#34;&gt;Amazonで渋川よしき, ごっちんのGoならわかるシステムプログラミング 第2版。アマゾンならポイント還元本が多数。渋川よしき, ごっちん作品ほか、お急ぎ便対象商品は当日お届けも可能。またGoならわかるシステムプログラミング 第2版もアマゾン配送商品なら通常配送無料。&lt;/div&gt;&#xA;    &lt;div class=&#34;belg-site&#34;&gt;&#xA;      &lt;span class=&#34;belg-site-name&#34;&gt;www.amazon.co.jp&lt;/span&gt;&#xA;    &lt;/div&gt;&#xA;  &lt;/div&gt;&#xA;&lt;/div&gt;&#xA;&lt;hr&gt;&#xA;&lt;h5&gt;Goならわかるシステムプログラミングの学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-2/&#34;&gt;第2章 io.Writer&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-3/&#34;&gt;第3章 io.Reader&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-4/&#34;&gt;第4章 チャネル&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-5/&#34;&gt;第5章 システムコール&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2022/04/13/go-system-programming-6/&#34;&gt;第6章 TCPソケットとHTTPの実装&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;Coming soon&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;</description>
     </item>
-    
     <item>
       <title>Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</title>
       <link>https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/</link>
       <pubDate>Tue, 01 Mar 2022 18:37:40 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-最近Tektonをより実践に向けて検証することが多くなってきました。
-今回は、ビルドの高速化に役立つキャッシュの方法について紹介します。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;最近Tektonをより実践に向けて検証することが多くなってきました。&#xA;今回は、ビルドの高速化に役立つキャッシュの方法について紹介します。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Argo CD、外部クラスタへのデプロイと認証の仕組み</title>
       <link>https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/</link>
       <pubDate>Tue, 08 Feb 2022 14:16:45 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Argo CD学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/&#34;&gt;Argo CD、外部クラスタへのデプロイ&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-今回はArgo CDを用いて、外部のKubernetesクラスタへアプリケーションをデプロイすることについて動きを確認します。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Argo CD学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/&#34;&gt;Argo CD、外部クラスタへのデプロイ&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;今回はArgo CDを用いて、外部のKubernetesクラスタへアプリケーションをデプロイすることについて動きを確認します。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</title>
       <link>https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/</link>
       <pubDate>Mon, 24 Jan 2022 10:52:13 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-このシリーズの中で&lt;a href=&#34;https://hub.tekton.dev/tekton/task/git-clone&#34;&gt;git-clone&lt;/a&gt;タスクを利用してきましたが、いままではパブリックなレポジトリを対象に扱ってきましたが、実運用では当然ながらプライベートレポジトリを活用するはずです。
-プライベートレポジトリを使っていくにはどうしたらいいのか、その場合の挙動などを確認しておきます。&lt;/p&gt;
-&lt;p&gt;Tektonパイプラインで、git-cloneタスクを使う場合、git-cloneタスクに実装される &lt;code&gt;ssh-directory&lt;/code&gt; 設定を使うか、Tektonで用意した認証の仕組みを使うかのどちらかになると思います。それぞれの方法について見ていきましょう。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;このシリーズの中で&lt;a href=&#34;https://hub.tekton.dev/tekton/task/git-clone&#34;&gt;git-clone&lt;/a&gt;タスクを利用してきましたが、いままではパブリックなレポジトリを対象に扱ってきましたが、実運用では当然ながらプライベートレポジトリを活用するはずです。&#xA;プライベートレポジトリを使っていくにはどうしたらいいのか、その場合の挙動などを確認しておきます。&lt;/p&gt;&#xA;&lt;p&gt;Tektonパイプラインで、git-cloneタスクを使う場合、git-cloneタスクに実装される &lt;code&gt;ssh-directory&lt;/code&gt; 設定を使うか、Tektonで用意した認証の仕組みを使うかのどちらかになると思います。それぞれの方法について見ていきましょう。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>OpenShift、プロジェクトスコープのノードセレクターの挙動確認</title>
       <link>https://blog.mosuke.tech/entry/2022/01/20/openshift-project-scoped-nodeselector/</link>
       <pubDate>Thu, 20 Jan 2022 15:07:28 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/01/20/openshift-project-scoped-nodeselector/</guid>
-      <description>&lt;p&gt;あけましておめでとうございます。もーすけです。&lt;br&gt;
-今年もよろしくおねがいします。&lt;/p&gt;
-&lt;p&gt;OpenShiftのプロジェクトスコープのノードセレクターに関する雑多なメモです。&lt;/p&gt;</description>
+      <description>&lt;p&gt;あけましておめでとうございます。もーすけです。&lt;br&gt;&#xA;今年もよろしくおねがいします。&lt;/p&gt;&#xA;&lt;p&gt;OpenShiftのプロジェクトスコープのノードセレクターに関する雑多なメモです。&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

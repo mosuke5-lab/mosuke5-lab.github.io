@@ -114,7 +114,7 @@ AnsibleとかChefとかPuppetとの違いは？住み分けは？と思うかも
 個人的にはAnsibleやChefを実行する前の最低限の設定を<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>にやらせようと思っています。<br>
 （一般的かとは思いますが…？）</p>
 <p>Lee ThompsonのProvisioning Toolchainを参考にKiskstarのやる範囲をまとめると。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150731/20150731223953.jpg" alt="f🆔mosuke5:20150731223953j:plain" title="f🆔mosuke5:20150731223953j:plain" class="hatena-fotolife" itemprop="image"></span></p>
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150731/20150731223953.jpg" alt="f:id:mosuke5:20150731223953j:plain" title="f:id:mosuke5:20150731223953j:plain" class="hatena-fotolife" itemprop="image"></span></p>
 <p><iframe src="//hatenablog-parts.com/embed?url=http%3A%2F%2Fen.oreilly.com%2Fvelocity-mar2010%2Fpublic%2Fschedule%2Fdetail%2F14180" title="Provisioning Toolchain: Web Performance and Operations - Velocity Online Conference - March 17, 2010 - O'Reilly Media" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"><a href="http://en.oreilly.com/velocity-mar2010/public/schedule/detail/14180">Provisioning Toolchain: Web Performance and Operations - Velocity Online Conference - March 17, 2010 - O'Reilly Media</a></iframe><cite class="hatena-citation"><a href="http://en.oreilly.com/velocity-mar2010/public/schedule/detail/14180">en.oreilly.com</a></cite></p>
 <h1>3.Hello <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>!!</h1>
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Virtualbox">Virtualbox</a>を使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>を試しました。</p>
@@ -140,57 +140,57 @@ AnsibleとかChefとかPuppetとの違いは？住み分けは？と思うかも
 </li>
 </ul>
 <p>利用した<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイル。自分の学習のためコメントを多く残しました。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span># アップグレードするかインストールするか
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#75715e"># アップグレードするかインストールするか</span>
 </span></span><span style="display:flex;"><span>install
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span># インストールタイプの設定
-</span></span><span style="display:flex;"><span># CD-ROM経由かネットワーク経由かとか
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># インストールタイプの設定</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># CD-ROM経由かネットワーク経由かとか</span>
 </span></span><span style="display:flex;"><span>cdrom
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span># 言語設定
-</span></span><span style="display:flex;"><span>lang ja_JP.UTF-8
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 言語設定</span>
+</span></span><span style="display:flex;"><span>lang ja_JP<span style="color:#f92672">.</span>UTF<span style="color:#f92672">-</span><span style="color:#ae81ff">8</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span># キーボード設定
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># キーボード設定</span>
 </span></span><span style="display:flex;"><span>keyboard jp106
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span># ネットワーク設定
-</span></span><span style="display:flex;"><span># /etc/sysconfig/network-scripts/ifcfg-xxxx 部分
-</span></span><span style="display:flex;"><span>network --onboot yes --device eth0 --bootproto dhcp --noipv6
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ネットワーク設定</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># /etc/sysconfig/network-scripts/ifcfg-xxxx 部分</span>
+</span></span><span style="display:flex;"><span>network <span style="color:#f92672">--</span>onboot yes <span style="color:#f92672">--</span>device eth0 <span style="color:#f92672">--</span>bootproto dhcp <span style="color:#f92672">--</span>noipv6
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span># rootのパスワード
-</span></span><span style="display:flex;"><span># xxxxxx部分はopensslコマンドで作成するといい
-</span></span><span style="display:flex;"><span># $openssl passwd -1
-</span></span><span style="display:flex;"><span>rootpw --iscrypted xxxxxxxxxxxxxxxxxxxxxxxxxxx
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># rootのパスワード</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># xxxxxx部分はopensslコマンドで作成するといい</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># $openssl passwd -1</span>
+</span></span><span style="display:flex;"><span>rootpw <span style="color:#f92672">--</span>iscrypted xxxxxxxxxxxxxxxxxxxxxxxxxxx
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span># iptablesの設定
-</span></span><span style="display:flex;"><span># プロビジョニングで設定するのでここでは無効にしておく
-</span></span><span style="display:flex;"><span>firewall --disabled
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># iptablesの設定</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># プロビジョニングで設定するのでここでは無効にしておく</span>
+</span></span><span style="display:flex;"><span>firewall <span style="color:#f92672">--</span>disabled
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span># 認証オプション
-</span></span><span style="display:flex;"><span>authconfig --enableshadow --passalgo=sha512
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 認証オプション</span>
+</span></span><span style="display:flex;"><span>authconfig <span style="color:#f92672">--</span>enableshadow <span style="color:#f92672">--</span>passalgo<span style="color:#f92672">=</span>sha512
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span># SELinuxの設定
-</span></span><span style="display:flex;"><span># こちらも詳細はプロビジョニングで設定するので無効にしておく
-</span></span><span style="display:flex;"><span>selinux --disabled
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># SELinuxの設定</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># こちらも詳細はプロビジョニングで設定するので無効にしておく</span>
+</span></span><span style="display:flex;"><span>selinux <span style="color:#f92672">--</span>disabled
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span># タイムゾーン
-</span></span><span style="display:flex;"><span>timezone --utc Asia/Tokyo
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># タイムゾーン</span>
+</span></span><span style="display:flex;"><span>timezone <span style="color:#f92672">--</span>utc Asia<span style="color:#f92672">/</span>Tokyo
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span># ブートローダのインストール方法
-</span></span><span style="display:flex;"><span>bootloader --location=mbr --driveorder=sda --append=&#34;nomodeset crashkernel=auto rhgb quiet&#34;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ブートローダのインストール方法</span>
+</span></span><span style="display:flex;"><span>bootloader <span style="color:#f92672">--</span>location<span style="color:#f92672">=</span>mbr <span style="color:#f92672">--</span>driveorder<span style="color:#f92672">=</span>sda <span style="color:#f92672">--</span>append<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;nomodeset crashkernel=auto rhgb quiet&#34;</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span># 設定後にリブート
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 設定後にリブート</span>
 </span></span><span style="display:flex;"><span>reboot
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span># パーティション設定
-</span></span><span style="display:flex;"><span>clearpart --linux --drives=sda
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># パーティション設定</span>
+</span></span><span style="display:flex;"><span>clearpart <span style="color:#f92672">--</span>linux <span style="color:#f92672">--</span>drives<span style="color:#f92672">=</span>sda
 </span></span><span style="display:flex;"><span>autopart
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span># インストールパッケージ選択
-</span></span><span style="display:flex;"><span>%packages --nobase
-</span></span><span style="display:flex;"><span>@core
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># インストールパッケージ選択</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">%</span>packages <span style="color:#f92672">--</span>nobase
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">@</span>core
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>%end 
+</span></span><span style="display:flex;"><span><span style="color:#f92672">%</span>end 
 </span></span></code></pre></div><h3>参考になったもの</h3>
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Redhat">Redhat</a>社のインストールガイドがよくまとまっていた。<br>
 特に<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイルについては下記あたりが役立ちます。</p>
@@ -203,10 +203,10 @@ AnsibleとかChefとかPuppetとの違いは？住み分けは？と思うかも
 はじめ戸惑いました…</p>
 <p>実は以下の方法で利用できます。</p>
 <p>OSのisoファイルで起動するとこの画面がでるやろ。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150802/20150802125544.png" alt="f🆔mosuke5:20150802125544p:plain" title="f🆔mosuke5:20150802125544p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150802/20150802125544.png" alt="f:id:mosuke5:20150802125544p:plain" title="f:id:mosuke5:20150802125544p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 <p>そして、ここでTabをおすと、なにか入力できるが画面が出てきて。<br>
 そこに、<a class="keyword" href="http://d.hatena.ne.jp/keyword/kickstart">kickstart</a>ファイルのパスを入力してやる。
-<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150802/20150802125630.png" alt="f🆔mosuke5:20150802125630p:plain" title="f🆔mosuke5:20150802125630p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+<span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20150802/20150802125630.png" alt="f:id:mosuke5:20150802125630p:plain" title="f:id:mosuke5:20150802125630p:plain" class="hatena-fotolife" itemprop="image"></span></p>
 <p>これで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>完了や。</p>
 <h1>4.最後に</h1>
 <p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Kickstart">Kickstart</a>入門したし、次はPackerをやりたいと思います。<br>

@@ -164,27 +164,27 @@ Tekton本体が、パイプラインの実態であるTaskなどを作成し管�
 そのため、このレポジトリから自分で作成する必要があります。<br>
 TektonのOperatorは<a href="https://github.com/operator-framework/operator-sdk" target="_blank">operator-sdk</a>と呼ばれるOperator開発のためのフレームワークで作成されていて、簡単にコンテナイメージをビルドできます。
 最終的に、ビルドしたイメージをDocker hub等で公開し、ダウンロードできるようにしておきましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>// Go moduleの有効化。Go開発でのパッケージ管理に使うものです
-</span></span><span style="display:flex;"><span>$ export GO111MODULE=on
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">//</span> Go moduleの有効化<span style="color:#960050;background-color:#1e0010">。</span>Go開発でのパッケージ管理に使うものです
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> <span style="color:#66d9ef">export</span> GO111MODULE<span style="color:#f92672">=</span>on
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>// イメージビルド
-</span></span><span style="display:flex;"><span>$ operator-sdk build mosuke5/openshift-pipelines-operator:abdc4db
+</span></span><span style="display:flex;"><span><span style="color:#f92672">//</span> <span style="color:#960050;background-color:#1e0010">イメージビルド</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> operator<span style="color:#f92672">-</span>sdk build mosuke5<span style="color:#f92672">/</span>openshift<span style="color:#f92672">-</span>pipelines<span style="color:#f92672">-</span>operator:abdc4db
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>// dockerコマンドでイメージを確認
-</span></span><span style="display:flex;"><span>% docker images
+</span></span><span style="display:flex;"><span><span style="color:#f92672">//</span> dockerコマンドでイメージを確認
+</span></span><span style="display:flex;"><span><span style="color:#f92672">%</span> docker images
 </span></span><span style="display:flex;"><span>REPOSITORY                              TAG       IMAGE ID        CREATED             SIZE
-</span></span><span style="display:flex;"><span>mosuke5/openshift-pipelines-operator    abdc4db   1a6d27db0ade    About an hour ago   126MB
+</span></span><span style="display:flex;"><span>mosuke5<span style="color:#f92672">/</span>openshift<span style="color:#f92672">-</span>pipelines<span style="color:#f92672">-</span>operator    abdc4db   <span style="color:#ae81ff">1</span>a6d27db0ade    About an hour ago   <span style="color:#ae81ff">126</span>MB
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>// docker hubへアップロード
-</span></span><span style="display:flex;"><span>$ docker push mosuke5/openshift-pipelines-operator:abdc4db
-</span></span><span style="display:flex;"><span>The push refers to repository [docker.io/mosuke5/openshift-pipelines-operator]
-</span></span><span style="display:flex;"><span>8735a82318c0: Pushed
+</span></span><span style="display:flex;"><span><span style="color:#f92672">//</span> docker hubへアップロード
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> docker push mosuke5<span style="color:#f92672">/</span>openshift<span style="color:#f92672">-</span>pipelines<span style="color:#f92672">-</span>operator:abdc4db
+</span></span><span style="display:flex;"><span>The push refers to repository [docker<span style="color:#f92672">.</span>io<span style="color:#f92672">/</span>mosuke5<span style="color:#f92672">/</span>openshift<span style="color:#f92672">-</span>pipelines<span style="color:#f92672">-</span>operator]
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">8735</span>a82318c0: Pushed
 </span></span><span style="display:flex;"><span>e43bb6002dda: Pushed
-</span></span><span style="display:flex;"><span>7e2ff418c30b: Pushed
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">7e2</span>ff418c30b: Pushed
 </span></span><span style="display:flex;"><span>d72d78bdfb8f: Pushed
 </span></span><span style="display:flex;"><span>ae08c0ad8885: Layer already exists
 </span></span><span style="display:flex;"><span>c94db2932445: Layer already exists
-</span></span><span style="display:flex;"><span>abdc4db: digest: sha256:683976ac37b1b83e031b8eb73327dd7fa233fbf1e2cca0199ab49744970f8010 size: 1572
+</span></span><span style="display:flex;"><span>abdc4db: digest: sha256:<span style="color:#ae81ff">683976</span>ac37b1b83e031b8eb73327dd7fa233fbf1e2cca0199ab49744970f8010 size: <span style="color:#ae81ff">1572</span>
 </span></span></code></pre></div><p>dockerhubへのアップロードが終われば以下のように公開されているはずです。<br>
 <a href="https://hub.docker.com/repository/docker/mosuke5/openshift-pipelines-operator">https://hub.docker.com/repository/docker/mosuke5/openshift-pipelines-operator</a></p>
 <h3 id="コントローラのデプロイ">コントローラのデプロイ</h3>

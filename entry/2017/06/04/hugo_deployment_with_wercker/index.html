@@ -126,7 +126,7 @@ Werckerを利用するには自分のレポジトリに<code>wercker.yml</code>�
 </span></span><span style="display:flex;"><span>    - <span style="color:#f92672">script</span>:
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">download theme</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">code</span>: |<span style="color:#e6db74">
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            </span>            <span style="color:#ae81ff">$(git clone https://github.com/dplesca/purehugo ./themes/purehugo)</span>
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            $(git clone https://github.com/dplesca/purehugo ./themes/purehugo)</span>            
 </span></span><span style="display:flex;"><span>    - <span style="color:#f92672">arjen/hugo-build</span>:
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;0.20&#34;</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">theme</span>: <span style="color:#ae81ff">purehugo</span>
@@ -151,7 +151,7 @@ Werckerを利用するには自分のレポジトリに<code>wercker.yml</code>�
 </span></span><span style="display:flex;"><span>    - <span style="color:#f92672">script</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">name</span>: <span style="color:#ae81ff">delete cloudflare cache</span>
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">code</span>: |<span style="color:#e6db74">
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        </span>        <span style="color:#ae81ff">sh ./scripts/delete_cache_all.sh ${CF_ZONE_ID} ${CF_EMAIL} ${CF_KEY}</span>
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        sh ./scripts/delete_cache_all.sh ${CF_ZONE_ID} ${CF_EMAIL} ${CF_KEY}</span>        
 </span></span><span style="display:flex;"><span>    - <span style="color:#f92672">slack-notifier</span>:
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">channel</span>: <span style="color:#ae81ff">$SLACK_CHANNEL</span>
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">url</span>: <span style="color:#ae81ff">$SLACK_URL</span>

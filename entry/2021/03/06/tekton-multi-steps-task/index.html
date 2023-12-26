@@ -208,29 +208,29 @@
 </span></span><span style="display:flex;"><span>multi-steps-task-run-pod-92s4v   0/3     Completed         0          15s
 </span></span></code></pre></div><h2 id="stepの実行順序の確認">Stepの実行順序の確認</h2>
 <p>どのように順番制御をしているのか気になったので確認してみます。TaskRunで作成されたTask Podの中身をのぞいてみます。そうすると、Pod内のコンテナが、前のコンテナの修了を待っていることがわかります。<code>-wait_file /tekton/tools/0</code> が<code>/tekton/tools/0</code>が作成されるのをまち、<code>-post_file /tekton/tools/1</code>はStepの処理終了後に<code>/tekton/tools/1</code>のファイルを作成するということを意味します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>## 2番目のStepのコンテナは、/tekton/tools/0ができるまでまっている（前のStepが終わるのを待つ）
-</span></span><span style="display:flex;"><span>$ kubectl get pod multi-steps-task-run-pod-92s4v -o yaml | less
-</span></span><span style="display:flex;"><span>...
-</span></span><span style="display:flex;"><span>  - args:
-</span></span><span style="display:flex;"><span>    - -wait_file
-</span></span><span style="display:flex;"><span>    - /tekton/tools/0
-</span></span><span style="display:flex;"><span>    - -post_file
-</span></span><span style="display:flex;"><span>    - /tekton/tools/1
-</span></span><span style="display:flex;"><span>    - -termination_path
-</span></span><span style="display:flex;"><span>    - /tekton/termination
-</span></span><span style="display:flex;"><span>    - -entrypoint
-</span></span><span style="display:flex;"><span>    - echo
-</span></span><span style="display:flex;"><span>    - --
-</span></span><span style="display:flex;"><span>    - hello second step
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#75715e">## 2番目のStepのコンテナは、/tekton/tools/0ができるまでまっている（前のStepが終わるのを待つ）</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> kubectl get pod multi<span style="color:#f92672">-</span>steps<span style="color:#f92672">-</span>task<span style="color:#f92672">-</span>run<span style="color:#f92672">-</span>pod<span style="color:#f92672">-</span><span style="color:#ae81ff">92</span>s4v <span style="color:#f92672">-</span>o yaml <span style="color:#f92672">|</span> less
+</span></span><span style="display:flex;"><span><span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">-</span> args:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>wait_file
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">/</span>tekton<span style="color:#f92672">/</span>tools<span style="color:#f92672">/</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>post_file
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">/</span>tekton<span style="color:#f92672">/</span>tools<span style="color:#f92672">/</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>termination_path
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">/</span>tekton<span style="color:#f92672">/</span>termination
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>entrypoint
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> echo
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">--</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> hello second step
 </span></span><span style="display:flex;"><span>    command:
-</span></span><span style="display:flex;"><span>    - /tekton/tools/entrypoint
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">/</span>tekton<span style="color:#f92672">/</span>tools<span style="color:#f92672">/</span>entrypoint
 </span></span><span style="display:flex;"><span>    env:
-</span></span><span style="display:flex;"><span>    - name: HOME
-</span></span><span style="display:flex;"><span>      value: /tekton/home
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> name: HOME
+</span></span><span style="display:flex;"><span>      value: <span style="color:#f92672">/</span>tekton<span style="color:#f92672">/</span>home
 </span></span><span style="display:flex;"><span>    image: ubuntu
 </span></span><span style="display:flex;"><span>    imagePullPolicy: Always
-</span></span><span style="display:flex;"><span>    name: step-second-output
-</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>    name: step<span style="color:#f92672">-</span>second<span style="color:#f92672">-</span>output
+</span></span><span style="display:flex;"><span><span style="color:#f92672">...</span>
 </span></span></code></pre></div><p>この <code>/tekton/tools/0</code>の実態を確認するべく、Taskを以下のように変更しました。
 3番目のStepをSleepに変更して、Task実行中とすることでその間にコンテナ内部を確認してみます。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: tekton.dev/v1beta1
@@ -253,36 +253,36 @@
 </span></span><span style="display:flex;"><span>      args: [&#34;600&#34;]
 </span></span></code></pre></div><p>では、もう一度multi-steps-task-runを実行します。同じ名前のTaskRunは作れないため、TaskRunの名前を変更してapplyするか、tknコマンド・ダッシュボードから実行してください。
 実行中のTask Podに対して<code>kubectl exec</code>でコンテナ内を確認します。<code>/tekton/tools/0</code>, <code>tekton/tools/1</code>という空ファイルが作成されています。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get pod
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">$</span> kubectl get pod
 </span></span><span style="display:flex;"><span>NAME                                           READY   STATUS      RESTARTS   AGE
-</span></span><span style="display:flex;"><span>multi-steps-task-run-1615020642552-pod-rldm6   1/3     Running     0          10s
-</span></span><span style="display:flex;"><span>multi-steps-task-run-pod-92s4v                 0/3     Completed   0          21m
+</span></span><span style="display:flex;"><span>multi<span style="color:#f92672">-</span>steps<span style="color:#f92672">-</span>task<span style="color:#f92672">-</span>run<span style="color:#f92672">-</span><span style="color:#ae81ff">1615020642552</span><span style="color:#f92672">-</span>pod<span style="color:#f92672">-</span>rldm6   <span style="color:#ae81ff">1</span><span style="color:#f92672">/</span><span style="color:#ae81ff">3</span>     Running     <span style="color:#ae81ff">0</span>          <span style="color:#ae81ff">10</span>s
+</span></span><span style="display:flex;"><span>multi<span style="color:#f92672">-</span>steps<span style="color:#f92672">-</span>task<span style="color:#f92672">-</span>run<span style="color:#f92672">-</span>pod<span style="color:#f92672">-</span><span style="color:#ae81ff">92</span>s4v                 <span style="color:#ae81ff">0</span><span style="color:#f92672">/</span><span style="color:#ae81ff">3</span>     Completed   <span style="color:#ae81ff">0</span>          <span style="color:#ae81ff">21</span>m
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>## コンテナ内の/tekton/tools内を確認
-</span></span><span style="display:flex;"><span>$ kubectl exec -it multi-steps-task-run-1615020642552-pod-rldm6 -c step-third-output -- ls -l /tekton/tools
-</span></span><span style="display:flex;"><span>total 39452
-</span></span><span style="display:flex;"><span>-rw-r--r-- 1 root  root         0 Mar  6 08:50 0
-</span></span><span style="display:flex;"><span>-rw-r--r-- 1 root  root         0 Mar  6 08:50 1
-</span></span><span style="display:flex;"><span>-r-xr-xr-x 1 65532 65532 40397757 Mar  6 08:50 entrypoint
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## コンテナ内の/tekton/tools内を確認</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> kubectl exec <span style="color:#f92672">-</span>it multi<span style="color:#f92672">-</span>steps<span style="color:#f92672">-</span>task<span style="color:#f92672">-</span>run<span style="color:#f92672">-</span><span style="color:#ae81ff">1615020642552</span><span style="color:#f92672">-</span>pod<span style="color:#f92672">-</span>rldm6 <span style="color:#f92672">-</span>c step<span style="color:#f92672">-</span>third<span style="color:#f92672">-</span>output <span style="color:#f92672">--</span> ls <span style="color:#f92672">-</span>l <span style="color:#f92672">/</span>tekton<span style="color:#f92672">/</span>tools
+</span></span><span style="display:flex;"><span>total <span style="color:#ae81ff">39452</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span>rw<span style="color:#f92672">-</span>r<span style="color:#f92672">--</span>r<span style="color:#f92672">--</span> <span style="color:#ae81ff">1</span> root  root         <span style="color:#ae81ff">0</span> Mar  <span style="color:#ae81ff">6</span> <span style="color:#ae81ff">08</span>:<span style="color:#ae81ff">50</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span>rw<span style="color:#f92672">-</span>r<span style="color:#f92672">--</span>r<span style="color:#f92672">--</span> <span style="color:#ae81ff">1</span> root  root         <span style="color:#ae81ff">0</span> Mar  <span style="color:#ae81ff">6</span> <span style="color:#ae81ff">08</span>:<span style="color:#ae81ff">50</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span>r<span style="color:#f92672">-</span>xr<span style="color:#f92672">-</span>xr<span style="color:#f92672">-</span>x <span style="color:#ae81ff">1</span> <span style="color:#ae81ff">65532</span> <span style="color:#ae81ff">65532</span> <span style="color:#ae81ff">40397757</span> Mar  <span style="color:#ae81ff">6</span> <span style="color:#ae81ff">08</span>:<span style="color:#ae81ff">50</span> entrypoint
 </span></span></code></pre></div><p>ちなみに、TaskないのStepはEmptyDirを用いて<code>/tekton/tools</code>を共有しています。
 これによってStepの終了を別のコンテナに通知している形となります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get pod multi-steps-task-run-1615020642552-pod-rldm6 -o yaml | less
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">$</span> kubectl get pod multi<span style="color:#f92672">-</span>steps<span style="color:#f92672">-</span>task<span style="color:#f92672">-</span>run<span style="color:#f92672">-</span><span style="color:#ae81ff">1615020642552</span><span style="color:#f92672">-</span>pod<span style="color:#f92672">-</span>rldm6 <span style="color:#f92672">-</span>o yaml <span style="color:#f92672">|</span> less
 </span></span><span style="display:flex;"><span>spec:
 </span></span><span style="display:flex;"><span>  containers:
-</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span><span style="color:#f92672">...</span>
 </span></span><span style="display:flex;"><span>    volumeMounts:
-</span></span><span style="display:flex;"><span>    - mountPath: /tekton/tools
-</span></span><span style="display:flex;"><span>      name: tekton-internal-tools
-</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> mountPath: <span style="color:#f92672">/</span>tekton<span style="color:#f92672">/</span>tools
+</span></span><span style="display:flex;"><span>      name: tekton<span style="color:#f92672">-</span>internal<span style="color:#f92672">-</span>tools
+</span></span><span style="display:flex;"><span><span style="color:#f92672">...</span>
 </span></span><span style="display:flex;"><span>  volumes:
-</span></span><span style="display:flex;"><span>  - emptyDir: {}
-</span></span><span style="display:flex;"><span>    name: tekton-internal-workspace
-</span></span><span style="display:flex;"><span>  - emptyDir: {}
-</span></span><span style="display:flex;"><span>    name: tekton-internal-home
-</span></span><span style="display:flex;"><span>  - emptyDir: {}
-</span></span><span style="display:flex;"><span>    name: tekton-internal-results
-</span></span><span style="display:flex;"><span>  - emptyDir: {}
-</span></span><span style="display:flex;"><span>    name: tekton-internal-tools
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">-</span> emptyDir: {}
+</span></span><span style="display:flex;"><span>    name: tekton<span style="color:#f92672">-</span>internal<span style="color:#f92672">-</span>workspace
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">-</span> emptyDir: {}
+</span></span><span style="display:flex;"><span>    name: tekton<span style="color:#f92672">-</span>internal<span style="color:#f92672">-</span>home
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">-</span> emptyDir: {}
+</span></span><span style="display:flex;"><span>    name: tekton<span style="color:#f92672">-</span>internal<span style="color:#f92672">-</span>results
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">-</span> emptyDir: {}
+</span></span><span style="display:flex;"><span>    name: tekton<span style="color:#f92672">-</span>internal<span style="color:#f92672">-</span>tools
 </span></span></code></pre></div><h2 id="さいごに">さいごに</h2>
 <p>前回から間が空いてしまいましたが、Tektonについて学んだこと、確認したことを継続してポストしますので次回もお楽しみにしてください。</p>
 <hr>

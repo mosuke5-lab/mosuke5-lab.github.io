@@ -132,15 +132,15 @@ OperatorSDKは、v1.0を前提としています。それ以前のバージョ�
 <p>Operator開発に必ずしもAnsibleは必要ありません。
 もし、Kubernetesクラスタ上でしか動作させないというのであれば開発端末へのAnsibleのインストールは不要ですが、やはり動作確認のために開発端末上で確認できたほうが当然よいです。
 開発端末にAnsibleをインストールしておくことを推奨します。自分は <code>pip</code> でインストールしました。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-v" data-lang="v"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> pip3 install <span style="color:#f92672">--</span>user ansible
-</span></span><span style="display:flex;"><span><span style="color:#f92672">...</span>
-</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> ansible <span style="color:#f92672">--</span>version
-</span></span><span style="display:flex;"><span>ansible <span style="color:#ae81ff">2.10.2</span>
-</span></span><span style="display:flex;"><span>  config file <span style="color:#f92672">=</span> <span style="color:#a6e22e">None</span>
-</span></span><span style="display:flex;"><span>  configured <span style="color:#f92672">module</span> search path <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;/Users/shinyamori/.ansible/plugins/modules&#39;</span>, <span style="color:#e6db74">&#39;/usr/share/ansible/plugins/modules&#39;</span>]
-</span></span><span style="display:flex;"><span>  ansible python <span style="color:#f92672">module</span> location <span style="color:#f92672">=</span> <span style="color:#f92672">/</span><span style="color:#a6e22e">Users</span><span style="color:#f92672">/</span>shinyamori<span style="color:#f92672">/</span><span style="color:#a6e22e">Library</span><span style="color:#f92672">/</span><span style="color:#a6e22e">Python</span><span style="color:#f92672">/</span><span style="color:#ae81ff">3.8</span><span style="color:#f92672">/</span>lib<span style="color:#f92672">/</span>python<span style="color:#f92672">/</span>site<span style="color:#f92672">-</span>packages<span style="color:#f92672">/</span>ansible
-</span></span><span style="display:flex;"><span>  executable location <span style="color:#f92672">=</span> <span style="color:#f92672">/</span><span style="color:#a6e22e">Users</span><span style="color:#f92672">/</span>shinyamori<span style="color:#f92672">/</span><span style="color:#a6e22e">Library</span><span style="color:#f92672">/</span><span style="color:#a6e22e">Python</span><span style="color:#f92672">/</span><span style="color:#ae81ff">3.8</span><span style="color:#f92672">/</span>bin<span style="color:#75715e">//ansible
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  python version <span style="color:#f92672">=</span> <span style="color:#ae81ff">3.8.5</span> (default, <span style="color:#a6e22e">Jul</span> <span style="color:#ae81ff">21</span> <span style="color:#ae81ff">2020</span>, <span style="color:#ae81ff">10</span>:<span style="color:#ae81ff">48</span>:<span style="color:#ae81ff">26</span>) [<span style="color:#a6e22e">Clang</span> <span style="color:#ae81ff">11.0.3</span> (clang<span style="color:#f92672">-</span><span style="color:#ae81ff">1103.0.32.62</span>)]
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ pip3 install --user ansible
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>$ ansible --version
+</span></span><span style="display:flex;"><span>ansible 2.10.2
+</span></span><span style="display:flex;"><span>  config file = None
+</span></span><span style="display:flex;"><span>  configured module search path = [&#39;/Users/shinyamori/.ansible/plugins/modules&#39;, &#39;/usr/share/ansible/plugins/modules&#39;]
+</span></span><span style="display:flex;"><span>  ansible python module location = /Users/shinyamori/Library/Python/3.8/lib/python/site-packages/ansible
+</span></span><span style="display:flex;"><span>  executable location = /Users/shinyamori/Library/Python/3.8/bin//ansible
+</span></span><span style="display:flex;"><span>  python version = 3.8.5 (default, Jul 21 2020, 10:48:26) [Clang 11.0.3 (clang-1103.0.32.62)]
 </span></span></code></pre></div><h3 id="その他のツール">その他のツール</h3>
 <p>その他、ローカルでの実行・開発をするには下記が必要になります。</p>
 <ul>
@@ -371,33 +371,33 @@ APIバージョンを新しく追加したい場合はどうすればいいか�
 <h3 id="利用できる変数を確認したい">利用できる変数を確認したい</h3>
 <p>playbookを書いていると、KubernetesのCRで定義した情報を変数として利用したいことがでてきます。その変数をどの様にとりだしたらいいかわからなくなることがあるので、変数をダンプするすべを覚えておくといいです。
 APIのグループとkind名で一定の命名規則で変数が格納されます。下の例だと <code>group = cache.example.com</code> で <code>kind = MyExternalDeployment</code> の場合、<code>_cache_example_com_myexternaldeployment</code> という名前で生成されます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>- name: &#34;dump variables vars&#34;
-</span></span><span style="display:flex;"><span>  debug: var=vars
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">-</span> name: <span style="color:#e6db74">&#34;dump variables vars&#34;</span>
+</span></span><span style="display:flex;"><span>  debug: <span style="color:#66d9ef">var</span><span style="color:#f92672">=</span>vars
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>TASK [dump variables vars] ********************************
-</span></span><span style="display:flex;"><span>ok: [localhost] =&gt; {
-</span></span><span style="display:flex;"><span>    &#34;vars&#34;: {
-</span></span><span style="display:flex;"><span>        &#34;_cache_example_com_myexternaldeployment&#34;: {
-</span></span><span style="display:flex;"><span>            &#34;apiVersion&#34;: &#34;cache.example.com/v1&#34;,
-</span></span><span style="display:flex;"><span>            &#34;kind&#34;: &#34;MyExternalDeployment&#34;,
-</span></span><span style="display:flex;"><span>            &#34;metadata&#34;: {
-</span></span><span style="display:flex;"><span>                &#34;annotations&#34;: {
-</span></span><span style="display:flex;"><span>                    &#34;ansible.sdk.operatorframework.io/verbosity&#34;: &#34;5&#34;,
-</span></span><span style="display:flex;"><span>                    &#34;kubectl.kubernetes.io/last-applied-configuration&#34;: &#34;{\&#34;apiVersion\&#34;:\&#34;cache.example.com/v1\&#34;,\&#34;kind\&#34;:\&#34;MyExternalDeployment\&#34;,\&#34;metadata\&#34;:{\&#34;annota
-</span></span><span style="display:flex;"><span>tions\&#34;:{\&#34;ansible.sdk.operatorframework.io/verbosity\&#34;:\&#34;5\&#34;},\&#34;name\&#34;:\&#34;myexternaldeployment-sample\&#34;,\&#34;namespace\&#34;:\&#34;default\&#34;},\&#34;spec\&#34;:{\&#34;imagetag\&#34;:\&#34;latest\&#34;,\&#34;mon
-</span></span><span style="display:flex;"><span>itoringUrl\&#34;:\&#34;https://raw.githubusercontent.com/mosuke5/ansible-operator-practice/master/config/testdata/sample.json\&#34;}}\n&#34;
+</span></span><span style="display:flex;"><span>TASK [dump variables vars] <span style="color:#f92672">********************************</span>
+</span></span><span style="display:flex;"><span>ok: [localhost] <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;vars&#34;</span>: {
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;_cache_example_com_myexternaldeployment&#34;</span>: {
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;apiVersion&#34;</span>: <span style="color:#e6db74">&#34;cache.example.com/v1&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;kind&#34;</span>: <span style="color:#e6db74">&#34;MyExternalDeployment&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;metadata&#34;</span>: {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;annotations&#34;</span>: {
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#34;ansible.sdk.operatorframework.io/verbosity&#34;</span>: <span style="color:#e6db74">&#34;5&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#34;kubectl.kubernetes.io/last-applied-configuration&#34;</span>: <span style="color:#e6db74">&#34;{</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">apiVersion</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">:</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">cache.example.com/v1</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">,</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">kind</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">:</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">MyExternalDeployment</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">,</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">metadata</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">:{</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">annota</span>
+</span></span><span style="display:flex;"><span>tions\<span style="color:#e6db74">&#34;:{</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">ansible.sdk.operatorframework.io/verbosity</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">:</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">5</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">},</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">name</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">:</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">myexternaldeployment-sample</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">,</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">namespace</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">:</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">default</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">},</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">spec</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">:{</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">imagetag</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">:</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">latest</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">,</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">mon</span>
+</span></span><span style="display:flex;"><span>itoringUrl\<span style="color:#e6db74">&#34;:</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">https://raw.githubusercontent.com/mosuke5/ansible-operator-practice/master/config/testdata/sample.json</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">}}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
 </span></span><span style="display:flex;"><span>                },
-</span></span><span style="display:flex;"><span>                &#34;creationTimestamp&#34;: &#34;2020-10-14T04:30:15Z&#34;,
-</span></span><span style="display:flex;"><span>                &#34;generation&#34;: 1,
-</span></span><span style="display:flex;"><span>                &#34;name&#34;: &#34;myexternaldeployment-sample&#34;,
-</span></span><span style="display:flex;"><span>                &#34;namespace&#34;: &#34;default&#34;,
-</span></span><span style="display:flex;"><span>                &#34;resourceVersion&#34;: &#34;591896&#34;,
-</span></span><span style="display:flex;"><span>                &#34;selfLink&#34;: &#34;/apis/cache.example.com/v1/namespaces/default/myexternaldeployments/myexternaldeployment-sample/status&#34;,
-</span></span><span style="display:flex;"><span>                &#34;uid&#34;: &#34;cae902e5-05d9-40ea-93b5-1896c53eab59&#34;
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;creationTimestamp&#34;</span>: <span style="color:#e6db74">&#34;2020-10-14T04:30:15Z&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;generation&#34;</span>: <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;myexternaldeployment-sample&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;namespace&#34;</span>: <span style="color:#e6db74">&#34;default&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;resourceVersion&#34;</span>: <span style="color:#e6db74">&#34;591896&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;selfLink&#34;</span>: <span style="color:#e6db74">&#34;/apis/cache.example.com/v1/namespaces/default/myexternaldeployments/myexternaldeployment-sample/status&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;uid&#34;</span>: <span style="color:#e6db74">&#34;cae902e5-05d9-40ea-93b5-1896c53eab59&#34;</span>
 </span></span><span style="display:flex;"><span>            },
-</span></span><span style="display:flex;"><span>            &#34;spec&#34;: {
-</span></span><span style="display:flex;"><span>                &#34;imagetag&#34;: &#34;latest&#34;,
-</span></span><span style="display:flex;"><span>                &#34;monitoringUrl&#34;: &#34;https://raw.githubusercontent.com/mosuke5/ansible-operator-practice/master/config/testdata/sample.json&#34;
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;spec&#34;</span>: {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;imagetag&#34;</span>: <span style="color:#e6db74">&#34;latest&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;monitoringUrl&#34;</span>: <span style="color:#e6db74">&#34;https://raw.githubusercontent.com/mosuke5/ansible-operator-practice/master/config/testdata/sample.json&#34;</span>
 </span></span><span style="display:flex;"><span>            },
 </span></span></code></pre></div><h3 id="operatorの挙動をテストしたい">Operatorの挙動をテストしたい</h3>
 <p>ソフトウェア開発でテストコードを書くのと同じ様に、Operator開発でも（しかもAnsibleを使った開発でも）テストが書けます。

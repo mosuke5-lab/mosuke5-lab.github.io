@@ -6,1249 +6,462 @@
     <description>Recent content in Kubernetes on Goldstine研究所</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Fri, 24 Jun 2022 14:13:25 +0900</lastBuildDate><atom:link href="https://blog.mosuke.tech/categories/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 24 Jun 2022 14:13:25 +0900</lastBuildDate>
+    <atom:link href="https://blog.mosuke.tech/categories/kubernetes/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Kubernetesで、NamespaceがTerminatingのまま消せない理由についての実験(finalizer)</title>
       <link>https://blog.mosuke.tech/entry/2022/06/24/k8s-finalizer/</link>
       <pubDate>Fri, 24 Jun 2022 14:13:25 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/06/24/k8s-finalizer/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-本日は、Kubernetesのfinalizerについて確認したことをまとめようと思います。
-Kubernetesを使っている方であれば、リソースを削除したのにTerminatingのまま止まってしまって困ったということがあるんではないでしょうか？あるいは、困っていまこのブログにたどり着いたかもしれません。&lt;/p&gt;
-&lt;p&gt;すでに世の中にはいくつか関連の記事は出ていますが、
-自分の整理のためにいくつか書き残していきます。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;本日は、Kubernetesのfinalizerについて確認したことをまとめようと思います。&#xA;Kubernetesを使っている方であれば、リソースを削除したのにTerminatingのまま止まってしまって困ったということがあるんではないでしょうか？あるいは、困っていまこのブログにたどり着いたかもしれません。&lt;/p&gt;&#xA;&lt;p&gt;すでに世の中にはいくつか関連の記事は出ていますが、&#xA;自分の整理のためにいくつか書き残していきます。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>CKS合格しました。学習方法や気になる疑問などまとめ</title>
       <link>https://blog.mosuke.tech/entry/2022/06/19/cks/</link>
       <pubDate>Sun, 19 Jun 2022 15:52:32 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/06/19/cks/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-最近少し時間があったので、ようやくCKS(Certified Kubernetes Security)をとってきたので、やってきたことなどかんたんに残します。
-CKA,CKADの取得に関しては過去ブログを参照ください。&lt;/p&gt;
-&lt;div class=&#34;belg-link row&#34;&gt;
-  &lt;div class=&#34;belg-left col-md-2 d-none d-md-block&#34;&gt;
-    &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/02/07/cka/&#34; target=&#34;_blank&#34;&gt;
-      &lt;img class=&#34;belg-site-image&#34; src=&#34;https://blog.mosuke.tech/image/logo.png&#34; /&gt;
-    &lt;/a&gt;
-  &lt;/div&gt;
-  &lt;div class=&#34;belg-right col-md-10&#34;&gt;
-  &lt;div class=&#34;belg-title&#34;&gt;
-      &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/02/07/cka/&#34; target=&#34;_blank&#34;&gt;新形式のCKAを受験し合格しました。受験の教訓紹介。 · Goldstine研究所&lt;/a&gt;
-    &lt;/div&gt;
-    &lt;div class=&#34;belg-description&#34;&gt;新形式のCKAを受験してきました。受験に際して学習したことや、受験時の失敗談などを中心にまとめました。&lt;/div&gt;
-    &lt;div class=&#34;belg-site&#34;&gt;
-      &lt;img src=&#34;https://blog.mosuke.tech/image/favicon.ico&#34; class=&#34;belg-site-icon&#34;&gt;
-      &lt;span class=&#34;belg-site-name&#34;&gt;Goldstine研究所&lt;/span&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&#34;belg-link row&#34;&gt;
-  &lt;div class=&#34;belg-left col-md-2 d-none d-md-block&#34;&gt;
-    &lt;a href=&#34;https://blog.mosuke.tech/entry/2019/07/08/ckad/&#34; target=&#34;_blank&#34;&gt;
-      &lt;img class=&#34;belg-site-image&#34; src=&#34;https://blog.mosuke.tech/image/logo.png&#34; /&gt;
-    &lt;/a&gt;
-  &lt;/div&gt;
-  &lt;div class=&#34;belg-right col-md-10&#34;&gt;
-  &lt;div class=&#34;belg-title&#34;&gt;
-      &lt;a href=&#34;https://blog.mosuke.tech/entry/2019/07/08/ckad/&#34; target=&#34;_blank&#34;&gt;CKADを取得の対策や試験当日の対応について · Goldstine研究所&lt;/a&gt;
-    &lt;/div&gt;
-    &lt;div class=&#34;belg-description&#34;&gt;CKAD(Certified Kubernetes Application Developer)を受験してきて無事に合格しました。合格のために準備すべきことと、試験受験に関して不安だったことなどをまとめました。&lt;/div&gt;
-    &lt;div class=&#34;belg-site&#34;&gt;
-      &lt;img src=&#34;https://blog.mosuke.tech/image/favicon.ico&#34; class=&#34;belg-site-icon&#34;&gt;
-      &lt;span class=&#34;belg-site-name&#34;&gt;Goldstine研究所&lt;/span&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;最近少し時間があったので、ようやくCKS(Certified Kubernetes Security)をとってきたので、やってきたことなどかんたんに残します。&#xA;CKA,CKADの取得に関しては過去ブログを参照ください。&lt;/p&gt;&#xA;&lt;div class=&#34;belg-link row&#34;&gt;&#xA;  &lt;div class=&#34;belg-left col-md-2 d-none d-md-block&#34;&gt;&#xA;    &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/02/07/cka/&#34; target=&#34;_blank&#34;&gt;&#xA;      &lt;img class=&#34;belg-site-image&#34; src=&#34;https://blog.mosuke.tech/image/logo.png&#34; /&gt;&#xA;    &lt;/a&gt;&#xA;  &lt;/div&gt;&#xA;  &lt;div class=&#34;belg-right col-md-10&#34;&gt;&#xA;  &lt;div class=&#34;belg-title&#34;&gt;&#xA;      &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/02/07/cka/&#34; target=&#34;_blank&#34;&gt;新形式のCKAを受験し合格しました。受験の教訓紹介。 · Goldstine研究所&lt;/a&gt;&#xA;    &lt;/div&gt;&#xA;    &lt;div class=&#34;belg-description&#34;&gt;新形式のCKAを受験してきました。受験に際して学習したことや、受験時の失敗談などを中心にまとめました。&lt;/div&gt;&#xA;    &lt;div class=&#34;belg-site&#34;&gt;&#xA;      &lt;img src=&#34;https://blog.mosuke.tech/image/favicon.ico&#34; class=&#34;belg-site-icon&#34;&gt;&#xA;      &lt;span class=&#34;belg-site-name&#34;&gt;Goldstine研究所&lt;/span&gt;&#xA;    &lt;/div&gt;&#xA;  &lt;/div&gt;&#xA;&lt;/div&gt;&#xA;&lt;div class=&#34;belg-link row&#34;&gt;&#xA;  &lt;div class=&#34;belg-left col-md-2 d-none d-md-block&#34;&gt;&#xA;    &lt;a href=&#34;https://blog.mosuke.tech/entry/2019/07/08/ckad/&#34; target=&#34;_blank&#34;&gt;&#xA;      &lt;img class=&#34;belg-site-image&#34; src=&#34;https://blog.mosuke.tech/image/logo.png&#34; /&gt;&#xA;    &lt;/a&gt;&#xA;  &lt;/div&gt;&#xA;  &lt;div class=&#34;belg-right col-md-10&#34;&gt;&#xA;  &lt;div class=&#34;belg-title&#34;&gt;&#xA;      &lt;a href=&#34;https://blog.mosuke.tech/entry/2019/07/08/ckad/&#34; target=&#34;_blank&#34;&gt;CKADを取得の対策や試験当日の対応について · Goldstine研究所&lt;/a&gt;&#xA;    &lt;/div&gt;&#xA;    &lt;div class=&#34;belg-description&#34;&gt;CKAD(Certified Kubernetes Application Developer)を受験してきて無事に合格しました。合格のために準備すべきことと、試験受験に関して不安だったことなどをまとめました。&lt;/div&gt;&#xA;    &lt;div class=&#34;belg-site&#34;&gt;&#xA;      &lt;img src=&#34;https://blog.mosuke.tech/image/favicon.ico&#34; class=&#34;belg-site-icon&#34;&gt;&#xA;      &lt;span class=&#34;belg-site-name&#34;&gt;Goldstine研究所&lt;/span&gt;&#xA;    &lt;/div&gt;&#xA;  &lt;/div&gt;&#xA;&lt;/div&gt;</description>
     </item>
-    
     <item>
       <title>Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeeper編）</title>
       <link>https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/</link>
       <pubDate>Tue, 07 Jun 2022 21:34:44 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-以前に投稿した「Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編&amp;amp;動作編）」の続編です。
-CKSの勉強をしていて、関連あるトピックがでてきたので紹介します。&lt;/p&gt;
-&lt;p&gt;Gatekeeperというツールについてなのですが、本ブログでは&lt;u&gt;Gatekeeperの細かな使い方を説明するものではありません&lt;/u&gt;。前回までにやってきた「Admission Webhookを作って遊んで、その仕組みを理解する」の延長上で、Gatekeeperの動きを見ていくものです。
-この仕組みがわかっていると、Gatekeeperの構成ややろうとしていることがすっと頭に入りそうだったので、この続編を書くことにしました。&lt;/p&gt;
-&lt;hr&gt;
-&lt;h5&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;おまけ: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/&#34;&gt;ImagePolicyWebhookって必要なの？&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;以前に投稿した「Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編&amp;amp;動作編）」の続編です。&#xA;CKSの勉強をしていて、関連あるトピックがでてきたので紹介します。&lt;/p&gt;&#xA;&lt;p&gt;Gatekeeperというツールについてなのですが、本ブログでは&lt;u&gt;Gatekeeperの細かな使い方を説明するものではありません&lt;/u&gt;。前回までにやってきた「Admission Webhookを作って遊んで、その仕組みを理解する」の延長上で、Gatekeeperの動きを見ていくものです。&#xA;この仕組みがわかっていると、Gatekeeperの構成ややろうとしていることがすっと頭に入りそうだったので、この続編を書くことにしました。&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h5&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;おまけ: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/&#34;&gt;ImagePolicyWebhookって必要なの？&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;</description>
     </item>
-    
     <item>
       <title>マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？</title>
       <link>https://blog.mosuke.tech/entry/2022/05/31/multi-az-pv/</link>
       <pubDate>Tue, 31 May 2022 10:24:15 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/05/31/multi-az-pv/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-なんとなくあいまいに理解していなかった、「マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？」について軽く調べてみました。ほぼ自分のメモなので、間違っているところもあるかもしれません。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;なんとなくあいまいに理解していなかった、「マルチAZ環境に構築したKubernetesで、PVをマウントしたPodがどのノードにスケジュールされるのか？」について軽く調べてみました。ほぼ自分のメモなので、間違っているところもあるかもしれません。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>ImagePolicyWebhookって必要なの？</title>
       <link>https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/</link>
       <pubDate>Sun, 29 May 2022 16:48:03 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-最近はCKS(Certified Kubernetes Security)を取ろうかと勉強をはじめているのですが、ImagePolicyWebhookについて出てきたので調べてみました。
-前回にブログを書いた　&amp;ldquo;Admission Webhook&amp;rdquo; と似たような仕組みなのですが、調べた結果の意見を雑に書き残しておきます。&lt;/p&gt;
-&lt;p&gt;おそらくより実践的で使えるのは Validating/Mulating Admission Webhookの方なので、気になる方は下記のブログも参考にしてください。
-&lt;hr&gt;
-&lt;h5&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;おまけ: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/&#34;&gt;ImagePolicyWebhookって必要なの？&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;最近はCKS(Certified Kubernetes Security)を取ろうかと勉強をはじめているのですが、ImagePolicyWebhookについて出てきたので調べてみました。&#xA;前回にブログを書いた　&amp;ldquo;Admission Webhook&amp;rdquo; と似たような仕組みなのですが、調べた結果の意見を雑に書き残しておきます。&lt;/p&gt;&#xA;&lt;p&gt;おそらくより実践的で使えるのは Validating/Mulating Admission Webhookの方なので、気になる方は下記のブログも参考にしてください。&#xA;&lt;hr&gt;&#xA;&lt;h5&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;おまけ: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/&#34;&gt;ImagePolicyWebhookって必要なの？&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）</title>
       <link>https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/</link>
       <pubDate>Mon, 16 May 2022 18:37:40 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-前回は、Admission Webhookの説明編を書きました。今回は実際に動かしていくことをやっていきたいと思います。
-前回ブログおよび関連ブログは以下にもありますので、あわせて確認してみてください。&lt;/p&gt;
-&lt;hr&gt;
-&lt;h5&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;おまけ: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/&#34;&gt;ImagePolicyWebhookって必要なの？&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;前回は、Admission Webhookの説明編を書きました。今回は実際に動かしていくことをやっていきたいと思います。&#xA;前回ブログおよび関連ブログは以下にもありますので、あわせて確認してみてください。&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h5&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;おまけ: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/&#34;&gt;ImagePolicyWebhookって必要なの？&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;</description>
     </item>
-    
     <item>
       <title>Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）</title>
       <link>https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/</link>
       <pubDate>Sun, 15 May 2022 18:38:40 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-今回はKubernetesの拡張する仕組みのひとつであるAdmission Webhookをスクラッチで作ることで、その仕組や作り方を理解しようというものです。自分自身はじめて試みて詰まったところなど多数あったので、その整理も兼ねて書きます。
-いままで、ドキュメントや文献を読んで、Admission webhookというものの存在やなんとなくの仕組みは理解しているつもりでした。一方で、実際に作ってみると見えていなかった要素もわかってきました。&lt;/p&gt;
-&lt;p&gt;Kubernetesを運用すると、業務に合わせた機能拡張はほぼ必須と言っても過言ではなく、一度自分の手で作っていくことはとても有益と思います。&lt;/p&gt;
-&lt;hr&gt;
-&lt;h5&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;おまけ: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/&#34;&gt;ImagePolicyWebhookって必要なの？&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;今回はKubernetesの拡張する仕組みのひとつであるAdmission Webhookをスクラッチで作ることで、その仕組や作り方を理解しようというものです。自分自身はじめて試みて詰まったところなど多数あったので、その整理も兼ねて書きます。&#xA;いままで、ドキュメントや文献を読んで、Admission webhookというものの存在やなんとなくの仕組みは理解しているつもりでした。一方で、実際に作ってみると見えていなかった要素もわかってきました。&lt;/p&gt;&#xA;&lt;p&gt;Kubernetesを運用すると、業務に合わせた機能拡張はほぼ必須と言っても過言ではなく、一度自分の手で作っていくことはとても有益と思います。&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h5&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（説明編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（動作編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/06/07/admission-webhook-opa/&#34;&gt;Admission Webhookを作って遊んで、その仕組みを理解しよう（Gatekeepr編）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;おまけ: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/05/29/image-policy-webhook/&#34;&gt;ImagePolicyWebhookって必要なの？&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;</description>
     </item>
-    
     <item>
       <title>Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</title>
       <link>https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/</link>
       <pubDate>Tue, 01 Mar 2022 18:37:40 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-最近Tektonをより実践に向けて検証することが多くなってきました。
-今回は、ビルドの高速化に役立つキャッシュの方法について紹介します。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;最近Tektonをより実践に向けて検証することが多くなってきました。&#xA;今回は、ビルドの高速化に役立つキャッシュの方法について紹介します。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Argo CD、外部クラスタへのデプロイと認証の仕組み</title>
       <link>https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/</link>
       <pubDate>Tue, 08 Feb 2022 14:16:45 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Argo CD学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/&#34;&gt;Argo CD、外部クラスタへのデプロイ&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-今回はArgo CDを用いて、外部のKubernetesクラスタへアプリケーションをデプロイすることについて動きを確認します。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Argo CD学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/&#34;&gt;Argo CD、外部クラスタへのデプロイ&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;今回はArgo CDを用いて、外部のKubernetesクラスタへアプリケーションをデプロイすることについて動きを確認します。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</title>
       <link>https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/</link>
       <pubDate>Mon, 24 Jan 2022 10:52:13 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-このシリーズの中で&lt;a href=&#34;https://hub.tekton.dev/tekton/task/git-clone&#34;&gt;git-clone&lt;/a&gt;タスクを利用してきましたが、いままではパブリックなレポジトリを対象に扱ってきましたが、実運用では当然ながらプライベートレポジトリを活用するはずです。
-プライベートレポジトリを使っていくにはどうしたらいいのか、その場合の挙動などを確認しておきます。&lt;/p&gt;
-&lt;p&gt;Tektonパイプラインで、git-cloneタスクを使う場合、git-cloneタスクに実装される &lt;code&gt;ssh-directory&lt;/code&gt; 設定を使うか、Tektonで用意した認証の仕組みを使うかのどちらかになると思います。それぞれの方法について見ていきましょう。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;このシリーズの中で&lt;a href=&#34;https://hub.tekton.dev/tekton/task/git-clone&#34;&gt;git-clone&lt;/a&gt;タスクを利用してきましたが、いままではパブリックなレポジトリを対象に扱ってきましたが、実運用では当然ながらプライベートレポジトリを活用するはずです。&#xA;プライベートレポジトリを使っていくにはどうしたらいいのか、その場合の挙動などを確認しておきます。&lt;/p&gt;&#xA;&lt;p&gt;Tektonパイプラインで、git-cloneタスクを使う場合、git-cloneタスクに実装される &lt;code&gt;ssh-directory&lt;/code&gt; 設定を使うか、Tektonで用意した認証の仕組みを使うかのどちらかになると思います。それぞれの方法について見ていきましょう。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Kubernetes環境についてTerratestでテストを書く</title>
       <link>https://blog.mosuke.tech/entry/2021/10/28/kubernetes-test-by-terratest/</link>
       <pubDate>Thu, 28 Oct 2021 23:11:43 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/10/28/kubernetes-test-by-terratest/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-今回は&lt;a href=&#34;https://github.com/gruntwork-io/terratest&#34; target=&#34;_blank&#34;&gt;Terratest&lt;/a&gt; を用いたKubernetes環境のテストについて検討します。&lt;/p&gt;
-&lt;p&gt;TerratestはGruntwork.ioが作成しているインフラのテスティングソフトウェアです。
-もともとは、Terraformで作成したクラウド環境のテストとして発達がしましたが、いまの時代となってKubernetes環境やコンテナイメージもテストできるようになっています。&lt;/p&gt;
-&lt;p&gt;Kubernetesマニフェストにより、宣言的にインフラ環境を表現できるようになってきているととはいえ、その結果が期待通りに動作しているのかは日々の悩みのタネであることはかわりません。
-Terratestがこの悩みを解消するのにイケてそうなので調査してみます。&lt;/p&gt;
-&lt;p&gt;かつて仮想サーバでアプリケーションを運用している時代に、Serverspecを用いてテスト駆動のインフラ構築を行っていてとても気持ちがよかったので、そのレイヤーが移ってきているとも考えられます。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;今回は&lt;a href=&#34;https://github.com/gruntwork-io/terratest&#34; target=&#34;_blank&#34;&gt;Terratest&lt;/a&gt; を用いたKubernetes環境のテストについて検討します。&lt;/p&gt;&#xA;&lt;p&gt;TerratestはGruntwork.ioが作成しているインフラのテスティングソフトウェアです。&#xA;もともとは、Terraformで作成したクラウド環境のテストとして発達がしましたが、いまの時代となってKubernetes環境やコンテナイメージもテストできるようになっています。&lt;/p&gt;&#xA;&lt;p&gt;Kubernetesマニフェストにより、宣言的にインフラ環境を表現できるようになってきているととはいえ、その結果が期待通りに動作しているのかは日々の悩みのタネであることはかわりません。&#xA;Terratestがこの悩みを解消するのにイケてそうなので調査してみます。&lt;/p&gt;&#xA;&lt;p&gt;かつて仮想サーバでアプリケーションを運用している時代に、Serverspecを用いてテスト駆動のインフラ構築を行っていてとても気持ちがよかったので、そのレイヤーが移ってきているとも考えられます。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Alibaba Cloud、Serverless KubernetesのマルチAZ対応について</title>
       <link>https://blog.mosuke.tech/entry/2021/09/12/ask-multiaz/</link>
       <pubDate>Sun, 12 Sep 2021 17:27:08 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/09/12/ask-multiaz/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-本日は、Alibaba CloudのServerless Kubernetes（ASK）のマルチAZ対応について、ナレッジをためていきます。
-前回も書きましたが、Serverless Kubernetesの構築を最近行っており関連のトピックについて書く頻度が増えそうです。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;本日は、Alibaba CloudのServerless Kubernetes（ASK）のマルチAZ対応について、ナレッジをためていきます。&#xA;前回も書きましたが、Serverless Kubernetesの構築を最近行っており関連のトピックについて書く頻度が増えそうです。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Kubeletのログ管理を追ってみる</title>
       <link>https://blog.mosuke.tech/entry/2021/09/08/kubelet-log-management/</link>
       <pubDate>Wed, 08 Sep 2021 10:36:00 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/09/08/kubelet-log-management/</guid>
-      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;
-今回はKubeletのログ管理について調べたことを残します。
-Kubernetesにおけるログ管理については以前もブログを書いてきましたが、どちらかというとアプリ目線でのことで、実際のところKubeletがどうログ管理しているかよくわかっていなかったので調査してみました。
-きっかけは、KubernetesのPodのログはローテートされるのか？ずっと標準出力にログを吐き続けたらストレージはどうなるのか？そのあたり気になったことです。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;&#xA;今回はKubeletのログ管理について調べたことを残します。&#xA;Kubernetesにおけるログ管理については以前もブログを書いてきましたが、どちらかというとアプリ目線でのことで、実際のところKubeletがどうログ管理しているかよくわかっていなかったので調査してみました。&#xA;きっかけは、KubernetesのPodのログはローテートされるのか？ずっと標準出力にログを吐き続けたらストレージはどうなるのか？そのあたり気になったことです。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Alibaba Cloud, Kubernetesのイメージキャッシュ機能を検証する</title>
       <link>https://blog.mosuke.tech/entry/2021/09/04/alibabacloud-image-cache/</link>
       <pubDate>Sat, 04 Sep 2021 16:11:27 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/09/04/alibabacloud-image-cache/</guid>
-      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;
-Alibaba CloudのServerless Kubernetesを使ったシステム構築に取り組んでいて、Alibaba Cloud固有のKubernetesまわりの仕組みについて検証したことをまとめていきます。
-今回は、ImageCacheについてです。&lt;/p&gt;
-&lt;p&gt;そもそも、Serverless Kubernetesって？という方は、少し古いですが以下を参照ください。（アップデートしたい…）
-一言でいうとノードレスのKubernetesで、EKS on Fargateなどに近い仕組みです。&lt;/p&gt;
-&lt;iframe src=&#34;//www.slideshare.net/slideshow/embed_code/key/7YPxzJxZzDfOlL&#34; width=&#34;595&#34; height=&#34;485&#34; frameborder=&#34;0&#34; marginwidth=&#34;0&#34; marginheight=&#34;0&#34; scrolling=&#34;no&#34; style=&#34;border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;&#34; allowfullscreen&gt; &lt;/iframe&gt; &lt;div style=&#34;margin-bottom:5px&#34;&gt; &lt;strong&gt; &lt;a href=&#34;//www.slideshare.net/mosuke5/alibaba-cloud-serverless-kubernetes&#34; title=&#34;Alibaba Cloud Serverless Kubernetes 徹底解説&#34; target=&#34;_blank&#34;&gt;Alibaba Cloud Serverless Kubernetes 徹底解説&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href=&#34;https://www.slideshare.net/mosuke5&#34; target=&#34;_blank&#34;&gt;Shinya Mori (@mosuke5)&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;</description>
+      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;&#xA;Alibaba CloudのServerless Kubernetesを使ったシステム構築に取り組んでいて、Alibaba Cloud固有のKubernetesまわりの仕組みについて検証したことをまとめていきます。&#xA;今回は、ImageCacheについてです。&lt;/p&gt;&#xA;&lt;p&gt;そもそも、Serverless Kubernetesって？という方は、少し古いですが以下を参照ください。（アップデートしたい…）&#xA;一言でいうとノードレスのKubernetesで、EKS on Fargateなどに近い仕組みです。&lt;/p&gt;&#xA;&lt;iframe src=&#34;//www.slideshare.net/slideshow/embed_code/key/7YPxzJxZzDfOlL&#34; width=&#34;595&#34; height=&#34;485&#34; frameborder=&#34;0&#34; marginwidth=&#34;0&#34; marginheight=&#34;0&#34; scrolling=&#34;no&#34; style=&#34;border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;&#34; allowfullscreen&gt; &lt;/iframe&gt; &lt;div style=&#34;margin-bottom:5px&#34;&gt; &lt;strong&gt; &lt;a href=&#34;//www.slideshare.net/mosuke5/alibaba-cloud-serverless-kubernetes&#34; title=&#34;Alibaba Cloud Serverless Kubernetes 徹底解説&#34; target=&#34;_blank&#34;&gt;Alibaba Cloud Serverless Kubernetes 徹底解説&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href=&#34;https://www.slideshare.net/mosuke5&#34; target=&#34;_blank&#34;&gt;Shinya Mori (@mosuke5)&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;</description>
     </item>
-    
     <item>
       <title>Kubernetes、ExternalName Serviceの検証と利用時の注意事項</title>
       <link>https://blog.mosuke.tech/entry/2021/08/26/kubernetes-externalname-service/</link>
       <pubDate>Thu, 26 Aug 2021 15:50:25 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/08/26/kubernetes-externalname-service/</guid>
-      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;
-いろいろとKubernetesナレッジは溜まってきているのですが、なかなかアウトプットができていないこの頃です。本日は、KubernetesのServiceタイプのひとつである「ExternalName」について解説したいと思います。
-基礎的な内容ではありますが、よく説明することが多かったのでまとめます。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;&#xA;いろいろとKubernetesナレッジは溜まってきているのですが、なかなかアウトプットができていないこの頃です。本日は、KubernetesのServiceタイプのひとつである「ExternalName」について解説したいと思います。&#xA;基礎的な内容ではありますが、よく説明することが多かったのでまとめます。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Argo CD、Resource Hooksを使ってデプロイを高度化する</title>
       <link>https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/</link>
       <pubDate>Sat, 12 Jun 2021 18:24:10 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Argo CD学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/&#34;&gt;Argo CD、外部クラスタへのデプロイ&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-Argo CD学習シリーズをやっていきます。
-今回は、Argo CDのResource Hooksという仕組みについて解説します。
-前回にやったArgo CDのSyncと密接に関連するトピックです。
-運用レベルでArgo CDを使っていく場合、避けて通れない内容になってきます。
-Argo CDを使った本格運用に向けて学んでいきましょう。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Argo CD学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/&#34;&gt;Argo CD、外部クラスタへのデプロイ&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;Argo CD学習シリーズをやっていきます。&#xA;今回は、Argo CDのResource Hooksという仕組みについて解説します。&#xA;前回にやったArgo CDのSyncと密接に関連するトピックです。&#xA;運用レベルでArgo CDを使っていく場合、避けて通れない内容になってきます。&#xA;Argo CDを使った本格運用に向けて学んでいきましょう。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討</title>
       <link>https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd/</link>
       <pubDate>Fri, 07 May 2021 15:40:04 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-今回は、クラウドネイティブな環境でのCI/CDツールとして有名なTektonとArgo CD、これらの組み合わせした場合のパイプラインフローを検討してみます。どのように使い分けていくことができるのか考えていきたいと思います。
-本記事はTekton学習シリーズとして行ったわけではないですが、関連トピックとして番外編扱いにしておきます。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;今回は、クラウドネイティブな環境でのCI/CDツールとして有名なTektonとArgo CD、これらの組み合わせした場合のパイプラインフローを検討してみます。どのように使い分けていくことができるのか考えていきたいと思います。&#xA;本記事はTekton学習シリーズとして行ったわけではないですが、関連トピックとして番外編扱いにしておきます。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>第3回: Argo CD、Syncの実行方法やタイミングについての検討</title>
       <link>https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/</link>
       <pubDate>Thu, 06 May 2021 13:11:40 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Argo CD学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/&#34;&gt;Argo CD、外部クラスタへのデプロイ&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-Argo CD学習シリーズどんどんやっていきます。
-今回は、Argo CDがアプリケーションをSync（同期）するタイミングに関する検討です。
-軽めの話題ですが、実運用を検討する上で重要になるのでしっかりおさえておきましょう。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Argo CD学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/&#34;&gt;Argo CD、外部クラスタへのデプロイ&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;Argo CD学習シリーズどんどんやっていきます。&#xA;今回は、Argo CDがアプリケーションをSync（同期）するタイミングに関する検討です。&#xA;軽めの話題ですが、実運用を検討する上で重要になるのでしっかりおさえておきましょう。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>第2回: Argo CD、Kustomizeを使った複数環境へのデプロイ</title>
       <link>https://blog.mosuke.tech/entry/2021/05/06/argocd-application/</link>
       <pubDate>Thu, 06 May 2021 09:46:40 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/05/06/argocd-application/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Argo CD学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/&#34;&gt;Argo CD、外部クラスタへのデプロイ&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。
-Argo CD学習シリーズの続きを行っていきたいと思います。
-前回はチュートリアル的に動かしてみるところまで行いましたが、もう少し細かなアプリケーションの設定を見ていきます。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Argo CD学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/&#34;&gt;Argo CD、外部クラスタへのデプロイ&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&#xA;Argo CD学習シリーズの続きを行っていきたいと思います。&#xA;前回はチュートリアル的に動かしてみるところまで行いましたが、もう少し細かなアプリケーションの設定を見ていきます。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Kubernetesのロギングパターンは結局どれを採用したらいいの？</title>
       <link>https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/</link>
       <pubDate>Sun, 18 Apr 2021 14:44:58 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-本日は、Kubernetes上で動くアプリケーションのロギングについて考えていきたいと思います。
-以前に&lt;a href=&#34;https://blog.mosuke.tech/entry/2019/07/12/sidecar-fluentd-to-cloudwatchlogs/&#34;&gt;「Sidecar方式のFluentdでCloudWatch logsへログを集約することについての検討」&lt;/a&gt;という記事を書いたのですが、この記事では、ロギングパターンのひとつであるSidecar方式（サイドカー方式）の検討についてのみ触れており、「で、結局どうしたらいいの？」という部分がたりなかったためです。&lt;br&gt;
-本記事では、その他の方式も含めて、どれを採用したらいいのか？という考え方についてまとめていきたいとおもいます。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;本日は、Kubernetes上で動くアプリケーションのロギングについて考えていきたいと思います。&#xA;以前に&lt;a href=&#34;https://blog.mosuke.tech/entry/2019/07/12/sidecar-fluentd-to-cloudwatchlogs/&#34;&gt;「Sidecar方式のFluentdでCloudWatch logsへログを集約することについての検討」&lt;/a&gt;という記事を書いたのですが、この記事では、ロギングパターンのひとつであるSidecar方式（サイドカー方式）の検討についてのみ触れており、「で、結局どうしたらいいの？」という部分がたりなかったためです。&lt;br&gt;&#xA;本記事では、その他の方式も含めて、どれを採用したらいいのか？という考え方についてまとめていきたいとおもいます。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>第1回: Argo CD、Operatorでのインストールと主要コンポーネントの解説</title>
       <link>https://blog.mosuke.tech/entry/2021/04/13/argocd/</link>
       <pubDate>Tue, 13 Apr 2021 10:21:39 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/04/13/argocd/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Argo CD学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/&#34;&gt;Argo CD、外部クラスタへのデプロイ&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-前回の「Tekton学習シリーズ」に続きArgo CD学習シリーズをやっていきます。
-わたしは、Argo CDを何年か前に検証で確認はしていたのですが、だいぶ忘れてしまったい、改めてまとめなおしたいと思っています。
-初回は、インストールと概念編です。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Argo CD学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/13/argocd/&#34;&gt;Argo CD、Operatorでのインストールと主要コンポーネントの解説&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-application/&#34;&gt;Argo CD、Kustomizeを使った複数環境へのデプロイ&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/06/argocd-sync-action/&#34;&gt;Argo CD、Syncの実行方法やタイミングについての検討&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/06/12/argocd-resourcehooks/&#34;&gt;Argo CD、Resource Hooksを使ってデプロイを高度化する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/02/08/argocd-deploy-to-external-cluster/&#34;&gt;Argo CD、外部クラスタへのデプロイ&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;関連記事: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;前回の「Tekton学習シリーズ」に続きArgo CD学習シリーズをやっていきます。&#xA;わたしは、Argo CDを何年か前に検証で確認はしていたのですが、だいぶ忘れてしまったい、改めてまとめなおしたいと思っています。&#xA;初回は、インストールと概念編です。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Tekton、interceptorを使ってイベントトリガーを進化させる</title>
       <link>https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/</link>
       <pubDate>Thu, 08 Apr 2021 21:47:39 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-本日もTekton学習シリーズをやっていきます。今回も前回の内容の続きになるので、はじめてTekton Triggersをさわるよという方は第10回の記事をやっておくとよいです。&lt;/p&gt;
-&lt;p&gt;前回、クラスタの外部からcurlを用いてHTTPリクエストを発行して、そのイベントをトリガーにパイプラインを実行しました。実運用では、GitレポジトリからのWebhookでパイプラインを動かしたいですよね？&lt;br&gt;
-しかし、前回のままでは認証も実装しておらず、そのまま外部公開してしまうのは危険な状態です。というわけで、interceptorという機能を使って、認証や特定のイベントのみにパイプラインを実行する方法などをみていきます。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;本日もTekton学習シリーズをやっていきます。今回も前回の内容の続きになるので、はじめてTekton Triggersをさわるよという方は第10回の記事をやっておくとよいです。&lt;/p&gt;&#xA;&lt;p&gt;前回、クラスタの外部からcurlを用いてHTTPリクエストを発行して、そのイベントをトリガーにパイプラインを実行しました。実運用では、GitレポジトリからのWebhookでパイプラインを動かしたいですよね？&lt;br&gt;&#xA;しかし、前回のままでは認証も実装しておらず、そのまま外部公開してしまうのは危険な状態です。というわけで、interceptorという機能を使って、認証や特定のイベントのみにパイプラインを実行する方法などをみていきます。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Tekton、トリガーを使って外部イベントでパイプラインを実行する</title>
       <link>https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/</link>
       <pubDate>Tue, 06 Apr 2021 17:20:40 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-今回も、Tekton学習シリーズをやっていきます。Tekton Triggersを用いて、WebhookイベントからTektonパイプラインを実行する方法をみていきます。
-利用するパイプラインは前回の第9回のものを利用しますので、まだやってない人は第9回を事前に済ませておきましょう。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;今回も、Tekton学習シリーズをやっていきます。Tekton Triggersを用いて、WebhookイベントからTektonパイプラインを実行する方法をみていきます。&#xA;利用するパイプラインは前回の第9回のものを利用しますので、まだやってない人は第9回を事前に済ませておきましょう。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Tekton、アプリケーションをKubernetesクラスタへデプロイする</title>
       <link>https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/</link>
       <pubDate>Mon, 22 Mar 2021 21:38:02 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。本日もTekton学習シリーズやっていきます。&lt;br&gt;
-第9回目は、ついにアプリケーションをKubernetesクラスタにデプロイします。
-今回は第8回の続きになりますので、まだ第8回を実施していない人は先にみておいてください。
-前回は、GitHubのレポジトリからソースコードをダウンロードしてきて、コンテナイメージをビルドし、イメージレジストリに格納するところまでやりました。
-今回は、そのビルドしたイメージをKubernetesクラスタにデプロイします。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。本日もTekton学習シリーズやっていきます。&lt;br&gt;&#xA;第9回目は、ついにアプリケーションをKubernetesクラスタにデプロイします。&#xA;今回は第8回の続きになりますので、まだ第8回を実施していない人は先にみておいてください。&#xA;前回は、GitHubのレポジトリからソースコードをダウンロードしてきて、コンテナイメージをビルドし、イメージレジストリに格納するところまでやりました。&#xA;今回は、そのビルドしたイメージをKubernetesクラスタにデプロイします。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Tekton、ClusterTaskとTekton Hubを理解する</title>
       <link>https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/</link>
       <pubDate>Sun, 21 Mar 2021 17:24:57 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-Tekton学習シリーズ、どんどん進めていきましょう。第8回は、ClusterTaskとTekton Hubについてです。
-今までの内容より軽い内容になっています。これまで学習を進めてきた方ならすぐに理解できるはずです。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;Tekton学習シリーズ、どんどん進めていきましょう。第8回は、ClusterTaskとTekton Hubについてです。&#xA;今までの内容より軽い内容になっています。これまで学習を進めてきた方ならすぐに理解できるはずです。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</title>
       <link>https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/</link>
       <pubDate>Sat, 20 Mar 2021 00:36:10 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-本日もTekton学習フェーズやっていきます。第7回では、カタログの活用とTektonを使っていく上で必ず通るであろうイメージビルドについてあわせてやっていきたいと思います。
-本日のゴールは、Tektonが公開しているカタログ（公開Task）を用いて、任意のGitレポジトリにあるDockerfileをビルドしてレジストリにPushするまです。ではよろしくおねがいします。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;本日もTekton学習フェーズやっていきます。第7回では、カタログの活用とTektonを使っていく上で必ず通るであろうイメージビルドについてあわせてやっていきたいと思います。&#xA;本日のゴールは、Tektonが公開しているカタログ（公開Task）を用いて、任意のGitレポジトリにあるDockerfileをビルドしてレジストリにPushするまです。ではよろしくおねがいします。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</title>
       <link>https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/</link>
       <pubDate>Wed, 17 Mar 2021 17:17:12 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-本日もTekton学習シリーズやっていきましょう。第6回はPipelineでWorkspaceを利用してTask間でデータを連携する方法についてです。
-あるTaskで作ったデータを別のTaskで利用することはパイプラインを作っていく上で非常に重要です。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;本日もTekton学習シリーズやっていきましょう。第6回はPipelineでWorkspaceを利用してTask間でデータを連携する方法についてです。&#xA;あるTaskで作ったデータを別のTaskで利用することはパイプラインを作っていく上で非常に重要です。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Kubernetesのノード障害時のPodの動きについての検証</title>
       <link>https://blog.mosuke.tech/entry/2021/03/11/kubernetes-node-down/</link>
       <pubDate>Thu, 11 Mar 2021 00:13:19 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/03/11/kubernetes-node-down/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-本日はKubernetesのノード障害が起きたときのPodの挙動について確認します。
-いままで、ノード障害が起きたときのPodの挙動、スケジューリングについて誤った認識をしていました。
-お恥ずかしい限りなのですが、同じような誤った認識をしているかたに向けて確認したことを解説します。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;本日はKubernetesのノード障害が起きたときのPodの挙動について確認します。&#xA;いままで、ノード障害が起きたときのPodの挙動、スケジューリングについて誤った認識をしていました。&#xA;お恥ずかしい限りなのですが、同じような誤った認識をしているかたに向けて確認したことを解説します。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Tekton、TaskをまとめてPipelineとして実行する</title>
       <link>https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/</link>
       <pubDate>Sun, 07 Mar 2021 23:13:07 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;はい、もーすけです。&lt;br&gt;
-Tekton学習シリーズ第5回をやっていきます。
-本日はいよいよTaskをまとめPipelineをやっていきます。Taskの仕様を理解できていればおそらくそこまで難しくないと思います。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;はい、もーすけです。&lt;br&gt;&#xA;Tekton学習シリーズ第5回をやっていきます。&#xA;本日はいよいよTaskをまとめPipelineをやっていきます。Taskの仕様を理解できていればおそらくそこまで難しくないと思います。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</title>
       <link>https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/</link>
       <pubDate>Sun, 07 Mar 2021 15:27:50 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-本日もTekton学習シリーズやっていきます。第4回は、TaskにPipelineResourceを追加してみます。
-CIパイプライン内でGitレポジトリのソースコードを扱うことは一般的です。その方法や、設定するとなにが起きるのか見ていきましょう。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;本日もTekton学習シリーズやっていきます。第4回は、TaskにPipelineResourceを追加してみます。&#xA;CIパイプライン内でGitレポジトリのソースコードを扱うことは一般的です。その方法や、設定するとなにが起きるのか見ていきましょう。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Tekton、Tasksにパラメータを設定する</title>
       <link>https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/</link>
       <pubDate>Sat, 06 Mar 2021 22:43:43 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-今回はTektonのTaskにパラメータを引き渡す方法についてみていきます。
-前回までは、Taskにべた書きしたコマンドを実行しましたが、パラメータ指定し変数化する方法を確認します。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;今回はTektonのTaskにパラメータを引き渡す方法についてみていきます。&#xA;前回までは、Taskにべた書きしたコマンドを実行しましたが、パラメータ指定し変数化する方法を確認します。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Tekton、TaskのStepの実行順序について確認する</title>
       <link>https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/</link>
       <pubDate>Sat, 06 Mar 2021 16:34:41 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;前回、TektonのOperatorを使ったインストールについて解説しました。
-今回は、もうすこしTaskの動きを確認してみます。具体的には、Task内のStepの役割や、複数のStepがある場合の実行順序の制御方法などについて確認してみます。&lt;/p&gt;
-&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34; data-iframely-url=&#34;//cdn.iframe.ly/aQ48OK3&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;前回、TektonのOperatorを使ったインストールについて解説しました。&#xA;今回は、もうすこしTaskの動きを確認してみます。具体的には、Task内のStepの役割や、複数のStepがある場合の実行順序の制御方法などについて確認してみます。&lt;/p&gt;&#xA;&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34; data-iframely-url=&#34;//cdn.iframe.ly/aQ48OK3&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
     </item>
-    
     <item>
       <title>Redis on Kubernetesの検討ポイントとredis-ha Helm chart</title>
       <link>https://blog.mosuke.tech/entry/2021/03/03/redis-on-kubernetes/</link>
       <pubDate>Wed, 03 Mar 2021 11:40:54 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/03/03/redis-on-kubernetes/</guid>
-      <description>&lt;p&gt;もーすけです。最近は、お金の勉強ばかりしてます。&lt;br&gt;
-住宅ローンをきっかけに、いままでやってきた株や投資信託のポートフォリオを見直して、確定申告やら、税金やら。。これまた学びがいのあるジャンルで楽しくて勉強しています。&lt;/p&gt;
-&lt;p&gt;今回は、インメモリDBである&lt;a href=&#34;https://redis.io/&#34;&gt;Redis&lt;/a&gt;をKubernetesにデプロイ・運用するための方針や方法にについてまとめます。&lt;br&gt;
-いまとなってはRedisを検討することはめずらしくなくなりましたよね。セッションやキャッシュの保管先、ランキングデータの管理などさまざまなところで利用されているかと思います。そんなRedisをKubernetesで使う場合に考えるポイントを簡単に説明します。&lt;/p&gt;</description>
+      <description>&lt;p&gt;もーすけです。最近は、お金の勉強ばかりしてます。&lt;br&gt;&#xA;住宅ローンをきっかけに、いままでやってきた株や投資信託のポートフォリオを見直して、確定申告やら、税金やら。。これまた学びがいのあるジャンルで楽しくて勉強しています。&lt;/p&gt;&#xA;&lt;p&gt;今回は、インメモリDBである&lt;a href=&#34;https://redis.io/&#34;&gt;Redis&lt;/a&gt;をKubernetesにデプロイ・運用するための方針や方法にについてまとめます。&lt;br&gt;&#xA;いまとなってはRedisを検討することはめずらしくなくなりましたよね。セッションやキャッシュの保管先、ランキングデータの管理などさまざまなところで利用されているかと思います。そんなRedisをKubernetesで使う場合に考えるポイントを簡単に説明します。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>OpenShiftでCA証明書を追加することについての検証</title>
       <link>https://blog.mosuke.tech/entry/2021/03/01/openshift-add-user-ca/</link>
       <pubDate>Mon, 01 Mar 2021 18:47:31 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/03/01/openshift-add-user-ca/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-最近検証したOpenShiftへのCA証明書を追加することについてです。
-どういうケースでCA証明書の追加が必要かというと、自己証明書で運用されているレジストリとかプロキシに接続しなければいけないケースなどです。
-たとえば以下のようなケースでしょうか。&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;非インターネット環境でのOpenShiftのインストールでミラーレジストリを構築した場合（ミラーレジストリの証明書が必要なケース）&lt;/li&gt;
-&lt;li&gt;OpenShift外にプライベートのコンテナレジストリを構築していて使っている場合（上とほぼ同義）&lt;/li&gt;
-&lt;li&gt;インターネットに出るのにプロキシを経由する必要があり、その証明書が必要な場合&lt;/li&gt;
-&lt;li&gt;社内のセキュリティでTLS復号化装置（SSL可視化ソリューションとかよばれるもの）を導入しており、その機器の証明書をインストールしなければならない場合&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;このときの証明書の追加の動きについて確認したので見ていきたいと思います。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;最近検証したOpenShiftへのCA証明書を追加することについてです。&#xA;どういうケースでCA証明書の追加が必要かというと、自己証明書で運用されているレジストリとかプロキシに接続しなければいけないケースなどです。&#xA;たとえば以下のようなケースでしょうか。&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;非インターネット環境でのOpenShiftのインストールでミラーレジストリを構築した場合（ミラーレジストリの証明書が必要なケース）&lt;/li&gt;&#xA;&lt;li&gt;OpenShift外にプライベートのコンテナレジストリを構築していて使っている場合（上とほぼ同義）&lt;/li&gt;&#xA;&lt;li&gt;インターネットに出るのにプロキシを経由する必要があり、その証明書が必要な場合&lt;/li&gt;&#xA;&lt;li&gt;社内のセキュリティでTLS復号化装置（SSL可視化ソリューションとかよばれるもの）を導入しており、その機器の証明書をインストールしなければならない場合&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;このときの証明書の追加の動きについて確認したので見ていきたいと思います。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Jaegerを使った分散トレーシングの検証 on Kubernetes (1)</title>
       <link>https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/</link>
       <pubDate>Mon, 08 Feb 2021 17:04:05 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/02/08/jaeger-operator/</guid>
-      <description>&lt;p&gt;もーすけです。&lt;br&gt;
-過去にDatadogでAPMを少し検証したり、トレーニングの中でJaegerを触ったりしましたが、正直ちゃんとわかっていなかったので、改めてJaegerというか分散トレーシングについて検証してみたいと思います。&lt;/p&gt;
-&lt;p&gt;今回はKubernetes上にJaegerを構築するので、&lt;a href=&#34;https://www.jaegertracing.io/docs/1.21/operator/&#34;&gt;Jaeger Operatorをインストール&lt;/a&gt;して利用します。
-今回はOpenShiftにて検証していますが、他のKubernetesディストリビューションでも同じように利用可能です。&lt;code&gt;oc&lt;/code&gt; は &lt;code&gt;kubectl&lt;/code&gt; と置き換えて読んでください。
-検証環境は下記のとおりです。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;OpenShift: 4.4&lt;/li&gt;
-&lt;li&gt;Jaeger: 1.17&lt;/li&gt;
-&lt;/ul&gt;</description>
+      <description>&lt;p&gt;もーすけです。&lt;br&gt;&#xA;過去にDatadogでAPMを少し検証したり、トレーニングの中でJaegerを触ったりしましたが、正直ちゃんとわかっていなかったので、改めてJaegerというか分散トレーシングについて検証してみたいと思います。&lt;/p&gt;&#xA;&lt;p&gt;今回はKubernetes上にJaegerを構築するので、&lt;a href=&#34;https://www.jaegertracing.io/docs/1.21/operator/&#34;&gt;Jaeger Operatorをインストール&lt;/a&gt;して利用します。&#xA;今回はOpenShiftにて検証していますが、他のKubernetesディストリビューションでも同じように利用可能です。&lt;code&gt;oc&lt;/code&gt; は &lt;code&gt;kubectl&lt;/code&gt; と置き換えて読んでください。&#xA;検証環境は下記のとおりです。&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;OpenShift: 4.4&lt;/li&gt;&#xA;&lt;li&gt;Jaeger: 1.17&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
     </item>
-    
     <item>
       <title>新形式のCKAを受験し合格しました。受験の教訓紹介。</title>
       <link>https://blog.mosuke.tech/entry/2021/02/07/cka/</link>
       <pubDate>Sun, 07 Feb 2021 11:57:42 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/02/07/cka/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-本日は、ついに？ようやく？&lt;a href=&#34;https://training.linuxfoundation.org/ja/certification/certified-kubernetes-administrator-cka/&#34;&gt;CKA（Certified Kubernetes Administorator）&lt;/a&gt;をとりましたのでその報告です。
-いまさらのCKA取得に関することなので、CKAとはなんなのか？とかそのあたりについては本ブログでは割愛します。ぜひ他のブログを参照してください。
-どちらかというと、個人的なモチベーションや準備したこと、受験に関する教訓（失敗談）などを中心にまとめたいと思います。
-1年半ほど前にCKADをとったときのブログは以下です。合わせて読んでみてください。&lt;/p&gt;
-&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2019/07/08/ckad/&#34; data-iframely-url=&#34;//cdn.iframe.ly/mmfuBDQ&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;本日は、ついに？ようやく？&lt;a href=&#34;https://training.linuxfoundation.org/ja/certification/certified-kubernetes-administrator-cka/&#34;&gt;CKA（Certified Kubernetes Administorator）&lt;/a&gt;をとりましたのでその報告です。&#xA;いまさらのCKA取得に関することなので、CKAとはなんなのか？とかそのあたりについては本ブログでは割愛します。ぜひ他のブログを参照してください。&#xA;どちらかというと、個人的なモチベーションや準備したこと、受験に関する教訓（失敗談）などを中心にまとめたいと思います。&#xA;1年半ほど前にCKADをとったときのブログは以下です。合わせて読んでみてください。&lt;/p&gt;&#xA;&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2019/07/08/ckad/&#34; data-iframely-url=&#34;//cdn.iframe.ly/mmfuBDQ&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
     </item>
-    
     <item>
       <title>Kubernetes上のアプリケーションをtcpdumpでデバッグする</title>
       <link>https://blog.mosuke.tech/entry/2021/01/31/network-debug-on-containers/</link>
       <pubDate>Sun, 31 Jan 2021 12:10:51 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2021/01/31/network-debug-on-containers/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。休日はもっぱら住宅購入の検討で忙しいマンです。&lt;br&gt;
-さて、本日は、Kubernetesのアプリケーションのデバッグに関して書きます。&lt;/p&gt;
-&lt;p&gt;Kubernetesで運用中のアプリケーションの障害対応で、ネットワーク関連のデバッグをしたいことはよくあります。
-このブログでは具体的にtcpdumpを取得したいという場面を想定して書きます。
-コンテナアプリケーションの開発・運用をしていると、&lt;strong&gt;イメージのサイズを小さく保っておきたい&lt;/strong&gt;と思うはずです。
-その理由についてはいろいろとありますが、イメージの展開のスピードを高めることで、デプロイや障害時の復旧を早めるなどが代表的なところです。（関連するトピックとして「&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/07/09/container-image-size/&#34;&gt;コンテナイメージを軽くする方法と、その原理原則を考える&lt;/a&gt;」も読んでみてください。）&lt;/p&gt;
-&lt;p&gt;それゆえに、アプリケーションの動作に必要なライブラリ以外は入れないことが多く、デバッグツールを除外しておくことが多いでしょう。
-しかし、障害発生時にいざtcpdumpやstrace, ping ,digなどを打ちたいと思ってもインストールされておらず困ることがあります。
-そんな場面に遭遇しても焦らないようにあらかじめ対応策を頭に入れて練習しておきましょう。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。休日はもっぱら住宅購入の検討で忙しいマンです。&lt;br&gt;&#xA;さて、本日は、Kubernetesのアプリケーションのデバッグに関して書きます。&lt;/p&gt;&#xA;&lt;p&gt;Kubernetesで運用中のアプリケーションの障害対応で、ネットワーク関連のデバッグをしたいことはよくあります。&#xA;このブログでは具体的にtcpdumpを取得したいという場面を想定して書きます。&#xA;コンテナアプリケーションの開発・運用をしていると、&lt;strong&gt;イメージのサイズを小さく保っておきたい&lt;/strong&gt;と思うはずです。&#xA;その理由についてはいろいろとありますが、イメージの展開のスピードを高めることで、デプロイや障害時の復旧を早めるなどが代表的なところです。（関連するトピックとして「&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/07/09/container-image-size/&#34;&gt;コンテナイメージを軽くする方法と、その原理原則を考える&lt;/a&gt;」も読んでみてください。）&lt;/p&gt;&#xA;&lt;p&gt;それゆえに、アプリケーションの動作に必要なライブラリ以外は入れないことが多く、デバッグツールを除外しておくことが多いでしょう。&#xA;しかし、障害発生時にいざtcpdumpやstrace, ping ,digなどを打ちたいと思ってもインストールされておらず困ることがあります。&#xA;そんな場面に遭遇しても焦らないようにあらかじめ対応策を頭に入れて練習しておきましょう。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>OpenShift on NVIDIA GPU（導入編）</title>
       <link>https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/</link>
       <pubDate>Thu, 17 Dec 2020 22:01:20 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-今回は前回に続き、OpenShiftにGPUのノードを追加して利用する方法（導入編）として書いていきます。
-インストールの細かな方法については英語ですが公式ドキュメントに譲るとして、実行していくにあたってのポイントなどを経験者としてまとめておきます。
-概要編につきましては以下をご覧ください。&lt;/p&gt;
-&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/12/16/openshift-on-nvidia-gpu/&#34; data-iframely-url=&#34;//cdn.iframe.ly/PbejT6X&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;今回は前回に続き、OpenShiftにGPUのノードを追加して利用する方法（導入編）として書いていきます。&#xA;インストールの細かな方法については英語ですが公式ドキュメントに譲るとして、実行していくにあたってのポイントなどを経験者としてまとめておきます。&#xA;概要編につきましては以下をご覧ください。&lt;/p&gt;&#xA;&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/12/16/openshift-on-nvidia-gpu/&#34; data-iframely-url=&#34;//cdn.iframe.ly/PbejT6X&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
     </item>
-    
     <item>
       <title>OpenShift on NVIDIA GPU（概要編）</title>
       <link>https://blog.mosuke.tech/entry/2020/12/16/openshift-on-nvidia-gpu/</link>
       <pubDate>Wed, 16 Dec 2020 19:21:02 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/12/16/openshift-on-nvidia-gpu/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-本日はOpenShiftにNVIDIA GPUのノードを追加して利用する方法2つのブログ（概要編と導入編）に分けて紹介したいと思います。
-あまりまだ日本語での情報がないので、挑戦したいと考えている人の参考になればと思います。
-また、非常に進化が速く、情報が古くなる可能性もあります。なるべく更新していきたいと思っていますが、最新情報は公式情報をみてください。。
-導入編では、OpenShiftを取り扱いますが、他のKubernetesディストリビューションをお使いの方も参考になるところはあると思います。&lt;/p&gt;
-&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/&#34; data-iframely-url=&#34;//cdn.iframe.ly/ELaxDLL&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;本日はOpenShiftにNVIDIA GPUのノードを追加して利用する方法2つのブログ（概要編と導入編）に分けて紹介したいと思います。&#xA;あまりまだ日本語での情報がないので、挑戦したいと考えている人の参考になればと思います。&#xA;また、非常に進化が速く、情報が古くなる可能性もあります。なるべく更新していきたいと思っていますが、最新情報は公式情報をみてください。。&#xA;導入編では、OpenShiftを取り扱いますが、他のKubernetesディストリビューションをお使いの方も参考になるところはあると思います。&lt;/p&gt;&#xA;&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/&#34; data-iframely-url=&#34;//cdn.iframe.ly/ELaxDLL&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
     </item>
-    
     <item>
       <title>P2Pでコンテナイメージを配信できるDragonflyとAlibaba Cloudのなぞ</title>
       <link>https://blog.mosuke.tech/entry/2020/12/02/dragonfly/</link>
       <pubDate>Wed, 02 Dec 2020 00:00:00 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/12/02/dragonfly/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-ここ最近、ワケアッて少しAlibaba Cloud関連のKubernetesについて調べています。
-ちなみにこちらの記事は&lt;a href=&#34;https://qiita.com/advent-calendar/2020/alibabacloud&#34;&gt;Alibaba Cloud Adovent Calender 2020&lt;/a&gt;の2日目の投稿です。&lt;/p&gt;
-&lt;p&gt;Alibaba Cloudの中の人をやめて、もう1年半以上たちますが、まだこうやって調べるとは思わなかったです。いまになっていろいろAlibaba Cloudが取り組んでいるコンテナ関連のことがよく理解できるようになってきました（笑）
-本日はアリババ/Alibaba Cloudが開発するP2Pのファイル配信ソフトウェアのDragonflyについて少し書いてみたいと思います。（まだ調べ中のところもあるので許してください）&lt;/p&gt;
-&lt;h2 id=&#34;dragonflyとは&#34;&gt;Dragonflyとは&lt;/h2&gt;
-&lt;p&gt;Dragonflyは、アリババおよびAlibaba Cloudがメインとなって開発している、オープンソースのP2Pファイル配信の仕組みです。&lt;br&gt;
-よくコンテナイメージの配信のためのソフトウェアといわれることもありますが、実態はコンテナイメージだけでなく、どんなファイルにも活用できるものです。
-コンテナ時代より前からアリババが研究していた効率的なアプリケーションの配布、キャッシュの配布、ログの配布、画像の配布がもとになっています。
-現代のクラウドネイティブの環境になってコンテナイメージの配布にも活用されてきているということです。
-その目標は、クラウドネイティブのシナリオにおけるすべての配布問題に取り組むことです。現在、Dragonflyは以下の点に焦点を当てています。&lt;/p&gt;
-&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://github.com/dragonflyoss/Dragonfly&#34; data-iframely-url=&#34;//cdn.iframe.ly/VOFvh8T&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;ここ最近、ワケアッて少しAlibaba Cloud関連のKubernetesについて調べています。&#xA;ちなみにこちらの記事は&lt;a href=&#34;https://qiita.com/advent-calendar/2020/alibabacloud&#34;&gt;Alibaba Cloud Adovent Calender 2020&lt;/a&gt;の2日目の投稿です。&lt;/p&gt;&#xA;&lt;p&gt;Alibaba Cloudの中の人をやめて、もう1年半以上たちますが、まだこうやって調べるとは思わなかったです。いまになっていろいろAlibaba Cloudが取り組んでいるコンテナ関連のことがよく理解できるようになってきました（笑）&#xA;本日はアリババ/Alibaba Cloudが開発するP2Pのファイル配信ソフトウェアのDragonflyについて少し書いてみたいと思います。（まだ調べ中のところもあるので許してください）&lt;/p&gt;&#xA;&lt;h2 id=&#34;dragonflyとは&#34;&gt;Dragonflyとは&lt;/h2&gt;&#xA;&lt;p&gt;Dragonflyは、アリババおよびAlibaba Cloudがメインとなって開発している、オープンソースのP2Pファイル配信の仕組みです。&lt;br&gt;&#xA;よくコンテナイメージの配信のためのソフトウェアといわれることもありますが、実態はコンテナイメージだけでなく、どんなファイルにも活用できるものです。&#xA;コンテナ時代より前からアリババが研究していた効率的なアプリケーションの配布、キャッシュの配布、ログの配布、画像の配布がもとになっています。&#xA;現代のクラウドネイティブの環境になってコンテナイメージの配布にも活用されてきているということです。&#xA;その目標は、クラウドネイティブのシナリオにおけるすべての配布問題に取り組むことです。現在、Dragonflyは以下の点に焦点を当てています。&lt;/p&gt;&#xA;&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://github.com/dragonflyoss/Dragonfly&#34; data-iframely-url=&#34;//cdn.iframe.ly/VOFvh8T&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
     </item>
-    
     <item>
       <title>[Alibaba Cloud] KubernetesのProfessional managed clustersは何が違うのか？</title>
       <link>https://blog.mosuke.tech/entry/2020/11/29/ack-professional/</link>
       <pubDate>Sun, 29 Nov 2020 20:46:17 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/11/29/ack-professional/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-&lt;a href=&#34;https://www.alibabacloud.com/product/kubernetes&#34;&gt;Container Service for Kubernetes (ACK)&lt;/a&gt; では、新しくマネージドクラスタの中でサービスレベルを選べるようになりました。
-&lt;a href=&#34;https://www.alibabacloud.com/help/doc-detail/173290.htm&#34;&gt;Professional managed clusters&lt;/a&gt;というものです。
-このクラスターは通常のマネージドクラスタと比べて何が違うのでしょうか？
-調べてみたのでまとめました。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;&lt;a href=&#34;https://www.alibabacloud.com/product/kubernetes&#34;&gt;Container Service for Kubernetes (ACK)&lt;/a&gt; では、新しくマネージドクラスタの中でサービスレベルを選べるようになりました。&#xA;&lt;a href=&#34;https://www.alibabacloud.com/help/doc-detail/173290.htm&#34;&gt;Professional managed clusters&lt;/a&gt;というものです。&#xA;このクラスターは通常のマネージドクラスタと比べて何が違うのでしょうか？&#xA;調べてみたのでまとめました。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Docker Hubのダウンロード回数制限の対策を考える</title>
       <link>https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/</link>
       <pubDate>Wed, 18 Nov 2020 17:32:21 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/11/18/docker-rate-limit/</guid>
-      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;
-今日は最近開始されたDocker Hubのイメージダウンロードの回数制限について書きたいと思います。
-動向だけはなんとなく追っていたのですが、先日に自分がこの問題に向き合わなければいけないケースに遭遇したため、残しておこうと思い立ちました。&lt;/p&gt;
-&lt;h2 id=&#34;きっかけ&#34;&gt;きっかけ&lt;/h2&gt;
-&lt;p&gt;本ブログの記事のビルドやデプロイには&lt;a href=&#34;https://app.wercker.com/&#34;&gt;Wecker&lt;/a&gt;というサービスを利用しています。
-ある日、記事を投稿しようとしたところCIのビルドがコケて記事を投稿できませんでした。
-エラーは以下のとおりで、調べるとDocker Hubのイメージダウンロードの回数制限に引っかかっていることがわかりました。&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;&lt;code&gt;fetch failed to pull image debian: API error (500): {&amp;quot;message&amp;quot;:&amp;quot;toomanyrequests: You have reached your pull rate limit. You may increase the limit by authenticating and upgrading: https://www.docker.com/increase-rate-limit&amp;quot;}&lt;/code&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;&lt;img src=&#34;https://blog.mosuke.tech/image/wercker-docker-rate-limit-error.png&#34; alt=&#34;docker-rate-limit-error&#34;&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;&#xA;今日は最近開始されたDocker Hubのイメージダウンロードの回数制限について書きたいと思います。&#xA;動向だけはなんとなく追っていたのですが、先日に自分がこの問題に向き合わなければいけないケースに遭遇したため、残しておこうと思い立ちました。&lt;/p&gt;&#xA;&lt;h2 id=&#34;きっかけ&#34;&gt;きっかけ&lt;/h2&gt;&#xA;&lt;p&gt;本ブログの記事のビルドやデプロイには&lt;a href=&#34;https://app.wercker.com/&#34;&gt;Wecker&lt;/a&gt;というサービスを利用しています。&#xA;ある日、記事を投稿しようとしたところCIのビルドがコケて記事を投稿できませんでした。&#xA;エラーは以下のとおりで、調べるとDocker Hubのイメージダウンロードの回数制限に引っかかっていることがわかりました。&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;&lt;code&gt;fetch failed to pull image debian: API error (500): {&amp;quot;message&amp;quot;:&amp;quot;toomanyrequests: You have reached your pull rate limit. You may increase the limit by authenticating and upgrading: https://www.docker.com/increase-rate-limit&amp;quot;}&lt;/code&gt;&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://blog.mosuke.tech/image/wercker-docker-rate-limit-error.png&#34; alt=&#34;docker-rate-limit-error&#34;&gt;&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>【翻訳】Kubernetes as a serviceの謎を解く。Alibaba Cloudが1万個のKubernetesクラスタを管理する方法</title>
       <link>https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/</link>
       <pubDate>Tue, 17 Nov 2020 17:24:47 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/11/17/how-to-manage-lots-of-k8s/</guid>
-      <description>&lt;p&gt;※本記事は、著者であるZhimin Tangの許可をとって翻訳した記事となります。(&lt;a href=&#34;https://www.cncf.io/blog/2019/12/12/demystifying-kubernetes-as-a-service-how-does-alibaba-cloud-manage-10000s-of-kubernetes-clusters/&#34;&gt;原文&lt;/a&gt;)&lt;br&gt;
-また本記事の内容は、2020/12/11のAliEaters Tokyo #16にて発表しており、スライドは以下です。&lt;/p&gt;
-&lt;iframe src=&#34;//www.slideshare.net/slideshow/embed_code/key/ajzBW1pq1pgkpj&#34; width=&#34;595&#34; height=&#34;485&#34; frameborder=&#34;0&#34; marginwidth=&#34;0&#34; marginheight=&#34;0&#34; scrolling=&#34;no&#34; style=&#34;border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;&#34; allowfullscreen&gt; &lt;/iframe&gt; &lt;div style=&#34;margin-bottom:5px&#34;&gt; &lt;strong&gt; &lt;a href=&#34;//www.slideshare.net/mosuke5/alibaba-cloud1kubernetes&#34; title=&#34;Alibaba Cloudが1万個のKubernetesクラスタを管理する方法&#34; target=&#34;_blank&#34;&gt;Alibaba Cloudが1万個のKubernetesクラスタを管理する方法&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href=&#34;https://www.slideshare.net/mosuke5&#34; target=&#34;_blank&#34;&gt;Shinya Mori (@mosuke5)&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;
-&lt;h2 id=&#34;概要&#34;&gt;概要&lt;/h2&gt;
-&lt;p&gt;2015年以来、Alibaba Cloud Container Service for Kubernetes（ACK）は、Alibaba Cloud上でもっとも急速に成長しているクラウドサービスの1つです。今日では、ACKは多数のAlibaba Cloudの顧客にサービスを提供しているだけでなく、Alibabaの社内インフラストラクチャやその他多くのAlibaba Cloudサービスをサポートしています。&lt;/p&gt;
-&lt;p&gt;世界的なクラウドベンダーが提供する他の多くのコンテナサービスと同様に、ACKでは信頼性と可用性が最優先事項となっています。これらの目標を達成するために、セルベースでグローバルに利用可能なプラットフォームを構築し、数万個のKubernetesクラスタを稼働させています。&lt;/p&gt;
-&lt;p&gt;今回のブログ記事では、クラウドインフラ上で大量のKubernetesクラスタを管理した経験と、その基盤となるプラットフォームの設計についてご紹介します。&lt;/p&gt;</description>
+      <description>&lt;p&gt;※本記事は、著者であるZhimin Tangの許可をとって翻訳した記事となります。(&lt;a href=&#34;https://www.cncf.io/blog/2019/12/12/demystifying-kubernetes-as-a-service-how-does-alibaba-cloud-manage-10000s-of-kubernetes-clusters/&#34;&gt;原文&lt;/a&gt;)&lt;br&gt;&#xA;また本記事の内容は、2020/12/11のAliEaters Tokyo #16にて発表しており、スライドは以下です。&lt;/p&gt;&#xA;&lt;iframe src=&#34;//www.slideshare.net/slideshow/embed_code/key/ajzBW1pq1pgkpj&#34; width=&#34;595&#34; height=&#34;485&#34; frameborder=&#34;0&#34; marginwidth=&#34;0&#34; marginheight=&#34;0&#34; scrolling=&#34;no&#34; style=&#34;border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;&#34; allowfullscreen&gt; &lt;/iframe&gt; &lt;div style=&#34;margin-bottom:5px&#34;&gt; &lt;strong&gt; &lt;a href=&#34;//www.slideshare.net/mosuke5/alibaba-cloud1kubernetes&#34; title=&#34;Alibaba Cloudが1万個のKubernetesクラスタを管理する方法&#34; target=&#34;_blank&#34;&gt;Alibaba Cloudが1万個のKubernetesクラスタを管理する方法&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href=&#34;https://www.slideshare.net/mosuke5&#34; target=&#34;_blank&#34;&gt;Shinya Mori (@mosuke5)&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&#xA;&lt;h2 id=&#34;概要&#34;&gt;概要&lt;/h2&gt;&#xA;&lt;p&gt;2015年以来、Alibaba Cloud Container Service for Kubernetes（ACK）は、Alibaba Cloud上でもっとも急速に成長しているクラウドサービスの1つです。今日では、ACKは多数のAlibaba Cloudの顧客にサービスを提供しているだけでなく、Alibabaの社内インフラストラクチャやその他多くのAlibaba Cloudサービスをサポートしています。&lt;/p&gt;&#xA;&lt;p&gt;世界的なクラウドベンダーが提供する他の多くのコンテナサービスと同様に、ACKでは信頼性と可用性が最優先事項となっています。これらの目標を達成するために、セルベースでグローバルに利用可能なプラットフォームを構築し、数万個のKubernetesクラスタを稼働させています。&lt;/p&gt;&#xA;&lt;p&gt;今回のブログ記事では、クラウドインフラ上で大量のKubernetesクラスタを管理した経験と、その基盤となるプラットフォームの設計についてご紹介します。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>OperatorSDK for Ansible の開発。チュートリアルの次の一歩</title>
       <link>https://blog.mosuke.tech/entry/2020/10/10/develop-ansible-operator/</link>
       <pubDate>Sat, 10 Oct 2020 14:06:03 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/10/10/develop-ansible-operator/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-本日は、Kubernetes Operatorの開発に関する情報提供をしたいと思います。
-Operatorってなに？ってかたやより内部実装を学びたい方はぜひこちらの書籍（&lt;a href=&#34;https://amzn.to/34SwsvS&#34;&gt;実践入門 Kubernetesカスタムコントローラーへの道&lt;/a&gt;）を参考にしてください。&lt;/p&gt;
-&lt;p&gt;Operator開発にはOperatorSDKを利用するのが非常に便利です。Go, Ansible, Helmなどを用いて開発できるのですが、今回はAnsibleを使ったOperatorについて書きます。
-OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメントのチュートリアルを実施したあとに何をすればいいのか？とっつきにくいさもあります。
-というわけで、このブログでは、チュートリアル後に何をすればいいか？どんなことを確認していけばいいのか？という観点でまとめてみましたので、ぜひ参考にしてOperator開発を楽しんでください。&lt;/p&gt;
-&lt;p&gt;まだチュートリアルをやっていないよ、というかたはこちらから済ましてみましょう。&lt;/p&gt;
-&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://sdk.operatorframework.io/docs/building-operators/ansible/tutorial/&#34; data-iframely-url=&#34;//cdn.iframe.ly/2QAR3qE&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;本日は、Kubernetes Operatorの開発に関する情報提供をしたいと思います。&#xA;Operatorってなに？ってかたやより内部実装を学びたい方はぜひこちらの書籍（&lt;a href=&#34;https://amzn.to/34SwsvS&#34;&gt;実践入門 Kubernetesカスタムコントローラーへの道&lt;/a&gt;）を参考にしてください。&lt;/p&gt;&#xA;&lt;p&gt;Operator開発にはOperatorSDKを利用するのが非常に便利です。Go, Ansible, Helmなどを用いて開発できるのですが、今回はAnsibleを使ったOperatorについて書きます。&#xA;OperatorSDKは便利ですが、まだまだ情報が少なく、ドキュメントのチュートリアルを実施したあとに何をすればいいのか？とっつきにくいさもあります。&#xA;というわけで、このブログでは、チュートリアル後に何をすればいいか？どんなことを確認していけばいいのか？という観点でまとめてみましたので、ぜひ参考にしてOperator開発を楽しんでください。&lt;/p&gt;&#xA;&lt;p&gt;まだチュートリアルをやっていないよ、というかたはこちらから済ましてみましょう。&lt;/p&gt;&#xA;&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://sdk.operatorframework.io/docs/building-operators/ansible/tutorial/&#34; data-iframely-url=&#34;//cdn.iframe.ly/2QAR3qE&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
     </item>
-    
     <item>
       <title>KubernetesのPod内からの名前解決を検証する</title>
       <link>https://blog.mosuke.tech/entry/2020/09/09/kuubernetes-dns-test/</link>
       <pubDate>Wed, 09 Sep 2020 17:45:05 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/09/09/kuubernetes-dns-test/</guid>
-      <description>&lt;p&gt;もーすけです。本日は最近おこなったトラブルシューティングの中で、自分がKubernetesのDNSまわりについて理解が乏しく手こずっていたのでその内容について簡単に書いていきたいと思います。&lt;/p&gt;
-&lt;h2 id=&#34;前提&#34;&gt;前提&lt;/h2&gt;
-&lt;p&gt;これからcurlをhttpサーバに打ったり、digを行ったりしますが、Kubernetes内の下記のような環境で行ってます。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://blog.mosuke.tech/image/kubernetes-dns-test-overview.png&#34; alt=&#34;overview&#34;&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;もーすけです。本日は最近おこなったトラブルシューティングの中で、自分がKubernetesのDNSまわりについて理解が乏しく手こずっていたのでその内容について簡単に書いていきたいと思います。&lt;/p&gt;&#xA;&lt;h2 id=&#34;前提&#34;&gt;前提&lt;/h2&gt;&#xA;&lt;p&gt;これからcurlをhttpサーバに打ったり、digを行ったりしますが、Kubernetes内の下記のような環境で行ってます。&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://blog.mosuke.tech/image/kubernetes-dns-test-overview.png&#34; alt=&#34;overview&#34;&gt;&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>ZabbixでKubernetesの監視を検討する（Prometheus exporter, Kubernetes API）</title>
       <link>https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/</link>
       <pubDate>Thu, 13 Aug 2020 18:40:35 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/</guid>
-      <description>&lt;p&gt;こんにちは、&lt;a href=&#34;https://twitter.com/mosuke5&#34; target=&#34;_blank&#34;&gt;mosuke5&lt;/a&gt; です。
-本日は、ZabbixでKubernetesの監視をどこまで頑張れるか考えてみたいと思います。
-クラウドネイティブな環境ならPrometheusとそう単純に思うところですが、使い慣れたツールに統合したいことも当然ありますし、選択肢はいろいろあるべきですね。
-どんな方法で実現できるのかみていきましょう。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは、&lt;a href=&#34;https://twitter.com/mosuke5&#34; target=&#34;_blank&#34;&gt;mosuke5&lt;/a&gt; です。&#xA;本日は、ZabbixでKubernetesの監視をどこまで頑張れるか考えてみたいと思います。&#xA;クラウドネイティブな環境ならPrometheusとそう単純に思うところですが、使い慣れたツールに統合したいことも当然ありますし、選択肢はいろいろあるべきですね。&#xA;どんな方法で実現できるのかみていきましょう。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>コンテナイメージを軽くする方法と、その原理原則を考える</title>
       <link>https://blog.mosuke.tech/entry/2020/07/09/container-image-size/</link>
       <pubDate>Thu, 09 Jul 2020 18:50:01 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/07/09/container-image-size/</guid>
-      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;
-はじめてコンテナアプリケーションの開発に挑戦していると覚えることがたくさんあり、楽しさ反面大変さもおそらく感じるかと思います。
-そんな覚えることがたくさんの中には、コンテナイメージは軽くしたほうがいいというものも含まれるかもしれません。
-軽くしないと動かないわけではないので、はじめてコンテナ環境に挑戦している人はどうしても忘れがち、見落としがちなことかもしれません。
-しかし、実際の運用を見据えると、軽量であるほうが断然よいです。&lt;br&gt;
-その理由を理解すると、みなさんが「なぜコンテナに挑戦しているのか」思い出してくるのではないかと思います。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;&#xA;はじめてコンテナアプリケーションの開発に挑戦していると覚えることがたくさんあり、楽しさ反面大変さもおそらく感じるかと思います。&#xA;そんな覚えることがたくさんの中には、コンテナイメージは軽くしたほうがいいというものも含まれるかもしれません。&#xA;軽くしないと動かないわけではないので、はじめてコンテナ環境に挑戦している人はどうしても忘れがち、見落としがちなことかもしれません。&#xA;しかし、実際の運用を見据えると、軽量であるほうが断然よいです。&lt;br&gt;&#xA;その理由を理解すると、みなさんが「なぜコンテナに挑戦しているのか」思い出してくるのではないかと思います。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>コンテナイメージの脆弱性のリスクと対策についてNIST SP 800-190に沿って考える</title>
       <link>https://blog.mosuke.tech/entry/2020/07/08/container-image-security/</link>
       <pubDate>Wed, 08 Jul 2020 21:10:32 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/07/08/container-image-security/</guid>
-      <description>&lt;p&gt;少なくとも年内まで在宅勤務が確定しいるもーすけです。&lt;br&gt;
-さすがに、出社方法などすべて忘れました（笑）&lt;/p&gt;
-&lt;p&gt;はい、本日はコンテナイメージのセキュリティに関する考え方について書きます。&lt;br&gt;
-新しくコンテナ環境を導入してみたいけど、セキュリティに対してどう考えたらいいかわからないといった声や、
-実際にKubernetes使い始めたけど本当にこれで安全なの？といった不安の声が聞こえてきているのでまとめてみました。&lt;/p&gt;</description>
+      <description>&lt;p&gt;少なくとも年内まで在宅勤務が確定しいるもーすけです。&lt;br&gt;&#xA;さすがに、出社方法などすべて忘れました（笑）&lt;/p&gt;&#xA;&lt;p&gt;はい、本日はコンテナイメージのセキュリティに関する考え方について書きます。&lt;br&gt;&#xA;新しくコンテナ環境を導入してみたいけど、セキュリティに対してどう考えたらいいかわからないといった声や、&#xA;実際にKubernetes使い始めたけど本当にこれで安全なの？といった不安の声が聞こえてきているのでまとめてみました。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>カスタマイズしたJenkinsを作成する方法 on OpenShift</title>
       <link>https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/</link>
       <pubDate>Sun, 05 Jul 2020 23:00:50 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/07/05/customized-jenkins-on-openshift/</guid>
-      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;
-本日はRed Hatが提供しているKubernetesディストリビューションであるOpenShift上のJenkinsの管理に関するお話です。
-OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカスタマイズ方法などをご紹介します。
-ハマリポイントもあり困っている方も見かけたのでお役に立てばと思います。&lt;/p&gt;
-&lt;p&gt;Jenkins本体ではなくJenkins agnetのカスタマイズに関しては以前に下記ブログを書いてますのでこちらをご参照ください。&lt;/p&gt;
-&lt;iframe src=&#34;https://hatenablog-parts.com/embed?url=https%3A%2F%2Frheb.hatenablog.com%2Fentry%2Fopenshift-custom-jenkins-agent&#34; style=&#34;border: 0; width: 100%; height: 190px;&#34; allowfullscreen scrolling=&#34;no&#34;&gt;&lt;/iframe&gt;</description>
+      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;&#xA;本日はRed Hatが提供しているKubernetesディストリビューションであるOpenShift上のJenkinsの管理に関するお話です。&#xA;OpenShift上でJenkinsを利用する際のプラグイン管理の方法やカスタマイズ方法などをご紹介します。&#xA;ハマリポイントもあり困っている方も見かけたのでお役に立てばと思います。&lt;/p&gt;&#xA;&lt;p&gt;Jenkins本体ではなくJenkins agnetのカスタマイズに関しては以前に下記ブログを書いてますのでこちらをご参照ください。&lt;/p&gt;&#xA;&lt;iframe src=&#34;https://hatenablog-parts.com/embed?url=https%3A%2F%2Frheb.hatenablog.com%2Fentry%2Fopenshift-custom-jenkins-agent&#34; style=&#34;border: 0; width: 100%; height: 190px;&#34; allowfullscreen scrolling=&#34;no&#34;&gt;&lt;/iframe&gt;</description>
     </item>
-    
     <item>
       <title>Sock Shopを使ったサービスメッシュ体験のハンズオン</title>
       <link>https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/</link>
       <pubDate>Wed, 01 Jul 2020 23:00:53 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/07/01/istio-sockshop/</guid>
-      <description>&lt;p&gt;おひさしぶりです。もーすけです。&lt;br&gt;
-あっという間に６月が終わってしまい、６月はブログが書けませんでしたが、ブログで書きたいなと思うネタはいくつかありますので、時間のすきをみつけて書いていきたいと思います。&lt;/p&gt;
-&lt;p&gt;以前に、Sock Shopを使ったマイクロサービスのハンズオン体験についてのブログを書きました。
-このネタに、Istioを使ったサービスメッシュを適応するハンズオンを追加したのでお知らせします。&lt;/p&gt;
-&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/01/22/sockshop/&#34; data-iframely-url=&#34;//cdn.iframe.ly/YDI2rVR&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+      <description>&lt;p&gt;おひさしぶりです。もーすけです。&lt;br&gt;&#xA;あっという間に６月が終わってしまい、６月はブログが書けませんでしたが、ブログで書きたいなと思うネタはいくつかありますので、時間のすきをみつけて書いていきたいと思います。&lt;/p&gt;&#xA;&lt;p&gt;以前に、Sock Shopを使ったマイクロサービスのハンズオン体験についてのブログを書きました。&#xA;このネタに、Istioを使ったサービスメッシュを適応するハンズオンを追加したのでお知らせします。&lt;/p&gt;&#xA;&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/01/22/sockshop/&#34; data-iframely-url=&#34;//cdn.iframe.ly/YDI2rVR&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
     </item>
-    
     <item>
       <title>Tekton 徹底解説、Operatorによるインストールとはじめの一歩（学習シリーズ01）</title>
       <link>https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/</link>
       <pubDate>Sun, 10 May 2020 15:15:21 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/</guid>
-      <description>&lt;hr&gt;
-&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;p&gt;&lt;a href=&#34;https://twitter.com/mosuke5&#34; target=&#34;_blank&#34;&gt;もーすけ&lt;/a&gt;です。
-GWはみなさんいかがお過ごしでしたか？&lt;br&gt;
-外に出れないGWという一生でもそんなことが2度あるかわかりませんが非常に大変な日々を過ごされたのではないかと思います。自分は、GWを使ってKubernetes Operatorの開発などに挑戦してみていました。
-このあたりの話は別で書きたいと思いますが、Kubernetesのよさについてさらに理解を深めた気がします。&lt;/p&gt;
-&lt;p&gt;さて、今日はCloud NativeなCI/CDツールと言われているTektonについて。&lt;br&gt;
-Tekton学習シリーズということで入門者向けの連載企画をおこないました。第1回目は、Operatorによるインストール編です。&lt;/p&gt;</description>
+      <description>&lt;hr&gt;&#xA;&lt;h5&gt;Tekton学習シリーズ&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;第1回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2020/05/10/tekton-operator/&#34;&gt;Tekton 徹底解説、Operatorによるインストールとはじめの一歩&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第2回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-multi-steps-task/&#34;&gt;Tekton、TaskのStepの実行順序について確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第3回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/06/tekton-task-with-params/&#34;&gt;Tekton、Taskにパラメータを引き渡す&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第4回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-task-with-pipelineresource/&#34;&gt;Tekton、TaskでPipelineResouceを利用したときの挙動を確認する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第5回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/07/tekton-pipeline/&#34;&gt;Tekton、TaskをまとめてPipelineとして実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第6回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/17/tekton-pipeline-with-workspace/&#34;&gt;Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第7回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/20/tekton-catalog-and-image-build/&#34;&gt;Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第8回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/21/tekton-cluster-task-tektonhub/&#34;&gt;Tekton、ClusterTaskとTekton Hubを理解する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第9回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/03/22/tekton-deploy-app/&#34;&gt;Tekton、アプリケーションをKubernetesクラスタへデプロイする&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第10回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/06/tekton-trigger/&#34;&gt;Tekton、トリガーを使って外部イベントでパイプラインを実行する&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第11回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/&#34;&gt;Tekton、interceptorを使ってイベントトリガーを進化させる&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第12回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/01/24/tekton-access-private-gitrepo/&#34;&gt;Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;第13回: &lt;a href=&#34;https://blog.mosuke.tech/entry/2022/03/01/tekton-lib-cache/&#34;&gt;Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;番外編: &lt;a href=&#34;https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd&#34;&gt;TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://twitter.com/mosuke5&#34; target=&#34;_blank&#34;&gt;もーすけ&lt;/a&gt;です。&#xA;GWはみなさんいかがお過ごしでしたか？&lt;br&gt;&#xA;外に出れないGWという一生でもそんなことが2度あるかわかりませんが非常に大変な日々を過ごされたのではないかと思います。自分は、GWを使ってKubernetes Operatorの開発などに挑戦してみていました。&#xA;このあたりの話は別で書きたいと思いますが、Kubernetesのよさについてさらに理解を深めた気がします。&lt;/p&gt;&#xA;&lt;p&gt;さて、今日はCloud NativeなCI/CDツールと言われているTektonについて。&lt;br&gt;&#xA;Tekton学習シリーズということで入門者向けの連載企画をおこないました。第1回目は、Operatorによるインストール編です。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>イメージのプルの効率化を考える。kubernetes-image-puller の紹介</title>
       <link>https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/</link>
       <pubDate>Tue, 28 Apr 2020 17:17:54 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/04/28/kubernetes-image-puller/</guid>
-      <description>&lt;p&gt;FF7リメイク、クリアしました。いまSwitchで原作のFF7をやり直しています。もーすけです。&lt;br&gt;
-今日は&lt;a href=&#34;https://github.com/che-incubator/kubernetes-image-puller&#34; target=&#34;_blank&#34;&gt;kubernetes-image-puller&lt;/a&gt;というツールを発見し試してみたので、背景や課題感含めてご紹介していきます。&lt;/p&gt;
-&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://github.com/che-incubator/kubernetes-image-puller&#34; data-iframely-url=&#34;//cdn.iframe.ly/VbiFtNx&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+      <description>&lt;p&gt;FF7リメイク、クリアしました。いまSwitchで原作のFF7をやり直しています。もーすけです。&lt;br&gt;&#xA;今日は&lt;a href=&#34;https://github.com/che-incubator/kubernetes-image-puller&#34; target=&#34;_blank&#34;&gt;kubernetes-image-puller&lt;/a&gt;というツールを発見し試してみたので、背景や課題感含めてご紹介していきます。&lt;/p&gt;&#xA;&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://github.com/che-incubator/kubernetes-image-puller&#34; data-iframely-url=&#34;//cdn.iframe.ly/VbiFtNx&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
     </item>
-    
     <item>
       <title>Jenkins pipelineで複数のOpenShiftクラスタを扱う</title>
       <link>https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/</link>
       <pubDate>Tue, 14 Apr 2020 17:05:07 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/</guid>
-      <description>&lt;p&gt;もーすけです。今日はJenkinsを使ったKubernetes(OpenShift)環境でのデプロイ関連についてです。&lt;br&gt;
-Jenkins pipelineで複数クラスタ（マルチクラスタ）を扱いたい場合の設定方法について確認したので共有します。&lt;/p&gt;
-&lt;h2 id=&#34;背景&#34;&gt;背景&lt;/h2&gt;
-&lt;p&gt;以前にskopeoを用いたコンテナイメージの別レジストリへのコピーする方法について書きました。
-イメージを別レジストリへコピーする目的は、イメージをビルドしたクラスタと本番環境が別クラスタの場合などがあります。
-複数のクラスタを利用する環境では、１つのJenkins pipelineから複数のOpenShiftのクラスタに対して操作するケースがでてきます。
-やることは単純で、複数のクラスタの認証情報を用意して操作することになるわけですが、JenkinsのOpenShift Client Pluginを用いた方法についてメモしていきます。&lt;/p&gt;
-&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/04/05/skopeo/&#34; data-iframely-url=&#34;//cdn.iframe.ly/SsqYHwS&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+      <description>&lt;p&gt;もーすけです。今日はJenkinsを使ったKubernetes(OpenShift)環境でのデプロイ関連についてです。&lt;br&gt;&#xA;Jenkins pipelineで複数クラスタ（マルチクラスタ）を扱いたい場合の設定方法について確認したので共有します。&lt;/p&gt;&#xA;&lt;h2 id=&#34;背景&#34;&gt;背景&lt;/h2&gt;&#xA;&lt;p&gt;以前にskopeoを用いたコンテナイメージの別レジストリへのコピーする方法について書きました。&#xA;イメージを別レジストリへコピーする目的は、イメージをビルドしたクラスタと本番環境が別クラスタの場合などがあります。&#xA;複数のクラスタを利用する環境では、１つのJenkins pipelineから複数のOpenShiftのクラスタに対して操作するケースがでてきます。&#xA;やることは単純で、複数のクラスタの認証情報を用意して操作することになるわけですが、JenkinsのOpenShift Client Pluginを用いた方法についてメモしていきます。&lt;/p&gt;&#xA;&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/04/05/skopeo/&#34; data-iframely-url=&#34;//cdn.iframe.ly/SsqYHwS&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
     </item>
-    
     <item>
       <title>Kubernetes、namespaceの分け方に迷った場合に考えること</title>
       <link>https://blog.mosuke.tech/entry/2020/04/09/kubernetes-namespace/</link>
       <pubDate>Thu, 09 Apr 2020 17:59:23 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/04/09/kubernetes-namespace/</guid>
-      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;
-Kubernetes Lifeは順調でしょうか？&lt;br&gt;
-今回は、すごく基本的なところなのですが、意外となやんでしまうnamespaceの切り方について考えてみようと思います。
-よくご質問いただくこともあり、迷ってしまった場合に何を考えればいいか、そのポイントをまとめてみました。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;&#xA;Kubernetes Lifeは順調でしょうか？&lt;br&gt;&#xA;今回は、すごく基本的なところなのですが、意外となやんでしまうnamespaceの切り方について考えてみようと思います。&#xA;よくご質問いただくこともあり、迷ってしまった場合に何を考えればいいか、そのポイントをまとめてみました。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Skopeoを利用したコンテナイメージのレジストリ間コピー</title>
       <link>https://blog.mosuke.tech/entry/2020/04/05/skopeo/</link>
       <pubDate>Sun, 05 Apr 2020 17:35:48 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/04/05/skopeo/</guid>
-      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;
-コロナでの在宅に非常にしんどくなってきました。&lt;br&gt;
-ブログを書いて気を紛らわしていきたいと思います。
-今回は軽めの話題でSkopeoを利用したコンテナイメージのレジストリ間のコピーについてです。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは。もーすけです。&lt;br&gt;&#xA;コロナでの在宅に非常にしんどくなってきました。&lt;br&gt;&#xA;ブログを書いて気を紛らわしていきたいと思います。&#xA;今回は軽めの話題でSkopeoを利用したコンテナイメージのレジストリ間のコピーについてです。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Kubernetesのリソースの基本を今度こそ理解する</title>
       <link>https://blog.mosuke.tech/entry/2020/03/31/kubernetes-resource/</link>
       <pubDate>Tue, 31 Mar 2020 09:56:21 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/03/31/kubernetes-resource/</guid>
-      <description>&lt;p&gt;こんにちは。&lt;a href=&#34;https://twitter.com/mosuke5&#34;&gt;もーすけ&lt;/a&gt;です。&lt;br&gt;
-コロナによる在宅勤務を行っている人も多いと思いますが、在宅は捗っていますか？
-テレビからYouTubeなどを使って、カフェの雑音などを流しておくと家の中でも雰囲気はがらっと変わって集中できたりします。
-イヤホンなどで流すよりも部屋全体に流れるようにテレビなどでやるとおすすめです。ぜひトライしてみてください。&lt;/p&gt;
-&lt;p&gt;今日は、Kubernetesのリソースの基本についてまとめました。&lt;br&gt;
-なんとなくでマニフェストのリソースを設定してアプリケーションがエラーになってしまってトラブルシュートに困ったことのある方もおそらくおおいのではないでしょうか。
-今回は最低限ここだけは抑えておいたほうがいいだろう、と個人的に感じているリソースの４点（コンテナのへのリソース割り当て, QoS Class, LimitRange、ResourceQuota）についてまとめました。機会あれば別の観点もご紹介したいともいます。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは。&lt;a href=&#34;https://twitter.com/mosuke5&#34;&gt;もーすけ&lt;/a&gt;です。&lt;br&gt;&#xA;コロナによる在宅勤務を行っている人も多いと思いますが、在宅は捗っていますか？&#xA;テレビからYouTubeなどを使って、カフェの雑音などを流しておくと家の中でも雰囲気はがらっと変わって集中できたりします。&#xA;イヤホンなどで流すよりも部屋全体に流れるようにテレビなどでやるとおすすめです。ぜひトライしてみてください。&lt;/p&gt;&#xA;&lt;p&gt;今日は、Kubernetesのリソースの基本についてまとめました。&lt;br&gt;&#xA;なんとなくでマニフェストのリソースを設定してアプリケーションがエラーになってしまってトラブルシュートに困ったことのある方もおそらくおおいのではないでしょうか。&#xA;今回は最低限ここだけは抑えておいたほうがいいだろう、と個人的に感じているリソースの４点（コンテナのへのリソース割り当て, QoS Class, LimitRange、ResourceQuota）についてまとめました。機会あれば別の観点もご紹介したいともいます。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>KubernetesにおけるCI/CD実践の勘所まとめ</title>
       <link>https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/</link>
       <pubDate>Wed, 04 Mar 2020 18:14:26 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/03/04/kubernetes-ci-cd/</guid>
-      <description>&lt;p&gt;こんにちは、&lt;a href=&#34;https://twitter.com/mosuke5&#34; target=&#34;_blank&#34;&gt;もーすけ&lt;/a&gt;です。&lt;br&gt;
-前回のブログでは「&lt;a href=&#34;https://amzn.to/2PraGZ8&#34; target=&#34;_blank&#34; onClick=&#34;ga(&#39;send&#39;,&#39;event&#39;,&#39;link&#39;,&#39;click&#39;,&#39;to-amz-cloudnativedevops&#39;);&#34;&gt;Kubernetesで実践するクラウドネイティブDevOps&lt;/a&gt;」の書籍を紹介しました。&lt;/p&gt;
-&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/02/26/cloud-native-devops/&#34; data-iframely-url=&#34;//cdn.iframe.ly/0pYInqQ&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
-&lt;p&gt;こちらの反響もよかったこともあり、KubernetesにおけるCI/CD（継続的インテグレーションと継続的デリバリー）に焦点を絞って、いままでの経験も含めて大事なポイントをいくつかの切り口でまとめることにしました。
-一部は書籍の内容とかぶる部分もあるのですが、わたしが普段Kubernetesでのアプリケーション運用に携わる中で大事だと思うことなど含めてご紹介します。
-KubernetesにおけるCI/CDとしていますが、項目は必ずしもKubernetesに限った話ではありませんのでご了承ください。&lt;/p&gt;
-&lt;p&gt;また、もっといろんなトピックを書きたいのですが、すべてのトピックを揃えると記事自体のボリュームも大きくなり公開も遅くなりそうだったので、基本的な内容のみ選んでみました。随時追加されていく（あるいは別記事？）可能性があります。&lt;/p&gt;</description>
+      <description>&lt;p&gt;こんにちは、&lt;a href=&#34;https://twitter.com/mosuke5&#34; target=&#34;_blank&#34;&gt;もーすけ&lt;/a&gt;です。&lt;br&gt;&#xA;前回のブログでは「&lt;a href=&#34;https://amzn.to/2PraGZ8&#34; target=&#34;_blank&#34; onClick=&#34;ga(&#39;send&#39;,&#39;event&#39;,&#39;link&#39;,&#39;click&#39;,&#39;to-amz-cloudnativedevops&#39;);&#34;&gt;Kubernetesで実践するクラウドネイティブDevOps&lt;/a&gt;」の書籍を紹介しました。&lt;/p&gt;&#xA;&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2020/02/26/cloud-native-devops/&#34; data-iframely-url=&#34;//cdn.iframe.ly/0pYInqQ&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;&#xA;&lt;p&gt;こちらの反響もよかったこともあり、KubernetesにおけるCI/CD（継続的インテグレーションと継続的デリバリー）に焦点を絞って、いままでの経験も含めて大事なポイントをいくつかの切り口でまとめることにしました。&#xA;一部は書籍の内容とかぶる部分もあるのですが、わたしが普段Kubernetesでのアプリケーション運用に携わる中で大事だと思うことなど含めてご紹介します。&#xA;KubernetesにおけるCI/CDとしていますが、項目は必ずしもKubernetesに限った話ではありませんのでご了承ください。&lt;/p&gt;&#xA;&lt;p&gt;また、もっといろんなトピックを書きたいのですが、すべてのトピックを揃えると記事自体のボリュームも大きくなり公開も遅くなりそうだったので、基本的な内容のみ選んでみました。随時追加されていく（あるいは別記事？）可能性があります。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>運用課題の指南書、Kubernetesで実践するクラウドネイティブDevOps</title>
       <link>https://blog.mosuke.tech/entry/2020/02/26/cloud-native-devops/</link>
       <pubDate>Wed, 26 Feb 2020 23:42:24 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/02/26/cloud-native-devops/</guid>
-      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;
-先日、O&amp;rsquo;REILLY Japanから &lt;a href=&#34;https://amzn.to/2PraGZ8&#34; target=&#34;_blank&#34; onClick=&#34;ga(&#39;send&#39;,&#39;event&#39;,&#39;link&#39;,&#39;click&#39;,&#39;to-amz-cloudnativedevops&#39;);&#34;&gt;Kubernetesで実践するクラウドネイティブDevOps&lt;/a&gt; という本が出版されました。
-最近仕事でKubernetes上のアプリケーションに関するDevOpsやCI/CDによく携わっているのもあり、発売日に手にとりにいきました。
-せっかくなので、こちらの本の紹介をしていきたいと思います。&lt;/p&gt;
-&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://www.amazon.co.jp/Kubernetes%25E3%2581%25A7%25E5%25AE%259F%25E8%25B7%25B5%25E3%2581%2599%25E3%2582%258B%25E3%2582%25AF%25E3%2583%25A9%25E3%2582%25A6%25E3%2583%2589%25E3%2583%258D%25E3%2582%25A4%25E3%2583%2586%25E3%2582%25A3%25E3%2583%2596DevOps-John-Arundel/dp/4873119014&#34; data-iframely-url=&#34;//cdn.iframe.ly/j1izGzy?iframe=card-small&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+      <description>&lt;p&gt;こんにちは、もーすけです。&lt;br&gt;&#xA;先日、O&amp;rsquo;REILLY Japanから &lt;a href=&#34;https://amzn.to/2PraGZ8&#34; target=&#34;_blank&#34; onClick=&#34;ga(&#39;send&#39;,&#39;event&#39;,&#39;link&#39;,&#39;click&#39;,&#39;to-amz-cloudnativedevops&#39;);&#34;&gt;Kubernetesで実践するクラウドネイティブDevOps&lt;/a&gt; という本が出版されました。&#xA;最近仕事でKubernetes上のアプリケーションに関するDevOpsやCI/CDによく携わっているのもあり、発売日に手にとりにいきました。&#xA;せっかくなので、こちらの本の紹介をしていきたいと思います。&lt;/p&gt;&#xA;&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://www.amazon.co.jp/Kubernetes%25E3%2581%25A7%25E5%25AE%259F%25E8%25B7%25B5%25E3%2581%2599%25E3%2582%258B%25E3%2582%25AF%25E3%2583%25A9%25E3%2582%25A6%25E3%2583%2589%25E3%2583%258D%25E3%2582%25A4%25E3%2583%2586%25E3%2582%25A3%25E3%2583%2596DevOps-John-Arundel/dp/4873119014&#34; data-iframely-url=&#34;//cdn.iframe.ly/j1izGzy?iframe=card-small&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
     </item>
-    
     <item>
       <title>Sock Shopを使ったマイクロサービス体験のハンズオン</title>
       <link>https://blog.mosuke.tech/entry/2020/01/22/sockshop/</link>
       <pubDate>Wed, 22 Jan 2020 14:44:04 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2020/01/22/sockshop/</guid>
-      <description>&lt;p&gt;あけましておめでとうございます。&lt;a href=&#34;https://twitter.com/mosuke5&#34; target=&#34;_blank&#34;&gt;@mosuke5&lt;/a&gt;です。&lt;br&gt;
-マイクロサービスの実際の体験や研修を探したことがありますでしょうか。
-残念ながら、実際に手を動かしなら学ぶトレーニングや研修は多く存在しませんが、
-マイクロサービスのデモアプリケーションとして&lt;a href=&#39;https://microservices-demo.github.io/&#39; target=&#39;_blank&#39;&gt;Sock Shop&lt;/a&gt;が有名で、これはトレーニングに最適です。&lt;/p&gt;
-&lt;p&gt;日本語でもたくさんのSock Shopの紹介やインストール記事がでています。しかし、自分もそうだったのですが、なんとなく起動して動かして、終わりとなっているものがおおく、どんな観点でこのSock Shopをいじっていけばいいかの情報が足りないと感じました。
-機会があり、Sock Shopをさわるタイミングがあったので、実際にどんなデータ構造になっているのか、マイクロサービスゆえの課題など、Sock Shopから少しでも多くの学びが得られるようにこの記事を書きます。&lt;/p&gt;</description>
+      <description>&lt;p&gt;あけましておめでとうございます。&lt;a href=&#34;https://twitter.com/mosuke5&#34; target=&#34;_blank&#34;&gt;@mosuke5&lt;/a&gt;です。&lt;br&gt;&#xA;マイクロサービスの実際の体験や研修を探したことがありますでしょうか。&#xA;残念ながら、実際に手を動かしなら学ぶトレーニングや研修は多く存在しませんが、&#xA;マイクロサービスのデモアプリケーションとして&lt;a href=&#39;https://microservices-demo.github.io/&#39; target=&#39;_blank&#39;&gt;Sock Shop&lt;/a&gt;が有名で、これはトレーニングに最適です。&lt;/p&gt;&#xA;&lt;p&gt;日本語でもたくさんのSock Shopの紹介やインストール記事がでています。しかし、自分もそうだったのですが、なんとなく起動して動かして、終わりとなっているものがおおく、どんな観点でこのSock Shopをいじっていけばいいかの情報が足りないと感じました。&#xA;機会があり、Sock Shopをさわるタイミングがあったので、実際にどんなデータ構造になっているのか、マイクロサービスゆえの課題など、Sock Shopから少しでも多くの学びが得られるようにこの記事を書きます。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Kubernetes上のリソースをAnsibleで管理する</title>
       <link>https://blog.mosuke.tech/entry/2019/08/21/ansible-for-k8s-resources/</link>
       <pubDate>Wed, 21 Aug 2019 19:36:45 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2019/08/21/ansible-for-k8s-resources/</guid>
-      <description>&lt;p&gt;お久しぶりです。@mosuke5です。&lt;br&gt;
-Kubernetes上のリソースをどのように管理していますか？
-&lt;code&gt;kubectl apply -f manifest-file.yml&lt;/code&gt; のようにkubectlを使うことがまず多いのかなと思います。
-自分もそのようにデプロイすることがおおいです。
-今日はAnsibleを用いてKubernetes上のリソースを管理することを試してみたいと思います。&lt;/p&gt;</description>
+      <description>&lt;p&gt;お久しぶりです。@mosuke5です。&lt;br&gt;&#xA;Kubernetes上のリソースをどのように管理していますか？&#xA;&lt;code&gt;kubectl apply -f manifest-file.yml&lt;/code&gt; のようにkubectlを使うことがまず多いのかなと思います。&#xA;自分もそのようにデプロイすることがおおいです。&#xA;今日はAnsibleを用いてKubernetes上のリソースを管理することを試してみたいと思います。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Sidecar方式のFluentdでCloudWatch logsへログを集約することについての検討</title>
       <link>https://blog.mosuke.tech/entry/2019/07/12/sidecar-fluentd-to-cloudwatchlogs/</link>
       <pubDate>Fri, 12 Jul 2019 12:57:59 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2019/07/12/sidecar-fluentd-to-cloudwatchlogs/</guid>
-      <description>&lt;p&gt;&lt;a href=&#34;https://twitter.com/mosuke5&#34;&gt;@mosuke5&lt;/a&gt;です。&lt;br&gt;
-Kubernetes上でのアプリケーションのロギングについてFluentdを使ってどうできるか考えていきます。
-今回はサイドカー方式という方法を使ってFluentdでAWS CloudWatch logsへ集約することについてやってみました。CloudWatch logsを例に取っていますが、それ以外でも考え方は応用できますので読んでみてください。
-また、サイドカー方式以外の方式については、こちらの「&lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/&#34;&gt;Kubernetesのロギングパターンは結局どれを採用したらいいの？&lt;/a&gt;」を参照してください。&lt;/p&gt;
-&lt;p&gt;FluentdとAWSの連携については、以前に「&lt;a href=&#34;https://blog.mosuke.tech/entry/2017/09/03/fluentd_to_dynamodb/&#34;&gt;NginxのログをFluentdでDynamoDBへ送る&lt;/a&gt;」もかきましたので、参考にしてください。自分も復習で見返しました。&lt;/p&gt;
-&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/&#34; data-iframely-url=&#34;//cdn.iframe.ly/qKFqn1a&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
+      <description>&lt;p&gt;&lt;a href=&#34;https://twitter.com/mosuke5&#34;&gt;@mosuke5&lt;/a&gt;です。&lt;br&gt;&#xA;Kubernetes上でのアプリケーションのロギングについてFluentdを使ってどうできるか考えていきます。&#xA;今回はサイドカー方式という方法を使ってFluentdでAWS CloudWatch logsへ集約することについてやってみました。CloudWatch logsを例に取っていますが、それ以外でも考え方は応用できますので読んでみてください。&#xA;また、サイドカー方式以外の方式については、こちらの「&lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/&#34;&gt;Kubernetesのロギングパターンは結局どれを採用したらいいの？&lt;/a&gt;」を参照してください。&lt;/p&gt;&#xA;&lt;p&gt;FluentdとAWSの連携については、以前に「&lt;a href=&#34;https://blog.mosuke.tech/entry/2017/09/03/fluentd_to_dynamodb/&#34;&gt;NginxのログをFluentdでDynamoDBへ送る&lt;/a&gt;」もかきましたので、参考にしてください。自分も復習で見返しました。&lt;/p&gt;&#xA;&lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2021/04/18/kubernetes-application-logging/&#34; data-iframely-url=&#34;//cdn.iframe.ly/qKFqn1a&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;</description>
     </item>
-    
     <item>
       <title>新システム対応）CKADを取得の対策や試験当日の対応について</title>
       <link>https://blog.mosuke.tech/entry/2019/07/08/ckad/</link>
       <pubDate>Mon, 08 Jul 2019 09:12:22 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2019/07/08/ckad/</guid>
-      <description>&lt;p&gt;&lt;strong&gt;※本記事は、もともと2019年7月に執筆されたものですが、当時の有効期限である2年が経過したので、2022年7月に認定を更新しました。2022年7月現在の状況に更新してお知らせします。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://twitter.com/mosuke5&#34;&gt;@mosuke5&lt;/a&gt;です。&lt;a href=&#34;https://www.cncf.io/certification/ckad/&#34; target=&#34;_blank&#34;&gt;CKAD(Certified Kubernetes Application Developer)&lt;/a&gt;を受けてきました。&lt;br&gt;
-すでに多くのCKA/CKADの合格レポートや体験記がでておりますが、
-それでも自分が実際に受けてみるまで不安な要素も多くあったので、
-そのあたりを払拭するべくこの記事を書きたいと思います。&lt;/p&gt;
-&lt;p&gt;2019年7月5日にCKADを受験して無事に合格しました。&lt;br&gt;
-スコアは89%と案外高く(66%で合格)、驚きでもあったのですが、その体験をこれから受験する人にもシェアできればと思います。
-（その後、2022年7月8日に認定を更新しました。スコアは96％と高く嬉しかったです）&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://blog.mosuke.tech/image/ckad-certificate.png&#34; alt=&#34;ckad-certificate&#34;&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;&lt;strong&gt;※本記事は、もともと2019年7月に執筆されたものですが、当時の有効期限である2年が経過したので、2022年7月に認定を更新しました。2022年7月現在の状況に更新してお知らせします。&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://twitter.com/mosuke5&#34;&gt;@mosuke5&lt;/a&gt;です。&lt;a href=&#34;https://www.cncf.io/certification/ckad/&#34; target=&#34;_blank&#34;&gt;CKAD(Certified Kubernetes Application Developer)&lt;/a&gt;を受けてきました。&lt;br&gt;&#xA;すでに多くのCKA/CKADの合格レポートや体験記がでておりますが、&#xA;それでも自分が実際に受けてみるまで不安な要素も多くあったので、&#xA;そのあたりを払拭するべくこの記事を書きたいと思います。&lt;/p&gt;&#xA;&lt;p&gt;2019年7月5日にCKADを受験して無事に合格しました。&lt;br&gt;&#xA;スコアは89%と案外高く(66%で合格)、驚きでもあったのですが、その体験をこれから受験する人にもシェアできればと思います。&#xA;（その後、2022年7月8日に認定を更新しました。スコアは96％と高く嬉しかったです）&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://blog.mosuke.tech/image/ckad-certificate.png&#34; alt=&#34;ckad-certificate&#34;&gt;&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Kustomizeで環境ごとに異なるマニフェストを作る</title>
       <link>https://blog.mosuke.tech/entry/2019/06/21/kustomize/</link>
       <pubDate>Fri, 21 Jun 2019 10:57:12 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2019/06/21/kustomize/</guid>
-      <description>&lt;p&gt;ブログの更新頻度が落ちていますが、サボっているわけではないです。。
-はい。mosuke5です。&lt;/p&gt;
-&lt;p&gt;やはりKubernetesマニフェストのテンプレートエンジンは必要だ、と気づいてしまったので、マニフェストを生成できるツールを探していました。
-そこで、Kustomizeを試しみたのでアウトプットとして残しておきます。使ってみた上でハマったポイントや注意すべき点なども含めて書きたいと思います。&lt;/p&gt;</description>
+      <description>&lt;p&gt;ブログの更新頻度が落ちていますが、サボっているわけではないです。。&#xA;はい。mosuke5です。&lt;/p&gt;&#xA;&lt;p&gt;やはりKubernetesマニフェストのテンプレートエンジンは必要だ、と気づいてしまったので、マニフェストを生成できるツールを探していました。&#xA;そこで、Kustomizeを試しみたのでアウトプットとして残しておきます。使ってみた上でハマったポイントや注意すべき点なども含めて書きたいと思います。&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Kubernetes上のリソースをTerraformで管理するメリットとデメリット</title>
       <link>https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/</link>
       <pubDate>Thu, 07 Mar 2019 01:06:27 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2019/03/07/k8s-with-terraform/</guid>
-      <description>&lt;p&gt;@mosuke5です。早くも3月になってしまいました。&lt;br&gt;
-しかし、個人的にはこの2か月は非常に動きがあった2か月でしたのでいろいろ楽しかったです。&lt;/p&gt;
-&lt;p&gt;さて、本題ですが、、&lt;br&gt;
-わたしの好きなTerraformを使ってKubernetesクラスタ上のリソースを管理するのをやってみたいと思います。&lt;br&gt;
-そもそもKubernetesをTeraformで管理するとなると2つのレイヤーの話があります。
-今回は、後者のほうに重きを置いてお伝えします。&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;KubernetesクラスターそのものをTerraformで管理する&lt;/li&gt;
-&lt;li&gt;Kubernetesクラスター上のリソースをTerraformで管理する&lt;/li&gt;
-&lt;/ol&gt;</description>
+      <description>&lt;p&gt;@mosuke5です。早くも3月になってしまいました。&lt;br&gt;&#xA;しかし、個人的にはこの2か月は非常に動きがあった2か月でしたのでいろいろ楽しかったです。&lt;/p&gt;&#xA;&lt;p&gt;さて、本題ですが、、&lt;br&gt;&#xA;わたしの好きなTerraformを使ってKubernetesクラスタ上のリソースを管理するのをやってみたいと思います。&lt;br&gt;&#xA;そもそもKubernetesをTeraformで管理するとなると2つのレイヤーの話があります。&#xA;今回は、後者のほうに重きを置いてお伝えします。&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;KubernetesクラスターそのものをTerraformで管理する&lt;/li&gt;&#xA;&lt;li&gt;Kubernetesクラスター上のリソースをTerraformで管理する&lt;/li&gt;&#xA;&lt;/ol&gt;</description>
     </item>
-    
     <item>
       <title>Virtual Kubeletとは何か。Alibaba Cloud上で実際に動かして検証する</title>
       <link>https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/</link>
       <pubDate>Sun, 03 Feb 2019 15:49:10 +0900</pubDate>
-      
       <guid>https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/</guid>
-      <description>&lt;p&gt;はい、@mosuke5です。&lt;br&gt;
-ここ最近、会社でも少しずつKubernetesに関するはなしなどもでてきており、自分の興味ある分野だったこともあり本腰いれて遊んでおります。
-そのなかで、Alibaba CloudもProviderを出しているという、&lt;a href=&#34;https://github.com/virtual-kubelet/virtual-kubelet&#34;&gt;Virtual Kubelet&lt;/a&gt;について気になったので、実際に動かして概念の整理と使いどころについて考えてみました。&lt;/p&gt;
-&lt;p&gt;例ではAlibaba CloudのKubernetesとECIを使っていますが、基本的な考え方は同じですので、Virtual Kubeletについて勉強したい人はぜひ読んでみてください。&lt;/p&gt;
-&lt;h5 id=&#34;2019310-追記&#34;&gt;2019/3/10 追記&lt;/h5&gt;
-&lt;p&gt;こちらの記事の内容についてはSlideShareにしていくつかのイベントで発表しています。&lt;a href=&#34;https://www.slideshare.net/mosuke5/virtualkubeletalibaba-cloud-133164822&#34;&gt;こちらもご参照&lt;/a&gt;ください。&lt;/p&gt;</description>
+      <description>&lt;p&gt;はい、@mosuke5です。&lt;br&gt;&#xA;ここ最近、会社でも少しずつKubernetesに関するはなしなどもでてきており、自分の興味ある分野だったこともあり本腰いれて遊んでおります。&#xA;そのなかで、Alibaba CloudもProviderを出しているという、&lt;a href=&#34;https://github.com/virtual-kubelet/virtual-kubelet&#34;&gt;Virtual Kubelet&lt;/a&gt;について気になったので、実際に動かして概念の整理と使いどころについて考えてみました。&lt;/p&gt;&#xA;&lt;p&gt;例ではAlibaba CloudのKubernetesとECIを使っていますが、基本的な考え方は同じですので、Virtual Kubeletについて勉強したい人はぜひ読んでみてください。&lt;/p&gt;&#xA;&lt;h5 id=&#34;2019310-追記&#34;&gt;2019/3/10 追記&lt;/h5&gt;&#xA;&lt;p&gt;こちらの記事の内容についてはSlideShareにしていくつかのイベントで発表しています。&lt;a href=&#34;https://www.slideshare.net/mosuke5/virtualkubeletalibaba-cloud-133164822&#34;&gt;こちらもご参照&lt;/a&gt;ください。&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

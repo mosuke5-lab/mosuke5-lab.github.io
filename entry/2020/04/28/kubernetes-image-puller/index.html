@@ -117,14 +117,14 @@
 <h3 id="レイヤーを意識してイメージを作成する">レイヤーを意識してイメージを作成する</h3>
 <p>コンテナイメージはレイヤー構造で構成されています。<br>
 簡単な例でいうと<code>docker pull</code>したときに表示されるハッシュ値のリストですが、これがレイヤーです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% docker pull nginxinc/nginx-unprivileged:1.18
-</span></span><span style="display:flex;"><span>1.18: Pulling from nginxinc/nginx-unprivileged
-</span></span><span style="display:flex;"><span>54fec2fa59d0: Already exists
-</span></span><span style="display:flex;"><span>3a4d0e4b78ef: Downloading [=============&gt;                                     ]  7.153MB/26.2MB
-</span></span><span style="display:flex;"><span>83b11c8c3a6e: Download complete
-</span></span><span style="display:flex;"><span>56e6a727dfef: Download complete
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">%</span> docker pull nginxinc<span style="color:#f92672">/</span>nginx<span style="color:#f92672">-</span>unprivileged:<span style="color:#ae81ff">1.18</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1.18</span>: Pulling from nginxinc<span style="color:#f92672">/</span>nginx<span style="color:#f92672">-</span>unprivileged
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">54</span>fec2fa59d0: Already exists
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3</span>a4d0e4b78ef: Downloading [<span style="color:#f92672">=============&gt;</span>                                     ]  <span style="color:#ae81ff">7.153</span>MB<span style="color:#f92672">/</span><span style="color:#ae81ff">26.2</span>MB
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">83</span>b11c8c3a6e: Download complete
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">56e6</span>a727dfef: Download complete
 </span></span><span style="display:flex;"><span>e575c5ee613a: Download complete
-</span></span><span style="display:flex;"><span>5073a53c326e: Download complete
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">5073</span>a53c326e: Download complete
 </span></span></code></pre></div><p>このレイヤーを意識してコンテナイメージを作成することで、イメージの一部に変更があったとしても最小限のレイヤーのプルのみで済むなどの工夫ができます。プルする対象を減らすことができるので、結果的にイメージプルの効率が上がります。
 よくある例としては、アプリケーションのコードに変更があった場合です。
 以下はRailsを例にしていますが、アプリケーションを実行するために必要な依存関係のライブラリのインストール(<code>RUN bundle install部分</code>)をアプリケーションのコードを置く前に実施しています。

@@ -124,20 +124,20 @@ Elastic社はいくつかのソフトウェアを提供しているのですが�
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>$ sudo yum install elasticsearch
 </span></span></code></pre></div><p>あとは起動するだけで実は最低限は動きます。簡単ですね。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ sudo systemctl enable elasticsearch
-</span></span><span style="display:flex;"><span>$ sudo systemctl start elasticsearch
-</span></span><span style="display:flex;"><span>$ sudo systemctl status elasticsearch
-</span></span><span style="display:flex;"><span>● elasticsearch.service - Elasticsearch
-</span></span><span style="display:flex;"><span>   Loaded: loaded (/usr/lib/systemd/system/elasticsearch.service; enabled; vendor preset: disabled)
-</span></span><span style="display:flex;"><span>   Active: active (running) since Sun 2017-08-13 07:07:34 UTC; 1h 2min ago
-</span></span><span style="display:flex;"><span>     Docs: http://www.elastic.co
-</span></span><span style="display:flex;"><span>  Process: 12494 ExecStartPre=/usr/share/elasticsearch/bin/elasticsearch-systemd-pre-exec (code=exited, status=0/SUCCESS)
-</span></span><span style="display:flex;"><span> Main PID: 12496 (java)
-</span></span><span style="display:flex;"><span>   CGroup: /system.slice/elasticsearch.service
-</span></span><span style="display:flex;"><span>           └─12496 /bin/java -Xms2g -Xmx2g -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly -XX:+AlwaysPreTou...
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo systemctl enable elasticsearch
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo systemctl start elasticsearch
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo systemctl status elasticsearch
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">●</span> elasticsearch<span style="color:#f92672">.</span>service <span style="color:#f92672">-</span> Elasticsearch
+</span></span><span style="display:flex;"><span>   Loaded: loaded (<span style="color:#f92672">/</span>usr<span style="color:#f92672">/</span>lib<span style="color:#f92672">/</span>systemd<span style="color:#f92672">/</span>system<span style="color:#f92672">/</span>elasticsearch<span style="color:#f92672">.</span>service; enabled; vendor preset: disabled)
+</span></span><span style="display:flex;"><span>   Active: active (running) since Sun <span style="color:#ae81ff">2017</span><span style="color:#f92672">-</span><span style="color:#ae81ff">08</span><span style="color:#f92672">-</span><span style="color:#ae81ff">13</span> <span style="color:#ae81ff">07</span>:<span style="color:#ae81ff">07</span>:<span style="color:#ae81ff">34</span> UTC; <span style="color:#ae81ff">1</span>h <span style="color:#ae81ff">2</span>min ago
+</span></span><span style="display:flex;"><span>     Docs: http:<span style="color:#f92672">//</span>www<span style="color:#f92672">.</span>elastic<span style="color:#f92672">.</span>co
+</span></span><span style="display:flex;"><span>  Process: <span style="color:#ae81ff">12494</span> ExecStartPre<span style="color:#f92672">=/</span>usr<span style="color:#f92672">/</span>share<span style="color:#f92672">/</span>elasticsearch<span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>elasticsearch<span style="color:#f92672">-</span>systemd<span style="color:#f92672">-</span>pre<span style="color:#f92672">-</span>exec (code<span style="color:#f92672">=</span>exited, status<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#f92672">/</span>SUCCESS)
+</span></span><span style="display:flex;"><span> Main PID: <span style="color:#ae81ff">12496</span> (java)
+</span></span><span style="display:flex;"><span>   CGroup: <span style="color:#f92672">/</span>system<span style="color:#f92672">.</span>slice<span style="color:#f92672">/</span>elasticsearch<span style="color:#f92672">.</span>service
+</span></span><span style="display:flex;"><span>           <span style="color:#960050;background-color:#1e0010">└─</span><span style="color:#ae81ff">12496</span> <span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>java <span style="color:#f92672">-</span>Xms2g <span style="color:#f92672">-</span>Xmx2g <span style="color:#f92672">-</span>XX:<span style="color:#f92672">+</span>UseConcMarkSweepGC <span style="color:#f92672">-</span>XX:CMSInitiatingOccupancyFraction<span style="color:#f92672">=</span><span style="color:#ae81ff">75</span> <span style="color:#f92672">-</span>XX:<span style="color:#f92672">+</span>UseCMSInitiatingOccupancyOnly <span style="color:#f92672">-</span>XX:<span style="color:#f92672">+</span>AlwaysPreTou<span style="color:#f92672">...</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>Aug 13 07:07:34 ip-172-31-22-86.ap-northeast-1.compute.internal systemd[1]: Starting Elasticsearch...
-</span></span><span style="display:flex;"><span>Aug 13 07:07:34 ip-172-31-22-86.ap-northeast-1.compute.internal systemd[1]: Started Elasticsearch.
+</span></span><span style="display:flex;"><span>Aug <span style="color:#ae81ff">13</span> <span style="color:#ae81ff">07</span>:<span style="color:#ae81ff">07</span>:<span style="color:#ae81ff">34</span> ip<span style="color:#f92672">-</span><span style="color:#ae81ff">172</span><span style="color:#f92672">-</span><span style="color:#ae81ff">31</span><span style="color:#f92672">-</span><span style="color:#ae81ff">22</span><span style="color:#f92672">-</span><span style="color:#ae81ff">86.</span>ap<span style="color:#f92672">-</span>northeast<span style="color:#f92672">-</span><span style="color:#ae81ff">1.</span>compute<span style="color:#f92672">.</span>internal systemd[<span style="color:#ae81ff">1</span>]: Starting Elasticsearch<span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>Aug <span style="color:#ae81ff">13</span> <span style="color:#ae81ff">07</span>:<span style="color:#ae81ff">07</span>:<span style="color:#ae81ff">34</span> ip<span style="color:#f92672">-</span><span style="color:#ae81ff">172</span><span style="color:#f92672">-</span><span style="color:#ae81ff">31</span><span style="color:#f92672">-</span><span style="color:#ae81ff">22</span><span style="color:#f92672">-</span><span style="color:#ae81ff">86.</span>ap<span style="color:#f92672">-</span>northeast<span style="color:#f92672">-</span><span style="color:#ae81ff">1.</span>compute<span style="color:#f92672">.</span>internal systemd[<span style="color:#ae81ff">1</span>]: Started Elasticsearch<span style="color:#f92672">.</span>
 </span></span></code></pre></div><p>起動の確認をします。デフォルトでは9200番ポートでAPIを利用できます。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl localhost:9200
 </span></span><span style="display:flex;"><span>{
@@ -282,23 +282,23 @@ ElasticSearchの検索クエリーをGUI上から実行できたり、その結�
 <p>AWS上で動かしているので、<code>server.host</code>の設定を変更して、外部からアクセスできるようにしています。<br>
 外部に晒すのは危険なこともあるので、注意してください。
 また、AWS上のセキュリティグループの設定も見直してくださいね。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>//まずはインストール
-</span></span><span style="display:flex;"><span>$ sudo yum install kibana
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">//</span><span style="color:#960050;background-color:#1e0010">まずはインストール</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo yum install kibana
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>//外部ネットワークからアクセスできるように
-</span></span><span style="display:flex;"><span>$ sudo vim /etc/kibana/kibana.yml
-</span></span><span style="display:flex;"><span>server.host: &#34;0.0.0.0&#34;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">//</span><span style="color:#960050;background-color:#1e0010">外部ネットワークからアクセスできるように</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo vim <span style="color:#f92672">/</span>etc<span style="color:#f92672">/</span>kibana<span style="color:#f92672">/</span>kibana<span style="color:#f92672">.</span>yml
+</span></span><span style="display:flex;"><span>server<span style="color:#f92672">.</span>host: <span style="color:#e6db74">&#34;0.0.0.0&#34;</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>//起動して起動の確認
-</span></span><span style="display:flex;"><span>$ sudo systemctl enable kibana
-</span></span><span style="display:flex;"><span>$ sudo systemctl start kibana
-</span></span><span style="display:flex;"><span>$ sudo systemctl status kibana
-</span></span><span style="display:flex;"><span>● kibana.service - Kibana
-</span></span><span style="display:flex;"><span>   Loaded: loaded (/etc/systemd/system/kibana.service; disabled; vendor preset: disabled)
-</span></span><span style="display:flex;"><span>   Active: active (running) since Tue 2017-08-15 09:15:42 UTC; 11min ago
-</span></span><span style="display:flex;"><span> Main PID: 21269 (node)
-</span></span><span style="display:flex;"><span>   CGroup: /system.slice/kibana.service
-</span></span><span style="display:flex;"><span>           └─21269 /usr/share/kibana/bin/../node/bin/node --no-warnings /usr/share/kibana/bin/../src/cli -c /etc/kibana/kibana.yml
+</span></span><span style="display:flex;"><span><span style="color:#f92672">//</span><span style="color:#960050;background-color:#1e0010">起動して起動の確認</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo systemctl enable kibana
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo systemctl start kibana
+</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo systemctl status kibana
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">●</span> kibana<span style="color:#f92672">.</span>service <span style="color:#f92672">-</span> Kibana
+</span></span><span style="display:flex;"><span>   Loaded: loaded (<span style="color:#f92672">/</span>etc<span style="color:#f92672">/</span>systemd<span style="color:#f92672">/</span>system<span style="color:#f92672">/</span>kibana<span style="color:#f92672">.</span>service; disabled; vendor preset: disabled)
+</span></span><span style="display:flex;"><span>   Active: active (running) since Tue <span style="color:#ae81ff">2017</span><span style="color:#f92672">-</span><span style="color:#ae81ff">08</span><span style="color:#f92672">-</span><span style="color:#ae81ff">15</span> <span style="color:#ae81ff">09</span>:<span style="color:#ae81ff">15</span>:<span style="color:#ae81ff">42</span> UTC; <span style="color:#ae81ff">11</span>min ago
+</span></span><span style="display:flex;"><span> Main PID: <span style="color:#ae81ff">21269</span> (node)
+</span></span><span style="display:flex;"><span>   CGroup: <span style="color:#f92672">/</span>system<span style="color:#f92672">.</span>slice<span style="color:#f92672">/</span>kibana<span style="color:#f92672">.</span>service
+</span></span><span style="display:flex;"><span>           <span style="color:#960050;background-color:#1e0010">└─</span><span style="color:#ae81ff">21269</span> <span style="color:#f92672">/</span>usr<span style="color:#f92672">/</span>share<span style="color:#f92672">/</span>kibana<span style="color:#f92672">/</span>bin<span style="color:#f92672">/../</span>node<span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>node <span style="color:#f92672">--</span>no<span style="color:#f92672">-</span>warnings <span style="color:#f92672">/</span>usr<span style="color:#f92672">/</span>share<span style="color:#f92672">/</span>kibana<span style="color:#f92672">/</span>bin<span style="color:#f92672">/../</span>src<span style="color:#f92672">/</span>cli <span style="color:#f92672">-</span>c <span style="color:#f92672">/</span>etc<span style="color:#f92672">/</span>kibana<span style="color:#f92672">/</span>kibana<span style="color:#f92672">.</span>yml
 </span></span></code></pre></div><p>ではさっそく接続して、なにかやってみます。<br>
 デフォルトでは<code>5601</code>番ポートでアクセスできます。</p>
 <p>Tag Cloudという機能があったのでためしてみました。
