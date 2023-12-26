@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -123,7 +123,7 @@ ClusterTaskに登録したTaskは、全Namespaceから参照して利用する�
 もう少し具体的に言うと、第7回でカタログからgit-cloneのTaskを使いましたが、このTaskは別のNamespaceでも利用し得るのでClusterTaskに切り替えて登録が可能ということです。実際にやってみましょう。</p>
 <p>カタログではTaskとして登録されています。
 しかし、ClusterTaskに書き換えてすぐに利用できるということです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ git clone https://github.com/tektoncd/catalog
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ git clone https://github.com/tektoncd/catalog
 </span></span><span style="display:flex;"><span>$ cd catalog/task/git-clone/0.2/
 </span></span><span style="display:flex;"><span>$ ls -l 
 </span></span><span style="display:flex;"><span>total 24
@@ -146,7 +146,7 @@ ClusterTaskに登録したTaskは、全Namespaceから参照して利用する�
 </span></span><span style="display:flex;"><span>spec:
 </span></span><span style="display:flex;"><span>  ...
 </span></span></code></pre></div><p><code>kind: Task</code>から<code>kind: ClusterTask</code>に切り替えて、クラスタに登録します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ vim git-clone.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ vim git-clone.yaml
 </span></span><span style="display:flex;"><span>apiVersion: tekton.dev/v1beta1
 </span></span><span style="display:flex;"><span>#kind: Task
 </span></span><span style="display:flex;"><span>kind: ClusterTask  # &lt;-ClusterTaskに変更した

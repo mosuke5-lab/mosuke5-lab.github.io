@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -97,8 +97,8 @@
 <h2 id="リバースプロキシ側でhttpヘッダー追加">リバースプロキシ側でHTTPヘッダー追加</h2>
 <p>まず、デフォルトのNginxの設定では接続元のIPアドレスをHTTPヘッダーに含みません。そのため、本当のクライアント側のIPアドレスをHTTPヘッダーに追加します。一般的に<code>X-Forwarded-For</code>というHTTPヘッダーを利用します。<br>
 X-Forwarded-Forというヘッダー名にNginxでもっている変数$proxy_add_x_forwarded_forを追加する。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
-</span></span></code></pre></div><p>リバースプロキシしかり、AWSのELBなどしかり、L7でのプロキシやロードバランサを利用した際に、よくX-Forwarded-Forというヘッダー名がでてきます。このヘッダーはなんなのか？HTTPの標準のヘッダーとして存在するのかと疑問に思い調べてみると、RFCには定義されていないが一般的に利用されているヘッダーであることがわかりました。</p>
+<pre tabindex="0"><code>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+</code></pre><p>リバースプロキシしかり、AWSのELBなどしかり、L7でのプロキシやロードバランサを利用した際に、よくX-Forwarded-Forというヘッダー名がでてきます。このヘッダーはなんなのか？HTTPの標準のヘッダーとして存在するのかと疑問に思い調べてみると、RFCには定義されていないが一般的に利用されているヘッダーであることがわかりました。</p>
 <blockquote>
 <p>X-Forwarded-For (XFF) とは、HTTPヘッダフィールドの一つ。HTTPプロキシサーバまたは負荷分散装置（ロードバランサ）を経由してウェブサーバに接続するクライアントの送信元IPアドレスを特定する際のデファクトスタンダードである。
 （略）RFCの標準的なヘッダフィールドではないが、IETFのネットワーク作業部会 (Network Working Group) は2011年10月より同種のHTTPヘッダForwardedの標準化作業を開始した[1]。</p>
@@ -120,20 +120,20 @@ X-Forwarded-Forというヘッダー名にNginxでもっている変数$proxy_ad
 </span></span><span style="display:flex;"><span><span style="color:#75715e"># array(x) { [&#34;X-Forwarded-For&#34;] =&gt; string(12) &#34;192.168.33.1&#34; ...... }
 </span></span></span></code></pre></div><h2 id="tcpdumpで生のパケットを確認してみる">tcpdumpで生のパケットを確認してみる</h2>
 <p>結果は見えているのですが、気になったのでtcpdumpで生パケットの状態を確認してみます。Nginxからプロキシされるときは期待通りとヘッダー名は&quot;X-Forwarded-For &ldquo;になっていること確認できました。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ sudo yum install tcpdump
-</span></span><span style="display:flex;"><span>$ tcpdump dst port 80 -X
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span># ながいんで適当に端折りました
-</span></span><span style="display:flex;"><span>11:04:01.883209 IP 10.0.2.15.43038 &gt; 192.168.0.10.54655: Flags [.], seq 802:1603, ack 1, win 14600, length 1460
-</span></span><span style="display:flex;"><span>     (略)
-</span></span><span style="display:flex;"><span>     0x0000:  4500 0355 c705 0000 3706 24ca adc2 265f  1.0..X-Forwarded
-</span></span><span style="display:flex;"><span>     0x0010:  c0a8 000a 0050 d57f 51ad 1e62 e596 78a4  -For:.192.168.33
-</span></span><span style="display:flex;"><span>     0x0020:  8018 0137 8dbe 0000 0101 080a d1dc c19e  .1..Host:.xxxxxx 
-</span></span></code></pre></div><h2 id="任意のhttpヘッダーつけた場合">任意のHTTPヘッダーつけた場合</h2>
+<pre tabindex="0"><code>$ sudo yum install tcpdump
+$ tcpdump dst port 80 -X
+
+# ながいんで適当に端折りました
+11:04:01.883209 IP 10.0.2.15.43038 &gt; 192.168.0.10.54655: Flags [.], seq 802:1603, ack 1, win 14600, length 1460
+     (略)
+     0x0000:  4500 0355 c705 0000 3706 24ca adc2 265f  1.0..X-Forwarded
+     0x0010:  c0a8 000a 0050 d57f 51ad 1e62 e596 78a4  -For:.192.168.33
+     0x0020:  8018 0137 8dbe 0000 0101 080a d1dc c19e  .1..Host:.xxxxxx 
+</code></pre><h2 id="任意のhttpヘッダーつけた場合">任意のHTTPヘッダーつけた場合</h2>
 <p>それでは、X-Forwarded-For以外の任意のHTTPヘッダーをつけた場合も同様になるのか確認してみます。
 Nginxにて、&lsquo;my-header&rsquo;という名前でヘッダーを追加してPHP側で受け取ります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>proxy_set_header my-header &#39;hogefugafoobar&#39;; 
-</span></span></code></pre></div><p><code>my-header</code>が<code>HTTP_MY_HEADER</code>に変わっていることが確認できた。</p>
+<pre tabindex="0"><code>proxy_set_header my-header &#39;hogefugafoobar&#39;; 
+</code></pre><p><code>my-header</code>が<code>HTTP_MY_HEADER</code>に変わっていることが確認できた。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">var_dump</span>($_SERVER);
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e"># array(35) { [&#34;HTTP_MY_HEADER&#34;] =&gt; string(14) &#34;hogefugafoobar&#34; ...... }

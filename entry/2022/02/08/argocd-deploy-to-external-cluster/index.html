@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -116,26 +116,26 @@
 <li>Argo CD: 2.2.2</li>
 <li>Argo CD CLI: 2.2.5</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% argocd version
-</span></span><span style="display:flex;"><span>argocd: v2.2.5+8f981cc.dirty
-</span></span><span style="display:flex;"><span>  BuildDate: 2022-02-05T05:20:39Z
-</span></span><span style="display:flex;"><span>  GitCommit: 8f981ccfcf942a9eb00bc466649f8499ba0455f5
-</span></span><span style="display:flex;"><span>  GitTreeState: dirty
-</span></span><span style="display:flex;"><span>  GoVersion: go1.17.6
-</span></span><span style="display:flex;"><span>  Compiler: gc
-</span></span><span style="display:flex;"><span>  Platform: darwin/amd64
-</span></span><span style="display:flex;"><span>argocd-server: v2.2.2+unknown
-</span></span><span style="display:flex;"><span>  BuildDate: 2022-01-26T02:18:29Z
-</span></span><span style="display:flex;"><span>  GitTreeState: clean
-</span></span><span style="display:flex;"><span>  GoVersion: go1.16.12
-</span></span><span style="display:flex;"><span>  Compiler: gc
-</span></span><span style="display:flex;"><span>  Platform: linux/amd64
-</span></span><span style="display:flex;"><span>  Ksonnet Version: unable to determine ksonnet version: exec: &#34;ks&#34;: executable file not found in $PATH
-</span></span><span style="display:flex;"><span>  Kustomize Version: v4.2.0 1970-01-01T00:00:00Z
-</span></span><span style="display:flex;"><span>  Helm Version: v3.7.1+gbf78984
-</span></span><span style="display:flex;"><span>  Kubectl Version: v0.22.2
-</span></span><span style="display:flex;"><span>  Jsonnet Version: v0.17.0
-</span></span></code></pre></div><h2 id="これまでのdestination設定">これまでのDestination設定</h2>
+<pre tabindex="0"><code>% argocd version
+argocd: v2.2.5+8f981cc.dirty
+  BuildDate: 2022-02-05T05:20:39Z
+  GitCommit: 8f981ccfcf942a9eb00bc466649f8499ba0455f5
+  GitTreeState: dirty
+  GoVersion: go1.17.6
+  Compiler: gc
+  Platform: darwin/amd64
+argocd-server: v2.2.2+unknown
+  BuildDate: 2022-01-26T02:18:29Z
+  GitTreeState: clean
+  GoVersion: go1.16.12
+  Compiler: gc
+  Platform: linux/amd64
+  Ksonnet Version: unable to determine ksonnet version: exec: &#34;ks&#34;: executable file not found in $PATH
+  Kustomize Version: v4.2.0 1970-01-01T00:00:00Z
+  Helm Version: v3.7.1+gbf78984
+  Kubectl Version: v0.22.2
+  Jsonnet Version: v0.17.0
+</code></pre><h2 id="これまでのdestination設定">これまでのDestination設定</h2>
 <p>Argo CDでアプリケーションを作成するときに <code>Destination</code> 設定がありました。
 アプリケーションをデプロイする対象のクラスタとそのNamespaceを指定します。
 これまでの学習では、Argo CDが起動しているクラスタ内でのデプロイだったため、<code>https://kubernetes.default.svc</code> と自身のkubernetes api service向けのURLを指定していました。</p>
@@ -144,111 +144,111 @@
 <h2 id="クラスタ情報の追加">クラスタ情報の追加</h2>
 <p><code>argocd</code>コマンドを用いて、クラスタ情報を追加できます。
 コマンドは <code>argocd cluster add CONTEXT</code> と書かれていますが、この「CONTEXT」は、kubeconfigのCONTEXTのことです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% argocd cluster add -h
-</span></span><span style="display:flex;"><span>argocd cluster add CONTEXT
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>Usage:
-</span></span><span style="display:flex;"><span>  argocd cluster add CONTEXT [flags]
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>Flags:
-</span></span><span style="display:flex;"><span>  ...
-</span></span></code></pre></div><p>いま手元では、ふたつのcontextがあるとします。
+<pre tabindex="0"><code>% argocd cluster add -h
+argocd cluster add CONTEXT
+
+Usage:
+  argocd cluster add CONTEXT [flags]
+
+Flags:
+  ...
+</code></pre><p>いま手元では、ふたつのcontextがあるとします。
 ひとつは検証用(staging)クラスタのものと、もうひとつが本番用（production）クラスタのものです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% kubectl config get-contexts
-</span></span><span style="display:flex;"><span>CURRENT   NAME                                         CLUSTER                        AUTHINFO                             NAMESPACE
-</span></span><span style="display:flex;"><span>*         default/api-cluster-staging:6443/admin       api-cluster-staging:6443       admin/api-cluster-staging:6443       default
-</span></span><span style="display:flex;"><span>          default/api-cluster-production:6443/admin    api-cluster-production:6443    admin/api-cluster-production:6443    default
-</span></span></code></pre></div><p>Argo CDが起動していない方の外部のクラスタのContextを指定して、<code>argocd cluster add</code> を実行します。
+<pre tabindex="0"><code>% kubectl config get-contexts
+CURRENT   NAME                                         CLUSTER                        AUTHINFO                             NAMESPACE
+*         default/api-cluster-staging:6443/admin       api-cluster-staging:6443       admin/api-cluster-staging:6443       default
+          default/api-cluster-production:6443/admin    api-cluster-production:6443    admin/api-cluster-production:6443    default
+</code></pre><p>Argo CDが起動していない方の外部のクラスタのContextを指定して、<code>argocd cluster add</code> を実行します。
 そうすると、<code>argocd-manager</code>というアドミン権限のもったService Accountを作るけどよいか？ときかれます。Yesと答えれば、Argo CDがデプロイするのに利用するService Accountの作成と権限付与が行われます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% argocd cluster add default/api-cluster-production:6443/admin
-</span></span><span style="display:flex;"><span>WARNING: This will create a service account `argocd-manager` on the cluster referenced by context `default/api-cluster-production:6443/admin` with full cluster level admin privileges. Do you want to continue [y/N]? y
-</span></span><span style="display:flex;"><span>INFO[0017] ServiceAccount &#34;argocd-manager&#34; created in namespace &#34;kube-system&#34;
-</span></span><span style="display:flex;"><span>INFO[0017] ClusterRole &#34;argocd-manager-role&#34; created
-</span></span><span style="display:flex;"><span>INFO[0017] ClusterRoleBinding &#34;argocd-manager-role-binding&#34; created
-</span></span><span style="display:flex;"><span>Cluster &#39;https://api.cluster.production:6443&#39; added
-</span></span></code></pre></div><p>作られたリソースを実際確認します。
+<pre tabindex="0"><code>% argocd cluster add default/api-cluster-production:6443/admin
+WARNING: This will create a service account `argocd-manager` on the cluster referenced by context `default/api-cluster-production:6443/admin` with full cluster level admin privileges. Do you want to continue [y/N]? y
+INFO[0017] ServiceAccount &#34;argocd-manager&#34; created in namespace &#34;kube-system&#34;
+INFO[0017] ClusterRole &#34;argocd-manager-role&#34; created
+INFO[0017] ClusterRoleBinding &#34;argocd-manager-role-binding&#34; created
+Cluster &#39;https://api.cluster.production:6443&#39; added
+</code></pre><p>作られたリソースを実際確認します。
 <code>argocd-manager-role</code>の権限がフル権限なので、ここは用途に応じて絞ってもいいかもしれません。
 とくに、これらのリソースはArgo CDによって管理されているわけではないので、任意で変更しても問題ないはずです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% kubectl get sa argocd-manager -n kube-system
-</span></span><span style="display:flex;"><span>NAME             SECRETS   AGE
-</span></span><span style="display:flex;"><span>argocd-manager   2         8h
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>% kubectl get clusterrole argocd-manager-role
-</span></span><span style="display:flex;"><span>NAME                  CREATED AT
-</span></span><span style="display:flex;"><span>argocd-manager-role   2022-02-08T05:58:54Z
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>% kubectl get clusterrolebinding argocd-manager-role-binding
-</span></span><span style="display:flex;"><span>NAME                          ROLE                              AGE
-</span></span><span style="display:flex;"><span>argocd-manager-role-binding   ClusterRole/argocd-manager-role   8h
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>% kubectl get clusterrole argocd-manager-role -o yaml
-</span></span><span style="display:flex;"><span>apiVersion: rbac.authorization.k8s.io/v1
-</span></span><span style="display:flex;"><span>kind: ClusterRole
-</span></span><span style="display:flex;"><span>metadata:
-</span></span><span style="display:flex;"><span>  creationTimestamp: &#34;2022-02-08T05:58:54Z&#34;
-</span></span><span style="display:flex;"><span>  name: argocd-manager-role
-</span></span><span style="display:flex;"><span>  resourceVersion: &#34;141171&#34;
-</span></span><span style="display:flex;"><span>  uid: 009bef0c-2a22-4518-9b97-1ebdee62b34d
-</span></span><span style="display:flex;"><span>rules:
-</span></span><span style="display:flex;"><span>- apiGroups:
-</span></span><span style="display:flex;"><span>  - &#39;*&#39;
-</span></span><span style="display:flex;"><span>  resources:
-</span></span><span style="display:flex;"><span>  - &#39;*&#39;
-</span></span><span style="display:flex;"><span>  verbs:
-</span></span><span style="display:flex;"><span>  - &#39;*&#39;
-</span></span><span style="display:flex;"><span>- nonResourceURLs:
-</span></span><span style="display:flex;"><span>  - &#39;*&#39;
-</span></span><span style="display:flex;"><span>  verbs:
-</span></span><span style="display:flex;"><span>  - &#39;*&#39;
-</span></span></code></pre></div><h2 id="設定はどこに">設定はどこに？</h2>
+<pre tabindex="0"><code>% kubectl get sa argocd-manager -n kube-system
+NAME             SECRETS   AGE
+argocd-manager   2         8h
+
+% kubectl get clusterrole argocd-manager-role
+NAME                  CREATED AT
+argocd-manager-role   2022-02-08T05:58:54Z
+
+% kubectl get clusterrolebinding argocd-manager-role-binding
+NAME                          ROLE                              AGE
+argocd-manager-role-binding   ClusterRole/argocd-manager-role   8h
+
+% kubectl get clusterrole argocd-manager-role -o yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: &#34;2022-02-08T05:58:54Z&#34;
+  name: argocd-manager-role
+  resourceVersion: &#34;141171&#34;
+  uid: 009bef0c-2a22-4518-9b97-1ebdee62b34d
+rules:
+- apiGroups:
+  - &#39;*&#39;
+  resources:
+  - &#39;*&#39;
+  verbs:
+  - &#39;*&#39;
+- nonResourceURLs:
+  - &#39;*&#39;
+  verbs:
+  - &#39;*&#39;
+</code></pre><h2 id="設定はどこに">設定はどこに？</h2>
 <p>上の作業が終わると、Argo CDのUI画面からCluster管理をみると、新しくClusterが追加されています。
 この設定情報は、Secretとして管理されています。</p>
 <p><img src="/image/argocd-external-cluster-setting.png" alt="argocd-external-cluster-setting"></p>
 <p><code>openshift-gitops</code>というnamespaceはArgo CDが起動しているものと考えてください。
 この中のSecretで、登録したクラスタのSecretがあります。実際に中身を確認してみましょう。
 Secret内に、対象のClusterの名前やAPIエンドポイント、トークン情報が入っているのがわかります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% kubectl get secret -n openshift-gitops
-</span></span><span style="display:flex;"><span>NAME                                       TYPE                                  DATA   AGE
-</span></span><span style="display:flex;"><span>argocd-secret                              Opaque                                5      9h
-</span></span><span style="display:flex;"><span>builder-dockercfg-dd62q                    kubernetes.io/dockercfg               1      9h
-</span></span><span style="display:flex;"><span>builder-token-7wxz7                        kubernetes.io/service-account-token   4      9h
-</span></span><span style="display:flex;"><span>builder-token-cvlgr                        kubernetes.io/service-account-token   4      9h
-</span></span><span style="display:flex;"><span>cluster                                    kubernetes.io/tls                     2      9h
-</span></span><span style="display:flex;"><span>cluster-api.cluster.production-358811194   Opaque                                3      8h
-</span></span><span style="display:flex;"><span>...
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>% kubectl describe secret -n openshift-gitops cluster-api.cluster.production-358811194
-</span></span><span style="display:flex;"><span>Name:         cluster-api.cluster.production-358811194
-</span></span><span style="display:flex;"><span>Namespace:    openshift-gitops
-</span></span><span style="display:flex;"><span>Labels:       argocd.argoproj.io/secret-type=cluster
-</span></span><span style="display:flex;"><span>Annotations:  managed-by: argocd.argoproj.io
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>Type:  Opaque
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>Data
-</span></span><span style="display:flex;"><span>====
-</span></span><span style="display:flex;"><span>config:  1333 bytes
-</span></span><span style="display:flex;"><span>name:    70 bytes
-</span></span><span style="display:flex;"><span>server:  58 bytes
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>% kubectl get secret -n openshift-gitops cluster-api.cluster.production-358811194 -o jsonpath=&#34;{.data.config}&#34; | base64 -d
-</span></span><span style="display:flex;"><span>{&#34;bearerToken&#34;:&#34;xxxxxxxxxxxxx&#34;,&#34;tlsClientConfig&#34;:{&#34;insecure&#34;:true}}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>% kubectl get secret -n openshift-gitops cluster-api.cluster.production-358811194 -o jsonpath=&#34;{.data.name}&#34; | base64 -d
-</span></span><span style="display:flex;"><span>default/api-cluster-production:6443/admin
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>% kubectl get secret -n openshift-gitops cluster-api.cluster.production-358811194 -o jsonpath=&#34;{.data.server}&#34; | base64 -d
-</span></span><span style="display:flex;"><span>https://api.cluster.production:6443
-</span></span></code></pre></div><p>上の <code>bearerToken</code> は、本番用クラスタ側の<code>argocd-manager</code>のトークンの値と一致することも確認できました。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>## 本番用クラスタ側
-</span></span><span style="display:flex;"><span>% kubectl get secret -n kube-system | grep argocd
-</span></span><span style="display:flex;"><span>argocd-manager-dockercfg-bdtdd                       kubernetes.io/dockercfg               1      8h
-</span></span><span style="display:flex;"><span>argocd-manager-token-7csz2                           kubernetes.io/service-account-token   4      8h
-</span></span><span style="display:flex;"><span>argocd-manager-token-vzvsf                           kubernetes.io/service-account-token   4      8h
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>% kubectl get secret -n kube-system argocd-manager-token-vzvsf -o jsonpath=&#34;{.data.token}&#34; | base64 -d
-</span></span><span style="display:flex;"><span>xxxxxxxxxxxxx
-</span></span></code></pre></div><h2 id="さいごに">さいごに</h2>
+<pre tabindex="0"><code>% kubectl get secret -n openshift-gitops
+NAME                                       TYPE                                  DATA   AGE
+argocd-secret                              Opaque                                5      9h
+builder-dockercfg-dd62q                    kubernetes.io/dockercfg               1      9h
+builder-token-7wxz7                        kubernetes.io/service-account-token   4      9h
+builder-token-cvlgr                        kubernetes.io/service-account-token   4      9h
+cluster                                    kubernetes.io/tls                     2      9h
+cluster-api.cluster.production-358811194   Opaque                                3      8h
+...
+
+% kubectl describe secret -n openshift-gitops cluster-api.cluster.production-358811194
+Name:         cluster-api.cluster.production-358811194
+Namespace:    openshift-gitops
+Labels:       argocd.argoproj.io/secret-type=cluster
+Annotations:  managed-by: argocd.argoproj.io
+
+Type:  Opaque
+
+Data
+====
+config:  1333 bytes
+name:    70 bytes
+server:  58 bytes
+
+% kubectl get secret -n openshift-gitops cluster-api.cluster.production-358811194 -o jsonpath=&#34;{.data.config}&#34; | base64 -d
+{&#34;bearerToken&#34;:&#34;xxxxxxxxxxxxx&#34;,&#34;tlsClientConfig&#34;:{&#34;insecure&#34;:true}}
+
+% kubectl get secret -n openshift-gitops cluster-api.cluster.production-358811194 -o jsonpath=&#34;{.data.name}&#34; | base64 -d
+default/api-cluster-production:6443/admin
+
+% kubectl get secret -n openshift-gitops cluster-api.cluster.production-358811194 -o jsonpath=&#34;{.data.server}&#34; | base64 -d
+https://api.cluster.production:6443
+</code></pre><p>上の <code>bearerToken</code> は、本番用クラスタ側の<code>argocd-manager</code>のトークンの値と一致することも確認できました。</p>
+<pre tabindex="0"><code>## 本番用クラスタ側
+% kubectl get secret -n kube-system | grep argocd
+argocd-manager-dockercfg-bdtdd                       kubernetes.io/dockercfg               1      8h
+argocd-manager-token-7csz2                           kubernetes.io/service-account-token   4      8h
+argocd-manager-token-vzvsf                           kubernetes.io/service-account-token   4      8h
+
+% kubectl get secret -n kube-system argocd-manager-token-vzvsf -o jsonpath=&#34;{.data.token}&#34; | base64 -d
+xxxxxxxxxxxxx
+</code></pre><h2 id="さいごに">さいごに</h2>
 <p>ここまで、Argo CDで外部クラスタを管理するときの動きについて確認しました。
 正直予想通りなのでとくに面白い点はありませんでしたが、外部クラスタ側にArgo CD用のService Accountを作り（<code>argocd-manager</code>）、そのトークン情報をArgo CDのSecretとして管理しているということがよくわかりました。ここまでわかれば、デバッグ等ももう怖くないですね。</p>
     </div>

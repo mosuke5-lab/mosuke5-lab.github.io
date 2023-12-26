@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -131,7 +131,7 @@
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    -----END CERTIFICATE-----</span>    
 </span></span></code></pre></div><p>ではさっそく作成したConfigMapをapplyして、<code>proxy/cluster</code>の<code>spec.trustedCA.name</code>に<code>user-ca-bundle</code>の値を入れて保存します。
 ここまでは、プロキシサーバの設定はしていませんが、ドキュメント操作どうりです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc apply -f user-ca.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc apply -f user-ca.yaml
 </span></span><span style="display:flex;"><span>configmap/user-ca-bundle created
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>$ oc get cm user-ca-bundle -n openshift-config
@@ -151,7 +151,7 @@
 </span></span></code></pre></div><p>この設定をいれるとなにがかわるのでしょうか。<br>
 <code>openshift-config-managed</code>というnamespace内に<code>trusted-ca-bundle</code>というConfigMapがあります。<code>proxy/cluster</code>の設定を行ったあとこのConfigMap内の値が変更されています。中身をみてみると、上で追加した、<code>user-ca-bundle</code>の証明書の中身が入っていることがわかります。
 これは、<a href="https://github.com/openshift/cluster-network-operator">Cluster Network Operator</a>が設定を行っています。該当のソースコードは<a href="https://github.com/openshift/cluster-network-operator/blob/release-4.6/pkg/controller/proxyconfig/controller.go#L361-L398">このへん</a>でしょうか？</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc get cm trusted-ca-bundle -n openshift-config-managed
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc get cm trusted-ca-bundle -n openshift-config-managed
 </span></span><span style="display:flex;"><span>NAME                DATA   AGE
 </span></span><span style="display:flex;"><span>trusted-ca-bundle   1      31h
 </span></span><span style="display:flex;"><span>
@@ -178,7 +178,7 @@ OpenShiftのドキュメントには、「<a href="https://access.redhat.com/doc
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">config.openshift.io/inject-trusted-cabundle</span>: <span style="color:#e6db74">&#34;true&#34;</span>
 </span></span></code></pre></div><p>ConfigMapを作成して、中身を確認してみると、ひとつ前の章で追加した証明書がはいっているではないかー。そうです、このなかみは<code>openshift-config-managed</code>のnamespace内にあった<code>trusted-ca-bundle</code>のConfigMapの中身です。
 Cluster Network Operatorは、<code>trusted-ca-bundle</code>の内容を挿入してくれるというわけです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc apply -f inject-ca-to-cm.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc apply -f inject-ca-to-cm.yaml
 </span></span><span style="display:flex;"><span>configmap/inject-trusted-cm created
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>$ oc get cm inject-trusted-cm -o yaml
@@ -196,7 +196,7 @@ Cluster Network Operatorは、<code>trusted-ca-bundle</code>の内容を挿入�
 <p>まずノードです。あるWorkerノードに入ってみます。
 <code>/etc/pki/ca-trust/source/anchors/openshift-config-user-ca-bundle.crt</code>をみると追加した証明書が追加されています。
 ノード側に配布されることで、kubeletがイメージを取得する際にも証明書が利用できるということでしょうか。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc debug node/worker-1
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc debug node/worker-1
 </span></span><span style="display:flex;"><span># chroot /host
 </span></span><span style="display:flex;"><span># cat /etc/pki/ca-trust/source/anchors/openshift-config-user-ca-bundle.crt
 </span></span><span style="display:flex;"><span>-----BEGIN CERTIFICATE-----
@@ -205,7 +205,7 @@ Cluster Network Operatorは、<code>trusted-ca-bundle</code>の内容を挿入�
 </span></span></code></pre></div><h3 id="openshiftのコアコンポーネント">OpenShiftのコアコンポーネント</h3>
 <p>つぎに、<code>openshift-apiserver</code>のnamespaceを見てみます。
 ConfigMapを確認すると<code>trusted-ca-bundle</code>と見覚えのある名前のものがあります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc get cm -n openshift-apiserver
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc get cm -n openshift-apiserver
 </span></span><span style="display:flex;"><span>NAME                DATA   AGE
 </span></span><span style="display:flex;"><span>config              1      31h
 </span></span><span style="display:flex;"><span>etcd-serving-ca     1      31h
@@ -213,7 +213,7 @@ ConfigMapを確認すると<code>trusted-ca-bundle</code>と見覚えのある�
 </span></span><span style="display:flex;"><span>trusted-ca-bundle   1      31h
 </span></span></code></pre></div><p>中身を確認すると案の定ではあります。追加した証明書の中身もありますし、labelには<code>config.openshift.io/inject-trusted-cabundle: &quot;true&quot;</code>があります。
 これは、まさしく上で紹介したCluster Network Operatorによる証明書の挿入によって作られたものです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: v1
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>apiVersion: v1
 </span></span><span style="display:flex;"><span>data:
 </span></span><span style="display:flex;"><span>  ca-bundle.crt: |
 </span></span><span style="display:flex;"><span>    -----BEGIN CERTIFICATE-----
@@ -229,7 +229,7 @@ ConfigMapを確認すると<code>trusted-ca-bundle</code>と見覚えのある�
 </span></span><span style="display:flex;"><span>...
 </span></span></code></pre></div><p>apiserverのPodの定義を見てみると、<code>trusted-ca-bundle</code>をマウントして内部で利用していることがわかる。
 Pod内からCA証明書を利用する必要のあるコンポーネントについてはこのように読み込んでいることがわかる。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc get pod -n openshift-apiserver
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc get pod -n openshift-apiserver
 </span></span><span style="display:flex;"><span>NAME                         READY   STATUS    RESTARTS   AGE
 </span></span><span style="display:flex;"><span>apiserver-58bbdff9b9-2c92j   1/1     Running   0          40m
 </span></span><span style="display:flex;"><span>apiserver-58bbdff9b9-2nmrh   1/1     Running   0          40m
@@ -252,7 +252,7 @@ Pod内からCA証明書を利用する必要のあるコンポーネントにつ
 <code>test-build-4-global-ca</code>の中身をみてみましょう。
 （私の環境で実行が4回目なので4になっています。）<br>
 結果は予想通りですね。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc start-build test-build
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc start-build test-build
 </span></span><span style="display:flex;"><span>build.build.openshift.io/test-build-4 started
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>$ oc get cm
@@ -272,7 +272,7 @@ Pod内からCA証明書を利用する必要のあるコンポーネントにつ
 </span></span><span style="display:flex;"><span>...
 </span></span></code></pre></div><p>また、当然ですが、Build Podは上のConfigMapをマウントします。
 Build Pod内で、コンテナイメージを取得する際に証明書を利用できることがわかります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc get pod test-build-4-build -o yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc get pod test-build-4-build -o yaml
 </span></span><span style="display:flex;"><span>...
 </span></span><span style="display:flex;"><span>  - configMap:
 </span></span><span style="display:flex;"><span>      defaultMode: 420

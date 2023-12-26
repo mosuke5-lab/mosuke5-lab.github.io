@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -150,14 +150,14 @@ $ vagrant init ubuntu1310</p>
 vb.customize [&ldquo;modifyvm&rdquo;, :id, &ldquo;&ndash;memory&rdquo;, &ldquo;128&rdquo;]
 end</p>
 <p>$ vagrant ssh</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>&lt;p&gt;同様にweb2においても同じことを行った。&lt;/p&gt;
-</span></span><span style="display:flex;"><span>&lt;p&gt;また、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/vagrant&#34;&gt;vagrant&lt;/a&gt;では一般的に対象のディレクトリで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/vagrant&#34;&gt;vagrant&lt;/a&gt; &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ssh&#34;&gt;ssh&lt;/a&gt;を利用してサーバに入るが、&lt;br&gt;
-</span></span><span style="display:flex;"><span>今回はプライベートアドレスも振ってあるし、物理サーバとしてイメージしているので以下のようにしてサーバにはいるようにした。&lt;/p&gt;
-</span></span></code></pre></div><p>$ ssh <a href="mailto:vagrant@192.168.33.10">vagrant@192.168.33.10</a>  # web1への接続
+<pre tabindex="0"><code>&lt;p&gt;同様にweb2においても同じことを行った。&lt;/p&gt;
+&lt;p&gt;また、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/vagrant&#34;&gt;vagrant&lt;/a&gt;では一般的に対象のディレクトリで&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/vagrant&#34;&gt;vagrant&lt;/a&gt; &lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/ssh&#34;&gt;ssh&lt;/a&gt;を利用してサーバに入るが、&lt;br&gt;
+今回はプライベートアドレスも振ってあるし、物理サーバとしてイメージしているので以下のようにしてサーバにはいるようにした。&lt;/p&gt;
+</code></pre><p>$ ssh <a href="mailto:vagrant@192.168.33.10">vagrant@192.168.33.10</a>  # web1への接続
 $ ssh <a href="mailto:vagrant@192.168.33.11">vagrant@192.168.33.11</a>  # web2への接続</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>&lt;p&gt;ホストサーバ側の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BF%A1%BC%A5%D5%A5%A7%A5%A4%A5%B9&#34;&gt;インターフェイス&lt;/a&gt;情報をみると。&lt;/p&gt;
-</span></span></code></pre></div><h1 id="cent7なので以下コマンドだがifconfig--aのこと">cent7なので以下コマンドだがifconfig -aのこと</h1>
+<pre tabindex="0"><code>
+&lt;p&gt;ホストサーバ側の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BF%A1%BC%A5%D5%A5%A7%A5%A4%A5%B9&#34;&gt;インターフェイス&lt;/a&gt;情報をみると。&lt;/p&gt;
+</code></pre><h1 id="cent7なので以下コマンドだがifconfig--aのこと">cent7なので以下コマンドだがifconfig -aのこと</h1>
 <p>$ ip a
 (中略)
 5: vboxnet0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UNKNOWN qlen 1000
@@ -168,23 +168,23 @@ inet 192.168.56.101/24 brd 192.168.56.255 scope global dynamic vboxnet0
 valid_lft 839sec preferred_lft 839sec
 inet6 fe80::800:27ff:fe00:0/64 scope link
 valid_lft forever preferred_lft forever</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>&lt;p&gt;vboxnet0という仮想の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BF%A1%BC%A5%D5%A5%A7%A5%A4%A5%B9&#34;&gt;インターフェイス&lt;/a&gt;が作成され、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&#34;&gt;IPアドレス&lt;/a&gt;も192.168.33.1が振られていることを確認。&lt;/p&gt;
-</span></span><span style="display:flex;"><span>&lt;p&gt;ルーティングテーブルも確認しておくと&lt;/p&gt;
-</span></span></code></pre></div><p>$ netstat -rn
+<pre tabindex="0"><code>
+&lt;p&gt;vboxnet0という仮想の&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BF%A1%BC%A5%D5%A5%A7%A5%A4%A5%B9&#34;&gt;インターフェイス&lt;/a&gt;が作成され、&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9&#34;&gt;IPアドレス&lt;/a&gt;も192.168.33.1が振られていることを確認。&lt;/p&gt;
+&lt;p&gt;ルーティングテーブルも確認しておくと&lt;/p&gt;
+</code></pre><p>$ netstat -rn
 Kernel IP routing table
 Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
 0.0.0.0         153.120.2.1     0.0.0.0         UG        0 0          0 eth0
 153.120.2.0     0.0.0.0         255.255.254.0   U         0 0          0 eth0
 192.168.33.0    0.0.0.0         255.255.255.0   U         0 0          0 vboxnet0</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>&lt;p&gt;192.168.33.0/24行はvboxnet0から出るように設定されている。&lt;/p&gt;
-</span></span><span style="display:flex;"><span>&lt;p&gt;上の物理イメージに詳細書き込むと以下。&lt;br&gt;
-</span></span><span style="display:flex;"><span>&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141006/20141006000246.png&#34; alt=&#34;f:id:mosuke5:20141006000246p:plain&#34; title=&#34;f:id:mosuke5:20141006000246p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
-</span></span><span style="display:flex;"><span>&lt;p&gt;&lt;/p&gt;
-</span></span><span style="display:flex;"><span>&lt;div style=&#34;border: solid 1px #dddddd;&#34;&gt;&lt;/div&gt;
-</span></span><span style="display:flex;"><span>&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Apache&#34;&gt;Apache&lt;/a&gt;のみインスールする必要があるので、&lt;br&gt;
-</span></span><span style="display:flex;"><span>web1, web2で以下を実施。（プロビジョニングしたほうが後々楽です。）&lt;/p&gt;
-</span></span></code></pre></div><p>$ sudo apt-get apache2</p>
+<pre tabindex="0"><code>&lt;p&gt;192.168.33.0/24行はvboxnet0から出るように設定されている。&lt;/p&gt;
+&lt;p&gt;上の物理イメージに詳細書き込むと以下。&lt;br&gt;
+&lt;span itemscope itemtype=&#34;http://schema.org/Photograph&#34;&gt;&lt;img src=&#34;https://cdn-ak.f.st-hatena.com/images/fotolife/m/mosuke5/20141006/20141006000246.png&#34; alt=&#34;f:id:mosuke5:20141006000246p:plain&#34; title=&#34;f:id:mosuke5:20141006000246p:plain&#34; class=&#34;hatena-fotolife&#34; itemprop=&#34;image&#34;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;div style=&#34;border: solid 1px #dddddd;&#34;&gt;&lt;/div&gt;
+&lt;p&gt;&lt;a class=&#34;keyword&#34; href=&#34;http://d.hatena.ne.jp/keyword/Apache&#34;&gt;Apache&lt;/a&gt;のみインスールする必要があるので、&lt;br&gt;
+web1, web2で以下を実施。（プロビジョニングしたほうが後々楽です。）&lt;/p&gt;
+</code></pre><p>$ sudo apt-get apache2</p>
 <p>##どちらがweb1でどちらがweb2か区別するために以下ファイルは変えておきます。
 $ sudo vim /var/www/index.html
 #Web1とかWeb2とかわかりやすい文言を入れておきます。</p>
@@ -193,14 +193,14 @@ $ sudo service apache2 start</p>
 <p>##Apache起動確認
 $ curl localhost
 　上記で変更したindex.htmlの内容が表示されること</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>&lt;p&gt;これでWebサーバの準備は完了。&lt;/p&gt;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>&lt;/div&gt;
-</span></span><span style="display:flex;"><span>&lt;div class=&#34;section&#34;&gt;
-</span></span><span style="display:flex;"><span>    &lt;h2&gt;4, Nginxでリバースプロキシサーバを構築する&lt;/h2&gt;
-</span></span><span style="display:flex;"><span>    &lt;p&gt;Nginx初めて触ったがとてもシンプル。&lt;br&gt;
-</span></span><span style="display:flex;"><span>今回はNginxをリバースプロキシとして利用したので、proxy.confを作成するだけ。&lt;/p&gt;
-</span></span></code></pre></div><p>##インスール
+<pre tabindex="0"><code>&lt;p&gt;これでWebサーバの準備は完了。&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;div class=&#34;section&#34;&gt;
+    &lt;h2&gt;4, Nginxでリバースプロキシサーバを構築する&lt;/h2&gt;
+    &lt;p&gt;Nginx初めて触ったがとてもシンプル。&lt;br&gt;
+今回はNginxをリバースプロキシとして利用したので、proxy.confを作成するだけ。&lt;/p&gt;
+</code></pre><p>##インスール
 $ sudo yum install nginx</p>
 <h2 id="etcnginx以下に設定ファイルなどあること確認">/etc/nginx以下に設定ファイルなどあること確認</h2>
 <p>$ ls /etc/nginx</p>
@@ -238,14 +238,14 @@ proxy_pass http://192.168.33.11/;
 <h2 id="あとは起動させるのみ">あとは起動させるのみ</h2>
 <p>$ sudo systemctl enable nginx
 $ sudo systemctl start nginx</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>&lt;/div&gt;
-</span></span><span style="display:flex;"><span>&lt;div class=&#34;section&#34;&gt;
-</span></span><span style="display:flex;"><span>    &lt;h2&gt;まとめ&lt;/h2&gt;
-</span></span><span style="display:flex;"><span>    &lt;p&gt;はじめてのリバースプロキシをサーバ仮想化を使って体験してみました。IPアドレスなどを意識しながら行うと非常に勉強になります。ちなみに、この数年後に下記のNginxの仕組みの記事を書いていますので、こちらもご覧ください。&lt;/p&gt;
-</span></span><span style="display:flex;"><span>    &lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2016/06/04/180122/&#34; data-iframely-url=&#34;//cdn.iframe.ly/nheb2qe&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
-</span></span><span style="display:flex;"><span>&lt;/div&gt;
-</span></span><span style="display:flex;"><span>&lt;/body&gt;
-</span></span></code></pre></div>
+<pre tabindex="0"><code>&lt;/div&gt;
+&lt;div class=&#34;section&#34;&gt;
+    &lt;h2&gt;まとめ&lt;/h2&gt;
+    &lt;p&gt;はじめてのリバースプロキシをサーバ仮想化を使って体験してみました。IPアドレスなどを意識しながら行うと非常に勉強になります。ちなみに、この数年後に下記のNginxの仕組みの記事を書いていますので、こちらもご覧ください。&lt;/p&gt;
+    &lt;div class=&#34;iframely-embed&#34;&gt;&lt;div class=&#34;iframely-responsive&#34; style=&#34;height: 140px; padding-bottom: 0;&#34;&gt;&lt;a href=&#34;https://blog.mosuke.tech/entry/2016/06/04/180122/&#34; data-iframely-url=&#34;//cdn.iframe.ly/nheb2qe&#34;&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;script async src=&#34;//cdn.iframe.ly/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+</code></pre>
     </div>
 <div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
     <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>

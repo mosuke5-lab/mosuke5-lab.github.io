@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -103,7 +103,7 @@ APIを利用して効率よく作業できる環境を整えた。</p>
 <h2 id="identifierの確認">identifierの確認</h2>
 <p><code>identifier</code>は下記APIで確認できる。<br>
 このAPIで返ってくるはじめの<code>id</code>が<code>idenitifer</code>だ。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>curl -X GET &#34;https://api.cloudflare.com/client/v4/zones \
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>curl -X GET &#34;https://api.cloudflare.com/client/v4/zones \
 </span></span><span style="display:flex;"><span>    ?name=&lt;your site&gt; \
 </span></span><span style="display:flex;"><span>    &amp;status=active \
 </span></span><span style="display:flex;"><span>    &amp;page=1 \
@@ -114,7 +114,7 @@ APIを利用して効率よく作業できる環境を整えた。</p>
 </span></span><span style="display:flex;"><span>    -H &#34;X-Auth-Email: &lt;your email&gt;&#34; \
 </span></span><span style="display:flex;"><span>    -H &#34;X-Auth-Key: &lt;your api key&gt;&#34; \
 </span></span><span style="display:flex;"><span>    -H &#34;Content-Type: application/json&#34; 
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>{
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  &#34;result&#34;: [
 </span></span><span style="display:flex;"><span>    {
 </span></span><span style="display:flex;"><span>      &#34;id&#34;: &#34;xxxxxxxxxxxxxxxxxxxxxxx&#34;,
@@ -136,7 +136,7 @@ APIを利用して効率よく作業できる環境を整えた。</p>
 </span></span></code></pre></div><h2 id="キャッシュの削除">キャッシュの削除</h2>
 <p>うえで手に入れた<code>identifier</code>を使って、ドキュメント通り<code>purge_cache</code>を実行するだけだ。<br>
 このAPIをデプロイの過程に組み込み効率よく運用できている。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>curl -X DELETE &#34;https://api.cloudflare.com/client/v4/zones/&lt;identifier&gt;/purge_cache&#34; \
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>curl -X DELETE &#34;https://api.cloudflare.com/client/v4/zones/&lt;identifier&gt;/purge_cache&#34; \
 </span></span><span style="display:flex;"><span>     -H &#34;X-Auth-Email: &lt;your email&gt;&#34; \
 </span></span><span style="display:flex;"><span>     -H &#34;X-Auth-Key: &lt;your api key&gt;&#34; \
 </span></span><span style="display:flex;"><span>     -H &#34;Content-Type: application/json&#34; \

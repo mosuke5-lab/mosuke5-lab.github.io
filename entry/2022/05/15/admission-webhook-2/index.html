@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -163,7 +163,7 @@
 <h2 id="kubernetesクラスタへのデプロイ">Kubernetesクラスタへのデプロイ</h2>
 <h3 id="tls証明書の作成">TLS証明書の作成</h3>
 <p>今回は、opensslを使って自己証明書を作って対応することにします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>## webhook serverの秘密鍵作成
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>## webhook serverの秘密鍵作成
 </span></span><span style="display:flex;"><span>$ openssl genrsa 2048 &gt; server.key
 </span></span><span style="display:flex;"><span>Generating RSA private key, 2048 bit long modulus
 </span></span><span style="display:flex;"><span>..+++
@@ -210,7 +210,7 @@
 </span></span></code></pre></div><p>x509の証明書の中身を確認する方法はぱっとコマンドを打てるようにしておくと結構便利です。
 Kubernetes環境の運用でも、各種サービスの証明書を確認することも多いでしょう。
 ここでのポイントは <code>X509v3 Subject Alternative Name</code> がきちんと付与されているかです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>## 証明書の中身確認
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>## 証明書の中身確認
 </span></span><span style="display:flex;"><span>$ openssl x509 -text -noout -in server.crt
 </span></span><span style="display:flex;"><span>Certificate:
 </span></span><span style="display:flex;"><span>    Data:
@@ -244,16 +244,16 @@ dNSName 型の subjectAltName 拡張 がある場合、それは、身元とし�
 <p>もし、SANを使っていないCommon Nameのみでの証明を使うとWebhookをcallするときに次のようなエラーがでます。
 Goの古いバージョンでは、<code>GODEBUG=x509ignoreCN=0</code> を与えることで回避できましたが、Go1.17移行を使っているKubernetesのバージョンでは正式にSANを使った証明書を用意しましょう。
 Go 1.17で <code>The temporary GODEBUG=x509ignoreCN=0 flag has been removed.</code> と無視するオプションが削除されています（<a href="https://go.dev/doc/go1.17#crypto/x509" target="_blank">リリースノート</a>）。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Error from server (InternalError): Internal error occurred: failed calling webhook &#34;sample-validating-webhook.hoge.fuga.local&#34;: failed to call webhook: Post &#34;https://mywebhook.mynamespace.svc:443/runasuser-validation?timeout=5s&#34;: x509: certificate relies on legacy Common Name field, use SANs instead
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Error from server (InternalError): Internal error occurred: failed calling webhook &#34;sample-validating-webhook.hoge.fuga.local&#34;: failed to call webhook: Post &#34;https://mywebhook.mynamespace.svc:443/runasuser-validation?timeout=5s&#34;: x509: certificate relies on legacy Common Name field, use SANs instead
 </span></span></code></pre></div><h3 id="ローカル実行">ローカル実行</h3>
 <p>作成した証明書を使って動作するかローカルで確認しておきます。
 起動オプションに証明書と鍵を指定できるようにしました。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ go run server.go -server-cert=./tmp/server.crt -server-key=./tmp/server.key -body-dump
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ go run server.go -server-cert=./tmp/server.crt -server-key=./tmp/server.key -body-dump
 </span></span><span style="display:flex;"><span>...
 </span></span></code></pre></div><p>別ターミナルセッションでCurlを使ってリクエストを送信してみます。
 <code>testdata</code>ディレクトリにサンプルのJSONリクエストを用意しておきました。
 レスポンスの形式が、公式ドキュメントであることをしっかり確認しておきましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl -s -k -H &#39;Content-Type: application/json&#39; -XPOST https://localhost:8443/runasuser-validation -d @testdata/noRunAsUserRequestTemplate.json | jq .
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ curl -s -k -H &#39;Content-Type: application/json&#39; -XPOST https://localhost:8443/runasuser-validation -d @testdata/noRunAsUserRequestTemplate.json | jq .
 </span></span><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  &#34;response&#34;: {
 </span></span><span style="display:flex;"><span>    &#34;uid&#34;: &#34;2e556680-fe1b-412d-9660-4e0574adcf47&#34;,
@@ -268,7 +268,7 @@ Go 1.17で <code>The temporary GODEBUG=x509ignoreCN=0 flag has been removed.</co
 </span></span></code></pre></div><h3 id="デプロイ-to-kubernetes">デプロイ to Kubernetes</h3>
 <p>作成した証明書と鍵は、Kubernetes上で動作するPodも読み込む必要があります。
 証明書等の機密情報はSecretに格納してマウントするのが常套手段ですね。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl create ns mynamespace
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ kubectl create ns mynamespace
 </span></span><span style="display:flex;"><span>$ kubectl create secret tls mywebhook-secret --key server.key --cert server.crt -n mynamespace
 </span></span><span style="display:flex;"><span>secret/mywebhook-secret created
 </span></span><span style="display:flex;"><span>
@@ -316,7 +316,7 @@ Go 1.17で <code>The temporary GODEBUG=x509ignoreCN=0 flag has been removed.</co
 </span></span><span style="display:flex;"><span>      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">tls</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#f92672">secret</span>:
 </span></span><span style="display:flex;"><span>          <span style="color:#f92672">secretName</span>: <span style="color:#ae81ff">mywebhook-secret</span>
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f manifests/deploy.yaml -n mynamespace
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ kubectl apply -f manifests/deploy.yaml -n mynamespace
 </span></span><span style="display:flex;"><span>$ kubectl get pod,service -n mynamespace
 </span></span><span style="display:flex;"><span>NAME                             READY   STATUS    RESTARTS   AGE
 </span></span><span style="display:flex;"><span>pod/mywebhook-685f859975-tfd2n   1/1     Running   0          37s
@@ -327,12 +327,12 @@ Go 1.17で <code>The temporary GODEBUG=x509ignoreCN=0 flag has been removed.</co
 <p>いよいよデプロイの最後のフェーズです。<br>
 Webhook Serverとしてはデプロイできましたので、AdmissionWebhookの設定を行って実際に動作するようにします。
 今回は自己証明書をつかっているので、<code>caBundle</code>の記載を忘れずに行いましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ sed  &#34;s/BASE64_ENCODED_PEM_FILE/$(base64 server.crt)/g&#34; manifests/validatingwebhookconfiguration.yaml.template | kubectl apply -f -
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ sed  &#34;s/BASE64_ENCODED_PEM_FILE/$(base64 server.crt)/g&#34; manifests/validatingwebhookconfiguration.yaml.template | kubectl apply -f -
 </span></span><span style="display:flex;"><span>validatingwebhookconfiguration.admissionregistration.k8s.io/sample-validating-webhook created
 </span></span></code></pre></div><p>これで、Admission webhookの設定は終わりです。<br>
 期待通り動くのでしょうか？
 <code>user-foo</code>と<code>admin-bar</code>というnamespaceに対してPodを作成して挙動を確認してみます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl create ns user-foo
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ kubectl create ns user-foo
 </span></span><span style="display:flex;"><span>$ kubectl create ns admin-bar
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>$ kubectl run debug --rm -it --image busybox:latest -n user-foo -- /bin/sh

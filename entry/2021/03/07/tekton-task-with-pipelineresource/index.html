@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -212,7 +212,7 @@ Taskは、内部の挙動を確認するため、わざと<code>sleep 3600</code
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">taskRef</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-task-with-pipelineresource</span>
 </span></span></code></pre></div><p>準備ができたら、実行して中身を確認します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f my-git-resource.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ kubectl apply -f my-git-resource.yaml
 </span></span><span style="display:flex;"><span>pipelineresource.tekton.dev/my-git-resource created
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>$ kubectl apply -f my-task-with-pipelineresource.yaml
@@ -230,37 +230,37 @@ Taskは、内部の挙動を確認するため、わざと<code>sleep 3600</code
 確認するとわかるのですが、Task内に書いたStepの他に、<code>name: step-git-source-src-shnpk</code>というコンテナが追加されています。
 こちらは、Tektonが追加したコンテナで、PipelineResourceで指定したリソースをGitレポジトリからダウンロードしてくる処理（<code>/workspace/src</code>にダウンロード）を行っています。
 Step間は、EmptyDirで共有されているので、後続の処理で同じソースコードを活用していくことができます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">$</span> kubectl get pod my<span style="color:#f92672">-</span>task<span style="color:#f92672">-</span>with<span style="color:#f92672">-</span>pipelineresource<span style="color:#f92672">-</span>run<span style="color:#f92672">-</span>pod<span style="color:#f92672">-</span>jfkrl <span style="color:#f92672">-</span>o yaml <span style="color:#f92672">|</span> less
-</span></span><span style="display:flex;"><span><span style="color:#f92672">...</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ kubectl get pod my-task-with-pipelineresource-run-pod-jfkrl -o yaml | less
+</span></span><span style="display:flex;"><span>...
 </span></span><span style="display:flex;"><span>spec:
 </span></span><span style="display:flex;"><span>  containers:
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">-</span> args:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>wait_file
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">/</span>tekton<span style="color:#f92672">/</span>downward<span style="color:#f92672">/</span>ready
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>wait_file_content
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>post_file
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">/</span>tekton<span style="color:#f92672">/</span>tools<span style="color:#f92672">/</span><span style="color:#ae81ff">0</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>termination_path
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">/</span>tekton<span style="color:#f92672">/</span>termination
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>entrypoint
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">/</span>ko<span style="color:#f92672">-</span>app<span style="color:#f92672">/</span>git<span style="color:#f92672">-</span>init
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">--</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>url
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> https:<span style="color:#f92672">//</span>github<span style="color:#f92672">.</span>com<span style="color:#f92672">/</span>mosuke5<span style="color:#f92672">/</span>hugo<span style="color:#f92672">-</span>blog<span style="color:#f92672">.</span>mosuke<span style="color:#f92672">.</span>tech
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>path
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">/</span>workspace<span style="color:#f92672">/</span>src
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">-</span>revision
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> master
+</span></span><span style="display:flex;"><span>  - args:
+</span></span><span style="display:flex;"><span>    - -wait_file
+</span></span><span style="display:flex;"><span>    - /tekton/downward/ready
+</span></span><span style="display:flex;"><span>    - -wait_file_content
+</span></span><span style="display:flex;"><span>    - -post_file
+</span></span><span style="display:flex;"><span>    - /tekton/tools/0
+</span></span><span style="display:flex;"><span>    - -termination_path
+</span></span><span style="display:flex;"><span>    - /tekton/termination
+</span></span><span style="display:flex;"><span>    - -entrypoint
+</span></span><span style="display:flex;"><span>    - /ko-app/git-init
+</span></span><span style="display:flex;"><span>    - --
+</span></span><span style="display:flex;"><span>    - -url
+</span></span><span style="display:flex;"><span>    - https://github.com/mosuke5/hugo-blog.mosuke.tech
+</span></span><span style="display:flex;"><span>    - -path
+</span></span><span style="display:flex;"><span>    - /workspace/src
+</span></span><span style="display:flex;"><span>    - -revision
+</span></span><span style="display:flex;"><span>    - master
 </span></span><span style="display:flex;"><span>    command:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#f92672">/</span>tekton<span style="color:#f92672">/</span>tools<span style="color:#f92672">/</span>entrypoint
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">...</span>
-</span></span><span style="display:flex;"><span>    image: gcr<span style="color:#f92672">.</span>io<span style="color:#f92672">/</span>tekton<span style="color:#f92672">-</span>releases<span style="color:#f92672">/</span>github<span style="color:#f92672">.</span>com<span style="color:#f92672">/</span>tektoncd<span style="color:#f92672">/</span>pipeline<span style="color:#f92672">/</span>cmd<span style="color:#f92672">/</span>git<span style="color:#f92672">-</span>init<span style="color:#960050;background-color:#1e0010">@</span>sha256:c6cb2257d718bbd6281f0d028c801c26333221a2c38ce85ae8e23b24bf20e781
+</span></span><span style="display:flex;"><span>    - /tekton/tools/entrypoint
+</span></span><span style="display:flex;"><span>    ...
+</span></span><span style="display:flex;"><span>    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init@sha256:c6cb2257d718bbd6281f0d028c801c26333221a2c38ce85ae8e23b24bf20e781
 </span></span><span style="display:flex;"><span>    imagePullPolicy: IfNotPresent
-</span></span><span style="display:flex;"><span>    name: step<span style="color:#f92672">-</span>git<span style="color:#f92672">-</span>source<span style="color:#f92672">-</span>src<span style="color:#f92672">-</span>shnpk
-</span></span><span style="display:flex;"><span><span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>    name: step-git-source-src-shnpk
+</span></span><span style="display:flex;"><span>...
 </span></span></code></pre></div><p>コンテナ内部を軽く確認してみましょう。<br>
 PipelineResourceで指定したGitレポジトリ（今回の場合は本ブログのGitレポジトリ）がダウンロードされていることが確認できます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% kc exec -it my-task-with-pipelineresource-run-pod-jfkrl -c step-wait -- /bin/bash
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% kc exec -it my-task-with-pipelineresource-run-pod-jfkrl -c step-wait -- /bin/bash
 </span></span><span style="display:flex;"><span>root@my-task-with-pipelineresource-run-pod-jfkrl:/workspace# ls -l
 </span></span><span style="display:flex;"><span>total 4
 </span></span><span style="display:flex;"><span>drwxr-xr-x 8 root root 4096 Mar  7 06:47 src

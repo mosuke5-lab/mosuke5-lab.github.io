@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -100,15 +100,15 @@ Werckerを使って自動で最適化させることにした。</p>
 </ul>
 <p>処理自体はいたってシンプル。<br>
 次のシェル(<code>optimize_image.sh</code>)を用意した。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/sh
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>find ./static/image/ -name <span style="color:#e6db74">&#34;*.png&#34;</span> | xargs optipng -o5
-</span></span><span style="display:flex;"><span>find ./static/image/ -name <span style="color:#e6db74">&#34;*.jpg&#34;</span> -type f -exec jpegtran -copy none -optimize -outfile <span style="color:#f92672">{}</span> <span style="color:#f92672">{}</span> <span style="color:#ae81ff">\;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>#!/bin/sh
+</span></span><span style="display:flex;"><span>find ./static/image/ -name &#34;*.png&#34; | xargs optipng -o5
+</span></span><span style="display:flex;"><span>find ./static/image/ -name &#34;*.jpg&#34; -type f -exec jpegtran -copy none -optimize -outfile {} {} \;
 </span></span></code></pre></div><h1 id="werckerに組み込む">Werckerに組み込む</h1>
 <p><code>wercker.yml</code>のbuildの段階で最適化を仕込めばおわり。<br>
 ただし、すべての画像ファイルをデプロイのたびに最適化すると時間がかかる。<br>
 定期的にローカルで圧縮してgitに更新しておいたほうがいいだろう。<br>
 あくまで、忘れてしまった時のためにCIでまかなってくれるというスタンスで利用している。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>- script:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>- script:
 </span></span><span style="display:flex;"><span>  name: optimize image size
 </span></span><span style="display:flex;"><span>  code: |
 </span></span><span style="display:flex;"><span>    sh ./scripts/optimize_image.sh

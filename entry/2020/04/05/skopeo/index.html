@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -137,13 +137,13 @@ gitlabは、Gitレポジトリでありながらプライベートのコンテ�
 今回もGitlabのプライベートレジストリを使うのでイメージを書き込むには認証が必要です。
 認証するには、コマンドのオプションでレジストリのユーザIDとパスワードを指定するか、認証のファイルを指定するなどで可能です。</p>
 <p>以下は、<code>--dest-creds</code> オプションでコマンドにIDとパスワードを引数にした場合です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ skopeo copy --dest-creds=&#34;mosuke5:xxxxxx&#34; docker://centos:8 docker://registry.gitlab.com/mosuke5/skopeo-test:v1
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ skopeo copy --dest-creds=&#34;mosuke5:xxxxxx&#34; docker://centos:8 docker://registry.gitlab.com/mosuke5/skopeo-test:v1
 </span></span></code></pre></div><p>コマンドラインにIDとパスワードを直接記述することを嫌うケースもあるでしょう。<br>
 認証用のjsonファイルを引数に渡すことで認証することもできます。
 dockerを利用している人は<code>docker login</code>
 フォーマットについてあまり情報がなかったのですが、<code>user:password</code>をbase64でエンコードした文字列が必要です。
 以下はサンプルです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ echo -n &#34;user:password&#34; | base64
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ echo -n &#34;user:password&#34; | base64
 </span></span><span style="display:flex;"><span>dXNlcjpwYXNzd29yZA==
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>$ vim gitlab-auth.json
@@ -157,7 +157,7 @@ dockerを利用している人は<code>docker login</code>
 </span></span></code></pre></div><h3 id="イメージのコピー同期">イメージのコピー、同期</h3>
 <p>認証方法がわかったところで実際にコピーをしてみます。
 以下は、<code>--dest-authfile</code>で上で作成した<code>gitlab-auth.json</code>を指定しています。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ skopeo copy --dest-authfile=&#34;./gitlab-auth.json&#34; docker://centos:8 docker://registry.gitlab.com/mosuke5/skopeo-test:v1
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ skopeo copy --dest-authfile=&#34;./gitlab-auth.json&#34; docker://centos:8 docker://registry.gitlab.com/mosuke5/skopeo-test:v1
 </span></span><span style="display:flex;"><span>Getting image source signatures
 </span></span><span style="display:flex;"><span>Copying blob 8a29a15cefae done  
 </span></span><span style="display:flex;"><span>Copying config 470671670c done  
@@ -167,7 +167,7 @@ dockerを利用している人は<code>docker login</code>
 <p><img src="/image/skopeo-copy.png" alt="skopeo-copy"></p>
 <p>skopeoでは、１つ１つのイメージをコピーするだけでなく、すべてのタグをまとめて他のレジストリに同期することも可能です。
 centosの場合、39のタグがあり、時間かかりますが以下のように同期できます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ skopeo sync --dest-authfile=&#34;./gitlab-auth.json&#34; --src docker --dest docker docker.io/centos registry.gitlab.com/mosuke5/skopeo-test
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ skopeo sync --dest-authfile=&#34;./gitlab-auth.json&#34; --src docker --dest docker docker.io/centos registry.gitlab.com/mosuke5/skopeo-test
 </span></span><span style="display:flex;"><span>INFO[0000] Tag presence check                            imagename=docker.io/centos tagged=false
 </span></span><span style="display:flex;"><span>INFO[0000] Getting tags                                  image=docker.io/library/centos
 </span></span><span style="display:flex;"><span>INFO[0003] Copying image tag 1/39                        from=&#34;docker://centos:5.11&#34; to=&#34;docker://registry.gitlab.com/mosuke5/skopeo-test/centos:5.11&#34;

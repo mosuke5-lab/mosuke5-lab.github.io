@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -129,7 +129,7 @@ ExternalName Serviceを作成した同じNamespace内からであれば <code>my
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">type</span>: <span style="color:#ae81ff">ExternalName</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">externalName</span>: <span style="color:#ae81ff">blog.mosuke.tech </span>
 </span></span></code></pre></div><p>次のように設定されていることを確認します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f external-service.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ kubectl apply -f external-service.yaml
 </span></span><span style="display:flex;"><span>service/my-blog created
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>$ kubectl get service
@@ -158,7 +158,7 @@ ExternalName Serviceを作成した同じNamespace内からであれば <code>my
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">runAsUser</span>: <span style="color:#ae81ff">0</span>
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">privileged</span>: <span style="color:#66d9ef">true</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">dnsPolicy</span>: <span style="color:#ae81ff">ClusterFirst</span>
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f debug-pod.yaml
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ kubectl apply -f debug-pod.yaml
 </span></span><span style="display:flex;"><span>$ kubectl get pod
 </span></span><span style="display:flex;"><span>NAME    READY   STATUS    RESTARTS   AGE
 </span></span><span style="display:flex;"><span>debug   1/1     Running   0          4s
@@ -171,7 +171,7 @@ ExternalName Serviceを作成した同じNamespace内からであれば <code>my
 </span></span><span style="display:flex;"><span>listening on eth0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 </span></span><span style="display:flex;"><span>...
 </span></span></code></pre></div><p>別のターミナルからデバッグコンテナに接続し、digなどを実行します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl exec -it debug -- bash
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ kubectl exec -it debug -- bash
 </span></span><span style="display:flex;"><span>[root@debug /]# 
 </span></span><span style="display:flex;"><span>[root@debug /]# dig +search my-blog
 </span></span><span style="display:flex;"><span>
@@ -201,11 +201,11 @@ ExternalName Serviceを作成した同じNamespace内からであれば <code>my
 </span></span><span style="display:flex;"><span>;; MSG SIZE  rcvd: 195
 </span></span></code></pre></div><p><code>dig +search my-blog</code> を実行したときのtcpdumpの出力が以下です。<br>
 &lsquo;my-blog.test.svc.cluster.local&rsquo; へ名前解決しに行き、結果として <code>CNAME blog.mosuke.tech., A 172.67.165.72, A 104.21.57.182</code> が返ってきていることがわかります。予想通りですね。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>## tcpdumpの出力
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>## tcpdumpの出力
 </span></span><span style="display:flex;"><span>08:24:54.761076 IP debug.43126 &gt; dns-default.openshift-dns.svc.cluster.local.domain: 6985+ [1au] A? my-blog.test.svc.cluster.local. (71)
 </span></span><span style="display:flex;"><span>08:24:54.798904 IP dns-default.openshift-dns.svc.cluster.local.domain &gt; debug.43126: 6985*- 3/0/1 CNAME blog.mosuke.tech., A 172.67.165.72, A 104.21.57.182 (195)
 </span></span></code></pre></div><p>ちなみに<code>blog.mosuke.tech</code>を直接名前解決したとき（<code>dig +search blog.mosuke.tech</code>）のtcpdumpの出力結果です。なんどもリクエストしていることがわかります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>08:25:51.192858 IP debug.38890 &gt; dns-default.openshift-dns.svc.cluster.local.domain: 46897+ [1au] A? blog.mosuke.tech.test.svc.cluster.local. (80)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>08:25:51.192858 IP debug.38890 &gt; dns-default.openshift-dns.svc.cluster.local.domain: 46897+ [1au] A? blog.mosuke.tech.test.svc.cluster.local. (80)
 </span></span><span style="display:flex;"><span>08:25:51.193849 IP dns-default.openshift-dns.svc.cluster.local.domain &gt; debug.38890: 46897 NXDomain*- 0/1/1 (173)
 </span></span><span style="display:flex;"><span>08:25:51.194182 IP debug.52319 &gt; dns-default.openshift-dns.svc.cluster.local.domain: 21491+ [1au] A? blog.mosuke.tech.svc.cluster.local. (75)
 </span></span><span style="display:flex;"><span>08:25:51.194422 IP dns-default.openshift-dns.svc.cluster.local.domain &gt; debug.52319: 21491 NXDomain*- 0/1/1 (168)
@@ -219,7 +219,7 @@ ExternalName Serviceを作成した同じNamespace内からであれば <code>my
 <p>ExternalName Serviceを使うときには一部の用途で注意が必要です。<br>
 <code>$ curl my-blog</code> したときのホスト名に注目しましょう。
 <code>Host: my-blog</code> となっており、<code>blog.mosuke.tech</code> がホスト名ではありません。それにより、TLSの暗号化やプロキシに問題がおこる可能性もあります。十分に仕組みを理解して使いましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl my-blog -v
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ curl my-blog -v
 </span></span><span style="display:flex;"><span>*   Trying 172.67.165.72:80...
 </span></span><span style="display:flex;"><span>* Connected to my-blog (172.67.165.72) port 80 (#0)
 </span></span><span style="display:flex;"><span>&gt; GET / HTTP/1.1

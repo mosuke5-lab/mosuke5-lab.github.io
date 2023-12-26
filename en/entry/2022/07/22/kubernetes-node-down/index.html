@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -101,7 +101,7 @@ We will see how it works in the case of Deployment and the case of StatefulSet.<
 <p>*This section describes the events. Explanations of the events are described later in this section.</p>
 <p>When I shutdown a node or stop kubelet, the status of Node becomes <code>NotReady</code>.
 We currently have a cluster running with 3 Master nodes and 3 Worker nodes. In this blog, we don&rsquo;t need to care about the Master node, so we will only retrieve the Worker when we run <code>kubectl get node</code>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get node --selector=&#39;node-role.kubernetes.io/worker&#39;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ kubectl get node --selector=&#39;node-role.kubernetes.io/worker&#39;
 </span></span><span style="display:flex;"><span>NAME                                              STATUS   ROLES    AGE     VERSION
 </span></span><span style="display:flex;"><span>ip-10-0-163-234.ap-southeast-1.compute.internal   Ready    worker   9m6s    v1.19.0+8d12420
 </span></span><span style="display:flex;"><span>ip-10-0-168-85.ap-southeast-1.compute.internal    Ready    worker   18h     v1.19.0+8d12420
@@ -109,7 +109,7 @@ We currently have a cluster running with 3 Master nodes and 3 Worker nodes. In t
 </span></span></code></pre></div><p>Also, start Nginx Deployment with Replicas=3. The node where the pod is running is important. Check it carefully.<br>
 One Pod on <code>ip-10-0-184-189.ap-southeast-1.compute.internal</code> (henceforth <code>ip-10-0-184-189</code>).<br>
 The other two pod are running on <code>ip-10-0-163-234.ap-southeast-1.compute.internal</code> (henceforth <code>ip-10-0-163-234</code>).</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl create deployment nginx --image=nginxinc/nginx-unprivileged:1.19 --replicas=3
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ kubectl create deployment nginx --image=nginxinc/nginx-unprivileged:1.19 --replicas=3
 </span></span><span style="display:flex;"><span>deployment.apps/nginx created
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>$ kubectl get pod -o wide
@@ -122,7 +122,7 @@ The other two pod are running on <code>ip-10-0-163-234.ap-southeast-1.compute.in
 </span></span><span style="display:flex;"><span>NAME    READY   UP-TO-DATE   AVAILABLE   AGE
 </span></span><span style="display:flex;"><span>nginx   3/3     3            3           73s
 </span></span></code></pre></div><p>Now we will shut down the node ip-10-0-184-189, which has one Pod running. After that, note the status of the Node and the movement of the Pod.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ ssh ip-10-0-184-189.ap-southeast-1.compute.internal
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ ssh ip-10-0-184-189.ap-southeast-1.compute.internal
 </span></span><span style="display:flex;"><span>node# shutdown -h now
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>// One minute later, ip-10-0-184-189 became NotReady status.
@@ -133,7 +133,7 @@ The other two pod are running on <code>ip-10-0-163-234.ap-southeast-1.compute.in
 </span></span><span style="display:flex;"><span>ip-10-0-184-189.ap-southeast-1.compute.internal   NotReady  worker   23m   v1.19.0+8d12420
 </span></span></code></pre></div><p>Let&rsquo;s check the state of the Pod at this time.<br>
 The node is shut down, but the pod (nginx-5998485d44-44bsh) is still running. I try to access this pod with curl, but of course it does not return any response.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get pod -o wide
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ kubectl get pod -o wide
 </span></span><span style="display:flex;"><span>NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE                                              NOMINATED NODE   READINESS GATES
 </span></span><span style="display:flex;"><span>nginx-5998485d44-44bsh   1/1     Running   0          10m   10.131.0.7    ip-10-0-184-189.ap-southeast-1.compute.internal   &lt;none&gt;           &lt;none&gt;
 </span></span><span style="display:flex;"><span>nginx-5998485d44-gg8h9   1/1     Running   0          10m   10.128.2.12   ip-10-0-163-234.ap-southeast-1.compute.internal   &lt;none&gt;           &lt;none&gt;
@@ -159,7 +159,7 @@ The node is shut down, but the pod (nginx-5998485d44-44bsh) is still running. I 
 </span></span></code></pre></div><p>I&rsquo;ll give a detailed explanation later, but let&rsquo;s move on.<br>
 After 5 minutes, a change occurred. The <code>nginx-5998485d44-44bsh</code> running on shutdown node became <code>Terminating</code> and a new <code>nginx-5998485d44-84zkg</code> was created on other node.<br>
 <code>nginx-5998485d44-44bsh</code> continues to remain <code>Terminating</code> status.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get node -o wide
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ kubectl get node -o wide
 </span></span><span style="display:flex;"><span>NAME                     READY   STATUS        RESTARTS   AGE   IP            NODE                                              NOMINATED NODE   READINESS GATES
 </span></span><span style="display:flex;"><span>nginx-5998485d44-44bsh   1/1     Terminating   0          14m   10.131.0.7    ip-10-0-184-189.ap-southeast-1.compute.internal   &lt;none&gt;      &lt;none&gt;
 </span></span><span style="display:flex;"><span>nginx-5998485d44-84zkg   1/1     Running       0          8s    10.128.2.24   ip-10-0-163-234.ap-southeast-1.compute.internal   &lt;none&gt;      &lt;none&gt;
@@ -171,13 +171,13 @@ As soon as the node was shut down, the pods on the node were not rescheduled.</p
 <p>After shutting down a node, node_lifecycle_controller (one of the functions of the Kubernetes control plane) detects that Kubelet no longer updates Node information and changes the Node Status to <code>NotReady</code>.<br>
 At this time, a Taint of <code>key: node.kubernetes.io/unreachable</code> is given to the node at the same time.</p>
 <p><a href="https://github.com/kubernetes/kubernetes/blob/release-1.19/pkg/controller/nodelifecycle/node_lifecycle_controller.go#L759">monitorNodeHealth() in node_licecycle_controller.go</a> is responsible for this process.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl describe node ip-10-0-184-189.ap-southeast-1.compute.internal
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ kubectl describe node ip-10-0-184-189.ap-southeast-1.compute.internal
 </span></span><span style="display:flex;"><span>...
 </span></span><span style="display:flex;"><span>Taints:             node.kubernetes.io/unreachable:NoExecute
 </span></span><span style="display:flex;"><span>                    node.kubernetes.io/unreachable:NoSchedule
 </span></span><span style="display:flex;"><span>...
 </span></span></code></pre></div><p>In Kubernetes, the <a href="https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#defaulttolerationseconds">DefaultTolerationSeconds</a> Admission Controller works by default, so when a pod is created, it is assigned the following tolerations.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get pod -o yaml anypod
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ kubectl get pod -o yaml anypod
 </span></span><span style="display:flex;"><span>...
 </span></span><span style="display:flex;"><span>  tolerations:
 </span></span><span style="display:flex;"><span>  - effect: NoExecute

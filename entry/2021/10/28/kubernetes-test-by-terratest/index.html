@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -106,7 +106,7 @@ Terratestがこの悩みを解消するのにイケてそうなので調査し�
 <p>かつて仮想サーバでアプリケーションを運用している時代に、Serverspecを用いてテスト駆動のインフラ構築を行っていてとても気持ちがよかったので、そのレイヤーが移ってきているとも考えられます。</p>
 <h2 id="環境">環境</h2>
 <p>本検証を行ったGoとKubernetesのバージョンは下記のとおりです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% go version
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% go version
 </span></span><span style="display:flex;"><span>go version go1.17.2 darwin/amd64
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>% kubectl version --short
@@ -116,7 +116,7 @@ Terratestがこの悩みを解消するのにイケてそうなので調査し�
 <p>なにごともはじめはあります。まずはドキュメントのサンプルをみながら試してみます。
 参考にしたのは公式ドキュメントの<a href="https://terratest.gruntwork.io/docs/getting-started/quick-start/#example-4-kubernetes" target="_blank">Example #4: Kubernetes</a>です。
 最終的に以下のようなファイル構成で進めました。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% tree .
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% tree .
 </span></span><span style="display:flex;"><span>.
 </span></span><span style="display:flex;"><span>├── hello-world-deployment.yaml
 </span></span><span style="display:flex;"><span>└── test
@@ -164,7 +164,7 @@ Terratestがこの悩みを解消するのにイケてそうなので調査し�
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">port</span>: <span style="color:#ae81ff">5000</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">type</span>: <span style="color:#ae81ff">LoadBalancer</span>
 </span></span></code></pre></div><p>試した環境は、AWS上に構築したKubernetesクラスタであり、Type: LoadBalancerのServiceリソースを作成するとELBが作成されてエンドポイントとなります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% kubectl apply -f hello-world-deployment.yaml
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% kubectl apply -f hello-world-deployment.yaml
 </span></span><span style="display:flex;"><span>deployment.apps/hello-world-deployment created
 </span></span><span style="display:flex;"><span>service/hello-world-service created
 </span></span><span style="display:flex;"><span>
@@ -268,7 +268,7 @@ CI環境などではそのような実行ステップでまったく問題ない
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p><code>go test</code>で実行するとわかりますが、1.973秒でテストが完了しています。
 開発中においては、テストの都度にリソースの作成をする必要はないことが多いかなと思います。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% go test -v
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% go test -v
 </span></span><span style="display:flex;"><span>=== RUN   TestKubernetesHelloWorldExample
 </span></span><span style="display:flex;"><span>=== PAUSE TestKubernetesHelloWorldExample
 </span></span><span style="display:flex;"><span>=== CONT  TestKubernetesHelloWorldExample

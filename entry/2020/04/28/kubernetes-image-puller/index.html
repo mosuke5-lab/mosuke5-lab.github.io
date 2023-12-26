@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -120,19 +120,19 @@
 <h3 id="レイヤーを意識してイメージを作成する">レイヤーを意識してイメージを作成する</h3>
 <p>コンテナイメージはレイヤー構造で構成されています。<br>
 簡単な例でいうと<code>docker pull</code>したときに表示されるハッシュ値のリストですが、これがレイヤーです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">%</span> docker pull nginxinc<span style="color:#f92672">/</span>nginx<span style="color:#f92672">-</span>unprivileged:<span style="color:#ae81ff">1.18</span>
-</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1.18</span>: Pulling from nginxinc<span style="color:#f92672">/</span>nginx<span style="color:#f92672">-</span>unprivileged
-</span></span><span style="display:flex;"><span><span style="color:#ae81ff">54</span>fec2fa59d0: Already exists
-</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3</span>a4d0e4b78ef: Downloading [<span style="color:#f92672">=============&gt;</span>                                     ]  <span style="color:#ae81ff">7.153</span>MB<span style="color:#f92672">/</span><span style="color:#ae81ff">26.2</span>MB
-</span></span><span style="display:flex;"><span><span style="color:#ae81ff">83</span>b11c8c3a6e: Download complete
-</span></span><span style="display:flex;"><span><span style="color:#ae81ff">56e6</span>a727dfef: Download complete
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% docker pull nginxinc/nginx-unprivileged:1.18
+</span></span><span style="display:flex;"><span>1.18: Pulling from nginxinc/nginx-unprivileged
+</span></span><span style="display:flex;"><span>54fec2fa59d0: Already exists
+</span></span><span style="display:flex;"><span>3a4d0e4b78ef: Downloading [=============&gt;                                     ]  7.153MB/26.2MB
+</span></span><span style="display:flex;"><span>83b11c8c3a6e: Download complete
+</span></span><span style="display:flex;"><span>56e6a727dfef: Download complete
 </span></span><span style="display:flex;"><span>e575c5ee613a: Download complete
-</span></span><span style="display:flex;"><span><span style="color:#ae81ff">5073</span>a53c326e: Download complete
+</span></span><span style="display:flex;"><span>5073a53c326e: Download complete
 </span></span></code></pre></div><p>このレイヤーを意識してコンテナイメージを作成することで、イメージの一部に変更があったとしても最小限のレイヤーのプルのみで済むなどの工夫ができます。プルする対象を減らすことができるので、結果的にイメージプルの効率が上がります。
 よくある例としては、アプリケーションのコードに変更があった場合です。
 以下はRailsを例にしていますが、アプリケーションを実行するために必要な依存関係のライブラリのインストール(<code>RUN bundle install部分</code>)をアプリケーションのコードを置く前に実施しています。
 アプリケーションの変更の多くはソースコードであるため、変わらない部分を前に持ってくることで、そこまでのイメージレイヤーを使い回すことができるためです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span># Dockerfile
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># Dockerfile
 </span></span><span style="display:flex;"><span>FROM ruby:2.6
 </span></span><span style="display:flex;"><span>RUN gem install bundler -v &#34;1.15.4&#34;
 </span></span><span style="display:flex;"><span>RUN mkdir /usr/local/src/app
@@ -192,7 +192,7 @@ Eclipse CheはKubernetes上で動作するオンラインのエディタです�
 以下、デプロイ部分以外は<code>oc xxxx</code>は<code>kubectl xxxx</code>と読み替えてもらってよいです。</p>
 <h4 id="環境">環境</h4>
 <p>本環境ではWorkerノードが3台ある状態です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc get node | grep worker
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc get node | grep worker
 </span></span><span style="display:flex;"><span>ip-10-0-129-134.ap-southeast-1.compute.internal   Ready    worker   75m   v1.16.2
 </span></span><span style="display:flex;"><span>ip-10-0-158-129.ap-southeast-1.compute.internal   Ready    worker   75m   v1.16.2
 </span></span><span style="display:flex;"><span>ip-10-0-175-177.ap-southeast-1.compute.internal   Ready    worker   50m   v1.16.2
@@ -200,7 +200,7 @@ Eclipse CheはKubernetes上で動作するオンラインのエディタです�
 <p>OpenShift Templateを使ってデプロイします。OpenShift以外の環境の人はHelmをお使いください。
 デプロイ方法は異なりますが、デプロイされるリソースや仕組み自体は変わりません。<br>
 今回、各ノードに<code>centos:8</code>と<code>nginxinc/nginx-unprivileged:1.18</code>の2つを事前にプルしておきたいと考えた想定とします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc process -f deploy/openshift/serviceaccount.yaml | oc apply -f -
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc process -f deploy/openshift/serviceaccount.yaml | oc apply -f -
 </span></span><span style="display:flex;"><span>$ oc process -f deploy/openshift/configmap.yaml \
 </span></span><span style="display:flex;"><span>-p IMAGES=&#34;centos=centos:8;nginx=nginxinc/nginx-unprivileged:1.18&#34; \
 </span></span><span style="display:flex;"><span>-p DAEMONSET_NAME=&#34;puller&#34; \
@@ -227,7 +227,7 @@ Eclipse CheはKubernetes上で動作するオンラインのエディタです�
 </ul>
 </li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc get ds,deployment,pod
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc get ds,deployment,pod
 </span></span><span style="display:flex;"><span>NAME                          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
 </span></span><span style="display:flex;"><span>daemonset.extensions/puller   3         3         3       3            3           &lt;none&gt;          35m
 </span></span><span style="display:flex;"><span>

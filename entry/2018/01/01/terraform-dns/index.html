@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -94,42 +94,42 @@
 <p>まずはAWS側の設定を見ておく。<br>
 今回はELB使うわけではなかったので、EC2インスタンスにElasticIPをバインドした。
 aws側のTerraformのコードでいつも通りEIPを購入する。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span># aws.tf
-</span></span><span style="display:flex;"><span>resource &#34;aws_eip&#34; &#34;main&#34; {
-</span></span><span style="display:flex;"><span>  instance = &#34;${aws_instance.main.id}&#34;
-</span></span><span style="display:flex;"><span>  vpc      = true
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>次に、CloudFlare側のコードをみる。<br>
+<pre tabindex="0"><code># aws.tf
+resource &#34;aws_eip&#34; &#34;main&#34; {
+  instance = &#34;${aws_instance.main.id}&#34;
+  vpc      = true
+}
+</code></pre><p>次に、CloudFlare側のコードをみる。<br>
 CloudFlareをTerraformで扱うには３つの情報が必要なのでここは変数化しておくとよい。<br>
 providerを指定し、あとはresouceを書いていく。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#75715e"># cloudflare.tf</span>
-</span></span><span style="display:flex;"><span>variable <span style="color:#e6db74">&#34;cloudflare_email&#34;</span> {}
-</span></span><span style="display:flex;"><span>variable <span style="color:#e6db74">&#34;cloudflare_token&#34;</span> {}
-</span></span><span style="display:flex;"><span>variable <span style="color:#e6db74">&#34;cloudflare_domain&#34;</span> {}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>provider <span style="color:#e6db74">&#34;cloudflare&#34;</span> {
-</span></span><span style="display:flex;"><span>  email <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;${var.cloudflare_email}&#34;</span>
-</span></span><span style="display:flex;"><span>  token <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;${var.cloudflare_token}&#34;</span>
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>resource <span style="color:#e6db74">&#34;cloudflare_record&#34;</span> <span style="color:#e6db74">&#34;gill-search-manage&#34;</span> {
-</span></span><span style="display:flex;"><span>  domain <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;${var.cloudflare_domain}&#34;</span>
-</span></span><span style="display:flex;"><span>  name   <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;gill-search-manage&#34;</span>
-</span></span><span style="display:flex;"><span>  value  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;${aws_eip.main.public_ip}&#34;</span>
-</span></span><span style="display:flex;"><span>  type   <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;A&#34;</span>
-</span></span><span style="display:flex;"><span>  ttl    <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
-</span></span><span style="display:flex;"><span>  proxied <span style="color:#f92672">=</span> false
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>resource <span style="color:#e6db74">&#34;cloudflare_record&#34;</span> <span style="color:#e6db74">&#34;gill-search&#34;</span> {
-</span></span><span style="display:flex;"><span>  domain <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;${var.cloudflare_domain}&#34;</span>
-</span></span><span style="display:flex;"><span>  name   <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;gill-search&#34;</span>
-</span></span><span style="display:flex;"><span>  value  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;${aws_eip.main.public_ip}&#34;</span>
-</span></span><span style="display:flex;"><span>  type   <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;A&#34;</span>
-</span></span><span style="display:flex;"><span>  ttl    <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
-</span></span><span style="display:flex;"><span>  proxied <span style="color:#f92672">=</span> true
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><ul>
+<pre tabindex="0"><code># cloudflare.tf
+variable &#34;cloudflare_email&#34; {}
+variable &#34;cloudflare_token&#34; {}
+variable &#34;cloudflare_domain&#34; {}
+
+provider &#34;cloudflare&#34; {
+  email = &#34;${var.cloudflare_email}&#34;
+  token = &#34;${var.cloudflare_token}&#34;
+}
+
+resource &#34;cloudflare_record&#34; &#34;gill-search-manage&#34; {
+  domain = &#34;${var.cloudflare_domain}&#34;
+  name   = &#34;gill-search-manage&#34;
+  value  = &#34;${aws_eip.main.public_ip}&#34;
+  type   = &#34;A&#34;
+  ttl    = 1
+  proxied = false
+}
+
+resource &#34;cloudflare_record&#34; &#34;gill-search&#34; {
+  domain = &#34;${var.cloudflare_domain}&#34;
+  name   = &#34;gill-search&#34;
+  value  = &#34;${aws_eip.main.public_ip}&#34;
+  type   = &#34;A&#34;
+  ttl    = 1
+  proxied = true
+}
+</code></pre><ul>
 <li><code>domain</code>はCloudFlareで管理しているドメイン名を入力。今回の場合は<code>mosuke.tech</code>を管理しているのでそれを入力。</li>
 <li><code>name</code>は今回Aレコードなのでサブドメインに当たる部分。</li>
 <li><code>value</code>は実際にIPアドレス。なので今回はAWS EIPの値が入る。<code>${aws_eip.main.public_ip}</code></li>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -160,51 +160,51 @@ Podにつけたい名前が違う、Podの利用するリソース量が違う�
 <p>まずは、Kustomizeを使った環境ごとに異なるマニフェストを作るとはどういうことなのか復習しておきましょう。
 練習台にとても簡単なサンプルを使います。この<a href="https://github.com/mosuke5/kustomize-examples">サンプルコード</a>は、Nginxをデプロイする簡単なものですが、<code>development</code>と<code>production</code>でパラメータや設定を変えたいと思っているというシナリオです。
 <code>base/</code>が共通部で、<code>overlays/development</code>と<code>overlays/production</code>が異なる部分です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">$</span> git clone https:<span style="color:#f92672">//</span>github<span style="color:#f92672">.</span>com<span style="color:#f92672">/</span>mosuke5<span style="color:#f92672">/</span>kustomize<span style="color:#f92672">-</span>examples
-</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> cd kustomize<span style="color:#f92672">-</span>examples<span style="color:#f92672">/</span>overlay<span style="color:#f92672">-</span>example
-</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> tree
-</span></span><span style="display:flex;"><span><span style="color:#f92672">.</span>
-</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">├──</span> base
-</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>   <span style="color:#960050;background-color:#1e0010">├──</span> kustomization<span style="color:#f92672">.</span>yml
-</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>   <span style="color:#960050;background-color:#1e0010">├──</span> nginx<span style="color:#f92672">-</span>deployment<span style="color:#f92672">.</span>yml
-</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>   <span style="color:#960050;background-color:#1e0010">└──</span> nginx<span style="color:#f92672">-</span>service<span style="color:#f92672">.</span>yml
-</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">└──</span> overlays
-</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">├──</span> development
-</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">│</span>   <span style="color:#960050;background-color:#1e0010">└──</span> kustomization<span style="color:#f92672">.</span>yml
-</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">└──</span> production
-</span></span><span style="display:flex;"><span>        <span style="color:#960050;background-color:#1e0010">├──</span> change<span style="color:#f92672">-</span>nginx<span style="color:#f92672">-</span>service<span style="color:#f92672">-</span>to<span style="color:#f92672">-</span>loadbalancer<span style="color:#f92672">.</span>yml
-</span></span><span style="display:flex;"><span>        <span style="color:#960050;background-color:#1e0010">└──</span> kustomization<span style="color:#f92672">.</span>yml
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#ae81ff">4</span> directories, <span style="color:#ae81ff">6</span> files
-</span></span></code></pre></div><p><code>development</code>と<code>production</code>の違いは、次の2つです。</p>
+<pre tabindex="0"><code>$ git clone https://github.com/mosuke5/kustomize-examples
+$ cd kustomize-examples/overlay-example
+$ tree
+.
+├── base
+│   ├── kustomization.yml
+│   ├── nginx-deployment.yml
+│   └── nginx-service.yml
+└── overlays
+    ├── development
+    │   └── kustomization.yml
+    └── production
+        ├── change-nginx-service-to-loadbalancer.yml
+        └── kustomization.yml
+
+4 directories, 6 files
+</code></pre><p><code>development</code>と<code>production</code>の違いは、次の2つです。</p>
 <ol>
 <li>デプロイするnamespaceを分けたい</li>
 <li><code>production</code>では、ServiceのTypeをLoadBalancerにしたい</li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -k overlays/development --dry-run=client -o yaml &gt; dev
-</span></span><span style="display:flex;"><span>$ kubectl apply -k overlays/production --dry-run=client -o yaml &gt; prod
-</span></span><span style="display:flex;"><span>$ diff dev prod
-</span></span><span style="display:flex;"><span>8c8
-</span></span><span style="display:flex;"><span>&lt;         {&#34;apiVersion&#34;:&#34;v1&#34;,&#34;kind&#34;:&#34;Service&#34;,&#34;metadata&#34;:{&#34;annotations&#34;:{},&#34;name&#34;:&#34;nginx-service&#34;,&#34;namespace&#34;:&#34;development&#34;},&#34;spec&#34;:{&#34;ports&#34;:[{&#34;name&#34;:&#34;http-port&#34;,&#34;port&#34;:80,&#34;protocol&#34;:&#34;TCP&#34;,&#34;targetPort&#34;:80}],&#34;selector&#34;:{&#34;app&#34;:&#34;nginx&#34;},&#34;type&#34;:&#34;ClusterIP&#34;}}
-</span></span><span style="display:flex;"><span>---
-</span></span><span style="display:flex;"><span>&gt;         {&#34;apiVersion&#34;:&#34;v1&#34;,&#34;kind&#34;:&#34;Service&#34;,&#34;metadata&#34;:{&#34;annotations&#34;:{},&#34;name&#34;:&#34;nginx-service&#34;,&#34;namespace&#34;:&#34;production&#34;},&#34;spec&#34;:{&#34;ports&#34;:[{&#34;name&#34;:&#34;http-port&#34;,&#34;port&#34;:80,&#34;protocol&#34;:&#34;TCP&#34;,&#34;targetPort&#34;:80}],&#34;selector&#34;:{&#34;app&#34;:&#34;nginx&#34;},&#34;type&#34;:&#34;LoadBalancer&#34;}}
-</span></span><span style="display:flex;"><span>10c10
-</span></span><span style="display:flex;"><span>&lt;     namespace: development
-</span></span><span style="display:flex;"><span>---
-</span></span><span style="display:flex;"><span>&gt;     namespace: production
-</span></span><span style="display:flex;"><span>19c19
-</span></span><span style="display:flex;"><span>&lt;     type: ClusterIP
-</span></span><span style="display:flex;"><span>---
-</span></span><span style="display:flex;"><span>&gt;     type: LoadBalancer
-</span></span><span style="display:flex;"><span>25c25
-</span></span><span style="display:flex;"><span>&lt;         {&#34;apiVersion&#34;:&#34;apps/v1&#34;,&#34;kind&#34;:&#34;Deployment&#34;,&#34;metadata&#34;:{&#34;annotations&#34;:{},&#34;name&#34;:&#34;nginx-deployment&#34;,&#34;namespace&#34;:&#34;development&#34;},&#34;spec&#34;:{&#34;replicas&#34;:1,&#34;selector&#34;:{&#34;matchLabels&#34;:{&#34;app&#34;:&#34;nginx&#34;}},&#34;template&#34;:{&#34;metadata&#34;:{&#34;labels&#34;:{&#34;app&#34;:&#34;nginx&#34;}},&#34;spec&#34;:{&#34;containers&#34;:[{&#34;image&#34;:&#34;nginx:1.17.0&#34;,&#34;name&#34;:&#34;nginx&#34;,&#34;ports&#34;:[{&#34;containerPort&#34;:80}]}]}}}}
-</span></span><span style="display:flex;"><span>---
-</span></span><span style="display:flex;"><span>&gt;         {&#34;apiVersion&#34;:&#34;apps/v1&#34;,&#34;kind&#34;:&#34;Deployment&#34;,&#34;metadata&#34;:{&#34;annotations&#34;:{},&#34;name&#34;:&#34;nginx-deployment&#34;,&#34;namespace&#34;:&#34;production&#34;},&#34;spec&#34;:{&#34;replicas&#34;:1,&#34;selector&#34;:{&#34;matchLabels&#34;:{&#34;app&#34;:&#34;nginx&#34;}},&#34;template&#34;:{&#34;metadata&#34;:{&#34;labels&#34;:{&#34;app&#34;:&#34;nginx&#34;}},&#34;spec&#34;:{&#34;containers&#34;:[{&#34;image&#34;:&#34;nginx:1.17.0&#34;,&#34;name&#34;:&#34;nginx&#34;,&#34;ports&#34;:[{&#34;containerPort&#34;:80}]}]}}}}
-</span></span><span style="display:flex;"><span>27c27
-</span></span><span style="display:flex;"><span>&lt;     namespace: development
-</span></span><span style="display:flex;"><span>---
-</span></span><span style="display:flex;"><span>&gt;     namespace: production
-</span></span></code></pre></div><p>vimdiffは差分がわかりやすいですね。</p>
+<pre tabindex="0"><code>$ kubectl apply -k overlays/development --dry-run=client -o yaml &gt; dev
+$ kubectl apply -k overlays/production --dry-run=client -o yaml &gt; prod
+$ diff dev prod
+8c8
+&lt;         {&#34;apiVersion&#34;:&#34;v1&#34;,&#34;kind&#34;:&#34;Service&#34;,&#34;metadata&#34;:{&#34;annotations&#34;:{},&#34;name&#34;:&#34;nginx-service&#34;,&#34;namespace&#34;:&#34;development&#34;},&#34;spec&#34;:{&#34;ports&#34;:[{&#34;name&#34;:&#34;http-port&#34;,&#34;port&#34;:80,&#34;protocol&#34;:&#34;TCP&#34;,&#34;targetPort&#34;:80}],&#34;selector&#34;:{&#34;app&#34;:&#34;nginx&#34;},&#34;type&#34;:&#34;ClusterIP&#34;}}
+---
+&gt;         {&#34;apiVersion&#34;:&#34;v1&#34;,&#34;kind&#34;:&#34;Service&#34;,&#34;metadata&#34;:{&#34;annotations&#34;:{},&#34;name&#34;:&#34;nginx-service&#34;,&#34;namespace&#34;:&#34;production&#34;},&#34;spec&#34;:{&#34;ports&#34;:[{&#34;name&#34;:&#34;http-port&#34;,&#34;port&#34;:80,&#34;protocol&#34;:&#34;TCP&#34;,&#34;targetPort&#34;:80}],&#34;selector&#34;:{&#34;app&#34;:&#34;nginx&#34;},&#34;type&#34;:&#34;LoadBalancer&#34;}}
+10c10
+&lt;     namespace: development
+---
+&gt;     namespace: production
+19c19
+&lt;     type: ClusterIP
+---
+&gt;     type: LoadBalancer
+25c25
+&lt;         {&#34;apiVersion&#34;:&#34;apps/v1&#34;,&#34;kind&#34;:&#34;Deployment&#34;,&#34;metadata&#34;:{&#34;annotations&#34;:{},&#34;name&#34;:&#34;nginx-deployment&#34;,&#34;namespace&#34;:&#34;development&#34;},&#34;spec&#34;:{&#34;replicas&#34;:1,&#34;selector&#34;:{&#34;matchLabels&#34;:{&#34;app&#34;:&#34;nginx&#34;}},&#34;template&#34;:{&#34;metadata&#34;:{&#34;labels&#34;:{&#34;app&#34;:&#34;nginx&#34;}},&#34;spec&#34;:{&#34;containers&#34;:[{&#34;image&#34;:&#34;nginx:1.17.0&#34;,&#34;name&#34;:&#34;nginx&#34;,&#34;ports&#34;:[{&#34;containerPort&#34;:80}]}]}}}}
+---
+&gt;         {&#34;apiVersion&#34;:&#34;apps/v1&#34;,&#34;kind&#34;:&#34;Deployment&#34;,&#34;metadata&#34;:{&#34;annotations&#34;:{},&#34;name&#34;:&#34;nginx-deployment&#34;,&#34;namespace&#34;:&#34;production&#34;},&#34;spec&#34;:{&#34;replicas&#34;:1,&#34;selector&#34;:{&#34;matchLabels&#34;:{&#34;app&#34;:&#34;nginx&#34;}},&#34;template&#34;:{&#34;metadata&#34;:{&#34;labels&#34;:{&#34;app&#34;:&#34;nginx&#34;}},&#34;spec&#34;:{&#34;containers&#34;:[{&#34;image&#34;:&#34;nginx:1.17.0&#34;,&#34;name&#34;:&#34;nginx&#34;,&#34;ports&#34;:[{&#34;containerPort&#34;:80}]}]}}}}
+27c27
+&lt;     namespace: development
+---
+&gt;     namespace: production
+</code></pre><p>vimdiffは差分がわかりやすいですね。</p>
 <p><img src="/image/kustomize-result-diff.png" alt="kustomize-result-diff"></p>
 <h2 id="kustomizeアプリケーションの登録">Kustomizeアプリケーションの登録</h2>
 <p>Kustomizeの仕組みがわかったところで、Argo CDにKustomizeアプリケーションを登録してみましょう。
@@ -248,34 +248,34 @@ Argo CD内では、開発(development)と商用(production)のふたつのアプ
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">targetRevision</span>: <span style="color:#ae81ff">HEAD</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">syncPolicy</span>: {}
 </span></span></code></pre></div><p>上のマニフェストをapplyして、Argo CDでSyncしたあとに状況を確認してみます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get all -n development
-</span></span><span style="display:flex;"><span>NAME                                    READY   STATUS    RESTARTS   AGE
-</span></span><span style="display:flex;"><span>pod/nginx-deployment-7465f86b8f-w8fbl   1/1     Running   0          4m28s
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>NAME                    TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE
-</span></span><span style="display:flex;"><span>service/nginx-service   ClusterIP   10.7.244.44   &lt;none&gt;        80/TCP    4m31s
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
-</span></span><span style="display:flex;"><span>deployment.apps/nginx-deployment   1/1     1            1           4m32s
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>NAME                                          DESIRED   CURRENT   READY   AGE
-</span></span><span style="display:flex;"><span>replicaset.apps/nginx-deployment-7465f86b8f   1         1         1       4m33s
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>----
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>$ kubectl get all -n production
-</span></span><span style="display:flex;"><span>NAME                                    READY   STATUS    RESTARTS   AGE
-</span></span><span style="display:flex;"><span>pod/nginx-deployment-599969c8d9-pkvtl   1/1     Running   0          2m13s
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>NAME                    TYPE           CLUSTER-IP    EXTERNAL-IP    PORT(S)        AGE
-</span></span><span style="display:flex;"><span>service/nginx-service   LoadBalancer   10.7.245.56   34.84.191.23   80:30826/TCP   2m16s
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
-</span></span><span style="display:flex;"><span>deployment.apps/nginx-deployment   1/1     1            1           2m17s
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>NAME                                          DESIRED   CURRENT   READY   AGE
-</span></span><span style="display:flex;"><span>replicaset.apps/nginx-deployment-599969c8d9   1         1         1       2m18s
-</span></span></code></pre></div><p>このようにして同じGitレポジトリでありながら、複数の環境に対してArgo CDを使ってデプロイできるようになるということです。Kustomizeなどのテンプレートエンジンの必要性も理解できましたでしょうか？
+<pre tabindex="0"><code>$ kubectl get all -n development
+NAME                                    READY   STATUS    RESTARTS   AGE
+pod/nginx-deployment-7465f86b8f-w8fbl   1/1     Running   0          4m28s
+
+NAME                    TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE
+service/nginx-service   ClusterIP   10.7.244.44   &lt;none&gt;        80/TCP    4m31s
+
+NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/nginx-deployment   1/1     1            1           4m32s
+
+NAME                                          DESIRED   CURRENT   READY   AGE
+replicaset.apps/nginx-deployment-7465f86b8f   1         1         1       4m33s
+
+----
+
+$ kubectl get all -n production
+NAME                                    READY   STATUS    RESTARTS   AGE
+pod/nginx-deployment-599969c8d9-pkvtl   1/1     Running   0          2m13s
+
+NAME                    TYPE           CLUSTER-IP    EXTERNAL-IP    PORT(S)        AGE
+service/nginx-service   LoadBalancer   10.7.245.56   34.84.191.23   80:30826/TCP   2m16s
+
+NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/nginx-deployment   1/1     1            1           2m17s
+
+NAME                                          DESIRED   CURRENT   READY   AGE
+replicaset.apps/nginx-deployment-599969c8d9   1         1         1       2m18s
+</code></pre><p>このようにして同じGitレポジトリでありながら、複数の環境に対してArgo CDを使ってデプロイできるようになるということです。Kustomizeなどのテンプレートエンジンの必要性も理解できましたでしょうか？
 理解を深めたい場合は、次のブログも参考にしてください。</p>
 <div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2019/06/21/kustomize/" data-iframely-url="//cdn.iframe.ly/4yC552R"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
 <h3 id="追加可能なパラメータ">追加可能なパラメータ</h3>
@@ -311,9 +311,9 @@ Argo CD内では、開発(development)と商用(production)のふたつのアプ
 </span></span><span style="display:flex;"><span>        - <span style="color:#e6db74">&#34;nginx:1.20.0&#34;</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">syncPolicy</span>: {}
 </span></span></code></pre></div><p>マニフェストを変更後、applyしてSyncすると、Deploymentのイメージが差し替わっていますね。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get deploy nginx-deployment -n production -o yaml | grep &#34;image: nginx:1.20.0&#34;
-</span></span><span style="display:flex;"><span>      - image: nginx:1.20.0
-</span></span></code></pre></div><p>アプリケーションの更新後に、Gitレポジトリに最新のタグを記述して保存する方法もよいですが、場合によってはイメージタグはArgo CD側で管理するのもひとつの手法として考えられると思います。
+<pre tabindex="0"><code>$ kubectl get deploy nginx-deployment -n production -o yaml | grep &#34;image: nginx:1.20.0&#34;
+      - image: nginx:1.20.0
+</code></pre><p>アプリケーションの更新後に、Gitレポジトリに最新のタグを記述して保存する方法もよいですが、場合によってはイメージタグはArgo CD側で管理するのもひとつの手法として考えられると思います。
 <strong>Gitレポジトリを信頼できる唯一の情報源とするというコンセプトでいうとイメージタグもGitに保存したいところですが、スコープは柔軟に判断してよいと思います。</strong></p>
 <h2 id="さいごに">さいごに</h2>
 <p>今回は、KustomizeアプリケーションをArgo CDに登録して、複数環境へのデプロイする方法についてみてみました。

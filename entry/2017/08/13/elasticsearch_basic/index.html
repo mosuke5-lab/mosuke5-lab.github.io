@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -113,196 +113,196 @@ Elastic社はいくつかのソフトウェアを提供しているのですが�
 推奨は、「1.8.0_131 or later」とのことです。詳しくは以下参照。<br>
 <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html</a></p>
 <p>CentOS7.4ではYumで条件を満たすJavaがインストールできますが、環境によってはインストールできないので、適宜ダウンロードしたりしてインストールしてください。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ sudo yum install java
-</span></span></code></pre></div><p>続いてElasticSearch本体のインストールですが、いろいろやり方はありますが、公式のYumレポジトリの登録をすると便利です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ sudo vim /etc/yum.repos.d/elasticsearch.repo
-</span></span><span style="display:flex;"><span>[elasticsearch-5.x]
-</span></span><span style="display:flex;"><span>name=Elasticsearch repository for 5.x packages
-</span></span><span style="display:flex;"><span>baseurl=https://artifacts.elastic.co/packages/5.x/yum
-</span></span><span style="display:flex;"><span>gpgcheck=1
-</span></span><span style="display:flex;"><span>gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
-</span></span><span style="display:flex;"><span>enabled=1
-</span></span><span style="display:flex;"><span>autorefresh=1
-</span></span><span style="display:flex;"><span>type=rpm-md
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>$ sudo yum install elasticsearch
-</span></span></code></pre></div><p>あとは起動するだけで実は最低限は動きます。簡単ですね。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo systemctl enable elasticsearch
-</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo systemctl start elasticsearch
-</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo systemctl status elasticsearch
-</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">●</span> elasticsearch<span style="color:#f92672">.</span>service <span style="color:#f92672">-</span> Elasticsearch
-</span></span><span style="display:flex;"><span>   Loaded: loaded (<span style="color:#f92672">/</span>usr<span style="color:#f92672">/</span>lib<span style="color:#f92672">/</span>systemd<span style="color:#f92672">/</span>system<span style="color:#f92672">/</span>elasticsearch<span style="color:#f92672">.</span>service; enabled; vendor preset: disabled)
-</span></span><span style="display:flex;"><span>   Active: active (running) since Sun <span style="color:#ae81ff">2017</span><span style="color:#f92672">-</span><span style="color:#ae81ff">08</span><span style="color:#f92672">-</span><span style="color:#ae81ff">13</span> <span style="color:#ae81ff">07</span>:<span style="color:#ae81ff">07</span>:<span style="color:#ae81ff">34</span> UTC; <span style="color:#ae81ff">1</span>h <span style="color:#ae81ff">2</span>min ago
-</span></span><span style="display:flex;"><span>     Docs: http:<span style="color:#f92672">//</span>www<span style="color:#f92672">.</span>elastic<span style="color:#f92672">.</span>co
-</span></span><span style="display:flex;"><span>  Process: <span style="color:#ae81ff">12494</span> ExecStartPre<span style="color:#f92672">=/</span>usr<span style="color:#f92672">/</span>share<span style="color:#f92672">/</span>elasticsearch<span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>elasticsearch<span style="color:#f92672">-</span>systemd<span style="color:#f92672">-</span>pre<span style="color:#f92672">-</span>exec (code<span style="color:#f92672">=</span>exited, status<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#f92672">/</span>SUCCESS)
-</span></span><span style="display:flex;"><span> Main PID: <span style="color:#ae81ff">12496</span> (java)
-</span></span><span style="display:flex;"><span>   CGroup: <span style="color:#f92672">/</span>system<span style="color:#f92672">.</span>slice<span style="color:#f92672">/</span>elasticsearch<span style="color:#f92672">.</span>service
-</span></span><span style="display:flex;"><span>           <span style="color:#960050;background-color:#1e0010">└─</span><span style="color:#ae81ff">12496</span> <span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>java <span style="color:#f92672">-</span>Xms2g <span style="color:#f92672">-</span>Xmx2g <span style="color:#f92672">-</span>XX:<span style="color:#f92672">+</span>UseConcMarkSweepGC <span style="color:#f92672">-</span>XX:CMSInitiatingOccupancyFraction<span style="color:#f92672">=</span><span style="color:#ae81ff">75</span> <span style="color:#f92672">-</span>XX:<span style="color:#f92672">+</span>UseCMSInitiatingOccupancyOnly <span style="color:#f92672">-</span>XX:<span style="color:#f92672">+</span>AlwaysPreTou<span style="color:#f92672">...</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>Aug <span style="color:#ae81ff">13</span> <span style="color:#ae81ff">07</span>:<span style="color:#ae81ff">07</span>:<span style="color:#ae81ff">34</span> ip<span style="color:#f92672">-</span><span style="color:#ae81ff">172</span><span style="color:#f92672">-</span><span style="color:#ae81ff">31</span><span style="color:#f92672">-</span><span style="color:#ae81ff">22</span><span style="color:#f92672">-</span><span style="color:#ae81ff">86.</span>ap<span style="color:#f92672">-</span>northeast<span style="color:#f92672">-</span><span style="color:#ae81ff">1.</span>compute<span style="color:#f92672">.</span>internal systemd[<span style="color:#ae81ff">1</span>]: Starting Elasticsearch<span style="color:#f92672">...</span>
-</span></span><span style="display:flex;"><span>Aug <span style="color:#ae81ff">13</span> <span style="color:#ae81ff">07</span>:<span style="color:#ae81ff">07</span>:<span style="color:#ae81ff">34</span> ip<span style="color:#f92672">-</span><span style="color:#ae81ff">172</span><span style="color:#f92672">-</span><span style="color:#ae81ff">31</span><span style="color:#f92672">-</span><span style="color:#ae81ff">22</span><span style="color:#f92672">-</span><span style="color:#ae81ff">86.</span>ap<span style="color:#f92672">-</span>northeast<span style="color:#f92672">-</span><span style="color:#ae81ff">1.</span>compute<span style="color:#f92672">.</span>internal systemd[<span style="color:#ae81ff">1</span>]: Started Elasticsearch<span style="color:#f92672">.</span>
-</span></span></code></pre></div><p>起動の確認をします。デフォルトでは9200番ポートでAPIを利用できます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl localhost:9200
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  &#34;name&#34; : &#34;mJ6XIq1&#34;,
-</span></span><span style="display:flex;"><span>  &#34;cluster_name&#34; : &#34;elasticsearch&#34;,
-</span></span><span style="display:flex;"><span>  &#34;cluster_uuid&#34; : &#34;r_sINFWcQKeSheOqYejhOA&#34;,
-</span></span><span style="display:flex;"><span>  &#34;version&#34; : {
-</span></span><span style="display:flex;"><span>    &#34;number&#34; : &#34;5.5.1&#34;,
-</span></span><span style="display:flex;"><span>    &#34;build_hash&#34; : &#34;19c13d0&#34;,
-</span></span><span style="display:flex;"><span>    &#34;build_date&#34; : &#34;2017-07-18T20:44:24.823Z&#34;,
-</span></span><span style="display:flex;"><span>    &#34;build_snapshot&#34; : false,
-</span></span><span style="display:flex;"><span>    &#34;lucene_version&#34; : &#34;6.6.0&#34;
-</span></span><span style="display:flex;"><span>  },
-</span></span><span style="display:flex;"><span>  &#34;tagline&#34; : &#34;You Know, for Search&#34;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>//ついでに9200ポート見とく
-</span></span><span style="display:flex;"><span>$ sudo lsof -i:9200
-</span></span><span style="display:flex;"><span>COMMAND   PID          USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
-</span></span><span style="display:flex;"><span>java    13118 elasticsearch  133u  IPv6 140804      0t0  TCP *:wap-wsp (LISTEN)
-</span></span></code></pre></div><h3 id="使ってみる">使ってみる</h3>
+<pre tabindex="0"><code>$ sudo yum install java
+</code></pre><p>続いてElasticSearch本体のインストールですが、いろいろやり方はありますが、公式のYumレポジトリの登録をすると便利です。</p>
+<pre tabindex="0"><code>$ sudo vim /etc/yum.repos.d/elasticsearch.repo
+[elasticsearch-5.x]
+name=Elasticsearch repository for 5.x packages
+baseurl=https://artifacts.elastic.co/packages/5.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
+
+$ sudo yum install elasticsearch
+</code></pre><p>あとは起動するだけで実は最低限は動きます。簡単ですね。</p>
+<pre tabindex="0"><code>$ sudo systemctl enable elasticsearch
+$ sudo systemctl start elasticsearch
+$ sudo systemctl status elasticsearch
+● elasticsearch.service - Elasticsearch
+   Loaded: loaded (/usr/lib/systemd/system/elasticsearch.service; enabled; vendor preset: disabled)
+   Active: active (running) since Sun 2017-08-13 07:07:34 UTC; 1h 2min ago
+     Docs: http://www.elastic.co
+  Process: 12494 ExecStartPre=/usr/share/elasticsearch/bin/elasticsearch-systemd-pre-exec (code=exited, status=0/SUCCESS)
+ Main PID: 12496 (java)
+   CGroup: /system.slice/elasticsearch.service
+           └─12496 /bin/java -Xms2g -Xmx2g -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly -XX:+AlwaysPreTou...
+
+Aug 13 07:07:34 ip-172-31-22-86.ap-northeast-1.compute.internal systemd[1]: Starting Elasticsearch...
+Aug 13 07:07:34 ip-172-31-22-86.ap-northeast-1.compute.internal systemd[1]: Started Elasticsearch.
+</code></pre><p>起動の確認をします。デフォルトでは9200番ポートでAPIを利用できます。</p>
+<pre tabindex="0"><code>$ curl localhost:9200
+{
+  &#34;name&#34; : &#34;mJ6XIq1&#34;,
+  &#34;cluster_name&#34; : &#34;elasticsearch&#34;,
+  &#34;cluster_uuid&#34; : &#34;r_sINFWcQKeSheOqYejhOA&#34;,
+  &#34;version&#34; : {
+    &#34;number&#34; : &#34;5.5.1&#34;,
+    &#34;build_hash&#34; : &#34;19c13d0&#34;,
+    &#34;build_date&#34; : &#34;2017-07-18T20:44:24.823Z&#34;,
+    &#34;build_snapshot&#34; : false,
+    &#34;lucene_version&#34; : &#34;6.6.0&#34;
+  },
+  &#34;tagline&#34; : &#34;You Know, for Search&#34;
+}
+
+//ついでに9200ポート見とく
+$ sudo lsof -i:9200
+COMMAND   PID          USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+java    13118 elasticsearch  133u  IPv6 140804      0t0  TCP *:wap-wsp (LISTEN)
+</code></pre><h3 id="使ってみる">使ってみる</h3>
 <p>ElasticSearchなのではやく何か検索したい！って思うかと思います。<br>
 ぼくもそう思いました。</p>
 <p>検索するためのデータを投入していきましょう。<br>
 まずは、インデックスの作成を行います。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>// blogというインデックスを作成
-</span></span><span style="display:flex;"><span>$ curl -XPUT localhost:9200/blog
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>// インデックスの確認
-</span></span><span style="display:flex;"><span>$ curl localhost:9200/_cat/indices?v
-</span></span><span style="display:flex;"><span>health status index   uuid                   pri rep docs.count docs.deleted store.size pri.store.size
-</span></span><span style="display:flex;"><span>yellow open   blog    rwvaOBVcRaSLqt3NDRFZ-w   5   1          0            0       324b           324b
-</span></span></code></pre></div><h5 id="qhealthがyellowだけどだいじょうぶなの">Q.healthがyellowだけどだいじょうぶなの？</h5>
+<pre tabindex="0"><code>// blogというインデックスを作成
+$ curl -XPUT localhost:9200/blog
+
+// インデックスの確認
+$ curl localhost:9200/_cat/indices?v
+health status index   uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+yellow open   blog    rwvaOBVcRaSLqt3NDRFZ-w   5   1          0            0       324b           324b
+</code></pre><h5 id="qhealthがyellowだけどだいじょうぶなの">Q.healthがyellowだけどだいじょうぶなの？</h5>
 <p>この段階では大丈夫です。サーバが1台のみだとレプリカを配置できないのでyellowとなりますが、動作上は問題ありません。</p>
 <p>データを投入していきます。
 下記のように1件ずつ投入することができます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl -XPUT &#39;localhost:9200/blog/entry/1&#39; -d &#39;
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  &#34;date&#34;: &#34;2017-08-13T16:28:48+09:00&#34;,
-</span></span><span style="display:flex;"><span>  &#34;title&#34;: &#34;ElasticSearch入門&#34;,
-</span></span><span style="display:flex;"><span>  &#34;body&#34;: &#34;ブログ記事の全文検索などをやりたくて、ElasticSearchはどんなもんじゃろか？と触ってみたのでメモ。ElasticSearchの入門についてはたくさんの記事がすでにでているので、ほぼ自分の理解のために残します。&#34;
-</span></span><span style="display:flex;"><span>}&#39;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>//Response
-</span></span><span style="display:flex;"><span>{&#34;_index&#34;:&#34;blog&#34;,&#34;_type&#34;:&#34;entry&#34;,&#34;_id&#34;:&#34;1&#34;,&#34;_version&#34;:1,&#34;result&#34;:&#34;created&#34;,&#34;_shards&#34;:{&#34;total&#34;:2,&#34;successful&#34;:1,&#34;failed&#34;:0},&#34;created&#34;:true}
-</span></span></code></pre></div><p>が、今回はあらかじめ用意したデータでいくつかのデータをまとめて入れていきたいと思います。<br>
+<pre tabindex="0"><code>$ curl -XPUT &#39;localhost:9200/blog/entry/1&#39; -d &#39;
+{
+  &#34;date&#34;: &#34;2017-08-13T16:28:48+09:00&#34;,
+  &#34;title&#34;: &#34;ElasticSearch入門&#34;,
+  &#34;body&#34;: &#34;ブログ記事の全文検索などをやりたくて、ElasticSearchはどんなもんじゃろか？と触ってみたのでメモ。ElasticSearchの入門についてはたくさんの記事がすでにでているので、ほぼ自分の理解のために残します。&#34;
+}&#39;
+
+//Response
+{&#34;_index&#34;:&#34;blog&#34;,&#34;_type&#34;:&#34;entry&#34;,&#34;_id&#34;:&#34;1&#34;,&#34;_version&#34;:1,&#34;result&#34;:&#34;created&#34;,&#34;_shards&#34;:{&#34;total&#34;:2,&#34;successful&#34;:1,&#34;failed&#34;:0},&#34;created&#34;:true}
+</code></pre><p>が、今回はあらかじめ用意したデータでいくつかのデータをまとめて入れていきたいと思います。<br>
 サンプルデータ：<a href="/entry/2017/08/13/test.json">test.json</a></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl -o https://blog.mosuke.tech/entry/2017/08/13/test.json
-</span></span><span style="display:flex;"><span>$ curl -H &#34;Content-Type: application/json&#34; -XPOST &#39;localhost:9200/blog/entry/_bulk?pretty&amp;refresh&#39; --data-binary @test.json
-</span></span></code></pre></div><h5 id="qcurlするときにパラメータにprettyってつけているのはなんで">Q.curlするときにパラメータにprettyってつけているのはなんで？？</h5>
+<pre tabindex="0"><code>$ curl -o https://blog.mosuke.tech/entry/2017/08/13/test.json
+$ curl -H &#34;Content-Type: application/json&#34; -XPOST &#39;localhost:9200/blog/entry/_bulk?pretty&amp;refresh&#39; --data-binary @test.json
+</code></pre><h5 id="qcurlするときにパラメータにprettyってつけているのはなんで">Q.curlするときにパラメータにprettyってつけているのはなんで？？</h5>
 <p>prettyパラメータを付けるとレスポンスのJsonを整形して出力してくれます。
 jqなど利用してもいいと思いますが、prettyつけるだけでお手軽に見やすくなります。</p>
 <h3 id="検索しよう">検索しよう</h3>
 <p>ではいよいよ、「検索」やっていきます。<br>
 細かい検索の方法はまずおいておいてキーワード検索を！</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>//&#34;ElasticSearch 入門&#34;というキーワードで検索
-</span></span><span style="display:flex;"><span>$ curl &#39;localhost:9200/blog/_search?pretty&#39; -d &#39;
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  &#34;query&#34;: { &#34;match&#34;: { &#34;body&#34;: &#34;ElasticSearch 入門&#34; } }
-</span></span><span style="display:flex;"><span>}&#39;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>//結果レスポンス
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  &#34;took&#34; : 2,
-</span></span><span style="display:flex;"><span>  &#34;timed_out&#34; : false,
-</span></span><span style="display:flex;"><span>  &#34;_shards&#34; : {
-</span></span><span style="display:flex;"><span>    &#34;total&#34; : 5,
-</span></span><span style="display:flex;"><span>    &#34;successful&#34; : 5,
-</span></span><span style="display:flex;"><span>    &#34;failed&#34; : 0
-</span></span><span style="display:flex;"><span>  },
-</span></span><span style="display:flex;"><span>  &#34;hits&#34; : {
-</span></span><span style="display:flex;"><span>    &#34;total&#34; : 2,
-</span></span><span style="display:flex;"><span>    &#34;max_score&#34; : 2.9046252,
-</span></span><span style="display:flex;"><span>    &#34;hits&#34; : [
-</span></span><span style="display:flex;"><span>      {
-</span></span><span style="display:flex;"><span>        &#34;_index&#34; : &#34;blog&#34;,
-</span></span><span style="display:flex;"><span>        &#34;_type&#34; : &#34;entry&#34;,
-</span></span><span style="display:flex;"><span>        &#34;_id&#34; : &#34;AV3gigX6d7baLXgnTis6&#34;,
-</span></span><span style="display:flex;"><span>        &#34;_score&#34; : 2.9046252,
-</span></span><span style="display:flex;"><span>        &#34;_source&#34; : {
-</span></span><span style="display:flex;"><span>          &#34;date&#34; : &#34;2017-08-13 10:00:00&#34;,
-</span></span><span style="display:flex;"><span>          &#34;title&#34; : &#34;ElasticSearch入門&#34;,
-</span></span><span style="display:flex;"><span>          &#34;body&#34; : &#34;ブログ記事の全文検索などをやりたくて、ElasticSearchはどんなもんじゃろか？と触ってみたのでメモ。ElasticSearchの入門についてはたくさんの記事がすでにでているので、ほぼ自分の理解のために残します。&#34;,
-</span></span><span style="display:flex;"><span>          &#34;tag&#34; : [
-</span></span><span style="display:flex;"><span>            &#34;ElasticSearch&#34;,
-</span></span><span style="display:flex;"><span>            &#34;入門&#34;
-</span></span><span style="display:flex;"><span>          ]
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>      },
-</span></span><span style="display:flex;"><span>      {
-</span></span><span style="display:flex;"><span>        &#34;_index&#34; : &#34;blog&#34;,
-</span></span><span style="display:flex;"><span>        &#34;_type&#34; : &#34;entry&#34;,
-</span></span><span style="display:flex;"><span>        &#34;_id&#34; : &#34;AV3gigX6d7baLXgnTis7&#34;,
-</span></span><span style="display:flex;"><span>        &#34;_score&#34; : 0.7911521,
-</span></span><span style="display:flex;"><span>        &#34;_source&#34; : {
-</span></span><span style="display:flex;"><span>          &#34;date&#34; : &#34;2017-08-14 22:00:00&#34;,
-</span></span><span style="display:flex;"><span>          &#34;title&#34; : &#34;ElasticSearch実践&#34;,
-</span></span><span style="display:flex;"><span>          &#34;body&#34; : &#34;ElasticSearchを利用した実践的な検索方法などについて開設します。また、クラスターの組み方なども解説。&#34;,
-</span></span><span style="display:flex;"><span>          &#34;tag&#34; : [
-</span></span><span style="display:flex;"><span>            &#34;ElasticSearch&#34;,
-</span></span><span style="display:flex;"><span>            &#34;実践&#34;,
-</span></span><span style="display:flex;"><span>            &#34;検索&#34;
-</span></span><span style="display:flex;"><span>          ]
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>      }
-</span></span><span style="display:flex;"><span>    ]
-</span></span><span style="display:flex;"><span>  }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>検索結果はスコアリングまでしてくれていてとてもいい感じ。<br>
+<pre tabindex="0"><code>//&#34;ElasticSearch 入門&#34;というキーワードで検索
+$ curl &#39;localhost:9200/blog/_search?pretty&#39; -d &#39;
+{
+  &#34;query&#34;: { &#34;match&#34;: { &#34;body&#34;: &#34;ElasticSearch 入門&#34; } }
+}&#39;
+
+//結果レスポンス
+{
+  &#34;took&#34; : 2,
+  &#34;timed_out&#34; : false,
+  &#34;_shards&#34; : {
+    &#34;total&#34; : 5,
+    &#34;successful&#34; : 5,
+    &#34;failed&#34; : 0
+  },
+  &#34;hits&#34; : {
+    &#34;total&#34; : 2,
+    &#34;max_score&#34; : 2.9046252,
+    &#34;hits&#34; : [
+      {
+        &#34;_index&#34; : &#34;blog&#34;,
+        &#34;_type&#34; : &#34;entry&#34;,
+        &#34;_id&#34; : &#34;AV3gigX6d7baLXgnTis6&#34;,
+        &#34;_score&#34; : 2.9046252,
+        &#34;_source&#34; : {
+          &#34;date&#34; : &#34;2017-08-13 10:00:00&#34;,
+          &#34;title&#34; : &#34;ElasticSearch入門&#34;,
+          &#34;body&#34; : &#34;ブログ記事の全文検索などをやりたくて、ElasticSearchはどんなもんじゃろか？と触ってみたのでメモ。ElasticSearchの入門についてはたくさんの記事がすでにでているので、ほぼ自分の理解のために残します。&#34;,
+          &#34;tag&#34; : [
+            &#34;ElasticSearch&#34;,
+            &#34;入門&#34;
+          ]
+        }
+      },
+      {
+        &#34;_index&#34; : &#34;blog&#34;,
+        &#34;_type&#34; : &#34;entry&#34;,
+        &#34;_id&#34; : &#34;AV3gigX6d7baLXgnTis7&#34;,
+        &#34;_score&#34; : 0.7911521,
+        &#34;_source&#34; : {
+          &#34;date&#34; : &#34;2017-08-14 22:00:00&#34;,
+          &#34;title&#34; : &#34;ElasticSearch実践&#34;,
+          &#34;body&#34; : &#34;ElasticSearchを利用した実践的な検索方法などについて開設します。また、クラスターの組み方なども解説。&#34;,
+          &#34;tag&#34; : [
+            &#34;ElasticSearch&#34;,
+            &#34;実践&#34;,
+            &#34;検索&#34;
+          ]
+        }
+      }
+    ]
+  }
+}
+</code></pre><p>検索結果はスコアリングまでしてくれていてとてもいい感じ。<br>
 「ElasticSearch」と「入門」の２つのワードで検索し、両方のワードを持つ記事のスコアが高くなっているのがわかります。</p>
 <p>その他、基本的な検索オプションもほぞぼそと紹介します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>//sizeは取り出すデータの量。SQLでいうLimit
-</span></span><span style="display:flex;"><span>$ curl &#39;localhost:9200/blog/_search?pretty&#39; -d &#39;
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  &#34;query&#34;: { &#34;match_all&#34;: {} },
-</span></span><span style="display:flex;"><span>  &#34;size&#34;: 1
-</span></span><span style="display:flex;"><span>}&#39;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>//取り出すデータフィールドの指定。SQLでいうselect指定的な
-</span></span><span style="display:flex;"><span>$ curl &#39;localhost:9200/blog/_search?pretty&#39; -d &#39;
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  &#34;query&#34;: { &#34;match_all&#34;: {} },
-</span></span><span style="display:flex;"><span>  &#34;_source&#34;: [&#34;title&#34;]
-</span></span><span style="display:flex;"><span>}&#39;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>//タイトルで検索
-</span></span><span style="display:flex;"><span>$ curl &#39;localhost:9200/blog/_search?pretty&#39; -d &#39;
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  &#34;query&#34;: { &#34;match&#34;: { &#34;title&#34;: &#34;ElasticSearch&#34; } }
-</span></span><span style="display:flex;"><span>}&#39;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>//「ElasticSearch」と「全文検索」のAND検索
-</span></span><span style="display:flex;"><span>$ curl &#39;localhost:9200/blog/_search?pretty&#39; -d &#39;
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  &#34;query&#34;: { &#34;match&#34;: { &#34;title&#34;: &#34;ElasticSearch&#34; } },
-</span></span><span style="display:flex;"><span>  &#34;query&#34;: { &#34;match&#34;: { &#34;body&#34;: &#34;全文検索&#34; } }
-</span></span><span style="display:flex;"><span>}&#39;
-</span></span></code></pre></div><h2 id="3kibana">3.Kibana</h2>
+<pre tabindex="0"><code>//sizeは取り出すデータの量。SQLでいうLimit
+$ curl &#39;localhost:9200/blog/_search?pretty&#39; -d &#39;
+{
+  &#34;query&#34;: { &#34;match_all&#34;: {} },
+  &#34;size&#34;: 1
+}&#39;
+
+//取り出すデータフィールドの指定。SQLでいうselect指定的な
+$ curl &#39;localhost:9200/blog/_search?pretty&#39; -d &#39;
+{
+  &#34;query&#34;: { &#34;match_all&#34;: {} },
+  &#34;_source&#34;: [&#34;title&#34;]
+}&#39;
+
+//タイトルで検索
+$ curl &#39;localhost:9200/blog/_search?pretty&#39; -d &#39;
+{
+  &#34;query&#34;: { &#34;match&#34;: { &#34;title&#34;: &#34;ElasticSearch&#34; } }
+}&#39;
+
+//「ElasticSearch」と「全文検索」のAND検索
+$ curl &#39;localhost:9200/blog/_search?pretty&#39; -d &#39;
+{
+  &#34;query&#34;: { &#34;match&#34;: { &#34;title&#34;: &#34;ElasticSearch&#34; } },
+  &#34;query&#34;: { &#34;match&#34;: { &#34;body&#34;: &#34;全文検索&#34; } }
+}&#39;
+</code></pre><h2 id="3kibana">3.Kibana</h2>
 <p>最後にKibanaについて少し書きます。
 KibanaはElasticSearchと組み合わせて利用する可視化ツールです。
 ElasticSearchの検索クエリーをGUI上から実行できたり、その結果を可視化したりすることができます。</p>
 <p>AWS上で動かしているので、<code>server.host</code>の設定を変更して、外部からアクセスできるようにしています。<br>
 外部に晒すのは危険なこともあるので、注意してください。
 また、AWS上のセキュリティグループの設定も見直してくださいね。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">//</span><span style="color:#960050;background-color:#1e0010">まずはインストール</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo yum install kibana
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">//</span><span style="color:#960050;background-color:#1e0010">外部ネットワークからアクセスできるように</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo vim <span style="color:#f92672">/</span>etc<span style="color:#f92672">/</span>kibana<span style="color:#f92672">/</span>kibana<span style="color:#f92672">.</span>yml
-</span></span><span style="display:flex;"><span>server<span style="color:#f92672">.</span>host: <span style="color:#e6db74">&#34;0.0.0.0&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">//</span><span style="color:#960050;background-color:#1e0010">起動して起動の確認</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo systemctl enable kibana
-</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo systemctl start kibana
-</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> sudo systemctl status kibana
-</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">●</span> kibana<span style="color:#f92672">.</span>service <span style="color:#f92672">-</span> Kibana
-</span></span><span style="display:flex;"><span>   Loaded: loaded (<span style="color:#f92672">/</span>etc<span style="color:#f92672">/</span>systemd<span style="color:#f92672">/</span>system<span style="color:#f92672">/</span>kibana<span style="color:#f92672">.</span>service; disabled; vendor preset: disabled)
-</span></span><span style="display:flex;"><span>   Active: active (running) since Tue <span style="color:#ae81ff">2017</span><span style="color:#f92672">-</span><span style="color:#ae81ff">08</span><span style="color:#f92672">-</span><span style="color:#ae81ff">15</span> <span style="color:#ae81ff">09</span>:<span style="color:#ae81ff">15</span>:<span style="color:#ae81ff">42</span> UTC; <span style="color:#ae81ff">11</span>min ago
-</span></span><span style="display:flex;"><span> Main PID: <span style="color:#ae81ff">21269</span> (node)
-</span></span><span style="display:flex;"><span>   CGroup: <span style="color:#f92672">/</span>system<span style="color:#f92672">.</span>slice<span style="color:#f92672">/</span>kibana<span style="color:#f92672">.</span>service
-</span></span><span style="display:flex;"><span>           <span style="color:#960050;background-color:#1e0010">└─</span><span style="color:#ae81ff">21269</span> <span style="color:#f92672">/</span>usr<span style="color:#f92672">/</span>share<span style="color:#f92672">/</span>kibana<span style="color:#f92672">/</span>bin<span style="color:#f92672">/../</span>node<span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>node <span style="color:#f92672">--</span>no<span style="color:#f92672">-</span>warnings <span style="color:#f92672">/</span>usr<span style="color:#f92672">/</span>share<span style="color:#f92672">/</span>kibana<span style="color:#f92672">/</span>bin<span style="color:#f92672">/../</span>src<span style="color:#f92672">/</span>cli <span style="color:#f92672">-</span>c <span style="color:#f92672">/</span>etc<span style="color:#f92672">/</span>kibana<span style="color:#f92672">/</span>kibana<span style="color:#f92672">.</span>yml
-</span></span></code></pre></div><p>ではさっそく接続して、なにかやってみます。<br>
+<pre tabindex="0"><code>//まずはインストール
+$ sudo yum install kibana
+
+//外部ネットワークからアクセスできるように
+$ sudo vim /etc/kibana/kibana.yml
+server.host: &#34;0.0.0.0&#34;
+
+//起動して起動の確認
+$ sudo systemctl enable kibana
+$ sudo systemctl start kibana
+$ sudo systemctl status kibana
+● kibana.service - Kibana
+   Loaded: loaded (/etc/systemd/system/kibana.service; disabled; vendor preset: disabled)
+   Active: active (running) since Tue 2017-08-15 09:15:42 UTC; 11min ago
+ Main PID: 21269 (node)
+   CGroup: /system.slice/kibana.service
+           └─21269 /usr/share/kibana/bin/../node/bin/node --no-warnings /usr/share/kibana/bin/../src/cli -c /etc/kibana/kibana.yml
+</code></pre><p>ではさっそく接続して、なにかやってみます。<br>
 デフォルトでは<code>5601</code>番ポートでアクセスできます。</p>
 <p>Tag Cloudという機能があったのでためしてみました。
 タグに利用されている頻度が大きいものが大きく表示されます。</p>

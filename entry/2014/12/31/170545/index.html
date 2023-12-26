@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -140,21 +140,21 @@ RDS（データベース）をプライベートネットワークに配置し�
 実現したいことは、VPSのサーバ上に立ち上がっている仮想マシンのWebサーバに、ローカルのPCのブラウザからアクセスするというものです。</p>
 <p><img src="/image/20141231162958.png" alt="ssh-portforward-example"></p>
 <p>ローカルPCからexample.jp(VPSのサーバ)へはSSHできる状態です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[local pc] $ ssh username@example.jp 
-</span></span><span style="display:flex;"><span>ログイン可能
-</span></span></code></pre></div><p>また、仮想サーバ上のWebサーバのポート番号は80でVPSのホストサーバからはWebサーバへ接続できる状態です。<br>
+<pre tabindex="0"><code>[local pc] $ ssh username@example.jp 
+ログイン可能
+</code></pre><p>また、仮想サーバ上のWebサーバのポート番号は80でVPSのホストサーバからはWebサーバへ接続できる状態です。<br>
 VPSのホストからcurlを使って仮想サーバの80番ポートにリクエストを投げると、Hello Worldが返ってきます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[example.jp] $ curl 192.168.33.10
-</span></span><span style="display:flex;"><span>&lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello World! Virtual Web Server&lt;/h1&gt;
-</span></span><span style="display:flex;"><span>&lt;/body&gt;&lt;/html&gt; 
-</span></span></code></pre></div><h2 id="ローカルポートフォワードの実行">ローカルポートフォワードの実行</h2>
+<pre tabindex="0"><code>[example.jp] $ curl 192.168.33.10
+&lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello World! Virtual Web Server&lt;/h1&gt;
+&lt;/body&gt;&lt;/html&gt; 
+</code></pre><h2 id="ローカルポートフォワードの実行">ローカルポートフォワードの実行</h2>
 <p>しかし、この状態では、仮想マシン上のWebサーバにたいしてローカルPCから直接はアクセスできません。
 そこで、SSHのローカルポートフォワーディングの出番です。ローカルPCから以下を実行してみます。<br>
 以下のコマンドは、<br>
 <strong>ローカルPCのポート8888での接続はexample.jpからみて「192.168.33.10のポート80」に飛ばす</strong><br>
 と解釈するとわかりやすいです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp 
-</span></span></code></pre></div><p>上を実行すると、いつもどおりSSHでログインした状態になります。
+<pre tabindex="0"><code>[local pc] $ ssh -L8888:192.168.33.10:80 username@example.jp 
+</code></pre><p>上を実行すると、いつもどおりSSHでログインした状態になります。
 「セッションを切らずに」、ブラウザから<code>http://localhost:8888</code>にアクセスするとなんと、ローカルホストにつないだはずが、example.jp上の仮想Webサーバのhtmlが帰ってくるのがわかります。</p>
 <p><img src="/image/20141231163932.png" alt="ssh-portforward-access"></p>
 <h2 id="rdsの例の場合">RDSの例の場合</h2>
@@ -163,10 +163,10 @@ VPSのホストからcurlを使って仮想サーバの80番ポートにリク�
 <p><img src="/image/ssh-portforward-rds-2.png" alt="ssh-portforward-rds-2"></p>
 <p>次のようにSSH接続していきます。こう解釈するとわかりやすいです。<br>
 <strong>ローカルPCのポート8888での接続はfumidai.example.jpからみて「xxxx.rds.amazonaws.comのポート3306」に飛ばす</strong></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[local pc] $ ssh -L8888:xxxx.rds.amazonaws.com:3306 username@fumidai.example.jp 
-</span></span></code></pre></div><p>SSHセッションは維持したまま、別ターミナルでmysql接続していきます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[local pc] $ mysql -u user -p -H 127.0.0.1:8888
-</span></span></code></pre></div><h3 id="セキュリティはどうなの">セキュリティはどうなの？</h3>
+<pre tabindex="0"><code>[local pc] $ ssh -L8888:xxxx.rds.amazonaws.com:3306 username@fumidai.example.jp 
+</code></pre><p>SSHセッションは維持したまま、別ターミナルでmysql接続していきます。</p>
+<pre tabindex="0"><code>[local pc] $ mysql -u user -p -H 127.0.0.1:8888
+</code></pre><h3 id="セキュリティはどうなの">セキュリティはどうなの？</h3>
 <p>ローカルポートフォワーディングのSSHコマンドで、ローカルPCからリモートホスト(example.jp)までトンネルをはっています。そのトンネルの中をhttp通信やmysqlの通信を流しています。そのため、セキュリティ的にも安心できます。</p>
 <h2 id="最後に">最後に</h2>
 <p>SSHのローカルポートフォワーディングが普段の業務の中で役立つ場面がでてきましたか？<br>
@@ -183,25 +183,25 @@ SSHは他にもたくさんのことができ、ポートフォワードだけ�
 以下の図で言うと、web10, web11(192.168.33.10/11)に一発でSSHできるようになるわけです。</p>
 <p><img src="/image/20141109170337.png" alt="ssh"></p>
 <p>設定のサンプルは下記のとおりです。クライアントPC側に以下の設定をすることで完了します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ vim ~/.ssh/config
-</span></span><span style="display:flex;"><span>host gateway
-</span></span><span style="display:flex;"><span>    HostName xxxxx.xxx
-</span></span><span style="display:flex;"><span>    User username
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>Host web10
-</span></span><span style="display:flex;"><span>    HostName 192.168.33.10
-</span></span><span style="display:flex;"><span>    User vagrant
-</span></span><span style="display:flex;"><span>    ProxyCommand ssh -W %h:%p gateway
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>Host web11
-</span></span><span style="display:flex;"><span>    HostName 192.168.33.11
-</span></span><span style="display:flex;"><span>    User vagrant
-</span></span><span style="display:flex;"><span>    ProxyCommand ssh -W %h:%p gateway
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>##これで以下で接続可能
-</span></span><span style="display:flex;"><span>$ ssh web10
-</span></span><span style="display:flex;"><span>$ ssh web11 
-</span></span></code></pre></div>
+<pre tabindex="0"><code>$ vim ~/.ssh/config
+host gateway
+    HostName xxxxx.xxx
+    User username
+
+Host web10
+    HostName 192.168.33.10
+    User vagrant
+    ProxyCommand ssh -W %h:%p gateway
+
+Host web11
+    HostName 192.168.33.11
+    User vagrant
+    ProxyCommand ssh -W %h:%p gateway
+
+##これで以下で接続可能
+$ ssh web10
+$ ssh web11 
+</code></pre>
     </div>
 <div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
     <h5>記事の内容に関連した相談、仕事依頼したい <span class="badge badge-info">New</span></h5>

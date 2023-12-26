@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -151,7 +151,7 @@ Terraformで管理するメリット/デメリットってどんなところに�
 <p>まずは試してみます。認証ですが、いろんな方法がありますが、もしすでに<code>~/.kube/config</code>にクライアント証明の入った設定ファイルがあるのならば、特に設定することなく利用できます。
 認証に、<code>servicea ccount</code>のtokenを利用している場合などは、既定の設定をいれる必要があります。
 ここでは、<code>~/.kube/config</code>があるので以下だけのProvider設定で行きます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>provider &#34;kubernetes&#34; {}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>provider &#34;kubernetes&#34; {}
 </span></span></code></pre></div><h3 id="deploymentを作ってみる">Deploymentを作ってみる</h3>
 <p>例えばすごく単純に、Nginxが3つ立ち上がるdeploymentを作ることとします。
 manifestなら以下のようになりますね。</p>
@@ -211,7 +211,7 @@ manifestなら以下のようになりますね。</p>
 </span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">}</span>
 </span></span></code></pre></div><p>Terraform管理のいいところは、なんといっても、この<code>terraform plan</code>によるDry-runができることですね。
 やってみます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ terraform plan
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ terraform plan
 </span></span><span style="display:flex;"><span>Refreshing Terraform state in-memory prior to plan...
 </span></span><span style="display:flex;"><span>The refreshed state will be used to calculate this plan, but will not be
 </span></span><span style="display:flex;"><span>persisted to local or remote state storage.
@@ -234,7 +234,7 @@ manifestなら以下のようになりますね。</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>Plan: 1 to add, 0 to change, 0 to destroy.
 </span></span></code></pre></div><p>差分を確認してapplyしてデプロイしていきます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ terraform apply
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ terraform apply
 </span></span><span style="display:flex;"><span>(中略)
 </span></span><span style="display:flex;"><span>Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 </span></span><span style="display:flex;"><span>
@@ -250,7 +250,7 @@ manifestなら以下のようになりますね。</p>
 </span></span></code></pre></div><p>変更があったと仮定して、Terraformの定義ファイルの中身を少し変えてみます。
 レプリカ数とコンテナ名を変更してみました。<br>
 変更の差分を確認できるのはやっぱりTerraformで管理する最大のメリットですね。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ terraform plan
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ terraform plan
 </span></span><span style="display:flex;"><span>kubernetes_deployment.test: Refreshing state... (ID: default/nginx-sample-deployment)
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>------------------------------------------------------------------------

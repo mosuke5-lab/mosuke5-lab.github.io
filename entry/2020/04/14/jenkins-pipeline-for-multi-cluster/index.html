@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -124,7 +124,7 @@ ServiceAccountを削除すれば認証のTokenも削除できるので比較的�
 <p>環境B側にServiceAccountを作成しましょう（ここでは<code>jenkins-deploy</code>というServiceAccountを作ります）。<br>
 ServiceAccountは作成されると、Secret(Tokenなど)が自動的に作成されます。（生成されるトークンに関する<a href="https://access.redhat.com/documentation/ja-jp/openshift_container_platform/4.3/html/authentication/understanding-and-creating-service-accounts" target="_blank">公式ドキュメント</a>）
 そのTokenを使って認証することができます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc create serviceaccount jenkins-deploy
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc create serviceaccount jenkins-deploy
 </span></span><span style="display:flex;"><span>serviceaccount/jenkins-deploy created
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>$ oc get secret
@@ -135,7 +135,7 @@ ServiceAccountは作成されると、Secret(Tokenなど)が自動的に作成�
 </span></span><span style="display:flex;"><span>jenkins-deploy-token-c5fhl       kubernetes.io/service-account-token   4      3m35s
 </span></span></code></pre></div><p>自動で作成されたSecretの中には、Tokenの他に証明書、Namespaceの情報が保存されています。<br>
 次のステップでこのTokenと証明書を利用していきます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc describe secrets jenkins-deploy-token-bvf8p
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc describe secrets jenkins-deploy-token-bvf8p
 </span></span><span style="display:flex;"><span>Name:         jenkins-deploy-token-bvf8p
 </span></span><span style="display:flex;"><span>Namespace:    mosuke5
 </span></span><span style="display:flex;"><span>Labels:       &lt;none&gt;
@@ -155,7 +155,7 @@ ServiceAccountは作成されると、Secret(Tokenなど)が自動的に作成�
 そのため、ServiceAccountに対して権限設定（RBAC）をしてあげる必要があります。
 この権限設定は十分に注意しましょう。強い権限を与えすぎると、Jenkins Pipelineから必要以上の操作ができてしまいます。<br>
 下はeditのcluster roleを与えますが、プロジェクトに合わせて適切なロールを作成して割り当てるようにしてください。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc policy add-role-to-user edit system:serviceaccount:production:jenkins-deploy -n production
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc policy add-role-to-user edit system:serviceaccount:production:jenkins-deploy -n production
 </span></span><span style="display:flex;"><span>clusterrole.rbac.authorization.k8s.io/edit added: &#34;system:serviceaccount:mosuke5:jenkins-deploy&#34;
 </span></span></code></pre></div><h3 id="jenkins設定">Jenkins設定</h3>
 <p>続いてJenkins側の設定を確認していきます。<br>
@@ -173,7 +173,7 @@ ServiceAccountは作成されると、Secret(Tokenなど)が自動的に作成�
 <p>さて、最後にJenkinsfileによるパイプランの設定を確認していきます。<br>
 <code>openshift.withCluster()</code>で利用するクラスタを切り替えることができます。
 <code>openshift.withCluster('your-cluster')</code>の <code>'your-cluster'</code>には、一つ前のJenkins側の設定で記述した<code>Cluster Name</code>がはいります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>pipeline {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>pipeline {
 </span></span><span style="display:flex;"><span>  agent {
 </span></span><span style="display:flex;"><span>    kubernetes {
 </span></span><span style="display:flex;"><span>      cloud &#39;openshift&#39;
@@ -214,14 +214,14 @@ ServiceAccountは作成されると、Secret(Tokenなど)が自動的に作成�
 本筋とは少しずれるのですが、複数クラスタを運用している場合、レジストリ間でのイメージのコピーが必要になります。
 イメージレジストリへの認証もServiceAccountを用いて行うことが実はできるのでお伝えします。
 上で、ServiceAccountを作成後にSecretが自動生成されると書きましたが、その中に<code>jenkins-deploy-dockercfg-pjwrj</code>という名前のSecretがありました。このSecretにはイメージレジストリの認証に利用できる情報が入っています。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc get secret
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc get secret
 </span></span><span style="display:flex;"><span>NAME                             TYPE                                  DATA   AGE
 </span></span><span style="display:flex;"><span>...
 </span></span><span style="display:flex;"><span>jenkins-deploy-dockercfg-pjwrj   kubernetes.io/dockercfg               1      3m35s
 </span></span><span style="display:flex;"><span>jenkins-deploy-token-bvf8p       kubernetes.io/service-account-token   4      3m35s
 </span></span><span style="display:flex;"><span>jenkins-deploy-token-c5fhl       kubernetes.io/service-account-token   4      3m35s
 </span></span></code></pre></div><p>中身はこんな具合です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  &#34;172.30.203.233:5000&#34;: {
 </span></span><span style="display:flex;"><span>    &#34;username&#34;: &#34;serviceaccount&#34;,
 </span></span><span style="display:flex;"><span>    &#34;password&#34;: &#34;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&#34;,
@@ -233,7 +233,7 @@ ServiceAccountは作成されると、Secret(Tokenなど)が自動的に作成�
 </span></span></code></pre></div><p>試しに、このServiceAccountの認証情報を使ってDocker CLIでクラスタ外部からログインしてみます。
 <code>~/.docker/config.json</code>を下記のように書いてログインができることを確認できます。
 下はDockerでのログインをしましたが、skopeoや<code>oc image mirror</code>コマンドで同様に認証が利用できます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ cat ~/.docker/config.json
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ cat ~/.docker/config.json
 </span></span><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>	&#34;auths&#34;: {
 </span></span><span style="display:flex;"><span>		&#34;your-openshift-registry-endpoint&#34;: {

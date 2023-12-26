@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -147,7 +147,7 @@ Rubyの場合は <code>&lt;ruby-version&gt;-&lt;base-os&gt;</code> の命名規�
 </table>
 <p>試しに<code>2.7.1-buster</code>, <code>2.7.1-slim-buster</code>, <code>alipne3.12</code>をそれぞれダウンロードしてみました。
 イメージサイズに大きな違いがあります。Debianといえども軽量版でないものはイメージサイズが大きすぎますね。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ docker images | grep ruby
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ docker images | grep ruby
 </span></span><span style="display:flex;"><span>ruby    2.7.1-alpine3.12       b46ea0bc5984     2 weeks ago     52.3MB
 </span></span><span style="display:flex;"><span>ruby    2.7.1-slim-buster      8ce8b58afe19     2 weeks ago     149MB
 </span></span><span style="display:flex;"><span>ruby    2.7.1-buster           9b840f43471e     2 weeks ago     842MB
@@ -165,40 +165,40 @@ UBIは現状RHEL7or8がベースであり、minimalバージョンも用意し�
 <p>たとえば以下2つのDockerfileを比べてみましょう。
 やっていることはどちらも同じで、<code>debian:buster-slim</code>イメージに対して、git, vim, rubyをインストールし、
 以下2つのDockerfileで比較して確認します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#75715e"># Dockerfile-1</span>
-</span></span><span style="display:flex;"><span>FROM debian:buster<span style="color:#f92672">-</span>slim
-</span></span><span style="display:flex;"><span>RUN apt<span style="color:#f92672">-</span>get update <span style="color:#f92672">&amp;&amp;</span> \
-</span></span><span style="display:flex;"><span>        apt<span style="color:#f92672">-</span>get install <span style="color:#f92672">-</span>y git vim ruby <span style="color:#f92672">&amp;&amp;</span> \
-</span></span><span style="display:flex;"><span>        rm <span style="color:#f92672">-</span>rf <span style="color:#f92672">/</span><span style="color:#66d9ef">var</span><span style="color:#f92672">/</span>lib<span style="color:#f92672">/</span>apt<span style="color:#f92672">/</span>lists<span style="color:#f92672">/*</span>
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#75715e"># Dockerfile-2</span>
-</span></span><span style="display:flex;"><span>FROM debian:buster<span style="color:#f92672">-</span>slim
-</span></span><span style="display:flex;"><span>RUN apt<span style="color:#f92672">-</span>get update
-</span></span><span style="display:flex;"><span>RUN apt<span style="color:#f92672">-</span>get install <span style="color:#f92672">-</span>y git vim ruby
-</span></span><span style="display:flex;"><span>RUN rm <span style="color:#f92672">-</span>rf <span style="color:#f92672">/</span><span style="color:#66d9ef">var</span><span style="color:#f92672">/</span>lib<span style="color:#f92672">/</span>apt<span style="color:#f92672">/</span>lists<span style="color:#f92672">/*</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># Dockerfile-1
+</span></span><span style="display:flex;"><span>FROM debian:buster-slim
+</span></span><span style="display:flex;"><span>RUN apt-get update &amp;&amp; \
+</span></span><span style="display:flex;"><span>        apt-get install -y git vim ruby &amp;&amp; \
+</span></span><span style="display:flex;"><span>        rm -rf /var/lib/apt/lists/*
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># Dockerfile-2
+</span></span><span style="display:flex;"><span>FROM debian:buster-slim
+</span></span><span style="display:flex;"><span>RUN apt-get update
+</span></span><span style="display:flex;"><span>RUN apt-get install -y git vim ruby
+</span></span><span style="display:flex;"><span>RUN rm -rf /var/lib/apt/lists/*
 </span></span></code></pre></div><p>上の2つのDockerfileをビルドしてサイズを確認してします。<br>
 約18MBの差がありますが、<code>/bin/sh -c apt-get update</code> で差が出ています。
 これは、<code>apt-get update</code> によって更新されたファイルを同じレイヤーで削除（<code>rm -rf /var/lib/apt/lists/*</code>）したかどうかによって差が出ています。
 もう少し平易にいえば、同じディレクトリの変更はひとつのレイヤーで行ってしまったほうが効率的ということでもあります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">$</span> docker build <span style="color:#f92672">.</span> <span style="color:#f92672">-</span>f Dockerfile<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span>t my<span style="color:#f92672">-</span>ruby:v1
-</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> docker build <span style="color:#f92672">.</span> <span style="color:#f92672">-</span>f Dockerfile<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">-</span>t my<span style="color:#f92672">-</span>ruby:v2
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ docker build . -f Dockerfile-1 -t my-ruby:v1
+</span></span><span style="display:flex;"><span>$ docker build . -f Dockerfile-2 -t my-ruby:v2
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> docker images <span style="color:#f92672">|</span> grep ruby
-</span></span><span style="display:flex;"><span>my<span style="color:#f92672">-</span>ruby    <span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>layers    <span style="color:#ae81ff">2449e0</span>eeb439    <span style="color:#ae81ff">8</span> minutes ago     <span style="color:#ae81ff">224</span>MB
-</span></span><span style="display:flex;"><span>my<span style="color:#f92672">-</span>ruby    <span style="color:#ae81ff">2</span><span style="color:#f92672">-</span>layers    b5f389081e02    <span style="color:#ae81ff">17</span> minutes ago    <span style="color:#ae81ff">242</span>MB
+</span></span><span style="display:flex;"><span>$ docker images | grep ruby
+</span></span><span style="display:flex;"><span>my-ruby    1-layers    2449e0eeb439    8 minutes ago     224MB
+</span></span><span style="display:flex;"><span>my-ruby    2-layers    b5f389081e02    17 minutes ago    242MB
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> docker history my<span style="color:#f92672">-</span>ruby:<span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>layers
+</span></span><span style="display:flex;"><span>$ docker history my-ruby:1-layers
 </span></span><span style="display:flex;"><span>IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
-</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2449e0</span>eeb439        <span style="color:#ae81ff">9</span> minutes ago       <span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>sh <span style="color:#f92672">-</span>c apt<span style="color:#f92672">-</span>get update <span style="color:#f92672">&amp;&amp;</span>         apt<span style="color:#f92672">-</span>get<span style="color:#960050;background-color:#1e0010">…</span>   <span style="color:#ae81ff">155</span>MB
-</span></span><span style="display:flex;"><span><span style="color:#ae81ff">43e3995</span>ee54a        <span style="color:#ae81ff">4</span> weeks ago         <span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>sh <span style="color:#f92672">-</span>c <span style="color:#75715e">#(nop)  CMD [&#34;bash&#34;]                 0B</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>missing<span style="color:#f92672">&gt;</span>           <span style="color:#ae81ff">4</span> weeks ago         <span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>sh <span style="color:#f92672">-</span>c <span style="color:#75715e">#(nop) ADD file:4d35f6c8bbbe6801c…   69.2MB</span>
+</span></span><span style="display:flex;"><span>2449e0eeb439        9 minutes ago       /bin/sh -c apt-get update &amp;&amp;         apt-get…   155MB
+</span></span><span style="display:flex;"><span>43e3995ee54a        4 weeks ago         /bin/sh -c #(nop)  CMD [&#34;bash&#34;]                 0B
+</span></span><span style="display:flex;"><span>&lt;missing&gt;           4 weeks ago         /bin/sh -c #(nop) ADD file:4d35f6c8bbbe6801c…   69.2MB
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">$</span> docker history my<span style="color:#f92672">-</span>ruby:<span style="color:#ae81ff">2</span><span style="color:#f92672">-</span>layers
+</span></span><span style="display:flex;"><span>$ docker history my-ruby:2-layers
 </span></span><span style="display:flex;"><span>IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
-</span></span><span style="display:flex;"><span>b5f389081e02        <span style="color:#ae81ff">17</span> minutes ago      <span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>sh <span style="color:#f92672">-</span>c rm <span style="color:#f92672">-</span>rf <span style="color:#f92672">/</span><span style="color:#66d9ef">var</span><span style="color:#f92672">/</span>lib<span style="color:#f92672">/</span>apt<span style="color:#f92672">/</span>lists<span style="color:#f92672">/*</span>          <span style="color:#ae81ff">0</span>B
-</span></span><span style="display:flex;"><span><span style="color:#ae81ff">0623</span>ec74ec5f        <span style="color:#ae81ff">20</span> minutes ago      <span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>sh <span style="color:#f92672">-</span>c apt<span style="color:#f92672">-</span>get install <span style="color:#f92672">-</span>y git vim ruby      <span style="color:#ae81ff">155</span>MB
-</span></span><span style="display:flex;"><span><span style="color:#ae81ff">5</span>d6295328e90        <span style="color:#ae81ff">20</span> minutes ago      <span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>sh <span style="color:#f92672">-</span>c apt<span style="color:#f92672">-</span>get update                       <span style="color:#ae81ff">17.4</span>MB
-</span></span><span style="display:flex;"><span><span style="color:#ae81ff">43e3995</span>ee54a        <span style="color:#ae81ff">4</span> weeks ago         <span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>sh <span style="color:#f92672">-</span>c <span style="color:#75715e">#(nop)  CMD [&#34;bash&#34;]                 0B</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>missing<span style="color:#f92672">&gt;</span>           <span style="color:#ae81ff">4</span> weeks ago         <span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>sh <span style="color:#f92672">-</span>c <span style="color:#75715e">#(nop) ADD file:4d35f6c8bbbe6801c…   69.2MB</span>
+</span></span><span style="display:flex;"><span>b5f389081e02        17 minutes ago      /bin/sh -c rm -rf /var/lib/apt/lists/*          0B
+</span></span><span style="display:flex;"><span>0623ec74ec5f        20 minutes ago      /bin/sh -c apt-get install -y git vim ruby      155MB
+</span></span><span style="display:flex;"><span>5d6295328e90        20 minutes ago      /bin/sh -c apt-get update                       17.4MB
+</span></span><span style="display:flex;"><span>43e3995ee54a        4 weeks ago         /bin/sh -c #(nop)  CMD [&#34;bash&#34;]                 0B
+</span></span><span style="display:flex;"><span>&lt;missing&gt;           4 weeks ago         /bin/sh -c #(nop) ADD file:4d35f6c8bbbe6801c…   69.2MB
 </span></span></code></pre></div><h4 id="闇雲な権限変更オーナー変更は注意">闇雲な権限変更、オーナー変更は注意</h4>
 <p><code>chown</code>や<code>chmod</code>といったファイルの権限変更やオーナー・グループの変更でもコンテナイメージのサイズは大きくなってしまうことがありますので注意しましょう。原理は上と一緒ですが、仕組みを理解した上で適切に利用しましょう。
 たとえば、<code>/usr/local/myapp</code> 内に50MBの独自のアプリケーションのソースコードなどを格納していたとします。
@@ -206,20 +206,20 @@ UBIは現状RHEL7or8がベースであり、minimalバージョンも用意し�
 さてどうなるか予想してみましょう。</p>
 <p>次のDockerfileを使って検証します。<br>
 途中までは、上で使ったものと一緒ですが、ダミーですが50MBのファイルを生成し、その権限を変更するを行っています。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#75715e"># Dockerfile_chmod</span>
-</span></span><span style="display:flex;"><span>FROM debian:buster<span style="color:#f92672">-</span>slim
-</span></span><span style="display:flex;"><span>RUN apt<span style="color:#f92672">-</span>get update <span style="color:#f92672">&amp;&amp;</span> \
-</span></span><span style="display:flex;"><span>        apt<span style="color:#f92672">-</span>get install <span style="color:#f92672">-</span>y git vim ruby <span style="color:#f92672">&amp;&amp;</span> \
-</span></span><span style="display:flex;"><span>        rm <span style="color:#f92672">-</span>rf <span style="color:#f92672">/</span><span style="color:#66d9ef">var</span><span style="color:#f92672">/</span>lib<span style="color:#f92672">/</span>apt<span style="color:#f92672">/</span>lists<span style="color:#f92672">/*</span>
-</span></span><span style="display:flex;"><span>RUN mkdir <span style="color:#f92672">/</span>usr<span style="color:#f92672">/</span>local<span style="color:#f92672">/</span>myapp
-</span></span><span style="display:flex;"><span>RUN dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=/</span>dev<span style="color:#f92672">/</span>zero of<span style="color:#f92672">=/</span>usr<span style="color:#f92672">/</span>local<span style="color:#f92672">/</span>myapp<span style="color:#f92672">/</span><span style="color:#ae81ff">50</span>M<span style="color:#f92672">.</span>dummy bs<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>M count<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span>
-</span></span><span style="display:flex;"><span>RUN chmod <span style="color:#f92672">-</span>R <span style="color:#ae81ff">750</span> <span style="color:#f92672">/</span>usr<span style="color:#f92672">/</span>local<span style="color:#f92672">/</span>myapp
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># Dockerfile_chmod
+</span></span><span style="display:flex;"><span>FROM debian:buster-slim
+</span></span><span style="display:flex;"><span>RUN apt-get update &amp;&amp; \
+</span></span><span style="display:flex;"><span>        apt-get install -y git vim ruby &amp;&amp; \
+</span></span><span style="display:flex;"><span>        rm -rf /var/lib/apt/lists/*
+</span></span><span style="display:flex;"><span>RUN mkdir /usr/local/myapp
+</span></span><span style="display:flex;"><span>RUN dd if=/dev/zero of=/usr/local/myapp/50M.dummy bs=1M count=50
+</span></span><span style="display:flex;"><span>RUN chmod -R 750 /usr/local/myapp
 </span></span></code></pre></div><p>ではビルドしてサイズを確認します。<br>
 気になるのは<code>docker history my-ruby:chmod</code>の出力結果で出てきた、<code>be0adfccccf6</code>と<code>951c58f26d5f</code>の2行です。
 下の方については、50MBのファイルを作ったので、サイズが増えるのは素直に納得できますが、上の方では権限の変更を行ったのみですが52.4MBのサイズがあります。
 これはまさにコンテナイメージがレイヤー構造となっているがゆえです。
 <code>be0adfccccf6</code> では権限が変更となったことで、権限が変更された <code>/usr/local/myapp</code> を保持していますし、<code>951c58f26d5f</code>では権限が変更される前の<code>/usr/local/myapp</code>のデータを持っているということです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ docker build . -f Dockerfile_chmod -t my-ruby:chmod
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ docker build . -f Dockerfile_chmod -t my-ruby:chmod
 </span></span><span style="display:flex;"><span>$ docker images | grep ruby
 </span></span><span style="display:flex;"><span>my-ruby    chmod       be0adfccccf6    18 seconds ago      329MB
 </span></span><span style="display:flex;"><span>my-ruby    1-layers    2449e0eeb439    About an hour ago   224MB
@@ -262,7 +262,7 @@ UBIは現状RHEL7or8がベースであり、minimalバージョンも用意し�
 おそらく必要ないのではないかと思います。</p>
 <p>以下はRubyでのGemの例ですが、環境毎に必要なライブラリを分けてインストールしておくことができます。
 コンテナとして動かす必要のあるもののみをインストールできるようにしておくといいです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>gem &#39;rails&#39;, &#39;5.2.4.2&#39;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>gem &#39;rails&#39;, &#39;5.2.4.2&#39;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>## 略
 </span></span><span style="display:flex;"><span>

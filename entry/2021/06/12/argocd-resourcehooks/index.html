@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:18">
+<meta name="generator" content="Hugo 0.121.1 at 2023-12-26 02:51">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -193,7 +193,7 @@ CIツールから実行することで、Sync以外の処理をCIツール側か
 </span></span></code></pre></div><h3 id="リソースの削除タイミング">リソースの削除タイミング</h3>
 <p>Resource Hooksで利用したリソースの削除のタイミングは、Annotationに<code>argocd.argoproj.io/hook-delete-policy</code>をつけることで設定可能です。
 もし、なにも設定しなかった場合、以下のように実行したJobがPodとして残りますが（<code>presync-job-gj4bd</code>が処理に利用したJobのPod）、任意のタイミングで削除できるというわけです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ oc get pod
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc get pod
 </span></span><span style="display:flex;"><span>NAME                                READY   STATUS      RESTARTS   AGE
 </span></span><span style="display:flex;"><span>nginx-deployment-64b6fc996b-94ttg   1/1     Running     0          4m33s
 </span></span><span style="display:flex;"><span>presync-job-gj4bd                   0/1     Completed   0          86s
