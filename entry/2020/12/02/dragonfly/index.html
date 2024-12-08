@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2024-01-01 01:01">
+<meta name="generator" content="Hugo 0.139.3 at 2024-12-08 10:52">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -23,10 +23,10 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="P2Pでコンテナイメージを配信できるDragonflyとAlibaba Cloudのなぞ &middot; Goldstine研究所">
 <meta property="og:description" content="超大規模環境でのコンテナイメージの配布に役立つといわれている、P2Pでのファイル配布ソフトウェアのDragonflyをさわってみました。Alibaba Cloudとの関係性などがみえてきます。">
-<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:image" content="https://blog.mosuke.tech//image/logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
 <meta property="og:url" content="https://blog.mosuke.tech/entry/2020/12/02/dragonfly/" />
-<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech//index.xml" />
 <link rel="icon" href="/image/favicon.ico" />
 <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
 <meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
@@ -115,7 +115,7 @@ Dragonflyはすでにアリババ内部では、月間平均20億回の配信を
 <h2 id="アーキテクチャ">アーキテクチャ</h2>
 <p>Dragonfly自身は、下の図にあるようにCluster Managerと書かれているSupernodeと、dfget proxyと書かれているdfclientの2つの要素で構成されます。
 Kubernetes環境だと、dfclientはDaemonSetとして各ノードに配置されます。Kubeletがイメージをプルする先として考えると納得がいく構成です。</p>
-<p><img src="/image/dragonfly-architecture-overview.png" alt="architecture"></p>
+<p><img alt="architecture" src="/image/dragonfly-architecture-overview.png"></p>
 <h2 id="実践-on-kubernetes">実践 on Kubernetes</h2>
 <p>というわけで、さっそくKubernetesクラスタにインストールして使ってみたいと思います。<br>
 KubernetesクラスタへのインストールはHelmが利用できます。ほとんどドキュメントがなくて困りますが<a href="https://github.com/dragonflyoss/helm-chart">こちらのレポジトリ</a>からHelm Chartをダウンロードできます。</p>
@@ -238,7 +238,7 @@ Rubyのイメージのレイヤーごとにキャッシュされていること�
 <p>以下の画像はKubeConの資料から拝借したものですが、下記のような仕組みになっています。<br>
 Enterprise EditionのContainer Registryを購入すると、セットアップスクリプトがでてきます。こちらのスクリプトを実行すると、DaemonSetとして、各ノードにdf-daemonがデプロイされます。
 そして、Container Registry自身が、マネージドのSupernodeの役割として動きます。与えられたP2P配信用のURLでコンテナイメージをプルすることができるようになります。</p>
-<p><img src="/image/dragonfly-on-alibaba-cloud.png" alt="dragonfly-on-alibaba-cloud"></p>
+<p><img alt="dragonfly-on-alibaba-cloud" src="/image/dragonfly-on-alibaba-cloud.png"></p>
 <h2 id="reference">Reference</h2>
 <p>参考になったリンクを張っておきます。</p>
 <ol>
@@ -300,7 +300,7 @@ Enterprise EditionのContainer Registryを購入すると、セットアップ�
     <h3>カテゴリー</h3>
     <ul class="list-group">
       <li class="list-group-item">
-        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+        <a href="/categories/alibaba%20cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba cloud'});">alibaba cloud (16)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>

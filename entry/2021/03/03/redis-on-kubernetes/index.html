@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2024-01-01 01:01">
+<meta name="generator" content="Hugo 0.139.3 at 2024-12-08 10:52">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -23,10 +23,10 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis on Kubernetesの検討ポイントとredis-ha Helm chart &middot; Goldstine研究所">
 <meta property="og:description" content="RedisをKubernetesで利用する際のポイントをまとめました。またReidisをHAとして利用する場合に有力候補となるHelm chartについて解説します。">
-<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:image" content="https://blog.mosuke.tech//image/logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
 <meta property="og:url" content="https://blog.mosuke.tech/entry/2021/03/03/redis-on-kubernetes/" />
-<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech//index.xml" />
 <link rel="icon" href="/image/favicon.ico" />
 <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
 <meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
@@ -122,7 +122,7 @@
 </li>
 <li>ある程度のデータの永続化が必要な場合は、特定の時点のスナップショットをRDBファイルとして保存可能なため合わせて検討する。</li>
 </ul>
-<p><img src="/image/redis-single.png" alt="redis-single"></p>
+<p><img alt="redis-single" src="/image/redis-single.png"></p>
 <h3 id="レプリケーション構成">レプリケーション構成</h3>
 <ul>
 <li>公式ドキュメント: <a href="https://redis.io/topics/replication">https://redis.io/topics/replication</a></li>
@@ -132,7 +132,7 @@
 <li>Kubernetes環境では、Podのヘルスチェックによるオートヒーリング（LivenessProbeによるヘルスチェック）がある程度設定できるため、書き込みの負荷分散が必要ないケースであれば、Replicationの採用も充分に検討可能。</li>
 <li>レプリカ数は、読み込みの負荷次第で決定できる。</li>
 </ul>
-<p><img src="/image/redis-replication.png" alt="redis-replication"></p>
+<p><img alt="redis-replication" src="/image/redis-replication.png"></p>
 <h3 id="sentinel構成">Sentinel構成</h3>
 <ul>
 <li>公式ドキュメント: <a href="https://redis.io/topics/sentinel">https://redis.io/topics/sentinel</a></li>
@@ -150,7 +150,7 @@
 </ul>
 </li>
 </ul>
-<p><img src="/image/redis-sentinel.png" alt="redis-sentinel"></p>
+<p><img alt="redis-sentinel" src="/image/redis-sentinel.png"></p>
 <h3 id="cluster構成">Cluster構成</h3>
 <ul>
 <li>公式ドキュメント: <a href="https://redis.io/topics/cluster-spec">https://redis.io/topics/cluster-spec</a></li>
@@ -159,7 +159,7 @@
 <li>データの永続性を持たせるために、シャーディングとレプリケーションとを併用する方式をとることがある。その場合、最低6台から構成されることになる。</li>
 <li>Kubernetesで構成する場合、RedisLabsが提供する、<a href="https://docs.redislabs.com/latest/platforms/kubernetes/concepts/operator/">Redis Enterprise Operator</a>の採用が検討できる。</li>
 </ul>
-<p><img src="/image/redis-cluster.png" alt="redis-cluster"></p>
+<p><img alt="redis-cluster" src="/image/redis-cluster.png"></p>
 <h3 id="構成に興味を持ってしまった人へ">構成に興味を持ってしまった人へ</h3>
 <p>データのレプリケーションやシャーディングなど、分散システムにおけるデータの基礎について興味を持ってしまった人はぜひO&rsquo;Reillyからでている「<a href="https://amzn.to/3rcWl3o">データ指向アプリケーションデザイン</a>」という本を手に取るといいと思います。以前に、輪読会したときのブログは以下です。</p>
 <div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2021/01/24/designing-data-intensive-applications/" data-iframely-url="//cdn.iframe.ly/Tu7Fr2P"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
@@ -215,7 +215,7 @@
 </span></span><span style="display:flex;"><span>  redis-cli -h my-redis-redis-ha.redis.svc.cluster.local
 </span></span></code></pre></div><p>デプロイされた内容を確認するために、読者のために全体像をまず図示します。
 以下のような構成でデプロイされています。</p>
-<p><img src="/image/redis-ha-overview.png" alt="redis-ha-overview"></p>
+<p><img alt="redis-ha-overview" src="/image/redis-ha-overview.png"></p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>## ha-proxyがdeploymentで3台構成でデプロイ
 </span></span><span style="display:flex;"><span>$ kubectl get deploy
 </span></span><span style="display:flex;"><span>NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
@@ -350,7 +350,7 @@ Sentinelは、どのRedisがPrimary(Master)かを判断しフェイルオーバ�
     <h3>カテゴリー</h3>
     <ul class="list-group">
       <li class="list-group-item">
-        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+        <a href="/categories/alibaba%20cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba cloud'});">alibaba cloud (16)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>

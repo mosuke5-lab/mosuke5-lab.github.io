@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2024-01-01 01:01">
+<meta name="generator" content="Hugo 0.139.3 at 2024-12-08 10:52">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -23,10 +23,10 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Jenkins pipelineで複数のOpenShiftクラスタを扱う &middot; Goldstine研究所">
 <meta property="og:description" content="Jenkins pipelineで複数のOpenShiftクラスタを扱う方法について共有します。OpenShift Jenkins Pipeline Pluginを使ったマルチクラスタの扱いを紹介します。">
-<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:image" content="https://blog.mosuke.tech//image/logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
 <meta property="og:url" content="https://blog.mosuke.tech/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/" />
-<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech//index.xml" />
 <link rel="icon" href="/image/favicon.ico" />
 <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
 <meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
@@ -114,7 +114,7 @@ Jenkins pipelineで複数クラスタ（マルチクラスタ）を扱いたい�
 <li>クラスタBはプロダクション環境であり、上のJenkinsからアプリケーションをデプロイしたいと考えている</li>
 <li>Jenkins pipelineを使っており、OpenShiftの操作は<a href="https://github.com/openshift/jenkins-client-plugin" target="_blank">OpenShift Jenkins Pipeline Plugin</a>を用いている</li>
 </ul>
-<p><img src="/image/jenkins-pipeline-multi-cluster-overview.png" alt="jenkins-pipeline-multi-cluster-overview"></p>
+<p><img alt="jenkins-pipeline-multi-cluster-overview" src="/image/jenkins-pipeline-multi-cluster-overview.png"></p>
 <h2 id="実装方法">実装方法</h2>
 <h3 id="serviceaccountの用意">ServiceAccountの用意</h3>
 <p>複数クラスタを扱うということは、Jenkinsが起動するクラスタとは異なるクラスタの操作をする必要があるということです。
@@ -167,9 +167,9 @@ ServiceAccountは作成されると、Secret(Tokenなど)が自動的に作成�
 設定のために用意するものは最低２つ、できれば３つあります。
 クラスタのAPIのエンドポイントと上で作成したToken(画面でいうCredentials)は必須です。クラスタのAPIエンドポイントは、Routerエンドポイントではないので注意してください。
 <code>Server Certificate Authority</code> は<code>Disable TLS Verify</code>にチェックを入れれば任意ですが、本番環境では設定することをおすすめします。</p>
-<p><img src="/image/jenkins-other-openshift-cluster.png" alt="jenkins-other-openshift-cluster"></p>
+<p><img alt="jenkins-other-openshift-cluster" src="/image/jenkins-other-openshift-cluster.png"></p>
 <p>TokenはJenkinsのCredential Providerに保存して利用できます。</p>
-<p><img src="/image/jenkins-credential-provider-openshift-client.png" alt="jenkins-credential-provider-openshift-client"></p>
+<p><img alt="jenkins-credential-provider-openshift-client" src="/image/jenkins-credential-provider-openshift-client.png"></p>
 <h3 id="pipeline">Pipeline</h3>
 <p>さて、最後にJenkinsfileによるパイプランの設定を確認していきます。<br>
 <code>openshift.withCluster()</code>で利用するクラスタを切り替えることができます。
@@ -315,7 +315,7 @@ OpenShift x Jenkinsをガンガン使いこなしていきましょう。</p>
     <h3>カテゴリー</h3>
     <ul class="list-group">
       <li class="list-group-item">
-        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+        <a href="/categories/alibaba%20cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba cloud'});">alibaba cloud (16)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>

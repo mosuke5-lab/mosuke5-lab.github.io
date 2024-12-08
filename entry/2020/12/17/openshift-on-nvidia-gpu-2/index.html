@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.121.1 at 2024-01-01 01:01">
+<meta name="generator" content="Hugo 0.139.3 at 2024-12-08 10:52">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -23,10 +23,10 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="OpenShift on NVIDIA GPU（導入編） &middot; Goldstine研究所">
 <meta property="og:description" content="OpenShiftにGPUのノードを追加して利用する方法（導入編）です。インストールして運用する上での知っておくと良いポイントなどを解説します。">
-<meta property="og:image" content="https://blog.mosuke.tech/image/logo.png" />
+<meta property="og:image" content="https://blog.mosuke.tech//image/logo.png" />
 <meta property="og:site_name" content="Goldstine研究所" />
 <meta property="og:url" content="https://blog.mosuke.tech/entry/2020/12/17/openshift-on-nvidia-gpu-2/" />
-<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech/index.xml" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech//index.xml" />
 <link rel="icon" href="/image/favicon.ico" />
 <meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
 <meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
@@ -133,7 +133,7 @@ OpenShiftクラスタにcluster-wide entitlementの設定をしておくこと�
 nvidia-driverは、起動時にelfutils-libelfなどのパッケージをインストールしてビルドを行います。（コンテナ起動時にビルドするのがいいかどうかは。。？）ベースイメージにUBI(Universal Base Image)を利用しており、Red Hatのレポジトリを参照しにいきます。そのため、コンテナが対象のレポジトリを参照できるように、エンタイトルメントの設定が必要になります。
 この設定がないとnvidia-driver podの起動時にエラーが発生し起動に失敗します。<br>
 OpenShiftをご利用であればサブスクリプションをお持ちかと思いますが、
-検証用で個人のサブスクリプションを使いたい場合には、1年間無料で利用できる <a href="https://developers.redhat.com/articles/getting-red-hat-developer-subscription-what-rhel-users-need-know#">Red Hat Developer Subscription</a>の利用でも可能です。</p>
+検証用で個人のサブスクリプションを使いたい場合には、1年間無料で利用できる <a href="https://developers.redhat.com/articles/getting-red-hat-developer-subscription-what-rhel-users-need-know">Red Hat Developer Subscription</a>の利用でも可能です。</p>
 <p>cluster-wide entitlementを設定すると（実態は<code>MachineConfig</code>）、Machine Config Operator（MCO）は各ノードに設定内容を反映しに行きます。ノードへの設定変更時は、ノードのスケジューリングを無効化した上で順次ローリングアップデートするため、でノード台数が多い場合は時間がかかります。MachineConfigPoolの設定で、Workerノードが同時に何台までアップデート作業を実行していいかも決めることができます。お使いのクラスタの状況に応じて、ノード更新のスピードを上げたい場合は<code>MachineConfigPool</code>の<code>spec.maxUnavailable</code>の値の変更を検討できます（<a href="https://docs.openshift.com/container-platform/4.6/scalability_and_performance/recommended-host-practices.html#create-a-kubeletconfig-crd-to-edit-kubelet-parameters_">ドキュメント</a>）。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc apply -f 0003-cluster-wide-machineconfigs.yaml
 </span></span><span style="display:flex;"><span>machineconfig.machineconfiguration.openshift.io/50-rhsm-conf created
@@ -307,7 +307,7 @@ GPUノードにtaintを付与し、tolerationを持たない通常のPodはス�
 </span></span></code></pre></div><p>以上のように、NVIDIA GPU OperatorのなかではPrometheus向けのexporterも内包しているので、Prometheusでの監視はすぐにはじめることができます。ご自身のPrometheusにServiceの監視設定を追加してみてください。少し余談ですが、ZabbixでこれらのGPU情報を監視したい場合はZabbixのPrometheus Checkを利用してください。詳しくは「<a href="https://blog.mosuke.tech/entry/2020/08/27/zabbix-for-kubernetes/">ZabbixでKubernetesの監視を検討する（Prometheus exporter, Kubernetes API）</a>」をご参照ください。<br>
 Grafanaでの可視化ですが、この点についてはNVIDIA公式ではダッシュボードテンプレートを提供していません。
 わたしが確認した限りでは、こちらの<a href="https://grafana.com/grafana/dashboards/12219">NVIDIA DCGM Exporter Dashboard</a>が活用できそうでした。</p>
-<p><img src="/image/nvidia-dcgm-exporter-dashboard.png" alt="nvidia-dcgm-exporter-dashboard"></p>
+<p><img alt="nvidia-dcgm-exporter-dashboard" src="/image/nvidia-dcgm-exporter-dashboard.png"></p>
 <h2 id="reference">reference</h2>
 <ul>
 <li><a href="https://docs.nvidia.com/datacenter/kubernetes/openshift-on-gpu-install-guide/index.html">NVIDIA GPU Operatorインストール方法公式ドキュメント</a></li>
@@ -368,7 +368,7 @@ Grafanaでの可視化ですが、この点についてはNVIDIA公式ではダ�
     <h3>カテゴリー</h3>
     <ul class="list-group">
       <li class="list-group-item">
-        <a href="/categories/alibaba-cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba-cloud'});">alibaba-cloud (16)</a>
+        <a href="/categories/alibaba%20cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba cloud'});">alibaba cloud (16)</a>
       </li>
       <li class="list-group-item">
         <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
