@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.139.3 at 2024-12-09 09:47">
+<meta name="generator" content="Hugo 0.139.3 at 2025-04-04 12:53">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -64,6 +64,18 @@
             <div class="container">
                 <div class="row">
 <div class="entry col-md-8 col-xs-12">
+  <h1><a href="https://blog.mosuke.tech/entry/2021/09/08/kubelet-log-management/" class="entry-title">Kubeletのログ管理を追ってみる</a></h1>
+  <div class="entry-sub-title">
+      <span class="">2021-09-08</span>
+      <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
+          </div>
+  <div class="entry-content">
+      <p>こんにちは。もーすけです。<br>
+今回はKubeletのログ管理について調べたことを残します。
+Kubernetesにおけるログ管理については以前もブログを書いてきましたが、どちらかというとアプリ目線でのことで、実際のところKubeletがどうログ管理しているかよくわかっていなかったので調査してみました。
+きっかけは、KubernetesのPodのログはローテートされるのか？ずっと標準出力にログを吐き続けたらストレージはどうなるのか？そのあたり気になったことです。</p>
+      <a href="https://blog.mosuke.tech/entry/2021/09/08/kubelet-log-management/">続きを読む</a>
+  </div>
   <h1><a href="https://blog.mosuke.tech/entry/2021/09/04/alibabacloud-image-cache/" class="entry-title">Alibaba Cloud, Kubernetesのイメージキャッシュ機能を検証する</a></h1>
   <div class="entry-sub-title">
       <span class="">2021-09-04</span>
@@ -202,36 +214,6 @@ Argo CDを使った本格運用に向けて学んでいきましょう。</p>
 それにより、暗号通貨BAT（Basic Attention Token）での支援チップの受付ができるようになりました。Braveブラウザを利用している人は、少しでも本ブログが役に立ったなと思ったらぜひチップを送ってください（笑）ますます頑張っていこうと思います。</p>
       <a href="https://blog.mosuke.tech/entry/2021/05/18/support-brave-bat/">続きを読む</a>
   </div>
-  <h1><a href="https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd/" class="entry-title">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討</a></h1>
-  <div class="entry-sub-title">
-      <span class="">2021-05-07</span>
-      <a class="badge badge-inf post-category post-category-Kubernetes" href="/categories/kubernetes">Kubernetes</a>
-          </div>
-  <div class="entry-content">
-      <hr>
-<h5>Tekton学習シリーズ</h5>
-<ul>
-<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
-<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
-<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
-<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
-<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
-<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
-<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
-<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
-<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
-<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
-<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
-<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
-<li>第13回: <a href="/entry/2022/03/01/tekton-lib-cache/">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
-<li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
-</ul>
-<hr>
-<p>こんにちは、もーすけです。<br>
-今回は、クラウドネイティブな環境でのCI/CDツールとして有名なTektonとArgo CD、これらの組み合わせした場合のパイプラインフローを検討してみます。どのように使い分けていくことができるのか考えていきたいと思います。
-本記事はTekton学習シリーズとして行ったわけではないですが、関連トピックとして番外編扱いにしておきます。</p>
-      <a href="https://blog.mosuke.tech/entry/2021/05/07/tekton-and-argocd/">続きを読む</a>
-  </div>
   
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
@@ -249,11 +231,11 @@ Argo CDを使った本格運用に向けて学んでいきましょう。</p>
   <div class="sidebar-content related-post">
     <h3>最新の記事</h3>
     <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2025/04/04/mac-mini-local-llm/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Mac mini M4 Pro (64GB) はローカルLLMの夢を見るか？ パフォーマンス検証とAIエージェント連携の現実 '});">Mac mini M4 Pro (64GB) はローカルLLMの夢を見るか？ パフォーマンス検証とAIエージェント連携の現実 </a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2024/12/08/acm-governance/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、ACMを使って利用者への権限委譲しつつ無法地帯を避ける方法を考えよう'});">OpenShift、ACMを使って利用者への権限委譲しつつ無法地帯を避ける方法を考えよう</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2023/12/31/reflection/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '2023年振り返り。心の戦いの終わり。'});">2023年振り返り。心の戦いの終わり。</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/12/31/reflection/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「父」2022年振り返り'});">「父」2022年振り返り</a></li>
       <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/12/14/openshift-user-alert-routing/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、開発者向けの監視機能（アラート通知）が進化しました'});">OpenShift、開発者向けの監視機能（アラート通知）が進化しました</a></li>
-      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/10/28/ikukyu/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '3ヶ月の育休にチャレンジして感じたぼくのエンジニアキャリア'});">3ヶ月の育休にチャレンジして感じたぼくのエンジニアキャリア</a></li>
       </ul>
   </div>
   <div class="sidebar-content campaign-ad">
@@ -280,6 +262,9 @@ Argo CDを使った本格運用に向けて学んでいきましょう。</p>
   <div class="sidebar-content related-post">
     <h3>カテゴリー</h3>
     <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/ai" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ai'});">ai (1)</a>
+      </li>
       <li class="list-group-item">
         <a href="/categories/alibaba%20cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba cloud'});">alibaba cloud (16)</a>
       </li>
@@ -359,6 +344,9 @@ Argo CDを使った本格運用に向けて学んでいきましょう。</p>
       </li>
       <li class="list-group-item">
         <a href="/archive/2024" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2024'});">2024 Archive (1)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2025" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2025'});">2025 Archive (1)</a>
       </li>
       </ul>
   </div>

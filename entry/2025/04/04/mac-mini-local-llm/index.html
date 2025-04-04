@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<meta name="generator" content="Hugo 0.139.3 at 2025-04-04 12:53">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>Mac mini M4 Pro (64GB) はローカルLLMの夢を見るか？ パフォーマンス検証とAIエージェント連携の現実 </title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2025/04/04/mac-mini-local-llm/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2025/04/04/mac-mini-local-llm/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="Mac mini M4 Pro (64GB) はローカルLLMの夢を見るか？ パフォーマンス検証とAIエージェント連携の現実  &middot; Goldstine研究所">
+<meta name="twitter:description" content="Mac mini M2 Pro(64GB)でローカルLLMはどこまで動く？実機でモデルサイズ・速度・メモリを徹底検証。MLX形式の優位性やAIエージェント連携の現実も解説。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mac mini M4 Pro (64GB) はローカルLLMの夢を見るか？ パフォーマンス検証とAIエージェント連携の現実  &middot; Goldstine研究所">
+<meta property="og:description" content="Mac mini M2 Pro(64GB)でローカルLLMはどこまで動く？実機でモデルサイズ・速度・メモリを徹底検証。MLX形式の優位性やAIエージェント連携の現実も解説。">
+<meta property="og:image" content="https://blog.mosuke.tech//image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2025/04/04/mac-mini-local-llm/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech//index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+        
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    
+    <div class="entry-header-image">
+        <img src="/image/mac-mini-with-ai.png" class="img-fluid" alt="Header image">
+    </div>
+    
+    <h1>Mac mini M4 Pro (64GB) はローカルLLMの夢を見るか？ パフォーマンス検証とAIエージェント連携の現実 </h1>
+    <div class="entry-sub-title">
+        <div class="publish-date">
+            <p>執筆日:<time datetime="2025-04-04T11:23">2025-04-04</time></p>
+            
+            <p>更新日:<time datetime="2025-04-04T11:23">2025-04-04</time></p>
+            
+        </div>
+        
+            
+                <a class="badge badge-inf post-category post-category-AI" href="/categories/ai">AI</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#検証環境">検証環境</a></li>
+    <li><a href="#lm-studioでのモデル起動とパフォーマンス比較">LM Studioでのモデル起動とパフォーマンス比較</a>
+      <ul>
+        <li><a href="#テスト結果-モデルサイズ別">テスト結果 (モデルサイズ別)</a></li>
+        <li><a href="#結果からの考察-モデルサイズ">結果からの考察 (モデルサイズ)</a></li>
+      </ul>
+    </li>
+    <li><a href="#mlx形式-vs-gguf形式">MLX形式 vs GGUF形式</a>
+      <ul>
+        <li><a href="#テスト結果-mlx-vs-gguf">テスト結果 (MLX vs GGUF)</a></li>
+        <li><a href="#結果からの考察-mlx-vs-gguf">結果からの考察 (MLX vs GGUF)</a></li>
+      </ul>
+    </li>
+    <li><a href="#ローカルllm--aiエージェントcline連携の実用性は">ローカルLLM + AIエージェント(Cline)連携の実用性は？</a>
+      <ul>
+        <li><a href="#結果は残念ながら">結果は…残念ながら</a></li>
+        <li><a href="#比較-claude-37-sonnetの場合">比較: Claude 3.7 Sonnetの場合</a></li>
+        <li><a href="#結果からの考察-aiエージェント連携">結果からの考察 (AIエージェント連携)</a></li>
+      </ul>
+    </li>
+    <li><a href="#推論高速化の試みvllm-on-mac">推論高速化の試み：vLLM on Mac</a></li>
+    <li><a href="#将来的な可能性クラスタリング">将来的な可能性：クラスタリング</a></li>
+    <li><a href="#まとめ">まとめ</a></li>
+  </ul>
+</nav>
+        <p>こんにちは、もーすけです。<br>
+昨今は、LLMの話題は尽きません。claudeやGeminiなどのクラウドLLMがすごいのはわかっていますが、 ローカルLLMがどこまでいけるのか、気軽に用意できるレベルでどこまでいけるのか、、、 とても気になっています。</p>
+<p>というわけで、新しいMac mini (M4 Pro, 64GBメモリ) を購入してみました！ Apple Silicon搭載Macは、その高い電力効率とユニファイドメモリによって、ローカル環境でのAI/機械学習タスク、特に大規模言語モデル（LLM）の実行において注目されています。</p>
+<p>今回は、この新しいMac miniでローカルLLMがどの程度実用的に動作するのか、いくつかのモデルサイズや量子化方式を比較しながら検証してみました。さらに、ローカルLLMをAIエージェント（Cline）と連携させて、少し複雑なタスクを実行できるかも試してみました。</p>
+<h2 id="検証環境">検証環境</h2>
+<ul>
+<li><strong>マシン:</strong> Mac mini
+<ul>
+<li>Apple M4 Pro 14コアCPU、20コアGPU</li>
+<li>64GB ユニファイドメモリ</li>
+<li>10GB Ethernet port</li>
+<li>SSD 1TB</li>
+<li>38万円くらい！！</li>
+</ul>
+</li>
+<li><strong>ツール:</strong> LM Studio (Runtime: llama.cpp)</li>
+</ul>
+<h2 id="lm-studioでのモデル起動とパフォーマンス比較">LM Studioでのモデル起動とパフォーマンス比較</h2>
+<p>まずはLM Studioを使って、どの程度のサイズのモデルまで快適に動作するのか、代表的なモデルであるQwen 2.5シリーズで試してみました。特にmacOS上で最適化されているとされるMLX形式のモデルを中心に検証しています。</p>
+<h3 id="テスト結果-モデルサイズ別">テスト結果 (モデルサイズ別)</h3>
+<p>以下の表は、異なるサイズのモデルを実行した際のパフォーマンスを示しています。</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">モデル (形式, 量子化)</th>
+          <th style="text-align: left">トークン生成速度 (tok/sec)</th>
+          <th style="text-align: left">初回トークン生成までの時間 (秒)</th>
+          <th style="text-align: left">使用メモリ (GB)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><code>qwen2.5-72b-instruct</code> (MLX, 4bit)</td>
+          <td style="text-align: left">5.76</td>
+          <td style="text-align: left">0.94</td>
+          <td style="text-align: left">約 36</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><code>qwen2.5-coder-32b-instruct</code> (MLX, 4bit)</td>
+          <td style="text-align: left">12.82</td>
+          <td style="text-align: left">0.44</td>
+          <td style="text-align: left">約 18</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><code>qwen2.5-coder-14b-instruct</code> (MLX, 4bit)</td>
+          <td style="text-align: left">28.13</td>
+          <td style="text-align: left">0.23</td>
+          <td style="text-align: left">約 8.7</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="各モデルのデモ動画">各モデルのデモ動画</h4>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/ok_ddwE6Q9k?si=q0Hu0Cc7JBv3IU7I" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<h3 id="結果からの考察-モデルサイズ">結果からの考察 (モデルサイズ)</h3>
+<p>表からわかるように、64GBのメモリを搭載したM4 Pro Mac miniでは、<strong>72Bクラスのモデルも起動・実行は可能</strong>です。しかし、トークン生成速度は5.76 tok/secと、他のモデルと比較して遅めです。チャット形式での対話なら我慢できるかもしれませんが、コーディング支援などでリアルタイム性を求めると少し厳しいかもしれません。</p>
+<p>一方で、<strong>32Bモデルでは12.82 tok/sec、14Bモデルでは28.13 tok/sec</strong>と、快適な速度で動作しました。特に14Bモデルは使用メモリも10GB以下に収まっており、他の作業と並行しても余裕がありそうです。</p>
+<p><strong>現実的な利用ラインとしては、応答速度とメモリ使用量のバランスから32Bまたは14Bモデル</strong>あたりがターゲットになりそうです。</p>
+<h2 id="mlx形式-vs-gguf形式">MLX形式 vs GGUF形式</h2>
+<p>macOS環境では、Apple Siliconに最適化されたMLXフレームワークを利用できます。これが従来のGGUF形式と比べてどの程度の差があるのか、同じ32Bモデルで比較してみました。</p>
+<h3 id="テスト結果-mlx-vs-gguf">テスト結果 (MLX vs GGUF)</h3>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">モデル (形式, 量子化)</th>
+          <th style="text-align: left">トークン生成速度 (tok/sec)</th>
+          <th style="text-align: left">初回トークン生成までの時間 (秒)</th>
+          <th style="text-align: left">使用メモリ (GB)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><code>qwen2.5-coder-32b-instruct</code> (MLX, 4bit)</td>
+          <td style="text-align: left">12.82</td>
+          <td style="text-align: left">0.44</td>
+          <td style="text-align: left">約 18</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><code>qwen2.5-coder-32b-instruct</code> (GGUF, Q4_K_M)</td>
+          <td style="text-align: left">9.70</td>
+          <td style="text-align: left">0.96</td>
+          <td style="text-align: left">約 27</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="結果からの考察-mlx-vs-gguf">結果からの考察 (MLX vs GGUF)</h3>
+<p>この比較結果は明らかです。<strong>MLX形式の方がGGUF形式よりも高速（約1.3倍）かつ省メモリ（約9GB削減）</strong> でした。初回トークン生成までの時間も半分以下に短縮されています。macOS上でLM Studioなどを使ってローカルLLMを動かす場合、<strong>可能であればMLX形式のモデルを選択するのがベストプラクティス</strong>と言えそうです。</p>
+<h2 id="ローカルllm--aiエージェントcline連携の実用性は">ローカルLLM + AIエージェント(Cline)連携の実用性は？</h2>
+<p>次に、パフォーマンスが比較的良好だった <code>qwen2.5-coder-32b-instruct</code> (MLX, 4bit) を使って、ClineのようなAIエージェントがどの程度実用になるかを試してみました。</p>
+<p>お題として、以下のような少し複雑なタスクを依頼しました。</p>
+<p>以下を実現するAnsible Playbookを作成してください。</p>
+<ol>
+<li>kind を用いてKubernetesクラスタをローカルに起動する。</li>
+<li>作成したクラスタに foo namespaceを作成する。</li>
+<li>foo namespaceにNginxをデプロイし、外部からアクセスできるようにする。Nginxは /hoge にアクセスすると &ldquo;fuga&rdquo; というメッセージを返すように設定する。</li>
+<li>Nginxが期待通りに動作するか、curl などでHTTPアクセスを行ってテストするステップも含める。</li>
+</ol>
+<p>これは、単一ツールの使い方だけでなく、kind (クラスタ構築) → Kubernetes (マニフェスト適用) → Nginx設定 → テスト、と複数のステップとツール知識を横断する必要があるお題です。</p>
+<h3 id="結果は残念ながら">結果は…残念ながら</h3>
+<p>ローカルLLM (<code>qwen2.5-coder-32b-instruct</code>) とClineの組み合わせでは、<strong>1時間以上試行錯誤を繰り返しましたが、最終的にタスクを完了させることはできませんでした</strong>。途中で生成されるコードの誤りや、タスクの意図を正確に汲み取れない場面が多く、人間がかなり積極的に介入・修正しないとゴールにたどり着けない印象です。</p>
+<h3 id="比較-claude-37-sonnetの場合">比較: Claude 3.7 Sonnetの場合</h3>
+<p>比較対象として、同じお題をクラウドベースのLLMであるClaude 3.7 Sonnet (Anthropic API経由などを想定) に依頼したところ、<strong>わずか5分程度でほぼ完璧なAnsible Playbookを生成し、タスクを完了</strong>させることができました。</p>
+<h4 id="ローカルllm-vs-claude-37-sonnet-のcline連携比較動画">ローカルLLM vs Claude 3.7 Sonnet のCline連携比較動画</h4>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Qg7PgKjT6WQ?si=TUmnC6-Lc0reouV4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<h3 id="結果からの考察-aiエージェント連携">結果からの考察 (AIエージェント連携)</h3>
+<p>現状のローカルLLM (少なくとも今回試した32Bクラス) では、このような<strong>自律的に複数のステップを実行する必要がある複雑なタスクを、人間が満足できるレベルでこなすのはまだ難しい</strong>ようです。基本的なコード生成や単純な質疑応答は可能ですが、AIエージェントとして「任せっぱなし」にするには力不足感が否めません。クラウドベースの高性能LLMとの差は、依然として大きいと言わざるを得ません。</p>
+<h2 id="推論高速化の試みvllm-on-mac">推論高速化の試み：vLLM on Mac</h2>
+<p>72Bモデルも動作はするものの、推論速度が遅いのが気になります。推論を高速化するランタイムとして知られるvLLMがMacで使えないか確認してみました。</p>
+<p>以前はLinux専用でしたが、現在では<strong>CPUモードであればmacOS上でも動作する</strong>ようになっています。しかし、当然ながらApple SiliconのGPU を活用することはできないため、<strong>推論速度の向上という点では、残念ながら現状ではMac環境における解決策にはなりませんでした</strong>。今後のGPU対応に期待したいところです。</p>
+<h2 id="将来的な可能性クラスタリング">将来的な可能性：クラスタリング</h2>
+<p>今回は試していませんが、複数のマシンを連携させてより大きなモデルを動かす「AIクラスタリング」というアプローチも存在します。<a href="https://github.com/exo-explore/exo"><code>exo-explore/exo</code></a> のようなプロジェクトがこれに該当します。</p>
+<p>ただし、これは主に<strong>推論速度の向上よりも、単一のマシンではメモリが足りずに動かせない、さらに巨大なモデル（数百Bクラスなど）を実行可能にすること</strong>を目的としていると理解しています。</p>
+<h2 id="まとめ">まとめ</h2>
+<p>今回の検証から、Mac mini M4 Pro (64GB) 環境におけるローカルLLMについて以下の点が分かりました。</p>
+<ol>
+<li><strong>モデルサイズ:</strong> 72Bモデルも動作はするが、推論速度はやや遅め。32Bや14Bモデルは非常に快適に動作し、実用的な選択肢となる（上記表参照）。</li>
+<li><strong>モデル形式:</strong> macOS上では、<strong>MLX形式のモデルがGGUF形式よりも高速・省メモリ</strong>であり、利用可能ならMLXを選ぶべき（上記表参照）。</li>
+<li><strong>AIエージェント連携:</strong> 現状のローカルLLM（32Bクラス）では、Cline等と連携して複雑な自律タスクを実行させるのはまだ難しく、クラウドLLMとの性能差は大きい。</li>
+<li><strong>高速化:</strong> vLLMはMacではCPUモードのみ動作可能で、現状ではGPUアクセラレーションによる速度向上は期待できない。</li>
+</ol>
+<p>Mac mini M4 ProはローカルLLMを試すには非常に優れた環境ですが、その能力にはまだ限界もあります。特にAIエージェントのような高度な応用を目指す場合は、現状ではクラウドベースの高性能LLMに頼るのが現実的かもしれません。とはいえ、技術の進歩は速いので、今後のソフトウェアやモデルの進化によって、ローカル環境でできることの幅がさらに広がることを期待しています！</p>
+<p>最後に、今回試した内容には直接は関係ないですが、ローカルLLMを検証していくにあたって以下の本で学んでいます。
+よかったら参考にしてください。</p>
+<div class="belg-link row">
+  <div class="belg-title">
+    <div class="belg-description"><a href="https://www.amazon.co.jp/%E3%81%A4%E3%81%8F%E3%82%8A%E3%81%AA%E3%81%8C%E3%82%89%E5%AD%A6%E3%81%B6%EF%BC%81LLM-Compass-Books%E3%82%B7%E3%83%AA%E3%83%BC%E3%82%BA-Sebastian-Raschka-ebook/dp/B0DSZV6BT2?crid=2SKWZWIRHDMO&amp;dib=eyJ2IjoiMSJ9.vH4RewQJDi2_W7A1HHx3B1IPwPv4JGJc-pfwcka9fAjie-1XTOBkiydXaFU4Jh4PKQ76Cv8vuXhqDHvNBcwEaBIQJ5dL2ZRbAAH4Zr1ov8XyWAyS6w_wVXFPbxSYXHlnL47IretGRZEUIZESnxhpRA.zWb_d9cLSEKu6uHgJUuDkSa01RbbuGZsSxo_w5I5p8I&amp;dib_tag=se&amp;keywords=llm&#43;%E8%87%AA%E4%BD%9C&#43;%E5%85%A5%E9%96%80&amp;qid=1743735402&amp;sprefix=llm&#43;%E8%87%AA%E4%BD%9C,aps,175&amp;sr=8-1&amp;linkCode=sl1&amp;tag=mosuke5-22&amp;linkId=5f3162bbb7328ebaf063c7ae2f02da1d&amp;language=ja_JP&amp;ref_=as_li_ss_tl" target="_blank">Amazon.co.jp: つくりながら学ぶ！LLM 自作入門 (Compass Booksシリーズ) eBook : Sebastian Raschka, 株式会社クイープ, 巣籠悠輔, 巣籠悠輔: Kindleストア</a></div>
+    <div class="belg-site">
+      <span class="belg-site-name">www.amazon.co.jp</span>
+    </div>
+  </div>
+</div>
+    </div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい</h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼。※OpenShiftなどRed Hat製品など本業と競合する内容はお断りすることがあります。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>フィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Mac%20mini%20M4%20Pro%20%2864GB%29%20%e3%81%af%e3%83%ad%e3%83%bc%e3%82%ab%e3%83%abLLM%e3%81%ae%e5%a4%a2%e3%82%92%e8%a6%8b%e3%82%8b%e3%81%8b%ef%bc%9f%20%e3%83%91%e3%83%95%e3%82%a9%e3%83%bc%e3%83%9e%e3%83%b3%e3%82%b9%e6%a4%9c%e8%a8%bc%e3%81%a8AI%e3%82%a8%e3%83%bc%e3%82%b8%e3%82%a7%e3%83%b3%e3%83%88%e9%80%a3%e6%90%ba%e3%81%ae%e7%8f%be%e5%ae%9f%20" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'Mac mini M4 Pro (64GB) はローカルLLMの夢を見るか？ パフォーマンス検証とAIエージェント連携の現実 '});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最新の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2025/04/04/mac-mini-local-llm/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'Mac mini M4 Pro (64GB) はローカルLLMの夢を見るか？ パフォーマンス検証とAIエージェント連携の現実 '});">Mac mini M4 Pro (64GB) はローカルLLMの夢を見るか？ パフォーマンス検証とAIエージェント連携の現実 </a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2024/12/08/acm-governance/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、ACMを使って利用者への権限委譲しつつ無法地帯を避ける方法を考えよう'});">OpenShift、ACMを使って利用者への権限委譲しつつ無法地帯を避ける方法を考えよう</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2023/12/31/reflection/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '2023年振り返り。心の戦いの終わり。'});">2023年振り返り。心の戦いの終わり。</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/12/31/reflection/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「父」2022年振り返り'});">「父」2022年振り返り</a></li>
+      <li class="list-group-item"><a href="https://blog.mosuke.tech/entry/2022/12/14/openshift-user-alert-routing/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift、開発者向けの監視機能（アラート通知）が進化しました'});">OpenShift、開発者向けの監視機能（アラート通知）が進化しました</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/ai" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ai'});">ai (1)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/alibaba%20cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba cloud'});">alibaba cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (34)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (66)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (18)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (9)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021 Archive (41)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2023" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2023'});">2023 Archive (1)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2024" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2024'});">2024 Archive (1)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2025" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2025'});">2025 Archive (1)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>
