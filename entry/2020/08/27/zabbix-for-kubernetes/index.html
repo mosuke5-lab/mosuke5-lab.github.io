@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.139.3 at 2025-09-03 09:55">
+<meta name="generator" content="Hugo 0.152.2 at 2025-12-04 08:09">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -191,11 +191,11 @@ node_exporter自身は、<code>openshift-monitoring</code>というnamespace内�
 </ol>
 <p>下記は参考に設定のスクリーンショットを掲載します。</p>
 <p>httpエージェントアイテムの作成<br>
-<img alt="zabbix-item" src="/image/zabbix-item-httpagent.png"></p>
+<img src="/image/zabbix-item-httpagent.png" alt="zabbix-item"></p>
 <p>依存アイテムの作成<br>
-<img alt="zabbix-item-dependency" src="/image/zabbix-item-dependency.png"></p>
+<img src="/image/zabbix-item-dependency.png" alt="zabbix-item-dependency"></p>
 <p>Prometheusパターンの設定<br>
-<img alt="zabbix-prometheus-pattern" src="/image/zabbix-prometheus-pattern.png"></p>
+<img src="/image/zabbix-prometheus-pattern.png" alt="zabbix-prometheus-pattern"></p>
 <h2 id="kubernetes-apiを利用する">Kubernetes APIを利用する</h2>
 <p>次に、Kubernetesの監視においてすべてをexporterでまかなえるわけではありません。
 たとえば、Kubernetes上の特定のPodのステータスを確認したいなどといった、Kubernetes APIの実行結果を監視したいこともあると思います。
@@ -261,7 +261,7 @@ Prometheus exporterを利用する場合には保存前処理にPrometheusパタ
 </li>
 </ol>
 <p>PodのStatusを下記のように取得できました。<br>
-<img alt="zabbix-pod-status" src="/image/zabbix-pod-status.png"></p>
+<img src="/image/zabbix-pod-status.png" alt="zabbix-pod-status"></p>
 <h2 id="zabbixの弱いところ">Zabbixの弱いところ</h2>
 <p>上記のような形式で、Prometheus exporterから値を取得したり、Kubernetes APIを利用したKubernetes上のリソースの監視などができることが確認できました。
 一方で、やはりPrometheusがKubernetes時代（よりダイナミックにリソースが変化する時代）に適していると思う理由として、サービスディスカバリの強さがあると感じています。

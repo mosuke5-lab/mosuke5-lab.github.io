@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.139.3 at 2025-09-03 09:55">
+<meta name="generator" content="Hugo 0.152.2 at 2025-12-04 08:09">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -115,7 +115,7 @@ Dragonflyはすでにアリババ内部では、月間平均20億回の配信を
 <h2 id="アーキテクチャ">アーキテクチャ</h2>
 <p>Dragonfly自身は、下の図にあるようにCluster Managerと書かれているSupernodeと、dfget proxyと書かれているdfclientの2つの要素で構成されます。
 Kubernetes環境だと、dfclientはDaemonSetとして各ノードに配置されます。Kubeletがイメージをプルする先として考えると納得がいく構成です。</p>
-<p><img alt="architecture" src="/image/dragonfly-architecture-overview.png"></p>
+<p><img src="/image/dragonfly-architecture-overview.png" alt="architecture"></p>
 <h2 id="実践-on-kubernetes">実践 on Kubernetes</h2>
 <p>というわけで、さっそくKubernetesクラスタにインストールして使ってみたいと思います。<br>
 KubernetesクラスタへのインストールはHelmが利用できます。ほとんどドキュメントがなくて困りますが<a href="https://github.com/dragonflyoss/helm-chart">こちらのレポジトリ</a>からHelm Chartをダウンロードできます。</p>
@@ -238,7 +238,7 @@ Rubyのイメージのレイヤーごとにキャッシュされていること�
 <p>以下の画像はKubeConの資料から拝借したものですが、下記のような仕組みになっています。<br>
 Enterprise EditionのContainer Registryを購入すると、セットアップスクリプトがでてきます。こちらのスクリプトを実行すると、DaemonSetとして、各ノードにdf-daemonがデプロイされます。
 そして、Container Registry自身が、マネージドのSupernodeの役割として動きます。与えられたP2P配信用のURLでコンテナイメージをプルすることができるようになります。</p>
-<p><img alt="dragonfly-on-alibaba-cloud" src="/image/dragonfly-on-alibaba-cloud.png"></p>
+<p><img src="/image/dragonfly-on-alibaba-cloud.png" alt="dragonfly-on-alibaba-cloud"></p>
 <h2 id="reference">Reference</h2>
 <p>参考になったリンクを張っておきます。</p>
 <ol>

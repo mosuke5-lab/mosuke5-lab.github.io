@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.139.3 at 2025-09-03 09:55">
+<meta name="generator" content="Hugo 0.152.2 at 2025-12-04 08:09">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -107,7 +107,7 @@ Alibaba CloudのServerless Kubernetesを使ったシステム構築に取り組�
 <h2 id="eciとはなんなのか">ECIとはなんなのか？</h2>
 <p>Alibaba CloudのServerless Kubernetesでは、PodはECI(Elastic Container Instance)を用いて起動します。AWSでいうとFargate相当のサービスです。
 Kubernetesから外部APIを通じてPodを起動させる仕組みは、Virtual Kubeletを用いています。（「<a href="https://blog.mosuke.tech/entry/2019/02/03/virtual-kubelet/">Virtual Kubeletとは何か。Alibaba Cloud上で実際に動かして検証する</a>」も参照）</p>
-<p><img alt="virtual-kubelet" src="/image/virtual-kubelet-overview.png"></p>
+<p><img src="/image/virtual-kubelet-overview.png" alt="virtual-kubelet"></p>
 <p>そして、ECIやFargateといったサービスの裏側はマイクロVMと呼ばれるVMで動作させていると言われています。
 つまり、コンテナを動作させるための専用軽量VMを起動します。AWSの場合、<a href="https://firecracker-microvm.github.io/">Firecracker</a>という仕組みで動かしています。
 Alibaba CloudがどのようにECIを実行しているかは定かではないのですが、もし新情報があればお知らせします。</p>
@@ -150,7 +150,7 @@ Serverless Kubernetesでは、クラスタ構築時点でCRD(Custom Resource Def
 </span></span></code></pre></div><p>具体的な動きを以下のように図示します。<br>
 イメージキャッシュのカスタムリソースを作成すると、イメージをダウンロードする一時的なECIが起動し、イメージダウンロードが終わるとスナップショットを作成します。
 イメージキャッシュを利用する場合は、作成したスナップショットからボリュームを作ってマイクロVMにマウントすることでイメージをキャッシュします。</p>
-<p><img alt="imagecache-architecture" src="/image/imagecache-architecture.png"></p>
+<p><img src="/image/imagecache-architecture.png" alt="imagecache-architecture"></p>
 <h2 id="試してみる">試してみる</h2>
 <p>それでは実際に試してみて、Alibaba Cloud上のリソースを追っていきましょう。</p>
 <h3 id="イメージキャッシュの作成">イメージキャッシュの作成</h3>
@@ -179,11 +179,11 @@ Serverless Kubernetesでは、クラスタ構築時点でCRD(Custom Resource Def
 </span></span></code></pre></div><p>イメージキャッシュの処理が始まると、ECIインスタンスが起動します。
 KubernetesのPodとして起動しているわけではないので、<code>kubectl get pod</code> をしてもPodが見えるわけではありませんが、ECIのコンソール画面から確認できます。
 残念ながら、中身の詳細設定については非表示となっており、内部の仕組みを追うことができませんでした。</p>
-<p><img alt="imagecache-eci-instance" src="/image/imagecache-eci-instance.png"></p>
+<p><img src="/image/imagecache-eci-instance.png" alt="imagecache-eci-instance"></p>
 <p>上のイメージキャッシュのECIインスタンスが起動している間、ECSコンソールからディスクを確認すると、25GBのディスクが払い出されていることが確認できます。
 ディスクサイズは、<code>imageCacheSize: 25</code> と指定した値です。
 つまり、イメージキャッシュサイズは合計でキャッシュしたいイメージのサイズを考慮して決めたほうがいいです。多くすると課金に響くので調整しましょう。</p>
-<p><img alt="imagecache-eci-disk" src="/image/imagecache-eci-disk.png"></p>
+<p><img src="/image/imagecache-eci-disk.png" alt="imagecache-eci-disk"></p>
 <p>イメージキャッシュの処理が完了するまで待ちます。<br>
 PROGRESSが100%になり、処理が完了したらスナップショットを確認しましょう。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ kubectl get imagecache -w
@@ -191,10 +191,10 @@ PROGRESSが100%になり、処理が完了したらスナップショットを�
 </span></span><span style="display:flex;"><span>imagecache-sample   13m    imc-6we5ooph73mvgk9hnfdp   Ready      100%
 </span></span></code></pre></div><p>イメージキャッシュの処理が完了すると、ディスクは削除され、スナップショットが作成されています。
 さきほど利用していたディスクのスナップショットとなります。</p>
-<p><img alt="imagecache-snapshot" src="/image/imagecache-snapshot.png"></p>
+<p><img src="/image/imagecache-snapshot.png" alt="imagecache-snapshot"></p>
 <p>スナップショットの <code>Automatic Snapshot Policy</code> を確認すると <code>Keep Snapshots: 7Days</code> となっていることを確認できます。
 <code>retentionDays: 7</code> と対応しています。</p>
-<p><img alt="imagecache-snapshot-policy" src="/image/imagecache-snapshot-policy.png"></p>
+<p><img src="/image/imagecache-snapshot-policy.png" alt="imagecache-snapshot-policy"></p>
 <h3 id="イメージキャッシュの利用">イメージキャッシュの利用</h3>
 <p>続いて、作成したイメージキャッシュを使ってPodを起動してみます。
 Podの起動は以下を使いました。キャッシュした <code>busybox:latest</code> を使うコンテナであることと、アノテーションでキャッシュを利用することを記述しています。</p>
@@ -246,7 +246,7 @@ Podの起動は以下を使いました。キャッシュした <code>busybox:la
 </span></span></code></pre></div><p>イメージキャッシュを利用した場合、ECIインスタンスを起動している間は、ディスクを使っていることになります。
 ECSコンソールからディスクを確認しましょう。
 アプリケーションを起動している間、ディスクを使っていることになるので大きく課金に影響します。</p>
-<p><img alt="imagecache-eci-cached-disk" src="/image/imagecache-eci-cached-disk.png"></p>
+<p><img src="/image/imagecache-eci-cached-disk.png" alt="imagecache-eci-cached-disk"></p>
 <p>このディスクは、Podにマウントしているわけではないということは注意が必要です。
 このディスクはイメージを保存してキャッシュしており、Podを起動するための下回りのVMへマウントしています（VMはユーザからは見えません）。
 Podの永続ストレージとして利用できるわけではありません。</p>
@@ -254,7 +254,7 @@ Podの永続ストレージとして利用できるわけではありません�
 <p>さいごに、課金ポイントの整理をしていきましょう。
 Kubernetesのよさを活かすのであればイメージキャッシュしたいところですが、どのくらいの追加費用が発生するかによりますよね。</p>
 <p>仕組みの全体像のおさらいですが、今度は「※課金」に注目しましょう。</p>
-<p><img alt="imagecache-architecture" src="/image/imagecache-architecture.png"></p>
+<p><img src="/image/imagecache-architecture.png" alt="imagecache-architecture"></p>
 <ul>
 <li>課金1:
 <ul>

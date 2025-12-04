@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.139.3 at 2025-09-03 09:55">
+<meta name="generator" content="Hugo 0.152.2 at 2025-12-04 08:09">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -121,14 +121,14 @@ Tektonではパイプラインを作成することができ、そのパイプ�
 <h2 id="argo-cdのsyncのタイミング">Argo CDのSyncのタイミング</h2>
 <p>別記事（<a href="/entry/2021/05/06/argocd-sync-action/">Argo CD、Syncの実行方法やタイミングについての検討</a>）でも書いたのですが、Argo CDのデフォルトでは3分に一度Gitレポジトリへポーリングします。その頻度が要件に合わない場合や、デプロイ後に任意の処理を実行したい場合（結合テストしたい、負荷テストしたいなど）は、Argo CD単体では要件にあいません。
 そこで、CIツールと組み合わせで使っていくことが求められます。</p>
-<p><img alt="argocd-sync-from-ci" src="/image/argocd-sync-from-ci.png"></p>
+<p><img src="/image/argocd-sync-from-ci.png" alt="argocd-sync-from-ci"></p>
 <h2 id="tektonと組み合わせたgitops">Tektonと組み合わせたGitOps</h2>
 <p>では、GitOpsの環境でどのようにTektonと組み合わせすることができるか考えてみましょう。
 わかりやすく図にしてみました。
 Tektonが利用される部分は全体感では2箇所です。</p>
 <p>ひとつめは、アプリケーションのソースコードに変更があった場合に、その変更を取り込んだコンテナイメージを作るところまでです。<br>
 ふたつめは、マニフェストレポジトリが変更された場合にArgo CDのSyncを実行し、それが終わったあとに、結合テストなどの任意の処理を行うところです。本ブログはこのふたつめの検証を行ったものです。</p>
-<p><img alt="tekton-argocd" src="/image/tekton-trigger-argocd-sync.png"></p>
+<p><img src="/image/tekton-trigger-argocd-sync.png" alt="tekton-argocd"></p>
 <h2 id="argocd-task-sync-and-wait">argocd-task-sync-and-wait</h2>
 <p>TektonからArgo CDのSyncを実行するには、<a href="https://hub.tekton.dev/tekton/task/argocd-task-sync-and-wait">argocd-task-sync-and-wait</a>というタスクがTektonHubにあるので便利そうです。実装は非常に簡単なので、自作しちゃってもいいと思いますがせっかくなので利用しましょう。
 本ブログ執筆時点では、version 0.1のタスクが最新のためそれを前提に記述します。</p>
@@ -207,8 +207,8 @@ Tektonが利用される部分は全体感では2箇所です。</p>
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">ARGOCD_PASSWORD</span>: <span style="color:#ae81ff">xxxxxx </span> <span style="color:#75715e"># base64でエンコードした値ですよ</span>
 </span></span></code></pre></div><p>パイプラインの実行結果とArgo CDのSyncステータスの確認。
 TektonパイプラインからArgo CDのSyncがしっかり実行されていることを確認しました。</p>
-<p><img alt="tekton-argo-pipline" src="/image/tekton-argo-pipeline.png"></p>
-<p><img alt="tekton-argo-sync-status" src="/image/tekton-argo-sync-status.png"></p>
+<p><img src="/image/tekton-argo-pipeline.png" alt="tekton-argo-pipline"></p>
+<p><img src="/image/tekton-argo-sync-status.png" alt="tekton-argo-sync-status"></p>
 <h2 id="gitレポジトリの更新から実行したい">Gitレポジトリの更新から実行したい</h2>
 <p>Gitレポジトリの更新からパイプラインを実行したい人は、別ブログでInterceptorの使い方をまとめているので、こちらを参照しましょう。</p>
 <div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://blog.mosuke.tech/entry/2021/04/09/tekton-trigger-interceptor/" data-iframely-url="//cdn.iframe.ly/zlWpI8z"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>

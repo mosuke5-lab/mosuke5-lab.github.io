@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.139.3 at 2025-09-03 09:55">
+<meta name="generator" content="Hugo 0.152.2 at 2025-12-04 08:09">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -101,11 +101,11 @@
 <p>本ブログは、AWS環境にマルチAZで構成した（東京リージョンで、a/c/dゾーンを利用）、Kubernetes 1.23を前提とします。
 ブロックストレージにはEBSを、ファイルストレージにはEFSを使うこととします。EBSの作成には、EBS CSI driverを利用、EFSのマウントにはAmazon EFS Driverを使うこととします。</p>
 <p>また、AWSを普段使っている人にとってはあたりまえのことだと思いますが、AWSで利用できるブロックストレージのEBSは、<a href="https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/ebs-volumes.html" target="_blank">AZをまたいでEC2インスタンスにアタッチすることはできない</a>、ということを前提に話をすすめます。</p>
-<p><img alt="cluster-overview" src="/image/multi-az-pv-cluster-overview.png"></p>
+<p><img src="/image/multi-az-pv-cluster-overview.png" alt="cluster-overview"></p>
 <h2 id="雰囲気">雰囲気</h2>
 <p>EBSボリュームは、AZをまたいでEC2インスタンスにアタッチできないため、Podのスケジューリングもいい感じにEBSボリュームがアタッチ可能なノードを選んでくれそうですよね。<br>
 経験則的にはそうだったのですが、ほんとうにそうなのか？どうしてそうなのか？（いままでちゃんと確認してなかったので）確認しようと思ったところです。</p>
-<p><img alt="expectation" src="/image/multi-az-pv-expectation.png"></p>
+<p><img src="/image/multi-az-pv-expectation.png" alt="expectation"></p>
 <h2 id="ポイント">ポイント</h2>
 <h3 id="1-nodeにzoneとregionのラベルが付与される">1. Nodeにzoneとregionのラベルが付与される</h3>
 <p>Kubernetesにジョインしているノードに、リージョンやゾーン情報がラベルとして付与されることが大事です。結局、PVがどのリージョン/ゾーンにあって、Podをどこに配置するか決定しなければならないからです。</p>

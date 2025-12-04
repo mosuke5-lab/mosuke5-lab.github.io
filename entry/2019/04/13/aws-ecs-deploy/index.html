@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.139.3 at 2025-09-03 09:55">
+<meta name="generator" content="Hugo 0.152.2 at 2025-12-04 08:09">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -98,7 +98,7 @@
 <p>Amazon ECSで実現することの全体像は下記の通りです。<br>
 大きく右と左で分かれていて、左側のAWS上ではECS(Fargateのタスク)でNginxで静的なデータを返すWebサーバを配置。前段にALBで分散してアクセスできるようにしています。
 右側では、Gitlabを用いて、そのECSに対して変更をデプロイを行います。</p>
-<p><img alt="overview" src="/image/overview-deploy-to-ecs-with-gitlab.png"></p>
+<p><img src="/image/overview-deploy-to-ecs-with-gitlab.png" alt="overview"></p>
 <h2 id="fargateの動き">Fargateの動き</h2>
 <p>まず、Fargateについてです。個人的に一番盛り上がっていたポイントです！！<br>
 Amazon ECSではタスクを実行する環境をEC2かFargateか選ぶことができます。
@@ -107,7 +107,7 @@ Amazon ECSではタスクを実行する環境をEC2かFargateか選ぶことが
 どういうことかというと、Fargate Taskをスケールさせた際にALB配下のターゲットがFargateのIPアドレスであり、また全てが同じ80番ポートだったということです。
 以下のスクリーンショットは3台にFargateをスケールさせたときのALBのターゲットです。<br>
 みなさんは、これをみて違和感に気づきましたでしょうか？</p>
-<p><img alt="alb-targets" src="/image/ecs-alb-targets.png"></p>
+<p><img src="/image/ecs-alb-targets.png" alt="alb-targets"></p>
 <p>もしFargateを単なるコンテナとして見るならば、すべてがポート80であることは不自然です。
 なぜかというと、コンテナはホストサーバの上に複数立ち上がることが一般的です。
 ホスト上では80ポートは1つしか使えないため、もしすべてのコンテナが80ポートでアクセスできるためにはそれぞれのコンテナが別々のホストでないといけないからです。
@@ -116,7 +116,7 @@ Amazon ECSではタスクを実行する環境をEC2かFargateか選ぶことが
 Kubernetesではロードバランサが直接コンテナに分散することはなく、ワーカーノードに対してロードバランサの振り先が設定されます。
 その上で、ワーカーノード上のkube-proxyが適切なコンテナへのリクエストの振り分けを行います。そのため、例えば80番ポートを利用するコンテナも、コンテナのホスト側のポートが必ずしも80である必要はない、というものです。
 下記は、<a href="https://www.slideshare.net/mosuke5/alibabacloudkubernetes">こちらのスライドの抜粋</a>。</p>
-<p><img alt="kube-proxy" src="/image/kubeproxy-why-loadbalanced.png"></p>
+<p><img src="/image/kubeproxy-why-loadbalanced.png" alt="kube-proxy"></p>
 <p>実際に、この違和感はすぐにとあることを思い出して納得しました。<br>
 それは少し前にAWSが公表していたFirecrackerというオープンソースです。こちらでは、125msでmicroVMを立ち上げることのできるソフトウェアで、こちらをFargateやLambdaに利用しているとのことでした。
 つまり、<strong>Fargateはたんなるコンテナではなく、やはりひとつのVMとして動作しているということ</strong>です。
@@ -195,7 +195,7 @@ ECSへのデプロイは、<a href="https://github.com/silinternational/ecs-depl
 </span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">]</span>
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>secret managerの下記の画面の「Secret Name」ではなく、ARNの末尾の値のことでした。ここは初心者には間違えやすいので注意してください。</p>
-<p><img alt="secret-name" src="/image/aws-secret-name-edited.png"></p>
+<p><img src="/image/aws-secret-name-edited.png" alt="secret-name"></p>
 <h2 id="まとめ">まとめ</h2>
 <p>Amazon ECSでタスクの実行にFargateを利用する際に知っておくべき、Fargeteの仕組みやECSへのデプロイ方法を見てきました。Fargateの仕組みについては、一見クラウド利用者からすると無関係な知識のように見えますが、コンテナのセキュリティやクラウドを真に理解して使っていくためには必要な知識と言えます。<br>
 今後ECSを使っていく人のすこしでも参考になればと思います。</p>

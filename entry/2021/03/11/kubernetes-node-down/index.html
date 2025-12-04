@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.139.3 at 2025-09-03 09:55">
+<meta name="generator" content="Hugo 0.152.2 at 2025-12-04 08:09">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -103,7 +103,7 @@
 Worker#1がシャットダウンした、kubeletが停止した、ネットワーク的に疎通ができなくなったなどが起きたときに、その上で動いていてPodはどうなるの？という話です。
 感覚的にいうと、レプリカ数を維持するために他のノードに移って起動するんでしょ！、と思いたいところなのですが、実際はそれほど単純でもありません。
 どのような動きをしていくのか、Deploymentを使ったケース、StatefulSetを利用したケースなどで確認します。</p>
-<p><img alt="node-down-overview" src="/image/kubernetes-node-down-overview.png"></p>
+<p><img src="/image/kubernetes-node-down-overview.png" alt="node-down-overview"></p>
 <h2 id="ノードをシャットダウンしたときに起きること事象">ノードをシャットダウンしたときに起きること（事象）</h2>
 <p>※このセクションでは事象を説明します。事象の解説については後述します。<br>
 ノードをシャットダウンしたり、kubeletを停止するとNodeのStatusは<code>NotReady</code>となります。

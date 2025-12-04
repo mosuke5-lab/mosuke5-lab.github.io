@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 
-<meta name="generator" content="Hugo 0.139.3 at 2025-09-03 09:55">
+<meta name="generator" content="Hugo 0.152.2 at 2025-12-04 08:09">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -112,11 +112,11 @@
 <h2 id="導入-introduction">導入 (Introduction)</h2>
 <p>Kubernetesは、さまざまなワークロードを実行するための事実上のクラウドネイティブプラットフォームとなっています。たとえば、図1に示すように、Alibaba Cloudではアプリケーションオペレータだけでなく、より多くのステートフル/ステートレスアプリケーションがKubernetesクラスタで実行されるようになっています。
 Kubernetesを管理することは、インフラエンジニアにとって常に興味深く深刻なテーマです。Alibaba Cloudのようなクラウドプロバイダーといえば、必ずスケールの問題を指摘します。大規模Kubernetesクラスタ管理とは？過去に、10,000ノードでKubernetesを管理するベストプラクティスを発表してきました。確かに、それは興味深いスケールの問題です。しかし、スケールにはもうひとつの側面、つまりクラスタの数があります。</p>
-<p><img alt="Kubenetes ecosystem in Alibaba Cloud" src="https://www.cncf.io/wp-content/uploads/2019/12/image9-2-700x377-1.jpg"><br>
+<p><img src="https://www.cncf.io/wp-content/uploads/2019/12/image9-2-700x377-1.jpg" alt="Kubenetes ecosystem in Alibaba Cloud"><br>
 図1: Kubenetes ecosystem in Alibaba Cloud</p>
 <p>私たちは、多くのACKユーザーとクラスターのスケールについて話をしてきました。ほとんどのユーザーは、障害の拡大の対策（blast radiusへの対応）、異なるチームのためのクラスタの分離、テストのための一時的にクラスターを作成・削除するなどの正当な理由から、数百ではないにしても数十個の小規模または中規模のKubernetesクラスタを実行することを好んでいます。おそらく、ACKがこのような使用用途で顧客をグローバルにサポートすることを目指していた場合、20以上のリージョンにまたがる多数のクラスタを確実かつ効率的に管理する必要があるでしょう。
 （解説：つまりひとつの巨大なクラスタではなく、小さなクラスタを大量に管理することになるということ。）</p>
-<p><img alt="The challenges of managing massive number of Kubernete clusters" src="https://www.cncf.io/wp-content/uploads/2019/12/image4-1-4-700x393-1.jpg"><br>
+<p><img src="https://www.cncf.io/wp-content/uploads/2019/12/image4-1-4-700x393-1.jpg" alt="The challenges of managing massive number of Kubernete clusters"><br>
 図2: The challenges of managing massive number of Kubernete clusters</p>
 <p>クラスターを大規模に運営する上での大きな課題は何でしょうか。図2にまとめたように、取り組むべき大きな課題は4つあります。</p>
 <h4 id="heterogeneous-clusters">Heterogeneous clusters</h4>
@@ -138,34 +138,34 @@ Kubernetesを管理することは、インフラエンジニアにとって常�
 <p>上でも述べたように、各リージョンでは、顧客数が増えればメタクラスタの数も増えていきます。しかし、いつになったら新しいメタクラスタを追加しなければならないのでしょうか？これは典型的なキャパシティプランニングの問題です。一般的には、既存のメタクラスタが必要なリソースを使い果たしたときに、新しいメタクラスタがインスタンス化されます。</p>
 <p>ネットワークリソースを例に考えてみましょう。KoKアーキテクチャでは、顧客のKubernetesコンポーネントはメタクラスタ内のPodとしてデプロイされます。コンテナネットワークを管理するために、Alibaba Cloudが開発した高性能コンテナネットワーキングプラグインであるTerway（図3）を使用します。これは、豊富なセキュリティポリシーのセットを提供し、Alibaba Cloud Elastic Networking Interface (ENI)を使用してユーザーのVPCに接続できるようにしています。メタクラスタ内のノード、ポッド、サービスにネットワークリソースを効率的に提供するためには、メタクラスタVPC内のネットワークリソースの容量と利用率に基づいて慎重に割り当てを行う必要があります。ネットワークリソースが尽きそうになったら、新しいセルを作成します。</p>
 <p>また、コスト要因、密度要件、リソースクォータ、信頼性要件、統計データを考慮して、各メタクラスタ内の顧客クラスタ数を決定し、新たにメタクラスタを作成するタイミングを決定します。小さなクラスタはより大きなクラスタに成長する可能性があるため、クラスタ数が変わらない場合でもより多くのリソースを必要とすることに注意します。私たちは通常、各クラスタの成長を許容するために十分な余剰リソースを残します。</p>
-<p><img alt="Cloud Native network architecture of Terway" src="https://www.cncf.io/wp-content/uploads/2019/12/image5-1-3-700x384-1.jpg"><br>
+<p><img src="https://www.cncf.io/wp-content/uploads/2019/12/image5-1-3-700x384-1.jpg" alt="Cloud Native network architecture of Terway"><br>
 図3: Cloud Native network architecture of Terway</p>
 <h3 id="scaling-the-master-components-of-customer-clusters">Scaling the master components of customer clusters</h3>
 <p>Kubernetesのマスターコンポーネントのリソース要件は固定ではありません。数は、ノード数、クラスタ内のポッド数、およびAPIServerと相互作用するカスタムコントローラとオペレータの数に関連しています。</p>
 <p>ACKでは、各顧客のKubernetesクラスタはサイズと実行時の要件が異なります。すべてのユーザー クラスターのマスター コンポーネントをホストするために同じ構成を使用することはできません。大きな顧客に対して誤って低いリソース要求を設定してしまうと、パフォーマンスが悪くなる可能性があります。すべてのクラスタに対して保守的な高いリソース要求を設定すると、小さなクラスタではリソースが無駄になります。</p>
 <p>信頼性とコストのトレードオフを慎重に処理するために、ACKはタイプベースのアプローチを使用します。具体的には、小、中、大の異なるタイプのクラスタを定義します。クラスタのタイプごとに、個別のリソース割り当てプロファイルが使用されます。各顧客クラスタは、マスターコンポーネントの負荷、ノード数、およびその他の要因に基づいて識別されるクラスタタイプに関連付けられています。クラスタタイプは時間の経過とともに変更される可能性があります。ACKは関心のある要因を常に監視しており、それに応じてクラスタ・タイプを変更させることがあります。クラスタタイプが変更されると、基礎となるリソース割り当ては、ユーザの中断を最小限に抑えて自動的に更新されます。</p>
 <p>私たちは、移行をよりスムーズかつ費用対効果の高いものにするため、より細かいスケーリングとインプレースタイプの更新の両方に取り組んでいます。</p>
-<p><img alt="Multi gears and intelligent shifting" src="https://www.cncf.io/wp-content/uploads/2019/12/image10-1-768x501-1.jpg"><br>
+<p><img src="https://www.cncf.io/wp-content/uploads/2019/12/image10-1-768x501-1.jpg" alt="Multi gears and intelligent shifting"><br>
 図4: Multi gears and intelligent shifting</p>
 <h3 id="evolving-customer-clusters-at-scale">Evolving customer clusters at scale</h3>
 <p>これまでのセクションでは、大量のKubernetesクラスタを管理する方法についていくつかの側面を説明してきました。しかし、クラスターの進化（アップグレード）というもうひとつの課題があります。</p>
 <p>Kubernetesはクラウドネイティブ時代の「Linux」と呼ばれています。それは常にアップデートされ続け、よりモジュール化されています。Kubernetesの新バージョンをタイムリーに提供し続け、既存のクラスタのCVEの修正やアップグレードを行い、顧客のために大量の関連コンポーネント（CSI、CNI、Device Plugin、Scheduler Pluginなど）を管理する必要があります。</p>
 <p>Kubernetesのコンポーネント管理を例に挙げてみましょう。まず、これらのプラグイン可能なコンポーネントをすべて登録・管理するための一元化されたシステムを開発します。</p>
-<p><img alt="Flexible and pluggable components" src="https://www.cncf.io/wp-content/uploads/2019/12/image7-1-2-768x455-1-e1598874944330.jpg"><br>
+<p><img src="https://www.cncf.io/wp-content/uploads/2019/12/image7-1-2-768x455-1-e1598874944330.jpg" alt="Flexible and pluggable components"><br>
 図5: Flexible and pluggable components</p>
 <p>移行前のアップグレードが成功しているかどうかを確認するために、プラグインコンポーネントのヘルスチェックシステムを開発し、アップグレードごとのチェックとアップグレード後のチェックを行っています。</p>
-<p><img alt="Precheck for cluster components" src="https://www.cncf.io/wp-content/uploads/2019/12/image8-2-768x461-1.jpg"><br>
+<p><img src="https://www.cncf.io/wp-content/uploads/2019/12/image8-2-768x461-1.jpg" alt="Precheck for cluster components"><br>
 図6: Precheck for cluster components</p>
 <p>これらのコンポーネントを迅速かつ確実にアップグレードするために、グレースケールデプロイメント（カナリアリリース）や一時停止などの機能を備えた継続的なデプロイをサポートしています。デフォルトのKubernetesコントローラでは、このユースケースでは十分に機能しません。そこで、プラグインとサイドカー管理の両方を含む、クラスタコンポーネント管理のためのカスタムコントローラのセットを開発しました。</p>
 <p>たとえば、BroadcastJobコントローラは、各ワーカーマシン上のコンポーネントをアップグレードしたり、各マシン上のノードを検査したりするために設計されています。ブロードキャストジョブは、DaemonSetのように終了するまで、クラスタ内の各ノード上でポッドを実行します。しかし、DaemonSetは、ポッドがBroadcastJobで終了する間、常に各ノード上で長く実行されているポッドを保持します。また、Broadcastコントローラは、必要なプラグインコンポーネントでノードを初期化するために、新しく参加したノードでもポッドを起動します。2019年6月には、社内で使用していたクラウドネイティブのアプリケーション自動化エンジン<a href="https://github.com/openkruise/kruise">OpenKruise</a>をオープンソース化しました。</p>
-<p><img alt="OpenKurise orchestrates broadcast job to each node for flexible work" src="https://www.cncf.io/wp-content/uploads/2019/12/image3-1-3-768x423-1-e1598874905366.jpg"><br>
+<p><img src="https://www.cncf.io/wp-content/uploads/2019/12/image3-1-3-768x423-1-e1598874905366.jpg" alt="OpenKurise orchestrates broadcast job to each node for flexible work"><br>
 図7: OpenKurise orchestrates broadcast job to each node for flexible work</p>
 <p>お客様が適切なクラスタ構成を選択できるように、サーバーレス、エッジ、Windows、ベアメタルのセットアップを含む、事前に定義されたクラスタプロファイルのセットも提供しています。今後、環境が拡大し、お客様のニーズが高まるにつれ、面倒な設定プロセスを簡素化するためのプロファイルを追加していく予定です。</p>
-<p><img alt="Rich and flexible cluster profiles for various scenarios" src="https://www.cncf.io/wp-content/uploads/2019/12/image1-1-14-768x382-1-e1598874924424.jpg"><br>
+<p><img src="https://www.cncf.io/wp-content/uploads/2019/12/image1-1-14-768x382-1-e1598874924424.jpg" alt="Rich and flexible cluster profiles for various scenarios"><br>
 図8: Rich and flexible cluster profiles for various scenarios</p>
 <h3 id="global-observability-across-datacenters">Global Observability Across Datacenters</h3>
 <p>図9に示すように、Alibaba Cloudのコンテナーサービスは世界20リージョンで展開されています。このような規模を考えると、顧客クラスタにトラブルが発生した場合に迅速に対応して修正できるように、稼働中のクラスタの状態を容易に把握することが、ACKの重要な課題のひとつです。つまり、全リージョンの顧客クラスタからリアルタイムの統計情報を効率的かつ安全に収集し、その結果を視覚的に表示するソリューションが必要です。</p>
-<p><img alt="Global deployment in 20 regions for Alibaba Cloud Container Service" src="https://www.cncf.io/wp-content/uploads/2019/12/image6-4-768x440-1.jpg"><br>
+<p><img src="https://www.cncf.io/wp-content/uploads/2019/12/image6-4-768x440-1.jpg" alt="Global deployment in 20 regions for Alibaba Cloud Container Service"><br>
 図9: Global deployment in 20 regions for Alibaba Cloud Container Service</p>
 <p>他の多くのKubernetes監視ソリューションと同様に、主要な監視ツールとしてPrometheusを使用しています。各メタクラスタについて、Prometheusエージェントは以下のメトリクスを収集します。</p>
 <ul>
@@ -182,7 +182,7 @@ Kubernetesを管理することは、インフラエンジニアにとって常�
 <p>カスケードPrometheusの機能は、複数の地域から監視データを収集することです。カスケードPrometheusサーバは、中国、アジア、ヨーロッパ、アメリカなどのより大きなリージョンに存在します。各大リージョンのクラスターサイズが大きくなると、大リージョンを複数の新しい大リージョンに分割し、常に新しい大リージョンごとにカスケードPrometheusを維持できます。この戦略を用いることで、柔軟な拡張と監視規模の進化を実現することができています。</p>
 <h4 id="central-prometheus-layer">Central Prometheus Layer</h4>
 <p>中央のPrometheusは、すべてのカスケードPrometheusサーバーに接続し、最終的なデータ集計を行います。信頼性を向上させるために、2つの中央Prometheusインスタンスを異なるAZに配置し、同じカスケードPrometheusサーバーに接続します。</p>
-<p><img alt="Global multi-layer monitoring architecture based on Prometheus federation" src="https://www.cncf.io/wp-content/uploads/2019/12/image2-17-768x486-1.jpg"><br>
+<p><img src="https://www.cncf.io/wp-content/uploads/2019/12/image2-17-768x486-1.jpg" alt="Global multi-layer monitoring architecture based on Prometheus federation"><br>
 図10: Global multi-layer monitoring architecture based on Prometheus federation</p>
 <h2 id="要約">要約</h2>
 <p>クラウドコンピューティングの発展に伴い、Kubernetesベースのクラウドネイティブ技術は、業界のデジタルトランスフォーメーションを促進し続けています。Alibaba Cloud ACKは、安全で安定した高性能なKubernetesホスティングサービスを提供しています。これは、クラウド上でKubernetesを実行するための最高のキャリアのひとつとなっています。Alibaba Cloudの背後にあるチームは、オープンソースとそのコミュニティを強く信じています。将来的には、クラウドネイティブ技術の運用と管理における私たちの洞察を共有します。</p>
