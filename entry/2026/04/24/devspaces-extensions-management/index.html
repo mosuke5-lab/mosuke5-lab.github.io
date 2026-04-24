@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<meta name="generator" content="Hugo 0.152.2 at 2026-04-24 06:23">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>OpenShift Dev SpacesでVS Code Extensionの標準化・管理する方法を整理する</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2026/04/24/devspaces-extensions-management/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2026/04/24/devspaces-extensions-management/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="OpenShift Dev SpacesでVS Code Extensionの標準化・管理する方法を整理する &middot; Goldstine研究所">
+<meta name="twitter:description" content="OpenShift Dev SpacesでVS Code Extensionを標準化・管理する方法を整理しました。リポジトリ配置、ConfigMap配布、独自レジストリ構築、ポリシー制御など複数のアプローチを比較します。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenShift Dev SpacesでVS Code Extensionの標準化・管理する方法を整理する &middot; Goldstine研究所">
+<meta property="og:description" content="OpenShift Dev SpacesでVS Code Extensionを標準化・管理する方法を整理しました。リポジトリ配置、ConfigMap配布、独自レジストリ構築、ポリシー制御など複数のアプローチを比較します。">
+<meta property="og:image" content="https://blog.mosuke.tech//image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2026/04/24/devspaces-extensions-management/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech//index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+        
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    
+    <div class="entry-header-image">
+        <img src="/image/devspaces-extensions-header.png" class="img-fluid" alt="Header image">
+    </div>
+    
+    <h1>OpenShift Dev SpacesでVS Code Extensionの標準化・管理する方法を整理する</h1>
+    <div class="entry-sub-title">
+        <div class="publish-date">
+            <p>執筆日:<time datetime="2026-04-24T18:02">2026-04-24</time></p>
+            
+            <p>更新日:<time datetime="2026-04-24T18:02">2026-04-24</time></p>
+            
+        </div>
+        
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#環境前提">環境・前提</a></li>
+    <li><a href="#extensionsの自動インストール">Extensionsの自動インストール</a>
+      <ul>
+        <li><a href="#方法1-リポジトリに-vscodeextensionsjson-を配置する">方法1: リポジトリに <code>.vscode/extensions.json</code> を配置する</a></li>
+        <li><a href="#方法2-configmapで全体配布する">方法2: ConfigMapで全体配布する</a></li>
+        <li><a href="#方法3-devfileのattributesに記述する非推奨">方法3: devfileのattributesに記述する（非推奨）</a></li>
+      </ul>
+    </li>
+    <li><a href="#extensionsの安全性ガバナンス">Extensionsの安全性・ガバナンス</a>
+      <ul>
+        <li><a href="#方法4-独自のextensionsレジストリを構築する">方法4: 独自のExtensionsレジストリを構築する</a></li>
+        <li><a href="#方法5-ポリシーで制御する">方法5: ポリシーで制御する</a></li>
+      </ul>
+    </li>
+    <li><a href="#まとめ">まとめ</a></li>
+  </ul>
+</nav>
+        <p>こんにちは、もーすけです。<br>
+エンタープライズの開発現場で「開発環境の標準化」に取り組んでいる方は多いのではないでしょうか。Web IDEであるOpenShift Dev SpacesやDevcontainerなどがそのソリューションとして挙がりますが、<strong>VS Code Extensionレベルの標準化</strong>をどう実現するかは意外と悩みどころです。今回はDev Spacesを前提に、Extensionを管理・標準化する方法をいくつか調べたので整理しておきます。</p>
+<h2 id="環境前提">環境・前提</h2>
+<ul>
+<li>Red Hat OpenShift Dev Spaces 3.27</li>
+<li>VS Code互換のブラウザIDEが前提</li>
+</ul>
+<h2 id="extensionsの自動インストール">Extensionsの自動インストール</h2>
+<p>まずは、開発者のWorkspaceに必要なExtensionを自動でインストールさせる方法を見ていきます。プロジェクト単位で設定する方法と、組織全体に配布する方法があります。</p>
+<h3 id="方法1-リポジトリに-vscodeextensionsjson-を配置する">方法1: リポジトリに <code>.vscode/extensions.json</code> を配置する</h3>
+<p>もっとも王道なアプローチです。アプリケーションのリポジトリに <code>.vscode/extensions.json</code> を置けば、Workspaceが起動したタイミングで自動インストールしてくれます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;recommendations&#34;</span>: [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;dbaeumer.vscode-eslint&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;redhat.vscode-yaml&#34;</span>
+</span></span><span style="display:flex;"><span>  ]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>ファイル上は <code>recommendations</code>（推奨）という表記ですが、<strong>Dev Spacesでは自動的にインストールされます</strong>。プロジェクトごとに必要なExtensionが異なる場合は、この方法がもっともシンプルで管理しやすいです。</p>
+<h3 id="方法2-configmapで全体配布する">方法2: ConfigMapで全体配布する</h3>
+<p>特定のプロジェクトではなく、<strong>組織全体で統一したいExtension</strong>がある場合は、ConfigMapで全体配布できます。</p>
+<p>Operatorがインストールされている Namespace に、以下のようなConfigMapを作成します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ConfigMap</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">vscode-editor-configurations</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">dev-spaces-operator</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/part-of</span>: <span style="color:#ae81ff">che.eclipse.org</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/component</span>: <span style="color:#ae81ff">workspaces-config</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">data</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">extensions.json</span>: |<span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    {
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      &#34;recommendations&#34;: [
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">          &#34;dbaeumer.vscode-eslint&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">          &#34;Anthropic.claude-code&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      ]
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    }</span>
+</span></span></code></pre></div><p>ドキュメントには「openshift-devspaces Namespaceにある ConfigMap をコピーする」と書いてありますが、ここで言っている Namespace は<strong>Operatorがインストールされている Namespace</strong>のことです。環境によって名前が異なるので注意しましょう。</p>
+<p>このConfigMapをApplyすると、各WorkspaceがあるNamespaceに自動でコピーされ、Workspaceにマウントされます。具体的には <code>/projects/.code-workspace</code> に配置され、Extensionが自動インストールされる仕組みです。</p>
+<h3 id="方法3-devfileのattributesに記述する非推奨">方法3: devfileのattributesに記述する（非推奨）</h3>
+<p>アプリケーションのソースコードにExtension設定を入れなくても済む方法として、devfileの <code>attributes</code> に <code>.vscode/extensions.json</code> を記述する方法がありますが、<strong>こちらは機能しませんでした</strong>。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">schemaVersion</span>: <span style="color:#ae81ff">2.2.0</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">hugo-blog-dev</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">components</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">runtime</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">image</span>: <span style="color:#ae81ff">registry.redhat.io/devspaces/udi-base-rhel10:3.27</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">cpuLimit</span>: <span style="color:#e6db74">&#34;1000m&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">cpuRequest</span>: <span style="color:#e6db74">&#34;600m&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">memoryLimit</span>: <span style="color:#e6db74">&#34;3Gi&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">memoryRequest</span>: <span style="color:#e6db74">&#34;2Gi&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">mountSources</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 中略</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">attributes</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">.vscode/extensions.json</span>: |<span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    {
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      &#34;recommendations&#34;: [
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;redhat.vscode-openshift-connector&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;redhat.vscode-yaml&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      ]
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    }</span>
+</span></span></code></pre></div><p>devfileでExtension管理ができればアプリケーションリポジトリとの依存を切り離せて便利なのですが、現時点では期待通りに動作しないので注意してください。</p>
+<h2 id="extensionsの安全性ガバナンス">Extensionsの安全性・ガバナンス</h2>
+<p>次に、インストールできるExtensionを管理者側で制御し、安全性やガバナンスを確保する方法です。パブリックなレジストリには玉石混交のExtensionがあるため、エンタープライズ環境では「何をインストールさせるか」のコントロールが求められることがあります。</p>
+<h3 id="方法4-独自のextensionsレジストリを構築する">方法4: 独自のExtensionsレジストリを構築する</h3>
+<p>デフォルトでは有効化されていませんが、<a href="https://open-vsx.org/" target="_blank">Open VSX Registry</a>を参照先に設定してExtensionをインストールできます。</p>
+<p>しかし、パブリックなレジストリには玉石混交のExtensionがあるため、管理者側でインストールできるものを絞りたいケースがあります。そこで、<strong>独自のExtensionsレジストリ（Plugin Registry）を立てる</strong>というアプローチがあります。</p>
+<h4 id="embedded-vs-open-vsx">embedded vs Open VSX</h4>
+<p>独自レジストリを立てる方法は大きく2つあります。</p>
+<ol>
+<li><strong>Embedded Plugin Registry</strong> — 必要なプラグインをすべてコンテナイメージに入れてデプロイする方式。ドキュメントにも記載されている通り、現在は<strong>推奨されていません</strong></li>
+<li><strong>Eclipse Open VSX Extension Registry</strong> — Open VSXを自前でホストする方式</li>
+</ol>
+<p>Embedded方式は実際に試しましたが、すべてのプラグインをイメージに含めてビルドするため<strong>30分程度</strong>はかかりました。メンテナンスコストも高いので避けたほうがよいでしょう。</p>
+<h4 id="open-vsxレジストリの構築手順と注意点">Open VSXレジストリの構築手順と注意点</h4>
+<p>Open VSX方式の手順はドキュメントに記載があります。</p>
+<a href="https://docs.redhat.com/ja/documentation/red_hat_openshift_dev_spaces/3.27/html/administration_guide/assembly_managing-ide-extensions_administration_guide#proc_running-open-vsx-using-workspace_administration_guide" target="_blank">Red Hat OpenShift Dev Spaces 3.27 - Managing IDE extensions</a>
+<p>ただし、<strong>現時点のドキュメントには不備があります</strong>。「2.5. Add OpenVSX user with PAT to the DB」のタスクを実行すると、DBのスキーマ定義が異なるというエラーが発生します。わたしが調査した限りでは、<code>registry.redhat.io/devspaces/openvsx-rhel9:3.27</code> のイメージが最新のソースコードでビルドされていないため、DBスキーマの不一致が起きているようです。</p>
+<p><strong>回避策としては、insert文から <code>notified</code> カラムを削除すれば動作します。</strong> この問題はサポートに報告済みなので、将来的には解消されるかもしれません。</p>
+<h3 id="方法5-ポリシーで制御する">方法5: ポリシーで制御する</h3>
+<p>独自のExtensionsレジストリを構築してメンテナンスし続けるのはなかなか大変です。そこで、<strong>パブリックなレジストリを参照しつつ、許可するExtensionをポリシーで制御する</strong>というアプローチもあります。</p>
+<p>以下のようなConfigMapを作成します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ConfigMap</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">vscode-editor-configurations</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">openshift-devspaces</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/component</span>: <span style="color:#ae81ff">workspaces-config</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/part-of</span>: <span style="color:#ae81ff">che.eclipse.org</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">annotations</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">controller.devfile.io/mount-as</span>: <span style="color:#ae81ff">subpath</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">controller.devfile.io/mount-path</span>: <span style="color:#ae81ff">/checode-config</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">controller.devfile.io/read-only</span>: <span style="color:#e6db74">&#39;true&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">data</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">policy.json</span>: |<span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    {
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      &#34;BlockCliExtensionsInstallation&#34;: true,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      &#34;BlockDefaultExtensionsInstallation&#34;: false,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      &#34;BlockInstallFromVSIXCommandExtensionsInstallation&#34;: true,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      &#34;AllowedExtensions&#34;: {
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;*&#34;: false,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;redhat.vscode-yaml&#34;: true,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;redhat.vscode-openshift-connector&#34;: true,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;dbaeumer.vscode-eslint&#34;: true,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;ms-python.python&#34;: true
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      }
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    }</span>
+</span></span></code></pre></div><p>ポイントは以下の通りです。</p>
+<ul>
+<li><code>&quot;*&quot;: false</code> でデフォルトはすべてのExtensionを<strong>ブロック</strong>する</li>
+<li>許可したいExtensionだけ個別に <code>true</code> を設定する</li>
+<li>CLIやVSIXからのインストールもブロックできる</li>
+</ul>
+<p>独自レジストリを持たなくても、パブリックレジストリの恩恵を受けつつガバナンスを効かせられるので、<strong>運用コストとのバランスが良い方法</strong>ではないでしょうか。</p>
+<h2 id="まとめ">まとめ</h2>
+<p>OpenShift Dev SpacesでVS Code Extensionを標準化・管理する方法を整理しました。</p>
+<table>
+  <thead>
+      <tr>
+          <th>方法</th>
+          <th>スコープ</th>
+          <th>運用コスト</th>
+          <th>備考</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>.vscode/extensions.json</code></td>
+          <td>プロジェクト単位</td>
+          <td>低</td>
+          <td>王道。リポジトリに入れるだけ</td>
+      </tr>
+      <tr>
+          <td>ConfigMap配布</td>
+          <td>組織全体</td>
+          <td>低</td>
+          <td>全Workspaceに自動配布</td>
+      </tr>
+      <tr>
+          <td>devfile attributes</td>
+          <td>—</td>
+          <td>—</td>
+          <td>現時点では機能しない</td>
+      </tr>
+      <tr>
+          <td>独自レジストリ</td>
+          <td>組織全体</td>
+          <td>高</td>
+          <td>ビルド・メンテナンスコストが大きい</td>
+      </tr>
+      <tr>
+          <td>ポリシー制御</td>
+          <td>組織全体</td>
+          <td>中</td>
+          <td>パブリックレジストリ＋ホワイトリスト</td>
+      </tr>
+  </tbody>
+</table>
+<p>プロジェクト単位なら <code>.vscode/extensions.json</code>、組織全体のガバナンスを効かせたいならConfigMap配布やポリシー制御を組み合わせるのがよいと思います。独自レジストリは運用負荷が高いので、本当に必要かどうかはよく検討してから導入しましょう。</p>
+<p>ぜひ皆さんも自分の環境に合ったアプローチを試してみてください。それでは！</p>
+    </div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい</h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼。※OpenShiftなどRed Hat製品など本業と競合する内容はお断りすることがあります。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>フィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=OpenShift%20Dev%20Spaces%e3%81%a7VS%20Code%20Extension%e3%81%ae%e6%a8%99%e6%ba%96%e5%8c%96%e3%83%bb%e7%ae%a1%e7%90%86%e3%81%99%e3%82%8b%e6%96%b9%e6%b3%95%e3%82%92%e6%95%b4%e7%90%86%e3%81%99%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'OpenShift Dev SpacesでVS Code Extensionの標準化・管理する方法を整理する'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最新の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="/entry/2026/04/24/devspaces-extensions-management/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift Dev SpacesでVS Code Extensionの標準化・管理する方法を整理する'});">OpenShift Dev SpacesでVS Code Extensionの標準化・管理する方法を整理する</a></li>
+      <li class="list-group-item"><a href="/entry/2026/04/21/review-architecture-modernization/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「アーキテクチャモダナイゼーション」書評 ── 点と点をつなぐ、血となり肉となる600ページ'});">「アーキテクチャモダナイゼーション」書評 ── 点と点をつなぐ、血となり肉となる600ページ</a></li>
+      <li class="list-group-item"><a href="/entry/2026/03/30/review-practical-claude-code/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「実践Claude Code入門」書評 ── AIエディタ時代に必要なスペック駆動開発とコンテキストエンジニアリングを学ぶ'});">「実践Claude Code入門」書評 ── AIエディタ時代に必要なスペック駆動開発とコンテキストエンジニアリングを学ぶ</a></li>
+      <li class="list-group-item"><a href="/entry/2026/03/09/openshift-on-oci/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OCI (Oracle Cloud Infrastructure) 上にOpenShift 4.21 を構築してみた備忘録'});">OCI (Oracle Cloud Infrastructure) 上にOpenShift 4.21 を構築してみた備忘録</a></li>
+      <li class="list-group-item"><a href="/entry/2026/01/29/my-poker/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'ラスベガスでの敗北から1年。ポーカー修行の成果とリベンジの記録'});">ラスベガスでの敗北から1年。ポーカー修行の成果とリベンジの記録</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/agile" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'agile'});">agile (1)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/ai" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ai'});">ai (3)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/alibaba%20cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba cloud'});">alibaba cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (36)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (66)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/life" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'life'});">life (1)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/management" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'management'});">management (2)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/oracle%20cloud%20infrastructure" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'oracle cloud infrastructure'});">oracle cloud infrastructure (1)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (9)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021 Archive (41)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2023" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2023'});">2023 Archive (1)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2024" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2024'});">2024 Archive (1)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2025" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2025'});">2025 Archive (4)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2026" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2026'});">2026 Archive (5)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="/entry/2026/03/09/openshift-on-oci/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'OCI (Oracle Cloud Infrastructure) 上にOpenShift 4.21 を構築してみた備忘録'});">OCI (Oracle Cloud Infrastructure) 上にOpenShift 4.21 を構築してみた備忘録</a> (2026/03/09)</li>
+        
+        <li class="list-group-item"><a href="/entry/2025/12/06/openshift-lightspeed-mcp/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'OpenShift LightspeedにMCPサーバーを追加して、AIエージェント機能を強化する'});">OpenShift LightspeedにMCPサーバーを追加して、AIエージェント機能を強化する</a> (2025/12/06)</li>
+        
+        <li class="list-group-item"><a href="/entry/2024/12/08/acm-governance/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'OpenShift、ACMを使って利用者への権限委譲しつつ無法地帯を避ける方法を考えよう'});">OpenShift、ACMを使って利用者への権限委譲しつつ無法地帯を避ける方法を考えよう</a> (2024/12/09)</li>
+        
+        <li class="list-group-item"><a href="/entry/2022/12/14/openshift-user-alert-routing/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'OpenShift、開発者向けの監視機能（アラート通知）が進化しました'});">OpenShift、開発者向けの監視機能（アラート通知）が進化しました</a> (2022/12/14)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>
