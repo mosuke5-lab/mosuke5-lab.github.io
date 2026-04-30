@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<meta name="generator" content="Hugo 0.152.2 at 2026-04-30 04:02">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/customization.css">
+
+<title>TektonのPipelines as Code（PAC）で何が便利になるのかを整理する</title>
+<link rel="canonical" href="https://blog.mosuke.tech/entry/2026/04/30/tekton-pipelines-as-code/">
+<link rel="alternate" hreflang="ja" href="https://blog.mosuke.tech/entry/2026/04/30/tekton-pipelines-as-code/" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@mosuke5" />
+<meta name="twitter:creator" content="@mosuke5" />
+<meta name="twitter:title" content="TektonのPipelines as Code（PAC）で何が便利になるのかを整理する &middot; Goldstine研究所">
+<meta name="twitter:description" content="TektonのPipelines as Code（PAC）を使うと何が便利になるのか。従来のEventListener方式との違い、GitHub Apps連携、マルチテナント対応など、PACの利点と仕組みを整理しました。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TektonのPipelines as Code（PAC）で何が便利になるのかを整理する &middot; Goldstine研究所">
+<meta property="og:description" content="TektonのPipelines as Code（PAC）を使うと何が便利になるのか。従来のEventListener方式との違い、GitHub Apps連携、マルチテナント対応など、PACの利点と仕組みを整理しました。">
+<meta property="og:image" content="https://blog.mosuke.tech//image/logo.png" />
+<meta property="og:site_name" content="Goldstine研究所" />
+<meta property="og:url" content="https://blog.mosuke.tech/entry/2026/04/30/tekton-pipelines-as-code/" />
+<link rel="alternate" type="application/rss+xml" title="Goldstine研究所" href="https://blog.mosuke.tech//index.xml" />
+<link rel="icon" href="/image/favicon.ico" />
+<meta name="msvalidate.01" content="9220008783970B337CA4AE8362168354" />
+<meta name="google-site-verification" content="OcOuGmjhG050c1d16ySxY_FCLT4zhvxFEsGLD9mm6f0" />
+</head>
+    <body><header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Goldstine研究所</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">ホーム <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">このサイトについて</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/entry">ブログ記事</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/kubernetes">Kubernetesを学ぶ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/work">お問い合わせ</a>
+        </li>
+        
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="content" role="main">
+            <div class="container">
+                <div class="row">
+<div class="entry col-md-8 col-xs-12">
+    
+    <div class="entry-header-image">
+        <img src="/image/tekton-pac-header.png" class="img-fluid" alt="Header image">
+    </div>
+    
+    <h1>TektonのPipelines as Code（PAC）で何が便利になるのかを整理する</h1>
+    <div class="entry-sub-title">
+        <div class="publish-date">
+            <p>執筆日:<time datetime="2026-04-30T14:43">2026-04-30</time></p>
+            
+            <p>更新日:<time datetime="2026-04-30T14:43">2026-04-30</time></p>
+            
+        </div>
+        
+            
+                <a class="badge badge-inf post-category post-category-OpenShift" href="/categories/openshift">OpenShift</a>
+            
+                <a class="badge badge-inf post-category post-category-DevOps" href="/categories/devops">DevOps</a>
+            
+        
+    </div>
+    <div class="entry-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#従来のtektonパイプライン運用の課題">従来のTektonパイプライン運用の課題</a></li>
+    <li><a href="#pipelines-as-codepacとは">Pipelines as Code（PAC）とは</a>
+      <ul>
+        <li><a href="#pacで何が便利になるのか">PACで何が便利になるのか</a></li>
+      </ul>
+    </li>
+    <li><a href="#認証方式github-appsの利用が推奨">認証方式：GitHub Appsの利用が推奨</a>
+      <ul>
+        <li><a href="#パイプライン内でのソースコード取得と認証">パイプライン内でのソースコード取得と認証</a></li>
+      </ul>
+    </li>
+    <li><a href="#namespaceによるパイプライン実行の分離">Namespaceによるパイプライン実行の分離</a></li>
+    <li><a href="#複数github-appsによるマルチテナント分離">複数GitHub Appsによるマルチテナント分離</a></li>
+    <li><a href="#どういうときにpacを採用すべきか">どういうときにPACを採用すべきか</a></li>
+    <li><a href="#まとめ">まとめ</a></li>
+  </ul>
+</nav>
+        <p>こんにちは、もーすけです。<br>
+Tektonでパイプラインを運用していると、EventListenerの設定やWebhookの管理がだんだん煩雑になってきませんか？
+今回は、そうした課題を解決してくれる <strong>Pipelines as Code（PAC）</strong> について、何が便利になるのか・どういう場面で活きるのかを整理してみました。</p>
+<p>以前にTekton学習シリーズをまとめているので、こちらも必要に応じて閲覧してください。</p>
+<hr>
+<h5>Tekton学習シリーズ</h5>
+<ul>
+<li>第1回: <a href="/entry/2020/05/10/tekton-operator/">Tekton 徹底解説、Operatorによるインストールとはじめの一歩</a></li>
+<li>第2回: <a href="/entry/2021/03/06/tekton-multi-steps-task/">Tekton、TaskのStepの実行順序について確認する</a></li>
+<li>第3回: <a href="/entry/2021/03/06/tekton-task-with-params/">Tekton、Taskにパラメータを引き渡す</a></li>
+<li>第4回: <a href="/entry/2021/03/07/tekton-task-with-pipelineresource/">Tekton、TaskでPipelineResouceを利用したときの挙動を確認する</a></li>
+<li>第5回: <a href="/entry/2021/03/07/tekton-pipeline/">Tekton、TaskをまとめてPipelineとして実行する</a></li>
+<li>第6回: <a href="/entry/2021/03/17/tekton-pipeline-with-workspace/">Tekton、PipelineでWorkspaceを利用してTask間でデータを連携する</a></li>
+<li>第7回: <a href="/entry/2021/03/20/tekton-catalog-and-image-build/">Tekton、カタログをうまく活用してパイプラインを作る（イメージビルド）</a></li>
+<li>第8回: <a href="/entry/2021/03/21/tekton-cluster-task-tektonhub/">Tekton、ClusterTaskとTekton Hubを理解する</a></li>
+<li>第9回: <a href="/entry/2021/03/22/tekton-deploy-app/">Tekton、アプリケーションをKubernetesクラスタへデプロイする</a></li>
+<li>第10回: <a href="/entry/2021/04/06/tekton-trigger/">Tekton、トリガーを使って外部イベントでパイプラインを実行する</a></li>
+<li>第11回: <a href="/entry/2021/04/09/tekton-trigger-interceptor/">Tekton、interceptorを使ってイベントトリガーを進化させる</a></li>
+<li>第12回: <a href="/entry/2022/01/24/tekton-access-private-gitrepo/">Tekton、プライベートなGitレポジトリを扱う方法と仕組みについて</a></li>
+<li>第13回: <a href="/entry/2022/03/01/tekton-lib-cache/">Tekton、ボリュームを使ってビルド・ライブラリダウンロードの高速化を図る</a></li>
+<li>番外編: <a href="/entry/2021/05/07/tekton-and-argocd">TektonからArgo CDの同期をトリガーする。それぞれの使い分けの検討。</a></li>
+</ul>
+<hr>
+<h2 id="従来のtektonパイプライン運用の課題">従来のTektonパイプライン運用の課題</h2>
+<p>まずは、PACを使わない従来のTektonパイプライン運用を振り返ってみましょう。従来の方式では、以下のような作業が必要でした。</p>
+<ol>
+<li>パイプラインを定義する（Task, Pipeline）</li>
+<li>パイプラインを実行するための<strong>EventListener</strong>を設定する（TriggerTemplate, TriggerBinding, EventListener）</li>
+<li>EventListenerでは、どのリポジトリのイベントでどのパイプラインを実行するかの<strong>フィルタリング・マッチング条件</strong>も書く必要がある（CEL式やInterceptorの設定など）</li>
+<li>各GitリポジトリにWebhookの設定を行う</li>
+</ol>
+<p>リポジトリが増えるたびにEventListenerの条件式を追加・修正していく必要があり、チームやリポジトリが増えていくとその管理がどんどん煩雑になっていきますよね。
+とくにGitHub/Gitlab側のステータス更新ができないのは、開発者体験としてもなかなか辛いところです。</p>
+<h2 id="pipelines-as-codepacとは">Pipelines as Code（PAC）とは</h2>
+<p><strong>Pipelines as Code（PAC）</strong> は、Tektonのパイプライン定義をアプリケーションのGitリポジトリ内で管理できる仕組みです。
+端的に言うと、アプリケーションリポジトリの <code>.tekton/</code> ディレクトリにパイプライン定義を置くだけで、Gitイベントに応じたパイプライン実行ができるようになります。</p>
+<p>これから紹介することを総じてまとめたものは以下です。</p>
+<p><img src="/image/tekton-pac-overview.png" alt="PACのアーキテクチャ概要。GitHub Apps経由でWebhookを受信し、Repository CRに基づいてパイプラインが実行される"></p>
+<h3 id="pacで何が便利になるのか">PACで何が便利になるのか</h3>
+<p>PACを導入すると、従来の課題が以下のように解決されます。</p>
+<ul>
+<li><strong>Webhookエンドポイントがひとつに集約される。</strong> チームごとにEventListenerを準備する必要がなくなります。</li>
+<li><strong>パイプライン定義がアプリのリポジトリで完結する。</strong> 共通定義のパイプラインを <code>.tekton/</code> に配置すれば、アプリケーションごとに細かなTektonの知識がなくても実行できます（カスタマイズしたい場合は当然Tektonの知識が必要ですが）。</li>
+<li><strong>Gitリポジトリ側のステータスが更新される。</strong> GitHubの場合、コミット履歴にチェックマークが付くようになります。これは開発者としてはかなり嬉しいポイントです！ ただし、GitHubではこの機能は<strong>GitHub Appsを利用した場合のみ</strong>有効です。Webhook方式ではステータスの更新はできないので注意しましょう。</li>
+</ul>
+<p>実際にGitHubのコミット履歴を見ると、パイプラインの実行結果がチェックマーク（成功）やバツマーク（失敗）で表示されます。</p>
+<p><img src="/image/tekton-pac-commit-check.png" alt="GitHubのコミット履歴にPACの実行結果が表示される"></p>
+<p>さらに詳細を開くと、PipelineRunの各タスクのステータスや実行時間も確認できます。</p>
+<p><img src="/image/tekton-pac-commit-check-details.png" alt="PACのチェック詳細画面。各タスクのステータスと実行時間が確認できる"></p>
+<h2 id="認証方式github-appsの利用が推奨">認証方式：GitHub Appsの利用が推奨</h2>
+<p>PACがプライベートリポジトリを参照するためには認証情報が必要です。いくつかの選択肢がありますが、それぞれ注意点があります。</p>
+<table>
+  <thead>
+      <tr>
+          <th>方式</th>
+          <th>注意点</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>SSH鍵</td>
+          <td>誰かの個人アカウントに紐づいてしまう。システムアカウントを作れれば別だが、管理が煩雑になりがち</td>
+      </tr>
+      <tr>
+          <td>Deploy Key</td>
+          <td>基本的にリポジトリ単位の紐づけになるため、複数リポジトリへの対応ができない</td>
+      </tr>
+      <tr>
+          <td><strong>GitHub Apps</strong></td>
+          <td><strong>推奨。</strong> Organization単位でインストールでき、各リポジトリへのWebhook設定も自動で行われる</td>
+      </tr>
+  </tbody>
+</table>
+<p>というわけで、<strong>GitHubであればGitHub Appsの利用が推奨</strong>されます。
+GitHub AppsをOrganizationにインストールすると、各リポジトリで個別にWebhook設定をしなくても自動的にWebhookが構成されるのも大きなメリットです。</p>
+<h3 id="パイプライン内でのソースコード取得と認証">パイプライン内でのソースコード取得と認証</h3>
+<p>GitHub Apps連携のもうひとつの嬉しいポイントが、<strong>パイプライン内でソースコードを取得する際の認証が自動化される</strong>ことです。</p>
+<p>従来の方式では、プライベートリポジトリをCloneするために、OpenShift上にSSH鍵やアクセストークンのシークレットを事前に作成しておく必要がありました。これが地味に面倒で、鍵のローテーションや管理も運用負荷になりますよね。</p>
+<p>PACでGitHub Appsを利用している場合、パイプライン実行のたびに<strong>GitHub Appsのトークンが自動的にシークレットリソースとして作成</strong>されます。シークレットは <code>pac-gitauth-&lt;REPOSITORY_OWNER&gt;-&lt;REPOSITORY_NAME&gt;-&lt;RANDOM_STRING&gt;</code> という形式で、ターゲットのNamespaceに自動生成されます。</p>
+<p>しかも、このシークレット名は <code>{{ git_auth_secret }}</code> という変数で参照できるため、パイプライン定義にハードコードする必要がありません。以下のように <code>basic-auth</code> ワークスペースとして渡すだけでOKです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">workspace</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">basic-auth</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">secret</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">secretName</span>: <span style="color:#e6db74">&#34;{{ git_auth_secret }}&#34;</span>
+</span></span></code></pre></div><p>あとは、パイプライン側で <code>git-clone</code> タスクに <code>basic-auth</code> ワークスペースを渡せば、プライベートリポジトリのCloneが認証付きで実行されます。<strong>事前にOpenShift内にSSH鍵や認証シークレットを配置しておく必要がない</strong>のは、運用面でかなり楽になります。</p>
+<p>詳細は<a href="https://docs.redhat.com/ja/documentation/red_hat_openshift_pipelines/1.19/html/pipelines_as_code/using-private-repositories-with-pipelines-as-code_using-pipelines-as-code-repos" target="_blank">Pipelines as Code でのプライベートリポジトリーの使用（Red Hat公式ドキュメント）</a>を参照してください。</p>
+<h2 id="namespaceによるパイプライン実行の分離">Namespaceによるパイプライン実行の分離</h2>
+<p>どのリポジトリでパイプラインを実行するかは、OpenShift上の<strong>Repositoryリソース</strong>で管理されます。
+Organizationにはパイプラインを実行する必要のないリポジトリも当然あるため、Repositoryリソースで明示的に対象を指定する仕組みになっています。</p>
+<p>パイプラインの定義は共通であっても、<strong>実行する場所（Namespace）は個別に設定</strong>できます。
+「<code>.tekton/</code> に任意のNamespaceを指定したら、他人のNamespaceでビルドが実行されてしまうのでは？」と心配になるかもしれませんが、そこは安心してください。パイプラインは<strong>Repositoryリソースが存在するNamespaceでのみ実行される</strong>ため、勝手に別のNamespaceで実行されることはありません。</p>
+<p>開発者からすると、自分のアプリケーションがあるNamespaceでビルドが動くため、非常にわかりやすい構成になります。当然ながら自分の関心のあるパイプラインだけがそのNamespaceで動くので、PipelineRunの一覧も見やすく、運用時の見通しがよくなります。</p>
+<h2 id="複数github-appsによるマルチテナント分離">複数GitHub Appsによるマルチテナント分離</h2>
+<p>デフォルトでは、PACコントローラーはひとつのGitHub Appsと通信します。
+しかし、組織の規模やセキュリティ要件によっては、ひとつのGitHub Appsだけでは不十分なケースがあります。たとえば、パイプライン内で権限のないプロジェクトをCloneできてしまう可能性が考えられます。</p>
+<p>このような場合は、<strong>追加のPACコントローラーを設定し、別のGitHub Appsを紐づける</strong>ことで対応できます。</p>
+<p>OpenShift PipelinesのTektonConfig（<code>TektonConfig</code>リソース）で、以下のように追加コントローラーを定義します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">platforms</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">openshift</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">pipelinesAsCode</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">additionalPACControllers</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">additional-pac-controller</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">configMapName</span>: <span style="color:#ae81ff">additional-pac-controller-pipelines-as-code-configmap</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">enable</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">secretName</span>: <span style="color:#ae81ff">additional-pac-secret</span>
+</span></span></code></pre></div><p>設定を適用すると、追加のPACコントローラーのPodとRouteが作成されます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ oc get pod,route -n openshift-pipelines | grep additional
+</span></span><span style="display:flex;"><span>pod/additional-pac-controller-pac-controller-5db78459b8-v9h8h   1/1     Running   0                14s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>route.route.openshift.io/additional-pac-controller-pac-controller   additional-pac-controller-pac-controller-openshift-pipelines.apps.cluster-9qtcm.9qtcm.sandbox1494.opentlc.com          additional-pac-controller-pac-controller   http-listener   edge/Redirect   None
+</span></span></code></pre></div><p>追加コントローラーの場合は、GitHub Appsを手動で設定する必要がある点に注意しましょう。
+詳細は<a href="https://docs.redhat.com/ja/documentation/red_hat_openshift_pipelines/1.19/html/pipelines_as_code/pac-additional-controller_install-config-pipelines-as-code" target="_blank">追加の Pipelines as Code コントローラー設定（Red Hat公式ドキュメント）</a>を参照してください。</p>
+<h2 id="どういうときにpacを採用すべきか">どういうときにPACを採用すべきか</h2>
+<p>さて、ここまでPACの便利さを紹介してきましたが、すべてのTektonユーザが今すぐPACに移行すべきかというと、そうとも限りません。従来のEventListener方式とPACの使い分けについて、自分なりの見解を書いておきます。</p>
+<p><strong>PACが向いているケース：</strong></p>
+<ul>
+<li><strong>リポジトリごとにパイプラインの定義を変えたい場合。</strong> アプリケーションチームが自分たちのペースでパイプラインを修正・拡張できるのが最大のメリットです。プラットフォームチームに依頼しなくても <code>.tekton/</code> を変更するだけで済むのは大きいですよね。</li>
+<li><strong>開発者にパイプライン実行結果のフィードバックを返したい場合。</strong> GitHub Appsと連携すれば、コミットステータスやPull Requestへのチェック結果が自動で反映されます。開発者体験を重視するならPAC一択です。</li>
+<li><strong>リポジトリ数が多く、Webhookやトリガー設定の管理が負担になっている場合。</strong> EventListenerのCEL式やInterceptorの設定を何十個も管理しているなら、PACに移行する価値は十分あります。</li>
+</ul>
+<p><strong>従来のEventListener方式のままでよいケース：</strong></p>
+<ul>
+<li><strong>Gitイベント以外のトリガーが主体の場合。</strong> 手動トリガーや定期実行、外部システムからのWebhookなど、Gitリポジトリの操作に基づかないパイプラインにはPACは関係ありません。</li>
+<li><strong>パイプライン定義を中央集権的に管理したい場合。</strong> セキュリティ要件やガバナンス上、開発者にパイプライン定義を自由に変えてほしくないケースでは、プラットフォームチーム側でEventListenerを管理するほうが合っています。</li>
+<li><strong>すでにEventListener方式でうまく回っている少数リポジトリの場合。</strong> 動いているものを無理に移行する必要はないですよね。</li>
+</ul>
+<p>要するに、<strong>リポジトリ数が増えてきて運用負荷が上がっている</strong>、あるいは<strong>開発者にセルフサービスでパイプラインを使わせたい</strong>という状況であれば、PACの導入を検討する価値があると思います。</p>
+<h2 id="まとめ">まとめ</h2>
+<p>TektonのPipelines as Code（PAC）について、従来の運用方式との違いや利点を整理しました。</p>
+<ul>
+<li>Webhookエンドポイントの一元化で運用負荷を軽減</li>
+<li><code>.tekton/</code> によるパイプライン定義のリポジトリ内管理</li>
+<li>GitHub Appsとの連携による認証・Webhook設定の自動化、パイプライン実行時のトークン自動生成</li>
+<li>Repositoryリソースによる実行制御とマルチテナント対応</li>
+<li>追加コントローラーでの複数GitHub Apps連携</li>
+</ul>
+<p>PACを活用すれば、Tektonパイプラインの運用がかなりスッキリします。とくにOpenShift環境でTektonを使っている方にはぜひ検討してみてほしいです。それでは！</p>
+    </div>
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>記事の内容に関連した相談、仕事依頼したい</h5>
+    <p>記事の内容やクラウドネイティブ技術に関する相談、仕事依頼。※OpenShiftなどRed Hat製品など本業と競合する内容はお断りすることがあります。<br/><a href="/work">仕事依頼、相談をしてみる</a></p>
+</div>
+
+<div class="entry-sub-content bd-callout bd-callout-info request-for-entry">
+    <h5>フィードバック</h5>
+    <p>本記事に対して、フィードバックあればこちらのフォームからご記入ください。<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSfvDsTxSsz2xRodgkYSXP8l-bpS39LIOoKrZwja8W_YWJRA7A/viewform?entry.853982869=Tekton%e3%81%aePipelines%20as%20Code%ef%bc%88PAC%ef%bc%89%e3%81%a7%e4%bd%95%e3%81%8c%e4%be%bf%e5%88%a9%e3%81%ab%e3%81%aa%e3%82%8b%e3%81%ae%e3%81%8b%e3%82%92%e6%95%b4%e7%90%86%e3%81%99%e3%82%8b" target="_blank" onClick="gtag('event', 'link', {'event_category': 'contact-to-entry','event_label': 'TektonのPipelines as Code（PAC）で何が便利になるのかを整理する'});">記事の内容にフィードバックしてみる</a></p>
+</div><div class="entry-sub-content post-share">
+        <div class="post-share-links">
+            <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3a%2f%2fblog.mosuke.tech%2fentry%2f2020%2f07%2f09%2fcontainer-image-size%2f&layout=button_count&size=small&mobile_iframe=true&appId=1383467145023614&width=90&height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+        </div>
+    </div>
+</div><div class="col-md-4 col-xs-12">
+  <div class="sidebar-content related-post">
+    <h3>最新の記事</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><a href="/entry/2026/04/30/tekton-pipelines-as-code/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'TektonのPipelines as Code（PAC）で何が便利になるのかを整理する'});">TektonのPipelines as Code（PAC）で何が便利になるのかを整理する</a></li>
+      <li class="list-group-item"><a href="/entry/2026/04/24/devspaces-extensions-management/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OpenShift Dev SpacesでVS Code Extensionの標準化・管理する方法を整理する'});">OpenShift Dev SpacesでVS Code Extensionの標準化・管理する方法を整理する</a></li>
+      <li class="list-group-item"><a href="/entry/2026/04/21/review-architecture-modernization/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「アーキテクチャモダナイゼーション」書評 ── 点と点をつなぐ、血となり肉となる600ページ'});">「アーキテクチャモダナイゼーション」書評 ── 点と点をつなぐ、血となり肉となる600ページ</a></li>
+      <li class="list-group-item"><a href="/entry/2026/03/30/review-practical-claude-code/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': '「実践Claude Code入門」書評 ── AIエディタ時代に必要なスペック駆動開発とコンテキストエンジニアリングを学ぶ'});">「実践Claude Code入門」書評 ── AIエディタ時代に必要なスペック駆動開発とコンテキストエンジニアリングを学ぶ</a></li>
+      <li class="list-group-item"><a href="/entry/2026/03/09/openshift-on-oci/" onClick="gtag('event', 'link', {'event_category': 'recent-posts','event_label': 'OCI (Oracle Cloud Infrastructure) 上にOpenShift 4.21 を構築してみた備忘録'});">OCI (Oracle Cloud Infrastructure) 上にOpenShift 4.21 を構築してみた備忘録</a></li>
+      </ul>
+  </div>
+  <div class="sidebar-content campaign-ad">
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+  <div class="sidebar-content openshift-ad">
+    
+    <div class="openshift-tettei-nyumon">
+      <p>「OpenShift徹底入門」執筆しました！</p>
+      <a href="https://amzn.to/325lCFr" target="_blank" onclick="gtag('event', 'link', {'event_category': 'sidebar_ad','event_label': 'OpenShift徹底入門'});"><img src="/image/openshift-tettei-nyumon.jpg" class="img-fluid" alt="Responsive image" style="max-width: 200px;"></a>
+    </div>
+    
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>カテゴリー</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/categories/agile" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'agile'});">agile (1)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/ai" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ai'});">ai (3)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/alibaba%20cloud" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'alibaba cloud'});">alibaba cloud (16)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/aws" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'aws'});">aws (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/devops" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'devops'});">devops (37)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/kubernetes" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'kubernetes'});">kubernetes (66)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/life" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'life'});">life (1)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/management" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'management'});">management (2)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/openshift" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'openshift'});">openshift (21)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/oracle%20cloud%20infrastructure" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'oracle cloud infrastructure'});">oracle cloud infrastructure (1)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a2%e3%83%97%e3%83%aa%e3%82%b1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e9%96%8b%e7%99%ba" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'アプリケーション開発'});">アプリケーション開発 (22)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%99%e3%83%b3%e3%83%88" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'イベント'});">イベント (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%a4%e3%83%b3%e3%83%95%e3%83%a9%e6%a7%8b%e7%af%89" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'インフラ構築'});">インフラ構築 (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%ad%e3%83%a3%e3%83%aa%e3%82%a2" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'キャリア'});">キャリア (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'クラウド技術'});">クラウド技術 (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'コンテナ'});">コンテナ (8)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%82%b5%e3%83%bc%e3%83%90%e6%8a%80%e8%a1%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'サーバ技術'});">サーバ技術 (5)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e3%83%96%e3%83%ad%e3%82%b0%e9%81%8b%e7%94%a8" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': 'ブログ運用'});">ブログ運用 (11)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/categories/%e8%b3%87%e6%a0%bc%e8%a9%a6%e9%a8%93" onClick="gtag('event', 'link', {'event_category': 'categories','event_label': '資格試験'});">資格試験 (9)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content related-post">
+    <h3>アーカイブ</h3>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="/archive/2014" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2014'});">2014 Archive (14)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2015" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2015'});">2015 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2016" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2016'});">2016 Archive (12)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2017" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2017'});">2017 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2018" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2018'});">2018 Archive (17)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2019" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2019'});">2019 Archive (20)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2020" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2020'});">2020 Archive (26)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2021" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2021'});">2021 Archive (41)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2022" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2022'});">2022 Archive (19)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2023" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2023'});">2023 Archive (1)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2024" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2024'});">2024 Archive (1)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2025" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2025'});">2025 Archive (4)</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/archive/2026" onClick="gtag('event', 'link', {'event_category': 'archives','event_label': '2026'});">2026 Archive (6)</a>
+      </li>
+      </ul>
+  </div>
+  <div class="sidebar-content custom-search">
+    <h3>サイト内検索</h3>
+    <div class="gcse-search"></div>
+  </div>
+
+  <div class="fixed-contents position-sticky">
+    
+    
+    <div class="sidebar-content related-post">
+      <h3>関連する記事</h3>
+      <ul class="list-group">
+        
+        <li class="list-group-item"><a href="/entry/2020/07/05/customized-jenkins-on-openshift/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'カスタマイズしたJenkinsを作成する方法 on OpenShift'});">カスタマイズしたJenkinsを作成する方法 on OpenShift</a> (2020/07/05)</li>
+        
+        <li class="list-group-item"><a href="/entry/2020/04/28/kubernetes-image-puller/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'イメージのプルの効率化を考える。kubernetes-image-puller の紹介'});">イメージのプルの効率化を考える。kubernetes-image-puller の紹介</a> (2020/04/28)</li>
+        
+        <li class="list-group-item"><a href="/entry/2020/04/14/jenkins-pipeline-for-multi-cluster/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'Jenkins pipelineで複数のOpenShiftクラスタを扱う'});">Jenkins pipelineで複数のOpenShiftクラスタを扱う</a> (2020/04/14)</li>
+        
+        <li class="list-group-item"><a href="/entry/2026/04/24/devspaces-extensions-management/" onClick="gtag('event', 'link', {'event_category': 'related-posts','event_label': 'OpenShift Dev SpacesでVS Code Extensionの標準化・管理する方法を整理する'});">OpenShift Dev SpacesでVS Code Extensionの標準化・管理する方法を整理する</a> (2026/04/24)</li>
+        
+      </ul>
+    </div>
+    
+
+    
+    <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-2753210161325997"
+    data-ad-slot="4759840302"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+</div>
+
+                </div>
+            </div>
+        </main><footer class="container">
+  <p class="float-right"><a href="#" class="btn btn-secondary">Back to top</a></p>
+  <p>&copy; 2020 <strong>mosuke5</strong> All rights reserved.<br />Powered by hugo</p>
+</footer>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-99596316-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-99596316-1');
+</script>
+ 
+        <script async src="https://cse.google.com/cse.js?cx=012458736543810277235:x4juxtghjhg"></script>
+
+        
+        
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2753210161325997",
+            enable_page_level_ads: true
+          });
+        </script>
+        
+    </body>
+</html>
